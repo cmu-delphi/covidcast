@@ -1,0 +1,82 @@
+---
+title: "Basic Correlation Analysis for COVID-19 Indicators"
+author: "Delphi Group"
+date: "April 24, 2020"
+---
+
+Getting data from the Epidata API
+===
+
+```{r}
+# This is where the basic R functionality lives
+source("https://raw.githubusercontent.com/cmu-delphi/delphi-epidata/master/src/client/delphi_epidata.R")
+
+# Pull the following sources and signals
+sources = c("doctor-visits", "fb-survey", "google-survey", "ght", "quidel", "jhu-cases")
+signals = c("smoothed_cli", "smoothed_cli", "smoothed_cli", "smoothed_search", "smoothed_tests_per_device", "jhu_confirmed_incidence")
+N = length(sources)
+dates = Epidata$range("20200406", "20200425") # Format is YYYYMMDD
+
+# Go fetch the desired signals from the API
+signal_dfs = vector(mode="list", length=N)
+for (i in 1:N) {
+  cat(sprintf("(%i of %i) Fetching %s : %s ...\n", i, N, sources[i], signals[i]))
+  res_county = Epidata$covidcast(sources[i], signals[i], "day", "county", dates, "*")
+  res_msa = Epidata$covidcast(sources[i], signals[i], "day", "msa", dates, "*")
+
+  # Lump together, change all NULL values to NA, reformat to a matrix
+  dat = c(res_county$epidata, res_msa$epidata)
+  dat = lapply(dat, function(x) lapply(x, function(v) ifelse (is.null(v), NA, v)))
+  signal_dfs[[i]] = as.data.frame(matrix(as.numeric(unlist(dat)), nrow=length(dat), byrow=TRUE))
+  signal_dfs[[i]] = cbind(signal_dfs[[i]], c(rep(TRUE, length(res_county$epidata)), rep(FALSE, length(res_msa$epidata))))
+  colnames(signal_dfs[[i]]) = c(names(dat[[1]]), "is_county")
+}
+```
+
+Compute rank correlations, county level
+===
+
+```{r}
+# Get county population estimates 
+county_pops = read.csv("https://raw.githubusercontent.com/JieYingWu/COVID-19_US_County-level_Summaries/master/data/counties.csv")[,c("FIPS","POP_ESTIMATE_2018")]
+
+# Minimum population to consider for a county
+min_pop = 500000 
+
+# Compute pairwise rank correlations
+library(dplyr)
+cor_county = matrix(NA, N, N)
+colnames(cor_county) = rownames(cor_county) = sources
+
+for (i in 1:N) {
+  for (j in 1:N) {
+    # Only compute lower triangular part
+    if (j >= i) next
+    
+    # Average over weeks within each county
+    x = signal_dfs[[i]] %>% 
+      filter(is_county) %>%
+      group_by(geo_value) %>%
+      summarize(value = mean(value, na.rm=TRUE))
+    y = signal_dfs[[j]] %>% 
+      filter(is_county) %>%
+      group_by(geo_value) %>%
+      summarize(value = mean(value, na.rm=TRUE))
+    
+    # Join by county ID 
+    z = inner_join(x, y, by="geo_value")
+    
+    # Filter out low population counties
+    z = inner_join(z, county_pops, by=c("geo_value" = "FIPS")) %>%
+      filter(POP_ESTIMATE_2018 >= min_pop)
+    
+    # Compute rank correlation
+    cor_county[i,j] = cor(z$value.x, z$value.y, method="spearman")
+  }
+}
+
+# Get rid of signals with no county data
+inds = which(rowSums(!is.na(cor_county)) > 0 | colSums(!is.na(cor_county)) > 0)
+cor_county = cor_county[inds, inds]
+cor_county
+```

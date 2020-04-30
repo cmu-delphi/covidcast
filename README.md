@@ -1,2 +1,2 @@
 # covidcast
-Public-facing documents and tools supporting our COVIDcast effort
+Public-facing documents and tools supporting Delphi's COVIDcast effort.

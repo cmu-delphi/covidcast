@@ -199,14 +199,14 @@ for (i in inds_msa) {
 }
 ```
 
-Correlations to 1-week-ahead JHU deaths
+Correlations to 2-week-ahead JHU deaths
 ===
 
-Same as in the last section, but now computing rank correlations against daily incident deaths averaged over the *next* week (relative to the week we consider for our indicators).
+Same as in the last section, but now computing rank correlations against daily incident deaths averaged over the *next-next* week (relative to the week we consider for our indicators).
 
 ```{r}
-# Fetch 1-week-ahead JHU cases
-dates_ahead = Epidata$range("20200418", "20200424") # Format is YYYYMMDD
+# Fetch 2-week-ahead JHU deaths
+dates_ahead = Epidata$range("20200425", "20200501") # Format is YYYYMMDD
 deaths_ahead = get_data("jhu-cases", "deaths_incidence", dates_ahead)
 par(mfrow=c(1, N_county), mar=c(4.5, 4.5, 5.5, 0.5))
 

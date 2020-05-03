@@ -418,7 +418,7 @@ cases = get_data(&quot;jhu-cases&quot;, &quot;confirmed_incidence&quot;, dates)<
 <li>Find the commonly available counties between <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, and call the restrictions of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> to this common set <span class="math inline">\(\tilde{x}\)</span> and <span class="math inline">\(\tilde{y}\)</span>.</li>
 <li>Compute the Spearman or rank correlation between <span class="math inline">\(\tilde{x}\)</span> and <span class="math inline">\(\tilde{y}\)</span> (the usual Pearson correlation between <span class="math inline">\(\mathrm{rank}(\tilde{x})\)</span> and <span class="math inline">\(\mathrm{rank}(\tilde{y})\)</span>, the vectors of ranks of <span class="math inline">\(\tilde{x}\)</span> and <span class="math inline">\(\tilde{y}\)</span>).</li>
 </ol>
-<p>To elaborate, in Step 4 we’re actually going to compute the rank correlation for each <em>population sweep cut</em> of <span class="math inline">\(\tilde{x}\)</span> and <span class="math inline">\(\tilde{y}\)</span>.</p>
+<p>To elaborate, in Step 4 we’re actually going to compute the rank correlation for a <em>population sweep cut</em> of <span class="math inline">\(\tilde{x}\)</span> and <span class="math inline">\(\tilde{y}\)</span>.</p>
 <ul>
 <li>A population cut of <span class="math inline">\(\tilde{x}\)</span> and <span class="math inline">\(\tilde{y}\)</span> means that we will further subset these vectors to only consider counties that have population at least <span class="math inline">\(p\)</span>.<br />
 </li>

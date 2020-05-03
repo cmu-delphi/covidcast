@@ -1,17 +1,17 @@
 ---
-title: "Basic Correlation Analysis for COVID-19 Indicators"
+title: "Basic Correlation Analyses for COVID-19 Indicators"
 author: "Delphi Group"
 date: "April 30, 2020"
 ---
-
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(fig.width=10, fig.height=4)
 ```
 
-
 Getting data from the Epidata API
 ===
+
+First we're going to fetch our indicators from the [covidcast endpoint](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html) of our [Epidata API](https://cmu-delphi.github.io/delphi-epidata/api/). 
 
 ```{r}
 # This is where the basic R functionality lives
@@ -49,6 +49,20 @@ cases = get_data("jhu-cases", "confirmed_incidence", dates)
 
 Compute rank correlations, county level
 ===
+
+Now for each one of our indicators, we're going to:  
+
+1. Average this indicator over a 1 week period, for each county in which this indicator is available, giving us a vector $y$.
+2. Average the daily incidence of COVID-19 cases (new cases per 100,000 people) as reported in the JHU CSSE COVID-19 GitHub over the same 1 week period, for each county in which this is available, giving us a vector $x$.
+3. Find the commonly available counties between $x$ and $y$, and call the restrictions of $x$ and $y$ to this common set $\tilde{x}$ and $\tilde{y}$.
+4. Compute the Spearman or rank correlation between $\tilde{x}$ and $\tilde{y}$ (the usual Pearson correlation between $\mathrm{rank}(\tilde{x})$ and $\mathrm{rank}(\tilde{y})$, the vectors of ranks of $\tilde{x}$ and $\tilde{y}$).  
+
+To elaborate, in Step 4 we're actually going to compute the rank correlation for each *population sweep cut* of $\tilde{x}$ and $\tilde{y}$.  
+
+- A population cut of $\tilde{x}$ and $\tilde{y}$ means that we will further subset these vectors to only consider counties that have population at least $p$.  
+- A population sweep cut means that we will consider all population cuts over all possible values of $p$.
+
+In the plots below, the horizontal axis shows the population threshold (on a log scale), the vertical axis shows the corresponding rank correlation. (The top horizontal axis below the plot title shows the number of counties that survived the population cut, and were used to compute the rank correlation.)
 
 ```{r}
 library(dplyr)
@@ -106,6 +120,8 @@ for (i in inds_county) {
 Compute rank correlations, MSA level
 ===
 
+Same as in the last section, but for metropolitan statistical areas or MSAs, instead of counties.
+
 ```{r}
 # Get MSA population estimates from 2019
 msa_pop = read.csv("https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.csv")
@@ -135,12 +151,14 @@ for (i in inds_msa) {
 }
 ```
 
-Correlations to 1.5 week-ahead JHU cases
+Correlations to 1-week-ahead JHU cases
 ===
 
+Same as in the last section, but now computing rank correlations against daily incident cases averaged over the *next* week (relative to the week we consider for our indicators).
+
 ```{r}
-# Fetch 1.5 week-ahead JHU cases
-dates_ahead = Epidata$range("20200418", "20200429") # Format is YYYYMMDD
+# Fetch 1-week-ahead JHU cases
+dates_ahead = Epidata$range("20200418", "20200424") # Format is YYYYMMDD
 cases_ahead = get_data("jhu-cases", "confirmed_incidence", dates_ahead)
 par(mfrow=c(1, N_county), mar=c(4.5, 4.5, 5.5, 0.5))
 
@@ -181,12 +199,14 @@ for (i in inds_msa) {
 }
 ```
 
-Correlations to 1.5 week-ahead JHU deaths
+Correlations to 1-week-ahead JHU deaths
 ===
 
+Same as in the last section, but now computing rank correlations against daily incident deaths averaged over the *next* week (relative to the week we consider for our indicators).
+
 ```{r}
-# Fetch 1.5 week-ahead JHU cases
-dates_ahead = Epidata$range("20200418", "20200429") # Format is YYYYMMDD
+# Fetch 1-week-ahead JHU cases
+dates_ahead = Epidata$range("20200418", "20200424") # Format is YYYYMMDD
 deaths_ahead = get_data("jhu-cases", "deaths_incidence", dates_ahead)
 par(mfrow=c(1, N_county), mar=c(4.5, 4.5, 5.5, 0.5))
 

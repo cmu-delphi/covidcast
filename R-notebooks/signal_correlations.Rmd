@@ -77,15 +77,15 @@ cor_plot = function(x, y, pop_df, min_obs = 100, main=NULL) {
     arrange(population)
     
   n = nrow(z); if (n < min_obs) { plot.new(); return() }
-  pop_vec = z$population[(min_obs+1):n]
-  cor_vec = rep(NA, n-min_obs)
-  for (i in 1:(n-min_obs)) {
+  pop_vec = z$population[min_obs:n]
+  cor_vec = rep(NA, n-min_obs+1)
+  for (i in 1:(n-min_obs+1)) {
     cor_vec[i] = cor(z$value.x[i:n], z$value.y[i:n], method="spearman")
   }
   
   plot(pop_vec, cor_vec, type="l", log="x", main=main,
        xlab="Population threshold", ylab="Rank correlation")
-  axis(3, at=pop_vec, labels=n:(min_obs+1), cex.axis=0.8)
+  axis(3, at=pop_vec, labels=n:min_obs, cex.axis=0.8)
   invisible(list(pop_vec=pop_vec, cor_vec=cor_vec))
 }
 

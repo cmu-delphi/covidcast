@@ -57,7 +57,7 @@ Now for each one of our indicators, we're going to:
 3. Find the commonly available counties between $x$ and $y$, and call the restrictions of $x$ and $y$ to this common set $\tilde{x}$ and $\tilde{y}$.
 4. Compute the Spearman or rank correlation between $\tilde{x}$ and $\tilde{y}$ (the usual Pearson correlation between $\mathrm{rank}(\tilde{x})$ and $\mathrm{rank}(\tilde{y})$, the vectors of ranks of $\tilde{x}$ and $\tilde{y}$).  
 
-To elaborate, in Step 4 we're actually going to compute the rank correlation for each *population sweep cut* of $\tilde{x}$ and $\tilde{y}$.  
+To elaborate, in Step 4 we're actually going to compute the rank correlation for a *population sweep cut* of $\tilde{x}$ and $\tilde{y}$.  
 
 - A population cut of $\tilde{x}$ and $\tilde{y}$ means that we will further subset these vectors to only consider counties that have population at least $p$.  
 - A population sweep cut means that we will consider all population cuts over all possible values of $p$.

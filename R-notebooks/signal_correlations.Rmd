@@ -37,9 +37,9 @@ get_data = function(sources, signals, dates) {
       dat = lapply(dat, function(x) lapply(x, function(v) ifelse (is.null(v), NA, v)))
       day_df = as.data.frame(matrix(as.numeric(unlist(dat)), nrow=length(dat), byrow=TRUE))
       day_dfs[[j]] = cbind(day_df, c(rep(TRUE, length(res_county$epidata)), rep(FALSE, length(res_msa$epidata))))
+      if (length(dat) > 0) colnames(day_dfs[[j]]) = c(names(dat[[1]]), "is_county")
     }
     signal_dfs[[i]] = do.call("rbind", day_dfs)
-    colnames(signal_dfs[[i]]) = c(names(dat[[1]]), "is_county")
   }
   if (N == 1) signal_dfs = signal_dfs[[1]] 
   return(signal_dfs)

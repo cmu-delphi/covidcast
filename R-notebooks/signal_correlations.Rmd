@@ -1,7 +1,7 @@
 ---
 title: "Basic Correlation Analyses for COVID-19 Indicators"
 author: "Delphi Group"
-date: "May 1, 2020"
+date: "May 20, 2020"
 ---
 
 ```{r, include=FALSE}

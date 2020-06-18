@@ -1,0 +1,2 @@
+# Deploy to central docs directory that's on GitHub Pages
+destination: ../../docs/covidcastR/

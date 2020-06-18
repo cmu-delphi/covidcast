@@ -6,7 +6,6 @@ Authors@R: as.person(c(
   "Jacob Bien <jbien@usc.edu> [aut]",
   "Logan Brooks <lcbrooks@andrew.cmu.edu> [aut]",
   "David Farrow <dfarrow0@gmail.com> [aut]",
-  "Addison Hu <addison@stat.cmu.edu> [aut]",
   "Pedrito Maynard-Zhang <pedritom@amazon.com> [aut]",
   "Alex Reinhart <areinhar@stat.cmu.edu> [aut,cre]"
   ))

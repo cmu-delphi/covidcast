@@ -137,7 +137,8 @@ argument. View <code><a href='../articles/covidcastR.html'>vignette("covidcastR"
   <span class='no'>signal</span>,
   <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>end_day</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"county"</span>, <span class='st'>"hrr"</span>, <span class='st'>"msa"</span>, <span class='st'>"dma"</span>, <span class='st'>"state"</span>)
+  <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"county"</span>, <span class='st'>"hrr"</span>, <span class='st'>"msa"</span>, <span class='st'>"dma"</span>, <span class='st'>"state"</span>),
+  <span class='kw'>geo_value</span> <span class='kw'>=</span> <span class='st'>"*"</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -156,8 +157,8 @@ for a list of available sources and signals.</p></td>
     <tr>
       <th>start_day</th>
       <td><p>Query data beginning on this date. Date object, or string in
-the form YYYYMMDD. If <code>start_day</code> is <code>NULL</code>, defaults to first day data
-is available for this signal.</p></td>
+the form YYYYMMDD. If <code>start_day</code> is <code>NULL</code>, defaults to first day data is
+available for this signal.</p></td>
     </tr>
     <tr>
       <th>end_day</th>
@@ -171,6 +172,11 @@ day data is available for this signal.</p></td>
 <code>"county"</code> or <code>"state"</code>. Available types are described in the COVIDcast
 signal documentation. Defaults to <code>"county"</code>.</p></td>
     </tr>
+    <tr>
+      <th>geo_value</th>
+      <td><p>Which geography to return. The default, <code><a href='https://rdrr.io/r/base/Arithmetic.html'>"*"</a></code>, fetches all
+geographies. To fetch a specific geography, specify its ID as a string.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -181,9 +187,9 @@ identifies the location, such as a state name or county FIPS code;
 <code>time_value</code> contains Date objects. <code>value</code> is the signal quantity
 requested and <code>stderr</code> its standard error if available. <code>sample_size</code>
 indicates the sample size available in that geography on that day; sample
-size may not be available. <code>direction</code> uses a local linear fit to
-estimate whether the signal in this region is currently increasing or
-decreasing. Consult the signal documentation for more details.</p>
+size may not be available. <code>direction</code> uses a local linear fit to estimate
+whether the signal in this region is currently increasing or decreasing.
+Consult the signal documentation for more details.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Downloading large amounts of data may be slow, so this function prints
@@ -205,6 +211,13 @@ messages for each day of data it downloads. To suppress these, use
 <span class='co'>## fetch all states on 2020-05-10, 2020-05-11, 2020-05-12</span>
 <span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='st'>"20200510"</span>,
                  <span class='kw'>end_day</span> <span class='kw'>=</span> <span class='st'>"20200512"</span>, <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='st'>"state"</span>)
+<span class='co'>## fetch all available data for just Pennsylvania</span>
+<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='st'>"state"</span>,
+                 <span class='kw'>geo_value</span> <span class='kw'>=</span> <span class='st'>"pa"</span>)
+<span class='co'>## fetch all available data in Pittsburgh metropolitan area (identified by</span>
+<span class='co'>## CBSA ID)</span>
+<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='st'>"msa"</span>,
+                 <span class='kw'>geo_value</span> <span class='kw'>=</span> <span class='st'>"38300"</span>)
 }</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

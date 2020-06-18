@@ -9,7 +9,8 @@ covidcast_signal(
   signal,
   start_day = NULL,
   end_day = NULL,
-  geo_type = c("county", "hrr", "msa", "dma", "state")
+  geo_type = c("county", "hrr", "msa", "dma", "state"),
+  geo_value = "*"
 )
 }
 \arguments{
@@ -20,8 +21,8 @@ for a list of available sources and signals.}
 \item{signal}{String identifying the signal from that source to query.}
 
 \item{start_day}{Query data beginning on this date. Date object, or string in
-the form YYYYMMDD. If \code{start_day} is \code{NULL}, defaults to first day data
-is available for this signal.}
+the form YYYYMMDD. If \code{start_day} is \code{NULL}, defaults to first day data is
+available for this signal.}
 
 \item{end_day}{Query data up to this date, inclusive. Date object or string
 in the form YYYYMMDD. If \code{end_day} is \code{NULL}, defaults to the most recent
@@ -30,6 +31,9 @@ day data is available for this signal.}
 \item{geo_type}{The geography type for which to request this data, such as
 \code{"county"} or \code{"state"}. Available types are described in the COVIDcast
 signal documentation. Defaults to \code{"county"}.}
+
+\item{geo_value}{Which geography to return. The default, \code{"*"}, fetches all
+geographies. To fetch a specific geography, specify its ID as a string.}
 }
 \value{
 Data frame with matching data. Contains \code{geo_value}, \code{time_value},
@@ -38,9 +42,9 @@ identifies the location, such as a state name or county FIPS code;
 \code{time_value} contains Date objects. \code{value} is the signal quantity
 requested and \code{stderr} its standard error if available. \code{sample_size}
 indicates the sample size available in that geography on that day; sample
-size may not be available. \code{direction} uses a local linear fit to
-estimate whether the signal in this region is currently increasing or
-decreasing. Consult the signal documentation for more details.
+size may not be available. \code{direction} uses a local linear fit to estimate
+whether the signal in this region is currently increasing or decreasing.
+Consult the signal documentation for more details.
 }
 \description{
 Obtains data for selected date ranges for all geographic regions of the
@@ -66,6 +70,13 @@ covidcast_signal("fb-survey", "raw_cli", start_day = "20200510",
 ## fetch all states on 2020-05-10, 2020-05-11, 2020-05-12
 covidcast_signal("fb-survey", "raw_cli", start_day = "20200510",
                  end_day = "20200512", geo_type = "state")
+## fetch all available data for just Pennsylvania
+covidcast_signal("fb-survey", "raw_cli", geo_type = "state",
+                 geo_value = "pa")
+## fetch all available data in Pittsburgh metropolitan area (identified by
+## CBSA ID)
+covidcast_signal("fb-survey", "raw_cli", geo_type = "msa",
+                 geo_value = "38300")
 }
 }
 \references{

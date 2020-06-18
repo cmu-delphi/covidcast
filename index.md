@@ -1,5 +1,4 @@
-# test
+# COVIDcast package documentation
 
-is this needed?
-
-[R](covidcastR/)
+* [covidcastR](covidcastR/) for R
+* [covidcast-py](covidcast-py/html/) for Python

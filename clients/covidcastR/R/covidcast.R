@@ -18,30 +18,32 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' ...))`.
 #'
 #' @param data_source String identifying the data source to query. See the
-#'     [signal
-#'     documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)
-#'     for a list of available sources and signals.
+#'   [signal
+#'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)
+#'   for a list of available sources and signals.
 #' @param signal String identifying the signal from that source to query.
 #' @param start_day Query data beginning on this date. Date object, or string in
-#'     the form YYYYMMDD. If `start_day` is `NULL`, defaults to first day data
-#'     is available for this signal.
+#'   the form YYYYMMDD. If `start_day` is `NULL`, defaults to first day data is
+#'   available for this signal.
 #' @param end_day Query data up to this date, inclusive. Date object or string
-#'     in the form YYYYMMDD. If `end_day` is `NULL`, defaults to the most recent
-#'     day data is available for this signal.
+#'   in the form YYYYMMDD. If `end_day` is `NULL`, defaults to the most recent
+#'   day data is available for this signal.
 #' @param geo_type The geography type for which to request this data, such as
-#'     `"county"` or `"state"`. Available types are described in the COVIDcast
-#'     signal documentation. Defaults to `"county"`.
+#'   `"county"` or `"state"`. Available types are described in the COVIDcast
+#'   signal documentation. Defaults to `"county"`.
+#' @param geo_value Which geography to return. The default, `"*"`, fetches all
+#'   geographies. To fetch a specific geography, specify its ID as a string.
 #' @return Data frame with matching data. Contains `geo_value`, `time_value`,
-#'     `direction`, `value`, `stderr`, and `sample_size` columns. `geo_value`
-#'     identifies the location, such as a state name or county FIPS code;
-#'     `time_value` contains Date objects. `value` is the signal quantity
-#'     requested and `stderr` its standard error if available. `sample_size`
-#'     indicates the sample size available in that geography on that day; sample
-#'     size may not be available. `direction` uses a local linear fit to
-#'     estimate whether the signal in this region is currently increasing or
-#'     decreasing. Consult the signal documentation for more details.
+#'   `direction`, `value`, `stderr`, and `sample_size` columns. `geo_value`
+#'   identifies the location, such as a state name or county FIPS code;
+#'   `time_value` contains Date objects. `value` is the signal quantity
+#'   requested and `stderr` its standard error if available. `sample_size`
+#'   indicates the sample size available in that geography on that day; sample
+#'   size may not be available. `direction` uses a local linear fit to estimate
+#'   whether the signal in this region is currently increasing or decreasing.
+#'   Consult the signal documentation for more details.
 #' @references COVIDcast API documentation:
-#'     \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html}
+#'   \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html}
 #'
 #' COVIDcast public map: \url{https://covidcast.cmu.edu/}
 #' @examples
@@ -54,12 +56,20 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' ## fetch all states on 2020-05-10, 2020-05-11, 2020-05-12
 #' covidcast_signal("fb-survey", "raw_cli", start_day = "20200510",
 #'                  end_day = "20200512", geo_type = "state")
+#' ## fetch all available data for just Pennsylvania
+#' covidcast_signal("fb-survey", "raw_cli", geo_type = "state",
+#'                  geo_value = "pa")
+#' ## fetch all available data in Pittsburgh metropolitan area (identified by
+#' ## CBSA ID)
+#' covidcast_signal("fb-survey", "raw_cli", geo_type = "msa",
+#'                  geo_value = "38300")
 #' }
 #' @export
 #' @importFrom dplyr %>%
 covidcast_signal <- function(data_source, signal,
                              start_day = NULL, end_day = NULL,
-                             geo_type = c("county", "hrr", "msa", "dma", "state")) {
+                             geo_type = c("county", "hrr", "msa", "dma", "state"),
+                             geo_value = "*") {
   geo_type <- match.arg(geo_type)
 
   if (is.null(start_day) | is.null(end_day)) {
@@ -114,8 +124,8 @@ covidcast_signal <- function(data_source, signal,
                           time_type = "day",
                           geo_type = geo_type,
                           time_values = day,
-                          geo_value = "*")
-    message(sprintf("..Day %s: %s, %s, num_entries = %s",
+                          geo_value = geo_value)
+    message(sprintf("Fetched day %s: %s, %s, num_entries = %s",
                     day,
                     dat[[i]]$result,
                     dat[[i]]$message,
@@ -180,7 +190,7 @@ covidcast_meta <- function() {
   if(!is.list(values) || ('from' %in% names(values) && 'to' %in% names(values))) {
     values <- list(values)
   }
-  return(paste(sapply(values, .listitem), collapse=','))
+  return(paste0(sapply(values, .listitem), collapse=','))
 }
 
 # Helper function to request and parse epidata

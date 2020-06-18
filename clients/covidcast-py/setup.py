@@ -22,6 +22,6 @@ setuptools.setup(
     install_requires=[
         'pandas',
         'requests',
-        'delphi-epidata>=0.0.5',
+        'delphi-epidata>=0.0.6',
     ],
 )

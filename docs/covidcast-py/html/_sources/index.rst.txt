@@ -26,6 +26,26 @@ all the data sources and signals available through this API.
    notified of package updates, new data sources, corrections, and other
    updates.
 
+Installation
+------------
+
+This package is available on PyPI as `covidcast
+<https://pypi.org/project/covidcast/>`_, and can be installed using ``pip`` or
+your favorite Python package manater:
+
+.. code-block:: sh
+
+   pip3 install covidcast
+
+The package requires `pandas <https://pandas.pydata.org/>`_ and `requests
+<https://requests.readthedocs.io/en/master/>`_; these should be installed
+automatically. It also uses the `delphi-epidata
+<https://pypi.org/project/delphi-epidata/>`_ package to access Delphi's Epidata
+API.
+
+Usage
+-----
+
 This package provides one key function to obtain any signal of interest as a
 Pandas data frame:
 

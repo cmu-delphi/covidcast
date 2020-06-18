@@ -8,7 +8,8 @@ import pandas as pd
 
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state"}
 
-def signal(data_source, signal, start_day = None, end_day = None, geo_type = "county"):
+def signal(data_source, signal, start_day = None, end_day = None,
+           geo_type = "county", geo_value = "*"):
     """Download a Pandas data frame for one signal.
 
     Obtains data for selected date ranges for all geographic regions of the
@@ -37,6 +38,9 @@ def signal(data_source, signal, start_day = None, end_day = None, geo_type = "co
     :param geo_type: The geography type for which to request this data, such as
       ``"county"`` or ``"state"``. Available types are described in the
       COVIDcast signal documentation. Defaults to ``"county"``.
+    :param geo_value: The geography to fetch data for. The default, ``"*"``,
+      fetches all geographies. To fetch a specific geography, specify its ID as
+      a string.
     :returns: A Pandas data frame with matching data. Contains ``geo_value``,
       ``time_value``, ``direction``, ``value``, ``stderr``, and ``sample_size``
       columns. ``geo_value`` identifies the location, such as a state name or
@@ -71,7 +75,7 @@ def signal(data_source, signal, start_day = None, end_day = None, geo_type = "co
 
         day_data = Epidata.covidcast(data_source, signal, time_type="day",
                                      geo_type=geo_type, time_values=day_str,
-                                     geo_value="*")
+                                     geo_value=geo_value)
 
         if day_data["message"] != "success":
             warnings.warn("Problem obtaining data on {day}: {message}".format(

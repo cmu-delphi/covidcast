@@ -64,7 +64,7 @@ API.</p>
 Pandas data frame:</p>
 <dl class="py function">
 <dt id="covidcast.signal">
-<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">signal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_source</span></em>, <em class="sig-param"><span class="n">signal</span></em>, <em class="sig-param"><span class="n">start_day</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">end_day</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">geo_type</span><span class="o">=</span><span class="default_value">'county'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.signal" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">signal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_source</span></em>, <em class="sig-param"><span class="n">signal</span></em>, <em class="sig-param"><span class="n">start_day</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">end_day</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">geo_type</span><span class="o">=</span><span class="default_value">'county'</span></em>, <em class="sig-param"><span class="n">geo_value</span><span class="o">=</span><span class="default_value">'*'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.signal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download a Pandas data frame for one signal.</p>
 <p>Obtains data for selected date ranges for all geographic regions of the
 United States. Available data sources and signals are documented in the
@@ -91,6 +91,9 @@ is available for this signal.</p></li>
 <li><p><strong>geo_type</strong> – The geography type for which to request this data, such as
 <code class="docutils literal notranslate"><span class="pre">&quot;county&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;state&quot;</span></code>. Available types are described in the
 COVIDcast signal documentation. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;county&quot;</span></code>.</p></li>
+<li><p><strong>geo_value</strong> – The geography to fetch data for. The default, <code class="docutils literal notranslate"><span class="pre">&quot;*&quot;</span></code>,
+fetches all geographies. To fetch a specific geography, specify its ID as
+a string.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

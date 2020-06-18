@@ -1,0 +1,10 @@
+# COVIDcast API client
+
+Provides Python access to the [COVIDcast
+API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html) published
+by the [Delphi group](https://delphi.cmu.edu/) at [Carnegie Mellon
+University](https://www.cmu.edu). This API provides daily access to a range of
+COVID-related signals Delphi collects from a variety of sources, including
+cases, deaths, symptom surveys, healthcare data, and other information.
+
+For full details, consult the package documentation.

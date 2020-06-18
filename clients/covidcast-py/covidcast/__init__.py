@@ -1,0 +1,1 @@
+from .covidcast import signal

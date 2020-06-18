@@ -84,3 +84,16 @@ example, we obtain ``smoothed_cli`` in each state for every day since
 3        0.0        az   11220.9587  0.061794 2020-05-01  0.566937
 4        0.0        ca   51870.1382  0.022803 2020-05-01  0.364908
 
+Using the ``geo_value`` argument, we can request data for a specific geography,
+such as the state of Pennsylvania for the month of May 2020:
+
+>>> pa_data = covidcast.signal("fb-survey", "smoothed_cli",
+...                            date(2020, 5, 1), date(2020, 5, 31),
+...                            geo_type="state", geo_value="pa")
+>>> pa_data.head()
+   direction geo_value  sample_size    stderr time_value     value
+0         -1        pa   31576.0165  0.030764 2020-05-01  0.400011
+0         -1        pa   31344.0168  0.030708 2020-05-02  0.394774
+0          0        pa   30620.0162  0.031173 2020-05-03  0.396340
+0         -1        pa   30419.0163  0.029836 2020-05-04  0.357501
+0          0        pa   29245.0172  0.030176 2020-05-05  0.354521

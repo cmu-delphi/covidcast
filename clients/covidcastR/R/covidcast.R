@@ -112,6 +112,11 @@ covidcast_signal <- function(data_source, signal,
       end_day <- as.Date(end_day, format = "%Y%m%d")
   }
 
+  if (start_day > end_day) {
+      stop("end_day must be on or after start_day, but start_day = '",
+           start_day, "' and end_day = '", end_day, "'")
+  }
+
   ndays <- as.numeric(end_day - start_day)
   dat <- list()
 

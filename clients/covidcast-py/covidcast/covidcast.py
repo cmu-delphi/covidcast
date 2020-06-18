@@ -28,24 +28,25 @@ def signal(data_source, signal, start_day = None, end_day = None, geo_type = "co
       ``"fb-survey"``.
     :param signal: String identifying the signal from that source to query,
       such as ``"smoothed_cli"``.
-    :param start_day: Query data beginning on this date. Provided as a date
-      object. If ``start_day`` is ``None``, defaults to the first day
-      data is available for this signal.
-    :param end_day: Query data up to this date, inclusive. Date object. If
-      ``end_day`` is ``None``, defaults to the most recent day data is available
-      for this signal.
+    :param start_day: Query data beginning on this date. Provided as a
+      ``datetime.date`` object. If ``start_day`` is ``None``, defaults to the
+      first day data is available for this signal.
+    :param end_day: Query data up to this date, inclusive. ``datetime.date``
+      object. If ``end_day`` is ``None``, defaults to the most recent day data
+      is available for this signal.
     :param geo_type: The geography type for which to request this data, such as
       ``"county"`` or ``"state"``. Available types are described in the
       COVIDcast signal documentation. Defaults to ``"county"``.
     :returns: A Pandas data frame with matching data. Contains ``geo_value``,
       ``time_value``, ``direction``, ``value``, ``stderr``, and ``sample_size``
       columns. ``geo_value`` identifies the location, such as a state name or
-      county FIPS code; ``time_value`` contains Date objects. ``value`` is the
-      signal quantity requested and ``stderr`` its standard error if available.
-      ``sample_size`` indicates the sample size available in that geography on
-      that day; sample size may not be available. ``direction`` uses a local
-      linear fit to estimate whether the signal in this region is currently
-      increasing or decreasing. Consult the signal documentation for more details.
+      county FIPS code; ``time_value`` contains pandas ``Timestamp`` objects.
+      ``value`` is the signal quantity requested and ``stderr`` its standard
+      error if available. ``sample_size`` indicates the sample size available in
+      that geography on that day; sample size may not be available.
+      ``direction`` uses a local linear fit to estimate whether the signal in
+      this region is currently increasing or decreasing. Consult the signal
+      documentation for more details.
 
     """
 

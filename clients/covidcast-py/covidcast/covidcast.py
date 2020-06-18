@@ -96,10 +96,15 @@ def signal(data_source, signal, start_day = None, end_day = None,
     return None
 
 def _signal_metadata(data_source, signal, geo_type):
-    meta = Epidata.covidcast_meta()["epidata"]
+    meta = Epidata.covidcast_meta()
+
+    if meta["result"] != 1:
+        ## Something failed in the API and we did not get real metadata
+        raise RuntimeError("Error when fetching metadata from the API",
+                           meta["message"])
 
     ## Find our signal
-    matches = [item for item in meta
+    matches = [item for item in meta["epidata"]
                if item["data_source"] == data_source and
                item["signal"] == signal and
                item["time_type"] == "day" and

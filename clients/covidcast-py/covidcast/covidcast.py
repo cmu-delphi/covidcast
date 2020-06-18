@@ -66,6 +66,12 @@ def signal(data_source, signal, start_day = None, end_day = None,
     end_day = datetime.strptime(str(signal_meta["max_time"]), "%Y%m%d").date() \
         if end_day is None else end_day
 
+    ## The YYYYMMDD format lets us use lexicographic ordering to test date order
+    if start_day > end_day:
+        raise ValueError("end_day must be on or after start_day, but "
+                         "start_day = '{start}', end_day = '{end}'".format(
+                             start=start_day, end=end_day))
+
     cur_day = start_day
 
     dfs = []

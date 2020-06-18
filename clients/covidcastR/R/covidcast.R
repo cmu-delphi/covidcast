@@ -87,6 +87,7 @@ covidcast_signal <- function(data_source, signal,
   if (is.null(start_day)) {
     start_day <- relevant_meta %>%
       dplyr::pull(min_time) %>%
+      as.character() %>%
       as.Date(format = "%Y%m%d")
   } else {
       start_day <- as.Date(start_day, format = "%Y%m%d")
@@ -95,6 +96,7 @@ covidcast_signal <- function(data_source, signal,
   if (is.null(end_day)) {
     end_day <- relevant_meta %>%
       dplyr::pull(max_time) %>%
+      as.character() %>%
       as.Date(format = "%Y%m%d")
   } else {
       end_day <- as.Date(end_day, format = "%Y%m%d")
@@ -126,7 +128,6 @@ covidcast_signal <- function(data_source, signal,
 
   df <- dat %>%
     purrr::map("epidata") %>% # just want $epidata part
-    unlist(recursive = FALSE) %>% # put all days into one big list
     purrr::map(purrr::compact) %>% # this removes the list elements that are NULL
     dplyr::bind_rows() # make this into a data frame
 
@@ -185,7 +186,12 @@ covidcast_meta <- function() {
 # Helper function to request and parse epidata
 .request <- function(params) {
   # API call
-  return(httr::content(httr::GET(COVIDCAST_BASE_URL, query=params), 'parsed'))
+  response <- httr::GET(COVIDCAST_BASE_URL, query=params)
+
+  httr::stop_for_status(response, task = "fetch data from API")
+
+  return(jsonlite::fromJSON(httr::content(response, as = "text",
+                                          encoding = "utf-8")))
 }
 
 # e.g. date_to_string(ymd("20200506")) gives "20200506"; this is the format

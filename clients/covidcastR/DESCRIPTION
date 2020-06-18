@@ -10,7 +10,7 @@ Authors@R: as.person(c(
   "Pedrito Maynard-Zhang <pedritom@amazon.com> [aut]",
   "Alex Reinhart <areinhar@stat.cmu.edu> [aut,cre]"
   ))
-URL: https://github.com/cmu-delphi/covidcast
+URL: https://cmu-delphi.github.io/covidcast/covidcastR/, https://github.com/cmu-delphi/covidcast
 BugReports: https://github.com/cmu-delphi/covidcast/issues
 Description: Client to download COVID-19 data from the Delphi group's public COVIDcast API.
 License: MIT + file LICENSE

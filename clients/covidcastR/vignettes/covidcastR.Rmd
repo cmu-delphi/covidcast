@@ -1,0 +1,60 @@
+---
+title: Getting started with covidcastR
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with covidcastR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This package exposes only one function: the `?covidcast_signal` function allows
+users to retrieve a data frame (tibble) of values from the [COVIDcast
+API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html). Using this
+function, you can fetch any data you may be interested in analyzing, then use
+other R packages to graph results, make maps, fit models, or join the data with
+data from other sources.
+
+## Installing
+
+This package is not on CRAN yet, so it can be installed using the
+[`devtools`](https://cran.r-project.org/package=devtools) package:
+
+```{r, eval=FALSE}
+devtools::install_github("cmu-delphi/covidcast", subdir = "clients/covidcastR")
+```
+
+## Example use
+
+For full usage information, see the function documentation at
+`help(covidcast_signal)`.
+
+To obtain smoothed estimates of COVID-like illness from our Facebook survey for
+every county in the United States between 2020-05-01 and 2020-05-07:
+
+```{r}
+library(covidcastR)
+
+suppressMessages(
+    covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
+                     end_day = "20200507")
+)
+```
+
+Notice the use of `?suppressMessages` to hide progress reporting from the
+function as it downloads the data; if you download particularly large amounts of
+data, you may prefer to allow the progress reporting so you know how long to
+wait.
+
+Note that `geo_value` is the FIPS code for each reported county; counties with
+insufficient sample size are not reported. The [API
+documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html)
+specifies how geographies are identified.
+
+To request estimates for states instead of counties:
+
+```{r}
+suppressMessages(
+    covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
+                     end_day = "20200507", geo_type = "state")
+)
+```

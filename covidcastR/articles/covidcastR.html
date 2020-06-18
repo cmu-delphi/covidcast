@@ -88,52 +88,98 @@
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span>(<span class="st">"cmu-delphi/covidcast"</span>, <span class="kw">ref</span> <span class="kw">=</span> <span class="st">"main"</span>,
                          <span class="kw">subdir</span> <span class="kw">=</span> <span class="st">"clients/covidcastR"</span>)</pre></body></html></div>
 </div>
-<div id="example-use" class="section level2">
+<div id="basic-examples" class="section level2">
 <h2 class="hasAnchor">
-<a href="#example-use" class="anchor"></a>Example use</h2>
+<a href="#basic-examples" class="anchor"></a>Basic examples</h2>
 <p>For full usage information, see the function documentation at <code><a href="../reference/covidcast_signal.html">help(covidcast_signal)</a></code>.</p>
 <p>To obtain smoothed estimates of COVID-like illness from our Facebook survey for every county in the United States between 2020-05-01 and 2020-05-07:</p>
 <div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">covidcastR</span>)
 
 <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
-    <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"fb-survey"</span>, <span class="st">"smoothed_cli"</span>, <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200501"</span>,
-                     <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200507"</span>)
-)</pre></body></html></div>
-<pre><code>## # A tibble: 7,080 x 6
-##    geo_value time_value direction value stderr sample_size
-##    &lt;chr&gt;     &lt;date&gt;         &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;       &lt;dbl&gt;
-##  1 01000     2020-05-01         0 0.823  0.126       1722.
-##  2 01001     2020-05-01         1 1.26   0.800        116.
-##  3 01003     2020-05-01         0 0.665  0.309        584.
-##  4 01015     2020-05-01         0 0.575  0.527        123.
-##  5 01031     2020-05-01        NA 0.408  0.347        115.
-##  6 01045     2020-05-01        NA 0.926  0.466        111.
-##  7 01051     2020-05-01         0 1.19   0.545        151.
-##  8 01069     2020-05-01         1 1.51   0.631        241.
-##  9 01071     2020-05-01         1 1.76   1.07         112.
-## 10 01073     2020-05-01         0 0.449  0.231        488.
-## # … with 7,070 more rows</code></pre>
+    <span class="no">cli</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"fb-survey"</span>, <span class="st">"smoothed_cli"</span>, <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200501"</span>,
+                            <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200507"</span>)
+)
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">cli</span>)</pre></body></html></div>
+<pre><code>##   geo_value time_value direction     value    stderr sample_size
+## 1     01000 2020-05-01         0 0.8230798 0.1255734   1722.4551
+## 2     01001 2020-05-01         1 1.2612613 0.8004444    115.8025
+## 3     01003 2020-05-01         0 0.6651292 0.3086796    584.3194
+## 4     01015 2020-05-01         0 0.5747126 0.5265904    122.5577
+## 5     01031 2020-05-01        NA 0.4081633 0.3474498    114.8318
+## 6     01045 2020-05-01        NA 0.9259259 0.4660393    110.6544</code></pre>
 <p>Notice the use of <code><a href="https://rdrr.io/r/base/message.html">?suppressMessages</a></code> to hide progress reporting from the function as it downloads the data; if you download particularly large amounts of data, you may prefer to allow the progress reporting so you know how long to wait.</p>
 <p>Note that <code>geo_value</code> is the FIPS code for each reported county; counties with insufficient sample size are not reported. The <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">API documentation</a> specifies how geographies are identified.</p>
 <p>To request estimates for states instead of counties:</p>
 <div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
-    <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"fb-survey"</span>, <span class="st">"smoothed_cli"</span>, <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200501"</span>,
-                     <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200507"</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>)
-)</pre></body></html></div>
-<pre><code>## # A tibble: 357 x 6
-##    geo_value time_value direction value stderr sample_size
-##    &lt;chr&gt;     &lt;date&gt;         &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;       &lt;dbl&gt;
-##  1 ak        2020-05-01        -1 0.461 0.159        1606 
-##  2 al        2020-05-01         0 0.700 0.0826       7540.
-##  3 ar        2020-05-01        -1 0.760 0.104        4921.
-##  4 az        2020-05-01         0 0.567 0.0618      11221.
-##  5 ca        2020-05-01         0 0.365 0.0228      51870.
-##  6 co        2020-05-01        -1 0.646 0.0685      10106.
-##  7 ct        2020-05-01         0 0.511 0.0642       8786 
-##  8 dc        2020-05-01         1 0.542 0.261         685 
-##  9 de        2020-05-01         0 0.585 0.125        2645.
-## 10 fl        2020-05-01         0 0.500 0.0313      38074 
-## # … with 347 more rows</code></pre>
+    <span class="no">cli</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"fb-survey"</span>, <span class="st">"smoothed_cli"</span>, <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200501"</span>,
+                            <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200507"</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>)
+)
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">cli</span>)</pre></body></html></div>
+<pre><code>##   geo_value time_value direction     value    stderr sample_size
+## 1        ak 2020-05-01        -1 0.4607721 0.1588797    1606.000
+## 2        al 2020-05-01         0 0.6995113 0.0825528    7540.244
+## 3        ar 2020-05-01        -1 0.7597977 0.1036508    4921.483
+## 4        az 2020-05-01         0 0.5669367 0.0617943   11220.959
+## 5        ca 2020-05-01         0 0.3649080 0.0228033   51870.138
+## 6        co 2020-05-01        -1 0.6458274 0.0684669   10105.894</code></pre>
+<p>One can also select a specific geographic region by its ID. For example, this is the FIPS code for Allegheny County, Pennsylvania:</p>
+<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
+    <span class="no">cli</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"fb-survey"</span>, <span class="st">"smoothed_cli"</span>, <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200501"</span>,
+                            <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200507"</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"county"</span>,
+                            <span class="kw">geo_value</span> <span class="kw">=</span> <span class="st">"42003"</span>)
+)
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">cli</span>)</pre></body></html></div>
+<pre><code>##   geo_value time_value direction     value    stderr sample_size
+## 1     42003 2020-05-01         0 0.3988456 0.1046833    2635.136
+## 2     42003 2020-05-02         0 0.3802972 0.1069189    2589.751
+## 3     42003 2020-05-03        -1 0.3369257 0.1042580    2552.011
+## 4     42003 2020-05-04        -1 0.1358908 0.0638397    2568.443
+## 5     42003 2020-05-05        -1 0.1438140 0.0668755    2482.389
+## 6     42003 2020-05-06        -1 0.2489833 0.0887830    2530.457</code></pre>
+</div>
+<div id="mapping-the-data" class="section level2">
+<h2 class="hasAnchor">
+<a href="#mapping-the-data" class="anchor"></a>Mapping the data</h2>
+<p>The <a href="https://cran.r-project.org/package=usmap"><code>usmap</code> package</a> can map counties and states in the United States. In combination with <code>covidcastR</code>, one can easily make maps of values on a specific date.</p>
+<p>For example, on June 1, 2020, this is a map of the fraction of doctor’s visits in each state (as reported by our healthcare partners) that were due to COVID-like symptoms:</p>
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">usmap</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
+
+<span class="no">dv</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
+    <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"doctor-visits"</span>, <span class="st">"smoothed_adj_cli"</span>,
+                     <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200601"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200601"</span>,
+                     <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>)
+)
+
+<span class="co">## plot_usmap expects a "state" column</span>
+<span class="no">dv</span>$<span class="no">state</span> <span class="kw">&lt;-</span> <span class="no">dv</span>$<span class="no">geo_value</span>
+
+<span class="fu"><a href="https://rdrr.io/pkg/usmap/man/plot_usmap.html">plot_usmap</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">dv</span>, <span class="kw">values</span> <span class="kw">=</span> <span class="st">"value"</span>) +
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html">scale_fill_continuous</a></span>(<span class="kw">low</span> <span class="kw">=</span> <span class="st">"white"</span>, <span class="kw">high</span> <span class="kw">=</span> <span class="st">"red"</span>, <span class="kw">name</span> <span class="kw">=</span> <span class="st">"% of visits"</span>)</pre></body></html></div>
+<pre><code>## Warning: Use of `map_df$x` is discouraged. Use `x` instead.</code></pre>
+<pre><code>## Warning: Use of `map_df$y` is discouraged. Use `y` instead.</code></pre>
+<pre><code>## Warning: Use of `map_df$group` is discouraged. Use `group` instead.</code></pre>
+<p><img src="covidcastR_files/figure-html/us_dv_map-1.png" width="700"></p>
+<p>(The warning messages appear to be an internal issue with the <code>usmap</code> package.)</p>
+<p>It should also be possible to use the data with any other mapping packages you prefer, as long as they can easily identify states, counties, MSAs, or the other regions reported in the API according to the IDs reported in the API.</p>
+</div>
+<div id="graphing-the-data" class="section level2">
+<h2 class="hasAnchor">
+<a href="#graphing-the-data" class="anchor"></a>Graphing the data</h2>
+<p>Using <a href="https://ggplot2.tidyverse.org/"><code>ggplot2</code></a> or your favorite plotting package, we can also easily plot time series from specific regions.</p>
+<p>For example, this plot shows the same value – the fraction of doctor’s visits due to COVID-like symptoms – for the state of New York from March 1 through June 1, 2020.</p>
+<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">ny</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
+    <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"doctor-visits"</span>, <span class="st">"smoothed_adj_cli"</span>,
+                     <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200301"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200601"</span>,
+                     <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>, <span class="kw">geo_value</span> <span class="kw">=</span> <span class="st">"ny"</span>)
+)
+
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">ny</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">time_value</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">value</span>)) +
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() +
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">"Date"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"% of doctor's visits due to CLI"</span>,
+         <span class="kw">title</span> <span class="kw">=</span> <span class="st">"New York state"</span>)</pre></body></html></div>
+<p><img src="covidcastR_files/figure-html/ny_time_series-1.png" width="700"></p>
+<p>This graph makes the peaks of the pandemic apparent; by loading other data sources from the API, such as cases and deaths, we could begin to conduct analyses comparing the time series against each other.</p>
 </div>
   </div>
 
@@ -148,7 +194,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Addison Hu, Pedrito Maynard-Zhang, Alex Reinhart.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Pedrito Maynard-Zhang, Alex Reinhart.</p>
 </div>
 
 <div class="pkgdown">

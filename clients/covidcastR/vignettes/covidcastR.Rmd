@@ -24,7 +24,7 @@ devtools::install_github("cmu-delphi/covidcast", ref = "main",
                          subdir = "clients/covidcastR")
 ```
 
-## Example use
+## Basic examples
 
 For full usage information, see the function documentation at
 `help(covidcast_signal)`.
@@ -36,9 +36,10 @@ every county in the United States between 2020-05-01 and 2020-05-07:
 library(covidcastR)
 
 suppressMessages(
-    covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
-                     end_day = "20200507")
+    cli <- covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
+                            end_day = "20200507")
 )
+head(cli)
 ```
 
 Notice the use of `?suppressMessages` to hide progress reporting from the
@@ -55,7 +56,79 @@ To request estimates for states instead of counties:
 
 ```{r}
 suppressMessages(
-    covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
-                     end_day = "20200507", geo_type = "state")
+    cli <- covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
+                            end_day = "20200507", geo_type = "state")
 )
+head(cli)
 ```
+
+One can also select a specific geographic region by its ID. For example, this is
+the FIPS code for Allegheny County, Pennsylvania:
+
+```{r}
+suppressMessages(
+    cli <- covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
+                            end_day = "20200507", geo_type = "county",
+                            geo_value = "42003")
+)
+head(cli)
+```
+
+## Mapping the data
+
+The [`usmap` package](https://cran.r-project.org/package=usmap) can map counties
+and states in the United States. In combination with `covidcastR`, one can
+easily make maps of values on a specific date.
+
+For example, on June 1, 2020, this is a map of the fraction of doctor's visits
+in each state (as reported by our healthcare partners) that were due to
+COVID-like symptoms:
+
+```{r us_dv_map}
+library(usmap)
+library(ggplot2)
+
+dv <- suppressMessages(
+    covidcast_signal("doctor-visits", "smoothed_adj_cli",
+                     start_day = "20200601", end_day = "20200601",
+                     geo_type = "state")
+)
+
+## plot_usmap expects a "state" column
+dv$state <- dv$geo_value
+
+plot_usmap(data = dv, values = "value") +
+    scale_fill_continuous(low = "white", high = "red", name = "% of visits")
+```
+
+(The warning messages appear to be an internal issue with the `usmap` package.)
+
+It should also be possible to use the data with any other mapping packages you
+prefer, as long as they can easily identify states, counties, MSAs, or the other
+regions reported in the API according to the IDs reported in the API.
+
+## Graphing the data
+
+Using [`ggplot2`](https://ggplot2.tidyverse.org/) or your favorite plotting
+package, we can also easily plot time series from specific regions.
+
+For example, this plot shows the same value -- the fraction of doctor's visits
+due to COVID-like symptoms -- for the state of New York from March 1 through
+June 1, 2020.
+
+```{r ny_time_series}
+ny <- suppressMessages(
+    covidcast_signal("doctor-visits", "smoothed_adj_cli",
+                     start_day = "20200301", end_day = "20200601",
+                     geo_type = "state", geo_value = "ny")
+)
+
+ggplot(ny, aes(x = time_value, y = value)) +
+    geom_line() +
+    labs(x = "Date", y = "% of doctor's visits due to CLI",
+         title = "New York state")
+```
+
+This graph makes the peaks of the pandemic apparent; by loading other data
+sources from the API, such as cases and deaths, we could begin to conduct
+analyses comparing the time series against each other.

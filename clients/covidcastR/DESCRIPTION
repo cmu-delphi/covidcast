@@ -1,0 +1,28 @@
+Package: covidcastR
+Type: Package
+Title: Client for Delphi's COVIDcast API
+Version: 0.1.0
+Authors@R: as.person(c(
+  "Jacob Bien <jbien@usc.edu> [aut]",
+  "Logan Brooks <lcbrooks@andrew.cmu.edu> [aut]",
+  "David Farrow <dfarrow0@gmail.com> [aut]",
+  "Addison Hu <addison@stat.cmu.edu> [aut]",
+  "Pedrito Maynard-Zhang <pedritom@amazon.com> [aut]",
+  "Alex Reinhart <areinhar@stat.cmu.edu> [aut,cre]"
+  ))
+URL: https://github.com/cmu-delphi/covidcastR
+BugReports: https://github.com/cmu-delphi/covidcastR/issues
+Description: Client to download COVID-19 data from the Delphi group's public COVIDcast API.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+Imports:
+  dplyr,
+  httr,
+  purrr
+RoxygenNote: 7.1.0
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

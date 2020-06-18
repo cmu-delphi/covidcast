@@ -1,2 +1,10 @@
 # Deploy to central docs directory that's on GitHub Pages
 destination: ../../docs/covidcastR/
+
+home:
+  links:
+    - text: covidcast-py
+      href: https://cmu-delphi.github.io/covidcast/covidcast-py/html/
+
+    - text: COVIDcast
+      href: https://covidcast.cmu.edu/

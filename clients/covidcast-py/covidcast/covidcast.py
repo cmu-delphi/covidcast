@@ -1,15 +1,15 @@
 
-from delphi_epidata import Epidata
-
 import warnings
 from datetime import timedelta, datetime
+
+from delphi_epidata import Epidata
 
 import pandas as pd
 
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state"}
 
-def signal(data_source, signal, start_day = None, end_day = None,
-           geo_type = "county", geo_value = "*"):
+def signal(data_source, signal, start_day=None, end_day=None,
+           geo_type="county", geo_value="*"):
     """Download a Pandas data frame for one signal.
 
     Obtains data for selected date ranges for all geographic regions of the
@@ -117,7 +117,12 @@ def _signal_metadata(data_source, signal, geo_type):
                item["geo_type"] == geo_type]
 
     if len(matches) == 0:
-        raise ValueError("Unable to find metadata for source '{source}', signal '{signal}', at '{geo_type}' resolution.".format(source=data_source, signal=signal, geo_type=geo_type))
+        raise ValueError("Unable to find metadata for source '{source}', "
+                         "signal '{signal}', at '{geo_type}' "
+                         "resolution.".format(
+                             source=data_source,
+                             signal=signal,
+                             geo_type=geo_type))
 
     assert len(matches) == 1, "it should be impossible to have two identical signals"
 

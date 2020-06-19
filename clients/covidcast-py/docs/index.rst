@@ -26,6 +26,16 @@ all the data sources and signals available through this API.
    notified of package updates, new data sources, corrections, and other
    updates.
 
+.. warning :: If you use data from the COVIDcast API to power a product,
+   dashboard, app, or other service, please download the data you need and store
+   it centrally rather than making API requests for every user. Our server
+   resources are limited and cannot support high-volume interactive use.
+
+   See also the `COVIDcast Terms of Use
+   <https://covidcast.cmu.edu/terms-of-use.html>`_, noting that the data is a
+   research product and not warranted for a particular purpose.
+
+
 Installation
 ------------
 

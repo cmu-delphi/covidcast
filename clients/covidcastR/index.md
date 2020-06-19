@@ -19,6 +19,15 @@ list](https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api)** to
 be notified of package updates, new data sources, corrections, and other
 updates.
 
-To get started using this package, view the Getting Started guide at
+**Warning:** If you use data from the COVIDcast API to power a product,
+dashboard, app, or other service, please download the data you need and store it
+centrally rather than making API requests for every user. Our server resources
+are limited and cannot support high-volume interactive use.
+
+See also the [COVIDcast Terms of
+Use](https://covidcast.cmu.edu/terms-of-use.html), noting that the data is a
+research product and not warranted for a particular purpose.
+
+**To get started** using this package, view the Getting Started guide at
 `vignette("covidcastR")` and consult the documentation for the main function,
 `?covidcast_signal`.

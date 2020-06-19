@@ -11,7 +11,7 @@ setuptools.setup(
     description="Access COVID-19 data through the Delphi COVIDcast API",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/cmu-delphi/covidcast-py",
+    url="https://cmu-delphi.github.io/covidcast/covidcast-py/html/",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

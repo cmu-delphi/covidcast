@@ -31,7 +31,7 @@ Installation
 
 This package is available on PyPI as `covidcast
 <https://pypi.org/project/covidcast/>`_, and can be installed using ``pip`` or
-your favorite Python package manater:
+your favorite Python package manager:
 
 .. code-block:: sh
 

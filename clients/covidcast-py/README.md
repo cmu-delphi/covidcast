@@ -7,4 +7,5 @@ University](https://www.cmu.edu). This API provides daily access to a range of
 COVID-related signals Delphi collects from a variety of sources, including
 cases, deaths, symptom surveys, healthcare data, and other information.
 
-For full details, consult the package documentation.
+For installation instructions, documentation, and examples, consult the [package
+documentation](https://cmu-delphi.github.io/covidcast/covidcast-py/html/).

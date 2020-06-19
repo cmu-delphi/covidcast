@@ -30,4 +30,5 @@ devtools::install_github("cmu-delphi/covidcast", subdir = "clients/covidcastR")
 
 ## Documentation
 
-TODO Link to the generated docs site
+The package documentation and examples are [available
+online](https://cmu-delphi.github.io/covidcast/covidcastR/index.html).

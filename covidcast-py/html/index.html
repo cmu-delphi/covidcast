@@ -47,10 +47,19 @@ all the data sources and signals available through this API.</p>
 notified of package updates, new data sources, corrections, and other
 updates.</p>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If you use data from the COVIDcast API to power a product,
+dashboard, app, or other service, please download the data you need and store
+it centrally rather than making API requests for every user. Our server
+resources are limited and cannot support high-volume interactive use.</p>
+<p>See also the <a class="reference external" href="https://covidcast.cmu.edu/terms-of-use.html">COVIDcast Terms of Use</a>, noting that the data is a
+research product and not warranted for a particular purpose.</p>
+</div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>This package is available on PyPI as <a class="reference external" href="https://pypi.org/project/covidcast/">covidcast</a>, and can be installed using <code class="docutils literal notranslate"><span class="pre">pip</span></code> or
-your favorite Python package manater:</p>
+your favorite Python package manager:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip3 install covidcast
 </pre></div>
 </div>
@@ -142,6 +151,20 @@ example, we obtain <code class="docutils literal notranslate"><span class="pre">
 <span class="go">2       -1.0        ar    4921.4827  0.103651 2020-05-01  0.759798</span>
 <span class="go">3        0.0        az   11220.9587  0.061794 2020-05-01  0.566937</span>
 <span class="go">4        0.0        ca   51870.1382  0.022803 2020-05-01  0.364908</span>
+</pre></div>
+</div>
+<p>Using the <code class="docutils literal notranslate"><span class="pre">geo_value</span></code> argument, we can request data for a specific geography,
+such as the state of Pennsylvania for the month of May 2020:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pa_data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span> <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                           <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
+<span class="gp">... </span>                           <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">geo_value</span><span class="o">=</span><span class="s2">&quot;pa&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pa_data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="go">   direction geo_value  sample_size    stderr time_value     value</span>
+<span class="go">0         -1        pa   31576.0165  0.030764 2020-05-01  0.400011</span>
+<span class="go">0         -1        pa   31344.0168  0.030708 2020-05-02  0.394774</span>
+<span class="go">0          0        pa   30620.0162  0.031173 2020-05-03  0.396340</span>
+<span class="go">0         -1        pa   30419.0163  0.029836 2020-05-04  0.357501</span>
+<span class="go">0          0        pa   29245.0172  0.030176 2020-05-05  0.354521</span>
 </pre></div>
 </div>
 </div>

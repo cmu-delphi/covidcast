@@ -3,8 +3,8 @@ destination: ../../docs/covidcastR/
 
 home:
   links:
-    - text: covidcast-py
+    - text: Get the Python client
       href: https://cmu-delphi.github.io/covidcast/covidcast-py/html/
 
-    - text: COVIDcast
+    - text: View the COVIDcast map
       href: https://covidcast.cmu.edu/

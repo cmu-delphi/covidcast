@@ -113,20 +113,20 @@ Using [`ggplot2`](https://ggplot2.tidyverse.org/) or your favorite plotting
 package, we can also easily plot time series from specific regions.
 
 For example, this plot shows the same value -- the fraction of doctor's visits
-due to COVID-like symptoms -- for the state of New York from March 1 through
-June 1, 2020.
+due to COVID-like symptoms -- for the states of New York and Pennsylvania from
+March 1 through June 1, 2020.
 
 ```{r ny_time_series}
 ny <- suppressMessages(
     covidcast_signal("doctor-visits", "smoothed_adj_cli",
                      start_day = "20200301", end_day = "20200601",
-                     geo_type = "state", geo_value = "ny")
+                     geo_type = "state", geo_values = c("pa", "ny"))
 )
 
-ggplot(ny, aes(x = time_value, y = value)) +
+ggplot(ny, aes(x = time_value, y = value, color = geo_value)) +
     geom_line() +
-    labs(x = "Date", y = "% of doctor's visits due to CLI",
-         title = "New York state")
+    labs(x = "Date", y = "% of visits due to CLI",
+         title = "Doctor's visits", color = "State")
 ```
 
 This graph makes the peaks of the pandemic apparent; by loading other data

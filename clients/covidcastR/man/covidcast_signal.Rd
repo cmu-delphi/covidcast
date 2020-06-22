@@ -10,7 +10,7 @@ covidcast_signal(
   start_day = NULL,
   end_day = NULL,
   geo_type = c("county", "hrr", "msa", "dma", "state"),
-  geo_value = "*"
+  geo_values = "*"
 )
 }
 \arguments{
@@ -32,8 +32,9 @@ day data is available for this signal.}
 \code{"county"} or \code{"state"}. Available types are described in the COVIDcast
 signal documentation. Defaults to \code{"county"}.}
 
-\item{geo_value}{Which geography to return. The default, \code{"*"}, fetches all
-geographies. To fetch a specific geography, specify its ID as a string.}
+\item{geo_values}{Which geographies to return. The default, \code{"*"}, fetches
+all geographies. To fetch specific geographies, specify their IDs as a
+vector or list of strings.}
 }
 \value{
 Data frame with matching data. Contains \code{geo_value}, \code{time_value},
@@ -70,13 +71,13 @@ covidcast_signal("fb-survey", "raw_cli", start_day = "20200510",
 ## fetch all states on 2020-05-10, 2020-05-11, 2020-05-12
 covidcast_signal("fb-survey", "raw_cli", start_day = "20200510",
                  end_day = "20200512", geo_type = "state")
-## fetch all available data for just Pennsylvania
+## fetch all available data for just Pennsylvania and New Jersey
 covidcast_signal("fb-survey", "raw_cli", geo_type = "state",
-                 geo_value = "pa")
+                 geo_values = c("pa", "nj"))
 ## fetch all available data in Pittsburgh metropolitan area (identified by
 ## CBSA ID)
 covidcast_signal("fb-survey", "raw_cli", geo_type = "msa",
-                 geo_value = "38300")
+                 geo_values = "38300")
 }
 }
 \references{

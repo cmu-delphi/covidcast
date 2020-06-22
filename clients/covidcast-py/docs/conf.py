@@ -54,3 +54,11 @@ html_theme = 'alabaster'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+html_theme_options = {
+    "extra_nav_links": {
+        "Delphi group": "https://delphi.cmu.edu/",
+        "COVIDcast maps": "https://covidcast.cmu.edu/",
+        "COVIDcast API": "https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html"
+    }
+}

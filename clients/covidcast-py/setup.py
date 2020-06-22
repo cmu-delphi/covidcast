@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="covidcast", # Replace with your own username
-    version="0.0.5",
+    version="0.0.6",
     author="Alex Reinhart",
     author_email="areinhar@stat.cmu.edu",
     description="Access COVID-19 data through the Delphi COVIDcast API",

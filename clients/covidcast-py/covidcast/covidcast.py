@@ -9,7 +9,7 @@ import pandas as pd
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state"}
 
 def signal(data_source, signal, start_day=None, end_day=None,
-           geo_type="county", geo_value="*"):
+           geo_type="county", geo_values="*"):
     """Download a Pandas data frame for one signal.
 
     Obtains data for selected date ranges for all geographic regions of the
@@ -38,9 +38,10 @@ def signal(data_source, signal, start_day=None, end_day=None,
     :param geo_type: The geography type for which to request this data, such as
       ``"county"`` or ``"state"``. Available types are described in the
       COVIDcast signal documentation. Defaults to ``"county"``.
-    :param geo_value: The geography to fetch data for. The default, ``"*"``,
-      fetches all geographies. To fetch a specific geography, specify its ID as
-      a string.
+    :param geo_values: The geographies to fetch data for. The default, ``"*"``,
+      fetches all geographies. To fetch one geography, specify its ID as a
+      string; multiple geographies can be provided as an iterable (list, tuple,
+      ...) of strings.
     :returns: A Pandas data frame with matching data. Contains ``geo_value``,
       ``time_value``, ``direction``, ``value``, ``stderr``, and ``sample_size``
       columns. ``geo_value`` identifies the location, such as a state name or
@@ -71,6 +72,38 @@ def signal(data_source, signal, start_day=None, end_day=None,
         raise ValueError("end_day must be on or after start_day, but "
                          "start_day = '{start}', end_day = '{end}'".format(
                              start=start_day, end=end_day))
+
+    if isinstance(geo_values, str):
+        ## User only provided one, not a list
+        geo_values = [geo_values]
+
+    dfs = [
+        _fetch_single_geo(
+            data_source, signal, start_day, end_day, geo_type, geo_value)
+        for geo_value in geo_values
+    ]
+
+    try:
+        # pd.concat automatically filters out None
+        out = pd.concat(dfs)
+    except ValueError:
+        ## pd.concat raises ValueError if all of the dfs are None, meaning we
+        ## found no data
+        return None
+
+    return out
+
+def _fetch_single_geo(data_source, signal, start_day, end_day, geo_type,
+                      geo_value):
+    """Fetch data for a single geo.
+
+    signal() wraps this to support fetching data over an iterable of
+    geographies, and stacks the resulting data frames.
+
+    If no data is found, return None, so signal() can easily filter out these
+    entries.
+
+    """
 
     cur_day = start_day
 

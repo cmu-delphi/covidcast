@@ -73,7 +73,7 @@
       <h1 data-toc-skip>Getting started with covidcastR</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cmu-delphi/covidcast/blob/master/vignettes/covidcastR.Rmd"><code>vignettes/covidcastR.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmu-delphi/covidcast/blob/master/../../vignettes/covidcastR.Rmd"><code>../../vignettes/covidcastR.Rmd</code></a></small>
       <div class="hidden name"><code>covidcastR.Rmd</code></div>
 
     </div>
@@ -167,17 +167,17 @@
 <h2 class="hasAnchor">
 <a href="#graphing-the-data" class="anchor"></a>Graphing the data</h2>
 <p>Using <a href="https://ggplot2.tidyverse.org/"><code>ggplot2</code></a> or your favorite plotting package, we can also easily plot time series from specific regions.</p>
-<p>For example, this plot shows the same value – the fraction of doctor’s visits due to COVID-like symptoms – for the state of New York from March 1 through June 1, 2020.</p>
+<p>For example, this plot shows the same value – the fraction of doctor’s visits due to COVID-like symptoms – for the states of New York and Pennsylvania from March 1 through June 1, 2020.</p>
 <div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">ny</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
     <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"doctor-visits"</span>, <span class="st">"smoothed_adj_cli"</span>,
                      <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200301"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200601"</span>,
-                     <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>, <span class="kw">geo_value</span> <span class="kw">=</span> <span class="st">"ny"</span>)
+                     <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>, <span class="kw">geo_values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"pa"</span>, <span class="st">"ny"</span>))
 )
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">ny</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">time_value</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">value</span>)) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">ny</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">time_value</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">value</span>, <span class="kw">color</span> <span class="kw">=</span> <span class="no">geo_value</span>)) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">"Date"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"% of doctor's visits due to CLI"</span>,
-         <span class="kw">title</span> <span class="kw">=</span> <span class="st">"New York state"</span>)</pre></body></html></div>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">"Date"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"% of visits due to CLI"</span>,
+         <span class="kw">title</span> <span class="kw">=</span> <span class="st">"Doctor's visits"</span>, <span class="kw">color</span> <span class="kw">=</span> <span class="st">"State"</span>)</pre></body></html></div>
 <p><img src="covidcastR_files/figure-html/ny_time_series-1.png" width="700"></p>
 <p>This graph makes the peaks of the pandemic apparent; by loading other data sources from the API, such as cases and deaths, we could begin to conduct analyses comparing the time series against each other.</p>
 </div>

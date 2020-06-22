@@ -31,8 +31,9 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' @param geo_type The geography type for which to request this data, such as
 #'   `"county"` or `"state"`. Available types are described in the COVIDcast
 #'   signal documentation. Defaults to `"county"`.
-#' @param geo_value Which geography to return. The default, `"*"`, fetches all
-#'   geographies. To fetch a specific geography, specify its ID as a string.
+#' @param geo_values Which geographies to return. The default, `"*"`, fetches
+#'   all geographies. To fetch specific geographies, specify their IDs as a
+#'   vector or list of strings.
 #' @return Data frame with matching data. Contains `geo_value`, `time_value`,
 #'   `direction`, `value`, `stderr`, and `sample_size` columns. `geo_value`
 #'   identifies the location, such as a state name or county FIPS code;
@@ -56,20 +57,20 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' ## fetch all states on 2020-05-10, 2020-05-11, 2020-05-12
 #' covidcast_signal("fb-survey", "raw_cli", start_day = "20200510",
 #'                  end_day = "20200512", geo_type = "state")
-#' ## fetch all available data for just Pennsylvania
+#' ## fetch all available data for just Pennsylvania and New Jersey
 #' covidcast_signal("fb-survey", "raw_cli", geo_type = "state",
-#'                  geo_value = "pa")
+#'                  geo_values = c("pa", "nj"))
 #' ## fetch all available data in Pittsburgh metropolitan area (identified by
 #' ## CBSA ID)
 #' covidcast_signal("fb-survey", "raw_cli", geo_type = "msa",
-#'                  geo_value = "38300")
+#'                  geo_values = "38300")
 #' }
 #' @export
 #' @importFrom dplyr %>%
 covidcast_signal <- function(data_source, signal,
                              start_day = NULL, end_day = NULL,
                              geo_type = c("county", "hrr", "msa", "dma", "state"),
-                             geo_value = "*") {
+                             geo_values = "*") {
   geo_type <- match.arg(geo_type)
 
   if (is.null(start_day) | is.null(end_day)) {
@@ -117,6 +118,16 @@ covidcast_signal <- function(data_source, signal,
            start_day, "' and end_day = '", end_day, "'")
   }
 
+  df <- purrr::map_dfr(geo_values, function(geo_val) {
+      single_geo(data_source, signal, start_day, end_day, geo_type, geo_val)
+  })
+
+  return(df)
+}
+
+## Helper function, not user-facing, to fetch a single geo-value.
+## covidcast_signal can then loop over multiple geos to produce its result.
+single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_value) {
   ndays <- as.numeric(end_day - start_day)
   dat <- list()
 
@@ -134,10 +145,11 @@ covidcast_signal <- function(data_source, signal,
                     day,
                     dat[[i]]$result,
                     dat[[i]]$message,
-                    length(dat[[i]]$epidata)))
+                    nrow(dat[[i]]$epidata)))
 
     if (dat[[i]]$message != "success") {
-      warning("Failed to obtain data for ", day, ": ", dat[[i]]$message)
+      warning("Failed to obtain data for ", day,
+              " in geography '", geo_value, "': ", dat[[i]]$message)
     }
   }
 
@@ -155,13 +167,16 @@ covidcast_signal <- function(data_source, signal,
 }
 
 
-
 ## Fetch Delphi's COVID-19 Surveillance Streams
-covidcast <- function(data_source, signal, time_type, geo_type, time_values, geo_value) {
+covidcast <- function(data_source, signal, time_type, geo_type, time_values,
+                      geo_value) {
   # Check parameters
-  if(missing(data_source) || missing(signal) || missing(time_type) || missing(geo_type) || missing(time_values) || missing(geo_value)) {
-    stop('`data_source`, `signal`, `time_type`, `geo_type`, `time_values`, and `geo_value` are all required')
+  if(missing(data_source) || missing(signal) || missing(time_type) ||
+       missing(geo_type) || missing(time_values) || missing(geo_value)) {
+    stop('`data_source`, `signal`, `time_type`, `geo_type`, `time_values`, and ',
+         '`geo_value` are all required')
   }
+
   # Set up request
   params <- list(
     source = 'covidcast',

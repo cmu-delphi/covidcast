@@ -138,7 +138,7 @@ argument. View <code><a href='../articles/covidcastR.html'>vignette("covidcastR"
   <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>end_day</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"county"</span>, <span class='st'>"hrr"</span>, <span class='st'>"msa"</span>, <span class='st'>"dma"</span>, <span class='st'>"state"</span>),
-  <span class='kw'>geo_value</span> <span class='kw'>=</span> <span class='st'>"*"</span>
+  <span class='kw'>geo_values</span> <span class='kw'>=</span> <span class='st'>"*"</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -173,9 +173,10 @@ day data is available for this signal.</p></td>
 signal documentation. Defaults to <code>"county"</code>.</p></td>
     </tr>
     <tr>
-      <th>geo_value</th>
-      <td><p>Which geography to return. The default, <code><a href='https://rdrr.io/r/base/Arithmetic.html'>"*"</a></code>, fetches all
-geographies. To fetch a specific geography, specify its ID as a string.</p></td>
+      <th>geo_values</th>
+      <td><p>Which geographies to return. The default, <code><a href='https://rdrr.io/r/base/Arithmetic.html'>"*"</a></code>, fetches
+all geographies. To fetch specific geographies, specify their IDs as a
+vector or list of strings.</p></td>
     </tr>
     </table>
 
@@ -211,13 +212,13 @@ messages for each day of data it downloads. To suppress these, use
 <span class='co'>## fetch all states on 2020-05-10, 2020-05-11, 2020-05-12</span>
 <span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='st'>"20200510"</span>,
                  <span class='kw'>end_day</span> <span class='kw'>=</span> <span class='st'>"20200512"</span>, <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='st'>"state"</span>)
-<span class='co'>## fetch all available data for just Pennsylvania</span>
+<span class='co'>## fetch all available data for just Pennsylvania and New Jersey</span>
 <span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='st'>"state"</span>,
-                 <span class='kw'>geo_value</span> <span class='kw'>=</span> <span class='st'>"pa"</span>)
+                 <span class='kw'>geo_values</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pa"</span>, <span class='st'>"nj"</span>))
 <span class='co'>## fetch all available data in Pittsburgh metropolitan area (identified by</span>
 <span class='co'>## CBSA ID)</span>
 <span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='st'>"msa"</span>,
-                 <span class='kw'>geo_value</span> <span class='kw'>=</span> <span class='st'>"38300"</span>)
+                 <span class='kw'>geo_values</span> <span class='kw'>=</span> <span class='st'>"38300"</span>)
 }</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

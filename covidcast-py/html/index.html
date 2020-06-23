@@ -15,6 +15,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Fetching data" href="signals.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -41,6 +42,7 @@ cases, deaths, symptom surveys, healthcare data, and other information.</p>
 on the data included in the API, licensing, and how to cite this data in your
 work. The <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">signals documentation</a> lists
 all the data sources and signals available through this API.</p>
+<p>The package source code and bug tracker can be found <a class="reference external" href="https://github.com/cmu-delphi/covidcast">on GitHub</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><strong>You should consider subscribing</strong> to the <a class="reference external" href="https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api">API mailing list</a> to be
@@ -49,7 +51,7 @@ updates.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>If you use data from the COVIDcast API to power a product,
+<p>If you use data from the COVIDcast API to power a public product,
 dashboard, app, or other service, please download the data you need and store
 it centrally rather than making API requests for every user. Our server
 resources are limited and cannot support high-volume interactive use.</p>
@@ -60,112 +62,25 @@ research product and not warranted for a particular purpose.</p>
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>This package is available on PyPI as <a class="reference external" href="https://pypi.org/project/covidcast/">covidcast</a>, and can be installed using <code class="docutils literal notranslate"><span class="pre">pip</span></code> or
 your favorite Python package manager:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip3 install covidcast
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip install covidcast
 </pre></div>
 </div>
 <p>The package requires <a class="reference external" href="https://pandas.pydata.org/">pandas</a> and <a class="reference external" href="https://requests.readthedocs.io/en/master/">requests</a>; these should be installed
 automatically. It also uses the <a class="reference external" href="https://pypi.org/project/delphi-epidata/">delphi-epidata</a> package to access Delphi’s Epidata
 API.</p>
 </div>
-<div class="section" id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>This package provides one key function to obtain any signal of interest as a
-Pandas data frame:</p>
-<dl class="py function">
-<dt id="covidcast.signal">
-<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">signal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_source</span></em>, <em class="sig-param"><span class="n">signal</span></em>, <em class="sig-param"><span class="n">start_day</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">end_day</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">geo_type</span><span class="o">=</span><span class="default_value">'county'</span></em>, <em class="sig-param"><span class="n">geo_value</span><span class="o">=</span><span class="default_value">'*'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.signal" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download a Pandas data frame for one signal.</p>
-<p>Obtains data for selected date ranges for all geographic regions of the
-United States. Available data sources and signals are documented in the
-<a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">COVIDcast signal documentation</a>.
-Most (but not all) data sources are available at the county level, but the
-API can also return data aggregated to metropolitan statistical areas,
-hospital referral regions, or states, as desired, by using the <code class="docutils literal notranslate"><span class="pre">geo_type</span></code>
-argument.</p>
-<p>See the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API documentation</a> for more
-information on available geography types, signals, and data formats.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data_source</strong> – String identifying the data source to query, such as
-<code class="docutils literal notranslate"><span class="pre">&quot;fb-survey&quot;</span></code>.</p></li>
-<li><p><strong>signal</strong> – String identifying the signal from that source to query,
-such as <code class="docutils literal notranslate"><span class="pre">&quot;smoothed_cli&quot;</span></code>.</p></li>
-<li><p><strong>start_day</strong> – Query data beginning on this date. Provided as a
-<code class="docutils literal notranslate"><span class="pre">datetime.date</span></code> object. If <code class="docutils literal notranslate"><span class="pre">start_day</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to the
-first day data is available for this signal.</p></li>
-<li><p><strong>end_day</strong> – Query data up to this date, inclusive. <code class="docutils literal notranslate"><span class="pre">datetime.date</span></code>
-object. If <code class="docutils literal notranslate"><span class="pre">end_day</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to the most recent day data
-is available for this signal.</p></li>
-<li><p><strong>geo_type</strong> – The geography type for which to request this data, such as
-<code class="docutils literal notranslate"><span class="pre">&quot;county&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;state&quot;</span></code>. Available types are described in the
-COVIDcast signal documentation. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;county&quot;</span></code>.</p></li>
-<li><p><strong>geo_value</strong> – The geography to fetch data for. The default, <code class="docutils literal notranslate"><span class="pre">&quot;*&quot;</span></code>,
-fetches all geographies. To fetch a specific geography, specify its ID as
-a string.</p></li>
+<div class="section" id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="signals.html">Fetching data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Example usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#v0-0-6-june-22-2020">v0.0.6, June 22, 2020</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#v0-0-5-june-19-2020">v0.0.5, June 19, 2020</a></li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A Pandas data frame with matching data. Contains <code class="docutils literal notranslate"><span class="pre">geo_value</span></code>,
-<code class="docutils literal notranslate"><span class="pre">time_value</span></code>, <code class="docutils literal notranslate"><span class="pre">direction</span></code>, <code class="docutils literal notranslate"><span class="pre">value</span></code>, <code class="docutils literal notranslate"><span class="pre">stderr</span></code>, and <code class="docutils literal notranslate"><span class="pre">sample_size</span></code>
-columns. <code class="docutils literal notranslate"><span class="pre">geo_value</span></code> identifies the location, such as a state name or
-county FIPS code; <code class="docutils literal notranslate"><span class="pre">time_value</span></code> contains pandas <code class="docutils literal notranslate"><span class="pre">Timestamp</span></code> objects.
-<code class="docutils literal notranslate"><span class="pre">value</span></code> is the signal quantity requested and <code class="docutils literal notranslate"><span class="pre">stderr</span></code> its standard
-error if available. <code class="docutils literal notranslate"><span class="pre">sample_size</span></code> indicates the sample size available in
-that geography on that day; sample size may not be available.
-<code class="docutils literal notranslate"><span class="pre">direction</span></code> uses a local linear fit to estimate whether the signal in
-this region is currently increasing or decreasing. Consult the signal
-documentation for more details.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="section" id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<p>To obtain smoothed estimates of COVID-like illness from our Facebook survey for
-every county in the United Statees between 2020-05-01 and 2020-05-07:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">covidcast</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span> <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
-<span class="gp">... </span>                        <span class="s2">&quot;county&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-<span class="go">   direction geo_value  sample_size    stderr time_value     value</span>
-<span class="go">0        0.0     01000    1722.4551  0.125573 2020-05-01  0.823080</span>
-<span class="go">1        1.0     01001     115.8025  0.800444 2020-05-01  1.261261</span>
-<span class="go">2        0.0     01003     584.3194  0.308680 2020-05-01  0.665129</span>
-<span class="go">3        0.0     01015     122.5577  0.526590 2020-05-01  0.574713</span>
-<span class="go">4        NaN     01031     114.8318  0.347450 2020-05-01  0.408163</span>
-</pre></div>
-</div>
-<p>We can also request all data on a signal after a specific date. Here, for
-example, we obtain <code class="docutils literal notranslate"><span class="pre">smoothed_cli</span></code> in each state for every day since
-2020-05-01:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span> <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;state&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-<span class="go">   direction geo_value  sample_size    stderr time_value     value</span>
-<span class="go">0       -1.0        ak    1606.0000  0.158880 2020-05-01  0.460772</span>
-<span class="go">1        0.0        al    7540.2437  0.082553 2020-05-01  0.699511</span>
-<span class="go">2       -1.0        ar    4921.4827  0.103651 2020-05-01  0.759798</span>
-<span class="go">3        0.0        az   11220.9587  0.061794 2020-05-01  0.566937</span>
-<span class="go">4        0.0        ca   51870.1382  0.022803 2020-05-01  0.364908</span>
-</pre></div>
-</div>
-<p>Using the <code class="docutils literal notranslate"><span class="pre">geo_value</span></code> argument, we can request data for a specific geography,
-such as the state of Pennsylvania for the month of May 2020:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pa_data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span> <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                           <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
-<span class="gp">... </span>                           <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">geo_value</span><span class="o">=</span><span class="s2">&quot;pa&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pa_data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-<span class="go">   direction geo_value  sample_size    stderr time_value     value</span>
-<span class="go">0         -1        pa   31576.0165  0.030764 2020-05-01  0.400011</span>
-<span class="go">0         -1        pa   31344.0168  0.030708 2020-05-02  0.394774</span>
-<span class="go">0          0        pa   30620.0162  0.031173 2020-05-03  0.396340</span>
-<span class="go">0         -1        pa   30419.0163  0.029836 2020-05-04  0.357501</span>
-<span class="go">0          0        pa   29245.0172  0.030176 2020-05-05  0.354521</span>
-</pre></div>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -187,11 +102,28 @@ such as the state of Pennsylvania for the month of May 2020:</p>
 
 
 <h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="signals.html">Fetching data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Example usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
 
+
+<hr />
+<ul>
+    
+    <li class="toctree-l1"><a href="https://delphi.cmu.edu/">Delphi group</a></li>
+    
+    <li class="toctree-l1"><a href="https://covidcast.cmu.edu/">COVIDcast maps</a></li>
+    
+    <li class="toctree-l1"><a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a></li>
+    
+</ul>
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="signals.html" title="next chapter">Fetching data</a></li>
   </ul></li>
 </ul>
 </div>

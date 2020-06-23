@@ -8,6 +8,8 @@ v0.0.6, June 22, 2020
   argument that can include multiple geographies, rather than a single
   ``geo_value`` argument.
 
+- Improved documentation.
+
 v0.0.5, June 19, 2020
 ---------------------
 

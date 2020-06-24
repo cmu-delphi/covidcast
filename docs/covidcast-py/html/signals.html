@@ -87,6 +87,50 @@ documentation for more details.</p>
 </dl>
 </dd></dl>
 
+<p>Many data sources and signals are available, so one can also obtain a data frame
+of all signals and their associated metadata:</p>
+<dl class="py function">
+<dt id="covidcast.metadata">
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch COVIDcast surveillance stream metadata.</p>
+<p>Obtains a data frame of metadata describing all publicly available data
+streams from the COVIDcast API. See the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">data source and signals
+documentation</a>
+for descriptions of the available sources.</p>
+<p>The returned data frame contains one row per available signal, with the
+following columns:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">data_source</span></code></dt><dd><p>Data source name.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">signal</span></code></dt><dd><p>Signal name.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">min_time</span></code></dt><dd><p>First day for which this signal is available.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">max_time</span></code></dt><dd><p>Most recent day for which this signal is available.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">geo_type</span></code></dt><dd><p>Geographic level for which this signal is available, such as county,
+state, msa, or hrr. Most signals are available at multiple geographic
+levels and will hence be listed in multiple rows with their own
+metadata.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">time_type</span></code></dt><dd><p>Temporal resolution at which this signal is reported. “day”, for
+example, means the signal is reported daily.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">num_locations</span></code></dt><dd><p>Number of distinct geographic locations available for this signal. For
+example, if <cite>geo_type</cite> is county, the number of counties for which this
+signal has ever been reported.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">min_value</span></code></dt><dd><p>The smallest value that has ever been reported.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">max_value</span></code></dt><dd><p>The largest value that has ever been reported.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">mean_value</span></code></dt><dd><p>The arithmetic mean of all reported values.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">stdev_value</span></code></dt><dd><p>The sample standard deviation of all reported values.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 

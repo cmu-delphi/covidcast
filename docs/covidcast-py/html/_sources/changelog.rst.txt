@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v0.0.7, TBD
+-----------
+
+- Addition: :py:func:`covidcast.metadata` returns a data frame of all available
+  sources and signals, with metadata about each.
+
 v0.0.6, June 22, 2020
 ---------------------
 

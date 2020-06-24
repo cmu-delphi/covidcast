@@ -7,12 +7,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-This package exposes only one function: the `?covidcast_signal` function allows
-users to retrieve a data frame (tibble) of values from the [COVIDcast
-API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html). Using this
-function, you can fetch any data you may be interested in analyzing, then use
-other R packages to graph results, make maps, fit models, or join the data with
-data from other sources.
+This package provides access to data frames of values from the [COVIDcast
+API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html). Using the
+`covidcast_signal()` function, you can fetch any data you may be interested in
+analyzing, then use other R packages to graph results, make maps, fit models, or
+join the data with data from other sources.
 
 ## Installing
 
@@ -26,23 +25,24 @@ devtools::install_github("cmu-delphi/covidcast", ref = "main",
 
 ## Basic examples
 
-For full usage information, see the function documentation at
-`help(covidcast_signal)`.
+For full usage information, see the [function
+documentation](../reference/index.html).
 
 To obtain smoothed estimates of COVID-like illness from our Facebook survey for
-every county in the United States between 2020-05-01 and 2020-05-07:
+every county in the United States between 2020-05-01 and 2020-05-07, we can use
+`covidcast_signal()`:
 
 ```{r}
 library(covidcastR)
 
-suppressMessages(
-    cli <- covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
-                            end_day = "20200507")
+cli <- suppressMessages(
+    covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
+                     end_day = "20200507")
 )
 head(cli)
 ```
 
-Notice the use of `?suppressMessages` to hide progress reporting from the
+Notice the use of `suppressMessages()` to hide progress reporting from the
 function as it downloads the data; if you download particularly large amounts of
 data, you may prefer to allow the progress reporting so you know how long to
 wait.
@@ -55,9 +55,9 @@ specifies how geographies are identified.
 To request estimates for states instead of counties:
 
 ```{r}
-suppressMessages(
-    cli <- covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
-                            end_day = "20200507", geo_type = "state")
+cli <- suppressMessages(
+    covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
+                     end_day = "20200507", geo_type = "state")
 )
 head(cli)
 ```
@@ -66,13 +66,25 @@ One can also select a specific geographic region by its ID. For example, this is
 the FIPS code for Allegheny County, Pennsylvania:
 
 ```{r}
-suppressMessages(
-    cli <- covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
-                            end_day = "20200507", geo_type = "county",
-                            geo_value = "42003")
+cli <- suppressMessages(
+    covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
+                     end_day = "20200507", geo_type = "county",
+                     geo_value = "42003")
 )
 head(cli)
 ```
+
+If we are interested in exploring the available signals and their metadata, we
+can use `covidcast_meta()` to fetch a data frame of the available signals:
+
+```{r}
+meta <- covidcast_meta()
+head(meta)
+```
+
+This can be filtered and sliced as desired to obtain information about any
+signal of interest.
+
 
 ## Mapping the data
 

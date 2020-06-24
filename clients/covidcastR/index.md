@@ -30,4 +30,4 @@ research product and not warranted for a particular purpose.
 
 **To get started** using this package, view the Getting Started guide at
 `vignette("covidcastR")` and consult the documentation for the main function,
-`?covidcast_signal`.
+`covidcast_signal`.

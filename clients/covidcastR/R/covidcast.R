@@ -74,7 +74,7 @@ covidcast_signal <- function(data_source, signal,
   geo_type <- match.arg(geo_type)
 
   if (is.null(start_day) | is.null(end_day)) {
-    meta <- dplyr::bind_rows(covidcast_meta()$epidata)
+    meta <- covidcast_meta()$epidata
 
     given_data_source <- data_source
     given_signal <- signal
@@ -97,18 +97,14 @@ covidcast_signal <- function(data_source, signal,
 
   if (is.null(start_day)) {
     start_day <- relevant_meta %>%
-      dplyr::pull(min_time) %>%
-      as.character() %>%
-      as.Date(format = "%Y%m%d")
+      dplyr::pull(min_time)
   } else {
       start_day <- as.Date(start_day, format = "%Y%m%d")
   }
 
   if (is.null(end_day)) {
     end_day <- relevant_meta %>%
-      dplyr::pull(max_time) %>%
-      as.character() %>%
-      as.Date(format = "%Y%m%d")
+      dplyr::pull(max_time)
   } else {
       end_day <- as.Date(end_day, format = "%Y%m%d")
   }
@@ -123,6 +119,48 @@ covidcast_signal <- function(data_source, signal,
   })
 
   return(df)
+}
+
+#' Fetch Delphi's COVID-19 Surveillance Streams metadata.
+#'
+#' Obtains a data frame of metadata describing all publicly available data
+#' streams from the COVIDcast API.
+#'
+#' @return Data frame containing one row per signal, with the following columns:
+#'   \item{data_source}{Data source name.}
+#'   \item{signal}{Signal name.}
+#'   \item{min_time}{First day for which this signal is available.}
+#'   \item{max_time}{Most recent day for which this signal is available.}
+#'   \item{geo_type}{Geographic level for which this signal is available, such
+#'   as county, state, msa, or hrr. Most signals are available at multiple
+#'   geographic levels and will hence be listed in multiple rows with their
+#'   own metadata.}
+#'   \item{time_type}{Temporal resolution at which this signal is reported.
+#'   "day", for example, means the signal is reported daily.}
+#'   \item{num_locations}{Number of distinct geographic locations available for
+#'   this signal. For example, if `geo_type` is county, the number of counties
+#'   for which this signal has ever been reported.}
+#'   \item{min_value}{The smallest value that has ever been reported.}
+#'   \item{max_value}{The largest value that has ever been reported.}
+#'   \item{mean_value}{The arithmetic mean of all reported values.}
+#'   \item{stdev_value}{The sample standard deviation of all reported values.}
+#'
+#' @references COVIDcast API sources and signals documentation:
+#'   \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
+#' @export
+#' @importFrom dplyr %>%
+covidcast_meta <- function() {
+  meta <- .request(list(source='covidcast_meta', cached="true"))
+
+  if (meta$message != "success") {
+    stop("Failed to obtain metadata: ", meta$message)
+  }
+
+  meta <- meta$epidata %>%
+    dplyr::mutate(min_time = as.Date(as.character(min_time), format = "%Y%m%d"),
+                  max_time = as.Date(as.character(max_time), format = "%Y%m%d"))
+
+  return(meta)
 }
 
 ## Helper function, not user-facing, to fetch a single geo-value.
@@ -166,7 +204,6 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_va
   return(df)
 }
 
-
 ## Fetch Delphi's COVID-19 Surveillance Streams
 covidcast <- function(data_source, signal, time_type, geo_type, time_values,
                       geo_value) {
@@ -191,10 +228,6 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   return(.request(params))
 }
 
-# Fetch Delphi's COVID-19 Surveillance Streams metadata
-covidcast_meta <- function() {
-  return(.request(list(source='covidcast_meta', cached="true")))
-}
 
 # Helper function to cast values and/or ranges to strings
 .listitem <- function(value) {

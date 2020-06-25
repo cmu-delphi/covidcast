@@ -25,7 +25,8 @@ This package is not on CRAN yet, so it can be installed using the
 [`devtools`](https://cran.r-project.org/package=devtools) package:
 
 ```r
-devtools::install_github("cmu-delphi/covidcast", subdir = "clients/covidcastR")
+devtools::install_github("cmu-delphi/covidcast", ref = "main",
+                         subdir = "clients/covidcastR")
 ```
 
 ## Documentation

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • covidcastR</title>
+<title>Fetch Delphi's COVID-19 Surveillance Streams metadata. — covidcast_meta • covidcastR</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,9 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Fetch Delphi's COVID-19 Surveillance Streams metadata. — covidcast_meta" />
+<meta property="og:description" content="Obtains a data frame of metadata describing all publicly available data
+streams from the COVIDcast API." />
 
 
 
@@ -58,7 +60,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -108,48 +110,48 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Fetch Delphi's COVID-19 Surveillance Streams metadata.</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/covidcast.R'><code>R/covidcast.R</code></a></small>
+    <div class="hidden name"><code>covidcast_meta.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p>Obtains a data frame of metadata describing all publicly available data
+streams from the COVIDcast API.</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>covidcast_meta</span>()</pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="covidcast_meta.html">covidcast_meta()</a></code> </p>
-        </td>
-        <td><p>Fetch Delphi's COVID-19 Surveillance Streams metadata.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="covidcast_signal.html">covidcast_signal()</a></code> </p>
-        </td>
-        <td><p>Produce a data frame for one signal.</p></td>
-      </tr>
-    </tbody>
-    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Data frame containing one row per signal, with the following columns:</p>
+<dt>data_source</dt><dd><p>Data source name.</p></dd>
+<dt>signal</dt><dd><p>Signal name.</p></dd>
+<dt>min_time</dt><dd><p>First day for which this signal is available.</p></dd>
+<dt>max_time</dt><dd><p>Most recent day for which this signal is available.</p></dd>
+<dt>geo_type</dt><dd><p>Geographic level for which this signal is available, such
+as county, state, msa, or hrr. Most signals are available at multiple
+geographic levels and will hence be listed in multiple rows with their
+own metadata.</p></dd>
+<dt>time_type</dt><dd><p>Temporal resolution at which this signal is reported.
+"day", for example, means the signal is reported daily.</p></dd>
+<dt>num_locations</dt><dd><p>Number of distinct geographic locations available for
+this signal. For example, if <code>geo_type</code> is county, the number of counties
+for which this signal has ever been reported.</p></dd>
+<dt>min_value</dt><dd><p>The smallest value that has ever been reported.</p></dd>
+<dt>max_value</dt><dd><p>The largest value that has ever been reported.</p></dd>
+<dt>mean_value</dt><dd><p>The arithmetic mean of all reported values.</p></dd>
+<dt>stdev_value</dt><dd><p>The sample standard deviation of all reported values.</p></dd>
+
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+
+    <p>COVIDcast API sources and signals documentation:
+<a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html</a></p>
+
   </div>
-
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>

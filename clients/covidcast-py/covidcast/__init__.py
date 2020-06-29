@@ -8,7 +8,8 @@ University.
 Functions:
 
 * signal - Fetch a Pandas data frame for one signal.
+* metadata - Fetch metadata for all available signals.
 
 """
 
-from .covidcast import signal
+from .covidcast import signal, metadata

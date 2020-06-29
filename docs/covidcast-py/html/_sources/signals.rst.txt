@@ -8,5 +8,5 @@ Pandas data frame:
 
 Many data sources and signals are available, so one can also obtain a data frame
 of all signals and their associated metadata:
-                  
+
 .. autofunction:: covidcast.metadata

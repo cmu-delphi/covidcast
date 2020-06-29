@@ -61,10 +61,10 @@ def signal(data_source, signal, start_day=None, end_day=None,
     if start_day is None or end_day is None:
         signal_meta = _signal_metadata(data_source, signal, geo_type)
 
-    start_day = datetime.strptime(str(signal_meta["min_time"]), "%Y%m%d").date() \
+    start_day = signal_meta["min_time"].to_pydatetime().date() \
         if start_day is None else start_day
 
-    end_day = datetime.strptime(str(signal_meta["max_time"]), "%Y%m%d").date() \
+    end_day = signal_meta["max_time"].to_pydatetime().date() \
         if end_day is None else end_day
 
     ## The YYYYMMDD format lets us use lexicographic ordering to test date order
@@ -92,6 +92,73 @@ def signal(data_source, signal, start_day=None, end_day=None,
         return None
 
     return out
+
+def metadata():
+    """Fetch COVIDcast surveillance stream metadata.
+
+    Obtains a data frame of metadata describing all publicly available data
+    streams from the COVIDcast API. See the `data source and signals
+    documentation
+    <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html>`_
+    for descriptions of the available sources.
+
+    The returned data frame contains one row per available signal, with the
+    following columns:
+
+    ``data_source``
+        Data source name.
+
+    ``signal``
+        Signal name.
+
+    ``min_time``
+        First day for which this signal is available.
+
+    ``max_time``
+        Most recent day for which this signal is available.
+
+    ``geo_type``
+        Geographic level for which this signal is available, such as county,
+        state, msa, or hrr. Most signals are available at multiple geographic
+        levels and will hence be listed in multiple rows with their own
+        metadata.
+
+    ``time_type``
+        Temporal resolution at which this signal is reported. "day", for
+        example, means the signal is reported daily.
+
+    ``num_locations``
+        Number of distinct geographic locations available for this signal. For
+        example, if `geo_type` is county, the number of counties for which this
+        signal has ever been reported.
+
+    ``min_value``
+        The smallest value that has ever been reported.
+
+    ``max_value``
+        The largest value that has ever been reported.
+
+    ``mean_value``
+        The arithmetic mean of all reported values.
+
+    ``stdev_value``
+        The sample standard deviation of all reported values.
+    """
+
+    meta = Epidata.covidcast_meta()
+
+    if meta["result"] != 1:
+        ## Something failed in the API and we did not get real metadata
+        raise RuntimeError("Error when fetching metadata from the API",
+                           meta["message"])
+
+
+    meta_df = pd.DataFrame.from_dict(meta["epidata"])
+    meta_df["min_time"] = pd.to_datetime(meta_df["min_time"], format="%Y%m%d")
+    meta_df["max_time"] = pd.to_datetime(meta_df["max_time"], format="%Y%m%d")
+
+    return meta_df
+
 
 def _fetch_single_geo(data_source, signal, start_day, end_day, geo_type,
                       geo_value):
@@ -135,21 +202,18 @@ def _fetch_single_geo(data_source, signal, start_day, end_day, geo_type,
     return None
 
 def _signal_metadata(data_source, signal, geo_type):
-    meta = Epidata.covidcast_meta()
+    """Fetch metadata for a single signal as a dict."""
 
-    if meta["result"] != 1:
-        ## Something failed in the API and we did not get real metadata
-        raise RuntimeError("Error when fetching metadata from the API",
-                           meta["message"])
+    meta = metadata()
 
-    ## Find our signal
-    matches = [item for item in meta["epidata"]
-               if item["data_source"] == data_source and
-               item["signal"] == signal and
-               item["time_type"] == "day" and
-               item["geo_type"] == geo_type]
+    mask = ((meta.data_source == data_source) &
+            (meta.signal == signal) &
+            (meta.time_type == "day") &
+            (meta.geo_type == geo_type))
 
-    if len(matches) == 0:
+    matches = meta[mask]
+
+    if matches.shape[0] == 0:
         raise ValueError("Unable to find metadata for source '{source}', "
                          "signal '{signal}', at '{geo_type}' "
                          "resolution.".format(
@@ -157,9 +221,9 @@ def _signal_metadata(data_source, signal, geo_type):
                              signal=signal,
                              geo_type=geo_type))
 
-    assert len(matches) == 1, "it should be impossible to have two identical signals"
+    assert matches.shape[0] == 1, "it should be impossible to have two identical signals"
 
-    return matches[0]
+    return matches.to_dict("records")[0]
 
 def _date_to_api_string(date):
     """Convert a date object to a YYYYMMDD string expected by the API."""

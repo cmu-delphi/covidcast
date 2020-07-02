@@ -74,7 +74,7 @@ covidcast_signal <- function(data_source, signal,
   geo_type <- match.arg(geo_type)
 
   if (is.null(start_day) | is.null(end_day)) {
-    meta <- covidcast_meta()$epidata
+    meta <- covidcast_meta()
 
     given_data_source <- data_source
     given_signal <- signal

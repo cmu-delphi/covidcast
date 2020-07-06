@@ -20,8 +20,11 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' @param data_source String identifying the data source to query. See the
 #'   [signal
 #'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)
-#'   for a list of available sources and signals.
-#' @param signal String identifying the signal from that source to query.
+#'   for a list of available data sources.
+#' @param signal String identifying the signal from that source to query. Again,
+#'   see the [signal
+#'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)
+#'   for a list of available signals.
 #' @param start_day Query data beginning on this date. Date object, or string in
 #'   the form YYYYMMDD. If `start_day` is `NULL`, defaults to first day data is
 #'   available for this signal.
@@ -29,11 +32,14 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #'   in the form YYYYMMDD. If `end_day` is `NULL`, defaults to the most recent
 #'   day data is available for this signal.
 #' @param geo_type The geography type for which to request this data, such as
-#'   `"county"` or `"state"`. Available types are described in the COVIDcast
-#'   signal documentation. Defaults to `"county"`.
+#'   `"county"` or `"state"`. Defaults to `"county"`. See the [geographic coding
+#'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html)
+#'   for details on which types are available.
 #' @param geo_values Which geographies to return. The default, `"*"`, fetches
 #'   all geographies. To fetch specific geographies, specify their IDs as a
-#'   vector or list of strings.
+#'   vector or list of strings. See the [geographic coding
+#'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html)
+#'   for details on how to specify these IDs.
 #' @return Data frame with matching data. Each row is one observation on one day
 #'   in one geographic location. Contains the following columns:
 #'
@@ -57,14 +63,15 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' @references COVIDcast API documentation:
 #'   \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html}
 #'
-#' Documentation of all COVIDcast sources and signals: \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
+#' Documentation of all COVIDcast sources and signals:
+#' \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 #'
 #' COVIDcast public map: \url{https://covidcast.cmu.edu/}
 #' @examples
 #' \dontrun{
-#' ## fetches all counties from 2020-05-10 to the most recent available data:
+#' ## fetch all counties from 2020-05-10 to the most recent available data:
 #' covidcast_signal("fb-survey", "raw_cli", start_day = "20200510")
-#' ## fetches all counties on just 2020-05-10 and no other days
+#' ## fetch all counties on just 2020-05-10 and no other days
 #' covidcast_signal("fb-survey", "raw_cli", start_day = "20200510",
 #'                  end_day = "20200510")
 #' ## fetch all states on 2020-05-10, 2020-05-11, 2020-05-12
@@ -240,7 +247,6 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   # Make the API call
   return(.request(params))
 }
-
 
 # Helper function to cast values and/or ranges to strings
 .listitem <- function(value) {

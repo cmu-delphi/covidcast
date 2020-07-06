@@ -16,9 +16,11 @@ covidcast_signal(
 \arguments{
 \item{data_source}{String identifying the data source to query. See the
 \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{signal documentation}
-for a list of available sources and signals.}
+for a list of available data sources.}
 
-\item{signal}{String identifying the signal from that source to query.}
+\item{signal}{String identifying the signal from that source to query. Again,
+see the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{signal documentation}
+for a list of available signals.}
 
 \item{start_day}{Query data beginning on this date. Date object, or string in
 the form YYYYMMDD. If \code{start_day} is \code{NULL}, defaults to first day data is
@@ -29,12 +31,13 @@ in the form YYYYMMDD. If \code{end_day} is \code{NULL}, defaults to the most rec
 day data is available for this signal.}
 
 \item{geo_type}{The geography type for which to request this data, such as
-\code{"county"} or \code{"state"}. Available types are described in the COVIDcast
-signal documentation. Defaults to \code{"county"}.}
+\code{"county"} or \code{"state"}. Defaults to \code{"county"}. See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
+for details on which types are available.}
 
 \item{geo_values}{Which geographies to return. The default, \code{"*"}, fetches
 all geographies. To fetch specific geographies, specify their IDs as a
-vector or list of strings.}
+vector or list of strings. See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
+for details on how to specify these IDs.}
 }
 \value{
 Data frame with matching data. Each row is one observation on one day
@@ -74,9 +77,9 @@ messages for each day of data it downloads. To suppress these, use
 }
 \examples{
 \dontrun{
-## fetches all counties from 2020-05-10 to the most recent available data:
+## fetch all counties from 2020-05-10 to the most recent available data:
 covidcast_signal("fb-survey", "raw_cli", start_day = "20200510")
-## fetches all counties on just 2020-05-10 and no other days
+## fetch all counties on just 2020-05-10 and no other days
 covidcast_signal("fb-survey", "raw_cli", start_day = "20200510",
                  end_day = "20200510")
 ## fetch all states on 2020-05-10, 2020-05-11, 2020-05-12
@@ -95,7 +98,8 @@ covidcast_signal("fb-survey", "raw_cli", geo_type = "msa",
 COVIDcast API documentation:
 \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html}
 
-Documentation of all COVIDcast sources and signals: \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
+Documentation of all COVIDcast sources and signals:
+\url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 
 COVIDcast public map: \url{https://covidcast.cmu.edu/}
 }

@@ -37,10 +37,17 @@ library(covidcastR)
 
 cli <- suppressMessages(
     covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
-                     end_day = "20200507")
+                     end_day = "20200507", geo_type = "county")
 )
 head(cli)
 ```
+
+Each row represents one observation in one county on one day. The county FIPS
+code is given in the `geo_value` column, the date in the `time_value` column.
+Here `value` is the requested signal---in this case, the smoothed estimate of
+the percentage of people with COVID-like illness, based on the symptom surveys.
+`stderr` is its standard error. See the `covidcast_signal()` documentation for
+details on the returned data frame.
 
 Notice the use of `suppressMessages()` to hide progress reporting from the
 function as it downloads the data; if you download particularly large amounts of

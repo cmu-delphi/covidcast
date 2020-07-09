@@ -37,15 +37,26 @@ all geographies. To fetch specific geographies, specify their IDs as a
 vector or list of strings.}
 }
 \value{
-Data frame with matching data. Contains \code{geo_value}, \code{time_value},
-\code{direction}, \code{value}, \code{stderr}, and \code{sample_size} columns. \code{geo_value}
-identifies the location, such as a state name or county FIPS code;
-\code{time_value} contains Date objects. \code{value} is the signal quantity
-requested and \code{stderr} its standard error if available. \code{sample_size}
-indicates the sample size available in that geography on that day; sample
-size may not be available. \code{direction} uses a local linear fit to estimate
-whether the signal in this region is currently increasing or decreasing.
-Consult the signal documentation for more details.
+Data frame with matching data. Each row is one observation on one day
+in one geographic location. Contains the following columns:
+
+\item{geo_value}{identifies the location, such as a state name or county
+FIPS code}
+\item{time_value}{a \code{Date} object identifying the date of this observation}
+\item{value}{the signal quantity requested. For example, in a query for the
+\code{confirmed_cumulative_num} signal from the \code{usa-facts} source, this would
+be the cumulative number of confirmed cases in the area, as of the
+\code{time_value}.}
+\item{stderr}{the value's standard error, if available}
+\item{sample_size}{indicates the sample size available in that geography on
+that day; sample size may not be available for all signals, due to privacy
+or other constraints, in which case they will be \code{NA}.}
+\item{direction}{uses a local linear fit to estimate whether the signal in
+this region is currently increasing or decreasing (reported as -1 for
+decreasing, 1 for increasing, and 0 for neither).}
+
+Consult the signal documentation for more details on how values and
+standard errors are calculated for specific signals.
 }
 \description{
 Obtains data for selected date ranges for all geographic regions of the
@@ -83,6 +94,8 @@ covidcast_signal("fb-survey", "raw_cli", geo_type = "msa",
 \references{
 COVIDcast API documentation:
 \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html}
+
+Documentation of all COVIDcast sources and signals: \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 
 COVIDcast public map: \url{https://covidcast.cmu.edu/}
 }

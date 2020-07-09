@@ -34,17 +34,30 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' @param geo_values Which geographies to return. The default, `"*"`, fetches
 #'   all geographies. To fetch specific geographies, specify their IDs as a
 #'   vector or list of strings.
-#' @return Data frame with matching data. Contains `geo_value`, `time_value`,
-#'   `direction`, `value`, `stderr`, and `sample_size` columns. `geo_value`
-#'   identifies the location, such as a state name or county FIPS code;
-#'   `time_value` contains Date objects. `value` is the signal quantity
-#'   requested and `stderr` its standard error if available. `sample_size`
-#'   indicates the sample size available in that geography on that day; sample
-#'   size may not be available. `direction` uses a local linear fit to estimate
-#'   whether the signal in this region is currently increasing or decreasing.
-#'   Consult the signal documentation for more details.
+#' @return Data frame with matching data. Each row is one observation on one day
+#'   in one geographic location. Contains the following columns:
+#'
+#'   \item{geo_value}{identifies the location, such as a state name or county
+#'   FIPS code}
+#'   \item{time_value}{a `Date` object identifying the date of this observation}
+#'   \item{value}{the signal quantity requested. For example, in a query for the
+#'   `confirmed_cumulative_num` signal from the `usa-facts` source, this would
+#'   be the cumulative number of confirmed cases in the area, as of the
+#'   `time_value`.}
+#'   \item{stderr}{the value's standard error, if available}
+#'   \item{sample_size}{indicates the sample size available in that geography on
+#'   that day; sample size may not be available for all signals, due to privacy
+#'   or other constraints, in which case they will be `NA`.}
+#'   \item{direction}{uses a local linear fit to estimate whether the signal in
+#'   this region is currently increasing or decreasing (reported as -1 for
+#'   decreasing, 1 for increasing, and 0 for neither).}
+#'
+#'   Consult the signal documentation for more details on how values and
+#'   standard errors are calculated for specific signals.
 #' @references COVIDcast API documentation:
 #'   \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html}
+#'
+#' Documentation of all COVIDcast sources and signals: \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 #'
 #' COVIDcast public map: \url{https://covidcast.cmu.edu/}
 #' @examples

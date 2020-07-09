@@ -97,7 +97,7 @@
 
 <span class="no">cli</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
     <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"fb-survey"</span>, <span class="st">"smoothed_cli"</span>, <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200501"</span>,
-                     <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200507"</span>)
+                     <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200507"</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"county"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">cli</span>)</pre></body></html></div>
 <pre><code>##   geo_value time_value direction     value    stderr sample_size
@@ -107,6 +107,7 @@
 ## 4     01015 2020-05-01         0 0.5747126 0.5265904    122.5577
 ## 5     01031 2020-05-01        NA 0.4081633 0.3474498    114.8318
 ## 6     01045 2020-05-01        NA 0.9259259 0.4660393    110.6544</code></pre>
+<p>Each row represents one observation in one county on one day. The county FIPS code is given in the <code>geo_value</code> column, the date in the <code>time_value</code> column. Here <code>value</code> is the requested signal—in this case, the smoothed estimate of the percentage of people with COVID-like illness, based on the symptom surveys. <code>stderr</code> is its standard error. See the <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> documentation for details on the returned data frame.</p>
 <p>Notice the use of <code><a href="https://rdrr.io/r/base/message.html">suppressMessages()</a></code> to hide progress reporting from the function as it downloads the data; if you download particularly large amounts of data, you may prefer to allow the progress reporting so you know how long to wait.</p>
 <p>Note that <code>geo_value</code> is the FIPS code for each reported county; counties with insufficient sample size are not reported. The <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">API documentation</a> specifies how geographies are identified.</p>
 <p>To request estimates for states instead of counties:</p>
@@ -139,20 +140,20 @@
 <p>If we are interested in exploring the available signals and their metadata, we can use <code><a href="../reference/covidcast_meta.html">covidcast_meta()</a></code> to fetch a data frame of the available signals:</p>
 <div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">meta</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_meta.html">covidcast_meta</a></span>()
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">meta</span>)</pre></body></html></div>
-<pre><code>##     min_time mean_value max_value num_locations min_value last_update
-## 1 2020-02-01   1.447217  87.18024          2500         0  1592779362
-## 2 2020-02-01   1.760231  48.00463           306         0  1592779361
-## 3 2020-02-01   1.480389  33.16651           380         0  1592779361
-## 4 2020-02-01   1.898482  20.64778            51         0  1592779361
-## 5 2020-02-01   1.250093  77.02878          2500         0  1592779361
-## 6 2020-02-01   1.655526  44.60737           306         0  1592779361
-##     max_time stdev_value   data_source time_type geo_type           signal
-## 1 2020-06-18    2.661424 doctor-visits       day   county smoothed_adj_cli
-## 2 2020-06-18    2.642886 doctor-visits       day      hrr smoothed_adj_cli
-## 3 2020-06-18    2.225071 doctor-visits       day      msa smoothed_adj_cli
-## 4 2020-06-18    2.298977 doctor-visits       day    state smoothed_adj_cli
-## 5 2020-06-18    2.321626 doctor-visits       day   county     smoothed_cli
-## 6 2020-06-18    2.540499 doctor-visits       day      hrr     smoothed_cli</code></pre>
+<pre><code>##             signal max_value min_value time_type last_update   data_source
+## 1 smoothed_adj_cli  87.86095         0       day  1594248750 doctor-visits
+## 2 smoothed_adj_cli  47.95543         0       day  1594248707 doctor-visits
+## 3 smoothed_adj_cli  32.97098         0       day  1594248694 doctor-visits
+## 4 smoothed_adj_cli  20.55140         0       day  1594248686 doctor-visits
+## 5     smoothed_cli  76.56961         0       day  1594248787 doctor-visits
+## 6     smoothed_cli  44.29551         0       day  1594248712 doctor-visits
+##     min_time   max_time geo_type stdev_value mean_value num_locations
+## 1 2020-02-01 2020-07-05   county    2.800825   1.648615          2505
+## 2 2020-02-01 2020-07-05      hrr    2.763754   2.018959           306
+## 3 2020-02-01 2020-07-05      msa    2.435419   1.729666           380
+## 4 2020-02-01 2020-07-05    state    2.426888   2.163669            51
+## 5 2020-02-01 2020-07-05   county    2.432688   1.419158          2505
+## 6 2020-02-01 2020-07-05      hrr    2.672196   1.898874           306</code></pre>
 <p>This can be filtered and sliced as desired to obtain information about any signal of interest.</p>
 </div>
 <div id="mapping-the-data" class="section level2">

@@ -51,6 +51,13 @@ every county in the United States between 2020-05-01 and 2020-05-07:</p>
 <span class="go">4        NaN     01031     114.8318  0.347450 2020-05-01  0.408163</span>
 </pre></div>
 </div>
+<p>Each row represents one observation in one county on one day. The county FIPS
+code is given in the <code class="docutils literal notranslate"><span class="pre">geo_value</span></code> column, the date in the <code class="docutils literal notranslate"><span class="pre">time_value</span></code>
+column. Here <code class="docutils literal notranslate"><span class="pre">value</span></code> is the requested signal—in this case, the smoothed
+estimate of the percentage of people with COVID-like illness, based on the
+symptom surveys. <code class="docutils literal notranslate"><span class="pre">stderr</span></code> is its standard error. See the
+<a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a> documentation for details on the returned data
+frame.</p>
 <p>We can also request all data on a signal after a specific date. Here, for
 example, we obtain <code class="docutils literal notranslate"><span class="pre">smoothed_cli</span></code> in each state for every day since
 2020-05-01:</p>

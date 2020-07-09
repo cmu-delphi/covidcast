@@ -182,15 +182,26 @@ vector or list of strings.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Data frame with matching data. Contains <code>geo_value</code>, <code>time_value</code>,
-<code>direction</code>, <code>value</code>, <code>stderr</code>, and <code>sample_size</code> columns. <code>geo_value</code>
-identifies the location, such as a state name or county FIPS code;
-<code>time_value</code> contains Date objects. <code>value</code> is the signal quantity
-requested and <code>stderr</code> its standard error if available. <code>sample_size</code>
-indicates the sample size available in that geography on that day; sample
-size may not be available. <code>direction</code> uses a local linear fit to estimate
-whether the signal in this region is currently increasing or decreasing.
-Consult the signal documentation for more details.</p>
+    <p>Data frame with matching data. Each row is one observation on one day
+in one geographic location. Contains the following columns:</p>
+<dt>geo_value</dt><dd><p>identifies the location, such as a state name or county
+FIPS code</p></dd>
+<dt>time_value</dt><dd><p>a <code>Date</code> object identifying the date of this observation</p></dd>
+<dt>value</dt><dd><p>the signal quantity requested. For example, in a query for the
+<code>confirmed_cumulative_num</code> signal from the <code>usa-facts</code> source, this would
+be the cumulative number of confirmed cases in the area, as of the
+<code>time_value</code>.</p></dd>
+<dt>stderr</dt><dd><p>the value's standard error, if available</p></dd>
+<dt>sample_size</dt><dd><p>indicates the sample size available in that geography on
+that day; sample size may not be available for all signals, due to privacy
+or other constraints, in which case they will be <code>NA</code>.</p></dd>
+<dt>direction</dt><dd><p>uses a local linear fit to estimate whether the signal in
+this region is currently increasing or decreasing (reported as -1 for
+decreasing, 1 for increasing, and 0 for neither).</p></dd>
+
+Consult the signal documentation for more details on how values and
+standard errors are calculated for specific signals.
+
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Downloading large amounts of data may be slow, so this function prints
@@ -200,6 +211,7 @@ messages for each day of data it downloads. To suppress these, use
 
     <p>COVIDcast API documentation:
 <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html</a></p>
+<p>Documentation of all COVIDcast sources and signals: <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html</a></p>
 <p>COVIDcast public map: <a href='https://covidcast.cmu.edu/'>https://covidcast.cmu.edu/</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>

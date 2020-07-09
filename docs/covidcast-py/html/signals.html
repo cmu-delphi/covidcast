@@ -35,6 +35,8 @@
             
   <div class="section" id="fetching-data">
 <h1>Fetching data<a class="headerlink" href="#fetching-data" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="signals">
+<h2>Signals<a class="headerlink" href="#signals" title="Permalink to this headline">¶</a></h2>
 <p>This package provides one key function to obtain any signal of interest as a
 Pandas data frame:</p>
 <dl class="py function">
@@ -73,20 +75,41 @@ string; multiple geographies can be provided as an iterable (list, tuple,
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A Pandas data frame with matching data. Contains <code class="docutils literal notranslate"><span class="pre">geo_value</span></code>,
-<code class="docutils literal notranslate"><span class="pre">time_value</span></code>, <code class="docutils literal notranslate"><span class="pre">direction</span></code>, <code class="docutils literal notranslate"><span class="pre">value</span></code>, <code class="docutils literal notranslate"><span class="pre">stderr</span></code>, and <code class="docutils literal notranslate"><span class="pre">sample_size</span></code>
-columns. <code class="docutils literal notranslate"><span class="pre">geo_value</span></code> identifies the location, such as a state name or
-county FIPS code; <code class="docutils literal notranslate"><span class="pre">time_value</span></code> contains pandas <code class="docutils literal notranslate"><span class="pre">Timestamp</span></code> objects.
-<code class="docutils literal notranslate"><span class="pre">value</span></code> is the signal quantity requested and <code class="docutils literal notranslate"><span class="pre">stderr</span></code> its standard
-error if available. <code class="docutils literal notranslate"><span class="pre">sample_size</span></code> indicates the sample size available in
-that geography on that day; sample size may not be available.
-<code class="docutils literal notranslate"><span class="pre">direction</span></code> uses a local linear fit to estimate whether the signal in
-this region is currently increasing or decreasing. Consult the signal
-documentation for more details.</p>
+<dd class="field-even"><p><p>A Pandas data frame with matching data. Each row is one
+observation on one day in one geographic location. Contains the following
+columns:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">geo_value</span></code></dt><dd><p>identifies the location, such as a state name or county FIPS code.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">time_value</span></code></dt><dd><p>contains a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html">pandas Timestamp object</a>
+identifying the date of this observation.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">value</span></code></dt><dd><p>the signal quantity requested. For example, in a query for the
+<code class="docutils literal notranslate"><span class="pre">confirmed_cumulative_num</span></code> signal from the <code class="docutils literal notranslate"><span class="pre">usa-facts</span></code> source,
+this would be the cumulative number of confirmed cases in the area, as
+of the <code class="docutils literal notranslate"><span class="pre">time_value</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">stderr</span></code></dt><dd><p>the signal’s standard error, if available.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">sample_size</span></code></dt><dd><p>indicates the sample size available in that geography on that day;
+sample size may not be available for all signals, due to privacy or
+other constraints.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">direction</span></code></dt><dd><p>uses a local linear fit to estimate whether the signal in this region is
+currently increasing or decreasing (reported as -1 for decreasing, 1 for
+increasing, and 0 for neither).</p>
 </dd>
 </dl>
+</p>
+</dd>
+</dl>
+<p>Consult the signal documentation for more details on how values and standard
+errors are calculated for specific signals.</p>
 </dd></dl>
 
+</div>
+<div class="section" id="metadata">
+<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h2>
 <p>Many data sources and signals are available, so one can also obtain a data frame
 of all signals and their associated metadata:</p>
 <dl class="py function">
@@ -132,6 +155,7 @@ signal has ever been reported.</p>
 </dd></dl>
 
 </div>
+</div>
 
 
           </div>
@@ -151,7 +175,11 @@ signal has ever been reported.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Fetching data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Fetching data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#signals">Signals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#metadata">Metadata</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Example usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>

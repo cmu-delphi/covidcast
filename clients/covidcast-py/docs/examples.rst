@@ -17,6 +17,14 @@ every county in the United States between 2020-05-01 and 2020-05-07:
 3        0.0     01015     122.5577  0.526590 2020-05-01  0.574713
 4        NaN     01031     114.8318  0.347450 2020-05-01  0.408163
 
+Each row represents one observation in one county on one day. The county FIPS
+code is given in the ``geo_value`` column, the date in the ``time_value``
+column. Here ``value`` is the requested signal---in this case, the smoothed
+estimate of the percentage of people with COVID-like illness, based on the
+symptom surveys. ``stderr`` is its standard error. See the
+:py:func:`covidcast.signal` documentation for details on the returned data
+frame.
+
 We can also request all data on a signal after a specific date. Here, for
 example, we obtain ``smoothed_cli`` in each state for every day since
 2020-05-01:

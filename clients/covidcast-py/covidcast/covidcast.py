@@ -42,16 +42,33 @@ def signal(data_source, signal, start_day=None, end_day=None,
       fetches all geographies. To fetch one geography, specify its ID as a
       string; multiple geographies can be provided as an iterable (list, tuple,
       ...) of strings.
-    :returns: A Pandas data frame with matching data. Contains ``geo_value``,
-      ``time_value``, ``direction``, ``value``, ``stderr``, and ``sample_size``
-      columns. ``geo_value`` identifies the location, such as a state name or
-      county FIPS code; ``time_value`` contains pandas ``Timestamp`` objects.
-      ``value`` is the signal quantity requested and ``stderr`` its standard
-      error if available. ``sample_size`` indicates the sample size available in
-      that geography on that day; sample size may not be available.
-      ``direction`` uses a local linear fit to estimate whether the signal in
-      this region is currently increasing or decreasing. Consult the signal
-      documentation for more details.
+    :returns: A Pandas data frame with matching data. Each row is one
+      observation on one day in one geographic location. Contains the following
+      columns:
+
+      ``geo_value``
+        identifies the location, such as a state name or county FIPS code.
+      ``time_value``
+        contains a `pandas Timestamp object <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_
+        identifying the date of this observation.
+      ``value``
+        the signal quantity requested. For example, in a query for the
+        ``confirmed_cumulative_num`` signal from the ``usa-facts`` source,
+        this would be the cumulative number of confirmed cases in the area, as
+        of the ``time_value``.
+      ``stderr``
+        the value's standard error, if available.
+      ``sample_size``
+        indicates the sample size available in that geography on that day;
+        sample size may not be available for all signals, due to privacy or
+        other constraints.
+      ``direction``
+        uses a local linear fit to estimate whether the signal in this region is
+        currently increasing or decreasing (reported as -1 for decreasing, 1 for
+        increasing, and 0 for neither).
+
+    Consult the signal documentation for more details on how values and standard
+    errors are calculated for specific signals.
 
     """
 

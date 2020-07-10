@@ -92,53 +92,171 @@ covidcast_signal <- function(data_source, signal,
                              geo_type = c("county", "hrr", "msa", "dma", "state"),
                              geo_values = "*") {
   geo_type <- match.arg(geo_type)
+  meta <- covidcast_meta()
+  given_data_source <- data_source
+  given_signal <- signal
+  given_geo_type <- geo_type
 
-  if (is.null(start_day) | is.null(end_day)) {
-    meta <- covidcast_meta()
+  relevant_meta <- meta %>%
+    dplyr::filter(data_source == given_data_source,
+                  signal == given_signal,
+                  time_type == "day",
+                  geo_type == given_geo_type)
 
-    given_data_source <- data_source
-    given_signal <- signal
-    given_geo_type <- geo_type
-
-    relevant_meta <- meta %>%
-      dplyr::filter(data_source == given_data_source,
-                    signal == given_signal,
-                    time_type == "day",
-                    geo_type == given_geo_type)
-
-    if (nrow(relevant_meta) == 0) {
-      stop("No match in metadata for source '", data_source,
-           "', signal '", signal, "', and geo_type '", geo_type,
-           "' at the daily level. ",
-           "Check that the source and signal are correctly spelled and that ",
-           "the signal is available at this geographic level.")
-    }
+  if (nrow(relevant_meta) == 0) {
+    stop("No match in metadata for source '", data_source,
+         "', signal '", signal, "', and geo_type '", geo_type,
+         "' at the daily level. ",
+         "Check that the source and signal are correctly spelled and that ",
+         "the signal is available at this geographic level.")
   }
-
+  
   if (is.null(start_day)) {
     start_day <- relevant_meta %>%
       dplyr::pull(min_time)
   } else {
-      start_day <- as.Date(start_day, format = "%Y%m%d")
+    start_day <- as.Date(start_day, format = "%Y%m%d")
   }
 
   if (is.null(end_day)) {
     end_day <- relevant_meta %>%
       dplyr::pull(max_time)
   } else {
-      end_day <- as.Date(end_day, format = "%Y%m%d")
+    end_day <- as.Date(end_day, format = "%Y%m%d")
   }
 
   if (start_day > end_day) {
-      stop("end_day must be on or after start_day, but start_day = '",
-           start_day, "' and end_day = '", end_day, "'")
+    stop("end_day must be on or after start_day, but start_day = '",
+         start_day, "' and end_day = '", end_day, "'")
   }
 
   df <- purrr::map_dfr(geo_values, function(geo_val) {
       single_geo(data_source, signal, start_day, end_day, geo_type, geo_val)
   })
 
+  # Assign covidcast_signal class and add some helpful attributes
+  class(df) = c("covidcast_signal", "data.frame")
+  attributes(df)$data_source = data_source
+  attributes(df)$signal = signal
+  attributes(df)$geo_type = geo_type
+  attributes(df)$mean_value = relevant_meta$mean_value
+  attributes(df)$stdev_value = relevant_meta$stdev_value
   return(df)
+}
+
+#' Print function for covidcast_signal object
+#'
+#' @param x The \code{covidcast_signal} object.
+#' 
+#' @method print covidcast_signal
+#' @export
+print.covidcast_signal = function(x) {
+  cat(sprintf("A `covidcast_signal` data frame with %i rows and %i columns.\n\n",
+              nrow(x), ncol(x)))
+  cat(sprintf("%-12s: %s\n", "data_source", attributes(x)$data_source))
+  cat(sprintf("%-12s: %s\n", "signal", attributes(x)$signal))
+  cat(sprintf("%-12s: %s\n", "geo_type", attributes(x)$geo_type))
+}
+
+#' Summary function for covidcast_signal object
+#'
+#' @param x The \code{covidcast_signal} object.
+#' 
+#' @method summary covidcast_signal
+#' @export
+summary.covidcast_signal = function(x) {
+  cat(sprintf("A `covidcast_signal` data frame with %i rows and %i columns.\n\n",
+              nrow(x), ncol(x)))
+  cat(sprintf("%-12s: %s\n", "data_source", attributes(x)$data_source))
+  cat(sprintf("%-12s: %s\n", "signal", attributes(x)$signal))
+  cat(sprintf("%-12s: %s\n\n", "geo_type", attributes(x)$geo_type))
+  cat(sprintf("%-37s: %s\n", "first date", min(x$time_value)))
+  cat(sprintf("%-37s: %s\n", "last date", max(x$time_value)))
+  cat(sprintf("%-37s: %i\n", "median number of geo_value's per day",
+              as.integer(x %>% dplyr::group_by(time_value) %>%
+                         dplyr::summarize(num = n()) %>%
+                         dplyr::summarize(median(num)))))
+  cat(sprintf("%-37s: %g\n", "median value", median(x$value, na.rm=TRUE)))
+  cat(sprintf("%-37s: %g\n", "median stderr",median(x$stderr, na.rm=TRUE)))
+  cat(sprintf("%-37s: %i\n", "median direction",
+              median(x$direction, na.rm=TRUE)))
+  cat(sprintf("%-37s: %g\n", "median sample_size",
+              median(x$sample_size, na.rm=TRUE)))
+}
+
+#' Plot function for covidcast_signal object
+#'
+#' @param x The \code{covidcast_signal} object.
+#' @param plot_type One of "choro", "bubble", "line" indicating whether to plot
+#'   a choropleth map, bubble map, or line (time series) graph, respectively.
+#'   The default is "choro".
+#' @param time_values Vector of Date objects (or strings in the form YYYY-MM-DD)
+#'   specifying the days for plotting. For choropleth and bubble maps, only a
+#'   single day can be plotted at one time, and this is taken to be maximum date 
+#'   in `time_values`. If `NULL`, the default, then the last date in `x` is used
+#'   for the maps, and (up to) the last 2 weeks in `x` is used for the time
+#'   series plot.  
+#' @param include Vector of state abbreviations (case insensitive, so "pa" and
+#'   "PA" both denote Pennsylvania) indicating which states to include in the
+#'   choropleth and bubble maps. Default is `c()`, which is interpreted to mean
+#'   all states.
+#' @param geo_values Vector of `geo_values` to include in the time series
+#'   plot. If `NULL`, the default, then the first 6 `geo_values` as found in `x`
+#'   are used.
+#' @param range Vector of two values: min and max, in this order, to use when
+#'   defining the color scale for choropleth maps and the size scale for bubble
+#'   maps. If `NULL`, the default, then the min and max are set to be the mean
+#'   +/- 3 standard deviations, where this mean and standard deviation are as
+#'   provided in the meta data for the given data source and signal.
+#' @param choro_col Vector of colors, as specified in hex code, to use for the
+#'   choropleth color scale. Can be arbitrary in length. Default is similar to
+#'   that from covidcast.cmu.edu.   
+#' @param alpha Number between 0 and 1, indicating the transparency level to be
+#'   used in the maps. For choropleth maps, this determines the transparency
+#'   level for the mega counties. For bubble maps, this determines the
+#'   transparency level for the bubbles. Default is 0.5.
+#' @param direction Should direction be visualized (instead of intensity) for
+#'   the maps? Default is `FALSE`.
+#' @param dir_col Vector of colors, as specified in hex code, to use for the
+#'   direction color scale. Must be of length 3. Default is similar to that from
+#'   covidcast.cmu.edu.
+#' @param bubble_col Bubble color for the bubble map. Default is "purple".
+#' @param line_col Vector of colors for the time series plot. This will be
+#'   recycled as necessary. Default is `1:6`. 
+#' @param lty Vector of line types for the time series plot. This will be
+#'   recycled as necessary. Default is `1:5`.
+#' @param title Title for the plot. If `NULL`, the default, then a simple title
+#'   is used based on the given data source, signal, and time values.
+#' @param choro_params,bubble_params,line_params Additional parameter lists for
+#'   the different plot types, for further customization. See details below. 
+#' 
+#' @method plot covidcast_signal
+#' @export
+plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
+                                 time_values = NULL, include = c(),
+                                 geo_values = NULL, range = NULL,
+                                 choro_col = c("#FFFFCC", "#FD893C", "#800026"),
+                                 alpha = 0.5, direction = FALSE,
+                                 dir_col = c("#BADEE8", "#F2DF91", "#CE0A05"),
+                                 bubble_col = "purple", line_col = 1:6,
+                                 lty = 1:5, title = NULL, choro_params = list(),
+                                 bubble_params = list(), line_params = list()) { 
+  plot_type = match.arg(plot_type)
+  if (plot_type == "choro") {
+    plot_choro(x, time_value = time_values, include = include, range = range,
+               col = choro_col, alpha = alpha, direction = direction,
+               dir_col = dir_col, title = title, params = choro_params)
+  }
+  else if (plot_type == "bubble") {
+    plot_bubble(x, time_value = time_values, include = include, range = range,
+                col = bubble_col, alpha = alpha, direction = direction,
+                dir_col = dir_col, title = title, params = bubble_params)
+  }
+  else {
+    plot_line(x, time_values = time_values, geo_values = geo_values,
+              range = range, col = line_col, lty = lty, direction = direction,
+              dir_col = dir_col, title = title, params = line_params) 
+  }
 }
 
 #' Fetch Delphi's COVID-19 Surveillance Streams metadata.

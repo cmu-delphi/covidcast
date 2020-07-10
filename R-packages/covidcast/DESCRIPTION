@@ -7,7 +7,8 @@ Authors@R: as.person(c(
   "Logan Brooks <lcbrooks@andrew.cmu.edu> [aut]",
   "David Farrow <dfarrow0@gmail.com> [aut]",
   "Pedrito Maynard-Zhang <pedritom@amazon.com> [aut]",
-  "Alex Reinhart <areinhar@stat.cmu.edu> [aut,cre]"
+  "Alex Reinhart <areinhar@stat.cmu.edu> [aut,cre]",
+  "Ryan Tibshirani <ryantibs@stat.cmu.edu> [aut]"
   ))
 URL: https://cmu-delphi.github.io/covidcast/R-packages/covidcast/, https://github.com/cmu-delphi/covidcast
 BugReports: https://github.com/cmu-delphi/covidcast/issues
@@ -20,11 +21,11 @@ Imports:
   dplyr,
   httr,
   purrr,
-  jsonlite
-RoxygenNote: 7.1.0
+  jsonlite,
+  usmap,
+  ggplot2	
+RoxygenNote: 7.1.1
 Suggests: 
     knitr,
-    rmarkdown,
-    usmap,
-    ggplot2
+    rmarkdown
 VignetteBuilder: knitr

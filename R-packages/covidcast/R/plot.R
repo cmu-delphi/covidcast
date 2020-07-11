@@ -40,14 +40,18 @@ plot_choro = function(x, time_value = NULL, include = c(), range = NULL,
                                    attributes(x)$signal, ", ", time_value)
 
   # Set a subtitle, if there are specific states we're viewing
-  if (!is.null(include)) subtitle = paste("Viewing",
-                                          paste(include, collapse=", "))
-  else subtitle = NULL
+  subtitle = params$subtitle
+  if (!is.null(include) && is.null(subtitle)) {
+    subtitle = paste("Viewing", paste(include, collapse=", "))
+  }
   
   # Set other map parameters, if we need to
-  if (is.null(params$missing_color)) params$missing_color = "gray"
-  if (is.null(params$border_color)) params$border_color = "white"
-  if (is.null(params$size)) params$size = 0.1
+  missing_col = params$missing_col
+  border_col = params$border_col
+  size = params$size
+  if (is.null(missing_col)) missing_col = "gray"
+  if (is.null(border_col)) border_col = "white"
+  if (is.null(size)) size = 0.1
 
   # For intensity, create a color function, if we need to
   col_fun = params$col_fun
@@ -78,6 +82,9 @@ plot_choro = function(x, time_value = NULL, include = c(), range = NULL,
 
   # For direction, create a color function
   else if (direction) {
+    if (length(dir_col) != 3) {
+      stop("'dir_col' must have length 3.")
+    }
     col_fun = function(val, alpha = 1) {
       alpha_str = substr(rgb(0, 0, 0, alpha = alpha), 8, 9)
       not_na = !is.na(val)
@@ -109,11 +116,11 @@ plot_choro = function(x, time_value = NULL, include = c(), range = NULL,
   geo = df$geo_value
   names(val) = geo
   
-  # Plot the choropleth map for counties 
+  # Create the choropleth colors for counties 
   if (attributes(x)$geo_type == "county") {
     map_df = usmap::us_map("county", include = include)
     geo_all = map_df$fips
-    col_all = rep(params$missing_col, length(geo_all))
+    col_all = rep(missing_col, length(geo_all))
 
     # First set the colors for mega counties
     mega_cty = geo[which(substr(geo, 3, 5) == "000")]
@@ -126,17 +133,17 @@ plot_choro = function(x, time_value = NULL, include = c(), range = NULL,
     obs_all = geo_all[geo_all %in% obs_cty]
     col_all[geo_all %in% obs_cty] = col_fun(val[obs_all])
     
-    # TODO: implement megacounties "properly". For this we should first draw the
+    # TODO: implement megacounties "properly"? For this we should first draw the
     # states (not counties) in transparent colors, then layer over the observed
     # counties. Hence, eventually, two calls to usmap::us_map() and two polygon
     # layers?
   }
 
-  # Set the colors for states
+  # Create the choropleth colors for states
   else if (attributes(x)$geo_type == "state") {
     map_df = usmap::us_map("state", include = include)
     geo_all = tolower(map_df$abbr)
-    col_all = rep(params$missing_col, length(geo_all))
+    col_all = rep(missing_col, length(geo_all))
     
     # Overwrite the colors for observed states
     obs_all = geo_all[geo_all %in% geo]
@@ -145,17 +152,68 @@ plot_choro = function(x, time_value = NULL, include = c(), range = NULL,
   
   # Create the polygon layer
   geom_args = list()
-  geom_args$color = params$border_color
-  geom_args$size = params$size
+  geom_args$color = border_col
+  geom_args$size = size
   geom_args$fill = col_all
   geom_args$mapping = ggplot2::aes(x = map_df$x, y = map_df$y,
                                    group = map_df$group)
   polygon_layer = do.call(ggplot2::geom_polygon, geom_args)
   
-  # TODO: implement a legend layer
+  # For intensity, create a legend layer
+  if (!direction) {
+    # Set the legend values, if we need to
+    legend_values = params$legend_values
+    if (is.null(legend_values)) legend_values = seq(range[1], range[2], len = 8)
+    
+    # Set the legend labels, if we need to
+    legend_labels = params$legend_labels
+    if (is.null(legend_labels)) legend_labels = sprintf("%0.2f", legend_values)
 
+    # Create a dense set of values, for the color gradient (especially important
+    # if the custom col_fun is not a linear color gradient)
+    N = length(legend_values)
+    d = approx(x = 0:(N-1) / (N-1), y = legend_values, xout = 0:299 / 299)$y
+    
+    # Define visual breaks (evenly-spaced across the range)
+    legend_breaks = seq(min(legend_values), max(legend_values), length = N)
+
+    # Now the legend layer
+    legend_df = data.frame(x = rep(Inf, N), z = legend_values)
+    hidden_layer = ggplot2::geom_point(ggplot2::aes(x = x, y = x, color = z),
+                                       data = legend_df, alpha = 0)
+    guide = ggplot2::guide_colorbar(title = NULL, horizontal = TRUE, 
+                                    barheight = 0.5, barwidth = 15,
+                                    draw.ulim = FALSE, draw.llim = FALSE)
+    legend_layer = ggplot2::scale_color_gradientn(colors = col_fun(d),
+                                                  limits = range(d),
+                                                  breaks = legend_breaks,
+                                                  labels = legend_labels,
+                                                  guide = guide)
+  }
+
+  # For direction, create a legend layer
+  else {
+    # Set the legend labels, if we need to
+    legend_labels = params$legend_labels
+    if (is.null(legend_labels)) legend_labels = c("Decreasing", "Steady",
+                                                  "Increasing")
+
+    # Now the legend layer
+    legend_df = data.frame(x = rep(Inf, 3), z = as.factor(-1:1))
+    hidden_layer = ggplot2::geom_point(ggplot2::aes(x = x, y = x, color = z),
+                                       data = legend_df, alpha = 0)
+    guide = ggplot2::guide_legend(title = NULL, horizontal = TRUE,
+                                  override.aes = list(alpha = 1, size = 2))
+    legend_layer = ggplot2::scale_color_manual(values = dir_col,
+                                               breaks = -1:1,
+                                               labels = legend_labels,
+                                               guide = guide)
+  }
+
+  # Put it all together
   return(ggplot2::ggplot(data = map_df) + polygon_layer +
-         ggplot2::coord_equal() + title_layer + theme_layer)
+         ggplot2::coord_equal() + title_layer + hidden_layer +
+         legend_layer + theme_layer)
 }
 
 # Plot a bubble map of a covidcast_signal object.

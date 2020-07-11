@@ -4,7 +4,7 @@
 #'
 #' @source
 #'   \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.csv}
-"county_pop"
+"county_census"
 
 #' Metro area populations.
 #'
@@ -12,7 +12,7 @@
 #'
 #' @source
 #'   \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.csv}
-"msa_pop"
+"msa_census"
 
 #' State populations.
 #'
@@ -20,27 +20,21 @@
 #'
 #' @source
 #'   \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/state/detail/SCPRC-EST2019-18+POP-RES.csv}
-"state_pop"
+"state_census"
 
-#' FIPS populations.
+#' County latitudes and longitudes.
 #'
-#' Data set on state populations, from the 2019 US Census. 
+#' Data set on latitudes and longitudes of county centroids, from the National
+#'   Weather Service.
 #'
 #' @source
-#'   \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/state/detail/SCPRC-EST2019-18+POP-RES.csv}
-"state_pop"
+#'   \url{https://www.weather.gov/gis/Counties}
+"county_geo"
 
-#' County FIPS codes.
+#' State latitudes and longitudes.
 #'
-#' Data set on county FIPS codes, extracted from the `county_pop` data frame. 
-"county_fips"
-
-#' Metro area CBSA codes.
+#' Data set on latitudes and longitudes of state centroids, from Google's DSPL. 
 #'
-#' Data set on metropolitan area CBSA codes, extracted from the `msa_pop` data frame. 
-"msa_cbsa"
-
-#' State FIPS codes.
-#'
-#' Data set on state FIPS codes, extracted from the `state_pop` data frame. 
-"state_fips"
+#' @source
+#'   \url{https://developers.google.com/public-data/docs/canonical/states_csv}
+"state_geo"

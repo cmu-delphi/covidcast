@@ -14,7 +14,7 @@
   choro_col = c("#FFFFCC", "#FD893C", "#800026"),
   alpha = 0.5,
   direction = FALSE,
-  dir_col = c("#6F9CC6", "#F7F793", "#C56B59"),
+  dir_col = c("#6F9CC6", "#F3EE9E", "#C56B59"),
   bubble_col = "purple",
   line_col = 1:6,
   lty = 1:5,

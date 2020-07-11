@@ -237,21 +237,27 @@ plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
                                  geo_values = NULL, range = NULL,
                                  choro_col = c("#FFFFCC", "#FD893C", "#800026"),
                                  alpha = 0.5, direction = FALSE,
-                                 dir_col = c("#BADEE8", "#F2DF91", "#CE0A05"),
+                                 dir_col = c("#6F9CC6", "#F7F793", "#C56B59"),
                                  bubble_col = "purple", line_col = 1:6,
                                  lty = 1:5, title = NULL, choro_params = list(),
                                  bubble_params = list(), line_params = list()) { 
   plot_type = match.arg(plot_type)
+  
+  # Choropleth map
   if (plot_type == "choro") {
     plot_choro(x, time_value = time_values, include = include, range = range,
                col = choro_col, alpha = alpha, direction = direction,
                dir_col = dir_col, title = title, params = choro_params)
   }
+
+  # Bubble map
   else if (plot_type == "bubble") {
     plot_bubble(x, time_value = time_values, include = include, range = range,
                 col = bubble_col, alpha = alpha, direction = direction,
                 dir_col = dir_col, title = title, params = bubble_params)
   }
+
+  # Line (time series) plot
   else {
     plot_line(x, time_values = time_values, geo_values = geo_values,
               range = range, col = line_col, lty = lty, direction = direction,

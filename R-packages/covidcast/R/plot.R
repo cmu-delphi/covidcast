@@ -11,10 +11,10 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     stop("Only 'county' and 'state' are supported for choropleth maps.")
   }
 
-  # Set the time value, if we need to
+  # Set the time value, if we need to (last observed time value)
   if (is.null(time_value)) time_value = max(x$time_value)
   
-  # Set a title, if we need to (simple combo of data_source, signal, time_value)
+  # Set a title, if we need to (simple combo of data source, signal, time value)
   if (is.null(title)) title = paste0(attributes(x)$data_source, ": ",
                                      attributes(x)$signal, ", ", time_value)
 
@@ -216,9 +216,8 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   }
 
   # Put it all together and return
-  return(ggplot2::ggplot(data = map_df) + polygon_layer +
-         ggplot2::coord_equal() + title_layer + hidden_layer +
-         scale_layer + theme_layer)
+  return(ggplot2::ggplot() + polygon_layer + ggplot2::coord_equal() +
+         title_layer + hidden_layer + scale_layer + theme_layer)
 }
 
 # Plot a bubble map of a covidcast_signal object.
@@ -232,10 +231,10 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     stop("Only 'county' and 'state' are supported for bubble maps.")
   }
 
-  # Set the time value, if we need to
+  # Set the time value, if we need to (last observed time value)
   if (is.null(time_value)) time_value = max(x$time_value)
-
-  # Set a title, if we need to (simple combo of data_source, signal, time_value)
+  
+  # Set a title, if we need to (simple combo of data source, signal, time value)
   if (is.null(title)) title = paste0(attributes(x)$data_source, ": ",
                                      attributes(x)$signal, ", ", time_value)
 
@@ -265,8 +264,10 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   # Create bubble sizes
   min_size = params$min_size
   max_size = params$max_size
-  if (is.null(min_size)) min_size = 0.1
-  if (is.null(max_size)) max_size = 4
+  if (is.null(min_size)) min_size = ifelse(attributes(x)$geo_type == "county",
+                                           0.1, 1)
+  if (is.null(max_size)) max_size = ifelse(attributes(x)$geo_type == "county",
+                                           4, 12)
   sizes = seq(min_size, max_size, length = num_bins)
 
   # Create discretization function
@@ -292,7 +293,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   given_time_value = time_value
   df = x %>%
     dplyr::filter(time_value == given_time_value) %>%
-    dplyr::select(value, direction, geo_value)
+    dplyr::select(value, geo_value)
   val = df$value
   geo = df$geo_value
   names(val) = geo
@@ -379,10 +380,8 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
                                            guide = guide)
   
   # Put it all together and return
-  return(ggplot2::ggplot(data = map_df) + polygon_layer +
-         ggplot2::coord_equal() + title_layer + bubble_layer +
-         scale_layer + theme_layer)
-  
+  return(ggplot2::ggplot() + polygon_layer + ggplot2::coord_equal() +
+         title_layer + bubble_layer + scale_layer + theme_layer)
 }
 
 # Plot a line (time series) graph of a covidcast_signal object.
@@ -390,4 +389,55 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 plot_line = function(x, time_values = NULL, geo_values = NULL, range = NULL,
                      col = 1:6, line_type = rep(1:6, each = length(col)),
                      title = NULL, params = list()) {
+  # Check for geo values having been specified
+  if (is.null(geo_values)) {
+    stop("'geo_values' must be specified for line plots.")
+  }
+    
+  # Set the number of weeks, if we need to
+  num_days = params$num_days
+  if (is.null(num_days)) num_days = 14
+  
+  # Set the time values, if we need to (the latest num_days)
+  if (is.null(time_values)) {
+    time_all = unique(x$time_value)
+    n = length(time_all)
+    time_values = time_all[max(1, n - num_days) : n]
+  }
+  
+  # Set a title, if we need to (simple combo of data source, signal)
+  if (is.null(title)) title = paste0(attributes(x)$data_source, ": ",
+                                     attributes(x)$signal)
+  
+  # Set other map parameters, if we need to
+  xlab = params$xlab
+  ylab = params$ylab
+  if (is.null(xlab)) xlab = "Date"
+  if (is.null(ylab)) ylab = "Value"
+  
+  # Grab the values
+  given_time_values = time_values
+  given_geo_values = geo_values
+  df = x %>%
+    dplyr::filter(time_value %in% given_time_values) %>%
+    dplyr::filter(geo_value %in% given_geo_values) %>%
+    dplyr::select(value, time_value, geo_value)
+
+  # Create label and theme layers
+  label_layer = ggplot2::labs(title = title, x = xlab, y = ylab) 
+  theme_layer = ggplot2::theme_bw() +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) + 
+    ggplot2::theme(legend.position = "bottom",
+                   legend.title = ggplot2::element_blank()) 
+
+  # Create line layer
+  line_layer = ggplot2::geom_line(ggplot2::aes(x = time_value, y = value,
+                                               color = geo_value,
+                                               group = geo_value), data = df)
+
+  # TODO: implement colors and line types (currently ignored). Also, show
+  # standard error bands, and other features?
+  
+  # Put it all together and return
+  return(ggplot2::ggplot() + line_layer + label_layer + theme_layer)
 }

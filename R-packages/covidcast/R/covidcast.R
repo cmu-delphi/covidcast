@@ -329,9 +329,6 @@ plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
   }
 }
 
-covidcast_signals = function() {
-}
-
 #' Fetch Delphi's COVID-19 Surveillance Streams metadata.
 #'
 #' Obtains a data frame of metadata describing all publicly available data

@@ -76,8 +76,8 @@ covidcast.cmu.edu.}
 \item{num_bins}{Number of bins for determining the bubble sizes for the
 bubble map. Default is 6. These bins are evenly-spaced in between the min
 and max as specified through the \code{range} parameter. Each bin is assigned
-the same bubble size. Also, values of zero special: values mapped to the
-same bin as zero are not drawn.}
+the same bubble size. Also, values of zero special: it has its own separate
+(small) bin, and values mapped to the zero bin are not drawn.}
 
 \item{line_col}{Vector of colors for the time series plot. This will be
 recycled as necessary. Default is \code{1:6}.}
@@ -93,4 +93,37 @@ the different plot types, for further customization. See details below.}
 }
 \description{
 Plot function for covidcast_signal object
+}
+\details{
+TODO explain all these advanced parameters.
+
+For both choropleth and bubble maps:
+\itemize{
+\item{\code{subtitle}}
+\item{\code{missing_col}}
+\item{\code{border_col}}
+\item{\code{border_size}}
+\item{\code{legend_height}}
+\item{\code{legend_width}}
+\item{\code{breaks}}
+}
+
+For choropleth maps only:
+\itemize{
+\item{\code{legend_n}}
+}
+
+For bubble maps only:
+\itemize{
+\item{\code{remove_zero}}
+\item{\code{min_size}}
+\item{\code{max_size}}
+}
+
+For line graphs:
+\itemize{
+\item{\code{num_days}}
+\item{\code{xlab}}
+\item{\code{ylab}}
+}
 }

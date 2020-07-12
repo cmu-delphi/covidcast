@@ -205,9 +205,10 @@ summary.covidcast_signal = function(x) {
 #'   are used.
 #' @param range Vector of two values: min and max, in this order, to use when
 #'   defining the color scale for choropleth maps and the size scale for bubble
-#'   maps. If `NULL`, the default, then the min and max are set to be the mean
-#'   +/- 3 standard deviations, where this mean and standard deviation are as
-#'   provided in the meta data for the given data source and signal.
+#'   maps, or the range of the y-axis for the time series plot. If `NULL`, the 
+#'   default, then the min and max are set to be the mean +/- 3 standard
+#'   deviations, where this mean and standard deviation are as provided in the
+#'   meta data for the given data source and signal. 
 #' @param choro_col Vector of colors, as specified in hex code, to use for the
 #'   choropleth color scale. Can be arbitrary in length. Default is similar to
 #'   that from covidcast.cmu.edu.   
@@ -216,15 +217,20 @@ summary.covidcast_signal = function(x) {
 #'   level for the mega counties. For bubble maps, this determines the
 #'   transparency level for the bubbles. Default is 0.5.
 #' @param direction Should direction be visualized (instead of intensity) for
-#'   the maps? Default is `FALSE`.
+#'   the choropleth map? Default is `FALSE`.
 #' @param dir_col Vector of colors, as specified in hex code, to use for the
 #'   direction color scale. Must be of length 3. Default is similar to that from
 #'   covidcast.cmu.edu.
 #' @param bubble_col Bubble color for the bubble map. Default is "purple".
+#' @param num_bins Number of bins for determining the bubble sizes for the
+#'   bubble map. Default is 6. These bins are evenly-spaced in between the min
+#'   and max as specified through the `range` parameter. Each bin is assigned
+#'   the same bubble size. Also, values of zero special: values mapped to the
+#'   same bin as zero are not drawn.
 #' @param line_col Vector of colors for the time series plot. This will be
 #'   recycled as necessary. Default is `1:6`. 
-#' @param lty Vector of line types for the time series plot. This will be
-#'   recycled as necessary. Default is `1:5`.
+#' @param line_type Vector of line types for the time series plot. This will be
+#'   recycled as necessary. Default is `rep(1:6, each = length(col))`.
 #' @param title Title for the plot. If `NULL`, the default, then a simple title
 #'   is used based on the given data source, signal, and time values.
 #' @param choro_params,bubble_params,line_params Additional parameter lists for
@@ -238,10 +244,35 @@ plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
                                  choro_col = c("#FFFFCC", "#FD893C", "#800026"),
                                  alpha = 0.5, direction = FALSE,
                                  dir_col = c("#6F9CC6", "#F3EE9E", "#C56B59"),
-                                 bubble_col = "purple", line_col = 1:6,
-                                 lty = 1:5, title = NULL, choro_params = list(),
+                                 bubble_col = "purple", num_bins = 8,
+                                 line_col = 1:6,
+                                 line_type = rep(1:6, each = length(line_col)),
+                                 title = NULL, choro_params = list(),
                                  bubble_params = list(), line_params = list()) { 
   plot_type = match.arg(plot_type)
+  
+  # Set range, if we need to (to mean +/- 3 standard deviations, from metadata)
+  if (is.null(range)) {
+    range = c(attributes(x)$mean_value - 3 * attributes(x)$stdev_value,
+              attributes(x)$mean_value + 3 * attributes(x)$stdev_value)
+    range = pmax(0, range)
+    # TODO: figure out for which signals we need to clip the top of the range.
+    # For example, for percentages, we need to clip it at 100
+  }
+
+  # For the maps, take the most recent time value if more than one is passed, 
+  # and check that the include arguments indeed contains state names
+  if (plot_type == "choro" || plot_type == "bubble") {
+    if (!is.null(time_values)) time_values = max(time_values)
+    if (!is.null(include)) {
+      include = toupper(include)
+      no_match = which(!(include %in% c(state.abb, "DC")))
+      if (length(no_match) > 0) {
+        warning("'include' must only contain US state abbreviations or 'DC'.") 
+        include = include[-no_match]
+      }
+    }
+  }
   
   # Choropleth map
   if (plot_type == "choro") {
@@ -250,18 +281,19 @@ plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
                dir_col = dir_col, title = title, params = choro_params)
   }
 
+  
   # Bubble map
   else if (plot_type == "bubble") {
     plot_bubble(x, time_value = time_values, include = include, range = range,
-                col = bubble_col, alpha = alpha, direction = direction,
-                dir_col = dir_col, title = title, params = bubble_params)
+                col = bubble_col, alpha = alpha, num_bins = num_bins,
+                title = title, params = bubble_params)
   }
 
   # Line (time series) plot
   else {
     plot_line(x, time_values = time_values, geo_values = geo_values,
-              range = range, col = line_col, lty = lty, direction = direction,
-              dir_col = dir_col, title = title, params = line_params) 
+              range = range, col = line_col, line_type = line_type,
+              title = title, params = line_params) 
   }
 }
 

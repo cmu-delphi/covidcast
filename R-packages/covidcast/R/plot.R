@@ -259,8 +259,15 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   # Create breaks, if we need to
   breaks = params$breaks
   if (!is.null(breaks)) num_bins = length(breaks)
-  else breaks = seq(range[1], range[2], length = num_bins)
-
+  else {
+    # Set a lower bound if range[1] == 0 and we're removing zeros
+    lower_bd = range[1]
+    if (!isFALSE(params$remove_zero) && range[1] == 0) {
+      lower_bd = min(0.1, range[2] / num_bins)
+    }
+    breaks = seq(lower_bd, range[2], length = num_bins)
+  }
+  
   # Create bubble sizes
   min_size = params$min_size
   max_size = params$max_size
@@ -272,9 +279,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 
   # Create discretization function
   dis_fun = function(val) {
-    not_na = !is.na(val)
     val_out = rep(NA, length(val))
-    val_out[not_na] = breaks[1]
     for (i in 1:length(breaks)) val_out[val >= breaks[i]] = breaks[i]
     return(val_out)
   }
@@ -316,7 +321,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   
   # Warn if there's any missing locations
   if (sum(map_mis == 1) > 0) {
-    warning("Bubble maps can be hard to read when there is missinng data;",
+    warning("Bubble maps can be hard to read when there is missing data;",
             "the locations without data are filled in gray.")
   }
   
@@ -359,7 +364,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   cur_val = factor(cur_val, levels = breaks)
   
   # Explicitly drop zeros (and from levels) unless we're asked not to
-  if (!isFALSE(params$remove_zeros)) {
+  if (!isFALSE(params$remove_zero)) {
     cur_val[cur_val == 0] = NA
     levels(cur_val)[levels(cur_val) == 0] = NA
   }

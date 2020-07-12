@@ -43,9 +43,11 @@ plot(df_comb, time_value = "2020-07-04", choro_col = cm.colors(10), alpha = 0.4,
 plot(df_comb, include = c("PA", "NY"))
 
 # One more example: custom (log-spaced) color scale for incident case numbers
-suppressMessages({df_inum = covidcast_signal(data_source = "jhu-csse", 
-                                             signal = "confirmed_7dav_incidence_num",
-                                             start_day = "20200704")})
+suppressMessages({
+df_inum = covidcast_signal(data_source = "jhu-csse", 
+                           signal = "confirmed_7dav_incidence_num",
+                           start_day = "20200704")
+})
 
 breaks = c(0, 1, 2, 5, 10, 20, 50, 100, 200) 
 colors = c("#D3D3D3", "#FFFFCC", "#FEDDA2", "#FDBB79", "#FD9950", "#EB7538", "#C74E32",
@@ -59,9 +61,11 @@ plot(df_inum, choro_col = colors, choro_params = list(breaks = breaks),
      title = paste("New COVID Cases (7 Day Trailing Average) on", max(df_inum$time_value)))
 
 # One more example: which counties have cumulative case rates of at least 1/100?
-suppressMessages({df_cprop = covidcast_signal(data_source = "jhu-csse",
-                                              signal = "confirmed_cumulative_prop",
-                                              start_day = "20200704")})
+suppressMessages({
+df_cprop = covidcast_signal(data_source = "jhu-csse",
+                            signal = "confirmed_cumulative_prop",
+                            start_day = "20200704")
+})
 
 breaks = c(0, 1000)
 colors = c("#D3D3D3", "#FFC0CB")
@@ -75,24 +79,64 @@ Bubble maps
 
 ```{r}
 # Plot a bubble map: default is 8 bins evenly-spaced over the auto range (with the zero
-# bin assigned a zero bubble size)
+# bin assigned a zero bubble size). For the legend labels, we interpret it as follows: 
+# each bubble size means *at least* the corresponding value
 plot(df_inum, plot_type = "bubble")
 
-# Example with customized options: only show Texas, red bubbles, bigger sizes, custom breaks.
+# Example with customized options: show Texas, red bubbles, bigger sizes, custom breaks.
 # Then plot the same but for incidence proportion 
-suppressMessages({df_iprop = covidcast_signal(data_source = "jhu-csse", 
-                                                   signal = "confirmed_7dav_incidence_prop",
-                                                   start_day = "20200704")})
+suppressMessages({
+df_iprop = covidcast_signal(data_source = "jhu-csse", 
+                            signal = "confirmed_7dav_incidence_prop",
+                            start_day = "20200704")
+})
 breaks1 = c(0, 1, 10, 100, 1000)
 breaks2 = c(0, 10, 50, 100, 500)
 p1 = plot(df_inum, plot_type = "bubble", bubble_params = list(breaks = breaks1, max_size = 6), 
-          include = "TX", bubble_col = "red", title = paste0("Incidence Number on", 
-                                                             max(df_inum$time_value)))
+          include = "TX", bubble_col = "red", title = paste("Incidence Number on", 
+                                                            max(df_inum$time_value)))
 p2 = plot(df_iprop, plot_type = "bubble", bubble_params = list(breaks = breaks2, max_size = 6), 
-          include = "TX", bubble_col = "red", title = paste0("Incidence Proportion on", 
-                                                             max(df_iprop$time_value)))
+          include = "TX", bubble_col = "red", title = paste("Incidence Proportion on", 
+                                                            max(df_iprop$time_value)))
 gridExtra::grid.arrange(p1, p2, nrow = 1)
 
-# One more example: bubble plot for combined indicator (doesn't really "work", hard to read)
+# One more example: bubble plot for combined indicator (doesn't really "work" that well)
 plot(df_comb, plot_type = "bubble")
+```
+
+State examples
+===
+
+```{r}
+suppressMessages({
+df_comb_st = covidcast_signal(data_source = "indicator-combination",  
+                              signal = "nmf_day_doc_fbc_fbs_ght", 
+                              geo_type = "state")
+df_inum_st = covidcast_signal(data_source = "jhu-csse", 
+                              signal = "confirmed_7dav_incidence_num",
+                              geo_type = "state")
+})
+
+plot(df_comb_st)
+plot(df_inum_st, plot_type = "bubble")
+```
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(fig.width=8, fig.height=6)
+```
+
+Time series plots
+===
+
+```{r}
+# Plot a time series graph: default is to show the last 2 weeks
+plot(df_comb_st, plot_type = "line", geo_values = c("ca","pa","tx","ny"))
+plot(df_inum_st, plot_type = "line", geo_values = c("ca","pa","tx","ny"))
+
+# Example with customized options: set the num_days argument to Inf, effectively plotting
+# back until data was first available
+plot(df_comb_st, plot_type = "line", geo_values = c("ca","pa","tx","ny"),
+     line_params = list(num_days = Inf))
+plot(df_inum_st, plot_type = "line", geo_values = c("ca","pa","tx","ny"),
+     line_params = list(num_days = Inf))
 ```

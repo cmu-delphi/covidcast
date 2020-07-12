@@ -78,13 +78,17 @@ Bubble maps
 ===
 
 ```{r}
-# Plot a bubble map: default is 8 bins evenly-spaced over the auto range (with the zero
-# bin assigned a zero bubble size). For the legend labels, we interpret it as follows: 
-# each bubble size means *at least* the corresponding value
+# Plot a bubble map: default is 8 bins evenly-spaced over the auto range (where zero is
+# always excluded and assigned a zero bubble size). Legend labels can be interpreted as 
+# follows: each bubble size means **at least** the corresponding value
 plot(df_inum, plot_type = "bubble")
 
-# Example with customized options: show Texas, red bubbles, bigger sizes, custom breaks.
-# Then plot the same but for incidence proportion 
+# Example with customized options: set custom breaks. As values to the left of the first
+# bin don't get drawn, this map is much sparser
+plot(df_inum, plot_type = "bubble", bubble_params = list(breaks = seq(20, 200, len = 6)))
+
+# Two more examples: show Texas, red bubbles, bigger sizes, custom breaks. Then plot the 
+# same but for incidence proportion 
 suppressMessages({
 df_iprop = covidcast_signal(data_source = "jhu-csse", 
                             signal = "confirmed_7dav_incidence_prop",

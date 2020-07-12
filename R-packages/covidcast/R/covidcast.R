@@ -225,8 +225,8 @@ summary.covidcast_signal = function(x) {
 #' @param num_bins Number of bins for determining the bubble sizes for the
 #'   bubble map. Default is 6. These bins are evenly-spaced in between the min
 #'   and max as specified through the `range` parameter. Each bin is assigned
-#'   the same bubble size. Also, values of zero special: values mapped to the
-#'   same bin as zero are not drawn.
+#'   the same bubble size. Also, values of zero special: it has its own separate
+#'   (small) bin, and values mapped to the zero bin are not drawn.
 #' @param line_col Vector of colors for the time series plot. This will be
 #'   recycled as necessary. Default is `1:6`. 
 #' @param line_type Vector of line types for the time series plot. This will be
@@ -235,6 +235,38 @@ summary.covidcast_signal = function(x) {
 #'   is used based on the given data source, signal, and time values.
 #' @param choro_params,bubble_params,line_params Additional parameter lists for
 #'   the different plot types, for further customization. See details below. 
+#'
+#' @details TODO explain all these advanced parameters.
+#' 
+#' For both choropleth and bubble maps:
+#' \itemize{
+#' \item{`subtitle`}
+#' \item{`missing_col`}
+#' \item{`border_col`} 
+#' \item{`border_size`}
+#' \item{`legend_height`}
+#' \item{`legend_width`}
+#' \item{`breaks`}
+#' }
+#'
+#' For choropleth maps only:
+#' \itemize{
+#' \item{`legend_n`}
+#' }
+#' 
+#' For bubble maps only:
+#' \itemize{
+#' \item{`remove_zero`}
+#' \item{`min_size`}
+#' \item{`max_size`}
+#' }
+#' 
+#' For line graphs:
+#' \itemize{
+#' \item{`num_days`}
+#' \item{`xlab`}
+#' \item{`ylab`}
+#' }
 #' 
 #' @method plot covidcast_signal
 #' @export
@@ -297,6 +329,9 @@ plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
   }
 }
 
+covidcast_signals = function() {
+}
+
 #' Fetch Delphi's COVID-19 Surveillance Streams metadata.
 #'
 #' Obtains a data frame of metadata describing all publicly available data
@@ -320,7 +355,6 @@ plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
 #'   \item{max_value}{The largest value that has ever been reported.}
 #'   \item{mean_value}{The arithmetic mean of all reported values.}
 #'   \item{stdev_value}{The sample standard deviation of all reported values.}
-#'
 #' @references COVIDcast API sources and signals documentation:
 #'   \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 #' @export

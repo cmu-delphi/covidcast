@@ -16,8 +16,9 @@
   direction = FALSE,
   dir_col = c("#6F9CC6", "#F3EE9E", "#C56B59"),
   bubble_col = "purple",
+  num_bins = 8,
   line_col = 1:6,
-  lty = 1:5,
+  line_type = rep(1:6, each = length(line_col)),
   title = NULL,
   choro_params = list(),
   bubble_params = list(),
@@ -49,9 +50,10 @@ are used.}
 
 \item{range}{Vector of two values: min and max, in this order, to use when
 defining the color scale for choropleth maps and the size scale for bubble
-maps. If \code{NULL}, the default, then the min and max are set to be the mean
-+/- 3 standard deviations, where this mean and standard deviation are as
-provided in the meta data for the given data source and signal.}
+maps, or the range of the y-axis for the time series plot. If \code{NULL}, the
+default, then the min and max are set to be the mean +/- 3 standard
+deviations, where this mean and standard deviation are as provided in the
+meta data for the given data source and signal.}
 
 \item{choro_col}{Vector of colors, as specified in hex code, to use for the
 choropleth color scale. Can be arbitrary in length. Default is similar to
@@ -63,7 +65,7 @@ level for the mega counties. For bubble maps, this determines the
 transparency level for the bubbles. Default is 0.5.}
 
 \item{direction}{Should direction be visualized (instead of intensity) for
-the maps? Default is \code{FALSE}.}
+the choropleth map? Default is \code{FALSE}.}
 
 \item{dir_col}{Vector of colors, as specified in hex code, to use for the
 direction color scale. Must be of length 3. Default is similar to that from
@@ -71,11 +73,17 @@ covidcast.cmu.edu.}
 
 \item{bubble_col}{Bubble color for the bubble map. Default is "purple".}
 
+\item{num_bins}{Number of bins for determining the bubble sizes for the
+bubble map. Default is 6. These bins are evenly-spaced in between the min
+and max as specified through the \code{range} parameter. Each bin is assigned
+the same bubble size. Also, values of zero special: values mapped to the
+same bin as zero are not drawn.}
+
 \item{line_col}{Vector of colors for the time series plot. This will be
 recycled as necessary. Default is \code{1:6}.}
 
-\item{lty}{Vector of line types for the time series plot. This will be
-recycled as necessary. Default is \code{1:5}.}
+\item{line_type}{Vector of line types for the time series plot. This will be
+recycled as necessary. Default is \code{rep(1:6, each = length(col))}.}
 
 \item{title}{Title for the plot. If \code{NULL}, the default, then a simple title
 is used based on the given data source, signal, and time values.}

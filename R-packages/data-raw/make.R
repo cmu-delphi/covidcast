@@ -29,5 +29,5 @@ county_geo[!county_geo$FIPS %in% county_census$FIPS, ] # AS, PR, VI, GU, etc.
 
 # State geo data from https://developers.google.com/public-data/docs/canonical/states_csv
 state_geo = read.table("state-geo.txt", sep = "\t", stringsAsFactors = FALSE)
-colnames(state_geo) = c("STATE", "LAT", "LONG", "NAME")
+colnames(state_geo) = c("STATE", "LAT", "LON", "NAME")
 save(state_geo, file = "../covidcast/data/state_geo.rda")

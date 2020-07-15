@@ -390,26 +390,8 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 }
 
 # Plot a line (time series) graph of a covidcast_signal object.
-
-plot_line = function(x, time_values = NULL, geo_values = NULL, range = NULL,
-                     col = 1:6, line_type = rep(1:6, each = length(col)),
+plot_line = function(x, range = NULL, col = 1:6, line_type = rep(1:6, each = length(col)),
                      title = NULL, params = list()) {
-  # Check for geo values having been specified
-  if (is.null(geo_values)) {
-    stop("'geo_values' must be specified for line plots.")
-  }
-
-  # Set the number of weeks, if we need to
-  num_days = params$num_days
-  if (is.null(num_days)) num_days = 14
-
-  # Set the time values, if we need to (the latest num_days)
-  if (is.null(time_values)) {
-    time_all = unique(x$time_value)
-    n = length(time_all)
-    time_values = time_all[max(1, n - num_days) : n]
-  }
-
   # Set a title, if we need to (simple combo of data source, signal)
   if (is.null(title)) title = paste0(attributes(x)$data_source, ": ",
                                      attributes(x)$signal)
@@ -421,12 +403,7 @@ plot_line = function(x, time_values = NULL, geo_values = NULL, range = NULL,
   if (is.null(ylab)) ylab = "Value"
 
   # Grab the values
-  given_time_values = time_values
-  given_geo_values = geo_values
-  df = x %>%
-    dplyr::filter(time_value %in% given_time_values) %>%
-    dplyr::filter(geo_value %in% given_geo_values) %>%
-    dplyr::select(value, time_value, geo_value)
+  df = x %>% dplyr::select(value, time_value, geo_value)
 
   # Create label and theme layers
   label_layer = ggplot2::labs(title = title, x = xlab, y = ylab)

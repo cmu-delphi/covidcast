@@ -7,9 +7,8 @@
 \method{plot}{covidcast_signal}(
   x,
   plot_type = c("choro", "bubble", "line"),
-  time_values = NULL,
+  time_value = NULL,
   include = c(),
-  geo_values = NULL,
   range = NULL,
   choro_col = c("#FFFFCC", "#FD893C", "#800026"),
   alpha = 0.5,
@@ -32,21 +31,15 @@
 a choropleth map, bubble map, or line (time series) graph, respectively.
 The default is "choro".}
 
-\item{time_values}{Vector of Date objects (or strings in the form YYYY-MM-DD)
-specifying the days for plotting. For choropleth and bubble maps, only a
-single day can be plotted at one time, and this is taken to be maximum date
-in \code{time_values}. If \code{NULL}, the default, then the last date in \code{x} is used
-for the maps, and (up to) the last 2 weeks in \code{x} is used for the time
-series plot.}
+\item{time_value}{Date object (or string in the form YYYY-MM-DD) specifying
+the day to map, for choropleth and bubble maps. If \code{NULL}, the default,
+then the last date in \code{x} is used for the maps. Time series plots always
+include all available time values in \code{x}.}
 
 \item{include}{Vector of state abbreviations (case insensitive, so "pa" and
 "PA" both denote Pennsylvania) indicating which states to include in the
 choropleth and bubble maps. Default is \code{c()}, which is interpreted to mean
 all states.}
-
-\item{geo_values}{Vector of \code{geo_values} to include in the time series
-plot. If \code{NULL}, the default, then the first 6 \code{geo_values} as found in \code{x}
-are used.}
 
 \item{range}{Vector of two values: min and max, in this order, to use when
 defining the color scale for choropleth maps and the size scale for bubble
@@ -122,7 +115,6 @@ For bubble maps only:
 
 For line graphs:
 \itemize{
-\item{\code{num_days}}
 \item{\code{xlab}}
 \item{\code{ylab}}
 }

@@ -4,10 +4,13 @@
 \alias{summary.covidcast_signal}
 \title{Summary function for covidcast_signal object}
 \usage{
-\method{summary}{covidcast_signal}(x)
+\method{summary}{covidcast_signal}(object, ...)
 }
 \arguments{
-\item{x}{The \code{covidcast_signal} object.}
+\item{object}{The \code{covidcast_signal} object.}
+
+\item{...}{Additional arguments, for compatibility with \code{summary()}.
+Currently unused.}
 }
 \description{
 Summary function for covidcast_signal object

@@ -21,7 +21,8 @@
   title = NULL,
   choro_params = list(),
   bubble_params = list(),
-  line_params = list()
+  line_params = list(),
+  ...
 )
 }
 \arguments{
@@ -83,6 +84,9 @@ is used based on the given data source, signal, and time values.}
 
 \item{choro_params, bubble_params, line_params}{Additional parameter lists for
 the different plot types, for further customization. See details below.}
+
+\item{...}{Additional arguments, for compatibility with \code{plot()}. Currently
+unused.}
 }
 \description{
 Plot function for covidcast_signal object

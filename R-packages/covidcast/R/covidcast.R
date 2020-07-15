@@ -153,10 +153,12 @@ covidcast_signal <- function(data_source, signal,
 #' Print function for covidcast_signal object
 #'
 #' @param x The \code{covidcast_signal} object.
+#' @param ... Additional arguments passed to `plot.data.frame()` to print the
+#'   data.
 #'
 #' @method print covidcast_signal
 #' @export
-print.covidcast_signal = function(x) {
+print.covidcast_signal = function(x, ...) {
   cat(sprintf("A `covidcast_signal` data frame with %i rows and %i columns.\n\n",
               nrow(x), ncol(x)))
   cat(sprintf("%-12s: %s\n", "data_source", attributes(x)$data_source))
@@ -164,17 +166,20 @@ print.covidcast_signal = function(x) {
   cat(sprintf("%-12s: %s\n\n", "geo_type", attributes(x)$geo_type))
 
   # forward to print the data as well
-  print.data.frame(x)
+  NextMethod("print")
 }
 
 #' Summary function for covidcast_signal object
 #'
-#' @param x The \code{covidcast_signal} object.
+#' @param object The \code{covidcast_signal} object.
+#' @param ... Additional arguments, for compatibility with `summary()`.
+#'   Currently unused.
 #'
 #' @method summary covidcast_signal
 #' @importFrom stats median
 #' @export
-summary.covidcast_signal = function(x) {
+summary.covidcast_signal = function(object, ...) {
+  x <- object
   cat(sprintf("A `covidcast_signal` data frame with %i rows and %i columns.\n\n",
               nrow(x), ncol(x)))
   cat(sprintf("%-12s: %s\n", "data_source", attributes(x)$data_source))
@@ -240,6 +245,8 @@ summary.covidcast_signal = function(x) {
 #'   is used based on the given data source, signal, and time values.
 #' @param choro_params,bubble_params,line_params Additional parameter lists for
 #'   the different plot types, for further customization. See details below.
+#' @param ... Additional arguments, for compatibility with `plot()`. Currently
+#'   unused.
 #'
 #' @details TODO explain all these advanced parameters.
 #'
@@ -284,7 +291,8 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
                                   line_col = 1:6,
                                   line_type = rep(1:6, each = length(line_col)),
                                   title = NULL, choro_params = list(),
-                                  bubble_params = list(), line_params = list()) {
+                                  bubble_params = list(), line_params = list(),
+                                  ...) {
   plot_type <- match.arg(plot_type)
 
   # Set range, if we need to (to mean +/- 3 standard deviations, from metadata)

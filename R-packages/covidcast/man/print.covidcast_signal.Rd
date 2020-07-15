@@ -4,10 +4,13 @@
 \alias{print.covidcast_signal}
 \title{Print function for covidcast_signal object}
 \usage{
-\method{print}{covidcast_signal}(x)
+\method{print}{covidcast_signal}(x, ...)
 }
 \arguments{
 \item{x}{The \code{covidcast_signal} object.}
+
+\item{...}{Additional arguments passed to \code{plot.data.frame()} to print the
+data.}
 }
 \description{
 Print function for covidcast_signal object

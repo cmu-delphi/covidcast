@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • covidcastR</title>
+<title>Function reference • covidcast</title>
 
 
 <!-- jquery -->
@@ -70,8 +70,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">covidcastR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <a class="navbar-link" href="../index.html">covidcast</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -84,10 +84,22 @@
   </a>
 </li>
 <li>
-  <a href="../articles/covidcastR.html">Get started</a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/covidcastR.html">Getting started with covidcast</a>
+    </li>
+    <li>
+      <a href="../articles/plotting-signals.html">Plotting and mapping signals</a>
+    </li>
+  </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -136,6 +148,18 @@
       <tr>
         
         <td>
+          <p><code><a href="county_census.html">county_census</a></code> </p>
+        </td>
+        <td><p>County census population data</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="county_geo.html">county_geo</a></code> </p>
+        </td>
+        <td><p>County latitudes and longitudes</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="covidcast_meta.html">covidcast_meta()</a></code> </p>
         </td>
         <td><p>Fetch Delphi's COVID-19 Surveillance Streams metadata.</p></td>
@@ -145,6 +169,42 @@
           <p><code><a href="covidcast_signal.html">covidcast_signal()</a></code> </p>
         </td>
         <td><p>Produce a data frame for one signal.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="msa_census.html">msa_census</a></code> </p>
+        </td>
+        <td><p>Metro area population data</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="plot.covidcast_signal.html">plot(<i>&lt;covidcast_signal&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Plot <code>covidcast_signal</code> objects</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="print.covidcast_signal.html">print(<i>&lt;covidcast_signal&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Print <code>covidcast_signal</code> objects</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="state_census.html">state_census</a></code> </p>
+        </td>
+        <td><p>State population data</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="state_geo.html">state_geo</a></code> </p>
+        </td>
+        <td><p>State latitudes and longitudes</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="summary.covidcast_signal.html">summary(<i>&lt;covidcast_signal&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Summarize <code>covidcast_signal</code> objects</p></td>
       </tr>
     </tbody>
     </table>
@@ -160,7 +220,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Pedrito Maynard-Zhang, Alex Reinhart.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Pedrito Maynard-Zhang, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

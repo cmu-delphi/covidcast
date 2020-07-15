@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Getting started with covidcastR • covidcastR</title>
+<title>Getting started with covidcast • covidcast</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Getting started with covidcastR">
-<meta property="og:description" content="covidcastR">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Getting started with covidcast">
+<meta property="og:description" content="covidcast">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -30,8 +30,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">covidcastR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <a class="navbar-link" href="../index.html">covidcast</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -44,10 +44,22 @@
   </a>
 </li>
 <li>
-  <a href="../articles/covidcastR.html">Get started</a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="../articles/covidcastR.html">Getting started with covidcast</a>
+    </li>
+    <li>
+      <a href="../articles/plotting-signals.html">Plotting and mapping signals</a>
+    </li>
+  </ul>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -70,7 +82,7 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Getting started with covidcastR</h1>
+      <h1 data-toc-skip>Getting started with covidcast</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/cmu-delphi/covidcast/blob/master/../../vignettes/covidcastR.Rmd"><code>../../vignettes/covidcastR.Rmd</code></a></small>
@@ -80,27 +92,33 @@
 
     
     
-<p>This package provides access to data frames of values from the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a>. Using the <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> function, you can fetch any data you may be interested in analyzing, then use other R packages to graph results, make maps, fit models, or join the data with data from other sources.</p>
+<p>This package provides access to data frames of values from the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a>. Using the <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> function, you can fetch any data you may be interested in analyzing, then use <code><a href="../reference/plot.covidcast_signal.html">plot.covidcast_signal()</a></code> to make plots and maps. Since the data is provided as a simple data frame, you can also wrangle it into whatever form you need to conduct your desired analyses using other packages and functions.</p>
 <div id="installing" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installing" class="anchor"></a>Installing</h2>
 <p>This package is not on CRAN yet, so it can be installed using the <a href="https://cran.r-project.org/package=devtools"><code>devtools</code></a> package:</p>
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span>(<span class="st">"cmu-delphi/covidcast"</span>, <span class="kw">ref</span> <span class="kw">=</span> <span class="st">"main"</span>,
-                         <span class="kw">subdir</span> <span class="kw">=</span> <span class="st">"clients/covidcastR"</span>)</pre></body></html></div>
+                         <span class="kw">subdir</span> <span class="kw">=</span> <span class="st">"R-packages/covidcast"</span>)</pre></body></html></div>
 </div>
 <div id="basic-examples" class="section level2">
 <h2 class="hasAnchor">
 <a href="#basic-examples" class="anchor"></a>Basic examples</h2>
 <p>For full usage information, see the <a href="../reference/index.html">function documentation</a>.</p>
 <p>To obtain smoothed estimates of COVID-like illness from our Facebook survey for every county in the United States between 2020-05-01 and 2020-05-07, we can use <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code>:</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">covidcastR</span>)
+<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">covidcast</span>)
 
 <span class="no">cli</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
     <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"fb-survey"</span>, <span class="st">"smoothed_cli"</span>, <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200501"</span>,
                      <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200507"</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"county"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">cli</span>)</pre></body></html></div>
-<pre><code>##   geo_value time_value direction     value    stderr sample_size
+<pre><code>## A `covidcast_signal` data frame with 6 rows and 6 columns.
+## 
+## data_source : fb-survey
+## signal      : smoothed_cli
+## geo_type    : county
+## 
+##   geo_value time_value direction     value    stderr sample_size
 ## 1     01000 2020-05-01         0 0.8230798 0.1255734   1722.4551
 ## 2     01001 2020-05-01         1 1.2612613 0.8004444    115.8025
 ## 3     01003 2020-05-01         0 0.6651292 0.3086796    584.3194
@@ -116,7 +134,13 @@
                      <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200507"</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">cli</span>)</pre></body></html></div>
-<pre><code>##   geo_value time_value direction     value    stderr sample_size
+<pre><code>## A `covidcast_signal` data frame with 6 rows and 6 columns.
+## 
+## data_source : fb-survey
+## signal      : smoothed_cli
+## geo_type    : state
+## 
+##   geo_value time_value direction     value    stderr sample_size
 ## 1        ak 2020-05-01        -1 0.4607721 0.1588797    1606.000
 ## 2        al 2020-05-01         0 0.6995113 0.0825528    7540.244
 ## 3        ar 2020-05-01        -1 0.7597977 0.1036508    4921.483
@@ -130,75 +154,64 @@
                      <span class="kw">geo_value</span> <span class="kw">=</span> <span class="st">"42003"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">cli</span>)</pre></body></html></div>
-<pre><code>##   geo_value time_value direction     value    stderr sample_size
+<pre><code>## A `covidcast_signal` data frame with 6 rows and 6 columns.
+## 
+## data_source : fb-survey
+## signal      : smoothed_cli
+## geo_type    : county
+## 
+##   geo_value time_value direction     value    stderr sample_size
 ## 1     42003 2020-05-01         0 0.3988456 0.1046833    2635.136
 ## 2     42003 2020-05-02         0 0.3802972 0.1069189    2589.751
 ## 3     42003 2020-05-03        -1 0.3369257 0.1042580    2552.011
 ## 4     42003 2020-05-04        -1 0.1358908 0.0638397    2568.443
 ## 5     42003 2020-05-05        -1 0.1438140 0.0668755    2482.389
 ## 6     42003 2020-05-06        -1 0.2489833 0.0887830    2530.457</code></pre>
+<p>This package provides convenient functions for plotting and mapping these signals. For more details and examples, see <code><a href="../articles/plotting-signals.html">vignette("plotting-signals")</a></code>.</p>
+<div id="finding-counties-and-metro-areas" class="section level3">
+<h3 class="hasAnchor">
+<a href="#finding-counties-and-metro-areas" class="anchor"></a>Finding counties and metro areas</h3>
+<p>The COVIDcast API identifies counties by their 5-digit FIPS code and metropolitan areas by their CBSA ID number. This means that to query a specific county or metropolitan area, we must have some way to quickly find its identifier.</p>
+<p>This package includes several datasets intended to make the process easier. For example, if we look at <code><a href="../reference/county_census.html">?county_census</a></code>, we find that the package provides census data on every county in the United States, including its FIPS code. To find Allegheny County, I could search the data frame however is most convenient to me:</p>
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
+
+<span class="no">county_census</span> <span class="kw">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">CTYNAME</span> <span class="kw">==</span> <span class="st">"Allegheny County"</span>) <span class="kw">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">FIPS</span>, <span class="no">CTYNAME</span>, <span class="no">STNAME</span>, <span class="no">POPESTIMATE2019</span>)</pre></body></html></div>
+<pre><code>##    FIPS          CTYNAME       STNAME POPESTIMATE2019
+## 1 42003 Allegheny County Pennsylvania         1216045</code></pre>
+<p>Hence we see that 42003 is the code to provide to <code>geo_value</code> to select this county. We also see we can obtain a 2019 population estimate, which could be useful in your analyses to normalize or scale values by population.</p>
+<p>Similarly, to find the Pittsburgh metropolitan area, we can use the <code><a href="../reference/msa_census.html">?msa_census</a></code> dataset provided in the package:</p>
+<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="no">msa_census</span> <span class="kw">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/startsWith.html">startsWith</a></span>(<span class="no">NAME</span>, <span class="st">"Pittsburgh"</span>)) <span class="kw">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">CBSA</span>, <span class="no">NAME</span>, <span class="no">LSAD</span>, <span class="no">POPESTIMATE2019</span>)</pre></body></html></div>
+<pre><code>##    CBSA           NAME                          LSAD POPESTIMATE2019
+## 1 38300 Pittsburgh, PA Metropolitan Statistical Area         2317600</code></pre>
+<p>We can see that the Pittsburgh metropolitan area has CBSA ID 38300, and we can also get its 2019 census-estimated population. We could pass this ID to <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> when using <code>geo_type = 'msa'</code>.</p>
+<p><strong>Note:</strong> The <code>msa_census</code> dataset includes types of area beyond metropolitan statistical areas, including micropolitan statistical areas. The <code>LSAD</code> column identifies the type of each area. The COVIDcast API only provides estimates for metropolitan statistical areas, not for their divisions or for micropolitan areas.</p>
+</div>
+</div>
+<div id="signal-metadata" class="section level2">
+<h2 class="hasAnchor">
+<a href="#signal-metadata" class="anchor"></a>Signal metadata</h2>
 <p>If we are interested in exploring the available signals and their metadata, we can use <code><a href="../reference/covidcast_meta.html">covidcast_meta()</a></code> to fetch a data frame of the available signals:</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">meta</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_meta.html">covidcast_meta</a></span>()
+<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">meta</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_meta.html">covidcast_meta</a></span>()
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">meta</span>)</pre></body></html></div>
-<pre><code>##             signal max_value min_value time_type last_update   data_source
-## 1 smoothed_adj_cli  87.86095         0       day  1594248750 doctor-visits
-## 2 smoothed_adj_cli  47.95543         0       day  1594248707 doctor-visits
-## 3 smoothed_adj_cli  32.97098         0       day  1594248694 doctor-visits
-## 4 smoothed_adj_cli  20.55140         0       day  1594248686 doctor-visits
-## 5     smoothed_cli  76.56961         0       day  1594248787 doctor-visits
-## 6     smoothed_cli  44.29551         0       day  1594248712 doctor-visits
-##     min_time   max_time geo_type stdev_value mean_value num_locations
-## 1 2020-02-01 2020-07-05   county    2.800825   1.648615          2505
-## 2 2020-02-01 2020-07-05      hrr    2.763754   2.018959           306
-## 3 2020-02-01 2020-07-05      msa    2.435419   1.729666           380
-## 4 2020-02-01 2020-07-05    state    2.426888   2.163669            51
-## 5 2020-02-01 2020-07-05   county    2.432688   1.419158          2505
-## 6 2020-02-01 2020-07-05      hrr    2.672196   1.898874           306</code></pre>
-<p>This can be filtered and sliced as desired to obtain information about any signal of interest.</p>
-</div>
-<div id="mapping-the-data" class="section level2">
-<h2 class="hasAnchor">
-<a href="#mapping-the-data" class="anchor"></a>Mapping the data</h2>
-<p>The <a href="https://cran.r-project.org/package=usmap"><code>usmap</code> package</a> can map counties and states in the United States. In combination with <code>covidcastR</code>, one can easily make maps of values on a specific date.</p>
-<p>For example, on June 1, 2020, this is a map of the fraction of doctor’s visits in each state (as reported by our healthcare partners) that were due to COVID-like symptoms:</p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">usmap</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
-
-<span class="no">dv</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
-    <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"doctor-visits"</span>, <span class="st">"smoothed_adj_cli"</span>,
-                     <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200601"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200601"</span>,
-                     <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>)
-)
-
-<span class="co">## plot_usmap expects a "state" column</span>
-<span class="no">dv</span>$<span class="no">state</span> <span class="kw">&lt;-</span> <span class="no">dv</span>$<span class="no">geo_value</span>
-
-<span class="fu"><a href="https://rdrr.io/pkg/usmap/man/plot_usmap.html">plot_usmap</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">dv</span>, <span class="kw">values</span> <span class="kw">=</span> <span class="st">"value"</span>) +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html">scale_fill_continuous</a></span>(<span class="kw">low</span> <span class="kw">=</span> <span class="st">"white"</span>, <span class="kw">high</span> <span class="kw">=</span> <span class="st">"red"</span>, <span class="kw">name</span> <span class="kw">=</span> <span class="st">"% of visits"</span>)</pre></body></html></div>
-<pre><code>## Warning: Use of `map_df$x` is discouraged. Use `x` instead.</code></pre>
-<pre><code>## Warning: Use of `map_df$y` is discouraged. Use `y` instead.</code></pre>
-<pre><code>## Warning: Use of `map_df$group` is discouraged. Use `group` instead.</code></pre>
-<p><img src="covidcastR_files/figure-html/us_dv_map-1.png" width="700"></p>
-<p>(The warning messages appear to be an internal issue with the <code>usmap</code> package.)</p>
-<p>It should also be possible to use the data with any other mapping packages you prefer, as long as they can easily identify states, counties, MSAs, or the other regions reported in the API according to the IDs reported in the API.</p>
-</div>
-<div id="graphing-the-data" class="section level2">
-<h2 class="hasAnchor">
-<a href="#graphing-the-data" class="anchor"></a>Graphing the data</h2>
-<p>Using <a href="https://ggplot2.tidyverse.org/"><code>ggplot2</code></a> or your favorite plotting package, we can also easily plot time series from specific regions.</p>
-<p>For example, this plot shows the same value – the fraction of doctor’s visits due to COVID-like symptoms – for the states of New York and Pennsylvania from March 1 through June 1, 2020.</p>
-<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="no">ny</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
-    <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"doctor-visits"</span>, <span class="st">"smoothed_adj_cli"</span>,
-                     <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200301"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200601"</span>,
-                     <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>, <span class="kw">geo_values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"pa"</span>, <span class="st">"ny"</span>))
-)
-
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">ny</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">time_value</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">value</span>, <span class="kw">color</span> <span class="kw">=</span> <span class="no">geo_value</span>)) +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">"Date"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"% of visits due to CLI"</span>,
-         <span class="kw">title</span> <span class="kw">=</span> <span class="st">"Doctor's visits"</span>, <span class="kw">color</span> <span class="kw">=</span> <span class="st">"State"</span>)</pre></body></html></div>
-<p><img src="covidcastR_files/figure-html/ny_time_series-1.png" width="700"></p>
-<p>This graph makes the peaks of the pandemic apparent; by loading other data sources from the API, such as cases and deaths, we could begin to conduct analyses comparing the time series against each other.</p>
+<pre><code>##   last_update stdev_value min_value max_value   data_source           signal
+## 1  1594767170    2.894421         0  87.91549 doctor-visits smoothed_adj_cli
+## 2  1594767127    2.872106         0  47.95543 doctor-visits smoothed_adj_cli
+## 3  1594767114    2.582609         0  32.90217 doctor-visits smoothed_adj_cli
+## 4  1594767106    2.503085         0  20.56443 doctor-visits smoothed_adj_cli
+## 5  1594767207    2.506823         0  76.56961 doctor-visits     smoothed_cli
+## 6  1594767133    2.769760         0  44.29551 doctor-visits     smoothed_cli
+##   time_type mean_value num_locations   min_time geo_type   max_time
+## 1       day   1.753611          2508 2020-02-01   county 2020-07-11
+## 2       day   2.160270           306 2020-02-01      hrr 2020-07-11
+## 3       day   1.867746           380 2020-02-01      msa 2020-07-11
+## 4       day   2.283296            51 2020-02-01    state 2020-07-11
+## 5       day   1.504615          2508 2020-02-01   county 2020-07-11
+## 6       day   2.024382           306 2020-02-01      hrr 2020-07-11</code></pre>
+<p>This can be filtered and sliced as desired to obtain information about any signal of interest. The <code><a href="../reference/covidcast_meta.html">covidcast_meta()</a></code> documentation describes the columns and their meanings.</p>
 </div>
   </div>
 
@@ -213,7 +226,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Pedrito Maynard-Zhang, Alex Reinhart.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Pedrito Maynard-Zhang, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

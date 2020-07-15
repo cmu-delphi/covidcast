@@ -110,7 +110,7 @@ covidcast_signal <- function(data_source, signal,
          "Check that the source and signal are correctly spelled and that ",
          "the signal is available at this geographic level.")
   }
-  
+
   if (is.null(start_day)) {
     start_day <- relevant_meta %>%
       dplyr::pull(min_time)
@@ -147,7 +147,7 @@ covidcast_signal <- function(data_source, signal,
 #' Print function for covidcast_signal object
 #'
 #' @param x The \code{covidcast_signal} object.
-#' 
+#'
 #' @method print covidcast_signal
 #' @export
 print.covidcast_signal = function(x) {
@@ -161,7 +161,7 @@ print.covidcast_signal = function(x) {
 #' Summary function for covidcast_signal object
 #'
 #' @param x The \code{covidcast_signal} object.
-#' 
+#'
 #' @method summary covidcast_signal
 #' @export
 summary.covidcast_signal = function(x) {
@@ -192,10 +192,10 @@ summary.covidcast_signal = function(x) {
 #'   The default is "choro".
 #' @param time_values Vector of Date objects (or strings in the form YYYY-MM-DD)
 #'   specifying the days for plotting. For choropleth and bubble maps, only a
-#'   single day can be plotted at one time, and this is taken to be maximum date 
+#'   single day can be plotted at one time, and this is taken to be maximum date
 #'   in `time_values`. If `NULL`, the default, then the last date in `x` is used
 #'   for the maps, and (up to) the last 2 weeks in `x` is used for the time
-#'   series plot.  
+#'   series plot.
 #' @param include Vector of state abbreviations (case insensitive, so "pa" and
 #'   "PA" both denote Pennsylvania) indicating which states to include in the
 #'   choropleth and bubble maps. Default is `c()`, which is interpreted to mean
@@ -205,13 +205,13 @@ summary.covidcast_signal = function(x) {
 #'   are used.
 #' @param range Vector of two values: min and max, in this order, to use when
 #'   defining the color scale for choropleth maps and the size scale for bubble
-#'   maps, or the range of the y-axis for the time series plot. If `NULL`, the 
+#'   maps, or the range of the y-axis for the time series plot. If `NULL`, the
 #'   default, then the min and max are set to be the mean +/- 3 standard
 #'   deviations, where this mean and standard deviation are as provided in the
-#'   meta data for the given data source and signal. 
+#'   meta data for the given data source and signal.
 #' @param choro_col Vector of colors, as specified in hex code, to use for the
 #'   choropleth color scale. Can be arbitrary in length. Default is similar to
-#'   that from covidcast.cmu.edu.   
+#'   that from covidcast.cmu.edu.
 #' @param alpha Number between 0 and 1, indicating the transparency level to be
 #'   used in the maps. For choropleth maps, this determines the transparency
 #'   level for the mega counties. For bubble maps, this determines the
@@ -228,21 +228,21 @@ summary.covidcast_signal = function(x) {
 #'   the same bubble size. Also, values of zero special: it has its own separate
 #'   (small) bin, and values mapped to the zero bin are not drawn.
 #' @param line_col Vector of colors for the time series plot. This will be
-#'   recycled as necessary. Default is `1:6`. 
+#'   recycled as necessary. Default is `1:6`.
 #' @param line_type Vector of line types for the time series plot. This will be
 #'   recycled as necessary. Default is `rep(1:6, each = length(col))`.
 #' @param title Title for the plot. If `NULL`, the default, then a simple title
 #'   is used based on the given data source, signal, and time values.
 #' @param choro_params,bubble_params,line_params Additional parameter lists for
-#'   the different plot types, for further customization. See details below. 
+#'   the different plot types, for further customization. See details below.
 #'
 #' @details TODO explain all these advanced parameters.
-#' 
+#'
 #' For both choropleth and bubble maps:
 #' \itemize{
 #' \item{`subtitle`}
 #' \item{`missing_col`}
-#' \item{`border_col`} 
+#' \item{`border_col`}
 #' \item{`border_size`}
 #' \item{`legend_height`}
 #' \item{`legend_width`}
@@ -253,59 +253,63 @@ summary.covidcast_signal = function(x) {
 #' \itemize{
 #' \item{`legend_n`}
 #' }
-#' 
+#'
 #' For bubble maps only:
 #' \itemize{
 #' \item{`remove_zero`}
 #' \item{`min_size`}
 #' \item{`max_size`}
 #' }
-#' 
+#'
 #' For line graphs:
 #' \itemize{
 #' \item{`num_days`}
 #' \item{`xlab`}
 #' \item{`ylab`}
 #' }
-#' 
+#'
 #' @method plot covidcast_signal
 #' @export
-plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
-                                 time_values = NULL, include = c(),
-                                 geo_values = NULL, range = NULL,
-                                 choro_col = c("#FFFFCC", "#FD893C", "#800026"),
-                                 alpha = 0.5, direction = FALSE,
-                                 dir_col = c("#6F9CC6", "#F3EE9E", "#C56B59"),
-                                 bubble_col = "purple", num_bins = 8,
-                                 line_col = 1:6,
-                                 line_type = rep(1:6, each = length(line_col)),
-                                 title = NULL, choro_params = list(),
-                                 bubble_params = list(), line_params = list()) { 
-  plot_type = match.arg(plot_type)
-  
+plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
+                                  time_values = NULL, include = c(),
+                                  geo_values = NULL, range = NULL,
+                                  choro_col = c("#FFFFCC", "#FD893C", "#800026"),
+                                  alpha = 0.5, direction = FALSE,
+                                  dir_col = c("#6F9CC6", "#F3EE9E", "#C56B59"),
+                                  bubble_col = "purple", num_bins = 8,
+                                  line_col = 1:6,
+                                  line_type = rep(1:6, each = length(line_col)),
+                                  title = NULL, choro_params = list(),
+                                  bubble_params = list(), line_params = list()) {
+  plot_type <- match.arg(plot_type)
+
   # Set range, if we need to (to mean +/- 3 standard deviations, from metadata)
   if (is.null(range)) {
-    range = c(attributes(x)$mean_value - 3 * attributes(x)$stdev_value,
+    range <- c(attributes(x)$mean_value - 3 * attributes(x)$stdev_value,
               attributes(x)$mean_value + 3 * attributes(x)$stdev_value)
-    range = pmax(0, range)
+    range <- pmax(0, range)
     # TODO: figure out for which signals we need to clip the top of the range.
     # For example, for percentages, we need to clip it at 100
   }
 
-  # For the maps, take the most recent time value if more than one is passed, 
+  # For the maps, take the most recent time value if more than one is passed,
   # and check that the include arguments indeed contains state names
   if (plot_type == "choro" || plot_type == "bubble") {
-    if (!is.null(time_values)) time_values = max(time_values)
+    if (!is.null(time_values)) {
+      time_values <- max(time_values)
+    }
+
     if (!is.null(include)) {
-      include = toupper(include)
-      no_match = which(!(include %in% c(state.abb, "DC")))
+      include <- toupper(include)
+      no_match <- which(!(include %in% c(state.abb, "DC")))
+
       if (length(no_match) > 0) {
-        warning("'include' must only contain US state abbreviations or 'DC'.") 
-        include = include[-no_match]
+        warning("'include' must only contain US state abbreviations or 'DC'.")
+        include <- include[-no_match]
       }
     }
   }
-  
+
   # Choropleth map
   if (plot_type == "choro") {
     plot_choro(x, time_value = time_values, include = include, range = range,
@@ -313,7 +317,7 @@ plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
                dir_col = dir_col, title = title, params = choro_params)
   }
 
-  
+
   # Bubble map
   else if (plot_type == "bubble") {
     plot_bubble(x, time_value = time_values, include = include, range = range,
@@ -325,7 +329,7 @@ plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
   else {
     plot_line(x, time_values = time_values, geo_values = geo_values,
               range = range, col = line_col, line_type = line_type,
-              title = title, params = line_params) 
+              title = title, params = line_params)
   }
 }
 

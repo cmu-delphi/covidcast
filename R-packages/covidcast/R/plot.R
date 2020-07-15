@@ -1,11 +1,11 @@
 # Plot a choropleth map of a covidcast_signal object.
 
 plot_choro = function(x, time_value = NULL, include = c(), range,
-                      col = c("#FFFFCC", "#FD893C", "#800026"), 
+                      col = c("#FFFFCC", "#FD893C", "#800026"),
                       alpha = 0.5, direction = FALSE,
                       dir_col = c("#6F9CC6", "#F3EE9E", "#C56B59"),
-                      title = NULL, params = list()) { 
-  # Check that we're looking at either counties or states 
+                      title = NULL, params = list()) {
+  # Check that we're looking at either counties or states
   if (!(attributes(x)$geo_type == "county" ||
                      attributes(x)$geo_type == "state")) {
     stop("Only 'county' and 'state' are supported for choropleth maps.")
@@ -13,7 +13,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
 
   # Set the time value, if we need to (last observed time value)
   if (is.null(time_value)) time_value = max(x$time_value)
-  
+
   # Set a title, if we need to (simple combo of data source, signal, time value)
   if (is.null(title)) title = paste0(attributes(x)$data_source, ": ",
                                      attributes(x)$signal, ", ", time_value)
@@ -23,7 +23,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   if (length(include) != 0 && is.null(subtitle)) {
     subtitle = paste("Viewing", paste(include, collapse=", "))
   }
-  
+
   # Set other map parameters, if we need to
   missing_col = params$missing_col
   border_col = params$border_col
@@ -66,7 +66,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
       return(col_out)
     }
   }
-  
+
   # For direction, create a discrete color function
   else {
     if (length(dir_col) != 3) {
@@ -84,26 +84,26 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   # Set some basic layers
   element_text = ggplot2::element_text
   margin = ggplot2::margin
-  title_layer = ggplot2::labs(title = title, subtitle = subtitle) 
+  title_layer = ggplot2::labs(title = title, subtitle = subtitle)
   theme_layer = ggplot2::theme_void() +
     ggplot2::theme(plot.title = element_text(hjust = 0.5, size = 12),
                    plot.subtitle = element_text(hjust = 0.5, size = 10,
                                                 margin = margin(t = 5)),
                    legend.position = "bottom")
-  
+
   # Grab the values
   given_time_value = time_value
   df = x %>%
     dplyr::filter(time_value == given_time_value) %>%
     dplyr::select(value, direction, geo_value)
-  
+
   if (!direction) val = df$value
   else val = df$direction
-  
+
   geo = df$geo_value
   names(val) = geo
-  
-  # Create the choropleth colors for counties 
+
+  # Create the choropleth colors for counties
   if (attributes(x)$geo_type == "county") {
     map_df = usmap::us_map("county", include = include)
     map_geo = map_df$fips
@@ -114,12 +114,12 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     map_mega = map_geo[substr(map_geo, 1, 2) %in% substr(mega_cty, 1, 2)]
     map_col[substr(map_geo, 1, 2) %in% substr(mega_cty, 1, 2)] =
       col_fun(val[paste0(substr(map_mega, 1, 2), "000")], alpha = alpha)
-    
+
     # Now overwrite the colors for observed counties
     obs_cty = geo[substr(geo, 3, 5) != "000"]
     map_obs = map_geo[map_geo %in% obs_cty]
     map_col[map_geo %in% obs_cty] = col_fun(val[map_obs])
-    
+
     # TODO: implement megacounties "properly"? For this we should first draw the
     # states (not counties) in transparent colors, then layer over the observed
     # counties. Hence, eventually, two calls to usmap::us_map() and two polygon
@@ -131,12 +131,12 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     map_df = usmap::us_map("state", include = include)
     map_geo = tolower(map_df$abbr)
     map_col = rep(missing_col, length(map_geo))
-    
+
     # Overwrite the colors for observed states
     map_obs = map_geo[map_geo %in% geo]
     map_col[map_geo %in% geo] = col_fun(val[map_obs])
   }
-  
+
   # Create the polygon layer
   geom_args = list()
   geom_args$color = border_col
@@ -145,7 +145,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   geom_args$mapping = ggplot2::aes(x = map_df$x, y = map_df$y,
                                    group = map_df$group)
   polygon_layer = do.call(ggplot2::geom_polygon, geom_args)
-  
+
   # For intensity and continuous color scale, create a legend layer
   if (!direction && is.null(breaks)) {
     # Create legend breaks and legend labels
@@ -162,7 +162,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     hidden_df = data.frame(x = rep(Inf, n), z = legend_breaks)
     hidden_layer = ggplot2::geom_point(ggplot2::aes(x = x, y = x, color = z),
                                        data = hidden_df, alpha = 0)
-    guide = ggplot2::guide_colorbar(title = NULL, horizontal = TRUE, 
+    guide = ggplot2::guide_colorbar(title = NULL, horizontal = TRUE,
                                     barheight = legend_height,
                                     barwidth = legend_width)
     scale_layer = ggplot2::scale_color_gradientn(colors = col_fun(d),
@@ -207,7 +207,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     guide = ggplot2::guide_legend(title = NULL, horizontal = TRUE, nrow = 1,
                                   keyheight = legend_height,
                                   keywidth = legend_width / 3,
-                                  label.position = "bottom", 
+                                  label.position = "bottom",
                                   override.aes = list(alpha = 1))
     scale_layer = ggplot2::scale_fill_manual(values = dir_col,
                                              breaks = legend_breaks,
@@ -225,7 +225,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
 plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
                        col = "purple", alpha = 0.5, num_bins = 8,
                        title = NULL, params = list()) {
-  # Check that we're looking at either counties or states 
+  # Check that we're looking at either counties or states
   if (!(attributes(x)$geo_type == "county" ||
                      attributes(x)$geo_type == "state")) {
     stop("Only 'county' and 'state' are supported for bubble maps.")
@@ -233,7 +233,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 
   # Set the time value, if we need to (last observed time value)
   if (is.null(time_value)) time_value = max(x$time_value)
-  
+
   # Set a title, if we need to (simple combo of data source, signal, time value)
   if (is.null(title)) title = paste0(attributes(x)$data_source, ": ",
                                      attributes(x)$signal, ", ", time_value)
@@ -243,7 +243,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   if (length(include) != 0 && is.null(subtitle)) {
     subtitle = paste("Viewing", paste(include, collapse=", "))
   }
-  
+
   # Set other map parameters, if we need to
   missing_col = params$missing_col
   border_col = params$border_col
@@ -255,7 +255,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   if (is.null(border_size)) border_size = 0.1
   if (is.null(legend_height)) legend_height = 0.5
   if (is.null(legend_width)) legend_width = 15
-  
+
   # Create breaks, if we need to
   breaks = params$breaks
   if (!is.null(breaks)) num_bins = length(breaks)
@@ -267,7 +267,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     }
     breaks = seq(lower_bd, range[2], length = num_bins)
   }
-  
+
   # Create bubble sizes
   min_size = params$min_size
   max_size = params$max_size
@@ -283,17 +283,17 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     for (i in 1:length(breaks)) val_out[val >= breaks[i]] = breaks[i]
     return(val_out)
   }
-   
+
   # Set some basic layers
   element_text = ggplot2::element_text
   margin = ggplot2::margin
-  title_layer = ggplot2::labs(title = title, subtitle = subtitle) 
+  title_layer = ggplot2::labs(title = title, subtitle = subtitle)
   theme_layer = ggplot2::theme_void() +
     ggplot2::theme(plot.title = element_text(hjust = 0.5, size = 12),
                    plot.subtitle = element_text(hjust = 0.5, size = 10,
                                                 margin = margin(t = 5)),
                    legend.position = "bottom")
-  
+
   # Grab the values
   given_time_value = time_value
   df = x %>%
@@ -302,7 +302,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   val = df$value
   geo = df$geo_value
   names(val) = geo
-  
+
   # Grap the map data frame for counties
   if (attributes(x)$geo_type == "county") {
     map_df = usmap::us_map("county", include = include)
@@ -315,16 +315,16 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     map_geo = tolower(map_df$abbr)
   }
 
-  # Determine which locations are missing 
+  # Determine which locations are missing
   map_mis = rep(1, length(map_geo))
   map_mis[map_geo %in% geo] = 0
-  
+
   # Warn if there's any missing locations
   if (sum(map_mis == 1) > 0) {
     warning("Bubble maps can be hard to read when there is missing data;",
             "the locations without data are filled in gray.")
   }
-  
+
   # Create the polygon layer
   geom_args = list()
   geom_args$color = border_col
@@ -333,7 +333,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   geom_args$mapping = ggplot2::aes(x = map_df$x, y = map_df$y,
                                    group = map_df$group)
   polygon_layer = do.call(ggplot2::geom_polygon, geom_args)
-  
+
   # Set the lats and lons for counties
   if (attributes(x)$geo_type == "county") {
     county_geo$FIPS = as.character(county_geo$FIPS)
@@ -355,14 +355,14 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     cur_lat = g$LAT
     cur_val = rep(NA, length(cur_geo))
   }
- 
+
   # Overwrite the values for observed locations
   cur_obs = cur_geo[cur_geo %in% geo]
   cur_val[cur_geo %in% geo] = dis_fun(val[cur_obs])
 
   # Important: make into a factor and set the levels (for the legend)
   cur_val = factor(cur_val, levels = breaks)
-  
+
   # Explicitly drop zeros (and from levels) unless we're asked not to
   if (!isFALSE(params$remove_zero)) {
     cur_val[cur_val == 0] = NA
@@ -376,14 +376,14 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
                                                   size = val),
                                      data = bubble_trans, color = col,
                                      alpha = alpha, na.rm = TRUE)
-  
+
   # Create the scale layer
   labels = round(breaks, 2)
   guide = ggplot2::guide_legend(title = NULL, horizontal = TRUE, nrow = 1)
   scale_layer = ggplot2::scale_size_manual(values = sizes, breaks = breaks,
                                            labels = labels, drop = FALSE,
                                            guide = guide)
-  
+
   # Put it all together and return
   return(ggplot2::ggplot() + polygon_layer + ggplot2::coord_equal() +
          title_layer + bubble_layer + scale_layer + theme_layer)
@@ -398,28 +398,28 @@ plot_line = function(x, time_values = NULL, geo_values = NULL, range = NULL,
   if (is.null(geo_values)) {
     stop("'geo_values' must be specified for line plots.")
   }
-    
+
   # Set the number of weeks, if we need to
   num_days = params$num_days
   if (is.null(num_days)) num_days = 14
-  
+
   # Set the time values, if we need to (the latest num_days)
   if (is.null(time_values)) {
     time_all = unique(x$time_value)
     n = length(time_all)
     time_values = time_all[max(1, n - num_days) : n]
   }
-  
+
   # Set a title, if we need to (simple combo of data source, signal)
   if (is.null(title)) title = paste0(attributes(x)$data_source, ": ",
                                      attributes(x)$signal)
-  
+
   # Set other map parameters, if we need to
   xlab = params$xlab
   ylab = params$ylab
   if (is.null(xlab)) xlab = "Date"
   if (is.null(ylab)) ylab = "Value"
-  
+
   # Grab the values
   given_time_values = time_values
   given_geo_values = geo_values
@@ -429,11 +429,11 @@ plot_line = function(x, time_values = NULL, geo_values = NULL, range = NULL,
     dplyr::select(value, time_value, geo_value)
 
   # Create label and theme layers
-  label_layer = ggplot2::labs(title = title, x = xlab, y = ylab) 
+  label_layer = ggplot2::labs(title = title, x = xlab, y = ylab)
   theme_layer = ggplot2::theme_bw() +
-    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) + 
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
     ggplot2::theme(legend.position = "bottom",
-                   legend.title = ggplot2::element_blank()) 
+                   legend.title = ggplot2::element_blank())
 
   # Create line layer
   line_layer = ggplot2::geom_line(ggplot2::aes(x = time_value, y = value,
@@ -442,7 +442,7 @@ plot_line = function(x, time_values = NULL, geo_values = NULL, range = NULL,
 
   # TODO: implement colors and line types (currently ignored). Also, show
   # standard error bands, and other features?
-  
+
   # Put it all together and return
   return(ggplot2::ggplot() + line_layer + label_layer + theme_layer)
 }

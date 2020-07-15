@@ -10,7 +10,7 @@ Authors@R: as.person(c(
   "Alex Reinhart <areinhar@stat.cmu.edu> [aut,cre]",
   "Ryan Tibshirani <ryantibs@stat.cmu.edu> [aut]"
   ))
-URL: https://cmu-delphi.github.io/covidcast/R-packages/covidcast/, https://github.com/cmu-delphi/covidcast
+URL: https://cmu-delphi.github.io/covidcast/covidcastR/, https://github.com/cmu-delphi/covidcast
 BugReports: https://github.com/cmu-delphi/covidcast/issues
 Description: R tools surrounding Delphi's COVIDcast API: data access tools for our COVID-19 indicators, maps and time series plotting, and basic signal processing.
 License: MIT + file LICENSE

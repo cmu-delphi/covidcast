@@ -73,7 +73,7 @@ argument. View \code{vignette("covidcastR")} for detailed example usage.
 \details{
 Downloading large amounts of data may be slow, so this function prints
 messages for each day of data it downloads. To suppress these, use
-\code{\link[base:suppressMessages]{base::suppressMessages()}}, as in \code{suppressMessages(covidcast_signal("fb-survey", ...))}.
+\code{\link[base:message]{base::suppressMessages()}}, as in \code{suppressMessages(covidcast_signal("fb-survey", ...))}.
 }
 \examples{
 \dontrun{

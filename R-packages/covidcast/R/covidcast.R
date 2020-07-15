@@ -150,7 +150,10 @@ covidcast_signal <- function(data_source, signal,
   return(df)
 }
 
-#' Print function for covidcast_signal object
+#' Print `covidcast_signal` objects
+#'
+#' Prints a brief summary of the data source, signal, and geographic level, and
+#' then prints the underlying data frame.
 #'
 #' @param x The \code{covidcast_signal} object.
 #' @param ... Additional arguments passed to `plot.data.frame()` to print the
@@ -169,7 +172,10 @@ print.covidcast_signal = function(x, ...) {
   NextMethod("print")
 }
 
-#' Summary function for covidcast_signal object
+#' Summarize `covidcast_signal` objects
+#'
+#' Prints a variety of summary statistics about the underlying data, such as
+#' median values, the date range included, sample sizes, and so on.
 #'
 #' @param object The \code{covidcast_signal} object.
 #' @param ... Additional arguments, for compatibility with `summary()`.
@@ -199,9 +205,12 @@ summary.covidcast_signal = function(object, ...) {
               median(x$sample_size, na.rm=TRUE)))
 }
 
-#' Plot function for covidcast_signal object
+#' Plot `covidcast_signal` objects
 #'
-#' @param x The \code{covidcast_signal} object.
+#' Several plot types are provided, including choropleth plots (maps), bubble
+#' plots, and time series plots showing the change of signals over time.
+#'
+#' @param x The \code{covidcast_signal} object to map or plot.
 #' @param plot_type One of "choro", "bubble", "line" indicating whether to plot
 #'   a choropleth map, bubble map, or line (time series) graph, respectively.
 #'   The default is "choro".

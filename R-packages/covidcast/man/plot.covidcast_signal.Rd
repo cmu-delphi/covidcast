@@ -2,7 +2,7 @@
 % Please edit documentation in R/covidcast.R
 \name{plot.covidcast_signal}
 \alias{plot.covidcast_signal}
-\title{Plot function for covidcast_signal object}
+\title{Plot \code{covidcast_signal} objects}
 \usage{
 \method{plot}{covidcast_signal}(
   x,
@@ -26,7 +26,7 @@
 )
 }
 \arguments{
-\item{x}{The \code{covidcast_signal} object.}
+\item{x}{The \code{covidcast_signal} object to map or plot.}
 
 \item{plot_type}{One of "choro", "bubble", "line" indicating whether to plot
 a choropleth map, bubble map, or line (time series) graph, respectively.
@@ -89,7 +89,8 @@ the different plot types, for further customization. See details below.}
 unused.}
 }
 \description{
-Plot function for covidcast_signal object
+Several plot types are provided, including choropleth plots (maps), bubble
+plots, and time series plots showing the change of signals over time.
 }
 \details{
 TODO explain all these advanced parameters.

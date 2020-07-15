@@ -1,5 +1,6 @@
 # Plot a choropleth map of a covidcast_signal object.
 
+#' @importFrom stats approx
 plot_choro = function(x, time_value = NULL, include = c(), range,
                       col = c("#FFFFCC", "#FD893C", "#800026"),
                       alpha = 0.5, direction = FALSE,
@@ -39,14 +40,14 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   # For intensity, create a continuous color function, if we need to
   breaks = params$breaks
   if (!direction && is.null(breaks)) {
-    ramp_fun = colorRamp(col)
+    ramp_fun = grDevices::colorRamp(col)
     col_fun = function(val, alpha = 1) {
       val = pmin(pmax(val, range[1]), range[2])
       val = (val - range[1]) / (range[2] - range[1])
       rgb_mat = ramp_fun(val)
       not_na = rowSums(is.na(rgb_mat)) == 0
       col_out = rep(NA, length(val))
-      col_out[not_na] = rgb(rgb_mat[not_na,], alpha = alpha*255, max = 255)
+      col_out[not_na] = grDevices::rgb(rgb_mat[not_na,], alpha = alpha*255, max = 255)
       return(col_out)
     }
   }
@@ -57,7 +58,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
       stop("'breaks' must have length equal to the number of colors.")
     }
     col_fun = function(val, alpha = 1) {
-      alpha_str = substr(rgb(0, 0, 0, alpha = alpha), 8, 9)
+      alpha_str = substr(grDevices::rgb(0, 0, 0, alpha = alpha), 8, 9)
       not_na = !is.na(val)
       col_out = rep(NA, length(val))
       col_out[not_na] = col[1]
@@ -73,7 +74,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
       stop("'dir_col' must have length 3.")
     }
     col_fun = function(val, alpha = 1) {
-      alpha_str = substr(rgb(0, 0, 0, alpha = alpha), 8, 9)
+      alpha_str = substr(grDevices::rgb(0, 0, 0, alpha = alpha), 8, 9)
       not_na = !is.na(val)
       col_out = rep(NA, length(val))
       col_out[not_na] = paste0(dir_col[val[not_na] + 2], alpha_str)

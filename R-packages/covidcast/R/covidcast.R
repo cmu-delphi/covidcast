@@ -172,6 +172,7 @@ print.covidcast_signal = function(x) {
 #' @param x The \code{covidcast_signal} object.
 #'
 #' @method summary covidcast_signal
+#' @importFrom stats median
 #' @export
 summary.covidcast_signal = function(x) {
   cat(sprintf("A `covidcast_signal` data frame with %i rows and %i columns.\n\n",

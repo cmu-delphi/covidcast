@@ -3,5 +3,6 @@ pkgdown: 1.5.1
 pkgdown_sha: ~
 articles:
   covidcastR: covidcastR.html
-last_built: 2020-07-09T17:59Z
+  plotting-signals: plotting-signals.html
+last_built: 2020-07-15T20:50Z
 

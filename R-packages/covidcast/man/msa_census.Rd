@@ -3,9 +3,22 @@
 \docType{data}
 \name{msa_census}
 \alias{msa_census}
-\title{Metro area populations.}
+\title{Metro area population data}
 \format{
-An object of class \code{data.frame} with 2797 rows and 97 columns.
+A data frame with 2797 rows, each representing one core-based
+statistical area (including metropolitan and micropolitan statistical
+areas). There are many columns. The most crucial are:
+
+\describe{
+\item{CBSA}{Core Based Statistical Area code. These are unique identifiers
+used, for example, as the \code{geo_values} argument to \code{covidcast_signal()}
+when requesting data from specific metro areas (with \code{geo_type = 'msa'}).}
+\item{NAME}{Name or title of the area.}
+\item{LSAD}{Legal/Statistical Area Description, identifying if this is a
+metropolitan or micropolitan area, a metropolitan division, or a county.}
+\item{POPESTIMATE2019}{Estimate of the area's resident population as of
+July 1, 2019.}
+}
 }
 \source{
 \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.csv}
@@ -14,6 +27,13 @@ An object of class \code{data.frame} with 2797 rows and 97 columns.
 msa_census
 }
 \description{
-Data set metropolitan area populations, from the 2019 US Census.
+Data set on metropolitan area populations, from the 2019 US Census. This
+includes metropolitan and micropolitan statistical areas, although the
+COVIDcast API only supports fetching data from metropolitan statistical
+areas.
+}
+\references{
+Census Bureau documentation of all columns and their meaning:
+\url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.pdf}
 }
 \keyword{datasets}

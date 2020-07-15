@@ -3,9 +3,16 @@
 \docType{data}
 \name{state_census}
 \alias{state_census}
-\title{State populations.}
+\title{State population data}
 \format{
-An object of class \code{data.frame} with 53 rows and 8 columns.
+Data frame with 53 rows (including one for the United States as a
+whole, plus the District of Columbia and the Puerto Rico Commonwealth).
+Important columns:
+
+\describe{
+\item{NAME}{Name of the state.}
+\item{POPESTIMATE2019}{Estimate of the state's resident population in 2019.}
+}
 }
 \source{
 \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/state/detail/SCPRC-EST2019-18+POP-RES.csv}

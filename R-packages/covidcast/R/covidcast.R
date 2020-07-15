@@ -161,7 +161,10 @@ print.covidcast_signal = function(x) {
               nrow(x), ncol(x)))
   cat(sprintf("%-12s: %s\n", "data_source", attributes(x)$data_source))
   cat(sprintf("%-12s: %s\n", "signal", attributes(x)$signal))
-  cat(sprintf("%-12s: %s\n", "geo_type", attributes(x)$geo_type))
+  cat(sprintf("%-12s: %s\n\n", "geo_type", attributes(x)$geo_type))
+
+  # forward to print the data as well
+  print.data.frame(x)
 }
 
 #' Summary function for covidcast_signal object

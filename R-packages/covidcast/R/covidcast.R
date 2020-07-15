@@ -92,11 +92,11 @@ covidcast_signal <- function(data_source, signal,
                              geo_type = c("county", "hrr", "msa", "dma", "state"),
                              geo_values = "*") {
   geo_type <- match.arg(geo_type)
+
   meta <- covidcast_meta()
   given_data_source <- data_source
   given_signal <- signal
   given_geo_type <- geo_type
-
   relevant_meta <- meta %>%
     dplyr::filter(data_source == given_data_source,
                   signal == given_signal,
@@ -104,11 +104,17 @@ covidcast_signal <- function(data_source, signal,
                   geo_type == given_geo_type)
 
   if (nrow(relevant_meta) == 0) {
-    stop("No match in metadata for source '", data_source,
-         "', signal '", signal, "', and geo_type '", geo_type,
-         "' at the daily level. ",
-         "Check that the source and signal are correctly spelled and that ",
-         "the signal is available at this geographic level.")
+    relevant_meta <- list()
+  }
+
+  if (is.null(start_day) || is.null(end_day)) {
+    if (is.null(relevant_meta$max_time) || is.null(relevant_meta$min_time)) {
+      stop("No match in metadata for source '", data_source,
+           "', signal '", signal, "', and geo_type '", geo_type,
+           "' at the daily level. ",
+           "Check that the source and signal are correctly spelled and that ",
+           "the signal is available at this geographic level.")
+    }
   }
 
   if (is.null(start_day)) {
@@ -135,7 +141,7 @@ covidcast_signal <- function(data_source, signal,
   })
 
   # Assign covidcast_signal class and add some helpful attributes
-  class(df) = c("covidcast_signal", "data.frame")
+  class(df) <- c("covidcast_signal", "data.frame")
   attributes(df)$data_source = data_source
   attributes(df)$signal = signal
   attributes(df)$geo_type = geo_type
@@ -285,8 +291,17 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
 
   # Set range, if we need to (to mean +/- 3 standard deviations, from metadata)
   if (is.null(range)) {
-    range <- c(attributes(x)$mean_value - 3 * attributes(x)$stdev_value,
-              attributes(x)$mean_value + 3 * attributes(x)$stdev_value)
+    if (is.null(attributes(x)$mean_value) || is.null(attributes(x)$stdev_value)) {
+      warning("Metadata for signal mean and standard deviation not available; ",
+              "defaulting to observed mean and standard deviation to set plot range.")
+      mean_value <- mean(x$value)
+      stdev_value <- std(x$value)
+    } else {
+      mean_value <- attributes(x)$mean_value
+      stdev_value <- attributes(x)$stdev_value
+    }
+    range <- c(mean_value - 3 * stdev_value,
+               mean_value + 3 * stdev_value)
     range <- pmax(0, range)
     # TODO: figure out for which signals we need to clip the top of the range.
     # For example, for percentages, we need to clip it at 100

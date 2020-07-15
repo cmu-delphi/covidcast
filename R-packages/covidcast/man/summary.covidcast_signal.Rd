@@ -2,7 +2,7 @@
 % Please edit documentation in R/covidcast.R
 \name{summary.covidcast_signal}
 \alias{summary.covidcast_signal}
-\title{Summary function for covidcast_signal object}
+\title{Summarize \code{covidcast_signal} objects}
 \usage{
 \method{summary}{covidcast_signal}(object, ...)
 }
@@ -13,5 +13,6 @@
 Currently unused.}
 }
 \description{
-Summary function for covidcast_signal object
+Prints a variety of summary statistics about the underlying data, such as
+median values, the date range included, sample sizes, and so on.
 }

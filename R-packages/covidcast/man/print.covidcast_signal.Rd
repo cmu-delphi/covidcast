@@ -2,7 +2,7 @@
 % Please edit documentation in R/covidcast.R
 \name{print.covidcast_signal}
 \alias{print.covidcast_signal}
-\title{Print function for covidcast_signal object}
+\title{Print \code{covidcast_signal} objects}
 \usage{
 \method{print}{covidcast_signal}(x, ...)
 }
@@ -13,5 +13,6 @@
 data.}
 }
 \description{
-Print function for covidcast_signal object
+Prints a brief summary of the data source, signal, and geographic level, and
+then prints the underlying data frame.
 }

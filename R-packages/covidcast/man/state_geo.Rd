@@ -3,9 +3,17 @@
 \docType{data}
 \name{state_geo}
 \alias{state_geo}
-\title{State latitudes and longitudes.}
+\title{State latitudes and longitudes}
 \format{
-An object of class \code{data.frame} with 52 rows and 4 columns.
+Data frame with 52 rows, each representing one state (including
+Puerto Rico and the District of Columbia). Columns:
+
+\describe{
+\item{STATE}{Two-letter state abbreviation.}
+\item{LAT}{Latitude of state centroid.}
+\item{LON}{Longitude of state centroid.}
+\item{NAME}{Name of state.}
+}
 }
 \source{
 \url{https://developers.google.com/public-data/docs/canonical/states_csv}

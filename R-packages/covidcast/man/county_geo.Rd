@@ -3,9 +3,17 @@
 \docType{data}
 \name{county_geo}
 \alias{county_geo}
-\title{County latitudes and longitudes.}
+\title{County latitudes and longitudes}
 \format{
-An object of class \code{data.frame} with 3331 rows and 7 columns.
+Data frame with 3331 rows, each representing one county. Columns:
+
+\describe{
+\item{COUNTYNAME}{Name of the county.}
+\item{FIPS}{5-digit county FIPS code.}
+\item{STATE}{Two-letter state abbreviation.}
+\item{LON}{Longitude of county centroid.}
+\item{LAT}{Latitude of county centroid.}
+}
 }
 \source{
 \url{https://www.weather.gov/gis/Counties}

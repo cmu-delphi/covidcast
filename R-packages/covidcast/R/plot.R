@@ -337,9 +337,6 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 
   # Set the lats and lons for counties
   if (attributes(x)$geo_type == "county") {
-    county_geo$FIPS = as.character(county_geo$FIPS)
-    county_geo$FIPS = paste0(ifelse(nchar(county_geo$FIPS) == 4, "0", ""),
-                             county_geo$FIPS)
     g = county_geo[county_geo$FIPS %in% map_geo, ]
     cur_geo = g$FIPS
     cur_lon = g$LON

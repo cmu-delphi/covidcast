@@ -183,10 +183,10 @@ summary.covidcast_signal = function(x) {
   cat(sprintf("%-37s: %s\n", "last date", max(x$time_value)))
   cat(sprintf("%-37s: %i\n", "median number of geo_value's per day",
               as.integer(x %>% dplyr::group_by(time_value) %>%
-                         dplyr::summarize(num = n()) %>%
+                         dplyr::summarize(num = dplyr::n()) %>%
                          dplyr::summarize(median(num)))))
   cat(sprintf("%-37s: %g\n", "median value", median(x$value, na.rm=TRUE)))
-  cat(sprintf("%-37s: %g\n", "median stderr",median(x$stderr, na.rm=TRUE)))
+  cat(sprintf("%-37s: %g\n", "median stderr", median(x$stderr, na.rm=TRUE)))
   cat(sprintf("%-37s: %i\n", "median direction",
               median(x$direction, na.rm=TRUE)))
   cat(sprintf("%-37s: %g\n", "median sample_size",
@@ -199,19 +199,14 @@ summary.covidcast_signal = function(x) {
 #' @param plot_type One of "choro", "bubble", "line" indicating whether to plot
 #'   a choropleth map, bubble map, or line (time series) graph, respectively.
 #'   The default is "choro".
-#' @param time_values Vector of Date objects (or strings in the form YYYY-MM-DD)
-#'   specifying the days for plotting. For choropleth and bubble maps, only a
-#'   single day can be plotted at one time, and this is taken to be maximum date
-#'   in `time_values`. If `NULL`, the default, then the last date in `x` is used
-#'   for the maps, and (up to) the last 2 weeks in `x` is used for the time
-#'   series plot.
+#' @param time_value Date object (or string in the form YYYY-MM-DD) specifying
+#'   the day to map, for choropleth and bubble maps. If `NULL`, the default,
+#'   then the last date in `x` is used for the maps. Time series plots always
+#'   include all available time values in `x`.
 #' @param include Vector of state abbreviations (case insensitive, so "pa" and
 #'   "PA" both denote Pennsylvania) indicating which states to include in the
 #'   choropleth and bubble maps. Default is `c()`, which is interpreted to mean
 #'   all states.
-#' @param geo_values Vector of `geo_values` to include in the time series
-#'   plot. If `NULL`, the default, then the first 6 `geo_values` as found in `x`
-#'   are used.
 #' @param range Vector of two values: min and max, in this order, to use when
 #'   defining the color scale for choropleth maps and the size scale for bubble
 #'   maps, or the range of the y-axis for the time series plot. If `NULL`, the
@@ -272,7 +267,6 @@ summary.covidcast_signal = function(x) {
 #'
 #' For line graphs:
 #' \itemize{
-#' \item{`num_days`}
 #' \item{`xlab`}
 #' \item{`ylab`}
 #' }
@@ -280,8 +274,8 @@ summary.covidcast_signal = function(x) {
 #' @method plot covidcast_signal
 #' @export
 plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
-                                  time_values = NULL, include = c(),
-                                  geo_values = NULL, range = NULL,
+                                  time_value = NULL, include = c(),
+                                  range = NULL,
                                   choro_col = c("#FFFFCC", "#FD893C", "#800026"),
                                   alpha = 0.5, direction = FALSE,
                                   dir_col = c("#6F9CC6", "#F3EE9E", "#C56B59"),
@@ -313,10 +307,6 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
   # For the maps, take the most recent time value if more than one is passed,
   # and check that the include arguments indeed contains state names
   if (plot_type == "choro" || plot_type == "bubble") {
-    if (!is.null(time_values)) {
-      time_values <- max(time_values)
-    }
-
     if (!is.null(include)) {
       include <- toupper(include)
       no_match <- which(!(include %in% c(state.abb, "DC")))
@@ -330,7 +320,7 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
 
   # Choropleth map
   if (plot_type == "choro") {
-    plot_choro(x, time_value = time_values, include = include, range = range,
+    plot_choro(x, time_value = time_value, include = include, range = range,
                col = choro_col, alpha = alpha, direction = direction,
                dir_col = dir_col, title = title, params = choro_params)
   }
@@ -338,15 +328,14 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
 
   # Bubble map
   else if (plot_type == "bubble") {
-    plot_bubble(x, time_value = time_values, include = include, range = range,
+    plot_bubble(x, time_value = time_value, include = include, range = range,
                 col = bubble_col, alpha = alpha, num_bins = num_bins,
                 title = title, params = bubble_params)
   }
 
   # Line (time series) plot
   else {
-    plot_line(x, time_values = time_values, geo_values = geo_values,
-              range = range, col = line_col, line_type = line_type,
+    plot_line(x, range = range, col = line_col, line_type = line_type,
               title = title, params = line_params)
   }
 }

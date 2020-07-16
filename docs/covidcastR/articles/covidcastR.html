@@ -61,6 +61,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
@@ -108,8 +111,8 @@
 <div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">covidcast</span>)
 
 <span class="no">cli</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
-    <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"fb-survey"</span>, <span class="st">"smoothed_cli"</span>, <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200501"</span>,
-                     <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200507"</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"county"</span>)
+    <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"fb-survey"</span>, <span class="st">"smoothed_cli"</span>, <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-05-01"</span>,
+                     <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-05-07"</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"county"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">cli</span>)</pre></body></html></div>
 <pre><code>## A `covidcast_signal` data frame with 6 rows and 6 columns.
@@ -130,8 +133,8 @@
 <p>Note that <code>geo_value</code> is the FIPS code for each reported county; counties with insufficient sample size are not reported. The <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">API documentation</a> specifies how geographies are identified.</p>
 <p>To request estimates for states instead of counties:</p>
 <div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">cli</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
-    <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"fb-survey"</span>, <span class="st">"smoothed_cli"</span>, <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200501"</span>,
-                     <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200507"</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>)
+    <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"fb-survey"</span>, <span class="st">"smoothed_cli"</span>, <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-05-01"</span>,
+                     <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-05-07"</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">cli</span>)</pre></body></html></div>
 <pre><code>## A `covidcast_signal` data frame with 6 rows and 6 columns.
@@ -149,8 +152,8 @@
 ## 6        co 2020-05-01        -1 0.6458274 0.0684669   10105.894</code></pre>
 <p>One can also select a specific geographic region by its ID. For example, this is the FIPS code for Allegheny County, Pennsylvania:</p>
 <div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">cli</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
-    <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"fb-survey"</span>, <span class="st">"smoothed_cli"</span>, <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200501"</span>,
-                     <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200507"</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"county"</span>,
+    <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"fb-survey"</span>, <span class="st">"smoothed_cli"</span>, <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-05-01"</span>,
+                     <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-05-07"</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"county"</span>,
                      <span class="kw">geo_value</span> <span class="kw">=</span> <span class="st">"42003"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">cli</span>)</pre></body></html></div>
@@ -197,20 +200,20 @@
 <p>If we are interested in exploring the available signals and their metadata, we can use <code><a href="../reference/covidcast_meta.html">covidcast_meta()</a></code> to fetch a data frame of the available signals:</p>
 <div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">meta</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_meta.html">covidcast_meta</a></span>()
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">meta</span>)</pre></body></html></div>
-<pre><code>##   last_update stdev_value min_value max_value   data_source           signal
-## 1  1594767170    2.894421         0  87.91549 doctor-visits smoothed_adj_cli
-## 2  1594767127    2.872106         0  47.95543 doctor-visits smoothed_adj_cli
-## 3  1594767114    2.582609         0  32.90217 doctor-visits smoothed_adj_cli
-## 4  1594767106    2.503085         0  20.56443 doctor-visits smoothed_adj_cli
-## 5  1594767207    2.506823         0  76.56961 doctor-visits     smoothed_cli
-## 6  1594767133    2.769760         0  44.29551 doctor-visits     smoothed_cli
-##   time_type mean_value num_locations   min_time geo_type   max_time
-## 1       day   1.753611          2508 2020-02-01   county 2020-07-11
-## 2       day   2.160270           306 2020-02-01      hrr 2020-07-11
-## 3       day   1.867746           380 2020-02-01      msa 2020-07-11
-## 4       day   2.283296            51 2020-02-01    state 2020-07-11
-## 5       day   1.504615          2508 2020-02-01   county 2020-07-11
-## 6       day   2.024382           306 2020-02-01      hrr 2020-07-11</code></pre>
+<pre><code>##     min_time min_value geo_type time_type num_locations stdev_value mean_value
+## 1 2020-02-01         0   county       day          2508    2.913568   1.775486
+## 2 2020-02-01         0      hrr       day           306    2.887333   2.183360
+## 3 2020-02-01         0      msa       day           380    2.602220   1.890585
+## 4 2020-02-01         0    state       day            51    2.513412   2.304190
+## 5 2020-02-01         0   county       day          2508    2.518373   1.520372
+## 6 2020-02-01         0      hrr       day           306    2.780507   2.043523
+##             signal   data_source last_update max_value   max_time
+## 1 smoothed_adj_cli doctor-visits  1594853577  88.23431 2020-07-12
+## 2 smoothed_adj_cli doctor-visits  1594853534  47.95543 2020-07-12
+## 3 smoothed_adj_cli doctor-visits  1594853522  32.82373 2020-07-12
+## 4 smoothed_adj_cli doctor-visits  1594853514  20.56443 2020-07-12
+## 5     smoothed_cli doctor-visits  1594853615  76.56961 2020-07-12
+## 6     smoothed_cli doctor-visits  1594853540  44.29551 2020-07-12</code></pre>
 <p>This can be filtered and sliced as desired to obtain information about any signal of interest. The <code><a href="../reference/covidcast_meta.html">covidcast_meta()</a></code> documentation describes the columns and their meanings.</p>
 </div>
   </div>

@@ -23,12 +23,12 @@ see the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.
 for a list of available signals.}
 
 \item{start_day}{Query data beginning on this date. Date object, or string in
-the form YYYY-MM-DD. If \code{start_day} is \code{NULL}, defaults to first day data
-is available for this signal.}
+the form \code{"YYYY-MM-DD"}. If \code{start_day} is \code{NULL}, defaults to first day
+data is available for this signal.}
 
 \item{end_day}{Query data up to this date, inclusive. Date object or string
-in the form YYYY-MM-DD. If \code{end_day} is \code{NULL}, defaults to the most recent
-day data is available for this signal.}
+in the form \code{"YYYY-MM-DD"}. If \code{end_day} is \code{NULL}, defaults to the most
+recent day data is available for this signal.}
 
 \item{geo_type}{The geography type for which to request this data, such as
 \code{"county"} or \code{"state"}. Defaults to \code{"county"}. See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}

@@ -38,8 +38,8 @@ every county in the United States between 2020-05-01 and 2020-05-07, we can use
 library(covidcast)
 
 cli <- suppressMessages(
-    covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
-                     end_day = "20200507", geo_type = "county")
+    covidcast_signal("fb-survey", "smoothed_cli", start_day = "2020-05-01",
+                     end_day = "2020-05-07", geo_type = "county")
 )
 head(cli)
 ```
@@ -65,8 +65,8 @@ To request estimates for states instead of counties:
 
 ```{r}
 cli <- suppressMessages(
-    covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
-                     end_day = "20200507", geo_type = "state")
+    covidcast_signal("fb-survey", "smoothed_cli", start_day = "2020-05-01",
+                     end_day = "2020-05-07", geo_type = "state")
 )
 head(cli)
 ```
@@ -76,8 +76,8 @@ the FIPS code for Allegheny County, Pennsylvania:
 
 ```{r}
 cli <- suppressMessages(
-    covidcast_signal("fb-survey", "smoothed_cli", start_day = "20200501",
-                     end_day = "20200507", geo_type = "county",
+    covidcast_signal("fb-survey", "smoothed_cli", start_day = "2020-05-01",
+                     end_day = "2020-05-07", geo_type = "county",
                      geo_value = "42003")
 )
 head(cli)

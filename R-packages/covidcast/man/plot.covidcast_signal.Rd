@@ -32,10 +32,10 @@
 a choropleth map, bubble map, or line (time series) graph, respectively.
 The default is "choro".}
 
-\item{time_value}{Date object (or string in the form YYYY-MM-DD) specifying
-the day to map, for choropleth and bubble maps. If \code{NULL}, the default,
-then the last date in \code{x} is used for the maps. Time series plots always
-include all available time values in \code{x}.}
+\item{time_value}{Date object (or string in the form \code{"YYYY-MM-DD"})
+specifying the day to map, for choropleth and bubble maps. If \code{NULL}, the
+default, then the last date in \code{x} is used for the maps. Time series plots
+always include all available time values in \code{x}.}
 
 \item{include}{Vector of state abbreviations (case insensitive, so "pa" and
 "PA" both denote Pennsylvania) indicating which states to include in the

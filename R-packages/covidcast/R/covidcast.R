@@ -26,11 +26,11 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)
 #'   for a list of available signals.
 #' @param start_day Query data beginning on this date. Date object, or string in
-#'   the form YYYYMMDD. If `start_day` is `NULL`, defaults to first day data is
-#'   available for this signal.
+#'   the form `"YYYY-MM-DD"`. If `start_day` is `NULL`, defaults to first day
+#'   data is available for this signal.
 #' @param end_day Query data up to this date, inclusive. Date object or string
-#'   in the form YYYYMMDD. If `end_day` is `NULL`, defaults to the most recent
-#'   day data is available for this signal.
+#'   in the form `"YYYY-MM-DD"`. If `end_day` is `NULL`, defaults to the most
+#'   recent day data is available for this signal.
 #' @param geo_type The geography type for which to request this data, such as
 #'   `"county"` or `"state"`. Defaults to `"county"`. See the [geographic coding
 #'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html)
@@ -121,14 +121,14 @@ covidcast_signal <- function(data_source, signal,
     start_day <- relevant_meta %>%
       dplyr::pull(min_time)
   } else {
-    start_day <- as.Date(start_day, format = "%Y%m%d")
+    start_day <- as.Date(start_day)
   }
 
   if (is.null(end_day)) {
     end_day <- relevant_meta %>%
       dplyr::pull(max_time)
   } else {
-    end_day <- as.Date(end_day, format = "%Y%m%d")
+    end_day <- as.Date(end_day)
   }
 
   if (start_day > end_day) {
@@ -214,10 +214,10 @@ summary.covidcast_signal = function(object, ...) {
 #' @param plot_type One of "choro", "bubble", "line" indicating whether to plot
 #'   a choropleth map, bubble map, or line (time series) graph, respectively.
 #'   The default is "choro".
-#' @param time_value Date object (or string in the form YYYY-MM-DD) specifying
-#'   the day to map, for choropleth and bubble maps. If `NULL`, the default,
-#'   then the last date in `x` is used for the maps. Time series plots always
-#'   include all available time values in `x`.
+#' @param time_value Date object (or string in the form `"YYYY-MM-DD"`)
+#'   specifying the day to map, for choropleth and bubble maps. If `NULL`, the
+#'   default, then the last date in `x` is used for the maps. Time series plots
+#'   always include all available time values in `x`.
 #' @param include Vector of state abbreviations (case insensitive, so "pa" and
 #'   "PA" both denote Pennsylvania) indicating which states to include in the
 #'   choropleth and bubble maps. Default is `c()`, which is interpreted to mean

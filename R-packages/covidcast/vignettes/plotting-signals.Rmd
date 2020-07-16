@@ -25,7 +25,7 @@ library(covidcast)
 
 df_comb <- suppressMessages(
     covidcast_signal("indicator-combination", "nmf_day_doc_fbc_fbs_ght",
-                     start_day = "20200701", end_day = "20200714",
+                     start_day = "2020-07-01", end_day = "2020-07-14",
                      geo_type = "county")
 )
 summary(df_comb)
@@ -33,7 +33,7 @@ summary(df_comb)
 df_inum <- suppressMessages(
     covidcast_signal(data_source = "indicator-combination",
                      signal = "confirmed_7dav_incidence_num",
-                     start_day = "20200701", end_day = "20200714",
+                     start_day = "2020-07-01", end_day = "2020-07-14",
                      geo_type = "county")
 )
 head(df_inum)
@@ -109,7 +109,7 @@ proportion signal:
 df_iprop <- suppressMessages(
     covidcast_signal(data_source = "indicator-combination",
                      signal = "confirmed_7dav_incidence_prop",
-                     start_day = "20200704")
+                     start_day = "2020-07-04")
 )
 ```
 
@@ -138,11 +138,11 @@ suppressMessages({
     df_comb_st <- covidcast_signal(data_source = "indicator-combination",
                                   signal = "nmf_day_doc_fbc_fbs_ght",
                                   geo_type = "state",
-                                  start_day = "20200415", end_day = "20200701")
+                                  start_day = "2020-04-15", end_day = "2020-07-01")
     df_inum_st <- covidcast_signal(data_source = "indicator-combination",
                                    signal = "confirmed_7dav_incidence_num",
                                    geo_type = "state",
-                                   start_day = "20200415", end_day = "20200701")
+                                   start_day = "2020-04-15", end_day = "2020-07-01")
 })
 ```
 

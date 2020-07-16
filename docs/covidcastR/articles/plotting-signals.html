@@ -61,6 +61,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
@@ -98,11 +101,11 @@
 
 <span class="no">df_comb</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
     <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"indicator-combination"</span>, <span class="st">"nmf_day_doc_fbc_fbs_ght"</span>,
-                     <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200701"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200714"</span>,
+                     <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-07-01"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-14"</span>,
                      <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"county"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">df_comb</span>)</pre></body></html></div>
-<pre><code>## A `covidcast_signal` data frame with 25730 rows and 6 columns.
+<pre><code>## A `covidcast_signal` data frame with 26112 rows and 6 columns.
 ## 
 ## data_source : indicator-combination
 ## signal      : nmf_day_doc_fbc_fbs_ght
@@ -110,15 +113,15 @@
 ## 
 ## first date                           : 2020-07-01
 ## last date                            : 2020-07-14
-## median number of geo_value's per day : 1820
-## median value                         : 0.901089
-## median stderr                        : 0.115999
+## median number of geo_value's per day : 1847
+## median value                         : 0.902723
+## median stderr                        : 0.115028
 ## median direction                     : 0
 ## median sample_size                   : NA</code></pre>
 <div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">df_inum</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
     <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"indicator-combination"</span>,
                      <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"confirmed_7dav_incidence_num"</span>,
-                     <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200701"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200714"</span>,
+                     <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-07-01"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-14"</span>,
                      <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"county"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">df_inum</span>)</pre></body></html></div>
@@ -174,7 +177,7 @@
 <div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="no">df_iprop</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
     <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"indicator-combination"</span>,
                      <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"confirmed_7dav_incidence_prop"</span>,
-                     <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200704"</span>)
+                     <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-07-04"</span>)
 )</pre></body></html></div>
 <p>Then we make two maps side-by-side with custom ranges:</p>
 <div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">breaks1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">10</span>, <span class="fl">100</span>, <span class="fl">1000</span>)
@@ -197,11 +200,11 @@
     <span class="no">df_comb_st</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"indicator-combination"</span>,
                                   <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"nmf_day_doc_fbc_fbs_ght"</span>,
                                   <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>,
-                                  <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200415"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200701"</span>)
+                                  <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-04-15"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-01"</span>)
     <span class="no">df_inum_st</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"indicator-combination"</span>,
                                    <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"confirmed_7dav_incidence_num"</span>,
                                    <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>,
-                                   <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"20200415"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"20200701"</span>)
+                                   <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-04-15"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-01"</span>)
 })</pre></body></html></div>
 <p>By default, time series plots show all available data, including all geographies. A line for every state would be unmanageable, so let’s select a few states and plot all data for them:</p>
 <div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)

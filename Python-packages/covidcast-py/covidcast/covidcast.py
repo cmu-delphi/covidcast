@@ -71,9 +71,10 @@ def signal(data_source, signal, start_day=None, end_day=None, geo_type="county",
       several updates to its value. If ``None``, the default, return the most
       recently issued data.
     :param lag: Integer. If, for example, ``lag=3``, fetch only data that was
-      published or updated exactly 3 days after the date. For example, a row with
-      ``time_value`` of June 3 will only be included in the results if its data
-      was issued or updated on June 6.
+      published or updated exactly 3 days after the date. For example, a row
+      with ``time_value`` of June 3 will only be included in the results if its
+      data was issued or updated on June 6. If ``None``, the default, return the
+      most recently issued data regardless of its lag.
     :returns: A Pandas data frame with matching data. Each row is one
       observation on one day in one geographic location. Contains the following
       columns:

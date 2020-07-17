@@ -101,7 +101,7 @@ estimate.</p>
 <p>For example, consider using our <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html">doctor visits signal</a>,
 which estimates the percentage of outpatient doctor visits that are
 COVID-related, and consider a result row with <code class="docutils literal notranslate"><span class="pre">time_value</span></code> 2020-05-01 for
-<code class="docutils literal notranslate"><span class="pre">geo_value</span> <span class="pre">=</span> <span class="pre">&quot;pa&quot;</span></code>. This is an estimate for the percentage in Pennsylvania on
+<code class="docutils literal notranslate"><span class="pre">geo_values</span> <span class="pre">=</span> <span class="pre">&quot;pa&quot;</span></code>. This is an estimate for the percentage in Pennsylvania on
 May 1, 2020. That estimate was <em>issued</em> on May 5, 2020, the delay being due to
 the aggregation of data by our source and the time taken by the COVIDcast API to
 ingest the data provided. Later, the estimate for May 1st could be updated,
@@ -176,7 +176,7 @@ issues 7 days after the corresponding <code class="docutils literal notranslate"
 <p>Note that though this query requested all values between 2020-05-01 and
 2020-05-07, May 3rd and May 4th were <em>not</em> included in the results set. This is
 because the query will only include a result for May 3rd if a value were issued
-on May 10th, but in fact the value was not updated on that day:</p>
+on May 10th (a 7-day lag), but in fact the value was not updated on that day:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;doctor-visits&quot;</span><span class="p">,</span> <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                 <span class="n">start_day</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">end_day</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
 <span class="gp">... </span>                 <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">geo_values</span><span class="o">=</span><span class="s2">&quot;pa&quot;</span><span class="p">,</span>

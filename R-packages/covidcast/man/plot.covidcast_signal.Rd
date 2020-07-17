@@ -26,7 +26,9 @@
 )
 }
 \arguments{
-\item{x}{The \code{covidcast_signal} object to map or plot.}
+\item{x}{The \code{covidcast_signal} object to map or plot. If the object
+contains multiple issues of the same observation, only the most recent
+issue is mapped or plotted.}
 
 \item{plot_type}{One of "choro", "bubble", "line" indicating whether to plot
 a choropleth map, bubble map, or line (time series) graph, respectively.

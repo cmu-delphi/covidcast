@@ -74,7 +74,7 @@ For example, consider using our `doctor visits signal
 <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html>`_,
 which estimates the percentage of outpatient doctor visits that are
 COVID-related, and consider a result row with ``time_value`` 2020-05-01 for
-``geo_value = "pa"``. This is an estimate for the percentage in Pennsylvania on
+``geo_values = "pa"``. This is an estimate for the percentage in Pennsylvania on
 May 1, 2020. That estimate was *issued* on May 5, 2020, the delay being due to
 the aggregation of data by our source and the time taken by the COVIDcast API to
 ingest the data provided. Later, the estimate for May 1st could be updated,
@@ -153,7 +153,7 @@ issues 7 days after the corresponding ``time_value``:
 Note that though this query requested all values between 2020-05-01 and
 2020-05-07, May 3rd and May 4th were *not* included in the results set. This is
 because the query will only include a result for May 3rd if a value were issued
-on May 10th, but in fact the value was not updated on that day:
+on May 10th (a 7-day lag), but in fact the value was not updated on that day:
 
 >>> covidcast.signal("doctor-visits", "smoothed_cli",
 ...                  start_day=date(2020, 5, 3), end_day=date(2020, 5, 3),

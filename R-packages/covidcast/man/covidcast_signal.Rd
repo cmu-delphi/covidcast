@@ -116,6 +116,15 @@ asking for data issued on June 6th (using \code{issues} or \code{lag}) would \em
 return that value, though asking for data \code{as_of} June 6th would. See
 \code{vignette("covidcastR")} for examples.
 
+Note also that the API enforces a maximum result row limit; results beyond
+the maximum limit are truncated. This limit is sufficient to fetch
+observations in all counties in the United States on one day. This client
+automatically splits queries for multiple days across multiple API calls.
+However, if data for one day has been issued many times, using the \code{issues}
+argument may return more results than the query limit. A warning will be
+issued in this case. To see all results, split your query across multiple
+calls with different \code{issues} arguments.
+
 Downloading large amounts of data may be slow, so this function prints
 messages for each day of data it downloads. To suppress these, use
 \code{\link[base:message]{base::suppressMessages()}}, as in \code{suppressMessages(covidcast_signal("fb-survey", ...))}.

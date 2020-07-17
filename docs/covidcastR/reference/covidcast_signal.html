@@ -271,6 +271,14 @@ to that value. If a value was first issued on June 5th and never updated,
 asking for data issued on June 6th (using <code>issues</code> or <code>lag</code>) would <em>not</em>
 return that value, though asking for data <code>as_of</code> June 6th would. See
 <code><a href='../articles/covidcastR.html'>vignette("covidcastR")</a></code> for examples.</p>
+<p>Note also that the API enforces a maximum result row limit; results beyond
+the maximum limit are truncated. This limit is sufficient to fetch
+observations in all counties in the United States on one day. This client
+automatically splits queries for multiple days across multiple API calls.
+However, if data for one day has been issued many times, using the <code>issues</code>
+argument may return more results than the query limit. A warning will be
+issued in this case. To see all results, split your query across multiple
+calls with different <code>issues</code> arguments.</p>
 <p>Downloading large amounts of data may be slow, so this function prints
 messages for each day of data it downloads. To suppress these, use
 <code><a href='https://rdrr.io/r/base/message.html'>base::suppressMessages()</a></code>, as in <code><a href='https://rdrr.io/r/base/message.html'>suppressMessages(covidcast_signal("fb-survey", ...))</a></code>.</p>

@@ -136,9 +136,10 @@
 <h2 class="hasAnchor">
 <a href="#major-changes" class="anchor"></a>Major changes</h2>
 <ul>
-<li><p>New plotting and mapping features provide convenient visualizations of signals. See <code><a href="../articles/plotting-signals.html">vignette("plotting-signals")</a></code> for examples.</p></li>
 <li><p><strong>Name change:</strong> The package is now called covidcast, not covidcastR. Users should remove covidcastR using <code><a href="https://rdrr.io/r/utils/remove.packages.html">remove.packages()</a></code> and then install covidcast using the instructions in <code><a href="../articles/covidcastR.html">vignette("covidcastR")</a></code>.</p></li>
 <li><p><strong>Incompatible change:</strong> The <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> function now takes <code>start_day</code> and <code>end_day</code> arguments as strings in the form YYYY-MM-DD, rather than YYYYMMDD, for consistency with <code><a href="https://rdrr.io/r/base/as.Date.html">as.Date()</a></code> and other common R usage.</p></li>
+<li><p>New plotting and mapping features provide convenient visualizations of signals. See <code><a href="../articles/plotting-signals.html">vignette("plotting-signals")</a></code> for examples.</p></li>
+<li><p>New feature: The <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> function now supports arguments <code>as_of</code>, <code>issues</code>, and <code>lag</code>, allowing users to request specific versions of data in the API. This allows users to track revisions of data and to see only data that was available as of a specific date.</p></li>
 </ul>
 </div>
 <div id="minor-changes" class="section level2">

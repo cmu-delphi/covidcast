@@ -30,6 +30,15 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' return that value, though asking for data `as_of` June 6th would. See
 #' `vignette("covidcastR")` for examples.
 #'
+#' Note also that the API enforces a maximum result row limit; results beyond
+#' the maximum limit are truncated. This limit is sufficient to fetch
+#' observations in all counties in the United States on one day. This client
+#' automatically splits queries for multiple days across multiple API calls.
+#' However, if data for one day has been issued many times, using the `issues`
+#' argument may return more results than the query limit. A warning will be
+#' issued in this case. To see all results, split your query across multiple
+#' calls with different `issues` arguments.
+#'
 #' Downloading large amounts of data may be slow, so this function prints
 #' messages for each day of data it downloads. To suppress these, use
 #' [base::suppressMessages()], as in `suppressMessages(covidcast_signal("fb-survey",
@@ -479,7 +488,7 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_va
                     nrow(dat[[i]]$epidata)))
 
     if (dat[[i]]$message != "success") {
-      warning("Failed to obtain data for ", day,
+      warning("Fetching data for ", day,
               " in geography '", geo_value, "': ", dat[[i]]$message)
     }
   }

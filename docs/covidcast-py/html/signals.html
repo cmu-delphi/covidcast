@@ -38,10 +38,10 @@
 <div class="section" id="signals">
 <h2>Signals<a class="headerlink" href="#signals" title="Permalink to this headline">¶</a></h2>
 <p>This package provides one key function to obtain any signal of interest as a
-Pandas data frame:</p>
+Pandas data frame. Detailed examples are provided in the <a class="reference internal" href="examples.html#example-usage"><span class="std std-ref">usage examples</span></a>.</p>
 <dl class="py function">
 <dt id="covidcast.signal">
-<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">signal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_source</span></em>, <em class="sig-param"><span class="n">signal</span></em>, <em class="sig-param"><span class="n">start_day</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">end_day</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">geo_type</span><span class="o">=</span><span class="default_value">'county'</span></em>, <em class="sig-param"><span class="n">geo_values</span><span class="o">=</span><span class="default_value">'*'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.signal" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">signal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_source</span></em>, <em class="sig-param"><span class="n">signal</span></em>, <em class="sig-param"><span class="n">start_day</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">end_day</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">geo_type</span><span class="o">=</span><span class="default_value">'county'</span></em>, <em class="sig-param"><span class="n">geo_values</span><span class="o">=</span><span class="default_value">'*'</span></em>, <em class="sig-param"><span class="n">as_of</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">issues</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.signal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download a Pandas data frame for one signal.</p>
 <p>Obtains data for selected date ranges for all geographic regions of the
 United States. Available data sources and signals are documented in the
@@ -50,8 +50,24 @@ Most (but not all) data sources are available at the county level, but the
 API can also return data aggregated to metropolitan statistical areas,
 hospital referral regions, or states, as desired, by using the <code class="docutils literal notranslate"><span class="pre">geo_type</span></code>
 argument.</p>
+<p>The COVIDcast API tracks updates and changes to its underlying data, and
+records the first date each observation became available. For example, a
+data source may report its estimate for a specific state on June 3rd on June
+5th, once records become available. This data is considered “issued” on June
+5th. Later, the data source may update its estimate for June 3rd based on
+revised data, creating a new issue on June 8th. By default, <code class="docutils literal notranslate"><span class="pre">signal()</span></code>
+returns the most recent issue available for every observation. The
+<code class="docutils literal notranslate"><span class="pre">as_of</span></code>, <code class="docutils literal notranslate"><span class="pre">issues</span></code>, and <code class="docutils literal notranslate"><span class="pre">lag</span></code> parameters allow the user to select
+specific issues instead, or to see all updates to observations. These
+options are mutually exclusive; if you specify more than one, <code class="docutils literal notranslate"><span class="pre">as_of</span></code> will
+take priority over <code class="docutils literal notranslate"><span class="pre">issues</span></code>, which will take priority over <code class="docutils literal notranslate"><span class="pre">lag</span></code>.</p>
+<p>Note that the API only tracks the initial value of an estimate and <em>changes</em>
+to that value. If a value was first issued on June 5th and never updated,
+asking for data issued on June 6th (using <code class="docutils literal notranslate"><span class="pre">issues</span></code> or <code class="docutils literal notranslate"><span class="pre">lag</span></code>) would <em>not</em>
+return that value, though asking for data <code class="docutils literal notranslate"><span class="pre">as_of</span></code> June 6th would.</p>
 <p>See the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API documentation</a> for more
-information on available geography types, signals, and data formats.</p>
+information on available geography types, signals, and data formats, and
+further discussion of issue dates and data versioning.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -72,6 +88,20 @@ COVIDcast signal documentation. Defaults to <code class="docutils literal notran
 fetches all geographies. To fetch one geography, specify its ID as a
 string; multiple geographies can be provided as an iterable (list, tuple,
 …) of strings.</p></li>
+<li><p><strong>as_of</strong> – Fetch only data that was available on or before this date,
+provided as a <code class="docutils literal notranslate"><span class="pre">datetime.date</span></code> object. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the default, return
+the most recent available data.</p></li>
+<li><p><strong>issues</strong> – Fetch only data that was published or updated (“issued”) on
+these dates. Provided as either a single <code class="docutils literal notranslate"><span class="pre">datetime.date</span></code> object,
+indicating a single date to fetch data issued on, or a tuple or list
+specifying (start, end) dates. In this case, return all data issued in
+this range. There may be multiple rows for each observation, indicating
+several updates to its value. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the default, return the most
+recently issued data.</p></li>
+<li><p><strong>lag</strong> – Integer. If, for example, <code class="docutils literal notranslate"><span class="pre">lag=3</span></code>, fetch only data that was
+published or updated exactly 3 days after the date. For example, a row with
+<code class="docutils literal notranslate"><span class="pre">time_value</span></code> of June 3 will only be included in the results if its data
+was issued or updated on June 6.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -82,14 +112,22 @@ columns:</p>
 <dt><code class="docutils literal notranslate"><span class="pre">geo_value</span></code></dt><dd><p>identifies the location, such as a state name or county FIPS code.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">time_value</span></code></dt><dd><p>contains a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html">pandas Timestamp object</a>
-identifying the date of this observation.</p>
+identifying the date this estimate is for.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">issue</span></code></dt><dd><p>contains a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html">pandas Timestamp object</a>
+identifying the date this estimate was issued. For example, an estimate
+with a <code class="docutils literal notranslate"><span class="pre">time_value</span></code> of June 3 might have been issued on June 5, after
+the data for June 3rd was collected and ingested into the API.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">lag</span></code></dt><dd><p>an integer giving the difference between <code class="docutils literal notranslate"><span class="pre">issue</span></code> and <code class="docutils literal notranslate"><span class="pre">time_value</span></code>,
+in days.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">value</span></code></dt><dd><p>the signal quantity requested. For example, in a query for the
 <code class="docutils literal notranslate"><span class="pre">confirmed_cumulative_num</span></code> signal from the <code class="docutils literal notranslate"><span class="pre">usa-facts</span></code> source,
 this would be the cumulative number of confirmed cases in the area, as
 of the <code class="docutils literal notranslate"><span class="pre">time_value</span></code>.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">stderr</span></code></dt><dd><p>the signal’s standard error, if available.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">stderr</span></code></dt><dd><p>the value’s standard error, if available.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">sample_size</span></code></dt><dd><p>indicates the sample size available in that geography on that day;
 sample size may not be available for all signals, due to privacy or

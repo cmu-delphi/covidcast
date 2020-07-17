@@ -5,7 +5,8 @@ Signals
 -------
 
 This package provides one key function to obtain any signal of interest as a
-Pandas data frame:
+Pandas data frame. Detailed examples are provided in the :ref:`usage examples
+<example-usage>`.
 
 .. autofunction:: covidcast.signal
 

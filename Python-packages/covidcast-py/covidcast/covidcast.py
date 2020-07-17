@@ -8,8 +8,8 @@ import pandas as pd
 
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state"}
 
-def signal(data_source, signal, start_day=None, end_day=None,
-           geo_type="county", geo_values="*"):
+def signal(data_source, signal, start_day=None, end_day=None, geo_type="county",
+           geo_values="*", as_of=None, issues=None, lag=None):
     """Download a Pandas data frame for one signal.
 
     Obtains data for selected date ranges for all geographic regions of the
@@ -21,9 +21,27 @@ def signal(data_source, signal, start_day=None, end_day=None,
     hospital referral regions, or states, as desired, by using the ``geo_type``
     argument.
 
+    The COVIDcast API tracks updates and changes to its underlying data, and
+    records the first date each observation became available. For example, a
+    data source may report its estimate for a specific state on June 3rd on June
+    5th, once records become available. This data is considered "issued" on June
+    5th. Later, the data source may update its estimate for June 3rd based on
+    revised data, creating a new issue on June 8th. By default, ``signal()``
+    returns the most recent issue available for every observation. The
+    ``as_of``, ``issues``, and ``lag`` parameters allow the user to select
+    specific issues instead, or to see all updates to observations. These
+    options are mutually exclusive; if you specify more than one, ``as_of`` will
+    take priority over ``issues``, which will take priority over ``lag``.
+
+    Note that the API only tracks the initial value of an estimate and *changes*
+    to that value. If a value was first issued on June 5th and never updated,
+    asking for data issued on June 6th (using ``issues`` or ``lag``) would *not*
+    return that value, though asking for data ``as_of`` June 6th would.
+
     See the `COVIDcast API documentation
     <https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html>`_ for more
-    information on available geography types, signals, and data formats.
+    information on available geography types, signals, and data formats, and
+    further discussion of issue dates and data versioning.
 
     :param data_source: String identifying the data source to query, such as
       ``"fb-survey"``.
@@ -42,26 +60,55 @@ def signal(data_source, signal, start_day=None, end_day=None,
       fetches all geographies. To fetch one geography, specify its ID as a
       string; multiple geographies can be provided as an iterable (list, tuple,
       ...) of strings.
+    :param as_of: Fetch only data that was available on or before this date,
+      provided as a ``datetime.date`` object. If ``None``, the default, return
+      the most recent available data.
+    :param issues: Fetch only data that was published or updated ("issued") on
+      these dates. Provided as either a single ``datetime.date`` object,
+      indicating a single date to fetch data issued on, or a tuple or list
+      specifying (start, end) dates. In this case, return all data issued in
+      this range. There may be multiple rows for each observation, indicating
+      several updates to its value. If ``None``, the default, return the most
+      recently issued data.
+    :param lag: Integer. If, for example, ``lag=3``, fetch only data that was
+      published or updated exactly 3 days after the date. For example, a row with
+      ``time_value`` of June 3 will only be included in the results if its data
+      was issued or updated on June 6.
     :returns: A Pandas data frame with matching data. Each row is one
       observation on one day in one geographic location. Contains the following
       columns:
 
       ``geo_value``
         identifies the location, such as a state name or county FIPS code.
+
       ``time_value``
         contains a `pandas Timestamp object <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_
-        identifying the date of this observation.
+        identifying the date this estimate is for.
+
+      ``issue``
+        contains a `pandas Timestamp object <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_
+        identifying the date this estimate was issued. For example, an estimate
+        with a ``time_value`` of June 3 might have been issued on June 5, after
+        the data for June 3rd was collected and ingested into the API.
+
+      ``lag``
+        an integer giving the difference between ``issue`` and ``time_value``,
+        in days.
+
       ``value``
         the signal quantity requested. For example, in a query for the
         ``confirmed_cumulative_num`` signal from the ``usa-facts`` source,
         this would be the cumulative number of confirmed cases in the area, as
         of the ``time_value``.
+
       ``stderr``
         the value's standard error, if available.
+
       ``sample_size``
         indicates the sample size available in that geography on that day;
         sample size may not be available for all signals, due to privacy or
         other constraints.
+
       ``direction``
         uses a local linear fit to estimate whether the signal in this region is
         currently increasing or decreasing (reported as -1 for decreasing, 1 for
@@ -84,7 +131,6 @@ def signal(data_source, signal, start_day=None, end_day=None,
     end_day = signal_meta["max_time"].to_pydatetime().date() \
         if end_day is None else end_day
 
-    ## The YYYYMMDD format lets us use lexicographic ordering to test date order
     if start_day > end_day:
         raise ValueError("end_day must be on or after start_day, but "
                          "start_day = '{start}', end_day = '{end}'".format(
@@ -96,7 +142,8 @@ def signal(data_source, signal, start_day=None, end_day=None,
 
     dfs = [
         _fetch_single_geo(
-            data_source, signal, start_day, end_day, geo_type, geo_value)
+            data_source, signal, start_day, end_day, geo_type, geo_value,
+            as_of, issues, lag)
         for geo_value in geo_values
     ]
 
@@ -178,7 +225,7 @@ def metadata():
 
 
 def _fetch_single_geo(data_source, signal, start_day, end_day, geo_type,
-                      geo_value):
+                      geo_value, as_of, issues, lag):
     """Fetch data for a single geo.
 
     signal() wraps this to support fetching data over an iterable of
@@ -189,6 +236,9 @@ def _fetch_single_geo(data_source, signal, start_day, end_day, geo_type,
 
     """
 
+    as_of_str = _date_to_api_string(as_of) if as_of is not None else None
+    issues_strs = _dates_to_api_strings(issues) if issues is not None else None
+
     cur_day = start_day
 
     dfs = []
@@ -198,7 +248,8 @@ def _fetch_single_geo(data_source, signal, start_day, end_day, geo_type,
 
         day_data = Epidata.covidcast(data_source, signal, time_type="day",
                                      geo_type=geo_type, time_values=day_str,
-                                     geo_value=geo_value)
+                                     geo_value=geo_value, as_of=as_of_str,
+                                     issues=issues_strs, lag=lag)
 
         if day_data["message"] != "success":
             warnings.warn("Problem obtaining data on {day}: {message}".format(
@@ -213,6 +264,7 @@ def _fetch_single_geo(data_source, signal, start_day, end_day, geo_type,
         out = pd.concat(dfs)
 
         out["time_value"] = pd.to_datetime(out["time_value"], format="%Y%m%d")
+        out["issue"] = pd.to_datetime(out["issue"], format="%Y%m%d")
 
         return out
 
@@ -246,3 +298,11 @@ def _date_to_api_string(date):
     """Convert a date object to a YYYYMMDD string expected by the API."""
 
     return date.strftime("%Y%m%d")
+
+def _dates_to_api_strings(dates):
+    """Convert a date object, or pair of (start, end) objects, to YYYYMMDD strings."""
+
+    if not isinstance(dates, (list, tuple)):
+        return _date_to_api_string(dates)
+
+    return "-".join(_date_to_api_string(date) for date in dates)

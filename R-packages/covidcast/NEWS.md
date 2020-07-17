@@ -2,9 +2,6 @@
 
 ## Major changes
 
-- New plotting and mapping features provide convenient visualizations of
-  signals. See `vignette("plotting-signals")` for examples.
-
 - **Name change:** The package is now called covidcast, not covidcastR. Users
   should remove covidcastR using `remove.packages()` and then install covidcast
   using the instructions in `vignette("covidcastR")`.
@@ -12,6 +9,14 @@
 - **Incompatible change:** The `covidcast_signal()` function now takes
   `start_day` and `end_day` arguments as strings in the form YYYY-MM-DD, rather
   than YYYYMMDD, for consistency with `as.Date()` and other common R usage.
+
+- New plotting and mapping features provide convenient visualizations of
+  signals. See `vignette("plotting-signals")` for examples.
+
+- New feature: The `covidcast_signal()` function now supports arguments `as_of`,
+  `issues`, and `lag`, allowing users to request specific versions of data in
+  the API. This allows users to track revisions of data and to see only data
+  that was available as of a specific date.
 
 ## Minor changes
 

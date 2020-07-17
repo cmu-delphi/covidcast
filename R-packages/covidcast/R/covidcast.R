@@ -504,10 +504,17 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_va
 ## issues for a single observation in a single geo, we may want only the most
 ## recent for plotting, mapping, or other purposes.
 latest_issue <- function(df) {
-  df %>%
+  # Preserve the attributes, since grouping overwrites them
+  attrs <- attributes(df)
+
+  df <- df %>%
     dplyr::group_by(geo_value, time_value) %>%
     dplyr::filter(issue == max(issue)) %>%
     dplyr::ungroup()
+
+  attributes(df) <- attrs
+
+  return(df)
 }
 
 ## Fetch Delphi's COVID-19 Surveillance Streams

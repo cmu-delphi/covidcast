@@ -10,7 +10,10 @@ covidcast_signal(
   start_day = NULL,
   end_day = NULL,
   geo_type = c("county", "hrr", "msa", "dma", "state"),
-  geo_values = "*"
+  geo_values = "*",
+  as_of = NULL,
+  issues = NULL,
+  lag = NULL
 )
 }
 \arguments{
@@ -38,6 +41,24 @@ for details on which types are available.}
 all geographies. To fetch specific geographies, specify their IDs as a
 vector or list of strings. See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
 for details on how to specify these IDs.}
+
+\item{as_of}{Fetch only data that was available on or before this date,
+provided as a \code{Date} object or string in the form \code{"YYYY-MM-DD"}. If
+\code{NULL}, the default, return the most recent available data.}
+
+\item{issues}{Fetch only data that was published or updated ("issued") on
+these dates. Provided as either a single \code{Date} object (or string in the
+form \code{"YYYY-MM-DD"}), indicating a single date to fetch data issued on, or
+a vector specifying two dates, start and end. In this case, return all data
+issued in this range. There may be multiple rows for each observation,
+indicating several updates to its value. If \code{NULL}, the default, return the
+most recently issued data.}
+
+\item{lag}{Integer. If, for example, \code{lag=3}, fetch only data that was
+published or updated exactly 3 days after the date. For example, a row with
+\code{time_value} of June 3 will only be included in the results if its data was
+issued or updated on June 6. If \code{NULL}, the default, return the most
+recently issued data regardless of its lag.}
 }
 \value{
 Data frame with matching data. Each row is one observation on one day
@@ -46,6 +67,12 @@ in one geographic location. Contains the following columns:
 \item{geo_value}{identifies the location, such as a state name or county
 FIPS code}
 \item{time_value}{a \code{Date} object identifying the date of this observation}
+\item{issue}{a \code{Date} object identifying the date this estimate was issued.
+For example, an estimate with a \code{time_value} of June 3 might have been
+issued on June 5, after the data for June 3rd was collected and ingested
+into the API.}
+\item{lag}{an integer giving the difference between \code{issue} and
+\code{time_value}, in days.}
 \item{value}{the signal quantity requested. For example, in a query for the
 \code{confirmed_cumulative_num} signal from the \code{usa-facts} source, this would
 be the cumulative number of confirmed cases in the area, as of the
@@ -71,6 +98,24 @@ hospital referral regions, or states, as desired, by using the \code{geo_type}
 argument. View \code{vignette("covidcastR")} for detailed example usage.
 }
 \details{
+The COVIDcast API tracks updates and changes to its underlying data, and
+records the first date each observation became available. For example, a data
+source may report its estimate for a specific state on June 3rd on June 5th,
+once records become available. This data is considered "issued" on June 5th.
+Later, the data source may update its estimate for June 3rd based on revised
+data, creating a new issue on June 8th. By default, \code{covidcast_signal()}
+returns the most recent issue available for every observation. The \code{as_of},
+\code{issues}, and \code{lag} parameters allow the user to select specific issues
+instead, or to see all updates to observations. These options are mutually
+exclusive; if you specify more than one, \code{as_of} will take priority over
+\code{issues}, which will take priority over \code{lag}.
+
+Note that the API only tracks the initial value of an estimate and \emph{changes}
+to that value. If a value was first issued on June 5th and never updated,
+asking for data issued on June 6th (using \code{issues} or \code{lag}) would \emph{not}
+return that value, though asking for data \code{as_of} June 6th would. See
+\code{vignette("covidcastR")} for examples.
+
 Downloading large amounts of data may be slow, so this function prints
 messages for each day of data it downloads. To suppress these, use
 \code{\link[base:message]{base::suppressMessages()}}, as in \code{suppressMessages(covidcast_signal("fb-survey", ...))}.

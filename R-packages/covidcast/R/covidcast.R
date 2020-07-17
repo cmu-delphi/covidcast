@@ -12,6 +12,24 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' hospital referral regions, or states, as desired, by using the `geo_type`
 #' argument. View `vignette("covidcastR")` for detailed example usage.
 #'
+#' The COVIDcast API tracks updates and changes to its underlying data, and
+#' records the first date each observation became available. For example, a data
+#' source may report its estimate for a specific state on June 3rd on June 5th,
+#' once records become available. This data is considered "issued" on June 5th.
+#' Later, the data source may update its estimate for June 3rd based on revised
+#' data, creating a new issue on June 8th. By default, `covidcast_signal()`
+#' returns the most recent issue available for every observation. The `as_of`,
+#' `issues`, and `lag` parameters allow the user to select specific issues
+#' instead, or to see all updates to observations. These options are mutually
+#' exclusive; if you specify more than one, `as_of` will take priority over
+#' `issues`, which will take priority over `lag`.
+#'
+#' Note that the API only tracks the initial value of an estimate and *changes*
+#' to that value. If a value was first issued on June 5th and never updated,
+#' asking for data issued on June 6th (using `issues` or `lag`) would *not*
+#' return that value, though asking for data `as_of` June 6th would. See
+#' `vignette("covidcastR")` for examples.
+#'
 #' Downloading large amounts of data may be slow, so this function prints
 #' messages for each day of data it downloads. To suppress these, use
 #' [base::suppressMessages()], as in `suppressMessages(covidcast_signal("fb-survey",
@@ -40,12 +58,33 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #'   vector or list of strings. See the [geographic coding
 #'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html)
 #'   for details on how to specify these IDs.
+#' @param as_of Fetch only data that was available on or before this date,
+#'   provided as a `Date` object or string in the form `"YYYY-MM-DD"`. If
+#'   `NULL`, the default, return the most recent available data.
+#' @param issues Fetch only data that was published or updated ("issued") on
+#'   these dates. Provided as either a single `Date` object (or string in the
+#'   form `"YYYY-MM-DD"`), indicating a single date to fetch data issued on, or
+#'   a vector specifying two dates, start and end. In this case, return all data
+#'   issued in this range. There may be multiple rows for each observation,
+#'   indicating several updates to its value. If `NULL`, the default, return the
+#'   most recently issued data.
+#' @param lag Integer. If, for example, `lag=3`, fetch only data that was
+#'   published or updated exactly 3 days after the date. For example, a row with
+#'   `time_value` of June 3 will only be included in the results if its data was
+#'   issued or updated on June 6. If `NULL`, the default, return the most
+#'   recently issued data regardless of its lag.
 #' @return Data frame with matching data. Each row is one observation on one day
 #'   in one geographic location. Contains the following columns:
 #'
 #'   \item{geo_value}{identifies the location, such as a state name or county
 #'   FIPS code}
 #'   \item{time_value}{a `Date` object identifying the date of this observation}
+#'   \item{issue}{a `Date` object identifying the date this estimate was issued.
+#'   For example, an estimate with a `time_value` of June 3 might have been
+#'   issued on June 5, after the data for June 3rd was collected and ingested
+#'   into the API.}
+#'   \item{lag}{an integer giving the difference between ``issue`` and
+#'   ``time_value``, in days.}
 #'   \item{value}{the signal quantity requested. For example, in a query for the
 #'   `confirmed_cumulative_num` signal from the `usa-facts` source, this would
 #'   be the cumulative number of confirmed cases in the area, as of the
@@ -90,7 +129,8 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 covidcast_signal <- function(data_source, signal,
                              start_day = NULL, end_day = NULL,
                              geo_type = c("county", "hrr", "msa", "dma", "state"),
-                             geo_values = "*") {
+                             geo_values = "*",
+                             as_of = NULL, issues = NULL, lag = NULL) {
   geo_type <- match.arg(geo_type)
 
   meta <- covidcast_meta()
@@ -136,8 +176,17 @@ covidcast_signal <- function(data_source, signal,
          start_day, "' and end_day = '", end_day, "'")
   }
 
+  if (!is.null(as_of)) {
+    as_of <- as.Date(as_of)
+  }
+
+  if (!is.null(issues)) {
+    issues <- as.Date(issues)
+  }
+
   df <- purrr::map_dfr(geo_values, function(geo_val) {
-      single_geo(data_source, signal, start_day, end_day, geo_type, geo_val)
+    single_geo(data_source, signal, start_day, end_day, geo_type, geo_val,
+               as_of, issues, lag)
   })
 
   # Assign covidcast_signal class and add some helpful attributes
@@ -401,7 +450,8 @@ covidcast_meta <- function() {
 
 ## Helper function, not user-facing, to fetch a single geo-value.
 ## covidcast_signal can then loop over multiple geos to produce its result.
-single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_value) {
+single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_value,
+                       as_of, issues, lag) {
   ndays <- as.numeric(end_day - start_day)
   dat <- list()
 
@@ -414,7 +464,10 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_va
                           time_type = "day",
                           geo_type = geo_type,
                           time_values = day,
-                          geo_value = geo_value)
+                          geo_value = geo_value,
+                          as_of = as_of,
+                          issues = issues,
+                          lag = lag)
     message(sprintf("Fetched day %s: %s, %s, num_entries = %s",
                     day,
                     dat[[i]]$result,
@@ -435,6 +488,7 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_va
   if (nrow(df) > 0) {
     # If no data is found, there is no time_value column to report
     df$time_value <- as.Date(as.character(df$time_value), format = "%Y%m%d")
+    df$issue <- as.Date(as.character(df$issue), format = "%Y%m%d")
   }
 
   return(df)
@@ -442,7 +496,7 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_va
 
 ## Fetch Delphi's COVID-19 Surveillance Streams
 covidcast <- function(data_source, signal, time_type, geo_type, time_values,
-                      geo_value) {
+                      geo_value, as_of, issues, lag) {
   # Check parameters
   if(missing(data_source) || missing(signal) || missing(time_type) ||
        missing(geo_type) || missing(time_values) || missing(geo_value)) {
@@ -460,6 +514,27 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
     time_values = .list(time_values),
     geo_value = geo_value
   )
+
+  if (!is.null(as_of)) {
+    params$as_of <- date_to_string(as_of)
+  }
+
+  if (!is.null(issues)) {
+    if (length(issues) == 2) {
+      params$issues <- paste0(date_to_string(issues[1]),
+                              "-",
+                              date_to_string(issues[2]))
+    } else if (length(issues) == 1) {
+      params$issues <- date_to_string(issues)
+    } else {
+      stop("`issues` must be either a single date or a date interval")
+    }
+  }
+
+  if (!is.null(lag)) {
+    params$lag <- lag
+  }
+
   # Make the API call
   return(.request(params))
 }

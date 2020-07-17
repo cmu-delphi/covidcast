@@ -38,6 +38,15 @@ def signal(data_source, signal, start_day=None, end_day=None, geo_type="county",
     asking for data issued on June 6th (using ``issues`` or ``lag``) would *not*
     return that value, though asking for data ``as_of`` June 6th would.
 
+    Note also that the API enforces a maximum result row limit; results beyond
+    the maximum limit are truncated. This limit is sufficient to fetch
+    observations in all counties in the United States on one day. This client
+    automatically splits queries for multiple days across multiple API calls.
+    However, if data for one day has been issued many times, using the
+    ``issues`` argument may return more results than the query limit. A warning
+    will be issued in this case. To see all results, split your query across
+    multiple calls with different ``issues`` arguments.
+
     See the `COVIDcast API documentation
     <https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html>`_ for more
     information on available geography types, signals, and data formats, and
@@ -252,11 +261,16 @@ def _fetch_single_geo(data_source, signal, start_day, end_day, geo_type,
                                      geo_value=geo_value, as_of=as_of_str,
                                      issues=issues_strs, lag=lag)
 
+        # Two possible error conditions: no data or too much data.
         if day_data["message"] != "success":
             warnings.warn("Problem obtaining data on {day}: {message}".format(
                 day=day_str,
                 message=day_data["message"]))
-        else:
+
+        # In the too-much-data case, we continue to try putting the truncated
+        # data in our results. In the no-data case, skip this day entirely,
+        # since there is no "epidata" in the response.
+        if "epidata" in day_data:
             dfs.append(pd.DataFrame.from_dict(day_data["epidata"]))
 
         cur_day += timedelta(1)

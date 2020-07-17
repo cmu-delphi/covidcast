@@ -65,6 +65,14 @@ take priority over <code class="docutils literal notranslate"><span class="pre">
 to that value. If a value was first issued on June 5th and never updated,
 asking for data issued on June 6th (using <code class="docutils literal notranslate"><span class="pre">issues</span></code> or <code class="docutils literal notranslate"><span class="pre">lag</span></code>) would <em>not</em>
 return that value, though asking for data <code class="docutils literal notranslate"><span class="pre">as_of</span></code> June 6th would.</p>
+<p>Note also that the API enforces a maximum result row limit; results beyond
+the maximum limit are truncated. This limit is sufficient to fetch
+observations in all counties in the United States on one day. This client
+automatically splits queries for multiple days across multiple API calls.
+However, if data for one day has been issued many times, using the
+<code class="docutils literal notranslate"><span class="pre">issues</span></code> argument may return more results than the query limit. A warning
+will be issued in this case. To see all results, split your query across
+multiple calls with different <code class="docutils literal notranslate"><span class="pre">issues</span></code> arguments.</p>
 <p>See the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API documentation</a> for more
 information on available geography types, signals, and data formats, and
 further discussion of issue dates and data versioning.</p>
@@ -99,9 +107,10 @@ this range. There may be multiple rows for each observation, indicating
 several updates to its value. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the default, return the most
 recently issued data.</p></li>
 <li><p><strong>lag</strong> – Integer. If, for example, <code class="docutils literal notranslate"><span class="pre">lag=3</span></code>, fetch only data that was
-published or updated exactly 3 days after the date. For example, a row with
-<code class="docutils literal notranslate"><span class="pre">time_value</span></code> of June 3 will only be included in the results if its data
-was issued or updated on June 6.</p></li>
+published or updated exactly 3 days after the date. For example, a row
+with <code class="docutils literal notranslate"><span class="pre">time_value</span></code> of June 3 will only be included in the results if its
+data was issued or updated on June 6. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the default, return the
+most recently issued data regardless of its lag.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

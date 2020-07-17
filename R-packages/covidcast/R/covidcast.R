@@ -259,7 +259,9 @@ summary.covidcast_signal = function(object, ...) {
 #' Several plot types are provided, including choropleth plots (maps), bubble
 #' plots, and time series plots showing the change of signals over time.
 #'
-#' @param x The \code{covidcast_signal} object to map or plot.
+#' @param x The \code{covidcast_signal} object to map or plot. If the object
+#'   contains multiple issues of the same observation, only the most recent
+#'   issue is mapped or plotted.
 #' @param plot_type One of "choro", "bubble", "line" indicating whether to plot
 #'   a choropleth map, bubble map, or line (time series) graph, respectively.
 #'   The default is "choro".
@@ -352,6 +354,8 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
                                   bubble_params = list(), line_params = list(),
                                   ...) {
   plot_type <- match.arg(plot_type)
+
+  x <- latest_issue(x)
 
   # Set range, if we need to (to mean +/- 3 standard deviations, from metadata)
   if (is.null(range)) {
@@ -492,6 +496,18 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_va
   }
 
   return(df)
+}
+
+## Fetch only the latest issue for each observation in a data frame.
+##
+## Since `covidcast_signal()` can, with the right options, return multiple
+## issues for a single observation in a single geo, we may want only the most
+## recent for plotting, mapping, or other purposes.
+latest_issue <- function(df) {
+  df %>%
+    dplyr::group_by(geo_value, time_value) %>%
+    dplyr::filter(issue == max(issue)) %>%
+    dplyr::ungroup()
 }
 
 ## Fetch Delphi's COVID-19 Surveillance Streams

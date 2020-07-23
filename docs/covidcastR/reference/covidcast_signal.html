@@ -227,8 +227,11 @@ recently issued data regardless of its lag.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Data frame with matching data. Each row is one observation on one day
-in one geographic location. Contains the following columns:</p>
+    <p>Data frame with matching data. Each row is one observation of one
+signal on one day in one geographic location. Contains the following
+columns:</p>
+<dt>data_source</dt><dd><p>Data source from which this observation was obtained.</p></dd>
+<dt>signal</dt><dd><p>The signal from which this observation was obtained.</p></dd>
 <dt>geo_value</dt><dd><p>identifies the location, such as a state name or county
 FIPS code</p></dd>
 <dt>time_value</dt><dd><p>a <code>Date</code> object identifying the date of this observation</p></dd>

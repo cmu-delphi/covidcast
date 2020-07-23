@@ -56,14 +56,15 @@ choose the day and also choose the color scales and title:
 
 ```{r}
 plot(df_comb, time_value = "2020-07-04", choro_col = cm.colors(10), alpha = 0.4,
-     title = "Combination of COVID-19 Indicators on 2020-06-04")
+     title = "Combination of COVID-19 Indicators on 2020-07-04")
 ```
 
 The API also provides a "direction" signal indicating if the signal is trending
 upward or downward, and we can map the directions:
 
 ```{r}
-plot(df_comb, direction = TRUE)
+plot(df_inum, direction = TRUE,
+     title = "Change in incident cases on 2020-07-14")
 ```
 
 By providing `breaks` and `colors`, we can create custom color scales, for

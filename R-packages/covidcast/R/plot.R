@@ -15,10 +15,6 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   # Set the time value, if we need to (last observed time value)
   if (is.null(time_value)) time_value = max(x$time_value)
 
-  # Set a title, if we need to (simple combo of data source, signal, time value)
-  if (is.null(title)) title = paste0(attributes(x)$data_source, ": ",
-                                     attributes(x)$signal, ", ", time_value)
-
   # Set a subtitle, if there are specific states we're viewing
   subtitle = params$subtitle
   if (length(include) != 0 && is.null(subtitle)) {

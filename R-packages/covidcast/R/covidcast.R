@@ -82,9 +82,12 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #'   `time_value` of June 3 will only be included in the results if its data was
 #'   issued or updated on June 6. If `NULL`, the default, return the most
 #'   recently issued data regardless of its lag.
-#' @return Data frame with matching data. Each row is one observation on one day
-#'   in one geographic location. Contains the following columns:
+#' @return Data frame with matching data. Each row is one observation of one
+#'   signal on one day in one geographic location. Contains the following
+#'   columns:
 #'
+#'   \item{data_source}{Data source from which this observation was obtained.}
+#'   \item{signal}{The signal from which this observation was obtained.}
 #'   \item{geo_value}{identifies the location, such as a state name or county
 #'   FIPS code}
 #'   \item{time_value}{a `Date` object identifying the date of this observation}
@@ -200,12 +203,57 @@ covidcast_signal <- function(data_source, signal,
 
   # Assign covidcast_signal class and add some helpful attributes
   class(df) <- c("covidcast_signal", "data.frame")
-  attributes(df)$data_source = data_source
-  attributes(df)$signal = signal
-  attributes(df)$geo_type = geo_type
-  attributes(df)$mean_value = relevant_meta$mean_value
-  attributes(df)$stdev_value = relevant_meta$stdev_value
+  attributes(df)$metadata <- relevant_meta
+  attributes(df)$geo_type <- geo_type
   return(df)
+}
+
+#' Obtain multiple signals in one data frame.
+#'
+#' This convenience function uses `covidcast_signal()` to obtain multiple
+#' signals, potentially from multiple data sources, in one data frame. See the
+#' `covidcast_signal()` documentation for further details.
+#'
+#' Deliberately not exported, because it's unclear how to plot data frames with
+#' multiple signals. Once `plot.covidcast_signal()` supports plotting the
+#' objects returned by `covidcast_signals()`, this function can be exported.
+#'
+#' @param signals Data frame with two columns: `data_source` and `signal`. Each
+#'   row specifies one signal to be fetched from the COVIDcast API.
+#' @inheritParams covidcast_signal
+#' @inherit covidcast_signal return references
+#' @seealso [covidcast_signal()]
+#' @examples
+#' \dontrun{
+#' signals <= data.frame(data_source=c("jhu-csse", "fb-survey"),
+#'                       signal=c("confirmed_incidence_num", "smoothed_cli"))
+#' covidcast_signals(signals, "2020-07-01", "2020-07-14", geo_type="state")
+#' }
+#' @noRd
+covidcast_signals <- function(signals, start_day = NULL, end_day = NULL,
+                              geo_type = c("county", "hrr", "msa", "dma", "state"),
+                              geo_values = "*", as_of = NULL, issues = NULL,
+                              lag = NULL) {
+  N <- nrow(signals)
+  dfs <- vector("list", N)
+  metas <- vector("list", N)
+
+  for (row in seq_len(N)) {
+    df <- covidcast_signal(signals$data_source[row], signals$signal[row],
+                           start_day, end_day, geo_type, geo_values, as_of,
+                           issues, lag)
+    dfs[[row]] <- df
+    metas[[row]] <- attributes(df)$metadata
+  }
+
+  df_out <- dplyr::bind_rows(dfs)
+  meta_out <- dplyr::bind_rows(metas)
+
+  class(df_out) <- c("covidcast_signal", "data.frame")
+  attributes(df_out)$metadata <- meta_out
+  attributes(df_out)$geo_type <- geo_type
+
+  return(df_out)
 }
 
 #' Print `covidcast_signal` objects
@@ -222,8 +270,7 @@ covidcast_signal <- function(data_source, signal,
 print.covidcast_signal = function(x, ...) {
   cat(sprintf("A `covidcast_signal` data frame with %i rows and %i columns.\n\n",
               nrow(x), ncol(x)))
-  cat(sprintf("%-12s: %s\n", "data_source", attributes(x)$data_source))
-  cat(sprintf("%-12s: %s\n", "signal", attributes(x)$signal))
+  cat(sprintf("%-12s: %s\n", "signals", unique(paste0(x$data_source, ":", x$signal))))
   cat(sprintf("%-12s: %s\n\n", "geo_type", attributes(x)$geo_type))
 
   # forward to print the data as well
@@ -246,21 +293,14 @@ summary.covidcast_signal = function(object, ...) {
   x <- object
   cat(sprintf("A `covidcast_signal` data frame with %i rows and %i columns.\n\n",
               nrow(x), ncol(x)))
-  cat(sprintf("%-12s: %s\n", "data_source", attributes(x)$data_source))
-  cat(sprintf("%-12s: %s\n", "signal", attributes(x)$signal))
+  cat(sprintf("%-12s: %s\n", "signals", unique(paste0(x$data_source, ":", x$signal))))
   cat(sprintf("%-12s: %s\n\n", "geo_type", attributes(x)$geo_type))
   cat(sprintf("%-37s: %s\n", "first date", min(x$time_value)))
   cat(sprintf("%-37s: %s\n", "last date", max(x$time_value)))
-  cat(sprintf("%-37s: %i\n", "median number of geo_value's per day",
+  cat(sprintf("%-37s: %i\n", "median number of geo_values per day",
               as.integer(x %>% dplyr::group_by(time_value) %>%
                          dplyr::summarize(num = dplyr::n()) %>%
                          dplyr::summarize(median(num)))))
-  cat(sprintf("%-37s: %g\n", "median value", median(x$value, na.rm=TRUE)))
-  cat(sprintf("%-37s: %g\n", "median stderr", median(x$stderr, na.rm=TRUE)))
-  cat(sprintf("%-37s: %i\n", "median direction",
-              median(x$direction, na.rm=TRUE)))
-  cat(sprintf("%-37s: %g\n", "median sample_size",
-              median(x$sample_size, na.rm=TRUE)))
 }
 
 #' Plot `covidcast_signal` objects
@@ -349,6 +389,7 @@ summary.covidcast_signal = function(object, ...) {
 #' }
 #'
 #' @method plot covidcast_signal
+#' @importFrom stats sd
 #' @export
 plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
                                   time_value = NULL, include = c(),
@@ -368,14 +409,16 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
 
   # Set range, if we need to (to mean +/- 3 standard deviations, from metadata)
   if (is.null(range)) {
-    if (is.null(attributes(x)$mean_value) || is.null(attributes(x)$stdev_value)) {
+    if (is.null(attributes(x)$metadata)) {
       warning("Metadata for signal mean and standard deviation not available; ",
               "defaulting to observed mean and standard deviation to set plot range.")
       mean_value <- mean(x$value)
       stdev_value <- sd(x$value)
     } else {
-      mean_value <- attributes(x)$mean_value
-      stdev_value <- attributes(x)$stdev_value
+      # TODO: Presently we assume there is only one signal type in the data
+      # frame. Will need special handling when there can be more.
+      mean_value <- attributes(x)$metadata$mean_value
+      stdev_value <- attributes(x)$metadata$stdev_value
     }
     range <- c(mean_value - 3 * stdev_value,
                mean_value + 3 * stdev_value)
@@ -443,6 +486,7 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
 #'   \item{max_value}{The largest value that has ever been reported.}
 #'   \item{mean_value}{The arithmetic mean of all reported values.}
 #'   \item{stdev_value}{The sample standard deviation of all reported values.}
+#'   \item{max_issue}{The most recent issue date for this signal.}
 #' @references COVIDcast API sources and signals documentation:
 #'   \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 #' @export
@@ -456,7 +500,8 @@ covidcast_meta <- function() {
 
   meta <- meta$epidata %>%
     dplyr::mutate(min_time = as.Date(as.character(min_time), format = "%Y%m%d"),
-                  max_time = as.Date(as.character(max_time), format = "%Y%m%d"))
+                  max_time = as.Date(as.character(max_time), format = "%Y%m%d"),
+                  max_issue = as.Date(as.character(max_issue), format = "%Y%m%d"))
 
   return(meta)
 }
@@ -502,6 +547,9 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_va
     # If no data is found, there is no time_value column to report
     df$time_value <- as.Date(as.character(df$time_value), format = "%Y%m%d")
     df$issue <- as.Date(as.character(df$issue), format = "%Y%m%d")
+
+    df$data_source <- data_source
+    df$signal <- signal
   }
 
   return(df)

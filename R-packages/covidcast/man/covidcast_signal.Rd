@@ -61,9 +61,12 @@ issued or updated on June 6. If \code{NULL}, the default, return the most
 recently issued data regardless of its lag.}
 }
 \value{
-Data frame with matching data. Each row is one observation on one day
-in one geographic location. Contains the following columns:
+Data frame with matching data. Each row is one observation of one
+signal on one day in one geographic location. Contains the following
+columns:
 
+\item{data_source}{Data source from which this observation was obtained.}
+\item{signal}{The signal from which this observation was obtained.}
 \item{geo_value}{identifies the location, such as a state name or county
 FIPS code}
 \item{time_value}{a \code{Date} object identifying the date of this observation}

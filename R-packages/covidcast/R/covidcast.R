@@ -487,6 +487,8 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
 #'   \item{mean_value}{The arithmetic mean of all reported values.}
 #'   \item{stdev_value}{The sample standard deviation of all reported values.}
 #'   \item{max_issue}{The most recent issue date for this signal.}
+#'   \item{min_lag}{Smallest lag from observation to issue, in `time_type` units}
+#'   \item{max_lag}{Largest lag from observation to issue, in `time_type` units}
 #' @references COVIDcast API sources and signals documentation:
 #'   \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 #' @export

@@ -105,19 +105,14 @@
                      <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"county"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">df_comb</span>)</pre></body></html></div>
-<pre><code>## A `covidcast_signal` data frame with 26112 rows and 6 columns.
+<pre><code>## A `covidcast_signal` data frame with 28023 rows and 10 columns.
 ## 
-## data_source : indicator-combination
-## signal      : nmf_day_doc_fbc_fbs_ght
+## signals     : indicator-combination:nmf_day_doc_fbc_fbs_ght
 ## geo_type    : county
 ## 
 ## first date                           : 2020-07-01
 ## last date                            : 2020-07-14
-## median number of geo_value's per day : 1847
-## median value                         : 0.902723
-## median stderr                        : 0.115028
-## median direction                     : 0
-## median sample_size                   : NA</code></pre>
+## median number of geo_values per day  : 2001</code></pre>
 <div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">df_inum</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
     <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"indicator-combination"</span>,
                      <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"confirmed_7dav_incidence_num"</span>,
@@ -125,19 +120,25 @@
                      <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"county"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">df_inum</span>)</pre></body></html></div>
-<pre><code>## A `covidcast_signal` data frame with 6 rows and 6 columns.
+<pre><code>## A `covidcast_signal` data frame with 6 rows and 10 columns.
 ## 
-## data_source : indicator-combination
-## signal      : confirmed_7dav_incidence_num
+## signals     : indicator-combination:confirmed_7dav_incidence_num
 ## geo_type    : county
 ## 
-##   geo_value time_value direction     value stderr sample_size
-## 1     01000 2020-07-01         0  0.000000     NA          NA
-## 2     01001 2020-07-01         0 12.000000     NA          NA
-## 3     01003 2020-07-01         0 34.142857     NA          NA
-## 4     01005 2020-07-01         0  5.428571     NA          NA
-## 5     01007 2020-07-01         0  4.714286     NA          NA
-## 6     01009 2020-07-01         0  7.142857     NA          NA</code></pre>
+##   geo_value time_value direction      issue lag     value stderr sample_size
+## 1     01000 2020-07-01         0 2020-07-07   6  0.000000     NA          NA
+## 2     01001 2020-07-01         0 2020-07-07   6 12.000000     NA          NA
+## 3     01003 2020-07-01         0 2020-07-07   6 34.142857     NA          NA
+## 4     01005 2020-07-01         0 2020-07-07   6  5.428571     NA          NA
+## 5     01007 2020-07-01         0 2020-07-07   6  4.714286     NA          NA
+## 6     01009 2020-07-01         0 2020-07-07   6  7.142857     NA          NA
+##             data_source                       signal
+## 1 indicator-combination confirmed_7dav_incidence_num
+## 2 indicator-combination confirmed_7dav_incidence_num
+## 3 indicator-combination confirmed_7dav_incidence_num
+## 4 indicator-combination confirmed_7dav_incidence_num
+## 5 indicator-combination confirmed_7dav_incidence_num
+## 6 indicator-combination confirmed_7dav_incidence_num</code></pre>
 <div id="choropleth-maps" class="section level2">
 <h2 class="hasAnchor">
 <a href="#choropleth-maps" class="anchor"></a>Choropleth maps</h2>
@@ -146,10 +147,11 @@
 <p><img src="plotting-signals_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
 <p>The color scheme is automatically chosen to be similar to that used on the online <a href="https://covidcast.cmu.edu">COVIDcast mapping tool</a>. Also, by default, this map shows the most recent day of data available in the data frame. One can choose the day and also choose the color scales and title:</p>
 <div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">df_comb</span>, <span class="kw">time_value</span> <span class="kw">=</span> <span class="st">"2020-07-04"</span>, <span class="kw">choro_col</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html">cm.colors</a></span>(<span class="fl">10</span>), <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.4</span>,
-     <span class="kw">title</span> <span class="kw">=</span> <span class="st">"Combination of COVID-19 Indicators on 2020-06-04"</span>)</pre></body></html></div>
+     <span class="kw">title</span> <span class="kw">=</span> <span class="st">"Combination of COVID-19 Indicators on 2020-07-04"</span>)</pre></body></html></div>
 <p><img src="plotting-signals_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 <p>The API also provides a “direction” signal indicating if the signal is trending upward or downward, and we can map the directions:</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">df_comb</span>, <span class="kw">direction</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">df_inum</span>, <span class="kw">direction</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
+     <span class="kw">title</span> <span class="kw">=</span> <span class="st">"Change in incident cases on 2020-07-14"</span>)</pre></body></html></div>
 <p><img src="plotting-signals_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 <p>By providing <code>breaks</code> and <code>colors</code>, we can create custom color scales, for example to have a log-spaced color scale for incident case counts:</p>
 <div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">breaks</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">5</span>, <span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">50</span>, <span class="fl">100</span>, <span class="fl">200</span>)

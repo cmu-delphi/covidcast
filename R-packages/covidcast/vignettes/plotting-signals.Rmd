@@ -1,0 +1,187 @@
+---
+title: Plotting and mapping signals
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Plotting and mapping signals}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Once you've fetched some COVIDcast signals using `covidcast_signal()`, the
+returned `covidcast` objects can be plotted and mapped in various ways. The data
+structure is designed to be tidy and easily wrangled using your favorite
+packages, but the covidcast package also provides some tools for plotting and
+mapping signals in an easy way.
+
+For this vignette, we'll use our [combination
+signal](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/indicator-combination.html)
+as an example; the combination indicator is a statistical combination of several
+data sources collected by Delphi, and for every county provides a measure of
+factors related to COVID activity. We'll also use incident case counts. Fetching
+the data is simple:
+
+```{r}
+library(covidcast)
+
+df_comb <- suppressMessages(
+    covidcast_signal("indicator-combination", "nmf_day_doc_fbc_fbs_ght",
+                     start_day = "2020-07-01", end_day = "2020-07-14",
+                     geo_type = "county")
+)
+summary(df_comb)
+
+df_inum <- suppressMessages(
+    covidcast_signal(data_source = "indicator-combination",
+                     signal = "confirmed_7dav_incidence_num",
+                     start_day = "2020-07-01", end_day = "2020-07-14",
+                     geo_type = "county")
+)
+head(df_inum)
+```
+
+## Choropleth maps
+
+The default `plot` method for `covidcast_signal` objects,
+`plot.covidcast_signal()`, produces choropleth maps by using `ggplot2` and the
+`usmap` package:
+
+```{r}
+plot(df_comb)
+```
+
+The color scheme is automatically chosen to be similar to that used on the
+online [COVIDcast mapping tool](https://covidcast.cmu.edu). Also, by default,
+this map shows the most recent day of data available in the data frame. One can
+choose the day and also choose the color scales and title:
+
+```{r}
+plot(df_comb, time_value = "2020-07-04", choro_col = cm.colors(10), alpha = 0.4,
+     title = "Combination of COVID-19 Indicators on 2020-07-04")
+```
+
+The API also provides a "direction" signal indicating if the signal is trending
+upward or downward, and we can map the directions:
+
+```{r}
+plot(df_inum, direction = TRUE,
+     title = "Change in incident cases on 2020-07-14")
+```
+
+By providing `breaks` and `colors`, we can create custom color scales, for
+example to have a log-spaced color scale for incident case counts:
+
+```{r}
+breaks <- c(0, 1, 2, 5, 10, 20, 50, 100, 200)
+colors <- c("#D3D3D3", "#FFFFCC", "#FEDDA2", "#FDBB79", "#FD9950", "#EB7538", "#C74E32",
+            "#A3272C", "#800026")
+
+# Note that length(breaks) == length(colors) by design. This is interpreted so that we
+# we assign colors[i] iff the value satisfies: breaks[i] <= value < breaks[i+1], where
+# we take breaks[N] = Inf, for N = length(breaks)
+
+plot(df_inum, choro_col = colors, choro_params = list(breaks = breaks),
+     title = paste("New COVID Cases (7 Day Trailing Average) on", max(df_inum$time_value)))
+```
+
+## Bubble maps
+
+As an alternative to choropleth maps, we can also quickly plot bubble maps. By
+default, bubble maps have 8 bubble size bins evenly spaced over the range, where
+zero always means zero bubble size. The legend shows all bins, interpreted as
+each bubble size meaning *at least* the corresponding value.
+
+```{r}
+plot(df_inum, plot_type = "bubble")
+```
+
+As before, we can of course set customized breaks. As values to the left of the
+first bin do not get drawn, this map is much sparser, and highlights areas with
+larger case counts.
+
+```{r}
+plot(df_inum, plot_type = "bubble", bubble_params = list(breaks = seq(20, 200, len = 6)))
+```
+
+As a final example, suppose we want to plot only counties in the state of Texas.
+We'd like to compare counts per 100,000 against absolute counts, so we fetch the
+proportion signal:
+
+```{r}
+df_iprop <- suppressMessages(
+    covidcast_signal(data_source = "indicator-combination",
+                     signal = "confirmed_7dav_incidence_prop",
+                     start_day = "2020-07-04")
+)
+```
+
+Then we make two maps side-by-side with custom ranges:
+
+```{r}
+breaks1 <- c(0, 1, 10, 100, 1000)
+breaks2 <- c(0, 10, 50, 100, 500)
+p1 <- plot(df_inum, plot_type = "bubble", bubble_params = list(breaks = breaks1, max_size = 6),
+           include = "TX", bubble_col = "red",
+           title = paste("Incidence Number on", max(df_inum$time_value)))
+p2 <- plot(df_iprop, plot_type = "bubble", bubble_params = list(breaks = breaks2, max_size = 6),
+           include = "TX", bubble_col = "red",
+           title = paste("Incidence Proportion on", max(df_iprop$time_value)))
+
+gridExtra::grid.arrange(p1, p2, nrow = 1)
+```
+
+## Time series plots
+
+Let's fetch the combination indicator and case counts, but for all states rather
+than for all counties. This will make the time series plots more manageable.
+
+```{r}
+suppressMessages({
+    df_comb_st <- covidcast_signal(data_source = "indicator-combination",
+                                  signal = "nmf_day_doc_fbc_fbs_ght",
+                                  geo_type = "state",
+                                  start_day = "2020-04-15", end_day = "2020-07-01")
+    df_inum_st <- covidcast_signal(data_source = "indicator-combination",
+                                   signal = "confirmed_7dav_incidence_num",
+                                   geo_type = "state",
+                                   start_day = "2020-04-15", end_day = "2020-07-01")
+})
+```
+
+By default, time series plots show all available data, including all
+geographies. A line for every state would be unmanageable, so let's select a few
+states and plot all data for them:
+
+```{r, message=FALSE}
+library(dplyr)
+
+states <- c("ca", "pa", "tx", "ny")
+plot(df_comb_st %>% filter(geo_value %in% states), plot_type = "line")
+plot(df_inum_st %>% filter(geo_value %in% states), plot_type = "line")
+```
+
+Notice how in Texas, the combined indicator rose several weeks in advance of
+confirmed cases, suggesting the signal could be predictive. Delphi is
+investigating these signals for their usefulness in forecasting and will publish
+results when they are available.
+
+### Custom time series plots
+
+Using `ggplot2` or your favorite plotting package, we can easily plot time
+series manually, without using the `plot.covidcast_signal()` method. You can use
+this to customize the appearance of your plots however you choose.
+
+For example,
+
+```{r}
+library(ggplot2)
+
+ggplot(df_inum_st %>% filter(geo_value == "pa"),
+       aes(x = time_value, y = value, color = geo_value)) +
+    geom_line() +
+    labs(x = "Date", y = "Daily confirmed cases",
+         title = "Confirmed cases", color = "State")
+```
+
+This graph makes the peaks of the pandemic apparent; by loading other data
+sources from the API, such as cases and deaths, we could begin to conduct
+analyses comparing the time series against each other.

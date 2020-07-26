@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fetch Delphi's COVID-19 Surveillance Streams metadata. — covidcast_meta • covidcastR</title>
+<title>Fetch Delphi's COVID-19 Surveillance Streams metadata. — covidcast_meta • covidcast</title>
 
 
 <!-- jquery -->
@@ -72,8 +72,8 @@ streams from the COVIDcast API." />
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">covidcastR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <a class="navbar-link" href="../index.html">covidcast</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -86,10 +86,25 @@ streams from the COVIDcast API." />
   </a>
 </li>
 <li>
-  <a href="../articles/covidcastR.html">Get started</a>
+  <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/covidcastR.html">Getting started with covidcast</a>
+    </li>
+    <li>
+      <a href="../articles/plotting-signals.html">Plotting and mapping signals</a>
+    </li>
+  </ul>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -145,6 +160,9 @@ for which this signal has ever been reported.</p></dd>
 <dt>max_value</dt><dd><p>The largest value that has ever been reported.</p></dd>
 <dt>mean_value</dt><dd><p>The arithmetic mean of all reported values.</p></dd>
 <dt>stdev_value</dt><dd><p>The sample standard deviation of all reported values.</p></dd>
+<dt>max_issue</dt><dd><p>The most recent issue date for this signal.</p></dd>
+<dt>min_lag</dt><dd><p>Smallest lag from observation to issue, in <code>time_type</code> units</p></dd>
+<dt>max_lag</dt><dd><p>Largest lag from observation to issue, in <code>time_type</code> units</p></dd>
 
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
@@ -162,7 +180,7 @@ for which this signal has ever been reported.</p></dd>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Pedrito Maynard-Zhang, Alex Reinhart.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Pedrito Maynard-Zhang, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

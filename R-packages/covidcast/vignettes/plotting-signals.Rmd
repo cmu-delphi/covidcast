@@ -172,7 +172,7 @@ this to customize the appearance of your plots however you choose.
 
 For example,
 
-```{r}
+```{r, warning=FALSE}
 library(ggplot2)
 
 ggplot(df_inum_st %>% filter(geo_value == "pa"),

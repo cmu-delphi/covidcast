@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Produce a data frame for one signal. — covidcast_signal • covidcast</title>
+<title>Obtain multiple signals in one data frame. — covidcast_signals • covidcast</title>
 
 
 <!-- jquery -->
@@ -39,14 +39,10 @@
 
 
 
-<meta property="og:title" content="Produce a data frame for one signal. — covidcast_signal" />
-<meta property="og:description" content="Obtains data for selected date ranges for all geographic regions of the
-United States. Available data sources and signals are documented in the
-COVIDcast signal documentation.
-Most (but not all) data sources are available at the county level, but the
-API can also return data aggregated to metropolitan statistical areas,
-hospital referral regions, or states, as desired, by using the geo_type
-argument. View vignette(&quot;covidcastR&quot;) for detailed example usage." />
+<meta property="og:title" content="Obtain multiple signals in one data frame. — covidcast_signals" />
+<meta property="og:description" content="This convenience function uses covidcast_signal() to obtain multiple
+signals, potentially from multiple data sources, in one data frame. See the
+covidcast_signal() documentation for further details." />
 
 
 
@@ -132,24 +128,19 @@ argument. View vignette(&quot;covidcastR&quot;) for detailed example usage." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Produce a data frame for one signal.</h1>
+    <h1>Obtain multiple signals in one data frame.</h1>
     <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/covidcast.R'><code>R/covidcast.R</code></a></small>
-    <div class="hidden name"><code>covidcast_signal.Rd</code></div>
+    <div class="hidden name"><code>covidcast_signals.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Obtains data for selected date ranges for all geographic regions of the
-United States. Available data sources and signals are documented in the
-<a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>COVIDcast signal documentation</a>.
-Most (but not all) data sources are available at the county level, but the
-API can also return data aggregated to metropolitan statistical areas,
-hospital referral regions, or states, as desired, by using the <code>geo_type</code>
-argument. View <code><a href='../articles/covidcastR.html'>vignette("covidcastR")</a></code> for detailed example usage.</p>
+    <p>This convenience function uses <code><a href='covidcast_signal.html'>covidcast_signal()</a></code> to obtain multiple
+signals, potentially from multiple data sources, in one data frame. See the
+<code><a href='covidcast_signal.html'>covidcast_signal()</a></code> documentation for further details.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>covidcast_signal</span>(
-  <span class='no'>data_source</span>,
-  <span class='no'>signal</span>,
+    <pre class="usage"><span class='fu'>covidcast_signals</span>(
+  <span class='no'>signals</span>,
   <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>end_day</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"county"</span>, <span class='st'>"hrr"</span>, <span class='st'>"msa"</span>, <span class='st'>"dma"</span>, <span class='st'>"state"</span>),
@@ -163,16 +154,9 @@ argument. View <code><a href='../articles/covidcastR.html'>vignette("covidcastR"
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>data_source</th>
-      <td><p>String identifying the data source to query. See the
-<a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>signal documentation</a>
-for a list of available data sources.</p></td>
-    </tr>
-    <tr>
-      <th>signal</th>
-      <td><p>String identifying the signal from that source to query. Again,
-see the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>signal documentation</a>
-for a list of available signals.</p></td>
+      <th>signals</th>
+      <td><p>Data frame with two columns: <code>data_source</code> and <code>signal</code>. Each
+row specifies one signal to be fetched from the COVIDcast API.</p></td>
     </tr>
     <tr>
       <th>start_day</th>
@@ -258,38 +242,7 @@ standard errors are calculated for specific signals.
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>For data on counties, metropolitan statistical areas, and states, this
-package provides the <code><a href='county_census.html'>county_census</a></code>, <code><a href='msa_census.html'>msa_census</a></code>, and <code><a href='state_census.html'>state_census</a></code>
-datasets. These include each area's unique identifier, used in the
-<code>geo_values</code> argument to select specific areas, and basic information on
-population and other Census data.</p>
-<p>The COVIDcast API tracks updates and changes to its underlying data, and
-records the first date each observation became available. For example, a data
-source may report its estimate for a specific state on June 3rd on June 5th,
-once records become available. This data is considered "issued" on June 5th.
-Later, the data source may update its estimate for June 3rd based on revised
-data, creating a new issue on June 8th. By default, <code>covidcast_signal()</code>
-returns the most recent issue available for every observation. The <code>as_of</code>,
-<code>issues</code>, and <code>lag</code> parameters allow the user to select specific issues
-instead, or to see all updates to observations. These options are mutually
-exclusive; if you specify more than one, <code>as_of</code> will take priority over
-<code>issues</code>, which will take priority over <code>lag</code>.</p>
-<p>Note that the API only tracks the initial value of an estimate and <em>changes</em>
-to that value. If a value was first issued on June 5th and never updated,
-asking for data issued on June 6th (using <code>issues</code> or <code>lag</code>) would <em>not</em>
-return that value, though asking for data <code>as_of</code> June 6th would. See
-<code><a href='../articles/covidcastR.html'>vignette("covidcastR")</a></code> for examples.</p>
-<p>Note also that the API enforces a maximum result row limit; results beyond
-the maximum limit are truncated. This limit is sufficient to fetch
-observations in all counties in the United States on one day. This client
-automatically splits queries for multiple days across multiple API calls.
-However, if data for one day has been issued many times, using the <code>issues</code>
-argument may return more results than the query limit. A warning will be
-issued in this case. To see all results, split your query across multiple
-calls with different <code>issues</code> arguments.</p>
-<p>Downloading large amounts of data may be slow, so this function prints
-messages for each day of data it downloads. To suppress these, use
-<code><a href='https://rdrr.io/r/base/message.html'>base::suppressMessages()</a></code>, as in <code><a href='https://rdrr.io/r/base/message.html'>suppressMessages(covidcast_signal("fb-survey", ...))</a></code>.</p>
+    <p>Deliberately not exported, because.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>COVIDcast API documentation:
@@ -299,26 +252,13 @@ messages for each day of data it downloads. To suppress these, use
 <p>COVIDcast public map: <a href='https://covidcast.cmu.edu/'>https://covidcast.cmu.edu/</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='plot.covidcast_signal.html'>plot.covidcast_signal()</a></code>, <code><a href='county_census.html'>county_census</a></code>, <code><a href='msa_census.html'>msa_census</a></code>,
-<code><a href='state_census.html'>state_census</a></code></p></div>
+    <div class='dont-index'><p><code><a href='covidcast_signal.html'>covidcast_signal()</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='co'>## fetch all counties from 2020-05-10 to the most recent available data:</span>
-<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='st'>"20200510"</span>)
-<span class='co'>## fetch all counties on just 2020-05-10 and no other days</span>
-<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='st'>"20200510"</span>,
-                 <span class='kw'>end_day</span> <span class='kw'>=</span> <span class='st'>"20200510"</span>)
-<span class='co'>## fetch all states on 2020-05-10, 2020-05-11, 2020-05-12</span>
-<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='st'>"20200510"</span>,
-                 <span class='kw'>end_day</span> <span class='kw'>=</span> <span class='st'>"20200512"</span>, <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='st'>"state"</span>)
-<span class='co'>## fetch all available data for just Pennsylvania and New Jersey</span>
-<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='st'>"state"</span>,
-                 <span class='kw'>geo_values</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pa"</span>, <span class='st'>"nj"</span>))
-<span class='co'>## fetch all available data in Pittsburgh metropolitan area (identified by</span>
-<span class='co'>## CBSA ID)</span>
-<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='st'>"msa"</span>,
-                 <span class='kw'>geo_values</span> <span class='kw'>=</span> <span class='st'>"38300"</span>)
+<span class='no'>signals</span> <span class='kw'>&lt;=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(<span class='kw'>data_source</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"jhu-csse"</span>, <span class='st'>"fb-survey"</span>),
+                      <span class='kw'>signal</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"confirmed_incidence_num"</span>, <span class='st'>"smoothed_cli"</span>))
+<span class='fu'>covidcast_signals</span>(<span class='no'>signals</span>, <span class='st'>"2020-07-01"</span>, <span class='st'>"2020-07-14"</span>, <span class='kw'>geo_type</span><span class='kw'>=</span><span class='st'>"state"</span>)
 }</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

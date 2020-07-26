@@ -12,6 +12,12 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' hospital referral regions, or states, as desired, by using the `geo_type`
 #' argument. View `vignette("covidcastR")` for detailed example usage.
 #'
+#' For data on counties, metropolitan statistical areas, and states, this
+#' package provides the [`county_census`], [`msa_census`], and [`state_census`]
+#' datasets. These include each area's unique identifier, used in the
+#' `geo_values` argument to select specific areas, and basic information on
+#' population and other Census data.
+#'
 #' The COVIDcast API tracks updates and changes to its underlying data, and
 #' records the first date each observation became available. For example, a data
 #' source may report its estimate for a specific state on June 3rd on June 5th,
@@ -118,8 +124,7 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 #'
 #' COVIDcast public map: \url{https://covidcast.cmu.edu/}
-#' @examples
-#' \dontrun{
+#' @examples \dontrun{
 #' ## fetch all counties from 2020-05-10 to the most recent available data:
 #' covidcast_signal("fb-survey", "raw_cli", start_day = "20200510")
 #' ## fetch all counties on just 2020-05-10 and no other days
@@ -136,6 +141,8 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' covidcast_signal("fb-survey", "raw_cli", geo_type = "msa",
 #'                  geo_values = "38300")
 #' }
+#' @seealso [plot.covidcast_signal()], [`county_census`], [`msa_census`],
+#'     [`state_census`]
 #' @export
 #' @importFrom dplyr %>%
 covidcast_signal <- function(data_source, signal,
@@ -564,6 +571,7 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_va
 #' @return The same `covidcast_signal` data frame, but with only the latest
 #'     issue of every observation
 #' @importFrom rlang .data
+#' @keywords internal
 latest_issue <- function(df) {
   # Preserve the attributes, since grouping overwrites them
   attrs <- attributes(df)

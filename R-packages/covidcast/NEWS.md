@@ -1,5 +1,7 @@
 # covidcast 0.2.0
 
+Released July 26, 2020.
+
 ## Major changes
 
 - **Name change:** The package is now called covidcast, not covidcastR. Users
@@ -8,7 +10,8 @@
 
 - **Incompatible change:** The `covidcast_signal()` function now takes
   `start_day` and `end_day` arguments as strings in the form YYYY-MM-DD, rather
-  than YYYYMMDD, for consistency with `as.Date()` and other common R usage.
+  than YYYYMMDD, for consistency with `as.Date()` and other common R usage. The
+  arguments can also be passed as `Date` objects directly.
 
 - New plotting and mapping features provide convenient visualizations of
   signals. See `vignette("plotting-signals")` for examples.
@@ -16,7 +19,8 @@
 - New feature: The `covidcast_signal()` function now supports arguments `as_of`,
   `issues`, and `lag`, allowing users to request specific versions of data in
   the API. This allows users to track revisions of data and to see only data
-  that was available as of a specific date.
+  that was available as of a specific date. See `vignette("covidcastR")` for
+  examples.
 
 ## Minor changes
 

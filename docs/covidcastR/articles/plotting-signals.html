@@ -105,14 +105,14 @@
                      <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"county"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">df_comb</span>)</pre></body></html></div>
-<pre><code>## A `covidcast_signal` data frame with 27642 rows and 10 columns.
+<pre><code>## A `covidcast_signal` data frame with 28023 rows and 10 columns.
 ## 
 ## signals     : indicator-combination:nmf_day_doc_fbc_fbs_ght
 ## geo_type    : county
 ## 
 ## first date                           : 2020-07-01
 ## last date                            : 2020-07-14
-## median number of geo_values per day  : 1975</code></pre>
+## median number of geo_values per day  : 2001</code></pre>
 <div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">df_inum</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
     <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"indicator-combination"</span>,
                      <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"confirmed_7dav_incidence_num"</span>,

@@ -150,10 +150,10 @@ covidcast_signal <- function(data_source, signal,
   given_signal <- signal
   given_geo_type <- geo_type
   relevant_meta <- meta %>%
-    dplyr::filter(data_source == given_data_source,
-                  signal == given_signal,
-                  time_type == "day",
-                  geo_type == given_geo_type)
+    dplyr::filter(.data$data_source == given_data_source,
+                  .data$signal == given_signal,
+                  .data$time_type == "day",
+                  .data$geo_type == given_geo_type)
 
   if (nrow(relevant_meta) == 0) {
     relevant_meta <- list()
@@ -170,15 +170,13 @@ covidcast_signal <- function(data_source, signal,
   }
 
   if (is.null(start_day)) {
-    start_day <- relevant_meta %>%
-      dplyr::pull(min_time)
+    start_day <- relevant_meta$min_time
   } else {
     start_day <- as.Date(start_day)
   }
 
   if (is.null(end_day)) {
-    end_day <- relevant_meta %>%
-      dplyr::pull(max_time)
+    end_day <- relevant_meta$max_time
   } else {
     end_day <- as.Date(end_day)
   }
@@ -298,9 +296,9 @@ summary.covidcast_signal = function(object, ...) {
   cat(sprintf("%-37s: %s\n", "first date", min(x$time_value)))
   cat(sprintf("%-37s: %s\n", "last date", max(x$time_value)))
   cat(sprintf("%-37s: %i\n", "median number of geo_values per day",
-              as.integer(x %>% dplyr::group_by(time_value) %>%
+              as.integer(x %>% dplyr::group_by(.data$time_value) %>%
                          dplyr::summarize(num = dplyr::n()) %>%
-                         dplyr::summarize(median(num)))))
+                         dplyr::summarize(median(.data$num)))))
 }
 
 #' Plot `covidcast_signal` objects
@@ -501,9 +499,9 @@ covidcast_meta <- function() {
   }
 
   meta <- meta$epidata %>%
-    dplyr::mutate(min_time = as.Date(as.character(min_time), format = "%Y%m%d"),
-                  max_time = as.Date(as.character(max_time), format = "%Y%m%d"),
-                  max_issue = as.Date(as.character(max_issue), format = "%Y%m%d"))
+    dplyr::mutate(min_time = as.Date(as.character(.data$min_time), format = "%Y%m%d"),
+                  max_time = as.Date(as.character(.data$max_time), format = "%Y%m%d"),
+                  max_issue = as.Date(as.character(.data$max_issue), format = "%Y%m%d"))
 
   return(meta)
 }
@@ -557,18 +555,22 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_va
   return(df)
 }
 
-## Fetch only the latest issue for each observation in a data frame.
-##
-## Since `covidcast_signal()` can, with the right options, return multiple
-## issues for a single observation in a single geo, we may want only the most
-## recent for plotting, mapping, or other purposes.
+#' Fetch only the latest issue for each observation in a data frame.
+#'
+#' Since `covidcast_signal()` can, with the right options, return multiple
+#' issues for a single observation in a single geo, we may want only the most
+#' recent for plotting, mapping, or other purposes.
+#' @param df A `covidcast_signal` data frame
+#' @return The same `covidcast_signal` data frame, but with only the latest
+#'     issue of every observation
+#' @importFrom rlang .data
 latest_issue <- function(df) {
   # Preserve the attributes, since grouping overwrites them
   attrs <- attributes(df)
 
   df <- df %>%
-    dplyr::group_by(geo_value, time_value) %>%
-    dplyr::filter(issue == max(issue)) %>%
+    dplyr::group_by(.data$geo_value, .data$time_value) %>%
+    dplyr::filter(.data$issue == max(.data$issue)) %>%
     dplyr::ungroup()
 
   attributes(df) <- attrs

@@ -26,7 +26,8 @@ Imports:
   usmap,
   maptools,
   ggplot2,
-  grDevices
+  grDevices,
+  rlang
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,

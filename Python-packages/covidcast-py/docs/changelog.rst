@@ -1,8 +1,8 @@
 Changelog
 =========
 
-v0.0.8, TODO DATE
------------------
+v0.0.8, July 26, 2020
+---------------------
 
 - New feature: :py:func:`covidcast.signal` now accepts arguments ``as_of``,
   ``issues``, and ``lag`` to request data that was issued on a specific date, or

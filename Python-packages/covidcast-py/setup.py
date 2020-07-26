@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="covidcast", # Replace with your own username
-    version="0.0.7",
+    version="0.0.8",
     author="Alex Reinhart",
     author_email="areinhar@stat.cmu.edu",
     description="Access COVID-19 data through the Delphi COVIDcast API",
@@ -22,6 +22,6 @@ setuptools.setup(
     install_requires=[
         'pandas',
         'requests',
-        'delphi-epidata>=0.0.6',
+        'delphi-epidata>=0.0.7',
     ],
 )

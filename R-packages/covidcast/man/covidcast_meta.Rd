@@ -25,6 +25,9 @@ for which this signal has ever been reported.}
 \item{max_value}{The largest value that has ever been reported.}
 \item{mean_value}{The arithmetic mean of all reported values.}
 \item{stdev_value}{The sample standard deviation of all reported values.}
+\item{max_issue}{The most recent issue date for this signal.}
+\item{min_lag}{Smallest lag from observation to issue, in \code{time_type} units}
+\item{max_lag}{Largest lag from observation to issue, in \code{time_type} units}
 }
 \description{
 Obtains a data frame of metadata describing all publicly available data

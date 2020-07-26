@@ -91,8 +91,8 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   # Grab the values
   given_time_value = time_value
   df = x %>%
-    dplyr::filter(time_value == given_time_value) %>%
-    dplyr::select(value, direction, geo_value)
+    dplyr::filter(.data$time_value == given_time_value) %>%
+    dplyr::select(.data$value, .data$direction, .data$geo_value)
 
   if (!direction) val = df$value
   else val = df$direction
@@ -294,8 +294,8 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   # Grab the values
   given_time_value = time_value
   df = x %>%
-    dplyr::filter(time_value == given_time_value) %>%
-    dplyr::select(value, geo_value)
+    dplyr::filter(.data$time_value == given_time_value) %>%
+    dplyr::select(.data$value, .data$geo_value)
   val = df$value
   geo = df$geo_value
   names(val) = geo
@@ -397,7 +397,7 @@ plot_line = function(x, range = NULL, col = 1:6, line_type = rep(1:6, each = len
   if (is.null(ylab)) ylab = "Value"
 
   # Grab the values
-  df = x %>% dplyr::select(value, time_value, geo_value)
+  df = x %>% dplyr::select(.data$value, .data$time_value, .data$geo_value)
 
   # Create label and theme layers
   label_layer = ggplot2::labs(title = title, x = xlab, y = ylab)

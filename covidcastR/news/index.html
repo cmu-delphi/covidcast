@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>License • covidcast</title>
+<title>Changelog • covidcast</title>
 
 
 <!-- jquery -->
@@ -18,8 +18,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
 <!-- bootstrap-toc -->
-<link rel="stylesheet" href="bootstrap-toc.css">
-<script src="bootstrap-toc.js"></script>
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
@@ -33,13 +33,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
-<link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script>
+<link href="../pkgdown.css" rel="stylesheet">
+<script src="../pkgdown.js"></script>
 
 
 
 
-<meta property="og:title" content="License" />
+<meta property="og:title" content="Changelog" />
 
 
 
@@ -58,7 +58,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-title-body">
+    <div class="container template-news">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -70,7 +70,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">covidcast</a>
+        <a class="navbar-link" href="../index.html">covidcast</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
@@ -78,13 +78,13 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="index.html">
+  <a href="../index.html">
     <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="reference/index.html">Reference</a>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -94,15 +94,15 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="articles/covidcastR.html">Getting started with covidcast</a>
+      <a href="../articles/covidcastR.html">Getting started with covidcast</a>
     </li>
     <li>
-      <a href="articles/plotting-signals.html">Plotting and mapping signals</a>
+      <a href="../articles/plotting-signals.html">Plotting and mapping signals</a>
     </li>
   </ul>
 </li>
 <li>
-  <a href="news/index.html">Changelog</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -123,15 +123,41 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>License</h1>
+      <h1 data-toc-skip>Changelog <small></small></h1>
+      <small>Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-<pre>YEAR: 2020
-COPYRIGHT HOLDER: Addison Hu, Alex Reinhart, Aaron Rumack, Pedrito Maynard-Zhang, Logan Brooks, Jacob Bien
-</pre>
-
+    <div id="covidcast-020" class="section level1">
+<h1 class="page-header" data-toc-text="0.2.0">
+<a href="#covidcast-020" class="anchor"></a>covidcast 0.2.0</h1>
+<p>Released July 26, 2020.</p>
+<div id="major-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#major-changes" class="anchor"></a>Major changes</h2>
+<ul>
+<li><p><strong>Name change:</strong> The package is now called covidcast, not covidcastR. Users should remove covidcastR using <code><a href="https://rdrr.io/r/utils/remove.packages.html">remove.packages()</a></code> and then install covidcast using the instructions in <code><a href="../articles/covidcastR.html">vignette("covidcastR")</a></code>.</p></li>
+<li><p><strong>Incompatible change:</strong> The <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> function now takes <code>start_day</code> and <code>end_day</code> arguments as strings in the form YYYY-MM-DD, rather than YYYYMMDD, for consistency with <code><a href="https://rdrr.io/r/base/as.Date.html">as.Date()</a></code> and other common R usage. The arguments can also be passed as <code>Date</code> objects directly.</p></li>
+<li><p>New plotting and mapping features provide convenient visualizations of signals. See <code><a href="../articles/plotting-signals.html">vignette("plotting-signals")</a></code> for examples.</p></li>
+<li><p>New feature: The <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> function now supports arguments <code>as_of</code>, <code>issues</code>, and <code>lag</code>, allowing users to request specific versions of data in the API. This allows users to track revisions of data and to see only data that was available as of a specific date. See <code><a href="../articles/covidcastR.html">vignette("covidcastR")</a></code> for examples.</p></li>
+</ul>
+</div>
+<div id="minor-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-changes" class="anchor"></a>Minor changes</h2>
+<ul>
+<li>The object returned from <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> is now a data frame augmented with extra attributes indicating the geography type and signal metadata. Additional <code>data_source</code> and <code>signal</code> columns are provided, in anticipation of options to request more than one signal at once. Methods for <code>print</code> and <code>summary</code> are provided (as <code><a href="../reference/print.covidcast_signal.html">print.covidcast_signal()</a></code> and <code><a href="../reference/summary.covidcast_signal.html">summary.covidcast_signal()</a></code>) to conveniently view these objects. They can still be used as ordinary data frames as well.</li>
+</ul>
+</div>
+</div>
+    <div id="covidcast-010" class="section level1">
+<h1 class="page-header" data-toc-text="0.1.0">
+<a href="#covidcast-010" class="anchor"></a>covidcast 0.1.0</h1>
+<ul>
+<li>First major release.</li>
+</ul>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -141,7 +167,6 @@ COPYRIGHT HOLDER: Addison Hu, Alex Reinhart, Aaron Rumack, Pedrito Maynard-Zhang
   </div>
 
 </div>
-
 
 
       <footer>

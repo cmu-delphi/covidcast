@@ -101,6 +101,12 @@ hospital referral regions, or states, as desired, by using the \code{geo_type}
 argument. View \code{vignette("covidcastR")} for detailed example usage.
 }
 \details{
+For data on counties, metropolitan statistical areas, and states, this
+package provides the \code{\link{county_census}}, \code{\link{msa_census}}, and \code{\link{state_census}}
+datasets. These include each area's unique identifier, used in the
+\code{geo_values} argument to select specific areas, and basic information on
+population and other Census data.
+
 The COVIDcast API tracks updates and changes to its underlying data, and
 records the first date each observation became available. For example, a data
 source may report its estimate for a specific state on June 3rd on June 5th,
@@ -159,4 +165,8 @@ Documentation of all COVIDcast sources and signals:
 \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 
 COVIDcast public map: \url{https://covidcast.cmu.edu/}
+}
+\seealso{
+\code{\link[=plot.covidcast_signal]{plot.covidcast_signal()}}, \code{\link{county_census}}, \code{\link{msa_census}},
+\code{\link{state_census}}
 }

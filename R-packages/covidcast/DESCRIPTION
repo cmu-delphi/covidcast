@@ -1,0 +1,36 @@
+Package: covidcast
+Type: Package
+Title: Client for Delphi's COVIDcast API
+Version: 0.2.0
+Authors@R: as.person(c(
+  "Jacob Bien <jbien@usc.edu> [aut]",
+  "Logan Brooks <lcbrooks@andrew.cmu.edu> [aut]",
+  "David Farrow <dfarrow0@gmail.com> [aut]",
+  "Pedrito Maynard-Zhang <pedritom@amazon.com> [aut]",
+  "Alex Reinhart <areinhar@stat.cmu.edu> [aut,cre]",
+  "Ryan Tibshirani <ryantibs@stat.cmu.edu> [aut]"
+  ))
+URL: https://cmu-delphi.github.io/covidcast/covidcastR/, https://github.com/cmu-delphi/covidcast
+BugReports: https://github.com/cmu-delphi/covidcast/issues
+Description: R tools surrounding Delphi's COVIDcast API: data access tools for our COVID-19 indicators, maps and time series plotting, and basic signal processing.
+Depends: R (>= 3.5.0)
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+Imports:
+  dplyr,
+  httr,
+  purrr,
+  jsonlite,
+  usmap,
+  maptools,
+  ggplot2,
+  grDevices,
+  rlang
+RoxygenNote: 7.1.1
+Suggests: 
+    knitr,
+    rmarkdown,
+    gridExtra
+VignetteBuilder: knitr

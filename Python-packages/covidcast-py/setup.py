@@ -4,8 +4,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="covidcast", # Replace with your own username
-    version="0.0.8",
+    name="covidcast",
+    version="0.0.8", # also update in docs/conf.py
     author="Alex Reinhart",
     author_email="areinhar@stat.cmu.edu",
     description="Access COVID-19 data through the Delphi COVIDcast API",

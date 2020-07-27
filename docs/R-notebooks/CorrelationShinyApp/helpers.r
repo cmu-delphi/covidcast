@@ -1,8 +1,8 @@
-library(covidcastR)
-library(dplyr)
+library(covidcast)
 library(ggplot2)
 library(lubridate)
 library(plotly)
+library(dplyr)
 
 
 #' Transforms a lubridate date format into string "YYYYMMDD" ready to be fed to the Delphi API
@@ -45,7 +45,7 @@ get_population <- function(){
 #' @param date_var lubridate date
 #' @return string "YYYYMMDD"
 date_to_char <- function(date_var){
-  gsub("-","", as.character(date_var))
+  as.character(date_var)
 }
 
 #' Transforms a character string "YYYYMMDD" in a lubridate date
@@ -53,7 +53,7 @@ date_to_char <- function(date_var){
 #' @param char_var string with date in form "YYYYMMDD"
 #' @return lubridate date format
 char_to_date <- function(char_var){
-  ymd(char_var)
+  as.Date(char_var)
 }
 
 #' Get average responses variable (to compute correlations) from the API
@@ -316,7 +316,6 @@ plot_from_csv <- function(csv_file_path, response, lag, geo_type, freescales = F
 # signal_correlations(signals_to_plot, response, date_var, lag, window, geo_type, freescales = TRUE)
 # signal_correlations(signals_to_plot, response, date_var, lag, window, geo_type = "state")
 # signal_correlations(signals_to_plot, response, date_var, lag, window, geo_type = "msa")
-
 # csv_file <- read.csv("~/Downloads/testquidel_state_raw.csv", header = T)
 # csv_file$time_value <- as.Date(csv_file$time_value)
 # csv_file <- csv_file %>% filter(time_value > max(csv_file$time_value) - 7)

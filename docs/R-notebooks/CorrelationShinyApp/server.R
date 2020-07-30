@@ -13,7 +13,7 @@ shinyServer(function(input, output) {
     population_mapping <- get_population()
     
     ############
-    ## first tab computation: signals from the API
+    ## first tab: signals from the API
     ############
     ## initialize corrPlot to make sure Spinner will only run after the button is pressed
     output$corrPlot <- renderPlot(NULL)
@@ -48,16 +48,21 @@ shinyServer(function(input, output) {
     })
     
     ## finally, script that is re-run when button is clicked but also re-runs every time the input$* that are called in the script changes 
+    plot_to_show <- reactiveValues()
     observeEvent(input$runButton, {
+        plot_to_show$plot <- plot_corr(sensors(), response(), population_mapping, geo_type(), !input$fixedAxis)
         output$description <- renderText({descr()})
-        output$corrPlot <- renderPlot({plot_corr(sensors(), response(), population_mapping, geo_type(), !input$fixedAxis)
-        })
+        output$corrPlot <- renderPlot({plot_to_show$plot})
     }, ignoreInit = TRUE)
+    output$download <- downloadHandler(
+        filename = function(){paste('corrPlot-', Sys.Date(), '.png', sep='')},
+        content = function(file) {ggsave(file, plot = plot_to_show$plot)}
+    )
     
     
     
     ############
-    ## first tab computation: signals from csv file
+    ## second tab: signals from csv file
     ############
     ## initialize corrPlot to make sure Spinner will only run after the button is pressed
     output$corrPlot_csv <- renderPlot(NULL)
@@ -113,10 +118,15 @@ shinyServer(function(input, output) {
     })
     
     ## finally, script that is re-run when button is clicked but also re-runs every time the input$* that are called in the script changes 
+    plot_to_show_csv <- reactiveValues()
     observeEvent(input$runButton_csv, {
+        plot_to_show_csv$plot <- plot_corr(sensors_csv(), response_csv(), population_mapping, geo_type_csv(), !input$fixedAxis_csv)
         output$description_csv <- renderText({descr_csv()})
-        output$corrPlot_csv <- renderPlot({plot_corr(sensors_csv(), response_csv(), population_mapping, geo_type_csv(), !input$fixedAxis_csv)
-        })
+        output$corrPlot_csv <- renderPlot({plot_to_show_csv$plot})
+        output$download_csv <- downloadHandler(
+            filename = function(){paste('corrPlot-', Sys.Date(), '.png', sep='')},
+            content = function(file) {ggsave(file, plot = plot_to_show_csv$plot)}
+        )
     }, ignoreInit = TRUE)
     
 })

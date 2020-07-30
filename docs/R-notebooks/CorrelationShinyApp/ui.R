@@ -123,7 +123,8 @@ shinyUI(fluidPage(theme = shinytheme("united"),
                                             value = TRUE
                                           ), 
                                           htmlOutput("description"), 
-                                          plotOutput("corrPlot") %>% addSpinner(spin ="fading-circle")
+                                          plotOutput("corrPlot") %>% addSpinner(spin ="fading-circle"), 
+                                          downloadButton("download", "Download Plot")
                                         )
                                       )
                              ), 
@@ -168,7 +169,8 @@ shinyUI(fluidPage(theme = shinytheme("united"),
                                             value = TRUE
                                           ), 
                                           htmlOutput("description_csv"),
-                                          plotOutput("corrPlot_csv") %>% addSpinner(spin ="fading-circle")
+                                          plotOutput("corrPlot_csv") %>% addSpinner(spin ="fading-circle"), 
+                                          downloadButton("download_csv", "Download Plot")
                                         )
                                       )
                                       

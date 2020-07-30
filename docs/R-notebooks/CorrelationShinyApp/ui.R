@@ -23,7 +23,7 @@ likely_responses <- c("jhu-csse: confirmed_incidence_num",
 shinyUI(fluidPage(theme = shinytheme("united"),
                   
                   # Application title
-                  titlePanel("Signal Correlations"),
+                  titlePanel("Signal Rank Correlations"),
                   
                   navbarPage("",
                              tabPanel(icon("home"), 
@@ -49,7 +49,7 @@ shinyUI(fluidPage(theme = shinytheme("united"),
                                           for each ", code("grographical granularity"), " in which this indicator is available, giving us a vector y."), 
                                           tags$li("Compute the Spearman or rank correlation between x and y for the geographical locations available in both vectors. ")
                                         ),
-                                        tags$img(src="corrdiagram.png", width = 400, length = 400),
+                                        tags$img(src="corrdiagram.png", width = 350, length = 350),
                                         p(),
                                         "To elaborate, we are actually going to compute the rank correlation for a population sweep cut of x and y:",
                                         tags$ul(
@@ -57,6 +57,9 @@ shinyUI(fluidPage(theme = shinytheme("united"),
                                           tags$li("A population sweep cut means that we will consider all population cuts over all possible values of p.")
                                         ),
                                         "In the plots, the horizontal axis shows the population threshold (on a log scale), the vertical axis shows the corresponding rank correlation. ",
+                                        "Here is an example of a ", strong("bad correlation plot"),", that is, what the rank correlation plot of two uncorrelated signals looks like. Note that the correlation values are around 0 (red line). A good signal will have high and positive correlations. ",
+                                        p(),
+                                        tags$img(src="uncorr_toy_plot.png", width = 350, length = 350),
                                         br(),br(),
                                         h4("Upload csv"),
                                         p(),

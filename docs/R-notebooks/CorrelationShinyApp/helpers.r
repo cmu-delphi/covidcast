@@ -3,6 +3,7 @@ library(ggplot2)
 library(lubridate)
 library(plotly)
 library(dplyr)
+library(maps)
 
 
 #' Transforms a lubridate date format into string "YYYYMMDD" ready to be fed to the Delphi API
@@ -12,26 +13,25 @@ library(dplyr)
 get_population <- function(){
   population_mapping = list()
   
-  census_url = "https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.csv"
-  county_pop = read.csv(census_url) %>% 
+  county_pop = county_census %>% 
     transmute (geo_value = 1000*as.numeric(STATE) + as.numeric(COUNTY),
                population = POPESTIMATE2019)
   county_pop$geo_value <- sprintf("%05d", county_pop$geo_value)
   population_mapping$county = county_pop
   
-  state_pop = read.csv(census_url) %>% 
+  state_pop <- state_census %>% 
     mutate(geo_value = as.numeric(STATE)) %>% 
+    filter(STATE != 0) %>% 
     group_by(geo_value) %>% 
     summarise(population = sum(POPESTIMATE2019))
-  state_crosswalk <- read.csv("https://raw.githubusercontent.com/cmu-delphi/covid-19/main/geographical_scope/StateToHHS.csv?token=AHQABX4BXLJ3S3SJFSOGPFC7EBAIA") %>% 
-    select(State, FIPS) %>% distinct()
+  state_crosswalk <- state.fips %>% 
+    select(abb, fips) %>% distinct() %>% mutate(abb = tolower(abb))
   state_pop <- state_pop %>% 
-    inner_join(state_crosswalk, by = c("geo_value" = "FIPS")) %>% 
-    select(geo_value = State, population) %>% 
-    mutate(geo_value = tolower(geo_value))
+    inner_join(state_crosswalk, by = c("geo_value" = "fips")) %>% 
+    select(geo_value = abb, population)
   population_mapping$state = state_pop
   
-  msa_pop = read.csv("https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.csv") %>% 
+  msa_pop = msa_census %>% 
     transmute(geo_value = as.character(CBSA),
               population = POPESTIMATE2019)
   population_mapping$msa = msa_pop

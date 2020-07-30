@@ -63,7 +63,7 @@ shinyUI(fluidPage(theme = shinytheme("united"),
                                         "Here we compute rank correlations between one response signal and signals from an user-uploaded csv file following the same algorithm from the", 
                                         tags$i("Signals from API"), " tab. The csv file", strong("must have")," the following columns:", 
                                         tags$ul(
-                                          tags$li("geo_val: grographical location. Numerical FIPS county, MSA code, lower case state abbreviation;"), 
+                                          tags$li("geo_value: grographical location. Numerical FIPS county, MSA code, lower case state abbreviation;"), 
                                           tags$li("time_value: signal date. String of the format YYYY-MM-DD;"), 
                                           tags$li("value: signal value for specified geographical location and date;"), 
                                           tags$li("source: string with source name;"), 
@@ -110,7 +110,7 @@ shinyUI(fluidPage(theme = shinytheme("united"),
                                                          "fb-survey: smoothed_hh_cmnty_cli",
                                                          "google-survey: smoothed_cli", 
                                                          "ght: smoothed_search", 
-                                                         "indicator-combination: nmf_day_doc_fbs_ght")
+                                                         "indicator-combination: nmf_day_doc_fbc_fbs_ght")
                                           ), 
                                           actionButton("runButton", "Create plots")
                                         ),
@@ -151,7 +151,7 @@ shinyUI(fluidPage(theme = shinytheme("united"),
                                           ), 
                                           fileInput(
                                             inputId = "signal_csv",
-                                            label = h4("CSV file with signals to correlate with response. Must have columns geo_val, time_value, value, source, signal."), 
+                                            label = h4("CSV file with signals to correlate with response. Must have columns geo_value, time_value, value, source, signal."), 
                                             accept = c(
                                               "text/csv",
                                               "text/comma-separated-values,text/plain",

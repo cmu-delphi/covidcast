@@ -62,6 +62,10 @@ shinyServer(function(input, output) {
     ## initialize corrPlot to make sure Spinner will only run after the button is pressed
     output$corrPlot_csv <- renderPlot(NULL)
     
+    geo_type_csv <- eventReactive(input$runButton_csv, {
+        ## saving geo_type so it doesn't change when the user clicks on it; it has to wait until the button is clicked on
+        input$geo_type_csv
+    })
     ## getting reactive inputs
     ## reactive events values will be cached and only invalidated and recomputed once runButton is clicked on
     signals_df <- eventReactive(input$runButton_csv, {
@@ -69,6 +73,9 @@ shinyServer(function(input, output) {
         signals_df <- read.csv(input$signal_csv$datapath, header = T) %>% select(geo_value, value, time_value, source, signal)
         ## check that colnames on uploaded file are correct
         if(sum(names(signals_df) %in% c("geo_value", "time_value", "value", "source", "signal")) != 5) stop("file does not have correct column names")
+        
+        if(geo_type_csv() %in% c("county", "msa")) signals_df$geo_value <- sprintf("%05d", signals_df$geo_value)
+        
         signals_df
     })
     date_var_csv <- eventReactive(input$runButton_csv, {
@@ -78,10 +85,6 @@ shinyServer(function(input, output) {
     window_csv <- eventReactive(input$runButton_csv, {
         ## sets window based on date col of csv input
         length(unique(as.Date(signals_df()$time_value)))
-    })
-    geo_type_csv <- eventReactive(input$runButton_csv, {
-        ## saving geo_type so it doesn't change when the user clicks on it; it has to wait until the button is clicked on
-        input$geo_type_csv
     })
     descr_csv <- eventReactive(input$runButton_csv, {
         ## writing description of plots and signals in the plot

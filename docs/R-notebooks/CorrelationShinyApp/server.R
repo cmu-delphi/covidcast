@@ -54,7 +54,8 @@ shinyServer(function(input, output) {
     }, ignoreInit = TRUE)
     output$download <- downloadHandler(
         filename = function(){paste('corrPlot-', Sys.Date(), '.png', sep='')},
-        content = function(file) {ggsave(file, plot = plot_corr(sensors(), response(), population_mapping, geo_type(), !input$fixedAxis))}
+        content = function(file) {ggsave(file, plot = plot_corr(sensors(), response(), population_mapping, geo_type(), !input$fixedAxis), 
+                                         width = 7, height = 4)}
     )
     
     
@@ -121,7 +122,8 @@ shinyServer(function(input, output) {
         output$corrPlot_csv <- renderPlot({plot_corr(sensors_csv(), response_csv(), population_mapping, geo_type_csv(), !input$fixedAxis_csv)})
         output$download_csv <- downloadHandler(
             filename = function(){paste('corrPlot-', Sys.Date(), '.png', sep='')},
-            content = function(file) {ggsave(file, plot = plot_corr(sensors_csv(), response_csv(), population_mapping, geo_type_csv(), !input$fixedAxis_csv))}
+            content = function(file) {ggsave(file, plot = plot_corr(sensors_csv(), response_csv(), population_mapping, geo_type_csv(), !input$fixedAxis_csv), 
+                                             width = 7, height = 4)}
         )
     }, ignoreInit = TRUE)
     

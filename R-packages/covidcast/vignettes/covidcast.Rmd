@@ -1,8 +1,8 @@
 ---
-title: Getting started with covidcast
+title: Get started with covidcast
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting started with covidcast}
+  %\VignetteIndexEntry{Get started with covidcast}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

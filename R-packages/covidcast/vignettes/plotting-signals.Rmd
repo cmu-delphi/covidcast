@@ -41,6 +41,10 @@ head(df_inum)
 
 ## Choropleth maps
 
+```{r, include=FALSE}
+knitr::opts_chunk$set(fig.width=10, fig.height=8)
+```
+
 The default `plot` method for `covidcast_signal` objects,
 `plot.covidcast_signal()`, produces choropleth maps by using `ggplot2` and the
 `usmap` package:
@@ -110,7 +114,7 @@ proportion signal:
 df_iprop <- suppressMessages(
     covidcast_signal(data_source = "indicator-combination",
                      signal = "confirmed_7dav_incidence_prop",
-                     start_day = "2020-07-04")
+                     start_day = "2020-07-04", end_day = "2020-07-14")
 )
 ```
 
@@ -130,6 +134,10 @@ gridExtra::grid.arrange(p1, p2, nrow = 1)
 ```
 
 ## Time series plots
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(fig.width=8, fig.height=6)
+```
 
 Let's fetch the combination indicator and case counts, but for all states rather
 than for all counties. This will make the time series plots more manageable.

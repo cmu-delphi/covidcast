@@ -10,7 +10,7 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' Most (but not all) data sources are available at the county level, but the
 #' API can also return data aggregated to metropolitan statistical areas,
 #' hospital referral regions, or states, as desired, by using the `geo_type`
-#' argument. View `vignette("covidcastR")` for detailed example usage.
+#' argument. View `vignette("covidcast")` for detailed example usage.
 #'
 #' For data on counties, metropolitan statistical areas, and states, this
 #' package provides the [`county_census`], [`msa_census`], and [`state_census`]
@@ -34,7 +34,7 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' to that value. If a value was first issued on June 5th and never updated,
 #' asking for data issued on June 6th (using `issues` or `lag`) would *not*
 #' return that value, though asking for data `as_of` June 6th would. See
-#' `vignette("covidcastR")` for examples.
+#' `vignette("covidcast")` for examples.
 #'
 #' Note also that the API enforces a maximum result row limit; results beyond
 #' the maximum limit are truncated. This limit is sufficient to fetch

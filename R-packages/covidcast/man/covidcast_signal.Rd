@@ -98,7 +98,7 @@ United States. Available data sources and signals are documented in the
 Most (but not all) data sources are available at the county level, but the
 API can also return data aggregated to metropolitan statistical areas,
 hospital referral regions, or states, as desired, by using the \code{geo_type}
-argument. View \code{vignette("covidcastR")} for detailed example usage.
+argument. View \code{vignette("covidcast")} for detailed example usage.
 }
 \details{
 For data on counties, metropolitan statistical areas, and states, this
@@ -123,7 +123,7 @@ Note that the API only tracks the initial value of an estimate and \emph{changes
 to that value. If a value was first issued on June 5th and never updated,
 asking for data issued on June 6th (using \code{issues} or \code{lag}) would \emph{not}
 return that value, though asking for data \code{as_of} June 6th would. See
-\code{vignette("covidcastR")} for examples.
+\code{vignette("covidcast")} for examples.
 
 Note also that the API enforces a maximum result row limit; results beyond
 the maximum limit are truncated. This limit is sufficient to fetch

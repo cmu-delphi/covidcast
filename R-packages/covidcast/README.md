@@ -1,11 +1,12 @@
-# covidcastR
+# covidcast R package
 
 Provides R access to the [COVIDcast
 API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html) published
 by the [Delphi group](https://delphi.cmu.edu/) at [Carnegie Mellon
 University](https://www.cmu.edu). This API provides daily access to a range of
-COVID-related signals Delphi collects from a variety of sources, including
-cases, deaths, symptom surveys, healthcare data, and other information.
+COVID-related signals Delphi that builds and maintains, from sources like
+symptom surveys and medical claims data, and also standard signals that we
+simply mirror, like confirmed cases and deaths.
 
 Consult the [COVIDcast API
 documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html)

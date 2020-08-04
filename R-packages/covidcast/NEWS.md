@@ -4,9 +4,10 @@ Released July 26, 2020.
 
 ## Major changes
 
-- **Name change:** The package is now called covidcast, not covidcastR. Users
-  should remove covidcastR using `remove.packages()` and then install covidcast
-  using the instructions in `vignette("covidcastR")`.
+- **Name change:** The package is now called covidcast, not covidcastR. If 
+  already installed, users should remove covidcastR using `remove.packages()`
+  and then install covidcast using the instructions in
+  `vignette("covidcast")`.
 
 - **Incompatible change:** The `covidcast_signal()` function now takes
   `start_day` and `end_day` arguments as strings in the form YYYY-MM-DD, rather
@@ -19,7 +20,7 @@ Released July 26, 2020.
 - New feature: The `covidcast_signal()` function now supports arguments `as_of`,
   `issues`, and `lag`, allowing users to request specific versions of data in
   the API. This allows users to track revisions of data and to see only data
-  that was available as of a specific date. See `vignette("covidcastR")` for
+  that was available as of a specific date. See `vignette("covidcast")` for
   examples.
 
 ## Minor changes

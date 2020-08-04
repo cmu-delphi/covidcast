@@ -114,7 +114,7 @@ proportion signal:
 df_iprop <- suppressMessages(
     covidcast_signal(data_source = "indicator-combination",
                      signal = "confirmed_7dav_incidence_prop",
-                     start_day = "2020-07-04")
+                     start_day = "2020-07-04", end_day = "2020-07-14")
 )
 ```
 

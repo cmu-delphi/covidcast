@@ -2,13 +2,13 @@ name: python_lint_and_test
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
   pull_request:
-    branches:
-      - master
+    branches: [ master ]
+
+
 jobs:
-  tests:
+ build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,4 +22,4 @@ jobs:
       - name: Run pylint
         run: pylint Python-packages/covidcast-py/covidcast/
       - name: Run tests
-        run: pytest
+        run: pytest  Python-packages/covidcast-py/

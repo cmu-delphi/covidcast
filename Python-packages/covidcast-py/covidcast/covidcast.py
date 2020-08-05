@@ -1,6 +1,6 @@
-
+"""This is the client side library for accessing the COVIDcast API."""
 import warnings
-from datetime import timedelta, datetime
+from datetime import timedelta
 
 from delphi_epidata import Epidata
 
@@ -8,7 +8,8 @@ import pandas as pd
 
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state"}
 
-def signal(data_source, signal, start_day=None, end_day=None, geo_type="county",
+
+def signal(data_source, signal, start_day=None, end_day=None, geo_type="county",  # pylint: disable=R0913,W0621
            geo_values="*", as_of=None, issues=None, lag=None):
     """Download a Pandas data frame for one signal.
 
@@ -92,11 +93,13 @@ def signal(data_source, signal, start_day=None, end_day=None, geo_type="county",
         identifies the location, such as a state name or county FIPS code.
 
       ``time_value``
-        contains a `pandas Timestamp object <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_
+        contains a `pandas Timestamp object
+        <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_
         identifying the date this estimate is for.
 
       ``issue``
-        contains a `pandas Timestamp object <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_
+        contains a `pandas Timestamp object
+        <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_
         identifying the date this estimate was issued. For example, an estimate
         with a ``time_value`` of June 3 might have been issued on June 5, after
         the data for June 3rd was collected and ingested into the API.
@@ -147,7 +150,7 @@ def signal(data_source, signal, start_day=None, end_day=None, geo_type="county",
                              start=start_day, end=end_day))
 
     if isinstance(geo_values, str):
-        ## User only provided one, not a list
+        # User only provided one, not a list
         geo_values = [geo_values]
 
     dfs = [
@@ -161,11 +164,12 @@ def signal(data_source, signal, start_day=None, end_day=None, geo_type="county",
         # pd.concat automatically filters out None
         out = pd.concat(dfs)
     except ValueError:
-        ## pd.concat raises ValueError if all of the dfs are None, meaning we
-        ## found no data
+        # pd.concat raises ValueError if all of the dfs are None, meaning we
+        # found no data
         return None
 
     return out
+
 
 def metadata():
     """Fetch COVIDcast surveillance stream metadata.
@@ -222,10 +226,9 @@ def metadata():
     meta = Epidata.covidcast_meta()
 
     if meta["result"] != 1:
-        ## Something failed in the API and we did not get real metadata
+        # Something failed in the API and we did not get real metadata
         raise RuntimeError("Error when fetching metadata from the API",
                            meta["message"])
-
 
     meta_df = pd.DataFrame.from_dict(meta["epidata"])
     meta_df["min_time"] = pd.to_datetime(meta_df["min_time"], format="%Y%m%d")
@@ -234,7 +237,7 @@ def metadata():
     return meta_df
 
 
-def _fetch_single_geo(data_source, signal, start_day, end_day, geo_type,
+def _fetch_single_geo(data_source, signal, start_day, end_day, geo_type,  # pylint: disable=R0913,R0914,W0621
                       geo_value, as_of, issues, lag):
     """Fetch data for a single geo.
 
@@ -285,7 +288,8 @@ def _fetch_single_geo(data_source, signal, start_day, end_day, geo_type,
 
     return None
 
-def _signal_metadata(data_source, signal, geo_type):
+
+def _signal_metadata(data_source, signal, geo_type):  # pylint: disable=W0621
     """Fetch metadata for a single signal as a dict."""
 
     meta = metadata()
@@ -309,10 +313,12 @@ def _signal_metadata(data_source, signal, geo_type):
 
     return matches.to_dict("records")[0]
 
+
 def _date_to_api_string(date):
     """Convert a date object to a YYYYMMDD string expected by the API."""
 
     return date.strftime("%Y%m%d")
+
 
 def _dates_to_api_strings(dates):
     """Convert a date object, or pair of (start, end) objects, to YYYYMMDD strings."""

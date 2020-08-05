@@ -1,0 +1,23 @@
+name: python_lint_and_test
+
+on:
+  push:
+    branches:
+      - master
+  pull-request:
+    branches:
+      - master
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.5
+      - name: Install dependencies
+        run: pip install -r Python-packages/covidcast-py/requirements.txt
+      - name: Run pylint
+        run: pylint Python-packages/covidcast-py/covidcast/
+      - name: Run tests
+        run: pytest

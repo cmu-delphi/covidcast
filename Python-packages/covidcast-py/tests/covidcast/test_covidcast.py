@@ -8,9 +8,14 @@ from covidcast import covidcast
 
 def test_signal():
     # TODO test happy path.
+    # test incorrect geo
     with pytest.raises(ValueError):
         covidcast.signal("source", "signal", geo_type="not_a_real_geo")
 
+    # test invalid dates
+    with pytest.raises(ValueError):
+        covidcast.signal("source", "signal", geo_type="state",
+                         start_day=date(2020, 4, 2), end_day=date(2020, 4, 1))
 
 @patch("delphi_epidata.Epidata.covidcast_meta")
 def test_metadata(mock_covidcast_meta):

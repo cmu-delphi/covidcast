@@ -17,6 +17,7 @@ def test_signal():
         covidcast.signal("source", "signal", geo_type="state",
                          start_day=date(2020, 4, 2), end_day=date(2020, 4, 1))
 
+
 @patch("delphi_epidata.Epidata.covidcast_meta")
 def test_metadata(mock_covidcast_meta):
     # not generating full DF since most attributes used
@@ -85,6 +86,11 @@ def test__signal_metadata(metadata):
     # test no matches raises ValueError
     with pytest.raises(ValueError):
         covidcast._signal_metadata("not", "actual", "values")
+
+
+def test__date_to_api_string():
+    # since the function just wraps strftime, this is just to ensure the format doesn't change
+    assert covidcast._date_to_api_string(date(2020, 4, 2)) == "20200402"
 
 
 def test__dates_to_api_strings():

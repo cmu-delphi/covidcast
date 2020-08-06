@@ -28,7 +28,7 @@ jobs:
         pip install -r Python-packages/covidcast-py/requirements.txt
     - name: Lint with pylint
       run: |
-        pylint Python-packages/covidcast-py/covidcast/
+        pylint Python-packages/covidcast-py/covidcast/ --rcfile Python-packages/covidcast-py/.pylintrc
     - name: Test with pytest
       run: |
         pytest Python-packages/covidcast-py/

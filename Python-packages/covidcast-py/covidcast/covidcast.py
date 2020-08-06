@@ -2,9 +2,8 @@
 import warnings
 from datetime import timedelta
 
-from delphi_epidata import Epidata
-
 import pandas as pd
+from delphi_epidata import Epidata
 
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state"}
 

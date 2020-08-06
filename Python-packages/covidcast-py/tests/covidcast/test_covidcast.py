@@ -6,6 +6,13 @@ import pytest
 from covidcast import covidcast
 
 
+def sort_df(df):
+    # helper function for sorting dfs for comparison
+    df = df.sort_index(axis=1)
+    df.sort_values(df.columns[0], inplace=True)
+    return df
+
+
 def test_signal():
     # TODO test happy path.
     # test incorrect geo
@@ -31,9 +38,10 @@ def test_metadata(mock_covidcast_meta):
                                         "message": "error: failed"}]
 
     # test happy path
-    assert covidcast.metadata().equals(
-        pd.DataFrame({"max_time": [datetime(2020, 6, 22), datetime(2020, 7, 24)],
-                      "min_time": [datetime(2020, 4, 21), datetime(2020, 5, 12)]}))
+    response = covidcast.metadata()
+    expected = pd.DataFrame({"max_time": [datetime(2020, 6, 22), datetime(2020, 7, 24)],
+                                     "min_time": [datetime(2020, 4, 21), datetime(2020, 5, 12)]})
+    assert sort_df(response).equals(sort_df(expected))
 
     # test failed response raises RuntimeError
     with pytest.raises(RuntimeError):
@@ -53,10 +61,12 @@ def test__fetch_single_geo(mock_covidcast):
                                   {"message": "success"}]  # no epidata
 
     # test happy path with 2 day range
-    assert covidcast._fetch_single_geo(
-        None, None, date(2020, 4, 2), date(2020, 4, 3), None, None, None, None, None).equals(
-            pd.DataFrame({"time_value": [datetime(2020, 6, 22), datetime(2020, 8, 21)],
-                          "issue": [datetime(2020, 7, 24), datetime(2020, 9, 25)]}, index=[0, 0]))
+    response = covidcast._fetch_single_geo(
+        None, None, date(2020, 4, 2), date(2020, 4, 3), None, None, None, None, None)
+    expected = pd.DataFrame({"time_value": [datetime(2020, 6, 22), datetime(2020, 8, 21)],
+                             "issue": [datetime(2020, 7, 24), datetime(2020, 9, 25)]},
+                            index=[0, 0])
+    assert sort_df(response).equals(sort_df(expected))
 
     # test warning is raised if unsuccessful API response
     with pytest.warns(UserWarning):

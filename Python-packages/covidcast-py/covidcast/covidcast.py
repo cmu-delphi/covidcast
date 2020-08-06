@@ -2,14 +2,13 @@
 import warnings
 from datetime import timedelta
 
-from delphi_epidata import Epidata
-
 import pandas as pd
+from delphi_epidata import Epidata
 
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state"}
 
 
-def signal(data_source, signal, start_day=None, end_day=None, geo_type="county",  # pylint: disable=R0913,W0621
+def signal(data_source, signal, start_day=None, end_day=None, geo_type="county",  # pylint: disable=W0621
            geo_values="*", as_of=None, issues=None, lag=None):
     """Download a Pandas data frame for one signal.
 
@@ -237,7 +236,7 @@ def metadata():
     return meta_df
 
 
-def _fetch_single_geo(data_source, signal, start_day, end_day, geo_type,  # pylint: disable=R0913,R0914,W0621
+def _fetch_single_geo(data_source, signal, start_day, end_day, geo_type,  # pylint: disable=W0621
                       geo_value, as_of, issues, lag):
     """Fetch data for a single geo.
 

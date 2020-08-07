@@ -252,7 +252,7 @@ def _fetch_single_geo(data_source: str,  # pylint: disable=W0621
                       geo_value: str,
                       as_of: date,
                       issues: Union[date, tuple, list],
-                      lag: int):
+                      lag: int) -> Union[pd.DataFrame, None]:
     """Fetch data for a single geo.
 
     signal() wraps this to support fetching data over an iterable of

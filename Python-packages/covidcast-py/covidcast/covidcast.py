@@ -303,7 +303,9 @@ def _fetch_single_geo(data_source: str,  # pylint: disable=W0621
     return None
 
 
-def _signal_metadata(data_source, signal, geo_type) -> dict:  # pylint: disable=W0621
+def _signal_metadata(data_source: str,
+                     signal: str,
+                     geo_type: str) -> dict:  # pylint: disable=W0621
     """Fetch metadata for a single signal as a dict."""
 
     meta = metadata()

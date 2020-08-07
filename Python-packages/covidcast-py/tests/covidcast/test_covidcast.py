@@ -7,7 +7,7 @@ from covidcast import covidcast
 
 
 def sort_df(df):
-    # helper function for sorting dfs for comparison
+    """Helper function for sorting dfs for comparison."""
     df = df.sort_index(axis=1)
     df.sort_values(df.columns[0], inplace=True)
     return df

@@ -7,14 +7,46 @@ from covidcast import covidcast
 
 
 def sort_df(df):
-    # helper function for sorting dfs for comparison
+    """Helper function for sorting dfs for comparison."""
     df = df.sort_index(axis=1)
     df.sort_values(df.columns[0], inplace=True)
     return df
 
 
-def test_signal():
-    # TODO test happy path.
+@patch("covidcast.covidcast._signal_metadata")
+@patch("delphi_epidata.Epidata.covidcast")
+def test_signal(mock_covidcast, mock_metadata):
+    mock_covidcast.return_value = {"result": 1,  # successful API response
+                                   "epidata": [{"time_value": 20200622, "issue": 20200724}],
+                                   "message": "success"}
+    mock_metadata.return_value = {"max_time": pd.Timestamp("2020-08-04 00:00:00"),
+                                  "min_time": pd.Timestamp("2020-08-03 00:00:00")}
+
+    # test happy path with no start or end day and one geo_value
+    response = covidcast.signal("source", "signal", geo_values="CA")
+    expected = pd.DataFrame({"time_value": [datetime(2020, 6, 22)]*2,
+                             "issue": [datetime(2020, 7, 24)]*2},
+                            index=[0]*2)
+    assert sort_df(response).equals(sort_df(expected))
+
+    # test happy path with no start or end day and two geo_values
+    response = covidcast.signal("source", "signal", geo_values=["CA", "AL"])
+    expected = pd.DataFrame({"time_value": [datetime(2020, 6, 22)]*4,
+                             "issue": [datetime(2020, 7, 24)]*4},
+                            index=[0]*4)
+    assert sort_df(response).equals(sort_df(expected))
+
+    # test happy path with start and end day (8 days apart) and one geo_value
+    response = covidcast.signal("source", "signal", start_day=date(2020, 8, 1),
+                                end_day=date(2020, 8, 8), geo_values="CA")
+    expected = pd.DataFrame({"time_value": [datetime(2020, 6, 22)]*8,
+                             "issue": [datetime(2020, 7, 24)]*8},
+                            index=[0]*8)
+    assert sort_df(response).equals(sort_df(expected))
+
+    # test no df output
+    assert not covidcast.signal("source", "signal", geo_values=[])
+
     # test incorrect geo
     with pytest.raises(ValueError):
         covidcast.signal("source", "signal", geo_type="not_a_real_geo")
@@ -29,12 +61,12 @@ def test_signal():
 def test_metadata(mock_covidcast_meta):
     # not generating full DF since most attributes used
     mock_covidcast_meta.side_effect = [{"result": 1,  # successful API response
-                                        "epidata": [{'max_time': 20200622, 'min_time': 20200421},
-                                                    {'max_time': 20200724, 'min_time': 20200512}],
+                                        "epidata": [{"max_time": 20200622, "min_time": 20200421},
+                                                    {"max_time": 20200724, "min_time": 20200512}],
                                         "message": "success"},
                                        {"result": 0,  # unsuccessful API response
-                                        "epidata": [{'max_time': 20200622, 'min_time': 20200421},
-                                                    {'max_time': 20200724, 'min_time': 20200512}],
+                                        "epidata": [{"max_time": 20200622, "min_time": 20200421},
+                                                    {"max_time": 20200724, "min_time": 20200512}],
                                         "message": "error: failed"}]
 
     # test happy path
@@ -52,10 +84,10 @@ def test_metadata(mock_covidcast_meta):
 def test__fetch_single_geo(mock_covidcast):
     # not generating full DF since most attributes used
     mock_covidcast.side_effect = [{"result": 1,  # successful API response
-                                   "epidata": [{'time_value': 20200622, 'issue': 20200724}],
+                                   "epidata": [{"time_value": 20200622, "issue": 20200724}],
                                    "message": "success"},
                                   {"result": 1,  # second successful API
-                                   "epidata": [{'time_value': 20200821, 'issue': 20200925}],
+                                   "epidata": [{"time_value": 20200821, "issue": 20200925}],
                                    "message": "success"},
                                   {"message": "error: failed"},  # unsuccessful API response
                                   {"message": "success"}]  # no epidata
@@ -83,11 +115,11 @@ def test__fetch_single_geo(mock_covidcast):
 
 
 @patch("covidcast.covidcast.metadata")
-def test__signal_metadata(metadata):
-    metadata.return_value = pd.DataFrame({"data_source": ["usa-facts", "doctor-visits"],
-                                          "signal": ["raw_cli", "smooth_cli"],
-                                          "time_type": ["day", "day"],
-                                          "geo_type": ["hrr", "state"]})
+def test__signal_metadata(mock_metadata):
+    mock_metadata.return_value = pd.DataFrame({"data_source": ["usa-facts", "doctor-visits"],
+                                               "signal": ["raw_cli", "smooth_cli"],
+                                               "time_type": ["day", "day"],
+                                               "geo_type": ["hrr", "state"]})
 
     # test happy path
     assert covidcast._signal_metadata("usa-facts", "raw_cli", "hrr") == \

@@ -14,7 +14,7 @@ def signal(data_source: str,
            start_day: date = None,
            end_day: date = None,
            geo_type: str = "county",
-           geo_values: Iterable[str] = "*",
+           geo_values: Union[str, Iterable[str]] = "*",
            as_of: date = None,
            issues: Union[date, Tuple[date], List[date]] = None,
            lag: int = None) -> Union[pd.DataFrame, None]:

@@ -9,8 +9,8 @@ from delphi_epidata import Epidata
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state"}
 
 
-def signal(data_source: str,  # pylint: disable=W0621
-           signal: str,
+def signal(data_source: str,
+           signal: str,  # pylint: disable=W0621
            start_day: date = None,
            end_day: date = None,
            geo_type: str = "county",
@@ -244,8 +244,8 @@ def metadata() -> pd.DataFrame:
     return meta_df
 
 
-def _fetch_single_geo(data_source: str,  # pylint: disable=W0621
-                      signal: str,
+def _fetch_single_geo(data_source: str,
+                      signal: str,  # pylint: disable=W0621
                       start_day: date,
                       end_day: date,
                       geo_type: str,
@@ -304,8 +304,8 @@ def _fetch_single_geo(data_source: str,  # pylint: disable=W0621
 
 
 def _signal_metadata(data_source: str,
-                     signal: str,
-                     geo_type: str) -> dict:  # pylint: disable=W0621
+                     signal: str,  # pylint: disable=W0621
+                     geo_type: str) -> dict:
     """Fetch metadata for a single signal as a dict."""
 
     meta = metadata()
@@ -330,7 +330,7 @@ def _signal_metadata(data_source: str,
     return matches.to_dict("records")[0]
 
 
-def _date_to_api_string(date: date) -> str:
+def _date_to_api_string(date: date) -> str:  # pylint: disable=W0621
     """Convert a date object to a YYYYMMDD string expected by the API."""
 
     return date.strftime("%Y%m%d")

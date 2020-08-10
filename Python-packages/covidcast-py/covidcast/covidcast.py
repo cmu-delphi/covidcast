@@ -1,6 +1,7 @@
 """This is the client side library for accessing the COVIDcast API."""
 import warnings
-from datetime import timedelta
+from datetime import timedelta, date
+from typing import Union, Iterable, Tuple, List
 
 import pandas as pd
 from delphi_epidata import Epidata
@@ -8,8 +9,15 @@ from delphi_epidata import Epidata
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state"}
 
 
-def signal(data_source, signal, start_day=None, end_day=None, geo_type="county",  # pylint: disable=W0621
-           geo_values="*", as_of=None, issues=None, lag=None):
+def signal(data_source: str,
+           signal: str,  # pylint: disable=W0621
+           start_day: date = None,
+           end_day: date = None,
+           geo_type: str = "county",
+           geo_values: Union[str, Iterable[str]] = "*",
+           as_of: date = None,
+           issues: Union[date, Tuple[date], List[date]] = None,
+           lag: int = None) -> Union[pd.DataFrame, None]:
     """Download a Pandas data frame for one signal.
 
     Obtains data for selected date ranges for all geographic regions of the
@@ -155,7 +163,7 @@ def signal(data_source, signal, start_day=None, end_day=None, geo_type="county",
     dfs = [
         _fetch_single_geo(
             data_source, signal, start_day, end_day, geo_type, geo_value,
-            as_of, issues, lag)
+            as_of, issues, lag)  # type: ignore
         for geo_value in geo_values
     ]
 
@@ -170,7 +178,7 @@ def signal(data_source, signal, start_day=None, end_day=None, geo_type="county",
     return out
 
 
-def metadata():
+def metadata() -> pd.DataFrame:
     """Fetch COVIDcast surveillance stream metadata.
 
     Obtains a data frame of metadata describing all publicly available data
@@ -236,8 +244,15 @@ def metadata():
     return meta_df
 
 
-def _fetch_single_geo(data_source, signal, start_day, end_day, geo_type,  # pylint: disable=W0621
-                      geo_value, as_of, issues, lag):
+def _fetch_single_geo(data_source: str,
+                      signal: str,  # pylint: disable=W0621
+                      start_day: date,
+                      end_day: date,
+                      geo_type: str,
+                      geo_value: str,
+                      as_of: date,
+                      issues: Union[date, tuple, list],
+                      lag: int) -> Union[pd.DataFrame, None]:
     """Fetch data for a single geo.
 
     signal() wraps this to support fetching data over an iterable of
@@ -288,7 +303,9 @@ def _fetch_single_geo(data_source, signal, start_day, end_day, geo_type,  # pyli
     return None
 
 
-def _signal_metadata(data_source, signal, geo_type):  # pylint: disable=W0621
+def _signal_metadata(data_source: str,
+                     signal: str,  # pylint: disable=W0621
+                     geo_type: str) -> dict:
     """Fetch metadata for a single signal as a dict."""
 
     meta = metadata()
@@ -313,13 +330,13 @@ def _signal_metadata(data_source, signal, geo_type):  # pylint: disable=W0621
     return matches.to_dict("records")[0]
 
 
-def _date_to_api_string(date):
+def _date_to_api_string(date: date) -> str:  # pylint: disable=W0621
     """Convert a date object to a YYYYMMDD string expected by the API."""
 
     return date.strftime("%Y%m%d")
 
 
-def _dates_to_api_strings(dates):
+def _dates_to_api_strings(dates: Union[date, list, tuple]) -> str:
     """Convert a date object, or pair of (start, end) objects, to YYYYMMDD strings."""
 
     if not isinstance(dates, (list, tuple)):

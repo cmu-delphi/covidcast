@@ -27,7 +27,7 @@ def get_geo_df(data: pd.DataFrame, geo_type: str, time_value: date = None) -> gp
 
 
 def _join_state_geo_df(data: pd.DataFrame, geo_info: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    geo_info.STUSPS = [i.lower() for i in data.geo_value]  # lowercase for consistency
+    geo_info.STUSPS = [i.lower() for i in geo_info.STUSPS]  # lowercase for consistency
     merged = geo_info.merge(data, how="left", left_on="STUSPS", right_on="geo_value")
     # use full state list in the return
     merged.geo_value = merged.STUSPS

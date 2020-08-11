@@ -13,6 +13,7 @@ CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
 def get_geo_df(data: pd.DataFrame, geo_type: str, time_value: date = None) -> gpd.GeoDataFrame:
+    # use most recent date in data if none provided
     day_to_plot = time_value if time_value else max(data.time_value)
     day_data = data.loc[data.time_value == day_to_plot, :]
     output_cols = list(data.columns) + ["geometry"]
@@ -39,7 +40,7 @@ def _join_county_geo_df(data: pd.DataFrame, geo_info: gpd.GeoDataFrame) -> gpd.G
     merged = geo_info.merge(data, how="left", left_on="GEOID", right_on="geo_value")
     mega_county_df = data.loc[[i.endswith('000') for i in data.geo_value], ["state_fips", "value"]]
     if not mega_county_df.empty:
-        # if mega counties exist, join them on state, and then use that value is no original signal
+        # if mega counties exist, join them on state, and then use that value if no original signal
         merged = merged.merge(mega_county_df, how="left", left_on="STATEFP", right_on="state_fips")
         merged["value"] = [j if pd.isna(i) else i for i, j in zip(merged.value_x, merged.value_y)]
     # use the full county FIPS list in the return

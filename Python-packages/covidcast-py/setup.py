@@ -24,8 +24,5 @@ setuptools.setup(
         'requests',
         'delphi-epidata>=0.0.7',
         'geopandas',
-        'descarters',
-        'matplotlib',
-        'numpy'
     ],
 )

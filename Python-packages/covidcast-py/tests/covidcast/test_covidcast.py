@@ -115,8 +115,6 @@ def test__fetch_single_geo(mock_covidcast):
                              "signal": None
                              },
                             index=[0, 0])
-    print(response)
-    print(expected)
     assert sort_df(response).equals(sort_df(expected))
 
     # test warning is raised if unsuccessful API response

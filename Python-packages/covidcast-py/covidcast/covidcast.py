@@ -297,7 +297,9 @@ def _fetch_single_geo(data_source: str,
 
         out["time_value"] = pd.to_datetime(out["time_value"], format="%Y%m%d")
         out["issue"] = pd.to_datetime(out["issue"], format="%Y%m%d")
-
+        out["geo_type"] = geo_type
+        out["data_source"] = data_source
+        out["signal"] = signal
         return out
 
     return None

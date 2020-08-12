@@ -25,14 +25,22 @@ def test_signal(mock_covidcast, mock_metadata):
     # test happy path with no start or end day and one geo_value
     response = covidcast.signal("source", "signal", geo_values="CA")
     expected = pd.DataFrame({"time_value": [datetime(2020, 6, 22)]*2,
-                             "issue": [datetime(2020, 7, 24)]*2},
+                             "issue": datetime(2020, 7, 24),
+                             "geo_type": "county",
+                             "data_source": "source",
+                             "signal": "signal"
+                             },
                             index=[0]*2)
     assert sort_df(response).equals(sort_df(expected))
 
     # test happy path with no start or end day and two geo_values
     response = covidcast.signal("source", "signal", geo_values=["CA", "AL"])
     expected = pd.DataFrame({"time_value": [datetime(2020, 6, 22)]*4,
-                             "issue": [datetime(2020, 7, 24)]*4},
+                             "issue": datetime(2020, 7, 24),
+                             "geo_type": "county",
+                             "data_source": "source",
+                             "signal": "signal"
+                             },
                             index=[0]*4)
     assert sort_df(response).equals(sort_df(expected))
 
@@ -40,8 +48,13 @@ def test_signal(mock_covidcast, mock_metadata):
     response = covidcast.signal("source", "signal", start_day=date(2020, 8, 1),
                                 end_day=date(2020, 8, 8), geo_values="CA")
     expected = pd.DataFrame({"time_value": [datetime(2020, 6, 22)]*8,
-                             "issue": [datetime(2020, 7, 24)]*8},
-                            index=[0]*8)
+                             "issue": datetime(2020, 7, 24),
+                             "geo_type": "county",
+                             "data_source": "source",
+                             "signal": "signal"
+                             },
+                            index=[0]*8,
+                            )
     assert sort_df(response).equals(sort_df(expected))
 
     # test no df output
@@ -96,8 +109,14 @@ def test__fetch_single_geo(mock_covidcast):
     response = covidcast._fetch_single_geo(
         None, None, date(2020, 4, 2), date(2020, 4, 3), None, None, None, None, None)
     expected = pd.DataFrame({"time_value": [datetime(2020, 6, 22), datetime(2020, 8, 21)],
-                             "issue": [datetime(2020, 7, 24), datetime(2020, 9, 25)]},
+                             "issue": [datetime(2020, 7, 24), datetime(2020, 9, 25)],
+                             "geo_type": None,
+                             "data_source": None,
+                             "signal": None
+                             },
                             index=[0, 0])
+    print(response)
+    print(expected)
     assert sort_df(response).equals(sort_df(expected))
 
     # test warning is raised if unsuccessful API response

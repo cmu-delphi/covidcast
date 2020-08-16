@@ -156,6 +156,7 @@ covidcast_signal("fb-survey", "raw_cli", geo_type = "state",
 covidcast_signal("fb-survey", "raw_cli", geo_type = "msa",
                  geo_values = "38300")
 }
+
 }
 \references{
 COVIDcast API documentation:

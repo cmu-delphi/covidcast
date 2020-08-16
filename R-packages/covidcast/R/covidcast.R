@@ -1,4 +1,4 @@
-## API base url
+# API base url
 COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 
 #' Produce a data frame for one signal.
@@ -88,6 +88,7 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #'   `time_value` of June 3 will only be included in the results if its data was
 #'   issued or updated on June 6. If `NULL`, the default, return the most
 #'   recently issued data regardless of its lag.
+#' 
 #' @return Data frame with matching data. Each row is one observation of one
 #'   signal on one day in one geographic location. Contains the following
 #'   columns:
@@ -117,6 +118,7 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #'
 #'   Consult the signal documentation for more details on how values and
 #'   standard errors are calculated for specific signals.
+#' 
 #' @references COVIDcast API documentation:
 #'   \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html}
 #'
@@ -124,6 +126,7 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 #'
 #' COVIDcast public map: \url{https://covidcast.cmu.edu/}
+#'
 #' @examples \dontrun{
 #' ## fetch all counties from 2020-05-10 to the most recent available data:
 #' covidcast_signal("fb-survey", "raw_cli", start_day = "20200510")
@@ -141,6 +144,7 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' covidcast_signal("fb-survey", "raw_cli", geo_type = "msa",
 #'                  geo_values = "38300")
 #' }
+#' 
 #' @seealso [plot.covidcast_signal()], [`county_census`], [`msa_census`],
 #'     [`state_census`]
 #' @export
@@ -409,7 +413,6 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
                                   bubble_params = list(), line_params = list(),
                                   ...) {
   plot_type <- match.arg(plot_type)
-
   x <- latest_issue(x)
 
   # Set range, if we need to (to mean +/- 3 standard deviations, from metadata)
@@ -494,8 +497,10 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
 #'   \item{max_issue}{The most recent issue date for this signal.}
 #'   \item{min_lag}{Smallest lag from observation to issue, in `time_type` units}
 #'   \item{max_lag}{Largest lag from observation to issue, in `time_type` units}
+#'
 #' @references COVIDcast API sources and signals documentation:
 #'   \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
+#'
 #' @export
 #' @importFrom dplyr %>%
 covidcast_meta <- function() {
@@ -513,15 +518,15 @@ covidcast_meta <- function() {
   return(meta)
 }
 
-## Helper function, not user-facing, to fetch a single geo-value.
-## covidcast_signal can then loop over multiple geos to produce its result.
+# Helper function, not user-facing, to fetch a single geo-value.
+# covidcast_signal can then loop over multiple geos to produce its result.
 single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_value,
                        as_of, issues, lag) {
   ndays <- as.numeric(end_day - start_day)
   dat <- list()
 
-  ## The API limits the number of rows that can be returned at once, so we query
-  ## each day separately.
+  # The API limits the number of rows that can be returned at once, so we query
+  # each day separately.
   for (i in seq(ndays + 1)) {
     day <- date_to_string(start_day + i - 1)
     dat[[i]] <- covidcast(data_source = data_source,
@@ -562,31 +567,7 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_va
   return(df)
 }
 
-#' Fetch only the latest issue for each observation in a data frame.
-#'
-#' Since `covidcast_signal()` can, with the right options, return multiple
-#' issues for a single observation in a single geo, we may want only the most
-#' recent for plotting, mapping, or other purposes.
-#' @param df A `covidcast_signal` data frame
-#' @return The same `covidcast_signal` data frame, but with only the latest
-#'     issue of every observation
-#' @importFrom rlang .data
-#' @keywords internal
-latest_issue <- function(df) {
-  # Preserve the attributes, since grouping overwrites them
-  attrs <- attributes(df)
-
-  df <- df %>%
-    dplyr::group_by(.data$geo_value, .data$time_value) %>%
-    dplyr::filter(.data$issue == max(.data$issue)) %>%
-    dplyr::ungroup()
-
-  attributes(df) <- attrs
-
-  return(df)
-}
-
-## Fetch Delphi's COVID-19 Surveillance Streams
+# Fetch Delphi's COVID-19 Surveillance Streams
 covidcast <- function(data_source, signal, time_type, geo_type, time_values,
                       geo_value, as_of, issues, lag) {
   # Check parameters

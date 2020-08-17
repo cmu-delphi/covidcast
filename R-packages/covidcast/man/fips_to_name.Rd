@@ -45,8 +45,8 @@ fips_to_name("42003")
 cbsa_to_name("38300")
 fips_to_name("4200", ties_method = "all")
 
-# Number of counties, grouped by first two digits of FIPS: 
-unlist(lapply(fips_to_name(sprintf("\%02d", 1:99), ties_method = "all"), length))
+# Count the number of counties, grouped by first two digits of FIPS code: 
+unlist(lapply(fips_to_name(sprintf("\%02d", 1:99), ties = "all"), length))
 
 }
 \seealso{

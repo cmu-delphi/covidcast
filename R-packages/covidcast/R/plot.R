@@ -4,7 +4,7 @@
 plot_choro = function(x, time_value = NULL, include = c(), range,
                       col = c("#FFFFCC", "#FD893C", "#800026"),
                       alpha = 0.5, direction = FALSE,
-                      dir_col = c("#6F9CC6", "#F3EE9E", "#C56B59"),
+                      dir_col = c("#6F9CC6", "#E4E4E4", "#C56B59"),
                       title = NULL, params = list()) {
   # Check that we're looking at either counties or states
   if (!(attributes(x)$geo_type == "county" ||

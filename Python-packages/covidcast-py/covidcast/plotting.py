@@ -66,4 +66,3 @@ def _join_county_geo_df(data: pd.DataFrame,
     # use the full county FIPS list in the return
     merged[county_col] = merged.GEOID
     return merged
-

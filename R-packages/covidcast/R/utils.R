@@ -87,8 +87,8 @@ name_to_cbsa = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 #' cbsa_to_name("38300")
 #' fips_to_name("4200", ties_method = "all")
 #'
-#' # Number of counties, grouped by first two digits of FIPS: 
-#' unlist(lapply(fips_to_name(sprintf("%02d", 1:99), ties_method = "all"), length))
+#' # Count the number of counties, grouped by first two digits of FIPS code: 
+#' unlist(lapply(fips_to_name(sprintf("%02d", 1:99), ties = "all"), length))
 #' 
 #' @seealso [name_to_fips()], [name_to_cbsa()]
 #' @export

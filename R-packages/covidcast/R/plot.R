@@ -16,7 +16,6 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   if (is.null(time_value)) time_value = max(x$time_value)
 
   # Set a title, if we need to (simple combo of data source, signal, time value)
-  # TODO Support data frames with multiple signals correctly
   if (is.null(title)) title = paste0(unique(x$data_source), ": ",
                                      unique(x$signal), ", ", time_value)
 
@@ -237,7 +236,6 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   if (is.null(time_value)) time_value = max(x$time_value)
 
   # Set a title, if we need to (simple combo of data source, signal, time value)
-  # TODO Support data frames with multiple signals correctly
   if (is.null(title)) title = paste0(unique(x$data_source), ": ",
                                      unique(x$signal), ", ", time_value)
 
@@ -393,7 +391,6 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 plot_line = function(x, range = NULL, col = 1:6, line_type = rep(1:6, each = length(col)),
                      title = NULL, params = list()) {
   # Set a title, if we need to (simple combo of data source, signal)
-  # TODO Support data frames with multiple signals correctly
   if (is.null(title)) title = paste0(unique(x$data_source), ": ",
                                      unique(x$signal))
 
@@ -406,6 +403,9 @@ plot_line = function(x, range = NULL, col = 1:6, line_type = rep(1:6, each = len
   # Grab the values
   df = x %>% dplyr::select(.data$value, .data$time_value, .data$geo_value)
 
+  # Expand the range, if we need to
+  range = base::range(c(range, df$value))
+  
   # Create label and theme layers
   label_layer = ggplot2::labs(title = title, x = xlab, y = ylab)
   theme_layer = ggplot2::theme_bw() +
@@ -413,14 +413,17 @@ plot_line = function(x, range = NULL, col = 1:6, line_type = rep(1:6, each = len
     ggplot2::theme(legend.position = "bottom",
                    legend.title = ggplot2::element_blank())
 
-  # Create line layer
+
+  # Create line and lim layers
   line_layer = ggplot2::geom_line(ggplot2::aes(x = time_value, y = value,
                                                color = geo_value,
-                                               group = geo_value), data = df)
-
-  # TODO: implement colors and line types (currently ignored). Also, show
-  # standard error bands, and other features?
+                                               group = geo_value), data = df) 
+  lim_layer = ggplot2::lims(y = c(range[1], range[2]))
+  
+  # TODO: show standard error bands?
 
   # Put it all together and return
-  return(ggplot2::ggplot() + line_layer + label_layer + theme_layer)
+  return(ggplot2::ggplot() + line_layer + lim_layer + label_layer + theme_layer)
 }
+
+# TODO: plot functions for covidcast_signals objects (note the plural form)?

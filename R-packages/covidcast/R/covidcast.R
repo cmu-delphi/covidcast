@@ -257,7 +257,7 @@ covidcast_signals <- function(signals, start_day = NULL, end_day = NULL,
   df_out <- dplyr::bind_rows(dfs)
   meta_out <- dplyr::bind_rows(metas)
 
-  class(df_out) <- c("covidcast_signal", "data.frame")
+  class(df_out) <- c("covidcast_signals", "data.frame")
   attributes(df_out)$metadata <- meta_out
   attributes(df_out)$geo_type <- geo_type
 
@@ -278,7 +278,8 @@ covidcast_signals <- function(signals, start_day = NULL, end_day = NULL,
 print.covidcast_signal = function(x, ...) {
   cat(sprintf("A `covidcast_signal` data frame with %i rows and %i columns.\n\n",
               nrow(x), ncol(x)))
-  cat(sprintf("%-12s: %s\n", "signals", unique(paste0(x$data_source, ":", x$signal))))
+  cat(sprintf("%-12s: %s\n", "data_source", x$data_source[1]))
+  cat(sprintf("%-12s: %s\n", "signal", x$signal[1]))
   cat(sprintf("%-12s: %s\n\n", "geo_type", attributes(x)$geo_type))
 
   # forward to print the data as well
@@ -301,11 +302,12 @@ summary.covidcast_signal = function(object, ...) {
   x <- object
   cat(sprintf("A `covidcast_signal` data frame with %i rows and %i columns.\n\n",
               nrow(x), ncol(x)))
-  cat(sprintf("%-12s: %s\n", "signals", unique(paste0(x$data_source, ":", x$signal))))
+  cat(sprintf("%-12s: %s\n", "data_source", x$data_source[1]))
+  cat(sprintf("%-12s: %s\n", "signal", x$signal[1]))
   cat(sprintf("%-12s: %s\n\n", "geo_type", attributes(x)$geo_type))
-  cat(sprintf("%-37s: %s\n", "first date", min(x$time_value)))
-  cat(sprintf("%-37s: %s\n", "last date", max(x$time_value)))
-  cat(sprintf("%-37s: %i\n", "median number of geo_values per day",
+  cat(sprintf("%-36s: %s\n", "first date", min(x$time_value)))
+  cat(sprintf("%-36s: %s\n", "last date", max(x$time_value)))
+  cat(sprintf("%-36s: %i\n", "median number of geo_values per day",
               as.integer(x %>% dplyr::group_by(.data$time_value) %>%
                          dplyr::summarize(num = dplyr::n()) %>%
                          dplyr::summarize(median(.data$num)))))
@@ -404,7 +406,7 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
                                   range = NULL,
                                   choro_col = c("#FFFFCC", "#FD893C", "#800026"),
                                   alpha = 0.5, direction = FALSE,
-                                  dir_col = c("#6F9CC6", "#F3EE9E", "#C56B59"),
+                                  dir_col = c("#6F9CC6", "#E4E4E4", "#C56B59"),
                                   bubble_col = "purple", num_bins = 8,
                                   line_col = 1:6,
                                   line_type = rep(1:6, each = length(line_col)),

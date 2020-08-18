@@ -1,10 +1,11 @@
 """This contains the plotting and geo data management methods for the COVIDcast signals."""
 
 import os
-from datetime import date
 
 import geopandas as gpd
 import pandas as pd
+
+from covidcast import covidcast
 
 SHAPEFILE_PATHS = {"county": "../shapefiles/county/cb_2019_us_county_5m.shp",
                    "state": "../shapefiles/state/cb_2019_us_state_5m.shp"}
@@ -12,18 +13,30 @@ SHAPEFILE_PATHS = {"county": "../shapefiles/county/cb_2019_us_county_5m.shp",
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
-def get_geo_df(data: pd.DataFrame, geo_type: str, time_value: date = None) -> gpd.GeoDataFrame:
-    """Given a dataframe with geographic values, return a dataframe with polygon info appended."""
-    # use most recent date in data if none provided
-    day_to_plot = time_value if time_value else max(data.time_value)
-    day_data = data.loc[data.time_value == day_to_plot, :]
-    output_cols = list(data.columns) + ["geometry"]
+def get_geo_df(data: pd.DataFrame,
+               geo_value_col: str = "geo_value",
+               geo_type_col: str = "geo_type") -> gpd.GeoDataFrame:
+    """Append polygons to a dataframe for a given geography.
+
+    Default values correspond to return of
+    covidcast.signal(). Currently only supports counties and states.
+
+    :param data: DataFrame of values and geographies
+    :param geo_value_col: name of column containing values of interest
+    :param geo_type_col: name of column containing geography type
+    """
+    geo_type = covidcast._detect_metadata(data, geo_type_col)[2]  # pylint: disable=W0212
+    output_cols = list(data.columns) + ["geometry", "state_fips"]
     shapefile_path = os.path.join(CURRENT_PATH, SHAPEFILE_PATHS[geo_type])
     geo_info = gpd.read_file(shapefile_path)
+
     if geo_type == "state":
-        output = _join_state_geo_df(day_data, "geo_value", geo_info)
+        output = _join_state_geo_df(data, geo_value_col, geo_info)
     elif geo_type == "county":
-        output = _join_county_geo_df(day_data, "geo_value", geo_info)
+        output = _join_county_geo_df(data, geo_value_col, geo_info)
+    else:
+        raise ValueError("Unsupported geography type.")
+    output.rename(columns={"STATEFP": "state_fips"}, inplace=True)
     return output[output_cols]
 
 

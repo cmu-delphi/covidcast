@@ -7,9 +7,8 @@ from typing import Tuple
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
-
 from covidcast import covidcast
+from matplotlib import pyplot as plt
 
 SHAPEFILE_PATHS = {"county": "../shapefiles/county/cb_2019_us_county_5m.shp",
                    "state": "../shapefiles/state/cb_2019_us_state_5m.shp"}

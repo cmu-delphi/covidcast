@@ -216,54 +216,6 @@ covidcast_signal <- function(data_source, signal,
   return(df)
 }
 
-#' Obtain multiple signals in one data frame.
-#'
-#' This convenience function uses `covidcast_signal()` to obtain multiple
-#' signals, potentially from multiple data sources, in one data frame. See the
-#' `covidcast_signal()` documentation for further details.
-#'
-#' Deliberately not exported, because it's unclear how to plot data frames with
-#' multiple signals. Once `plot.covidcast_signal()` supports plotting the
-#' objects returned by `covidcast_signals()`, this function can be exported.
-#'
-#' @param signals Data frame with two columns: `data_source` and `signal`. Each
-#'   row specifies one signal to be fetched from the COVIDcast API.
-#' @inheritParams covidcast_signal
-#' @inherit covidcast_signal return references
-#' @seealso [covidcast_signal()]
-#' @examples
-#' \dontrun{
-#' signals <= data.frame(data_source=c("jhu-csse", "fb-survey"),
-#'                       signal=c("confirmed_incidence_num", "smoothed_cli"))
-#' covidcast_signals(signals, "2020-07-01", "2020-07-14", geo_type="state")
-#' }
-#' @noRd
-covidcast_signals <- function(signals, start_day = NULL, end_day = NULL,
-                              geo_type = c("county", "hrr", "msa", "dma", "state"),
-                              geo_values = "*", as_of = NULL, issues = NULL,
-                              lag = NULL) {
-  N <- nrow(signals)
-  dfs <- vector("list", N)
-  metas <- vector("list", N)
-
-  for (row in seq_len(N)) {
-    df <- covidcast_signal(signals$data_source[row], signals$signal[row],
-                           start_day, end_day, geo_type, geo_values, as_of,
-                           issues, lag)
-    dfs[[row]] <- df
-    metas[[row]] <- attributes(df)$metadata
-  }
-
-  df_out <- dplyr::bind_rows(dfs)
-  meta_out <- dplyr::bind_rows(metas)
-
-  class(df_out) <- c("covidcast_signals", "data.frame")
-  attributes(df_out)$metadata <- meta_out
-  attributes(df_out)$geo_type <- geo_type
-
-  return(df_out)
-}
-
 #' Print `covidcast_signal` objects
 #'
 #' Prints a brief summary of the data source, signal, and geographic level, and
@@ -472,6 +424,63 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
   }
 }
 
+##########
+
+#' Obtain multiple signals in one data frame.
+#'
+#' This convenience function uses `covidcast_signal()` to obtain multiple
+#' signals, potentially from multiple data sources, in one data frame. See the
+#' `covidcast_signal()` documentation for further details.
+#'
+#' Deliberately not exported, because it's unclear how to plot data frames with
+#' multiple signals. Once `plot.covidcast_signal()` supports plotting the
+#' objects returned by `covidcast_signals()`, this function can be exported.
+#'
+#' @param signals Data frame with two columns: `data_source` and `signal`. Each
+#'   row specifies one signal to be fetched from the COVIDcast API.
+#' @inheritParams covidcast_signal
+#' @inherit covidcast_signal return references
+#' @seealso [covidcast_signal()]
+#' @examples
+#' \dontrun{
+#' signals <= data.frame(data_source=c("jhu-csse", "fb-survey"),
+#'                       signal=c("confirmed_incidence_num", "smoothed_cli"))
+#' covidcast_signals(signals, "2020-07-01", "2020-07-14", geo_type="state")
+#' }
+#' @noRd
+covidcast_signals <- function(signals, start_day = NULL, end_day = NULL,
+                              geo_type = c("county", "hrr", "msa", "dma", "state"),
+                              geo_values = "*", as_of = NULL, issues = NULL,
+                              lag = NULL) {
+  N <- nrow(signals)
+  dfs <- vector("list", N)
+  metas <- vector("list", N)
+
+  for (row in seq_len(N)) {
+    df <- covidcast_signal(signals$data_source[row], signals$signal[row],
+                           start_day, end_day, geo_type, geo_values, as_of,
+                           issues, lag)
+    dfs[[row]] <- df
+    metas[[row]] <- attributes(df)$metadata
+  }
+
+  df_out <- dplyr::bind_rows(dfs)
+  meta_out <- dplyr::bind_rows(metas)
+
+  class(df_out) <- c("covidcast_signals", "data.frame")
+  attributes(df_out)$metadata <- meta_out
+  attributes(df_out)$geo_type <- geo_type
+
+  return(df_out)
+}
+
+# TODO add S3 functions for covidcast_signals
+# TODO add covidcast_rbind function or something like that, which rbind's but 
+# preserves attributes appropriately? And doesn't allow you to rbind (or warns,
+# at least), if the geo_type's don't match?
+
+##########
+
 #' Fetch Delphi's COVID-19 Surveillance Streams metadata.
 #'
 #' Obtains a data frame of metadata describing all publicly available data
@@ -518,6 +527,11 @@ covidcast_meta <- function() {
 
   return(meta)
 }
+
+# TODO add class structure and S3 functions to covidcast_meta. In particular,
+# print, which gives a nice summary of the metadata
+
+##########
 
 # Helper function, not user-facing, to fetch a single geo-value.
 # covidcast_signal can then loop over multiple geos to produce its result.

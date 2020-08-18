@@ -2,4 +2,5 @@ pylint
 pytest
 delphi_epidata
 pandas
+geopandas
 mypy

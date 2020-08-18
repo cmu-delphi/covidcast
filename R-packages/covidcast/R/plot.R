@@ -413,7 +413,6 @@ plot_line = function(x, range = NULL, col = 1:6, line_type = rep(1:6, each = len
     ggplot2::theme(legend.position = "bottom",
                    legend.title = ggplot2::element_blank())
 
-
   # Create line and lim layers
   line_layer = ggplot2::geom_line(ggplot2::aes(x = time_value, y = value,
                                                color = geo_value,

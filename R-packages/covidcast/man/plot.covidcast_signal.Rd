@@ -26,9 +26,9 @@
 )
 }
 \arguments{
-\item{x}{The \code{covidcast_signal} object to map or plot. If the object
-contains multiple issues of the same observation, only the most recent
-issue is mapped or plotted.}
+\item{x}{The \code{covidcast_signal} object to map or plot. If the object contains
+multiple issues of the same observation, only the most recent issue is
+mapped or plotted.}
 
 \item{plot_type}{One of "choro", "bubble", "line" indicating whether to plot
 a choropleth map, bubble map, or line (time series) graph, respectively.
@@ -95,34 +95,38 @@ Several plot types are provided, including choropleth plots (maps), bubble
 plots, and time series plots showing the change of signals over time.
 }
 \details{
-TODO explain all these advanced parameters.
+The following named arguments are supported through the lists
+\code{choro_params}, \code{bubble_params}, and \code{line_params}.
 
 For both choropleth and bubble maps:
-\itemize{
-\item{\code{subtitle}}
-\item{\code{missing_col}}
-\item{\code{border_col}}
-\item{\code{border_size}}
-\item{\code{legend_height}}
-\item{\code{legend_width}}
-\item{\code{breaks}}
+\describe{
+\item{\code{subtitle}}{Subtitle for the map.}
+\item{\code{missing_col}}{Color assigned to missing or NA geo locations.}
+\item{\code{border_col}}{Border color for geo locations.}
+\item{\code{border_size}}{Border size for geo locations.}
+\item{\code{legend_height}, \code{legend_width}}{Height and width of the legend.}
+\item{\code{breaks}}{Breaks for a custom (discrete) color or size scale.  Note
+that we must set \code{breaks} to be a vector of the same length as \code{choro_col}
+for choropleth maps. This works as follows: we assign the \code{i}th color for
+choropleth maps, or the \code{i}th size for bubble maps, if and only if the
+given value satisfies \verb{breaks[i] <= value < breaks[i+1]}, where we take by
+convention \code{breaks[0] = -Inf} and \code{breaks[N+1] = Inf} for \code{N = length(breaks)}.}
 }
 
 For choropleth maps only:
-\itemize{
-\item{\code{legend_n}}
+\describe{
+\item{\code{legend_n}}{Number of values to label on the color bar.}
 }
 
 For bubble maps only:
-\itemize{
-\item{\code{remove_zero}}
-\item{\code{min_size}}
-\item{\code{max_size}}
+\describe{
+\item{\code{remove_zero}}{Should zeros be excluded from the size scale (hence
+effectively drawn as bubbles of zero size)?}
+\item{\code{min_size}, \code{max_size}}{Min size for the size scale.}
 }
 
 For line graphs:
-\itemize{
-\item{\code{xlab}}
-\item{\code{ylab}}
+\describe{
+\item{\code{xlab}, \code{ylab}}{Labels for the x-axis and y-axis.}
 }
 }

@@ -319,35 +319,40 @@ summary.covidcast_signal = function(object, ...) {
 #' @param ... Additional arguments, for compatibility with `plot()`. Currently
 #'   unused.
 #'
-#' @details TODO explain all these advanced parameters.
+#' @details The following named arguments are supported through the lists 
+#'   `choro_params`, `bubble_params`, and `line_params`.
 #'
 #' For both choropleth and bubble maps:
-#' \itemize{
-#' \item{`subtitle`}
-#' \item{`missing_col`}
-#' \item{`border_col`}
-#' \item{`border_size`}
-#' \item{`legend_height`}
-#' \item{`legend_width`}
-#' \item{`breaks`}
+#' \describe{
+#' \item{`subtitle`}{Subtitle for the map.}
+#' \item{`missing_col`}{Color assigned to missing or NA geo locations.}
+#' \item{`border_col`}{Border color for geo locations.}
+#' \item{`border_size`}{Border size for geo locations.}
+#' \item{`legend_height`, `legend_width`}{Height and width of the legend.} 
+#' \item{`breaks`}{Breaks for a custom (discrete) color or size scale.  Note
+#'   that we must set `breaks` to be a vector of the same length as `choro_col`
+#'   for choropleth maps. This works as follows: we assign the `i`th color for
+#'   choropleth maps, or the `i`th size for bubble maps, if and only if the
+#'   given value satisfies `breaks[i] <= value < breaks[i+1]`, where we take by 
+#'   convention `breaks[0] = -Inf` and `breaks[N+1] = Inf` for `N =
+#'   length(breaks)`.}   
 #' }
 #'
 #' For choropleth maps only:
-#' \itemize{
-#' \item{`legend_n`}
+#' \describe{
+#' \item{`legend_n`}{Number of values to label on the color bar.}
 #' }
 #'
 #' For bubble maps only:
-#' \itemize{
-#' \item{`remove_zero`}
-#' \item{`min_size`}
-#' \item{`max_size`}
+#' \describe{
+#' \item{`remove_zero`}{Should zeros be excluded from the size scale (hence
+#'   effectively drawn as bubbles of zero size)?}
+#' \item{`min_size`, `max_size`}{Min size for the size scale.}
 #' }
 #'
 #' For line graphs:
-#' \itemize{
-#' \item{`xlab`}
-#' \item{`ylab`}
+#' \describe{
+#' \item{`xlab`, `ylab`}{Labels for the x-axis and y-axis.}
 #' }
 #'
 #' @method plot covidcast_signal

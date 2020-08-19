@@ -80,7 +80,7 @@ colors <- c("#D3D3D3", "#FFFFCC", "#FEDDA2", "#FDBB79", "#FD9950", "#EB7538",
 
 # Note that length(breaks) == length(colors) by design. This works as follows: 
 # we assign colors[i] iff the value satisfies breaks[i] <= value < breaks[i+1], 
-# where we take breaks[N] = Inf, for N = length(breaks)
+# where we take breaks[0] = -Inf and breaks[N+1] = Inf, for N = length(breaks)
 
 plot(df_inum, choro_col = colors, choro_params = list(breaks = breaks),
      title = "New COVID Cases (7 Day Trailing Average) on 2020-07-14")

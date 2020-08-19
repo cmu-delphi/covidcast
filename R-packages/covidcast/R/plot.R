@@ -46,7 +46,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
       val = (val - range[1]) / (range[2] - range[1])
       rgb_mat = ramp_fun(val)
       not_na = rowSums(is.na(rgb_mat)) == 0
-      col_out = rep(NA, length(val))
+      col_out = rep(missing_col, length(val))
       col_out[not_na] = grDevices::rgb(rgb_mat[not_na,], alpha = alpha*255, max = 255)
       return(col_out)
     }
@@ -60,7 +60,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     col_fun = function(val, alpha = 1) {
       alpha_str = substr(grDevices::rgb(0, 0, 0, alpha = alpha), 8, 9)
       not_na = !is.na(val)
-      col_out = rep(NA, length(val))
+      col_out = rep(missing_col, length(val))
       col_out[not_na] = col[1]
       for (i in 1:length(breaks)) col_out[val >= breaks[i]] = col[i]
       col_out[not_na] = paste0(col_out[not_na], alpha_str)

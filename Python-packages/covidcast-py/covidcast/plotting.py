@@ -35,7 +35,7 @@ def get_geo_df(data: pd.DataFrame,
     elif geo_type == "county":
         output = _join_county_geo_df(data, geo_value_col, geo_info)
     else:
-        raise ValueError("Unsupported geography type.")
+        raise ValueError("Unsupported geography type; only state and county supported.")
     output.rename(columns={"STATEFP": "state_fips"}, inplace=True)
     return output[output_cols]
 

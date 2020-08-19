@@ -128,18 +128,18 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' COVIDcast public map: \url{https://covidcast.cmu.edu/}
 #'
 #' @examples \dontrun{
-#' # Fetch all counties from 2020-05-10 to the most recent available data
+#' ## Fetch all counties from 2020-05-10 to the most recent available data
 #' covidcast_signal("fb-survey", "raw_cli", start_day = "20200510")
-#' # Fetch all counties on just 2020-05-10 and no other days
+#' ## Fetch all counties on just 2020-05-10 and no other days
 #' covidcast_signal("fb-survey", "raw_cli", start_day = "20200510",
 #'                  end_day = "20200510")
-#' # Fetch all states on 2020-05-10, 2020-05-11, 2020-05-12
+#' ## Fetch all states on 2020-05-10, 2020-05-11, 2020-05-12
 #' covidcast_signal("fb-survey", "raw_cli", start_day = "20200510",
 #'                  end_day = "20200512", geo_type = "state")
-#' # Fetch all available data for just Pennsylvania and New Jersey
+#' ## Fetch all available data for just Pennsylvania and New Jersey
 #' covidcast_signal("fb-survey", "raw_cli", geo_type = "state",
 #'                  geo_values = c("pa", "nj"))
-#' # Fetch all available data in the Pittsburgh metropolitan area
+#' ## Fetch all available data in the Pittsburgh metropolitan area
 #' covidcast_signal("fb-survey", "raw_cli", geo_type = "msa",
 #'                  geo_values = name_to_cbsa("Pittsburgh"))
 #' }
@@ -221,8 +221,8 @@ covidcast_signal <- function(data_source, signal,
 #' Prints a brief summary of the data source, signal, and geographic level, and
 #' then prints the underlying data frame.
 #'
-#' @param x The \code{covidcast_signal} object.
-#' @param ... Additional arguments passed to `plot.data.frame()` to print the
+#' @param x The `covidcast_signal` object.
+#' @param ... Additional arguments passed to `print.data.frame()` to print the 
 #'   data.
 #'
 #' @method print covidcast_signal
@@ -243,7 +243,7 @@ print.covidcast_signal = function(x, ...) {
 #' Prints a variety of summary statistics about the underlying data, such as
 #' median values, the date range included, sample sizes, and so on.
 #'
-#' @param object The \code{covidcast_signal} object.
+#' @param object The `covidcast_signal` object.
 #' @param ... Additional arguments, for compatibility with `summary()`.
 #'   Currently unused.
 #'
@@ -270,9 +270,9 @@ summary.covidcast_signal = function(object, ...) {
 #' Several plot types are provided, including choropleth plots (maps), bubble
 #' plots, and time series plots showing the change of signals over time.
 #'
-#' @param x The \code{covidcast_signal} object to map or plot. If the object
-#'   contains multiple issues of the same observation, only the most recent
-#'   issue is mapped or plotted.
+#' @param x The `covidcast_signal` object to map or plot. If the object contains
+#'   multiple issues of the same observation, only the most recent issue is
+#'   mapped or plotted. 
 #' @param plot_type One of "choro", "bubble", "line" indicating whether to plot
 #'   a choropleth map, bubble map, or line (time series) graph, respectively.
 #'   The default is "choro".
@@ -512,7 +512,6 @@ covidcast_signals <- function(signals, start_day = NULL, end_day = NULL,
 #'   \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 #'
 #' @export
-#' @importFrom dplyr %>%
 covidcast_meta <- function() {
   meta <- .request(list(source='covidcast_meta', cached="true"))
 
@@ -525,11 +524,73 @@ covidcast_meta <- function() {
                   max_time = as.Date(as.character(.data$max_time), format = "%Y%m%d"),
                   max_issue = as.Date(as.character(.data$max_issue), format = "%Y%m%d"))
 
+  class(meta) <- c("covidcast_meta", "data.frame")
   return(meta)
 }
 
-# TODO add class structure and S3 functions to covidcast_meta. In particular,
-# print, which gives a nice summary of the metadata
+#' Print `covidcast_meta` object
+#'
+#' Prints a brief summary of the metadata, and then prints the underlying data
+#' frame. 
+#'
+#' @param x The `covidcast_meta` object.
+#' @param ... Additional arguments passed to `print.data.frame()` to print the
+#'   data.
+#'
+#' @method print covidcast_meta
+#' @export
+print.covidcast_meta = function(x, ...) {
+  cat(sprintf("A `covidcast_meta` data frame with %i rows and %i columns.\n\n",
+              nrow(x), ncol(x)))
+  cat(sprintf("%-23s: %s\n", "Number of data sources",
+              length(unique(x$data_source))))
+  cat(sprintf("%-23s: %s\n\n", "Number of signals",
+              length(unique(paste(x$data_source, x$signal)))))
+
+  # forward to print the data as well
+  NextMethod("print")
+}
+
+#' Summarize `covidcast_meta` object
+#'
+#' Prints a summary of the metadata.
+#'
+#' @param object The `covidcast_meta` object.
+#' @param ... Additional arguments, for compatibility with `summary()`.
+#'   Currently unused.
+#'
+#' @method summary covidcast_meta
+#' @export
+summary.covidcast_meta = function(object, ...) {
+  x <- object
+  cat(sprintf("A `covidcast_meta` data frame with %i rows and %i columns.\n\n",
+              nrow(x), ncol(x)))
+  cat(sprintf("%-23s: %s\n", "Number of data sources",
+              length(unique(x$data_source))))
+  cat(sprintf("%-23s: %s\n\n", "Number of signals",
+              length(unique(paste(x$data_source, x$signal)))))
+  cat("Summary:\n\n")
+  df <- suppressMessages(
+    meta %>% group_by(data_source, signal) %>%
+    summarize(county = ifelse("county" %in% geo_type, "*", ""),
+              msa = ifelse("msa" %in% geo_type, "*", ""),
+              hrr = ifelse("hrr" %in% geo_type, "*", ""),
+              state = ifelse("state" %in% geo_type, "*", ""),
+              min_time = max(min_time),
+              max_time = min(max_time)) %>%
+    ungroup
+  )
+  print(as.data.frame(df), right = FALSE, row.names = FALSE)
+  invisible(df)
+  
+  # TODO should we do anything more intelligent here in summarizing min_time and
+  # max_time?  Currently it looks to me (based on the metadata on 08/18/2020)
+  # these are always equal across all geo_type's, for a given data_source x
+  # signal pair. (In other words, data became available at all geographies at
+  # the same time.)  The way I've implemented above is a bit of a safeguard for
+  # when this is not the case---it returns the last min_time, and the first
+  # max_time, so it's a conversative way to report these.
+}
 
 ##########
 

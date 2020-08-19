@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{The \code{covidcast_signal} object.}
 
-\item{...}{Additional arguments passed to \code{plot.data.frame()} to print the
+\item{...}{Additional arguments passed to \code{print.data.frame()} to print the
 data.}
 }
 \description{

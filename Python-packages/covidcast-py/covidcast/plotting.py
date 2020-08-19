@@ -1,11 +1,16 @@
-"""This contains the plotting and geo data management methods for the COVIDcast signals."""
+"""This contains the plotting and geo data management methods for the COVIDcast signals.
+
+Shapefiles are sourced from the 2019 US Census Cartographic Boundary Files
+https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html
+Scale is 1:5,000,000
+"""
 
 import os
 
 import geopandas as gpd
 import pandas as pd
 
-from covidcast import covidcast
+from covidcast.covidcast import _detect_metadata
 
 SHAPEFILE_PATHS = {"county": "../shapefiles/county/cb_2019_us_county_5m.shp",
                    "state": "../shapefiles/state/cb_2019_us_state_5m.shp"}
@@ -16,16 +21,28 @@ CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 def get_geo_df(data: pd.DataFrame,
                geo_value_col: str = "geo_value",
                geo_type_col: str = "geo_type") -> gpd.GeoDataFrame:
-    """Append polygons to a dataframe for a given geography.
+    """Append polygons to a dataframe for a given geography and return a geoDF with this info.
 
-    Default values correspond to return of
-    covidcast.signal(). Currently only supports counties and states.
+    This method takes in a pandas DataFrame object and returns a GeoDataFrame object from the
+    geopandas package (https://geopandas.org/).
+
+    After detecting the geography type (either county or state) for the input, loads the
+    GeoDataFrame which contains state and geometry information from the Census for that geography
+    type. Left joins the input data to this, so all states/counties will always be present
+    regardless of the input i.e. the output dimension for a given geo_type is always the same
+    regardless of input. Finally, returns the columns containing the input columns along with a
+    `geometry` (polygon for plotting) and `state_fips` (FIPS code which will be used in the
+    plotting function to rearrange AK and HI) column. Coordinate system is GCS NAD83.
+
+    Default arguments for column names correspond to return of covidcast.signal(). Currently
+    only supports counties and states.
 
     :param data: DataFrame of values and geographies
     :param geo_value_col: name of column containing values of interest
     :param geo_type_col: name of column containing geography type
+    :return: GeoDataFrame of all state and geometry info for given geo type w/ input data appended.
     """
-    geo_type = covidcast._detect_metadata(data, geo_type_col)[2]  # pylint: disable=W0212
+    geo_type = _detect_metadata(data, geo_type_col)[2]  # pylint: disable=W0212
     output_cols = list(data.columns) + ["geometry", "state_fips"]
     shapefile_path = os.path.join(CURRENT_PATH, SHAPEFILE_PATHS[geo_type])
     geo_info = gpd.read_file(shapefile_path)

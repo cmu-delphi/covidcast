@@ -5,17 +5,14 @@ https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-bo
 Scale is 1:5,000,000
 """
 
-import os
-
 import geopandas as gpd
 import pandas as pd
 
+import pkg_resources
 from covidcast.covidcast import _detect_metadata
 
-SHAPEFILE_PATHS = {"county": "../shapefiles/county/cb_2019_us_county_5m.shp",
-                   "state": "../shapefiles/state/cb_2019_us_state_5m.shp"}
-
-CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
+SHAPEFILE_PATHS = {"county": "shapefiles/cb_2019_us_county_5m.zip",
+                   "state": "shapefiles/cb_2019_us_state_5m.zip"}
 
 
 def get_geo_df(data: pd.DataFrame,
@@ -44,8 +41,9 @@ def get_geo_df(data: pd.DataFrame,
     """
     geo_type = _detect_metadata(data, geo_type_col)[2]  # pylint: disable=W0212
     output_cols = list(data.columns) + ["geometry", "state_fips"]
-    shapefile_path = os.path.join(CURRENT_PATH, SHAPEFILE_PATHS[geo_type])
-    geo_info = gpd.read_file(shapefile_path)
+
+    shapefile_path = pkg_resources.resource_filename(__name__, SHAPEFILE_PATHS[geo_type])
+    geo_info = gpd.read_file("zip://" + shapefile_path)
 
     if geo_type == "state":
         output = _join_state_geo_df(data, geo_value_col, geo_info)

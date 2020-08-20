@@ -27,7 +27,19 @@ covidcast_cor = function(x, y, dt_x = 0, dt_y = 0,
   method = match.arg(method)
   if (dt_x < 0 || dt_y < 0) stop("Both dt_x and dt_y must be nonnegative")
   if (dt_x > 0 && dt_y > 0) stop("Only one of dt_x and dt_y can be positive")
-  z = dplyr::full_join(x, y, by = c("geo_value", "time_value"))
+
+  # Join the two data frames together by pairs of geo_value and time_value
+  z = dplyr::full_join(x, y, by = c("geo_value", "time_value")) 
+
+  # Make sure that we have a complete record of dates for each geo_value (fill
+  # with NAs as necessary)
+  z_all = z %>% dplyr::group_by(geo_value) %>%
+    summarize(time_value = seq.Date(as.Date(min(time_value)),
+                                    as.Date(max(time_value)),
+                                    by = "day")) %>% ungroup()
+  z = dplyr::full_join(z, z_all, by = c("geo_value", "time_value")) 
+  
+  # Perform time shifts, then compute appropriate correlations and return
   return(z %>% dplyr::group_by(geo_value) %>% # group by geo value
          dplyr::arrange(time_value) %>%  # sort rows by increasing time
          dplyr::mutate(value.x = dplyr::lag(value.x, n = dt_x), # shift values

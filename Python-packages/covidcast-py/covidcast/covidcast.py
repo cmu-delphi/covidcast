@@ -244,6 +244,33 @@ def metadata() -> pd.DataFrame:
     return meta_df
 
 
+def _detect_metadata(data: pd.DataFrame,
+                     data_source_col: str = "data_source",
+                     signal_col: str = "signal",
+                     geo_type_col: str = "geo_type") -> Tuple:
+    """Given a DataFrame, return the signal attributes of that DataFrame.
+
+    Raises ValueError if any of the columns are heterogeneous.
+    Inputs must have all three of the relevant columns: data source, signal, and geography type.
+
+    :param data: DataFrame with data_source, signal, and geo_tye columns.
+    :param data_source_col: name of column with data source info
+    :param signal_col: name of column with signal info
+    :param geo_type_col: name of column with geography type
+    :return: tuple of the three types
+    """
+    unique_data_source_vals = data[data_source_col].unique()
+    unique_signal_col_vals = data[signal_col].unique()
+    unique_geo_type_vals = data[geo_type_col].unique()
+    if len(unique_data_source_vals) > 1:
+        raise ValueError("Multiple data sources detected.")
+    if len(unique_signal_col_vals) > 1:
+        raise ValueError("Multiple signals detected.")
+    if len(unique_geo_type_vals) > 1:
+        raise ValueError("Multiple geography types detected.")
+    return unique_data_source_vals[0], unique_signal_col_vals[0], unique_geo_type_vals[0]
+
+
 def _fetch_single_geo(data_source: str,
                       signal: str,  # pylint: disable=W0621
                       start_day: date,

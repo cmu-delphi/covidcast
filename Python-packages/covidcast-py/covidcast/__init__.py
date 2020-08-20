@@ -13,3 +13,4 @@ Functions:
 """
 
 from .covidcast import signal, metadata
+from .plotting import get_geo_df

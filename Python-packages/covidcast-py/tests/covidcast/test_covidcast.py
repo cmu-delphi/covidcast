@@ -93,6 +93,26 @@ def test_metadata(mock_covidcast_meta):
         covidcast.metadata()
 
 
+def test__detect_metadata():
+    test_input = pd.DataFrame(
+        {"data_source": ["a", "a"], "signal": ["b", "b"], "geo_type": ["c", "c"]})
+    assert covidcast._detect_metadata(test_input) == ("a", "b", "c")
+
+    # test heterogenous cases error
+    test_bad_source = pd.DataFrame(
+        {"data_source": ["a", "d"], "signal": ["b", "b"], "geo_type": ["c", "c"]})
+    with pytest.raises(ValueError):
+        covidcast._detect_metadata(test_bad_source)
+    test_bad_signal = pd.DataFrame(
+        {"data_source": ["a", "a"], "signal": ["d", "b"], "geo_type": ["c", "c"]})
+    with pytest.raises(ValueError):
+        covidcast._detect_metadata(test_bad_signal)
+    test_bad_geo = pd.DataFrame(
+        {"data_source": ["a", "a"], "signal": ["b", "b"], "geo_type": ["c", "x"]})
+    with pytest.raises(ValueError):
+        covidcast._detect_metadata(test_bad_geo)
+
+
 @patch("delphi_epidata.Epidata.covidcast")
 def test__fetch_single_geo(mock_covidcast):
     # not generating full DF since most attributes used

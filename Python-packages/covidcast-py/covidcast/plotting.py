@@ -21,7 +21,7 @@ def get_geo_df(data: pd.DataFrame,
     """Append polygons to a dataframe for a given geography and return a geoDF with this info.
 
     This method takes in a pandas DataFrame object and returns a GeoDataFrame object from the
-    geopandas package (https://geopandas.org/).
+    `geopandas package <https://geopandas.org/>`__.
 
     After detecting the geography type (either county or state) for the input, loads the
     GeoDataFrame which contains state and geometry information from the Census for that geography

@@ -31,7 +31,7 @@ def get_geo_df(data: pd.DataFrame,
     `geometry` (polygon for plotting) and `state_fips` (FIPS code which will be used in the
     plotting function to rearrange AK and HI) column. Coordinate system is GCS NAD83.
 
-    Default arguments for column names correspond to return of covidcast.signal(). Currently
+    Default arguments for column names correspond to return of :py:func:`covidcast.signal`. Currently
     only supports counties and states.
 
     :param data: DataFrame of values and geographies

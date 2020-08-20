@@ -95,13 +95,11 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   # Grab the values
   given_time_value = time_value
   df = x %>%
-    dplyr::filter(.data$time_value == given_time_value) %>%
-    dplyr::select(.data$value, .data$direction, .data$geo_value)
-
-  if (!direction) val = df$value
-  else val = df$direction
-
-  geo = df$geo_value
+    dplyr::filter(time_value == given_time_value) %>%
+    dplyr::select(val = ifelse(direction, "direction", "value"),
+                  geo = "geo_value")
+  val = df$val
+  geo = df$geo
   names(val) = geo
 
   # Create the choropleth colors for counties
@@ -298,10 +296,10 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   # Grab the values
   given_time_value = time_value
   df = x %>%
-    dplyr::filter(.data$time_value == given_time_value) %>%
-    dplyr::select(.data$value, .data$geo_value)
-  val = df$value
-  geo = df$geo_value
+    dplyr::filter(time_value == given_time_value) %>%
+    dplyr::select(val = value, geo = geo_value)
+  val = df$val
+  geo = df$geo
   names(val) = geo
 
   # Grap the map data frame for counties
@@ -401,7 +399,7 @@ plot_line = function(x, range = NULL, col = 1:6, line_type = rep(1:6, each = len
   if (is.null(ylab)) ylab = "Value"
 
   # Grab the values
-  df = x %>% dplyr::select(.data$value, .data$time_value, .data$geo_value)
+  df = x %>% dplyr::select(value, time_value, geo_value)
 
   # Expand the range, if we need to
   range = base::range(c(range, df$value))

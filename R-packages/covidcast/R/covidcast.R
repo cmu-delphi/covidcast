@@ -1,6 +1,14 @@
 ## API base url
 COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 
+.onAttach <- function(libname, pkgname) {
+  msg <- c("We encourage COVIDcast API users to register on our mailing list:",
+           "https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api",
+           "We'll send announcements about new data sources, package updates,",
+           "server maintenance, and new features.")
+  packageStartupMessage(paste(msg, collapse = "\n"))
+}
+
 #' Produce a data frame for one signal.
 #'
 #' Obtains data for selected date ranges for all geographic regions of the

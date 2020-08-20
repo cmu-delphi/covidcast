@@ -24,7 +24,8 @@ def plot_choropleth(data: pd.DataFrame,
     Plot is in a style similar to the website https://covidcast.cmu.edu.
 
     :param data: DataFrame of values and geographies
-    :param time_value: If multiple days of data are present in ``data``, map only values from this day. Defaults to plotting the most recent day of data in ``data``.
+    :param time_value: If multiple days of data are present in ``data``, map only values from this
+    day. Defaults to plotting the most recent day of data in ``data``.
     :param kwargs: optional keyword arguments passed to plot()
     :return: GeoDF with polygon info. Same as get_geo_df()
     """
@@ -34,7 +35,7 @@ def plot_choropleth(data: pd.DataFrame,
     day_to_plot = time_value if time_value else max(data.time_value)
     day_data = data.loc[data.time_value == day_to_plot, :]
     data_w_geo = get_geo_df(day_data)
-    _, ax = plt.subplots(1, figsize=(40, 12))
+    fig, ax = plt.subplots(1, figsize=(12.8, 9.6))  # twice MPL default so text doesn't get squished
     ax.axis("off")
 
     kwargs["vmin"] = kwargs.get("vmin", 0)
@@ -47,7 +48,7 @@ def plot_choropleth(data: pd.DataFrame,
     plt.title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")
     for shape in _project_and_transform(data_w_geo):
         shape.plot("value", ax=ax, **kwargs)
-    return data_w_geo
+    return fig
 
 
 def get_geo_df(data: pd.DataFrame,

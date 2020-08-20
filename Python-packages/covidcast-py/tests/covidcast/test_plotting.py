@@ -1,14 +1,36 @@
-import pandas as pd
-import geopandas as gpd
-from datetime import date
 import os
+
+import geopandas as gpd
+import matplotlib
+import pandas as pd
 from covidcast import plotting
-import pytest
+from matplotlib import pyplot as plt
+from matplotlib.testing.decorators import image_comparison
 
 SHAPEFILE_PATHS = {"county": "../../shapefiles/county/cb_2019_us_county_5m.shp",
                    "state": "../../shapefiles/state/cb_2019_us_state_5m.shp"}
 
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
+
+
+def teardown_module():
+    if os.path.exists("temp.png"):
+        os.remove("temp.png")
+    if os.path.exists("temp-failed-diff.png"):
+        os.remove("temp-failed-diff.png")
+
+
+def test_plot_choropleth():
+    test_df = pd.read_csv(os.path.join(CURRENT_PATH, "../reference_data/test_signal.csv"),
+                          dtype=str)
+    test_df["time_value"] = test_df.time_value.astype("datetime64[D]")
+    test_df["value"] = test_df.value.astype("float")
+    plotting.plot_choropleth(test_df)
+    plt.savefig("temp.png", dpi=100)
+    matplotlib.testing.compare.compare_images(
+        os.path.join(CURRENT_PATH, "../reference_data/expected_choropleth.png"),
+        "temp.png",
+        tol=1)
 
 
 def test_get_geo_df():

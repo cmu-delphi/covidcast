@@ -4,3 +4,5 @@ delphi_epidata
 pandas
 geopandas
 mypy
+matplotlib
+numpy

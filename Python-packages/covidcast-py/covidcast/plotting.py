@@ -24,7 +24,7 @@ def plot_choropleth(data: pd.DataFrame,
     Plot is in a style similar to the website https://covidcast.cmu.edu.
 
     :param data: DataFrame of values and geographies
-    :param time_value: date of interest for the geography
+    :param time_value: If multiple days of data are present in ``data``, map only values from this day. Defaults to plotting the most recent day of data in ``data``.
     :param kwargs: optional keyword arguments passed to plot()
     :return: GeoDF with polygon info. Same as get_geo_df()
     """

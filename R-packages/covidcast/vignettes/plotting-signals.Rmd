@@ -24,13 +24,14 @@ the data is simple:
 library(covidcast)
 
 df_comb <- suppressMessages(
-  covidcast_signal("indicator-combination", "nmf_day_doc_fbc_fbs_ght",
+  covidcast_signal(data_source = "indicator-combination", 
+                   signal = "nmf_day_doc_fbc_fbs_ght",
                    start_day = "2020-07-01", end_day = "2020-07-14")
 )
 summary(df_comb)
 
 df_inum <- suppressMessages(
-  covidcast_signal(data_source = "indicator-combination",
+  covidcast_signal(data_source = "jhu-csse",
                    signal = "confirmed_7dav_incidence_num",
                    start_day = "2020-07-01", end_day = "2020-07-14")
 )
@@ -60,14 +61,6 @@ counties, and title:
 ```{r}
 plot(df_comb, time_value = "2020-07-04", choro_col = cm.colors(10), alpha = 0.4,
      title = "Combination of COVID-19 Indicators on 2020-07-04")
-```
-
-The API also provides a "direction" signal indicating if the signal is trending
-upward or downward, and we can map the directions:
-
-```{r}
-plot(df_inum, direction = TRUE,
-     title = "Change in incident cases on 2020-07-14")
 ```
 
 By providing `breaks` and `colors`, we can create custom color scales, for
@@ -122,13 +115,17 @@ larger case counts.
 plot(df_inum, plot_type = "bubble", bubble_params = list(breaks = seq(20, 200, len = 6)))
 ```
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(fig.width = 10, fig.height = 6)
+```
+
 As a final example, suppose we want to plot only counties in the state of Texas.
 We'd like to compare counts per 100,000 against absolute counts, so we fetch the
 proportion signal:
 
 ```{r}
 df_iprop <- suppressMessages(
-  covidcast_signal(data_source = "indicator-combination",
+  covidcast_signal(data_source = "jhu-csse",
                    signal = "confirmed_7dav_incidence_prop",
                    start_day = "2020-07-01", end_day = "2020-07-14")
 )
@@ -167,7 +164,7 @@ suppressMessages({
                                  signal = "nmf_day_doc_fbc_fbs_ght",
                                  start_day = "2020-04-15", end_day = "2020-07-01",
                                  geo_type = "state")
-  df_inum_st <- covidcast_signal(data_source = "indicator-combination",
+  df_inum_st <- covidcast_signal(data_source = "jhu-csse",
                                  signal = "confirmed_7dav_incidence_num",
                                  start_day = "2020-04-15", end_day = "2020-07-01",
                                  geo_type = "state")

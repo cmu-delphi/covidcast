@@ -23,5 +23,7 @@ setuptools.setup(
         'pandas',
         'requests',
         'delphi-epidata>=0.0.7',
+        'geopandas',
     ],
+    package_data={'covidcast': ['shapefiles/*.zip']}
 )

@@ -27,4 +27,5 @@ setuptools.setup(
         'matplotlib',
         'numpy'
     ],
+    package_data={'covidcast': ['shapefiles/*.zip']}
 )

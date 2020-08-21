@@ -7,8 +7,8 @@ from covidcast import plotting
 from matplotlib import pyplot as plt
 from matplotlib.testing.decorators import image_comparison
 
-SHAPEFILE_PATHS = {"county": "../../shapefiles/county/cb_2019_us_county_5m.shp",
-                   "state": "../../shapefiles/state/cb_2019_us_state_5m.shp"}
+SHAPEFILE_PATHS = {"county": "../../covidcast/shapefiles/cb_2019_us_county_5m.zip",
+                   "state": "../../covidcast/shapefiles/cb_2019_us_state_5m.zip"}
 
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -59,7 +59,7 @@ def test__join_state_geo_df():
     # TODO? generate expected output shapefile+metadata files for tests
     test_input = pd.DataFrame({"state_code": ["ca", "al", "ak"],
                                "value": [1.5, 2.5, 3]})
-    geo_info = gpd.read_file(os.path.join(CURRENT_PATH, SHAPEFILE_PATHS["state"]))
+    geo_info = gpd.read_file("zip://" + os.path.join(CURRENT_PATH, SHAPEFILE_PATHS["state"]))
     output = plotting._join_state_geo_df(test_input, "state_code", geo_info)
     # test output df is the right dimensions
     assert output.shape == (56, test_input.shape[1]+10)
@@ -74,7 +74,7 @@ def test__join_state_geo_df():
 def test__join_county_geo_df():
     test_input = pd.DataFrame({"county_code": ["24510", "31169", "37000"],
                                "value": [1.5, 2.5, 3]})
-    geo_info = gpd.read_file(os.path.join(CURRENT_PATH, SHAPEFILE_PATHS["county"]))
+    geo_info = gpd.read_file("zip://" + os.path.join(CURRENT_PATH, SHAPEFILE_PATHS["county"]))
     output = plotting._join_county_geo_df(test_input, "county_code", geo_info)
     assert output.shape == (3233, test_input.shape[1]+14)
     assert output.loc[output.GEOID == "24510", "value"].iloc[0] == 1.5

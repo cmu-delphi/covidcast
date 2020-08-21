@@ -250,9 +250,10 @@ def _detect_metadata(data: pd.DataFrame,
                      geo_type_col: str = "geo_type") -> Tuple:
     """Given a DataFrame, return the signal attributes of that DataFrame.
 
-    Errors if any of the columns are heterogeneous.
+    Raises ValueError if any of the columns are heterogeneous.
+    Inputs must have all three of the relevant columns: data source, signal, and geography type.
 
-    :param data: dataframe with geo_value an
+    :param data: DataFrame with data_source, signal, and geo_tye columns.
     :param data_source_col: name of column with data source info
     :param signal_col: name of column with signal info
     :param geo_type_col: name of column with geography type

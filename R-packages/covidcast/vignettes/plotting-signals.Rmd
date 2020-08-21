@@ -20,7 +20,7 @@ data sources collected by Delphi, and for every county provides a measure of
 factors related to COVID activity. We'll also use incident case counts. Fetching
 the data is simple:
 
-```{r}
+```{r, message=FALSE}
 library(covidcast)
 
 df_comb <- suppressMessages(

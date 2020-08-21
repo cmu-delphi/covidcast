@@ -23,6 +23,31 @@ latest_issue <- function(df) {
   return(df)
 }
 
+#' Fetch only the earliest issue for each observation in a data frame.
+#'
+#' Since `covidcast_signal()` can, with the right options, return multiple
+#' issues for a single observation in a single geo, we may want only the most
+#' recent for plotting, mapping, or other purposes.
+#' 
+#' @param df A `covidcast_signal` data frame
+#' @return The same `covidcast_signal` data frame, but with only the earliest 
+#'     issue of every observation
+#' @importFrom rlang .data
+#' @keywords internal
+earliest_issue <- function(df) {
+  # Preserve the attributes, since grouping overwrites them
+  attrs <- attributes(df)
+
+  df <- df %>%
+    dplyr::group_by(.data$geo_value, .data$time_value) %>%
+    dplyr::filter(.data$issue == min(.data$issue)) %>%
+    dplyr::ungroup()
+
+  attributes(df) <- attrs
+
+  return(df)
+}
+
 ##########
 
 #' Get FIPS or CBSA codes from county or city names
@@ -52,18 +77,26 @@ latest_issue <- function(df) {
 #' @export
 name_to_fips = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE, 
                         ties_method = c("first", "all")) {
-  grep_lookup(key = name, keys = county_census$CTYNAME,
-              values = county_census$FIPS, ignore.case = ignore.case,
-              perl = perl, fixed = fixed, ties_method = ties_method) 
+  # First remove states from county_census 
+  df = county_census %>% filter(COUNTY != 0)
+
+  # Now perform the grep-based look up
+  grep_lookup(key = name, keys = df$CTYNAME, values = df$FIPS,
+              ignore.case = ignore.case, perl = perl, fixed = fixed,
+              ties_method = ties_method) 
 }
 
 #' @rdname name_to_fips
 #' @export
 name_to_cbsa = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE, 
                         ties_method = c("first", "all")) {
-  grep_lookup(key = name, keys = msa_census$NAME, values = msa_census$CBSA,
+  # First restrict msa_census to metro areas
+  df = msa_census %>% filter(LSAD == "Metropolitan Statistical Area")
+  
+  # Now perform the grep-based look up
+  grep_lookup(key = name, keys = df$NAME, values = df$CBSA,
               ignore.case = ignore.case, perl = perl, fixed = fixed,
-              ties_method = ties_method)
+              ties_method = ties_method) 
 }
 
 #' Get county or city names from FIPS or CBSA codes 
@@ -94,22 +127,24 @@ name_to_cbsa = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 #' @export
 fips_to_name = function(code, ignore.case = FALSE, perl = FALSE, fixed = FALSE, 
                         ties_method = c("first", "all")) {
-  grep_lookup(key = code, keys = county_census$FIPS,
-              values = county_census$CTYNAME, ignore.case = ignore.case,
-              perl = perl, fixed = fixed, ties_method = ties_method) 
+  # First remove states from county_census 
+  df = county_census %>% filter(COUNTY != 0)
+
+  # Now perform the grep-based look up
+  grep_lookup(key = code, keys = df$FIPS, values = df$CTYNAME,
+              ignore.case = ignore.case, perl = perl, fixed = fixed,
+              ties_method = ties_method) 
 }
-
-# TODO it looks like the county_census data frame actually contains states (see
-# the result of fips_to_name("42000"). Should we remove them?
-
-# TODO it looks like the msa_census data frame contains some counties (see the
-# result of cbsa_to_name("38300"). Should we remove them?
 
 #' @rdname fips_to_name
 #' @export
 cbsa_to_name = function(code, ignore.case = FALSE, perl = FALSE, fixed = FALSE, 
                         ties_method = c("first", "all")) {
-  grep_lookup(key = code, keys = msa_census$CBSA, values = msa_census$NAME,
+  # First restrict msa_census to metro areas
+  df = msa_census %>% filter(LSAD == "Metropolitan Statistical Area")
+  
+  # Now perform the grep-based look up
+  grep_lookup(key = code, keys = df$CBSA, values = df$NAME,
               ignore.case = ignore.case, perl = perl, fixed = fixed,
               ties_method = ties_method)
 }

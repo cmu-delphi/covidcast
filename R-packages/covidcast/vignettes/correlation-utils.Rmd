@@ -178,8 +178,10 @@ for (i in 1:length(dt_vec)) {
 
 # Stack into one big data frame, and then plot the median correlation by shift
 df = do.call(rbind, df_list)
-ggplot(df %>% group_by(dt) %>% summarize(median = median(value, na.rm = TRUE)), 
-       aes(x = dt, y = median)) + geom_line() + geom_point() +
+df %>%
+  group_by(dt) %>%
+  summarize(median = median(value, na.rm = TRUE, .groups = "drop_last")) %>%
+  ggplot(aes(x = dt, y = median)) + geom_line() + geom_point() +
   labs(title = "Median correlation between cases and deaths",
        x = "Shift", y = "Correlation") +
   theme(legend.position = "bottom", legend.title = element_blank())

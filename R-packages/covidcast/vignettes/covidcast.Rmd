@@ -34,7 +34,7 @@ To obtain smoothed estimates of COVID-like illness from our Facebook survey for
 every county in the United States between 2020-05-01 and 2020-05-07, we can use
 `covidcast_signal()`:
 
-```{r}
+```{r, message=FALSE}
 library(covidcast)
 
 cli <- suppressMessages(

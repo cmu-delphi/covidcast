@@ -42,15 +42,13 @@ knitr::opts_chunk$set(fig.width = 8, fig.height = 6)
 ```
 
 ```{r, warning = FALSE}
-# Compute correlation per time, over all counties. The default is Pearson (rank)
-# correlation
+# Compute Spearman correlation per time, over all counties
 df_cor1 = covidcast_cor(df_inum_act, df_dnum_act, by = "time_value")
 
 # Plot the correlation time series
 ggplot(df_cor1, aes(x = time_value, y = value)) + geom_line() + 
-  labs(x = "Date", y = "Correlation", 
-       title = "Correlation per time, over all counties") + 
-  theme_bw() 
+  labs(title = "Correlation between cases and deaths",
+       x = "Date", y = "Correlation") 
 ```
 
 ```{r, warning = FALSE}
@@ -59,13 +57,29 @@ df_cor2 = covidcast_cor(df_inum_act, df_dnum_act, by = "time_value", dt_x = 10)
 
 # Stack rowwise into one data frame, then plot time series
 df_cor = rbind(df_cor1, df_cor2)
-df_cor$shift = c(rep("No shift", nrow(df_cor1)), 
-                 rep("Shift", nrow(df_cor2)))
+df_cor$Shift = as.factor(c(rep(0, nrow(df_cor1)), rep(10, nrow(df_cor2))))
 ggplot(df_cor, aes(x = time_value, y = value)) + 
-  geom_line(aes(color = shift)) + 
-  labs(x = "Date", y = "Correlation", 
-       title = "Correlation per time, over all counties") + theme_bw() +
-  theme(legend.position = "bottom", legend.title  = element_blank())
+  geom_line(aes(color = Shift)) + 
+  labs(title = "Correlation between cases and deaths",
+       x = "Date", y = "Correlation") +
+  theme(legend.position = "bottom")
+```
+
+```{r, warning = FALSE}
+# Repeat this same comparison, but using Spearman (rank) correlation
+df_cor1 = covidcast_cor(df_inum_act, df_dnum_act, by = "time_value", 
+                        method = "spearman")
+df_cor2 = covidcast_cor(df_inum_act, df_dnum_act, by = "time_value", dt_x = 10,
+                        method = "spearman")
+
+# Stack rowwise into one data frame, plot time series
+df_cor = rbind(df_cor1, df_cor2)
+df_cor$Shift = as.factor(c(rep(0, nrow(df_cor1)), rep(10, nrow(df_cor2))))
+ggplot(df_cor, aes(x = time_value, y = value)) + 
+  geom_line(aes(color = Shift)) + 
+  labs(title = "Spearman correlation between cases and deaths",
+       x = "Date", y = "Correlation")
+  theme(legend.position = "bottom")
 ```
 
 ## Correlations sliced by county
@@ -77,13 +91,14 @@ df_cor2 = covidcast_cor(df_inum_act, df_dnum_act, by = "geo_value", dt_x = 10)
 
 # Stack rowwise into one data frame, then plot densities
 df_cor = rbind(df_cor1, df_cor2)
-df_cor$shift = c(rep("No shift", nrow(df_cor1)), 
-                 rep("Shift", nrow(df_cor2)))
+df_cor$Shift = as.factor(c(rep(0, nrow(df_cor1)), rep(10, nrow(df_cor2))))
 ggplot(df_cor, aes(value)) + 
-  geom_density(aes(color = shift, fill = shift), alpha = 0.5) + 
-  labs(x = "Correlation", y = "Density", 
-       title = "Correlation per county, over all time") + theme_bw() +
-  theme(legend.position = "bottom", legend.title = element_blank())
+  geom_density(aes(color = Shift, fill = Shift), alpha = 0.5) + 
+  labs(title = "Correlation between cases and deaths",
+       x = "Correlation", y = "Density")
+  theme(legend.position = "bottom")
+
+df_cor %>% group_by(Shift) %>% summarize(median(value, na.rm = TRUE))
 ```
 
 ```{r, include = FALSE}
@@ -122,11 +137,9 @@ for (i in 1:length(dt_vec)) {
 }
 df = do.call(rbind, a)
 
-p = 1:3 / 4
-quantiles = df %>% group_by(dt) %>% 
-  summarize(p = p, q = quantile(value, probs = p, na.rm = TRUE))
-ggplot(quantiles, aes(x = dt, y = q)) + 
-  geom_line(aes(color = as.factor(p))) + 
-  geom_point(aes(color = as.factor(p))) + theme_bw() +
+ggplot(df %>% group_by(dt) %>% summarize(median = median(value, na.rm = TRUE)), 
+       aes(x = dt, y = median)) + geom_line() + geom_point() +
+  labs(title = "Median correlation between cases and deaths",
+       x = "Shift", y = "Correlation") +
   theme(legend.position = "bottom", legend.title = element_blank())
 ```

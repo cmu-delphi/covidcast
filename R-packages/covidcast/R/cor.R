@@ -16,8 +16,8 @@
 #'   location, over all time. If "time_value", then correlations are computed
 #'   for each time, over all geo locations. Default is "geo_value".
 #' @param use,method Arguments to pass to `cor()`, with "na.or.complete" the
-#'   default for `use`, and "spearman" the default for `method` (different than
-#'   the defaults used by `cor()`).
+#'   default for `use` (different than `cor()`) and "pearson" the default for
+#'   `method` (same as `cor()`).  
 #' 
 #' @return A data frame with first column `geo_value` or `time_value` (depending
 #'   on `by`), and second column `value`, which gives the correlation.
@@ -26,7 +26,7 @@
 covidcast_cor = function(x, y, dt_x = 0, dt_y = 0,
                          by = c("geo_value", "time_value"),
                          use = "na.or.complete", 
-                         method = c("spearman", "pearson", "kendall")) {
+                         method = c("pearson", "kendall", "spearman")) {
   x = latest_issue(x)
   y = latest_issue(y)
   if (dt_x < 0 || dt_y < 0) stop("Both dt_x and dt_y must be nonnegative")

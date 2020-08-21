@@ -168,20 +168,13 @@ this:
 
 ```{r, message = TRUE, warning = TRUE}
 dt_vec = 0:15
-a = vector("list", length(dt_vec))
+df_list = vector("list", length(dt_vec))
 for (i in 1:length(dt_vec)) {
-  dt = dt_vec[i]
-  if (dt > 0) {
-    a[[i]] = covidcast_cor(df_inum_act, df_dnum_act, dt_x = dt, 
-                           by = "geo_value")
-  }
-  else {
-    a[[i]] = covidcast_cor(df_inum_act, df_dnum_act, dt_y = -dt, 
-                           by = "geo_value")
-  }
-  a[[i]]$dt = dt
+  df_list[[i]] = covidcast_cor(df_inum_act, df_dnum_act, dt_x = dt_vec[i],
+                               by = "geo_value")
+  df_list[[i]]$dt = dt_vec[i]
 }
-df = do.call(rbind, a)
+df = do.call(rbind, df_list)
 
 ggplot(df %>% group_by(dt) %>% summarize(median = median(value, na.rm = TRUE)), 
        aes(x = dt, y = median)) + geom_line() + geom_point() +

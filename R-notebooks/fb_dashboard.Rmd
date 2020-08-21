@@ -1,6 +1,9 @@
 ---
 title: "Facebook Survey Dashboard"
 author: "Delphi Group"
+output:
+  html_document:
+    code_folding: hide
 ---
 
 ## Sampling
@@ -11,15 +14,15 @@ library(dplyr)
 library(ggplot2)
 
 df_fb1_st = covidcast_signal("fb-survey", "raw_cli", geo_type = "state")
-n_per_week = df_fb1_st %>% 
+n_per_day = df_fb1_st %>% 
   group_by(time_value) %>% 
-  summarize(n= sum(sample_size)) 
+  summarize(n = sum(sample_size)) 
 
-ggplot(n_per_week, aes(x = time_value, y = n)) + 
+ggplot(n_per_day, aes(x = time_value, y = n)) + 
   geom_line() + geom_point() + theme_bw() + 
-  labs(x = "Date", y = "Number of Responses")
-mean(n_per_week$n)
-sum(n_per_week$n)
+  labs(x = "Date", y = "Number of Responses",
+       title = sprintf("Total responses: %i, mean per day: %i", 
+                       round(sum(n_per_day$n)), round(mean(n_per_day$n))))
 
 df_fb1 = covidcast_signal("fb-survey", "smoothed_cli")
 county_per_week = df_fb1 %>% 
@@ -28,8 +31,10 @@ county_per_week = df_fb1 %>%
 
 ggplot(county_per_week, aes(x = time_value, y = n)) + 
   geom_line() + geom_point() + theme_bw() + 
-  labs(x = "Date", y = "Number of Counties")
-mean(county_per_week$n)
+  labs(x = "Date", y = "Number of Counties", 
+       title = sprintf("Unique counties: %i, mean per week: %i", 
+                       length(unique(df_fb1$geo_value)), 
+                       round(mean(county_per_week$n))))
 ```
 
 ## Coverage
@@ -54,7 +59,8 @@ plot(county_totals, title = "Which counties ever appear in our CLI signals?",
 
 ```{r, message = FALSE, warning = FALSE, fig.width = 6, fig.height = 5}
 df_fb2 = covidcast_signal("fb-survey", "smoothed_hh_cmnty_cli")
-df_in = covidcast_signal("jhu-csse", "confirmed_7dav_incidence_prop"
+df_in = covidcast_signal("jhu-csse", "confirmed_7dav_incidence_prop", 
+                         start_day = min(df_fb1$time_value))
 
 case_num = 500
 geo_values = covidcast_signal("jhu-csse", "confirmed_cumulative_num",

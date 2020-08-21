@@ -148,8 +148,8 @@ fips_to_name("42003")
 cbsa_to_name("38300")
 ```
 
-See the documentation for more details (for example, the options for handling 
-matches in the case of ties).
+See their documentation for more details (for example, the options for handling
+matches when counties have the same name).
 
 ## Signal metadata
 

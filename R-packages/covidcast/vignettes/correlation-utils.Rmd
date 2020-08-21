@@ -166,7 +166,7 @@ You could also imagine trying to move the signals with various lags to see at
 what lag one signal is most correlated with the other. A simple way to achieve
 this:
 
-```{r, message = TRUE, warning = TRUE}
+```{r, message = TRUE, warning = FALSE}
 # Loop over values for the time shift, and compute correlations per county
 dt_vec = 0:15
 df_list = vector("list", length(dt_vec))

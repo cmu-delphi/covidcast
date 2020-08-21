@@ -37,8 +37,9 @@ A vector of FIPS or CBSA codes if \code{ties_method} equals "first", and a
 list of FIPS or CBSA codes otherwise.
 }
 \description{
-Look up FIPS or CBSA codes by county or city names, respectively; these
-functions are based on \code{grep()}, and hence allow for regular expressions.
+Look up FIPS or CBSA codes by county or metropolitan area names,
+respectively; these functions are based on \code{grep()}, and hence allow for
+regular expressions.
 }
 \examples{
 name_to_fips("Allegheny")

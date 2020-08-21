@@ -3,7 +3,7 @@
 \name{fips_to_name}
 \alias{fips_to_name}
 \alias{cbsa_to_name}
-\title{Get county or city names from FIPS or CBSA codes}
+\title{Get county or metropolitan area names from FIPS or CBSA codes}
 \usage{
 fips_to_name(
   code,
@@ -37,15 +37,17 @@ A vector of FIPS or CBSA codes if \code{ties_method} equals "first", and a
 list of FIPS or CBSA codes otherwise.
 }
 \description{
-Look up county or city names by FIPS or CBSA codes, respectively; these
-functions are based on \code{grep()}, and hence allow for regular expressions.
+Look up county or metropolitan area names by FIPS or CBSA codes,
+respectively; these functions are based on \code{grep()}, and hence allow for
+regular expressions.
 }
 \examples{
 fips_to_name("42003")
 cbsa_to_name("38300")
 fips_to_name("4200", ties_method = "all")
 
-# Count the number of counties, grouped by first two digits of FIPS code: 
+# Count the number of counties, grouped by first two digits of FIPS code
+# (which identify states):
 unlist(lapply(fips_to_name(sprintf("\%02d", 1:99), ties = "all"), length))
 
 }

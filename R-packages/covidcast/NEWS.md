@@ -1,3 +1,23 @@
+# covidcast 0.3.0
+
+Released August 22, 2020.
+
+## Major changes
+
+- New `covidcast_cor()` function for calculating correlations between COVIDcast
+  signals. See `vignette("correlation-utils")` for examples.
+
+- New utility functions `name_to_fips()` and `name_to_cbsa()` to look up FIPS
+  codes (for counties) or CBSA codes (for metropolitan statistical areas) based
+  on the names of the counties or MSAs.
+
+- New utility functions `fips_to_name()` and `cbsa_to_name()` to find the names
+  corresponding to FIPS codes (for counties) or CBSA codes (for metropolitan
+  statistical areas).
+
+- New `summary.covidcast_meta()` S3 method for `summary()`, to print summaries
+  of objects returned from `covidcast_meta()`.
+
 # covidcast 0.2.0
 
 Released July 26, 2020.

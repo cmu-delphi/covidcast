@@ -238,6 +238,12 @@ print.covidcast_signal = function(x, ...) {
   NextMethod("print")
 }
 
+#' @method head covidcast_signal
+#' @export
+head.covidcast_signal = function(x, ...) {
+  head(as.data.frame(x), ...)
+}
+
 #' Summarize `covidcast_signal` objects
 #'
 #' Prints a variety of summary statistics about the underlying data, such as
@@ -554,6 +560,12 @@ print.covidcast_meta = function(x, ...) {
 
   # forward to print the data as well
   NextMethod("print")
+}
+
+#' @method head covidcast_meta
+#' @export
+head.covidcast_meta = function(x, ...) {
+  head(as.data.frame(x), ...)
 }
 
 #' Summarize `covidcast_meta` object

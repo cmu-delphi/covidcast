@@ -11,7 +11,7 @@ covidcast_cor(
   dt_y = 0,
   by = c("geo_value", "time_value"),
   use = "na.or.complete",
-  method = c("spearman", "pearson", "kendall")
+  method = c("pearson", "kendall", "spearman")
 )
 }
 \arguments{
@@ -28,8 +28,8 @@ location, over all time. If "time_value", then correlations are computed
 for each time, over all geo locations. Default is "geo_value".}
 
 \item{use, method}{Arguments to pass to \code{cor()}, with "na.or.complete" the
-default for \code{use}, and "spearman" the default for \code{method} (different than
-the defaults used by \code{cor()}).}
+default for \code{use} (different than \code{cor()}) and "pearson" the default for
+\code{method} (same as \code{cor()}).}
 }
 \value{
 A data frame with first column \code{geo_value} or \code{time_value} (depending

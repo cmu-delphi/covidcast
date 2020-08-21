@@ -25,7 +25,8 @@ setuptools.setup(
         'delphi-epidata>=0.0.7',
         'geopandas',
         'matplotlib',
-        'numpy'
+        'numpy',
+        'descartes'
     ],
     package_data={'covidcast': ['shapefiles/*.zip']}
 )

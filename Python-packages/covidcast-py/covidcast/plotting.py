@@ -1,10 +1,5 @@
 """This contains the plotting and geo data management methods for the COVIDcast signals.
 
-<<<<<<< HEAD
-import os
-from datetime import date
-from typing import Tuple
-=======
 Shapefiles are sourced from the 2019 US Census Cartographic Boundary Files
 https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html
 Scale is 1:5,000,000
@@ -52,11 +47,11 @@ def plot_choropleth(data: pd.DataFrame,
     kwargs["cmap"] = kwargs.get("cmap", "YlOrRd")
 
     sm = plt.cm.ScalarMappable(cmap=kwargs["cmap"])
-    plt.colorbar(sm, boundaries=np.linspace(kwargs["vmin"], kwargs["vmax"], 8),
-                 orientation="horizontal", fraction=0.02, pad=0.05)
     plt.title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")
     for shape in _project_and_transform(data_w_geo):
         shape.plot("value", ax=ax, **kwargs)
+    fig.colorbar(sm, boundaries=np.linspace(kwargs["vmin"], kwargs["vmax"], 8), ax=ax,
+                 orientation="horizontal", fraction=0.02, pad=0.05)
     return fig
 
 

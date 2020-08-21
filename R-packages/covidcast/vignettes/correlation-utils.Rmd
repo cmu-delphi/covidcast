@@ -111,7 +111,7 @@ ggplot(df_cor, aes(x = time_value, y = value)) +
   geom_line(aes(color = Shift)) + 
   labs(title = "Correlation between cases and deaths",
        subtitle = sprintf("Per day, over counties with at least %i cases", case_num),
-       x = "Date", y = "Correlation")
+       x = "Date", y = "Correlation") +
   theme(legend.position = "bottom")
 ```
 
@@ -167,6 +167,7 @@ what lag one signal is most correlated with the other. A simple way to achieve
 this:
 
 ```{r, message = TRUE, warning = TRUE}
+# Loop over values for the time shift, and compute correlations per county
 dt_vec = 0:15
 df_list = vector("list", length(dt_vec))
 for (i in 1:length(dt_vec)) {
@@ -174,8 +175,9 @@ for (i in 1:length(dt_vec)) {
                                by = "geo_value")
   df_list[[i]]$dt = dt_vec[i]
 }
-df = do.call(rbind, df_list)
 
+# Stack into one big data frame, and then plot the median correlation by shift
+df = do.call(rbind, df_list)
 ggplot(df %>% group_by(dt) %>% summarize(median = median(value, na.rm = TRUE)), 
        aes(x = dt, y = median)) + geom_line() + geom_point() +
   labs(title = "Median correlation between cases and deaths",

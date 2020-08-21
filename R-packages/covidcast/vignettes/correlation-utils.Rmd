@@ -1,0 +1,132 @@
+---
+title: Correlation utilities
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Correlation utilities}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+TODO: write some nice intro, write nice text explaining all of this
+
+```{r, message = FALSE}
+library(covidcast)
+
+df_inum = suppressMessages(
+  covidcast_signal(data_source = "jhu-csse",
+                   signal = "confirmed_7dav_incidence_num", 
+                   start_day = "2020-03-01", end_day = "2020-08-15")
+)
+summary(df_inum)
+
+df_dnum = suppressMessages(
+  covidcast_signal(data_source = "jhu-csse",
+                   signal = "deaths_7dav_incidence_num", 
+                   start_day = "2020-03-01", end_day = "2020-08-15")
+)
+summary(df_dnum)
+
+# Restrict attention to "active" counties with at least 500 total cases 
+case_num = 500
+geo_values = df_inum %>% group_by(geo_value) %>% 
+  summarize(total = sum(value)) %>% 
+  filter(total >= case_num) %>% pull(geo_value)
+df_inum_act = df_inum %>% filter(geo_value %in% geo_values)
+df_dnum_act = df_dnum %>% filter(geo_value %in% geo_values)
+```
+
+## Correlations sliced by time
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(fig.width = 8, fig.height = 6)
+```
+
+```{r, warning = FALSE}
+# Compute correlation per time, over all counties. The default is Pearson (rank)
+# correlation
+df_cor1 = covidcast_cor(df_inum_act, df_dnum_act, by = "time_value")
+
+# Plot the correlation time series
+ggplot(df_cor1, aes(x = time_value, y = value)) + geom_line() + 
+  labs(x = "Date", y = "Correlation", 
+       title = "Correlation per time, over all counties") + 
+  theme_bw() 
+```
+
+```{r, warning = FALSE}
+# Now shift case incidence 10 days forward in time, then recompute correlations
+df_cor2 = covidcast_cor(df_inum_act, df_dnum_act, by = "time_value", dt_x = 10)
+
+# Stack rowwise into one data frame, then plot time series
+df_cor = rbind(df_cor1, df_cor2)
+df_cor$shift = c(rep("No shift", nrow(df_cor1)), 
+                 rep("Shift", nrow(df_cor2)))
+ggplot(df_cor, aes(x = time_value, y = value)) + 
+  geom_line(aes(color = shift)) + 
+  labs(x = "Date", y = "Correlation", 
+       title = "Correlation per time, over all counties") + theme_bw() +
+  theme(legend.position = "bottom", legend.title  = element_blank())
+```
+
+## Correlations sliced by county
+
+```{r, warning = FALSE}
+# Compute correlations, per county, over all time. Both unshifted and shifted
+df_cor1 = covidcast_cor(df_inum_act, df_dnum_act, by = "geo_value")
+df_cor2 = covidcast_cor(df_inum_act, df_dnum_act, by = "geo_value", dt_x = 10)
+
+# Stack rowwise into one data frame, then plot densities
+df_cor = rbind(df_cor1, df_cor2)
+df_cor$shift = c(rep("No shift", nrow(df_cor1)), 
+                 rep("Shift", nrow(df_cor2)))
+ggplot(df_cor, aes(value)) + 
+  geom_density(aes(color = shift, fill = shift), alpha = 0.5) + 
+  labs(x = "Correlation", y = "Density", 
+       title = "Correlation per county, over all time") + theme_bw() +
+  theme(legend.position = "bottom", legend.title = element_blank())
+```
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(fig.width = 10, fig.height = 8)
+```
+
+```{r}
+# Set a bunch of fields so that the data frame knows how to plot itself
+df_cor2$time_value = start_day
+df_cor2$issue =  start_day
+attributes(df_cor2)$geo_type = "county"
+class(df_cor2) = c("covidcast_signal", "data.frame")
+
+# Plot choropleth maps, using the covidcast plotting functionality
+plot(df_cor2, title = "Correlations between 10-day shifted cases and deaths",
+     range = c(-1, 1), choro_col = c("orange","lightblue", "purple"))
+```
+
+## More systematic lag analysis
+
+```{r, message = TRUE, warning = TRUE}
+dt_vec = 0:15
+a = vector("list", length(dt_vec))
+for (i in 1:length(dt_vec)) {
+  cat(i, "... ")
+  dt = dt_vec[i]
+  if (dt > 0) {
+    a[[i]] = covidcast_cor(df_inum_act, df_dnum_act, dt_x = dt, 
+                           by = "geo_value")
+  }
+  else {
+    a[[i]] = covidcast_cor(df_inum_act, df_dnum_act, dt_y = -dt, 
+                           by = "geo_value")
+  }
+  a[[i]]$dt = dt
+}
+df = do.call(rbind, a)
+
+p = 1:3 / 4
+quantiles = df %>% group_by(dt) %>% 
+  summarize(p = p, q = quantile(value, probs = p, na.rm = TRUE))
+ggplot(quantiles, aes(x = dt, y = q)) + 
+  geom_line(aes(color = as.factor(p))) + 
+  geom_point(aes(color = as.factor(p))) + theme_bw() +
+  theme(legend.position = "bottom", legend.title = element_blank())
+```

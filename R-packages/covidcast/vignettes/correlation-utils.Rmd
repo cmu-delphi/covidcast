@@ -7,22 +7,33 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-TODO: write some nice intro, write nice text explaining all of this
+The covidcast package provides some simple utilities for exploring the
+correlations between two signals, over space or time, which may be helpful for
+simple analyses and explorations of data.
+
+For these examples, we will load confirmed cases and deaths to compare against,
+and restrict our analysis to counties with at least 500 total cases by August
+15th.
 
 ```{r, message = FALSE}
 library(covidcast)
+library(dplyr)
+library(ggplot2)
+
+start_day = "2020-03-01"
+end_day = "2020-08-15"
 
 df_inum = suppressMessages(
   covidcast_signal(data_source = "jhu-csse",
                    signal = "confirmed_7dav_incidence_num", 
-                   start_day = "2020-03-01", end_day = "2020-08-15")
+                   start_day = start_day, end_day = end_day)
 )
 summary(df_inum)
 
 df_dnum = suppressMessages(
   covidcast_signal(data_source = "jhu-csse",
                    signal = "deaths_7dav_incidence_num", 
-                   start_day = "2020-03-01", end_day = "2020-08-15")
+                   start_day = start_day, end_day = end_day)
 )
 summary(df_dnum)
 
@@ -41,20 +52,27 @@ df_dnum_act = df_dnum %>% filter(geo_value %in% geo_values)
 knitr::opts_chunk$set(fig.width = 8, fig.height = 6)
 ```
 
+The `covidcast_cor()` function is your primary way to calculate correlations.
+The first type of correlation we can do is to fix a specific time and calculate
+the correlation between the signals at each geographic location. By default, the
+function uses Spearman (rank) correlation, which does not require a linear
+relationship between the two signals.
+
 ```{r, warning = FALSE}
-# Compute correlation per time, over all counties. The default is Pearson (rank)
-# correlation
 df_cor1 = covidcast_cor(df_inum_act, df_dnum_act, by = "time_value")
 
 # Plot the correlation time series
 ggplot(df_cor1, aes(x = time_value, y = value)) + geom_line() + 
   labs(x = "Date", y = "Correlation", 
-       title = "Correlation per time, over all counties") + 
+       title = "Correlation per time, over all counties with at least 500 cases") + 
   theme_bw() 
 ```
 
+We might also be interested in how cases now correlate with deaths in the
+*future*. Using the `dt_x` parameter, we can shift the signal by 10 days before
+calculating correlations:
+
 ```{r, warning = FALSE}
-# Now shift case incidence 10 days forward in time, then recompute correlations
 df_cor2 = covidcast_cor(df_inum_act, df_dnum_act, by = "time_value", dt_x = 10)
 
 # Stack rowwise into one data frame, then plot time series
@@ -64,14 +82,20 @@ df_cor$shift = c(rep("No shift", nrow(df_cor1)),
 ggplot(df_cor, aes(x = time_value, y = value)) + 
   geom_line(aes(color = shift)) + 
   labs(x = "Date", y = "Correlation", 
-       title = "Correlation per time, over all counties") + theme_bw() +
+       title = "Correlation per time, over all counties with at least 500 cases") + theme_bw() +
   theme(legend.position = "bottom", legend.title  = element_blank())
 ```
 
 ## Correlations sliced by county
 
+Another option is to fix a geographic location and obtain the time series for
+both signals at that location. If we repeat this for every available geographic
+location, we obtain one correlation per location. By setting `by = "geo_value"`,
+we instruct `covidcast_cor()` to group by geographic location in this way. We'll
+again look at correlations both for observations at the same time and for a 10
+day shift:
+
 ```{r, warning = FALSE}
-# Compute correlations, per county, over all time. Both unshifted and shifted
 df_cor1 = covidcast_cor(df_inum_act, df_dnum_act, by = "geo_value")
 df_cor2 = covidcast_cor(df_inum_act, df_dnum_act, by = "geo_value", dt_x = 10)
 
@@ -90,10 +114,14 @@ ggplot(df_cor, aes(value)) +
 knitr::opts_chunk$set(fig.width = 10, fig.height = 8)
 ```
 
+Using some tricks, we can attach the necessary properties to the data frame so
+we can plot these correlations in space as a map, using
+`plot.covidcast_signal()`'s support for choropleth plots:
+
 ```{r}
 # Set a bunch of fields so that the data frame knows how to plot itself
 df_cor2$time_value = start_day
-df_cor2$issue =  start_day
+df_cor2$issue = start_day
 attributes(df_cor2)$geo_type = "county"
 class(df_cor2) = c("covidcast_signal", "data.frame")
 
@@ -104,11 +132,14 @@ plot(df_cor2, title = "Correlations between 10-day shifted cases and deaths",
 
 ## More systematic lag analysis
 
+You could also imagine trying to move the signals with various lags to see at
+what lag one signal is most correlated with the other. A simple way to achieve
+this:
+
 ```{r, message = TRUE, warning = TRUE}
 dt_vec = 0:15
 a = vector("list", length(dt_vec))
 for (i in 1:length(dt_vec)) {
-  cat(i, "... ")
   dt = dt_vec[i]
   if (dt > 0) {
     a[[i]] = covidcast_cor(df_inum_act, df_dnum_act, dt_x = dt, 

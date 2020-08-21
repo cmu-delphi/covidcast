@@ -3,7 +3,7 @@
 \name{name_to_fips}
 \alias{name_to_fips}
 \alias{name_to_cbsa}
-\title{Get FIPS or CBSA codes from county or city names}
+\title{Get FIPS or CBSA codes from county or metropolitan area names}
 \usage{
 name_to_fips(
   name,
@@ -22,7 +22,7 @@ name_to_cbsa(
 )
 }
 \arguments{
-\item{name}{Vector of county or city names to look up.}
+\item{name}{Vector of county or metropolitan area names to look up.}
 
 \item{ignore.case, perl, fixed}{Arguments to pass to \code{grep()}, with the same
 defaults as in the latter function. Hence, by default, regular expressions

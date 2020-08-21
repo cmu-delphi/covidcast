@@ -50,13 +50,13 @@ earliest_issue <- function(df) {
 
 ##########
 
-#' Get FIPS or CBSA codes from county or city names
+#' Get FIPS or CBSA codes from county or metropolitan area names
 #'
 #' Look up FIPS or CBSA codes by county or metropolitan area names,
 #' respectively; these functions are based on `grep()`, and hence allow for
 #' regular expressions.
 #'
-#' @param name Vector of county or city names to look up.
+#' @param name Vector of county or metropolitan area names to look up.
 #' @param ignore.case,perl,fixed Arguments to pass to `grep()`, with the same
 #'   defaults as in the latter function. Hence, by default, regular expressions
 #'   are used; to match against a fixed string (no regular expressions), set
@@ -79,7 +79,7 @@ earliest_issue <- function(df) {
 name_to_fips = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
   # First remove states from county_census
-  df = county_census %>% filter(COUNTY != 0)
+  df = county_census %>% dplyr::filter(.data$COUNTY != 0)
 
   # Now perform the grep-based look up
   grep_lookup(key = name, keys = df$CTYNAME, values = df$FIPS,
@@ -92,7 +92,7 @@ name_to_fips = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 name_to_cbsa = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
   # First restrict msa_census to metro areas
-  df = msa_census %>% filter(LSAD == "Metropolitan Statistical Area")
+  df = msa_census %>% dplyr::filter(.data$LSAD == "Metropolitan Statistical Area")
 
   # Now perform the grep-based look up
   grep_lookup(key = name, keys = df$NAME, values = df$CBSA,
@@ -131,7 +131,7 @@ name_to_cbsa = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 fips_to_name = function(code, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
   # First remove states from county_census
-  df = county_census %>% filter(COUNTY != 0)
+  df = county_census %>% dplyr::filter(.data$COUNTY != 0)
 
   # Now perform the grep-based look up
   grep_lookup(key = code, keys = df$FIPS, values = df$CTYNAME,
@@ -144,7 +144,7 @@ fips_to_name = function(code, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 cbsa_to_name = function(code, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
   # First restrict msa_census to metro areas
-  df = msa_census %>% filter(LSAD == "Metropolitan Statistical Area")
+  df = msa_census %>% dplyr::filter(.data$LSAD == "Metropolitan Statistical Area")
 
   # Now perform the grep-based look up
   grep_lookup(key = code, keys = df$CBSA, values = df$NAME,

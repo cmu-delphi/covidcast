@@ -2,7 +2,9 @@
 #'
 #' Compute correlations between two covidcast_signal data frames
 #'
-#' Computes correlations between two covidcast_signal data frames.
+#' Computes correlations between two covidcast_signal data frames, allowing for
+#' slicing by geo location, or by time. (The latest issue from each data frame
+#' is used, when computing correlations.)
 #' 
 #' @param x,y The `covidcast_signal` data frames to correlate.
 #' @param dt_x,dt_y Time shifts to consider for `x` and `y`, respectively,
@@ -17,16 +19,20 @@
 #'   default for `use`, and "spearman" the default for `method` (different than
 #'   the defaults used by `cor()`).
 #' 
-#' @return 
+#' @return A data frame with first column `geo_value` or `time_value` (depending
+#'   on `by`), and second column `value`, which gives the correlation.
+#' 
 #' @export
 covidcast_cor = function(x, y, dt_x = 0, dt_y = 0,
                          by = c("geo_value", "time_value"),
                          use = "na.or.complete", 
                          method = c("spearman", "pearson", "kendall")) {
-  by = match.arg(by)
-  method = match.arg(method)
+  x = latest_issue(x)
+  y = latest_issue(y)
   if (dt_x < 0 || dt_y < 0) stop("Both dt_x and dt_y must be nonnegative")
   if (dt_x > 0 && dt_y > 0) stop("Only one of dt_x and dt_y can be positive")
+  by = match.arg(by)
+  method = match.arg(method)
 
   # Join the two data frames together by pairs of geo_value and time_value
   z = dplyr::full_join(x, y, by = c("geo_value", "time_value")) 

@@ -32,8 +32,11 @@ default for \code{use}, and "spearman" the default for \code{method} (different 
 the defaults used by \code{cor()}).}
 }
 \value{
-
+A data frame with first column \code{geo_value} or \code{time_value} (depending
+on \code{by}), and second column \code{value}, which gives the correlation.
 }
 \description{
-Computes correlations between two covidcast_signal data frames.
+Computes correlations between two covidcast_signal data frames, allowing for
+slicing by geo location, or by time. (The latest issue from each data frame
+is used, when computing correlations.)
 }

@@ -52,8 +52,9 @@ earliest_issue <- function(df) {
 
 #' Get FIPS or CBSA codes from county or city names
 #'
-#' Look up FIPS or CBSA codes by county or city names, respectively; these
-#' functions are based on `grep()`, and hence allow for regular expressions.
+#' Look up FIPS or CBSA codes by county or metropolitan area names,
+#' respectively; these functions are based on `grep()`, and hence allow for
+#' regular expressions.
 #'
 #' @param name Vector of county or city names to look up.
 #' @param ignore.case,perl,fixed Arguments to pass to `grep()`, with the same
@@ -99,10 +100,11 @@ name_to_cbsa = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
               ties_method = ties_method)
 }
 
-#' Get county or city names from FIPS or CBSA codes
+#' Get county or metropolitan area names from FIPS or CBSA codes
 #'
-#' Look up county or city names by FIPS or CBSA codes, respectively; these
-#' functions are based on `grep()`, and hence allow for regular expressions.
+#' Look up county or metropolitan area names by FIPS or CBSA codes,
+#' respectively; these functions are based on `grep()`, and hence allow for
+#' regular expressions.
 #'
 #' @param code Vector of FIPS or CBSA codes to look up.
 #' @param ignore.case,perl,fixed Arguments to pass to `grep()`, with the same
@@ -120,7 +122,8 @@ name_to_cbsa = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 #' cbsa_to_name("38300")
 #' fips_to_name("4200", ties_method = "all")
 #'
-#' # Count the number of counties, grouped by first two digits of FIPS code:
+#' # Count the number of counties, grouped by first two digits of FIPS code
+#' # (which identify states):
 #' unlist(lapply(fips_to_name(sprintf("%02d", 1:99), ties = "all"), length))
 #'
 #' @seealso [name_to_fips()], [name_to_cbsa()]

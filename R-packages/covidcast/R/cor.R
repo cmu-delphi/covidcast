@@ -1,8 +1,9 @@
-#' Compute correlations between two covidcast_signal data frames
+#' Compute correlations between two `covidcast_signal` data frames
 #'
-#' Computes correlations between two covidcast_signal data frames, allowing for
-#' slicing by geo location, or by time. (The latest issue from each data frame
-#' is used, when computing correlations.)
+#' Computes correlations between two `covidcast_signal()` data frames, allowing
+#' for slicing by geo location, or by time. (The latest issue from each data
+#' frame is used when computing correlations.) See
+#' `vignette("correlation-utils")` for examples.
 #'
 #' @param x,y The `covidcast_signal` data frames to correlate.
 #' @param dt_x,dt_y Time shifts to consider for `x` and `y`, respectively,
@@ -11,8 +12,10 @@
 #'   forward 1 day in time (so, data on June 1 becomes data on June 2, and so
 #'   on). Default is 0 for both.
 #' @param by If "geo_value", then correlations are computed for each geo
-#'   location, over all time. If "time_value", then correlations are computed
-#'   for each time, over all geo locations. Default is "geo_value".
+#'   location, over all time. Each correlation is measured between two time
+#'   series at the same location. If "time_value", then correlations are
+#'   computed for each time, over all geo locations. Each correlation is
+#'   measured between all locations at one time. Default is "geo_value".
 #' @param use,method Arguments to pass to `cor()`, with "na.or.complete" the
 #'   default for `use`, and "spearman" the default for `method` (different than
 #'   the defaults used by `cor()`).

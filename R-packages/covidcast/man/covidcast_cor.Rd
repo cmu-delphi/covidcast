@@ -2,7 +2,7 @@
 % Please edit documentation in R/cor.R
 \name{covidcast_cor}
 \alias{covidcast_cor}
-\title{Compute correlations between two covidcast_signal data frames}
+\title{Compute correlations between two \code{covidcast_signal} data frames}
 \usage{
 covidcast_cor(
   x,
@@ -24,8 +24,10 @@ forward 1 day in time (so, data on June 1 becomes data on June 2, and so
 on). Default is 0 for both.}
 
 \item{by}{If "geo_value", then correlations are computed for each geo
-location, over all time. If "time_value", then correlations are computed
-for each time, over all geo locations. Default is "geo_value".}
+location, over all time. Each correlation is measured between two time
+series at the same location. If "time_value", then correlations are
+computed for each time, over all geo locations. Each correlation is
+measured between all locations at one time. Default is "geo_value".}
 
 \item{use, method}{Arguments to pass to \code{cor()}, with "na.or.complete" the
 default for \code{use}, and "spearman" the default for \code{method} (different than
@@ -36,7 +38,8 @@ A data frame with first column \code{geo_value} or \code{time_value} (depending
 on \code{by}), and second column \code{value}, which gives the correlation.
 }
 \description{
-Computes correlations between two covidcast_signal data frames, allowing for
-slicing by geo location, or by time. (The latest issue from each data frame
-is used, when computing correlations.)
+Computes correlations between two \code{covidcast_signal()} data frames, allowing
+for slicing by geo location, or by time. (The latest issue from each data
+frame is used when computing correlations.) See
+\code{vignette("correlation-utils")} for examples.
 }

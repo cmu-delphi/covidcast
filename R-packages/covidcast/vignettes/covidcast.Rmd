@@ -20,7 +20,7 @@ functions.
 This package is not on CRAN yet, so it can be installed using the
 [`devtools`](https://cran.r-project.org/package=devtools) package:
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 devtools::install_github("cmu-delphi/covidcast", ref = "main",
                          subdir = "R-packages/covidcast")
 ```
@@ -38,8 +38,9 @@ every county in the United States between 2020-05-01 and 2020-05-07, we can use
 library(covidcast)
 
 cli <- suppressMessages(
-    covidcast_signal("fb-survey", "smoothed_cli", start_day = "2020-05-01",
-                     end_day = "2020-05-07", geo_type = "county")
+  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli", 
+                   start_day = "2020-05-01", end_day = "2020-05-07", 
+                   geo_type = "county")
 )
 head(cli)
 ```
@@ -47,26 +48,28 @@ head(cli)
 Each row represents one observation in one county on one day. The county FIPS
 code is given in the `geo_value` column, the date in the `time_value` column.
 Here `value` is the requested signal---in this case, the smoothed estimate of
-the percentage of people with COVID-like illness, based on the symptom surveys.
-`stderr` is its standard error. See the `covidcast_signal()` documentation for
-details on the returned data frame.
+the percentage of people with COVID-like illness, based on the symptom surveys,
+and `stderr` is its standard error. See the `covidcast_signal()` documentation 
+for details on the returned data frame.
 
 Notice the use of `suppressMessages()` to hide progress reporting from the
 function as it downloads the data; if you download particularly large amounts of
 data, you may prefer to allow the progress reporting so you know how long to
 wait.
 
-Note that `geo_value` is the FIPS code for each reported county; counties with
-insufficient sample size are not reported. The [API
-documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html)
-specifies how geographies are identified.
+To get a basic summary of the returned data frame: 
+
+```{r}
+summary(cli)
+```
 
 To request estimates for states instead of counties:
 
 ```{r}
 cli <- suppressMessages(
-    covidcast_signal("fb-survey", "smoothed_cli", start_day = "2020-05-01",
-                     end_day = "2020-05-07", geo_type = "state")
+  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli", 
+                   start_day = "2020-05-01", end_day = "2020-05-07", 
+                   geo_type = "state")
 )
 head(cli)
 ```
@@ -76,9 +79,9 @@ the FIPS code for Allegheny County, Pennsylvania:
 
 ```{r}
 cli <- suppressMessages(
-    covidcast_signal("fb-survey", "smoothed_cli", start_day = "2020-05-01",
-                     end_day = "2020-05-07", geo_type = "county",
-                     geo_value = "42003")
+  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli", 
+                   start_day = "2020-05-01", end_day = "2020-05-07", 
+                   geo_type = "county", geo_value = "42003")
 )
 head(cli)
 ```
@@ -93,18 +96,18 @@ metropolitan areas by their CBSA ID number. This means that to query a specific
 county or metropolitan area, we must have some way to quickly find its
 identifier.
 
-This package includes several datasets intended to make the process easier. For
+This package includes several utilities intended to make the process easier. For
 example, if we look at `?county_census`, we find that the package provides
 census data on every county in the United States, including its FIPS code. To
-find Allegheny County, I could search the data frame however is most convenient
-to me:
+find Allegheny County, we could search the data frame however is most convenient
+to us:
 
-```{r, message=FALSE}
+```{r, message = FALSE}
 library(dplyr)
 
 county_census %>%
-    filter(CTYNAME == "Allegheny County") %>%
-    select(FIPS, CTYNAME, STNAME, POPESTIMATE2019)
+  filter(CTYNAME == "Allegheny County") %>%
+  select(FIPS, CTYNAME, STNAME, POPESTIMATE2019)
 ```
 
 Hence we see that 42003 is the code to provide to `geo_value` to select this
@@ -112,23 +115,41 @@ county. We also see we can obtain a 2019 population estimate, which could be
 useful in your analyses to normalize or scale values by population.
 
 Similarly, to find the Pittsburgh metropolitan area, we can use the
-`?msa_census` dataset provided in the package:
+`?msa_census` data provided in the package:
 
 ```{r}
 msa_census %>%
-    filter(startsWith(NAME, "Pittsburgh")) %>%
-    select(CBSA, NAME, LSAD, POPESTIMATE2019)
+  filter(startsWith(NAME, "Pittsburgh")) %>%
+  select(CBSA, NAME, LSAD, POPESTIMATE2019)
 ```
 
 We can see that the Pittsburgh metropolitan area has CBSA ID 38300, and we can
 also get its 2019 census-estimated population. We could pass this ID to
-`covidcast_signal()` when using `geo_type = 'msa'`.
+`covidcast_signal()` when using `geo_type = 'msa'`. (Note: the `msa_census` data
+includes types of area beyond metropolitan statistical areas, including 
+micropolitan statistical areas. The `LSAD` column identifies the type of each 
+area. The COVIDcast API only provides estimates for metropolitan statistical 
+areas, not for their divisions or for micropolitan areas.)
 
-**Note:** The `msa_census` dataset includes types of area beyond metropolitan
-statistical areas, including micropolitan statistical areas. The `LSAD` column
-identifies the type of each area. The COVIDcast API only provides estimates for
-metropolitan statistical areas, not for their divisions or for micropolitan
-areas.
+Beyond this, the package provides convenience functions `name_to_fips()` and 
+`name_to_cbsa()` for `grep()`-based searching of county or metropolitan area 
+names in order to find FIPS or CBSA codes, respectively:
+
+```{r}
+name_to_fips("Allegheny")
+name_to_cbsa("Pittsburgh")
+```
+
+The package also provides inverse mappings `fips_to_name()` and `cbsa_to_name()`
+that work in the analogous way: 
+
+```{r}
+fips_to_name("42003")
+cbsa_to_name("38300")
+```
+
+See the documentation for more details (for example, the options for handling 
+matches in the case of ties).
 
 ## Signal metadata
 
@@ -140,9 +161,16 @@ meta <- covidcast_meta()
 head(meta)
 ```
 
-This can be filtered and sliced as desired to obtain information about any
-signal of interest. The `covidcast_meta()` documentation describes the columns
-and their meanings.
+The `covidcast_meta()` documentation describes the columns and their meanings. 
+The metadata data frame can be filtered and sliced as desired to obtain 
+information about signals of interest. To get a basic summary of the metadata: 
+
+```{r, eval = FALSE}
+summary(meta)
+```
+
+(We silenced the evaluation because the output of `summary()` here is still 
+quite long.)
 
 ## Tracking issues and updates
 
@@ -169,18 +197,17 @@ reported, we can request specific data versions.
 First, we can request the data that was available *as of* a specific date, using
 the `as_of` argument:
 
-```{r, message=FALSE}
-covidcast_signal("doctor-visits", "smoothed_cli",
+```{r, message = FALSE}
+covidcast_signal(data_source = "doctor-visits", signal = "smoothed_cli",
                  start_day = "2020-05-01", end_day = "2020-05-01",
-                 geo_type = "state", geo_values = "pa",
-                 as_of = "2020-05-07")
+                 geo_type = "state", geo_values = "pa", as_of = "2020-05-07")
 ```
 
 This shows that an estimate of about 2.3% was issued on May 7. If we don't
 specify `as_of`, we get the most recent estimate available:
 
-```{r, message=FALSE}
-covidcast_signal("doctor-visits", "smoothed_cli",
+```{r, message = FALSE}
+covidcast_signal(data_source = "doctor-visits", signal = "smoothed_cli",
                  start_day = "2020-05-01", end_day = "2020-05-01",
                  geo_type = "state", geo_values = "pa")
 ```
@@ -195,8 +222,8 @@ later.
 By using the `issues` argument, we can request all issues in a certain time
 period:
 
-```{r, message=FALSE}
-covidcast_signal("doctor-visits", "smoothed_cli",
+```{r, message = FALSE}
+covidcast_signal(data_source = "doctor-visits", signal = "smoothed_cli",
                  start_day = "2020-05-01", end_day = "2020-05-01",
                  geo_type = "state", geo_values = "pa",
                  issues = c("2020-05-01", "2020-05-15"))
@@ -212,11 +239,10 @@ Finally, we can use the `lag` argument to request only data reported with a
 certain lag. For example, requesting a lag of 7 days means to request only
 issues 7 days after the corresponding `time_value`:
 
-```{r, message=FALSE}
-covidcast_signal("doctor-visits", "smoothed_cli",
+```{r, message = FALSE}
+covidcast_signal(data_source = "doctor-visits", signal = "smoothed_cli",
                  start_day = "2020-05-01", end_day = "2020-05-07",
-                 geo_type = "state", geo_values = "pa",
-                 lag = 7)
+                 geo_type = "state", geo_values = "pa", lag = 7)
 ```
 
 Note that though this query requested all values between 2020-05-01 and
@@ -224,8 +250,8 @@ Note that though this query requested all values between 2020-05-01 and
 because the query will only include a result for May 3rd if a value were issued
 on May 10th (a 7-day lag), but in fact the value was not updated on that day:
 
-```{r, message=FALSE}
-covidcast_signal("doctor-visits", "smoothed_cli",
+```{r, message = FALSE}
+covidcast_signal(data_source = "doctor-visits", signal = "smoothed_cli",
                  start_day = "2020-05-03", end_day = "2020-05-03",
                  geo_type = "state", geo_values = "pa",
                  issues = c("2020-05-09", "2020-05-15"))

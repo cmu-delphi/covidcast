@@ -1,0 +1,81 @@
+---
+title: "Facebook Survey Dashboard"
+author: "Delphi Group"
+---
+
+## Sampling
+
+```{r, message = FALSE, warning = FALSE, fig.width = 6, fig.height = 5}
+library(covidcast)
+library(dplyr)
+library(ggplot2)
+
+df_fb1_st = covidcast_signal("fb-survey", "raw_cli", geo_type = "state")
+n_per_week = df_fb1_st %>% 
+  group_by(time_value) %>% 
+  summarize(n= sum(sample_size)) 
+
+ggplot(n_per_week, aes(x = time_value, y = n)) + 
+  geom_line() + geom_point() + theme_bw() + 
+  labs(x = "Date", y = "Number of Responses")
+mean(n_per_week$n)
+sum(n_per_week$n)
+
+df_fb1 = covidcast_signal("fb-survey", "smoothed_cli")
+county_per_week = df_fb1 %>% 
+  group_by(time_value) %>%
+  summarize(n = n())
+
+ggplot(county_per_week, aes(x = time_value, y = n)) + 
+  geom_line() + geom_point() + theme_bw() + 
+  labs(x = "Date", y = "Number of Counties")
+mean(county_per_week$n)
+```
+
+## Coverage
+
+```{r, message = FALSE, warning = FALSE, fig.width = 10, fig.height = 8}
+county_totals = df_fb1 %>% 
+  group_by(geo_value) %>%
+  summarize(value = n()) %>% ungroup() %>%
+  filter(substr(geo_value,3,5) != "000") 
+
+county_totals$time_value = "2020-04-15"
+county_totals$issue = "2020-04-15"
+attributes(county_totals)$geo_type = "county"
+class(county_totals) = c("covidcast_signal", "data.frame")
+
+plot(county_totals, title = "Which counties ever appear in our CLI signals?",
+     choro_col = c("#D3D3D3", "#FFC0CB"), choro_params = list(breaks = c(0, 1), 
+                                                              legend_width = 5))
+```
+
+## Correlation
+
+```{r, message = FALSE, warning = FALSE, fig.width = 6, fig.height = 5}
+df_fb2 = covidcast_signal("fb-survey", "smoothed_hh_cmnty_cli")
+df_in = covidcast_signal("jhu-csse", "confirmed_7dav_incidence_prop"
+
+case_num = 500
+geo_values = covidcast_signal("jhu-csse", "confirmed_cumulative_num",
+                              max(df_in$time_value), max(df_in$time_value)) %>%
+  filter(value >= case_num) %>% pull(geo_value)
+df_fb1_act = df_fb1 %>% filter(geo_value %in% geo_values)
+df_fb2_act = df_fb2 %>% filter(geo_value %in% geo_values)
+df_in_act = df_in %>% filter(geo_value %in% geo_values)
+
+df_cor1 = covidcast_cor(df_fb1_act, df_in_act, by = "time_value",
+                        method = "spearman")
+df_cor2 = covidcast_cor(df_fb2_act, df_in_act, by = "time_value",
+                        method = "spearman")
+
+df_cor = rbind(df_cor1, df_cor2)
+df_cor$signal = c(rep("% CLI", nrow(df_cor1)), 
+                  rep("% CLI-in-community", nrow(df_cor2)))
+ggplot(df_cor, aes(x = time_value, y = value)) + 
+  geom_line(aes(color = signal)) + 
+  labs(title = "Correlation between CLI signals and cases",
+       subtitle = sprintf("Over all counties with at least %i cases", case_num),
+       x = "Date", y = "Correlation") + theme_bw() +
+  theme(legend.position = "bottom", legend.title  = element_blank())
+```

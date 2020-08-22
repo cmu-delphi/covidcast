@@ -69,7 +69,11 @@ ggplot(df_cor1, aes(x = time_value, y = value)) + geom_line() +
        x = "Date", y = "Correlation") 
 ```
 
-TODO: explain that some outlier cause this bizarre dip in correlation? 
+(The sudden drop on July 25th is due to a [sudden change in how New Jersey
+reported deaths](https://github.com/CSSEGISandData/COVID-19/issues/2763) being
+reflected in our data source as large outliers; since the signal is a 7-day
+average, these outliers last until the beginning of July and affect the reported
+correlation.)
 
 We might also be interested in how cases now correlate with deaths in the
 *future*. Using the `dt_x` parameter, we can shift the signal by 10 days forward
@@ -115,7 +119,9 @@ ggplot(df_cor, aes(x = time_value, y = value)) +
   theme(legend.position = "bottom")
 ```
 
-The "big dip" is gone, and we can again see that the shift helps correlations.
+The "big dip" is gone (since the Spearman correlation uses ranks and not the
+actual values, and hence is less sensitive to outliers), and we can again see
+that the shift helps correlations.
 
 ## Correlations sliced by county
 

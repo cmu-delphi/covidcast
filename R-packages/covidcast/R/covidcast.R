@@ -522,6 +522,8 @@ covidcast_signals <- function(signals, start_day = NULL, end_day = NULL,
 #' @references COVIDcast API sources and signals documentation:
 #'   \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 #'
+#' @seealso [summary.covidcast_meta()]
+#'
 #' @export
 covidcast_meta <- function() {
   meta <- .request(list(source='covidcast_meta', cached="true"))
@@ -542,7 +544,7 @@ covidcast_meta <- function() {
 #' Print `covidcast_meta` object
 #'
 #' Prints a brief summary of the metadata, and then prints the underlying data
-#' frame. 
+#' frame, for objects returned from `covidcast_meta()`.
 #'
 #' @param x The `covidcast_meta` object.
 #' @param ... Additional arguments passed to `print.data.frame()` to print the
@@ -570,7 +572,7 @@ head.covidcast_meta = function(x, ...) {
 
 #' Summarize `covidcast_meta` object
 #'
-#' Prints a summary of the metadata.
+#' Prints a summary of the metadata returned by `covidcast_meta()`.
 #'
 #' @param object The `covidcast_meta` object.
 #' @param ... Additional arguments, for compatibility with `summary()`.

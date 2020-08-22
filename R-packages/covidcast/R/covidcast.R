@@ -219,7 +219,8 @@ covidcast_signal <- function(data_source, signal,
 #' Print `covidcast_signal` objects
 #'
 #' Prints a brief summary of the data source, signal, and geographic level, and
-#' then prints the underlying data frame.
+#' then prints the underlying data frame, for objects returned by
+#' `covidcast_signal()`. 
 #'
 #' @param x The `covidcast_signal` object.
 #' @param ... Additional arguments passed to `print.data.frame()` to print the 
@@ -248,7 +249,8 @@ head.covidcast_signal = function(x, ...) {
 #' Summarize `covidcast_signal` objects
 #'
 #' Prints a variety of summary statistics about the underlying data, such as
-#' median values, the date range included, sample sizes, and so on.
+#' median values, the date range included, sample sizes, and so on, for objects
+#' returned by `covidcast_signal()`.
 #'
 #' @param object The `covidcast_signal` object.
 #' @param ... Additional arguments, for compatibility with `summary()`.
@@ -275,7 +277,8 @@ summary.covidcast_signal = function(object, ...) {
 #' Plot `covidcast_signal` objects
 #'
 #' Several plot types are provided, including choropleth plots (maps), bubble
-#' plots, and time series plots showing the change of signals over time.
+#' plots, and time series plots showing the change of signals over time, for
+#' returned by `covidcast_signal()`.
 #'
 #' @param x The `covidcast_signal` object to map or plot. If the object contains
 #'   multiple issues of the same observation, only the most recent issue is
@@ -545,7 +548,7 @@ covidcast_meta <- function() {
 #' Print `covidcast_meta` object
 #'
 #' Prints a brief summary of the metadata, and then prints the underlying data
-#' frame, for objects returned from `covidcast_meta()`.
+#' frame, for objects returned by `covidcast_meta()`.
 #'
 #' @param x The `covidcast_meta` object.
 #' @param ... Additional arguments passed to `print.data.frame()` to print the

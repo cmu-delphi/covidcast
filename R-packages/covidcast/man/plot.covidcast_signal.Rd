@@ -92,7 +92,8 @@ unused.}
 }
 \description{
 Several plot types are provided, including choropleth plots (maps), bubble
-plots, and time series plots showing the change of signals over time.
+plots, and time series plots showing the change of signals over time, for
+returned by \code{covidcast_signal()}.
 }
 \details{
 The following named arguments are supported through the lists

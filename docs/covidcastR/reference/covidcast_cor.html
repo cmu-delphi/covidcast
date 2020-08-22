@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • covidcast</title>
+<title>Compute correlations between two <code>covidcast_signal</code> data frames — covidcast_cor • covidcast</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,11 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="Compute correlations between two <code>covidcast_signal</code> data frames — covidcast_cor" />
+<meta property="og:description" content="Computes correlations between two covidcast_signal() data frames, allowing
+for slicing by geo location, or by time. (The latest issue from each data
+frame is used when computing correlations.) See
+vignette(&quot;correlation-utils&quot;) for examples." />
 
 
 
@@ -58,7 +62,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -128,22 +132,69 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>Compute correlations between two <code>covidcast_signal</code> data frames</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/cor.R'><code>R/cor.R</code></a></small>
+    <div class="hidden name"><code>covidcast_cor.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <dl>
-        <dt><a href="correlation-utils.html">Correlation utilities</a></dt>
-        <dd></dt>
-        <dt><a href="covidcast.html">Get started with covidcast</a></dt>
-        <dd></dt>
-        <dt><a href="plotting-signals.html">Plotting and mapping signals</a></dt>
-        <dd></dt>
-      </dl>
+    <div class="ref-description">
+    <p>Computes correlations between two <code><a href='covidcast_signal.html'>covidcast_signal()</a></code> data frames, allowing
+for slicing by geo location, or by time. (The latest issue from each data
+frame is used when computing correlations.) See
+<code><a href='../articles/correlation-utils.html'>vignette("correlation-utils")</a></code> for examples.</p>
     </div>
+
+    <pre class="usage"><span class='fu'>covidcast_cor</span>(
+  <span class='no'>x</span>,
+  <span class='no'>y</span>,
+  <span class='kw'>dt_x</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>dt_y</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"geo_value"</span>, <span class='st'>"time_value"</span>),
+  <span class='kw'>use</span> <span class='kw'>=</span> <span class='st'>"na.or.complete"</span>,
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pearson"</span>, <span class='st'>"kendall"</span>, <span class='st'>"spearman"</span>)
+)</pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x, y</th>
+      <td><p>The <code>covidcast_signal</code> data frames to correlate.</p></td>
+    </tr>
+    <tr>
+      <th>dt_x, dt_y</th>
+      <td><p>Time shifts to consider for <code>x</code> and <code>y</code>, respectively,
+before computing correlations. These must both be nonnegative, and only one
+can be positive. If <code>dt_x = 1</code>, for example, then data for <code>x</code> is shifted
+forward 1 day in time (so, data on June 1 becomes data on June 2, and so
+on). Default is 0 for both.</p></td>
+    </tr>
+    <tr>
+      <th>by</th>
+      <td><p>If "geo_value", then correlations are computed for each geo
+location, over all time. Each correlation is measured between two time
+series at the same location. If "time_value", then correlations are
+computed for each time, over all geo locations. Each correlation is
+measured between all locations at one time. Default is "geo_value".</p></td>
+    </tr>
+    <tr>
+      <th>use, method</th>
+      <td><p>Arguments to pass to <code><a href='https://rdrr.io/r/stats/cor.html'>cor()</a></code>, with "na.or.complete" the
+default for <code>use</code> (different than <code><a href='https://rdrr.io/r/stats/cor.html'>cor()</a></code>) and "pearson" the default for
+<code>method</code> (same as <code><a href='https://rdrr.io/r/stats/cor.html'>cor()</a></code>).</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A data frame with first column <code>geo_value</code> or <code>time_value</code> (depending
+on <code>by</code>), and second column <code>value</code>, which gives the correlation.</p>
+
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 

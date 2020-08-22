@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fetch only the latest issue for each observation in a data frame. — latest_issue • covidcast</title>
+<title>Get FIPS or CBSA codes from county or metropolitan area names — name_to_fips • covidcast</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,10 @@
 
 
 
-<meta property="og:title" content="Fetch only the latest issue for each observation in a data frame. — latest_issue" />
-<meta property="og:description" content="Since covidcast_signal() can, with the right options, return multiple
-issues for a single observation in a single geo, we may want only the most
-recent for plotting, mapping, or other purposes." />
+<meta property="og:title" content="Get FIPS or CBSA codes from county or metropolitan area names — name_to_fips" />
+<meta property="og:description" content="Look up FIPS or CBSA codes by county or metropolitan area names,
+respectively; these functions are based on grep(), and hence allow for
+regular expressions." />
 
 
 
@@ -131,33 +131,84 @@ recent for plotting, mapping, or other purposes." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Fetch only the latest issue for each observation in a data frame.</h1>
+    <h1>Get FIPS or CBSA codes from county or metropolitan area names</h1>
     <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
-    <div class="hidden name"><code>latest_issue.Rd</code></div>
+    <div class="hidden name"><code>name_to_fips.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Since <code><a href='covidcast_signal.html'>covidcast_signal()</a></code> can, with the right options, return multiple
-issues for a single observation in a single geo, we may want only the most
-recent for plotting, mapping, or other purposes.</p>
+    <p>Look up FIPS or CBSA codes by county or metropolitan area names,
+respectively; these functions are based on <code><a href='https://rdrr.io/r/base/grep.html'>grep()</a></code>, and hence allow for
+regular expressions.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>latest_issue</span>(<span class='no'>df</span>)</pre>
+    <pre class="usage"><span class='fu'>name_to_fips</span>(
+  <span class='no'>name</span>,
+  <span class='kw'>ignore.case</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>perl</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>fixed</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>ties_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first"</span>, <span class='st'>"all"</span>)
+)
+
+<span class='fu'>name_to_cbsa</span>(
+  <span class='no'>name</span>,
+  <span class='kw'>ignore.case</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>perl</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>fixed</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>ties_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first"</span>, <span class='st'>"all"</span>)
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>df</th>
-      <td><p>A <code>covidcast_signal</code> data frame</p></td>
+      <th>name</th>
+      <td><p>Vector of county or metropolitan area names to look up.</p></td>
+    </tr>
+    <tr>
+      <th>ignore.case, perl, fixed</th>
+      <td><p>Arguments to pass to <code><a href='https://rdrr.io/r/base/grep.html'>grep()</a></code>, with the same
+defaults as in the latter function. Hence, by default, regular expressions
+are used; to match against a fixed string (no regular expressions), set
+<code>fixed = TRUE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>ties_method</th>
+      <td><p>If "first", then only the first match for each name is
+returned. If "all", then all matches for each name are returned.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The same <code>covidcast_signal</code> data frame, but with only the latest
-issue of every observation</p>
+    <p>A vector of FIPS or CBSA codes if <code>ties_method</code> equals "first", and a
+list of FIPS or CBSA codes otherwise.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
+    <div class='dont-index'><p><code><a href='fips_to_name.html'>fips_to_name()</a></code>, <code><a href='fips_to_name.html'>cbsa_to_name()</a></code></p></div>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>name_to_fips</span>(<span class='st'>"Allegheny"</span>)</div><div class='output co'>#&gt; Allegheny County 
+#&gt;          "42003" </div><div class='input'><span class='fu'>name_to_cbsa</span>(<span class='st'>"Pittsburgh"</span>)</div><div class='output co'>#&gt; Pittsburgh, PA 
+#&gt;        "38300" </div><div class='input'><span class='fu'>name_to_fips</span>(<span class='st'>"Miami"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Some inputs were not uniquely matched; returning only the first match in each case.</span></div><div class='output co'>#&gt; Miami-Dade County 
+#&gt;           "12086" </div><div class='input'><span class='fu'>name_to_fips</span>(<span class='st'>"Miami"</span>, <span class='kw'>ties_method</span> <span class='kw'>=</span> <span class='st'>"all"</span>)</div><div class='output co'>#&gt; [[1]]
+#&gt; Miami-Dade County      Miami County      Miami County      Miami County 
+#&gt;           "12086"           "18103"           "20121"           "39109" 
+#&gt; </div><div class='input'><span class='fu'>name_to_fips</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Allegheny"</span>, <span class='st'>"Miami"</span>, <span class='st'>"New "</span>), <span class='kw'>ties_method</span> <span class='kw'>=</span> <span class='st'>"all"</span>)</div><div class='output co'>#&gt; [[1]]
+#&gt; Allegheny County 
+#&gt;          "42003" 
+#&gt; 
+#&gt; [[2]]
+#&gt; Miami-Dade County      Miami County      Miami County      Miami County 
+#&gt;           "12086"           "18103"           "20121"           "39109" 
+#&gt; 
+#&gt; [[3]]
+#&gt;   New Haven County  New London County  New Castle County  New Madrid County 
+#&gt;            "09009"            "09011"            "10003"            "29143" 
+#&gt;    New York County New Hanover County    New Kent County 
+#&gt;            "36061"            "37129"            "51127" 
+#&gt; </div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

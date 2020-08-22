@@ -73,7 +73,7 @@ plots, and time series plots showing the change of signals over time." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -98,6 +98,9 @@ plots, and time series plots showing the change of signals over time." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/correlation-utils.html">Correlation utilities</a>
+    </li>
     <li>
       <a href="../articles/plotting-signals.html">Plotting and mapping signals</a>
     </li>
@@ -147,7 +150,7 @@ plots, and time series plots showing the change of signals over time.</p>
   <span class='kw'>choro_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"#FFFFCC"</span>, <span class='st'>"#FD893C"</span>, <span class='st'>"#800026"</span>),
   <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
   <span class='kw'>direction</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>dir_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"#6F9CC6"</span>, <span class='st'>"#F3EE9E"</span>, <span class='st'>"#C56B59"</span>),
+  <span class='kw'>dir_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"#6F9CC6"</span>, <span class='st'>"#E4E4E4"</span>, <span class='st'>"#C56B59"</span>),
   <span class='kw'>bubble_col</span> <span class='kw'>=</span> <span class='st'>"purple"</span>,
   <span class='kw'>num_bins</span> <span class='kw'>=</span> <span class='fl'>8</span>,
   <span class='kw'>line_col</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>6</span>,
@@ -164,9 +167,9 @@ plots, and time series plots showing the change of signals over time.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>The <code>covidcast_signal</code> object to map or plot. If the object
-contains multiple issues of the same observation, only the most recent
-issue is mapped or plotted.</p></td>
+      <td><p>The <code>covidcast_signal</code> object to map or plot. If the object contains
+multiple issues of the same observation, only the most recent issue is
+mapped or plotted.</p></td>
     </tr>
     <tr>
       <th>plot_type</th>
@@ -262,31 +265,39 @@ unused.</p></td>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>TODO explain all these advanced parameters.</p>
-<p>For both choropleth and bubble maps:</p><ul>
-<li><p><code>subtitle</code></p></li>
-<li><p><code>missing_col</code></p></li>
-<li><p><code>border_col</code></p></li>
-<li><p><code>border_size</code></p></li>
-<li><p><code>legend_height</code></p></li>
-<li><p><code>legend_width</code></p></li>
-<li><p><code>breaks</code></p></li>
-</ul>
+    <p>The following named arguments are supported through the lists
+<code>choro_params</code>, <code>bubble_params</code>, and <code>line_params</code>.</p>
+<p>For both choropleth and bubble maps:</p><dl'>
+<dt><code>subtitle</code></dt><dd><p>Subtitle for the map.</p></dd>
+<dt><code>missing_col</code></dt><dd><p>Color assigned to missing or NA geo locations.</p></dd>
+<dt><code>border_col</code></dt><dd><p>Border color for geo locations.</p></dd>
+<dt><code>border_size</code></dt><dd><p>Border size for geo locations.</p></dd>
+<dt><code>legend_height</code>, <code>legend_width</code></dt><dd><p>Height and width of the legend.</p></dd>
+<dt><code>breaks</code></dt><dd><p>Breaks for a custom (discrete) color or size scale.  Note
+that we must set <code>breaks</code> to be a vector of the same length as <code>choro_col</code>
+for choropleth maps. This works as follows: we assign the <code>i</code>th color for
+choropleth maps, or the <code>i</code>th size for bubble maps, if and only if the
+given value satisfies <code>breaks[i] &lt;= value &lt; breaks[i+1]</code>, where we take by
+convention <code>breaks[0] = -Inf</code> and <code>breaks[N+1] = Inf</code> for <code>N = length(breaks)</code>.</p></dd>
 
-<p>For choropleth maps only:</p><ul>
-<li><p><code>legend_n</code></p></li>
-</ul>
+</dl>
 
-<p>For bubble maps only:</p><ul>
-<li><p><code>remove_zero</code></p></li>
-<li><p><code>min_size</code></p></li>
-<li><p><code>max_size</code></p></li>
-</ul>
+<p>For choropleth maps only:</p><dl'>
+<dt><code>legend_n</code></dt><dd><p>Number of values to label on the color bar.</p></dd>
 
-<p>For line graphs:</p><ul>
-<li><p><code>xlab</code></p></li>
-<li><p><code>ylab</code></p></li>
-</ul>
+</dl>
+
+<p>For bubble maps only:</p><dl'>
+<dt><code>remove_zero</code></dt><dd><p>Should zeros be excluded from the size scale (hence
+effectively drawn as bubbles of zero size)?</p></dd>
+<dt><code>min_size</code>, <code>max_size</code></dt><dd><p>Min size for the size scale.</p></dd>
+
+</dl>
+
+<p>For line graphs:</p><dl'>
+<dt><code>xlab</code>, <code>ylab</code></dt><dd><p>Labels for the x-axis and y-axis.</p></dd>
+
+</dl>
 
 
   </div>

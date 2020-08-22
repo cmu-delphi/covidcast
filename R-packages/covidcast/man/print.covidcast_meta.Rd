@@ -14,5 +14,5 @@ data.}
 }
 \description{
 Prints a brief summary of the metadata, and then prints the underlying data
-frame.
+frame, for objects returned from \code{covidcast_meta()}.
 }

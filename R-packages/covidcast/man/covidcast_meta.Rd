@@ -37,3 +37,6 @@ streams from the COVIDcast API.
 COVIDcast API sources and signals documentation:
 \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 }
+\seealso{
+\code{\link[=summary.covidcast_meta]{summary.covidcast_meta()}}
+}

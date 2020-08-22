@@ -239,6 +239,7 @@ print.covidcast_signal = function(x, ...) {
 }
 
 #' @method head covidcast_signal
+#' @importFrom utils head
 #' @export
 head.covidcast_signal = function(x, ...) {
   head(as.data.frame(x), ...)
@@ -565,6 +566,7 @@ print.covidcast_meta = function(x, ...) {
 }
 
 #' @method head covidcast_meta
+#' @importFrom utils head
 #' @export
 head.covidcast_meta = function(x, ...) {
   head(as.data.frame(x), ...)
@@ -590,14 +592,14 @@ summary.covidcast_meta = function(object, ...) {
               length(unique(paste(x$data_source, x$signal)))))
   cat("Summary:\n\n")
   df <- suppressMessages(
-    meta %>% group_by(data_source, signal) %>%
-    summarize(county = ifelse("county" %in% geo_type, "*", ""),
-              msa = ifelse("msa" %in% geo_type, "*", ""),
-              hrr = ifelse("hrr" %in% geo_type, "*", ""),
-              state = ifelse("state" %in% geo_type, "*", ""),
-              min_time = max(min_time),
-              max_time = min(max_time)) %>%
-    ungroup
+    meta %>% dplyr::group_by(data_source, signal) %>%
+    dplyr::summarize(county = ifelse("county" %in% geo_type, "*", ""),
+                     msa = ifelse("msa" %in% geo_type, "*", ""),
+                     hrr = ifelse("hrr" %in% geo_type, "*", ""),
+                     state = ifelse("state" %in% geo_type, "*", ""),
+                     min_time = max(min_time),
+                     max_time = min(max_time)) %>%
+    dplyr::ungroup
   )
   print(as.data.frame(df), right = FALSE, row.names = FALSE)
   invisible(df)

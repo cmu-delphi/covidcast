@@ -23,6 +23,7 @@
 #' @return A data frame with first column `geo_value` or `time_value` (depending
 #'   on `by`), and second column `value`, which gives the correlation.
 #'
+#' @importFrom stats cor
 #' @export
 covidcast_cor = function(x, y, dt_x = 0, dt_y = 0,
                          by = c("geo_value", "time_value"),
@@ -41,9 +42,10 @@ covidcast_cor = function(x, y, dt_x = 0, dt_y = 0,
   # Make sure that we have a complete record of dates for each geo_value (fill
   # with NAs as necessary)
   z_all = z %>% dplyr::group_by(geo_value) %>%
-    summarize(time_value = seq.Date(as.Date(min(time_value)),
-                                    as.Date(max(time_value)),
-                                    by = "day")) %>% ungroup()
+    dplyr::summarize(time_value = seq.Date(as.Date(min(time_value)),
+                                           as.Date(max(time_value)),
+                                           by = "day")) %>%
+    dplyr::ungroup()
   z = dplyr::full_join(z, z_all, by = c("geo_value", "time_value"))
 
   # Perform time shifts, then compute appropriate correlations and return

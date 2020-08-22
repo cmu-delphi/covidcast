@@ -95,7 +95,8 @@ ggplot(df_cor, aes(x = time_value, y = value)) +
 ```
 
 We can see that, for the most part, shifting the cases time series forward by 10
-days improves correlations.
+days improves correlations, showing that cases are better correlated with deaths
+10 days from now.
 
 We can also look at Spearman (rank) correlation, which is a more robust measure 
 of correlation: it's invariant to monotone transformations, and doesn't rely on
@@ -142,19 +143,15 @@ ggplot(df_cor, aes(value)) +
   geom_density(aes(color = Shift, fill = Shift), alpha = 0.5) + 
   labs(title = "Correlation between cases and deaths",
        subtitle = "Computed separately for each county, over all times",
-       x = "Date", y = "Density")
+       x = "Date", y = "Density") +
   theme(legend.position = "bottom")
-```
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(fig.width = 10, fig.height = 8)
 ```
 
 Using some tricks, we can attach the necessary properties to the data frame so
 we can plot these correlations in space as a choropleth map, using
 `plot.covidcast_signal()`:
 
-```{r}
+```{r, fig.width=10, fig.height=8}
 # Set a bunch of fields so that the data frame knows how to plot itself
 df_cor2$time_value = start_day
 df_cor2$issue = start_day
@@ -172,7 +169,7 @@ You could also imagine trying to move the signals with various lags to see at
 what lag one signal is most correlated with the other. A simple way to achieve
 this:
 
-```{r, message = TRUE, warning = FALSE}
+```{r, message = TRUE, warning = FALSE, fig.width=6, fig.height=4}
 # Loop over values for the time shift, and compute correlations per county
 dt_vec = 0:15
 df_list = vector("list", length(dt_vec))
@@ -186,7 +183,7 @@ for (i in 1:length(dt_vec)) {
 df = do.call(rbind, df_list)
 df %>%
   group_by(dt) %>%
-  summarize(median = median(value, na.rm = TRUE, .groups = "drop_last")) %>%
+  summarize(median = median(value, na.rm = TRUE), .groups = "drop_last") %>%
   ggplot(aes(x = dt, y = median)) + geom_line() + geom_point() +
   labs(title = "Median correlation between cases and deaths",
        x = "Shift", y = "Correlation") +

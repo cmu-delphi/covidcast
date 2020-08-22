@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -57,6 +57,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/correlation-utils.html">Correlation utilities</a>
+    </li>
+    <li>
       <a href="../articles/plotting-signals.html">Plotting and mapping signals</a>
     </li>
   </ul>
@@ -88,7 +91,7 @@
       <h1 data-toc-skip>Plotting and mapping signals</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cmu-delphi/covidcast/blob/master/../../vignettes/plotting-signals.Rmd"><code>../../vignettes/plotting-signals.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmu-delphi/covidcast/blob/master/vignettes/plotting-signals.Rmd"><code>vignettes/plotting-signals.Rmd</code></a></small>
       <div class="hidden name"><code>plotting-signals.Rmd</code></div>
 
     </div>
@@ -100,70 +103,69 @@
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">covidcast</span>)
 
 <span class="no">df_comb</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
-    <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="st">"indicator-combination"</span>, <span class="st">"nmf_day_doc_fbc_fbs_ght"</span>,
-                     <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-07-01"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-14"</span>,
-                     <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"county"</span>)
+  <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"indicator-combination"</span>,
+                   <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"nmf_day_doc_fbc_fbs_ght"</span>,
+                   <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-07-01"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-14"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">df_comb</span>)</pre></body></html></div>
-<pre><code>## A `covidcast_signal` data frame with 28440 rows and 10 columns.
+<pre><code>## A `covidcast_signal` data frame with 28921 rows and 10 columns.
 ## 
-## signals     : indicator-combination:nmf_day_doc_fbc_fbs_ght
+## data_source : indicator-combination
+## signal      : nmf_day_doc_fbc_fbs_ght
 ## geo_type    : county
 ## 
-## first date                           : 2020-07-01
-## last date                            : 2020-07-14
-## median number of geo_values per day  : 2027</code></pre>
+## first date                          : 2020-07-01
+## last date                           : 2020-07-14
+## median number of geo_values per day : 2064</code></pre>
 <div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">df_inum</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
-    <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"indicator-combination"</span>,
-                     <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"confirmed_7dav_incidence_num"</span>,
-                     <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-07-01"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-14"</span>,
-                     <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"county"</span>)
+  <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"jhu-csse"</span>,
+                   <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"confirmed_7dav_incidence_num"</span>,
+                   <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-07-01"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-14"</span>)
 )
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">df_inum</span>)</pre></body></html></div>
-<pre><code>## A `covidcast_signal` data frame with 6 rows and 10 columns.
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">df_inum</span>)</pre></body></html></div>
+<pre><code>## A `covidcast_signal` data frame with 44744 rows and 10 columns.
 ## 
-## signals     : indicator-combination:confirmed_7dav_incidence_num
+## data_source : jhu-csse
+## signal      : confirmed_7dav_incidence_num
 ## geo_type    : county
 ## 
-##   geo_value time_value direction      issue lag     value stderr sample_size
-## 1     01000 2020-07-01         0 2020-07-07   6  0.000000     NA          NA
-## 2     01001 2020-07-01         0 2020-07-07   6 12.000000     NA          NA
-## 3     01003 2020-07-01         0 2020-07-07   6 34.142857     NA          NA
-## 4     01005 2020-07-01         0 2020-07-07   6  5.428571     NA          NA
-## 5     01007 2020-07-01         0 2020-07-07   6  4.714286     NA          NA
-## 6     01009 2020-07-01         0 2020-07-07   6  7.142857     NA          NA
-##             data_source                       signal
-## 1 indicator-combination confirmed_7dav_incidence_num
-## 2 indicator-combination confirmed_7dav_incidence_num
-## 3 indicator-combination confirmed_7dav_incidence_num
-## 4 indicator-combination confirmed_7dav_incidence_num
-## 5 indicator-combination confirmed_7dav_incidence_num
-## 6 indicator-combination confirmed_7dav_incidence_num</code></pre>
+## first date                          : 2020-07-01
+## last date                           : 2020-07-14
+## median number of geo_values per day : 3196</code></pre>
 <div id="choropleth-maps" class="section level2">
 <h2 class="hasAnchor">
 <a href="#choropleth-maps" class="anchor"></a>Choropleth maps</h2>
 <p>The default <code>plot</code> method for <code>covidcast_signal</code> objects, <code><a href="../reference/plot.covidcast_signal.html">plot.covidcast_signal()</a></code>, produces choropleth maps by using <code>ggplot2</code> and the <code>usmap</code> package:</p>
 <div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">df_comb</span>)</pre></body></html></div>
 <p><img src="plotting-signals_files/figure-html/unnamed-chunk-3-1.png" width="960"></p>
-<p>The color scheme is automatically chosen to be similar to that used on the online <a href="https://covidcast.cmu.edu">COVIDcast mapping tool</a>. Also, by default, this map shows the most recent day of data available in the data frame. One can choose the day and also choose the color scales and title:</p>
+<p>The color scheme is automatically chosen to be similar to that used on the online <a href="https://covidcast.cmu.edu">COVIDcast mapping tool</a>. Also, by default, this map shows the most recent day of data available in the data frame. One can choose the day and also choose the color scales, transparency level for mega counties, and title:</p>
 <div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">df_comb</span>, <span class="kw">time_value</span> <span class="kw">=</span> <span class="st">"2020-07-04"</span>, <span class="kw">choro_col</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html">cm.colors</a></span>(<span class="fl">10</span>), <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.4</span>,
      <span class="kw">title</span> <span class="kw">=</span> <span class="st">"Combination of COVID-19 Indicators on 2020-07-04"</span>)</pre></body></html></div>
 <p><img src="plotting-signals_files/figure-html/unnamed-chunk-4-1.png" width="960"></p>
-<p>The API also provides a “direction” signal indicating if the signal is trending upward or downward, and we can map the directions:</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">df_inum</span>, <span class="kw">direction</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
-     <span class="kw">title</span> <span class="kw">=</span> <span class="st">"Change in incident cases on 2020-07-14"</span>)</pre></body></html></div>
-<p><img src="plotting-signals_files/figure-html/unnamed-chunk-5-1.png" width="960"></p>
 <p>By providing <code>breaks</code> and <code>colors</code>, we can create custom color scales, for example to have a log-spaced color scale for incident case counts:</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">breaks</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">5</span>, <span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">50</span>, <span class="fl">100</span>, <span class="fl">200</span>)
-<span class="no">colors</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"#D3D3D3"</span>, <span class="st">"#FFFFCC"</span>, <span class="st">"#FEDDA2"</span>, <span class="st">"#FDBB79"</span>, <span class="st">"#FD9950"</span>, <span class="st">"#EB7538"</span>, <span class="st">"#C74E32"</span>,
-            <span class="st">"#A3272C"</span>, <span class="st">"#800026"</span>)
+<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="no">breaks</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">5</span>, <span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">50</span>, <span class="fl">100</span>, <span class="fl">200</span>)
+<span class="no">colors</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"#D3D3D3"</span>, <span class="st">"#FFFFCC"</span>, <span class="st">"#FEDDA2"</span>, <span class="st">"#FDBB79"</span>, <span class="st">"#FD9950"</span>, <span class="st">"#EB7538"</span>,
+            <span class="st">"#C74E32"</span>, <span class="st">"#A3272C"</span>, <span class="st">"#800026"</span>)
 
-<span class="co"># Note that length(breaks) == length(colors) by design. This is interpreted so that we</span>
-<span class="co"># we assign colors[i] iff the value satisfies: breaks[i] &lt;= value &lt; breaks[i+1], where</span>
-<span class="co"># we take breaks[N] = Inf, for N = length(breaks)</span>
+<span class="co"># Note that length(breaks) == length(colors) by design. This works as follows: </span>
+<span class="co"># we assign colors[i] iff the value satisfies breaks[i] &lt;= value &lt; breaks[i+1], </span>
+<span class="co"># where we take breaks[0] = -Inf and breaks[N+1] = Inf, for N = length(breaks)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">df_inum</span>, <span class="kw">choro_col</span> <span class="kw">=</span> <span class="no">colors</span>, <span class="kw">choro_params</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">breaks</span> <span class="kw">=</span> <span class="no">breaks</span>),
-     <span class="kw">title</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"New COVID Cases (7 Day Trailing Average) on"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="no">df_inum</span>$<span class="no">time_value</span>)))</pre></body></html></div>
+     <span class="kw">title</span> <span class="kw">=</span> <span class="st">"New COVID Cases (7 Day Trailing Average) on 2020-07-14"</span>)</pre></body></html></div>
+<p><img src="plotting-signals_files/figure-html/unnamed-chunk-5-1.png" width="960"></p>
+<p>Lastly, we show how we can use custom breaks to (visually) answer the question: which counties have cumulative case rates of at least 1/100?</p>
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">df_cprop</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
+  <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"jhu-csse"</span>,
+                   <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"confirmed_cumulative_prop"</span>,
+                   <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-07-01"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-14"</span>)
+)
+
+<span class="no">breaks</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1000</span>)
+<span class="no">colors</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"#D3D3D3"</span>, <span class="st">"#FFC0CB"</span>)
+
+<span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">df_cprop</span>, <span class="kw">choro_col</span> <span class="kw">=</span> <span class="no">colors</span>, <span class="kw">choro_params</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">breaks</span> <span class="kw">=</span> <span class="no">breaks</span>, <span class="kw">legend_width</span> <span class="kw">=</span> <span class="fl">5</span>),
+     <span class="kw">title</span> <span class="kw">=</span> <span class="st">"Cumulative COVID Cases per 100k People on 2020-07-14"</span>)</pre></body></html></div>
 <p><img src="plotting-signals_files/figure-html/unnamed-chunk-6-1.png" width="960"></p>
 </div>
 <div id="bubble-maps" class="section level2">
@@ -177,13 +179,16 @@
 <p><img src="plotting-signals_files/figure-html/unnamed-chunk-8-1.png" width="960"></p>
 <p>As a final example, suppose we want to plot only counties in the state of Texas. We’d like to compare counts per 100,000 against absolute counts, so we fetch the proportion signal:</p>
 <div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="no">df_iprop</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
-    <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"indicator-combination"</span>,
-                     <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"confirmed_7dav_incidence_prop"</span>,
-                     <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-07-04"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-14"</span>)
+  <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"jhu-csse"</span>,
+                   <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"confirmed_7dav_incidence_prop"</span>,
+                   <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-07-01"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-14"</span>)
 )</pre></body></html></div>
 <p>Then we make two maps side-by-side with custom ranges:</p>
-<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">breaks1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">10</span>, <span class="fl">100</span>, <span class="fl">1000</span>)
+<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">gridExtra</span>)
+
+<span class="no">breaks1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">10</span>, <span class="fl">100</span>, <span class="fl">1000</span>)
 <span class="no">breaks2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">10</span>, <span class="fl">50</span>, <span class="fl">100</span>, <span class="fl">500</span>)
+
 <span class="no">p1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">df_inum</span>, <span class="kw">plot_type</span> <span class="kw">=</span> <span class="st">"bubble"</span>, <span class="kw">bubble_params</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">breaks</span> <span class="kw">=</span> <span class="no">breaks1</span>, <span class="kw">max_size</span> <span class="kw">=</span> <span class="fl">6</span>),
            <span class="kw">include</span> <span class="kw">=</span> <span class="st">"TX"</span>, <span class="kw">bubble_col</span> <span class="kw">=</span> <span class="st">"red"</span>,
            <span class="kw">title</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"Incidence Number on"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="no">df_inum</span>$<span class="no">time_value</span>)))
@@ -191,47 +196,84 @@
            <span class="kw">include</span> <span class="kw">=</span> <span class="st">"TX"</span>, <span class="kw">bubble_col</span> <span class="kw">=</span> <span class="st">"red"</span>,
            <span class="kw">title</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"Incidence Proportion on"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="no">df_iprop</span>$<span class="no">time_value</span>)))
 
-<span class="kw pkg">gridExtra</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html">grid.arrange</a></span>(<span class="no">p1</span>, <span class="no">p2</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">1</span>)</pre></body></html></div>
-<p><img src="plotting-signals_files/figure-html/unnamed-chunk-10-1.png" width="960"></p>
+<span class="fu"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html">grid.arrange</a></span>(<span class="no">p1</span>, <span class="no">p2</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">1</span>)</pre></body></html></div>
+<p><img src="plotting-signals_files/figure-html/unnamed-chunk-11-1.png" width="960"></p>
 </div>
 <div id="time-series-plots" class="section level2">
 <h2 class="hasAnchor">
 <a href="#time-series-plots" class="anchor"></a>Time series plots</h2>
 <p>Let’s fetch the combination indicator and case counts, but for all states rather than for all counties. This will make the time series plots more manageable.</p>
 <div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>({
-    <span class="no">df_comb_st</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"indicator-combination"</span>,
-                                  <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"nmf_day_doc_fbc_fbs_ght"</span>,
-                                  <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>,
-                                  <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-04-15"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-01"</span>)
-    <span class="no">df_inum_st</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"indicator-combination"</span>,
-                                   <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"confirmed_7dav_incidence_num"</span>,
-                                   <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>,
-                                   <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-04-15"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-01"</span>)
+  <span class="no">df_comb_st</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"indicator-combination"</span>,
+                                 <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"nmf_day_doc_fbc_fbs_ght"</span>,
+                                 <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-04-15"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-01"</span>,
+                                 <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>)
+  <span class="no">df_inum_st</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"jhu-csse"</span>,
+                                 <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"confirmed_7dav_incidence_num"</span>,
+                                 <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-04-15"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-01"</span>,
+                                 <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>)
 })</pre></body></html></div>
 <p>By default, time series plots show all available data, including all geographies. A line for every state would be unmanageable, so let’s select a few states and plot all data for them:</p>
 <div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
 
 <span class="no">states</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"ca"</span>, <span class="st">"pa"</span>, <span class="st">"tx"</span>, <span class="st">"ny"</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">df_comb_st</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">geo_value</span> <span class="kw">%in%</span> <span class="no">states</span>), <span class="kw">plot_type</span> <span class="kw">=</span> <span class="st">"line"</span>)</pre></body></html></div>
-<p><img src="plotting-signals_files/figure-html/unnamed-chunk-13-1.png" width="768"></p>
+<p><img src="plotting-signals_files/figure-html/unnamed-chunk-14-1.png" width="768"></p>
 <div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">df_inum_st</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">geo_value</span> <span class="kw">%in%</span> <span class="no">states</span>), <span class="kw">plot_type</span> <span class="kw">=</span> <span class="st">"line"</span>)</pre></body></html></div>
-<p><img src="plotting-signals_files/figure-html/unnamed-chunk-13-2.png" width="768"></p>
-<p>Notice how in Texas, the combined indicator rose several weeks in advance of confirmed cases, suggesting the signal could be predictive. Delphi is investigating these signals for their usefulness in forecasting and will publish results when they are available.</p>
-<div id="custom-time-series-plots" class="section level3">
-<h3 class="hasAnchor">
-<a href="#custom-time-series-plots" class="anchor"></a>Custom time series plots</h3>
+<p><img src="plotting-signals_files/figure-html/unnamed-chunk-14-2.png" width="768"></p>
+<p>Notice how in Texas, the combined indicator rose several weeks in advance of confirmed cases, suggesting the signal could be predictive. Delphi is investigating these signals for their usefulness in forecasting, as well as hotspot detection and will publish results when they are available.</p>
+</div>
+<div id="manual-plotting" class="section level2">
+<h2 class="hasAnchor">
+<a href="#manual-plotting" class="anchor"></a>Manual plotting</h2>
 <p>Using <code>ggplot2</code> or your favorite plotting package, we can easily plot time series manually, without using the <code><a href="../reference/plot.covidcast_signal.html">plot.covidcast_signal()</a></code> method. You can use this to customize the appearance of your plots however you choose.</p>
-<p>For example,</p>
+<p>For example:</p>
 <div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">df_inum_st</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">geo_value</span> <span class="kw">==</span> <span class="st">"pa"</span>),
-       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">time_value</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">value</span>, <span class="kw">color</span> <span class="kw">=</span> <span class="no">geo_value</span>)) +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">"Date"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"Daily confirmed cases"</span>,
-         <span class="kw">title</span> <span class="kw">=</span> <span class="st">"Confirmed cases"</span>, <span class="kw">color</span> <span class="kw">=</span> <span class="st">"State"</span>)</pre></body></html></div>
-<p><img src="plotting-signals_files/figure-html/unnamed-chunk-14-1.png" width="768"></p>
-<p>This graph makes the peaks of the pandemic apparent; by loading other data sources from the API, such as cases and deaths, we could begin to conduct analyses comparing the time series against each other.</p>
-</div>
+<span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>({
+  <span class="no">df_comb_md</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"indicator-combination"</span>,
+                                 <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"nmf_day_doc_fbc_fbs_ght"</span>,
+                                 <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-06-01"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-15"</span>,
+                                 <span class="kw">geo_values</span> <span class="kw">=</span> <span class="fu"><a href="../reference/name_to_fips.html">name_to_fips</a></span>(<span class="st">"Miami-Dade"</span>))
+  <span class="no">df_inum_md</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"jhu-csse"</span>,
+                                 <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"confirmed_7dav_incidence_num"</span>,
+                                 <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-06-01"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-15"</span>,
+                                 <span class="kw">geo_values</span> <span class="kw">=</span> <span class="fu"><a href="../reference/name_to_fips.html">name_to_fips</a></span>(<span class="st">"Miami-Dade"</span>))
+})
+
+<span class="co"># Compute the ranges of the two signals</span>
+<span class="no">range1</span> <span class="kw">&lt;-</span> <span class="no">df_inum_md</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="st">"value"</span>) <span class="kw">%&gt;%</span> <span class="no">range</span>
+<span class="no">range2</span> <span class="kw">&lt;-</span> <span class="no">df_comb_md</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="st">"value"</span>) <span class="kw">%&gt;%</span> <span class="no">range</span>
+
+<span class="co"># Function to transform from one range to another</span>
+<span class="no">trans</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>, <span class="no">from_range</span>, <span class="no">to_range</span>) {
+  (<span class="no">x</span> - <span class="no">from_range</span>[<span class="fl">1</span>]) / (<span class="no">from_range</span>[<span class="fl">2</span>] - <span class="no">from_range</span>[<span class="fl">1</span>]) *
+    (<span class="no">to_range</span>[<span class="fl">2</span>] - <span class="no">to_range</span>[<span class="fl">1</span>]) + <span class="no">to_range</span>[<span class="fl">1</span>]
+}
+
+<span class="co"># Convenience functions for our two signal ranges</span>
+<span class="no">trans12</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>) <span class="fu">trans</span>(<span class="no">x</span>, <span class="no">range1</span>, <span class="no">range2</span>)
+<span class="no">trans21</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>) <span class="fu">trans</span>(<span class="no">x</span>, <span class="no">range2</span>, <span class="no">range1</span>)
+
+<span class="co"># Transform the combined signal to the incidence range, then stack</span>
+<span class="co"># these rowwise into one data frame</span>
+<span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span>(<span class="no">df_comb_md</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate_all.html">mutate_at</a></span>(<span class="st">"value"</span>, <span class="no">trans21</span>),
+                   <span class="no">df_inum_md</span>), <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"time_value"</span>, <span class="st">"value"</span>))
+<span class="no">df</span>$<span class="no">signal</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"Combined indicator"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">df_comb_md</span>)),
+               <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"New COVID-19 cases"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">df_inum_md</span>)))
+
+<span class="co"># Finally, plot both signals</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">time_value</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">value</span>)) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">"Date"</span>, <span class="kw">title</span> <span class="kw">=</span> <span class="st">"Miami-Dade County"</span>) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">signal</span>)) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span>(
+    <span class="kw">name</span> <span class="kw">=</span> <span class="st">"New COVID-19 cases (7-day trailing avg)"</span>,
+    <span class="kw">sec.axis</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/sec_axis.html">sec_axis</a></span>(<span class="no">trans12</span>, <span class="kw">name</span> <span class="kw">=</span> <span class="st">"Combination of COVID-19 indicators"</span>)
+  ) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">legend.position</span> <span class="kw">=</span> <span class="st">"bottom"</span>,
+        <span class="kw">legend.title</span> <span class="kw">=</span> <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span>())</pre></body></html></div>
+<p><img src="plotting-signals_files/figure-html/unnamed-chunk-15-1.png" width="768"></p>
+<p>Again, we see that the combined indicator starts rising several days before the new COVID-19 cases do, an exciting phenomenon that Delphi is studying now.</p>
 </div>
   </div>
 

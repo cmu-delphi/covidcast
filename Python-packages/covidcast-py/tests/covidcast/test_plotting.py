@@ -2,6 +2,9 @@ import os
 
 import geopandas as gpd
 import matplotlib
+
+matplotlib.use("agg")
+
 import pandas as pd
 from covidcast import plotting
 import numpy as np
@@ -10,7 +13,6 @@ SHAPEFILE_PATHS = {"county": "../../covidcast/shapefiles/cb_2019_us_county_5m.zi
                    "state": "../../covidcast/shapefiles/cb_2019_us_state_5m.zip"}
 
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
-
 
 
 def test_plot_choropleth():
@@ -24,7 +26,7 @@ def test_plot_choropleth():
     data = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
     # load expected array and compare
     expected = np.load(os.path.join(CURRENT_PATH, "../reference_data/expected_plot_array.npz"))
-    np.array_equal(data, expected["expected"])
+    assert np.array_equal(data, expected["expected"])
 
 
 def test_get_geo_df():

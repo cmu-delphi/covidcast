@@ -12,9 +12,9 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import pkg_resources
-from covidcast import covidcast
-from covidcast.covidcast import _detect_metadata
 from matplotlib import pyplot as plt
+
+from .covidcast import _detect_metadata, _signal_metadata
 
 SHAPEFILE_PATHS = {"county": "shapefiles/cb_2019_us_county_5m.zip",
                    "state": "shapefiles/cb_2019_us_state_5m.zip"}
@@ -33,19 +33,20 @@ def plot_choropleth(data: pd.DataFrame,
     :param kwargs: optional keyword arguments passed to plot()
     :return: GeoDF with polygon info. Same as get_geo_df()
     """
-    data_source, signal, geo_type = covidcast._detect_metadata(data)  # pylint: disable=W0212
-    meta = covidcast._signal_metadata(data_source, signal, geo_type)  # pylint: disable=W0212
+    data_source, signal, geo_type = _detect_metadata(data)  # pylint: disable=W0212
+    meta = _signal_metadata(data_source, signal, geo_type)  # pylint: disable=W0212
     # use most recent date in data if none provided
     day_to_plot = time_value if time_value else max(data.time_value)
     day_data = data.loc[data.time_value == day_to_plot, :]
     data_w_geo = get_geo_df(day_data)
-    fig, ax = plt.subplots(1, figsize=(12.8, 9.6))  # twice MPL default so text doesn't get squished
-    ax.axis("off")
 
     kwargs["vmin"] = kwargs.get("vmin", 0)
     kwargs["vmax"] = kwargs.get("vmax", meta["mean_value"] + 3 * meta["stdev_value"])
     kwargs["cmap"] = kwargs.get("cmap", "YlOrRd")
+    kwargs["figsize"] = kwargs.get("figsize", (12.8, 9.6))
 
+    fig, ax = plt.subplots(1, figsize=kwargs["figsize"])
+    ax.axis("off")
     sm = plt.cm.ScalarMappable(cmap=kwargs["cmap"],
                                norm=plt.Normalize(vmin=kwargs["vmin"], vmax=kwargs["vmax"]))
     plt.title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")

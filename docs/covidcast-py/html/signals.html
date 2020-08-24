@@ -4,8 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fetching data &#8212; COVIDcast API client 0.0.8 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fetching Data &#8212; COVIDcast API client 0.0.8 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -15,7 +15,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Example usage" href="examples.html" />
+    <link rel="next" title="Plotting Data" href="plotting.html" />
     <link rel="prev" title="COVIDcast API client" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -34,14 +34,14 @@
           <div class="body" role="main">
             
   <div class="section" id="fetching-data">
-<h1>Fetching data<a class="headerlink" href="#fetching-data" title="Permalink to this headline">¶</a></h1>
+<h1>Fetching Data<a class="headerlink" href="#fetching-data" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="signals">
 <h2>Signals<a class="headerlink" href="#signals" title="Permalink to this headline">¶</a></h2>
 <p>This package provides one key function to obtain any signal of interest as a
-Pandas data frame. Detailed examples are provided in the <a class="reference internal" href="examples.html#example-usage"><span class="std std-ref">usage examples</span></a>.</p>
+Pandas data frame. Detailed examples are provided in the <a class="reference internal" href="getting_started.html#getting-started"><span class="std std-ref">usage examples</span></a>.</p>
 <dl class="py function">
 <dt id="covidcast.signal">
-<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">signal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_source</span></em>, <em class="sig-param"><span class="n">signal</span></em>, <em class="sig-param"><span class="n">start_day</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">end_day</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">geo_type</span><span class="o">=</span><span class="default_value">'county'</span></em>, <em class="sig-param"><span class="n">geo_values</span><span class="o">=</span><span class="default_value">'*'</span></em>, <em class="sig-param"><span class="n">as_of</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">issues</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.signal" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">signal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_source</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">signal</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">start_day</span><span class="p">:</span> <span class="n">datetime.date</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">end_day</span><span class="p">:</span> <span class="n">datetime.date</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">geo_type</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'county'</span></em>, <em class="sig-param"><span class="n">geo_values</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>Iterable<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">'*'</span></em>, <em class="sig-param"><span class="n">as_of</span><span class="p">:</span> <span class="n">datetime.date</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">issues</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>datetime.date<span class="p">, </span>Tuple<span class="p">[</span>datetime.date<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>datetime.date<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lag</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>pandas.core.frame.DataFrame<span class="p">]</span><a class="headerlink" href="#covidcast.signal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download a Pandas data frame for one signal.</p>
 <p>Obtains data for selected date ranges for all geographic regions of the
 United States. Available data sources and signals are documented in the
@@ -161,7 +161,7 @@ errors are calculated for specific signals.</p>
 of all signals and their associated metadata:</p>
 <dl class="py function">
 <dt id="covidcast.metadata">
-<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.metadata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#covidcast.metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch COVIDcast surveillance stream metadata.</p>
 <p>Obtains a data frame of metadata describing all publicly available data
 streams from the COVIDcast API. See the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">data source and signals
@@ -222,12 +222,14 @@ signal has ever been reported.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Fetching data</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Fetching Data</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#signals">Signals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#metadata">Metadata</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html">Example usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_examples.html">Plotting Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
@@ -247,7 +249,7 @@ signal has ever been reported.</p>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">COVIDcast API client</a></li>
-      <li>Next: <a href="examples.html" title="next chapter">Example usage</a></li>
+      <li>Next: <a href="plotting.html" title="next chapter">Plotting Data</a></li>
   </ul></li>
 </ul>
 </div>
@@ -277,7 +279,7 @@ signal has ever been reported.</p>
       &copy;2020, Delphi research group.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

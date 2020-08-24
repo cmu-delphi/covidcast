@@ -6,3 +6,4 @@ geopandas
 mypy
 matplotlib
 numpy
+descartes

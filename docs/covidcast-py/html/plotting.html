@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plotting Data &#8212; COVIDcast API client 0.0.8 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Getting Started" href="getting_started.html" />
+    <link rel="prev" title="Fetching Data" href="signals.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="plotting-data">
+<span id="id1"></span><h1>Plotting Data<a class="headerlink" href="#plotting-data" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="prebuilt-choropleths">
+<h2>Prebuilt Choropleths<a class="headerlink" href="#prebuilt-choropleths" title="Permalink to this headline">¶</a></h2>
+<p>This package provides a plotting function that takes a county or state level signal and
+generates a choropleth map. Detailed examples are provided in the <a class="reference internal" href="plot_examples.html#plotting-examples"><span class="std std-ref">usage examples</span></a>.</p>
+<dl class="py function">
+<dt id="covidcast.plot_choropleth">
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">plot_choropleth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">time_value</span><span class="p">:</span> <span class="n">datetime.date</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; geopandas.geodataframe.GeoDataFrame<a class="headerlink" href="#covidcast.plot_choropleth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given the output df of covidcast.signal(), plot a choropleth map.</p>
+<p>Projections:
+ESRI:102003 (USA Contiguous Albers Equal Area Conic) for the contiguous US and Puerto Rico
+ESRI:102006 (Alaska Albers Equal Area Conic) for Alaska
+ESRI:102007 (Hawaii Albers Equal Area Conic) for Hawaii</p>
+<p>For visual purposes, Alaska and Hawaii are moved the lower left corner of the contiguous US
+and Puerto Rico is moved closer to Florida.</p>
+<p>By default, the colormap used is <code class="docutils literal notranslate"><span class="pre">YlOrRd</span></code> and is binned into the signal’s mean value +- 3
+standard deviations. Custom arguments can be passed in as kwargs for customizability. More
+information on these arguments can be found at
+&lt;<a class="reference external" href="https://geopandas.org/reference.html#geopandas.GeoSeries.plot">https://geopandas.org/reference.html#geopandas.GeoSeries.plot</a>&gt;`_</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – DataFrame of values and geographies</p></li>
+<li><p><strong>time_value</strong> – If multiple days of data are present in <code class="docutils literal notranslate"><span class="pre">data</span></code>, map only values from this         day. Defaults to plotting the most recent day of data in <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p></li>
+<li><p><strong>kwargs</strong> – Optional keyword arguments passed to plot()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>GeoDF with polygon info. Same as get_geo_df()</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="geodataframe">
+<h2>GeoDataFrame<a class="headerlink" href="#geodataframe" title="Permalink to this headline">¶</a></h2>
+<p>A function for generating a GeoPandas GeoDataFrame with signal information appended is also
+provided if the user desires more control over their plotting.</p>
+<dl class="py function">
+<dt id="covidcast.get_geo_df">
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">get_geo_df</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">geo_value_col</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'geo_value'</span></em>, <em class="sig-param"><span class="n">geo_type_col</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'geo_type'</span></em><span class="sig-paren">)</span> &#x2192; geopandas.geodataframe.GeoDataFrame<a class="headerlink" href="#covidcast.get_geo_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append signal info to a GeoDataFrame with county/state geometries.</p>
+<p>This method takes in a pandas DataFrame object and returns a GeoDataFrame object from the
+<a class="reference external" href="https://geopandas.org/">geopandas package</a>.</p>
+<p>Shapefiles are 1:5,000,000 scale and sourced from the 2019 US Census Cartographic Boundary Files
+&lt;<a class="reference external" href="https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html">https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html</a>&gt;`__</p>
+<p>After detecting the geography type (either county or state) for the input, loads the
+GeoDataFrame which contains state and geometry information from the Census for that geography
+type. Left joins the input data to this, so all states/counties will always be present
+regardless of the input i.e. the output dimension for a given geo_type is always the same
+regardless of input. Finally, returns the columns containing the input columns along with a
+<cite>geometry</cite> (polygon for plotting) and <cite>state_fips</cite> (FIPS code which will be used in the
+plotting function to rearrange AK and HI) column. Coordinate system is GCS NAD83.</p>
+<p>Default arguments for column names correspond to return of <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a>.
+Currently only supports counties and states.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – DataFrame of values and geographies</p></li>
+<li><p><strong>geo_value_col</strong> – Name of column containing values of interest</p></li>
+<li><p><strong>geo_type_col</strong> – Name of column containing geography type</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>GeoDataFrame of all state and geometry info for given geo type w/ input data appended.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">COVIDcast API client</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="signals.html">Fetching Data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Plotting Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prebuilt-choropleths">Prebuilt Choropleths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#geodataframe">GeoDataFrame</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_examples.html">Plotting Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+
+<hr />
+<ul>
+    
+    <li class="toctree-l1"><a href="https://delphi.cmu.edu/">Delphi group</a></li>
+    
+    <li class="toctree-l1"><a href="https://covidcast.cmu.edu/">COVIDcast maps</a></li>
+    
+    <li class="toctree-l1"><a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a></li>
+    
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="signals.html" title="previous chapter">Fetching Data</a></li>
+      <li>Next: <a href="getting_started.html" title="next chapter">Getting Started</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Delphi research group.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/plotting.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

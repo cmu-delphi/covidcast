@@ -29,11 +29,13 @@ def plot_choropleth(data: pd.DataFrame,
     and Puerto Rico is moved closer to Florida.
 
     By default, the colormap used is ``YlOrRd`` and is binned into the signal's mean value +- 3
-    standard deviations. Custom arguments can be passed in as kwargs for customizability.
+    standard deviations. Custom arguments can be passed in as kwargs for customizability. More
+    information on these arguments can be found at
+    <https://geopandas.org/reference.html#geopandas.GeoSeries.plot>`_
 
     :param data: DataFrame of values and geographies
-    :param time_value: If multiple days of data are present in ``data``, map only values from this
-    day. Defaults to plotting the most recent day of data in ``data``.
+    :param time_value: If multiple days of data are present in ``data``, map only values from this \
+        day. Defaults to plotting the most recent day of data in ``data``.
     :param kwargs: Optional keyword arguments passed to plot()
     :return: GeoDF with polygon info. Same as get_geo_df()
     """

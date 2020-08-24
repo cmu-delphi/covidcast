@@ -63,5 +63,7 @@ Contents
    :maxdepth: 2
 
    signals
-   examples
+   plotting
+   getting_started
+   plot_examples
    changelog

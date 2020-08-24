@@ -7,7 +7,8 @@
 \format{
 A data frame with 2797 rows, each representing one core-based
 statistical area (including metropolitan and micropolitan statistical
-areas). There are many columns. The most crucial are:
+areas, county or county equivalents, and metropolitan divisions). There are
+many columns. The most crucial are:
 
 \describe{
 \item{CBSA}{Core Based Statistical Area code. These are unique identifiers

@@ -2,8 +2,8 @@
 #'
 #' Data set on county populations, from the 2019 US Census.
 #'
-#' @format A data frame with 3193 rows, each representing one county. There are
-#'   many columns. The most crucial are:
+#' @format A data frame with 3193 rows, one for each county (along with the 50
+#'   states and DC). There are many columns. The most crucial are:  
 #'
 #' \describe{
 #'   \item{FIPS}{5-digit county FIPS codes. These are unique identifiers
@@ -28,11 +28,12 @@
 #' Data set on metropolitan area populations, from the 2019 US Census. This
 #' includes metropolitan and micropolitan statistical areas, although the
 #' COVIDcast API only supports fetching data from metropolitan statistical
-#' areas.
+#' areas. 
 #'
 #' @format A data frame with 2797 rows, each representing one core-based
 #'   statistical area (including metropolitan and micropolitan statistical
-#'   areas). There are many columns. The most crucial are:
+#'   areas, county or county equivalents, and metropolitan divisions). There are
+#'   many columns. The most crucial are: 
 #'
 #' \describe{
 #'   \item{CBSA}{Core Based Statistical Area code. These are unique identifiers

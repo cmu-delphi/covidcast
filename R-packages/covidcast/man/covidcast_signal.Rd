@@ -140,22 +140,22 @@ messages for each day of data it downloads. To suppress these, use
 }
 \examples{
 \dontrun{
-## fetch all counties from 2020-05-10 to the most recent available data:
+## Fetch all counties from 2020-05-10 to the most recent available data
 covidcast_signal("fb-survey", "raw_cli", start_day = "20200510")
-## fetch all counties on just 2020-05-10 and no other days
+## Fetch all counties on just 2020-05-10 and no other days
 covidcast_signal("fb-survey", "raw_cli", start_day = "20200510",
                  end_day = "20200510")
-## fetch all states on 2020-05-10, 2020-05-11, 2020-05-12
+## Fetch all states on 2020-05-10, 2020-05-11, 2020-05-12
 covidcast_signal("fb-survey", "raw_cli", start_day = "20200510",
                  end_day = "20200512", geo_type = "state")
-## fetch all available data for just Pennsylvania and New Jersey
+## Fetch all available data for just Pennsylvania and New Jersey
 covidcast_signal("fb-survey", "raw_cli", geo_type = "state",
                  geo_values = c("pa", "nj"))
-## fetch all available data in Pittsburgh metropolitan area (identified by
-## CBSA ID)
+## Fetch all available data in the Pittsburgh metropolitan area
 covidcast_signal("fb-survey", "raw_cli", geo_type = "msa",
-                 geo_values = "38300")
+                 geo_values = name_to_cbsa("Pittsburgh"))
 }
+
 }
 \references{
 COVIDcast API documentation:

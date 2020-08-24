@@ -1,4 +1,4 @@
-## API base url
+# API base url
 COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 
 .onAttach <- function(libname, pkgname) {
@@ -96,6 +96,7 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #'   `time_value` of June 3 will only be included in the results if its data was
 #'   issued or updated on June 6. If `NULL`, the default, return the most
 #'   recently issued data regardless of its lag.
+#' 
 #' @return Data frame with matching data. Each row is one observation of one
 #'   signal on one day in one geographic location. Contains the following
 #'   columns:
@@ -125,6 +126,7 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #'
 #'   Consult the signal documentation for more details on how values and
 #'   standard errors are calculated for specific signals.
+#' 
 #' @references COVIDcast API documentation:
 #'   \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html}
 #'
@@ -132,23 +134,24 @@ COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
 #' \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 #'
 #' COVIDcast public map: \url{https://covidcast.cmu.edu/}
+#'
 #' @examples \dontrun{
-#' ## fetch all counties from 2020-05-10 to the most recent available data:
+#' ## Fetch all counties from 2020-05-10 to the most recent available data
 #' covidcast_signal("fb-survey", "raw_cli", start_day = "20200510")
-#' ## fetch all counties on just 2020-05-10 and no other days
+#' ## Fetch all counties on just 2020-05-10 and no other days
 #' covidcast_signal("fb-survey", "raw_cli", start_day = "20200510",
 #'                  end_day = "20200510")
-#' ## fetch all states on 2020-05-10, 2020-05-11, 2020-05-12
+#' ## Fetch all states on 2020-05-10, 2020-05-11, 2020-05-12
 #' covidcast_signal("fb-survey", "raw_cli", start_day = "20200510",
 #'                  end_day = "20200512", geo_type = "state")
-#' ## fetch all available data for just Pennsylvania and New Jersey
+#' ## Fetch all available data for just Pennsylvania and New Jersey
 #' covidcast_signal("fb-survey", "raw_cli", geo_type = "state",
 #'                  geo_values = c("pa", "nj"))
-#' ## fetch all available data in Pittsburgh metropolitan area (identified by
-#' ## CBSA ID)
+#' ## Fetch all available data in the Pittsburgh metropolitan area
 #' covidcast_signal("fb-survey", "raw_cli", geo_type = "msa",
-#'                  geo_values = "38300")
+#'                  geo_values = name_to_cbsa("Pittsburgh"))
 #' }
+#' 
 #' @seealso [plot.covidcast_signal()], [`county_census`], [`msa_census`],
 #'     [`state_census`]
 #' @export
@@ -221,61 +224,14 @@ covidcast_signal <- function(data_source, signal,
   return(df)
 }
 
-#' Obtain multiple signals in one data frame.
-#'
-#' This convenience function uses `covidcast_signal()` to obtain multiple
-#' signals, potentially from multiple data sources, in one data frame. See the
-#' `covidcast_signal()` documentation for further details.
-#'
-#' Deliberately not exported, because it's unclear how to plot data frames with
-#' multiple signals. Once `plot.covidcast_signal()` supports plotting the
-#' objects returned by `covidcast_signals()`, this function can be exported.
-#'
-#' @param signals Data frame with two columns: `data_source` and `signal`. Each
-#'   row specifies one signal to be fetched from the COVIDcast API.
-#' @inheritParams covidcast_signal
-#' @inherit covidcast_signal return references
-#' @seealso [covidcast_signal()]
-#' @examples
-#' \dontrun{
-#' signals <= data.frame(data_source=c("jhu-csse", "fb-survey"),
-#'                       signal=c("confirmed_incidence_num", "smoothed_cli"))
-#' covidcast_signals(signals, "2020-07-01", "2020-07-14", geo_type="state")
-#' }
-#' @noRd
-covidcast_signals <- function(signals, start_day = NULL, end_day = NULL,
-                              geo_type = c("county", "hrr", "msa", "dma", "state"),
-                              geo_values = "*", as_of = NULL, issues = NULL,
-                              lag = NULL) {
-  N <- nrow(signals)
-  dfs <- vector("list", N)
-  metas <- vector("list", N)
-
-  for (row in seq_len(N)) {
-    df <- covidcast_signal(signals$data_source[row], signals$signal[row],
-                           start_day, end_day, geo_type, geo_values, as_of,
-                           issues, lag)
-    dfs[[row]] <- df
-    metas[[row]] <- attributes(df)$metadata
-  }
-
-  df_out <- dplyr::bind_rows(dfs)
-  meta_out <- dplyr::bind_rows(metas)
-
-  class(df_out) <- c("covidcast_signal", "data.frame")
-  attributes(df_out)$metadata <- meta_out
-  attributes(df_out)$geo_type <- geo_type
-
-  return(df_out)
-}
-
 #' Print `covidcast_signal` objects
 #'
 #' Prints a brief summary of the data source, signal, and geographic level, and
-#' then prints the underlying data frame.
+#' then prints the underlying data frame, for objects returned by
+#' `covidcast_signal()`. 
 #'
-#' @param x The \code{covidcast_signal} object.
-#' @param ... Additional arguments passed to `plot.data.frame()` to print the
+#' @param x The `covidcast_signal` object.
+#' @param ... Additional arguments passed to `print.data.frame()` to print the 
 #'   data.
 #'
 #' @method print covidcast_signal
@@ -283,19 +239,28 @@ covidcast_signals <- function(signals, start_day = NULL, end_day = NULL,
 print.covidcast_signal = function(x, ...) {
   cat(sprintf("A `covidcast_signal` data frame with %i rows and %i columns.\n\n",
               nrow(x), ncol(x)))
-  cat(sprintf("%-12s: %s\n", "signals", unique(paste0(x$data_source, ":", x$signal))))
+  cat(sprintf("%-12s: %s\n", "data_source", x$data_source[1]))
+  cat(sprintf("%-12s: %s\n", "signal", x$signal[1]))
   cat(sprintf("%-12s: %s\n\n", "geo_type", attributes(x)$geo_type))
 
   # forward to print the data as well
   NextMethod("print")
 }
 
+#' @method head covidcast_signal
+#' @importFrom utils head
+#' @export
+head.covidcast_signal = function(x, ...) {
+  head(as.data.frame(x), ...)
+}
+
 #' Summarize `covidcast_signal` objects
 #'
 #' Prints a variety of summary statistics about the underlying data, such as
-#' median values, the date range included, sample sizes, and so on.
+#' median values, the date range included, sample sizes, and so on, for objects
+#' returned by `covidcast_signal()`.
 #'
-#' @param object The \code{covidcast_signal} object.
+#' @param object The `covidcast_signal` object.
 #' @param ... Additional arguments, for compatibility with `summary()`.
 #'   Currently unused.
 #'
@@ -306,11 +271,12 @@ summary.covidcast_signal = function(object, ...) {
   x <- object
   cat(sprintf("A `covidcast_signal` data frame with %i rows and %i columns.\n\n",
               nrow(x), ncol(x)))
-  cat(sprintf("%-12s: %s\n", "signals", unique(paste0(x$data_source, ":", x$signal))))
+  cat(sprintf("%-12s: %s\n", "data_source", x$data_source[1]))
+  cat(sprintf("%-12s: %s\n", "signal", x$signal[1]))
   cat(sprintf("%-12s: %s\n\n", "geo_type", attributes(x)$geo_type))
-  cat(sprintf("%-37s: %s\n", "first date", min(x$time_value)))
-  cat(sprintf("%-37s: %s\n", "last date", max(x$time_value)))
-  cat(sprintf("%-37s: %i\n", "median number of geo_values per day",
+  cat(sprintf("%-36s: %s\n", "first date", min(x$time_value)))
+  cat(sprintf("%-36s: %s\n", "last date", max(x$time_value)))
+  cat(sprintf("%-36s: %i\n", "median number of geo_values per day",
               as.integer(x %>% dplyr::group_by(.data$time_value) %>%
                          dplyr::summarize(num = dplyr::n()) %>%
                          dplyr::summarize(median(.data$num)))))
@@ -319,11 +285,12 @@ summary.covidcast_signal = function(object, ...) {
 #' Plot `covidcast_signal` objects
 #'
 #' Several plot types are provided, including choropleth plots (maps), bubble
-#' plots, and time series plots showing the change of signals over time.
+#' plots, and time series plots showing the change of signals over time, for
+#' objects returned by `covidcast_signal()`.
 #'
-#' @param x The \code{covidcast_signal} object to map or plot. If the object
-#'   contains multiple issues of the same observation, only the most recent
-#'   issue is mapped or plotted.
+#' @param x The `covidcast_signal` object to map or plot. If the object contains
+#'   multiple issues of the same observation, only the most recent issue is
+#'   mapped or plotted. 
 #' @param plot_type One of "choro", "bubble", "line" indicating whether to plot
 #'   a choropleth map, bubble map, or line (time series) graph, respectively.
 #'   The default is "choro".
@@ -370,35 +337,40 @@ summary.covidcast_signal = function(object, ...) {
 #' @param ... Additional arguments, for compatibility with `plot()`. Currently
 #'   unused.
 #'
-#' @details TODO explain all these advanced parameters.
+#' @details The following named arguments are supported through the lists 
+#'   `choro_params`, `bubble_params`, and `line_params`.
 #'
 #' For both choropleth and bubble maps:
-#' \itemize{
-#' \item{`subtitle`}
-#' \item{`missing_col`}
-#' \item{`border_col`}
-#' \item{`border_size`}
-#' \item{`legend_height`}
-#' \item{`legend_width`}
-#' \item{`breaks`}
+#' \describe{
+#' \item{`subtitle`}{Subtitle for the map.}
+#' \item{`missing_col`}{Color assigned to missing or NA geo locations.}
+#' \item{`border_col`}{Border color for geo locations.}
+#' \item{`border_size`}{Border size for geo locations.}
+#' \item{`legend_height`, `legend_width`}{Height and width of the legend.} 
+#' \item{`breaks`}{Breaks for a custom (discrete) color or size scale.  Note
+#'   that we must set `breaks` to be a vector of the same length as `choro_col`
+#'   for choropleth maps. This works as follows: we assign the `i`th color for
+#'   choropleth maps, or the `i`th size for bubble maps, if and only if the
+#'   given value satisfies `breaks[i] <= value < breaks[i+1]`, where we take by 
+#'   convention `breaks[0] = -Inf` and `breaks[N+1] = Inf` for `N =
+#'   length(breaks)`.}   
 #' }
 #'
 #' For choropleth maps only:
-#' \itemize{
-#' \item{`legend_n`}
+#' \describe{
+#' \item{`legend_n`}{Number of values to label on the color bar.}
 #' }
 #'
 #' For bubble maps only:
-#' \itemize{
-#' \item{`remove_zero`}
-#' \item{`min_size`}
-#' \item{`max_size`}
+#' \describe{
+#' \item{`remove_zero`}{Should zeros be excluded from the size scale (hence
+#'   effectively drawn as bubbles of zero size)?}
+#' \item{`min_size`, `max_size`}{Min size for the size scale.}
 #' }
 #'
 #' For line graphs:
-#' \itemize{
-#' \item{`xlab`}
-#' \item{`ylab`}
+#' \describe{
+#' \item{`xlab`, `ylab`}{Labels for the x-axis and y-axis.}
 #' }
 #'
 #' @method plot covidcast_signal
@@ -409,7 +381,7 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
                                   range = NULL,
                                   choro_col = c("#FFFFCC", "#FD893C", "#800026"),
                                   alpha = 0.5, direction = FALSE,
-                                  dir_col = c("#6F9CC6", "#F3EE9E", "#C56B59"),
+                                  dir_col = c("#6F9CC6", "#E4E4E4", "#C56B59"),
                                   bubble_col = "purple", num_bins = 8,
                                   line_col = 1:6,
                                   line_type = rep(1:6, each = length(line_col)),
@@ -417,7 +389,6 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
                                   bubble_params = list(), line_params = list(),
                                   ...) {
   plot_type <- match.arg(plot_type)
-
   x <- latest_issue(x)
 
   # Set range, if we need to (to mean +/- 3 standard deviations, from metadata)
@@ -476,6 +447,63 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
   }
 }
 
+##########
+
+#' Obtain multiple signals in one data frame.
+#'
+#' This convenience function uses `covidcast_signal()` to obtain multiple
+#' signals, potentially from multiple data sources, in one data frame. See the
+#' `covidcast_signal()` documentation for further details.
+#'
+#' Deliberately not exported, because it's unclear how to plot data frames with
+#' multiple signals. Once `plot.covidcast_signal()` supports plotting the
+#' objects returned by `covidcast_signals()`, this function can be exported.
+#'
+#' @param signals Data frame with two columns: `data_source` and `signal`. Each
+#'   row specifies one signal to be fetched from the COVIDcast API.
+#' @inheritParams covidcast_signal
+#' @inherit covidcast_signal return references
+#' @seealso [covidcast_signal()]
+#' @examples
+#' \dontrun{
+#' signals <= data.frame(data_source=c("jhu-csse", "fb-survey"),
+#'                       signal=c("confirmed_incidence_num", "smoothed_cli"))
+#' covidcast_signals(signals, "2020-07-01", "2020-07-14", geo_type="state")
+#' }
+#' @noRd
+covidcast_signals <- function(signals, start_day = NULL, end_day = NULL,
+                              geo_type = c("county", "hrr", "msa", "dma", "state"),
+                              geo_values = "*", as_of = NULL, issues = NULL,
+                              lag = NULL) {
+  N <- nrow(signals)
+  dfs <- vector("list", N)
+  metas <- vector("list", N)
+
+  for (row in seq_len(N)) {
+    df <- covidcast_signal(signals$data_source[row], signals$signal[row],
+                           start_day, end_day, geo_type, geo_values, as_of,
+                           issues, lag)
+    dfs[[row]] <- df
+    metas[[row]] <- attributes(df)$metadata
+  }
+
+  df_out <- dplyr::bind_rows(dfs)
+  meta_out <- dplyr::bind_rows(metas)
+
+  class(df_out) <- c("covidcast_signals", "data.frame")
+  attributes(df_out)$metadata <- meta_out
+  attributes(df_out)$geo_type <- geo_type
+
+  return(df_out)
+}
+
+# TODO add S3 functions for covidcast_signals
+# TODO add covidcast_rbind function or something like that, which rbind's but 
+# preserves attributes appropriately? And doesn't allow you to rbind (or warns,
+# at least), if the geo_type's don't match?
+
+##########
+
 #' Fetch Delphi's COVID-19 Surveillance Streams metadata.
 #'
 #' Obtains a data frame of metadata describing all publicly available data
@@ -502,10 +530,13 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
 #'   \item{max_issue}{The most recent issue date for this signal.}
 #'   \item{min_lag}{Smallest lag from observation to issue, in `time_type` units}
 #'   \item{max_lag}{Largest lag from observation to issue, in `time_type` units}
+#'
 #' @references COVIDcast API sources and signals documentation:
 #'   \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
+#'
+#' @seealso [summary.covidcast_meta()]
+#'
 #' @export
-#' @importFrom dplyr %>%
 covidcast_meta <- function() {
   meta <- .request(list(source='covidcast_meta', cached="true"))
 
@@ -518,18 +549,92 @@ covidcast_meta <- function() {
                   max_time = as.Date(as.character(.data$max_time), format = "%Y%m%d"),
                   max_issue = as.Date(as.character(.data$max_issue), format = "%Y%m%d"))
 
+  class(meta) <- c("covidcast_meta", "data.frame")
   return(meta)
 }
 
-## Helper function, not user-facing, to fetch a single geo-value.
-## covidcast_signal can then loop over multiple geos to produce its result.
+#' Print `covidcast_meta` object
+#'
+#' Prints a brief summary of the metadata, and then prints the underlying data
+#' frame, for objects returned by `covidcast_meta()`.
+#'
+#' @param x The `covidcast_meta` object.
+#' @param ... Additional arguments passed to `print.data.frame()` to print the
+#'   data.
+#'
+#' @method print covidcast_meta
+#' @export
+print.covidcast_meta = function(x, ...) {
+  cat(sprintf("A `covidcast_meta` data frame with %i rows and %i columns.\n\n",
+              nrow(x), ncol(x)))
+  cat(sprintf("%-23s: %s\n", "Number of data sources",
+              length(unique(x$data_source))))
+  cat(sprintf("%-23s: %s\n\n", "Number of signals",
+              length(unique(paste(x$data_source, x$signal)))))
+
+  # forward to print the data as well
+  NextMethod("print")
+}
+
+#' @method head covidcast_meta
+#' @importFrom utils head
+#' @export
+head.covidcast_meta = function(x, ...) {
+  head(as.data.frame(x), ...)
+}
+
+#' Summarize `covidcast_meta` object
+#'
+#' Prints a summary of the metadata returned by `covidcast_meta()`.
+#'
+#' @param object The `covidcast_meta` object.
+#' @param ... Additional arguments, for compatibility with `summary()`.
+#'   Currently unused.
+#'
+#' @method summary covidcast_meta
+#' @export
+summary.covidcast_meta = function(object, ...) {
+  x <- object
+  cat(sprintf("A `covidcast_meta` data frame with %i rows and %i columns.\n\n",
+              nrow(x), ncol(x)))
+  cat(sprintf("%-23s: %s\n", "Number of data sources",
+              length(unique(x$data_source))))
+  cat(sprintf("%-23s: %s\n\n", "Number of signals",
+              length(unique(paste(x$data_source, x$signal)))))
+  cat("Summary:\n\n")
+  df <- suppressMessages(
+    meta %>% dplyr::group_by(data_source, signal) %>%
+    dplyr::summarize(county = ifelse("county" %in% geo_type, "*", ""),
+                     msa = ifelse("msa" %in% geo_type, "*", ""),
+                     hrr = ifelse("hrr" %in% geo_type, "*", ""),
+                     state = ifelse("state" %in% geo_type, "*", ""),
+                     min_time = max(min_time),
+                     max_time = min(max_time)) %>%
+    dplyr::ungroup
+  )
+  print(as.data.frame(df), right = FALSE, row.names = FALSE)
+  invisible(df)
+  
+  # TODO should we do anything more intelligent here in summarizing min_time and
+  # max_time?  Currently it looks to me (based on the metadata on 08/18/2020)
+  # these are always equal across all geo_type's, for a given data_source x
+  # signal pair. (In other words, data became available at all geographies at
+  # the same time.)  The way I've implemented above is a bit of a safeguard for
+  # when this is not the case---it returns the last min_time, and the first
+  # max_time, so it's a conversative way to report these.
+}
+
+##########
+
+# Helper function, not user-facing, to fetch a single geo-value.
+# covidcast_signal can then loop over multiple geos to produce its result.
 single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_value,
                        as_of, issues, lag) {
   ndays <- as.numeric(end_day - start_day)
   dat <- list()
 
-  ## The API limits the number of rows that can be returned at once, so we query
-  ## each day separately.
+  # The API limits the number of rows that can be returned at once, so we query
+  # each day separately.
   for (i in seq(ndays + 1)) {
     day <- date_to_string(start_day + i - 1)
     dat[[i]] <- covidcast(data_source = data_source,
@@ -570,31 +675,7 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_va
   return(df)
 }
 
-#' Fetch only the latest issue for each observation in a data frame.
-#'
-#' Since `covidcast_signal()` can, with the right options, return multiple
-#' issues for a single observation in a single geo, we may want only the most
-#' recent for plotting, mapping, or other purposes.
-#' @param df A `covidcast_signal` data frame
-#' @return The same `covidcast_signal` data frame, but with only the latest
-#'     issue of every observation
-#' @importFrom rlang .data
-#' @keywords internal
-latest_issue <- function(df) {
-  # Preserve the attributes, since grouping overwrites them
-  attrs <- attributes(df)
-
-  df <- df %>%
-    dplyr::group_by(.data$geo_value, .data$time_value) %>%
-    dplyr::filter(.data$issue == max(.data$issue)) %>%
-    dplyr::ungroup()
-
-  attributes(df) <- attrs
-
-  return(df)
-}
-
-## Fetch Delphi's COVID-19 Surveillance Streams
+# Fetch Delphi's COVID-19 Surveillance Streams
 covidcast <- function(data_source, signal, time_type, geo_type, time_values,
                       geo_value, as_of, issues, lag) {
   # Check parameters

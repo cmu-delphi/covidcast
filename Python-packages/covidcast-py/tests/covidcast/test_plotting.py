@@ -22,6 +22,11 @@ def test_get_geo_df():
     assert output.shape == (3233, test_input.shape[1]+2)
     assert not any(pd.isna(output.geometry))
 
+    # test counties w/ right join
+    output = plotting.get_geo_df(test_input, join_type="left")
+    assert output.shape == (3, test_input.shape[1]+2)
+    assert sum(pd.isna(output.geometry)) == 1  # one megacounty should be nan
+
     # test states
     test_input["geo_type"] = "state"
     output = plotting.get_geo_df(test_input)
@@ -32,6 +37,14 @@ def test_get_geo_df():
     assert set(output.columns) == {"geo_value", "value", "geo_type", "signal",
                                    "data_source", "geometry", "state_fips"}
 
+    # test a non county or state geo_type
+    with pytest.raises(ValueError):
+        plotting.get_geo_df(pd.DataFrame(
+            {"geo_value": ["a"], "geo_type": ["b"], "signal": ["c"], "data_source": ["d"]}))
+    # test_duplicate_values
+    with pytest.raises(ValueError):
+        plotting.get_geo_df(pd.DataFrame({"geo_value": ["24510", "24510"]}))
+
 
 def test__join_state_geo_df():
     # TODO? generate expected output shapefile+metadata files for tests
@@ -41,12 +54,15 @@ def test__join_state_geo_df():
     output = plotting._join_state_geo_df(test_input, "state_code", geo_info)
     # test output df is the right dimensions
     assert output.shape == (56, test_input.shape[1]+10)
-    # verify values right
+    # verify values correct
     assert output.loc[output.STUSPS == "ca", "value"].iloc[0] == 1.5
     assert output.loc[output.STUSPS == "al", "value"].iloc[0] == 2.5
     assert output.loc[output.STUSPS == "ak", "value"].iloc[0] == 3
     # test all polygons populated
     assert not any(pd.isna(output.geometry))
+    # test left join
+    output = plotting._join_state_geo_df(test_input, "state_code", geo_info, "left")
+    assert output.shape == (3, test_input.shape[1]+10)
 
 
 def test__join_county_geo_df():
@@ -59,4 +75,8 @@ def test__join_county_geo_df():
     assert output.loc[output.GEOID == "31169", "value"].iloc[0] == 2.5
     assert output.loc[output.GEOID == "37077", "value"].iloc[0] == 3
     assert not any(pd.isna(output.geometry))
+
+    output = plotting._join_county_geo_df(test_input, "county_code", geo_info, "left")
+    # less columns since no megacounty joined, which adds extra state and value cols
+    assert output.shape == (3, test_input.shape[1]+11)
 

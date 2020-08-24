@@ -23,15 +23,24 @@ SHAPEFILE_PATHS = {"county": "shapefiles/cb_2019_us_county_5m.zip",
 def plot_choropleth(data: pd.DataFrame,
                     time_value: date = None,
                     **kwargs) -> gpd.GeoDataFrame:
-    """Given the output df of covidcast.signal(), plot the choropleth.
+    """Given the output df of covidcast.signal(), plot a choropleth map.
 
-    Plot is in a style similar to the website https://covidcast.cmu.edu.
+    Projections:
+    ESRI:102003 (USA Contiguous Albers Equal Area Conic) for the contiguous US and Puerto Rico
+    ESRI:102006 (Alaska Albers Equal Area Conic) for Alaska
+    ESRI:102007 (Hawaii Albers Equal Area Conic) for Hawaii
 
-    :param data: DataFrame of values and geographies
+    For visual purposes, Alaska and Hawaii are moved the lower left corner of the contiguous US
+    and Puerto Rico is moved closer to Florida.
+
+    By default, the colormap used is ``YlOrRd`` and is binned into the signal's mean value +- 3
+    standard deviations. Custom arguments can be passed in as kwargs for customizability.
+
+    :param data: DataFrame of values and geographies.
     :param time_value: If multiple days of data are present in ``data``, map only values from this
     day. Defaults to plotting the most recent day of data in ``data``.
-    :param kwargs: optional keyword arguments passed to plot()
-    :return: GeoDF with polygon info. Same as get_geo_df()
+    :param kwargs: Optional keyword arguments passed to plot().
+    :return: Matplotlib figure object.
     """
     data_source, signal, geo_type = _detect_metadata(data)  # pylint: disable=W0212
     meta = _signal_metadata(data_source, signal, geo_type)  # pylint: disable=W0212
@@ -60,10 +69,13 @@ def plot_choropleth(data: pd.DataFrame,
 def get_geo_df(data: pd.DataFrame,
                geo_value_col: str = "geo_value",
                geo_type_col: str = "geo_type") -> gpd.GeoDataFrame:
-    """Append polygons to a dataframe for a given geography and return a geoDF with this info.
+    """Append signal info to a GeoDataFrame with county/state geometries.
 
     This method takes in a pandas DataFrame object and returns a GeoDataFrame object from the
     `geopandas package <https://geopandas.org/>`__.
+
+    Shapefiles are 1:5,000,000 scale and sourced from the 2019 US Census Cartographic Boundary Files
+    <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`__
 
     After detecting the geography type (either county or state) for the input, loads the
     GeoDataFrame which contains state and geometry information from the Census for that geography
@@ -76,9 +88,9 @@ def get_geo_df(data: pd.DataFrame,
     Default arguments for column names correspond to return of :py:func:`covidcast.signal`.
     Currently only supports counties and states.
 
-    :param data: DataFrame of values and geographies
-    :param geo_value_col: name of column containing values of interest
-    :param geo_type_col: name of column containing geography type
+    :param data: DataFrame of values and geographies.
+    :param geo_value_col: Name of column containing values of interest.
+    :param geo_type_col: Name of column containing geography type.
     :return: GeoDataFrame of all state and geometry info for given geo type w/ input data appended.
     """
     geo_type = _detect_metadata(data, geo_type_col)[2]  # pylint: disable=W0212
@@ -103,16 +115,11 @@ def _project_and_transform(data: gpd.GeoDataFrame) -> Tuple:
     Given GeoDF with state fips column, break into Continental US, Alaska, Puerto Rico, and Hawaii
     GeoDFs with their own Albers Equal Area Conic Projections.
 
-    Projections:
-    ESRI:102003 (USA Contiguous Albers Equal Area Conic) for the contiguous us and puerto rico
-    ESRI:102006 (Alaska Albers Equal Area Conic) for alaska
-    ESRI:102007 (Hawaii Albers Equal Area Conic) for hawaii
-
-    Also scales and translates so Alaska and Hawiia are in the bottom left corner and Puerto Rico
+    Also scales and translates so Alaska and Hawaii are in the bottom left corner and Puerto Rico
     is closer to Hawaii.
 
-    :param data: GeoDF with shape info and a column designating the state
-    :return: tuple of GeoDFs, each value representing one region
+    :param data: GeoDF with shape info and a column designating the state.
+    :return: Tuple of four GeoDFs: Contiguous US, Alaska, Hawaii, and Puerto Rico.
     """
     cont = data.loc[[i not in ('02', '15', '72') for i in data.state_fips], :].to_crs(
         "ESRI:102003")

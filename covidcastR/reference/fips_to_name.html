@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fetch only the latest issue for each observation in a data frame. — latest_issue • covidcast</title>
+<title>Get county or metropolitan area names from FIPS or CBSA codes — fips_to_name • covidcast</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,10 @@
 
 
 
-<meta property="og:title" content="Fetch only the latest issue for each observation in a data frame. — latest_issue" />
-<meta property="og:description" content="Since covidcast_signal() can, with the right options, return multiple
-issues for a single observation in a single geo, we may want only the most
-recent for plotting, mapping, or other purposes." />
+<meta property="og:title" content="Get county or metropolitan area names from FIPS or CBSA codes — fips_to_name" />
+<meta property="og:description" content="Look up county or metropolitan area names by FIPS or CBSA codes,
+respectively; these functions are based on grep(), and hence allow for
+regular expressions." />
 
 
 
@@ -131,33 +131,80 @@ recent for plotting, mapping, or other purposes." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Fetch only the latest issue for each observation in a data frame.</h1>
+    <h1>Get county or metropolitan area names from FIPS or CBSA codes</h1>
     <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
-    <div class="hidden name"><code>latest_issue.Rd</code></div>
+    <div class="hidden name"><code>fips_to_name.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Since <code><a href='covidcast_signal.html'>covidcast_signal()</a></code> can, with the right options, return multiple
-issues for a single observation in a single geo, we may want only the most
-recent for plotting, mapping, or other purposes.</p>
+    <p>Look up county or metropolitan area names by FIPS or CBSA codes,
+respectively; these functions are based on <code><a href='https://rdrr.io/r/base/grep.html'>grep()</a></code>, and hence allow for
+regular expressions.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>latest_issue</span>(<span class='no'>df</span>)</pre>
+    <pre class="usage"><span class='fu'>fips_to_name</span>(
+  <span class='no'>code</span>,
+  <span class='kw'>ignore.case</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>perl</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>fixed</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>ties_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first"</span>, <span class='st'>"all"</span>)
+)
+
+<span class='fu'>cbsa_to_name</span>(
+  <span class='no'>code</span>,
+  <span class='kw'>ignore.case</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>perl</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>fixed</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>ties_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first"</span>, <span class='st'>"all"</span>)
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>df</th>
-      <td><p>A <code>covidcast_signal</code> data frame</p></td>
+      <th>code</th>
+      <td><p>Vector of FIPS or CBSA codes to look up.</p></td>
+    </tr>
+    <tr>
+      <th>ignore.case, perl, fixed</th>
+      <td><p>Arguments to pass to <code><a href='https://rdrr.io/r/base/grep.html'>grep()</a></code>, with the same
+defaults as in the latter function. Hence, by default, regular expressions
+are used; to match against a fixed string (no regular expressions), set
+<code>fixed = TRUE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>ties_method</th>
+      <td><p>If "first", then only the first match for each code is
+returned. If "all", then all matches for each code are returned.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The same <code>covidcast_signal</code> data frame, but with only the latest
-issue of every observation</p>
+    <p>A vector of FIPS or CBSA codes if <code>ties_method</code> equals "first", and a
+list of FIPS or CBSA codes otherwise.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
+    <div class='dont-index'><p><code><a href='name_to_fips.html'>name_to_fips()</a></code>, <code><a href='name_to_fips.html'>name_to_cbsa()</a></code></p></div>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>fips_to_name</span>(<span class='st'>"42003"</span>)</div><div class='output co'>#&gt;              42003 
+#&gt; "Allegheny County" </div><div class='input'><span class='fu'>cbsa_to_name</span>(<span class='st'>"38300"</span>)</div><div class='output co'>#&gt;            38300 
+#&gt; "Pittsburgh, PA" </div><div class='input'><span class='fu'>fips_to_name</span>(<span class='st'>"4200"</span>, <span class='kw'>ties_method</span> <span class='kw'>=</span> <span class='st'>"all"</span>)</div><div class='output co'>#&gt; [[1]]
+#&gt;              42001              42003              42005              42007 
+#&gt;     "Adams County" "Allegheny County" "Armstrong County"    "Beaver County" 
+#&gt;              42009 
+#&gt;   "Bedford County" 
+#&gt; </div><div class='input'>
+<span class='co'># Count the number of counties, grouped by first two digits of FIPS code</span>
+<span class='co'># (which identify states):</span>
+<span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span>(<span class='fu'>fips_to_name</span>(<span class='fu'><a href='https://rdrr.io/r/base/sprintf.html'>sprintf</a></span>(<span class='st'>"%02d"</span>, <span class='fl'>1</span>:<span class='fl'>99</span>), <span class='kw'>ties</span> <span class='kw'>=</span> <span class='st'>"all"</span>), <span class='no'>length</span>))</div><div class='output co'>#&gt;  [1] 461 251 286 202 336 227 252 219 244 398 324 206 334  92 177 134 250 153 215
+#&gt; [20] 305 268  92 106  35  97  94 170  94 192 186 218  72  92  26 102  68 167  58
+#&gt; [39] 153 201 106  72  65  10 111  71 157 254  91 222 237   1  96  56 127  23  57
+#&gt; [58]   2  57 270 126   1  55   2  54   1  54   4  53 206 231   3  53   1  53   1
+#&gt; [77]  51   2  49 255 187  52  99  51  53   2  46   1  44 192 178  15  42   1  46
+#&gt; [96]   1  43   1  42</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

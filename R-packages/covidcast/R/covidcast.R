@@ -595,14 +595,14 @@ summary.covidcast_meta = function(object, ...) {
               length(unique(paste(x$data_source, x$signal)))))
   cat("Summary:\n\n")
   df <- suppressMessages(
-    meta %>% dplyr::group_by(data_source, signal) %>%
+    x %>% dplyr::group_by(data_source, signal) %>%
     dplyr::summarize(county = ifelse("county" %in% geo_type, "*", ""),
                      msa = ifelse("msa" %in% geo_type, "*", ""),
                      hrr = ifelse("hrr" %in% geo_type, "*", ""),
                      state = ifelse("state" %in% geo_type, "*", ""),
                      min_time = max(min_time),
                      max_time = min(max_time)) %>%
-    dplyr::ungroup
+    dplyr::ungroup()
   )
   print(as.data.frame(df), right = FALSE, row.names = FALSE)
   invisible(df)

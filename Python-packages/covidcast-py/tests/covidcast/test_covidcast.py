@@ -1,6 +1,10 @@
 from datetime import date, datetime
 from unittest.mock import patch
 
+# Force tests to use a specific backend, so they reproduce across platforms
+import matplotlib
+matplotlib.use("AGG")
+
 import pandas as pd
 import pytest
 from covidcast import covidcast

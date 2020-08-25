@@ -7,9 +7,9 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import pkg_resources
-from covidcast import covidcast
-from covidcast.covidcast import _detect_metadata
 from matplotlib import pyplot as plt
+
+from .covidcast import _detect_metadata, _signal_metadata
 
 SHAPEFILE_PATHS = {"county": "shapefiles/cb_2019_us_county_5m.zip",
                    "state": "shapefiles/cb_2019_us_state_5m.zip"}
@@ -31,32 +31,34 @@ def plot_choropleth(data: pd.DataFrame,
     By default, the colormap used is ``YlOrRd`` and is binned into the signal's mean value +- 3
     standard deviations. Custom arguments can be passed in as kwargs for customizability. More
     information on these arguments can be found at
-    <https://geopandas.org/reference.html#geopandas.GeoSeries.plot>`_
+    <https://geopandas.org/reference.html#geopandas.GeoSeries.plot>`__
 
-    :param data: DataFrame of values and geographies
+    :param data: DataFrame of values and geographies.
     :param time_value: If multiple days of data are present in ``data``, map only values from this \
         day. Defaults to plotting the most recent day of data in ``data``.
-    :param kwargs: Optional keyword arguments passed to plot()
-    :return: GeoDF with polygon info. Same as get_geo_df()
+    :param kwargs: Optional keyword arguments passed to plot().
+    :return: Matplotlib figure object.
     """
-    data_source, signal, geo_type = covidcast._detect_metadata(data)  # pylint: disable=W0212
-    meta = covidcast._signal_metadata(data_source, signal, geo_type)  # pylint: disable=W0212
+    data_source, signal, geo_type = _detect_metadata(data)  # pylint: disable=W0212
+    meta = _signal_metadata(data_source, signal, geo_type)  # pylint: disable=W0212
     # use most recent date in data if none provided
     day_to_plot = time_value if time_value else max(data.time_value)
     day_data = data.loc[data.time_value == day_to_plot, :]
     data_w_geo = get_geo_df(day_data)
-    fig, ax = plt.subplots(1, figsize=(12.8, 9.6))  # twice MPL default so text doesn't get squished
-    ax.axis("off")
 
     kwargs["vmin"] = kwargs.get("vmin", 0)
     kwargs["vmax"] = kwargs.get("vmax", meta["mean_value"] + 3 * meta["stdev_value"])
     kwargs["cmap"] = kwargs.get("cmap", "YlOrRd")
+    kwargs["figsize"] = kwargs.get("figsize", (12.8, 9.6))
 
-    sm = plt.cm.ScalarMappable(cmap=kwargs["cmap"])
+    fig, ax = plt.subplots(1, figsize=kwargs["figsize"])
+    ax.axis("off")
+    sm = plt.cm.ScalarMappable(cmap=kwargs["cmap"],
+                               norm=plt.Normalize(vmin=kwargs["vmin"], vmax=kwargs["vmax"]))
     plt.title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")
     for shape in _project_and_transform(data_w_geo):
         shape.plot("value", ax=ax, **kwargs)
-    fig.colorbar(sm, boundaries=np.linspace(kwargs["vmin"], kwargs["vmax"], 8), ax=ax,
+    plt.colorbar(sm, ticks=np.linspace(kwargs["vmin"], kwargs["vmax"], 8), ax=ax,
                  orientation="horizontal", fraction=0.02, pad=0.05)
     return fig
 
@@ -70,7 +72,8 @@ def get_geo_df(data: pd.DataFrame,
     `geopandas package <https://geopandas.org/>`__.
 
     Shapefiles are 1:5,000,000 scale and sourced from the 2019 US Census Cartographic Boundary Files
-    <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`_
+    <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`__
+
 
     After detecting the geography type (either county or state) for the input, loads the
     GeoDataFrame which contains state and geometry information from the Census for that geography
@@ -83,9 +86,9 @@ def get_geo_df(data: pd.DataFrame,
     Default arguments for column names correspond to return of :py:func:`covidcast.signal`.
     Currently only supports counties and states.
 
-    :param data: DataFrame of values and geographies
-    :param geo_value_col: Name of column containing values of interest
-    :param geo_type_col: Name of column containing geography type
+    :param data: DataFrame of values and geographies.
+    :param geo_value_col: Name of column containing values of interest.
+    :param geo_type_col: Name of column containing geography type.
     :return: GeoDataFrame of all state and geometry info for given geo type w/ input data appended.
     """
     geo_type = _detect_metadata(data, geo_type_col)[2]  # pylint: disable=W0212
@@ -113,8 +116,13 @@ def _project_and_transform(data: gpd.GeoDataFrame) -> Tuple:
     Also scales and translates so Alaska and Hawaii are in the bottom left corner and Puerto Rico
     is closer to Hawaii.
 
+<<<<<<< HEAD
     :param data: GeoDF with shape info and a column designating the state
     :return: Tuple of four GeoDFs: Contiguous US, Alaska, Hawaii, and Puerto Rico
+=======
+    :param data: GeoDF with shape info and a column designating the state.
+    :return: Tuple of four GeoDFs: Contiguous US, Alaska, Hawaii, and Puerto Rico.
+>>>>>>> plot_functions
     """
     cont = data.loc[[i not in ('02', '15', '72') for i in data.state_fips], :].to_crs(
         "ESRI:102003")

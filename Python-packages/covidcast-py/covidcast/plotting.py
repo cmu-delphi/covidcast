@@ -30,7 +30,7 @@ def plot_choropleth(data: pd.DataFrame,
 
     By default, the colormap used is ``YlOrRd`` and is binned into the signal's mean value +- 3
     standard deviations. Custom arguments can be passed in as kwargs for customizability. More
-    information on these arguments can be found at
+    information on these arguments can be found in `the GeoPandas documentation
     <https://geopandas.org/reference.html#geopandas.GeoSeries.plot>`__
 
     :param data: DataFrame of values and geographies.
@@ -71,7 +71,7 @@ def get_geo_df(data: pd.DataFrame,
     This method takes in a pandas DataFrame object and returns a GeoDataFrame object from the
     `geopandas package <https://geopandas.org/>`__.
 
-    Shapefiles are 1:5,000,000 scale and sourced from the 2019 US Census Cartographic Boundary Files
+    Shapefiles are 1:5,000,000 scale and sourced from the `2019 US Census Cartographic Boundary Files
     <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`__
 
 

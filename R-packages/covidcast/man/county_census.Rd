@@ -5,8 +5,8 @@
 \alias{county_census}
 \title{County census population data}
 \format{
-A data frame with 3193 rows, each representing one county. There are
-many columns. The most crucial are:
+A data frame with 3193 rows, one for each county (along with the 50
+states and DC). There are many columns. The most crucial are:
 
 \describe{
 \item{FIPS}{5-digit county FIPS codes. These are unique identifiers

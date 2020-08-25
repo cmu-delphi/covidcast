@@ -4,7 +4,7 @@
 plot_choro = function(x, time_value = NULL, include = c(), range,
                       col = c("#FFFFCC", "#FD893C", "#800026"),
                       alpha = 0.5, direction = FALSE,
-                      dir_col = c("#6F9CC6", "#F3EE9E", "#C56B59"),
+                      dir_col = c("#6F9CC6", "#E4E4E4", "#C56B59"),
                       title = NULL, params = list()) {
   # Check that we're looking at either counties or states
   if (!(attributes(x)$geo_type == "county" ||
@@ -16,7 +16,6 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   if (is.null(time_value)) time_value = max(x$time_value)
 
   # Set a title, if we need to (simple combo of data source, signal, time value)
-  # TODO Support data frames with multiple signals correctly
   if (is.null(title)) title = paste0(unique(x$data_source), ": ",
                                      unique(x$signal), ", ", time_value)
 
@@ -47,7 +46,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
       val = (val - range[1]) / (range[2] - range[1])
       rgb_mat = ramp_fun(val)
       not_na = rowSums(is.na(rgb_mat)) == 0
-      col_out = rep(NA, length(val))
+      col_out = rep(missing_col, length(val))
       col_out[not_na] = grDevices::rgb(rgb_mat[not_na,], alpha = alpha*255, max = 255)
       return(col_out)
     }
@@ -61,7 +60,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     col_fun = function(val, alpha = 1) {
       alpha_str = substr(grDevices::rgb(0, 0, 0, alpha = alpha), 8, 9)
       not_na = !is.na(val)
-      col_out = rep(NA, length(val))
+      col_out = rep(missing_col, length(val))
       col_out[not_na] = col[1]
       for (i in 1:length(breaks)) col_out[val >= breaks[i]] = col[i]
       col_out[not_na] = paste0(col_out[not_na], alpha_str)
@@ -96,13 +95,11 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   # Grab the values
   given_time_value = time_value
   df = x %>%
-    dplyr::filter(.data$time_value == given_time_value) %>%
-    dplyr::select(.data$value, .data$direction, .data$geo_value)
-
-  if (!direction) val = df$value
-  else val = df$direction
-
-  geo = df$geo_value
+    dplyr::filter(time_value == given_time_value) %>%
+    dplyr::select(val = ifelse(direction, "direction", "value"),
+                  geo = "geo_value")
+  val = df$val
+  geo = df$geo
   names(val) = geo
 
   # Create the choropleth colors for counties
@@ -237,7 +234,6 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   if (is.null(time_value)) time_value = max(x$time_value)
 
   # Set a title, if we need to (simple combo of data source, signal, time value)
-  # TODO Support data frames with multiple signals correctly
   if (is.null(title)) title = paste0(unique(x$data_source), ": ",
                                      unique(x$signal), ", ", time_value)
 
@@ -300,10 +296,10 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   # Grab the values
   given_time_value = time_value
   df = x %>%
-    dplyr::filter(.data$time_value == given_time_value) %>%
-    dplyr::select(.data$value, .data$geo_value)
-  val = df$value
-  geo = df$geo_value
+    dplyr::filter(time_value == given_time_value) %>%
+    dplyr::select(val = value, geo = geo_value)
+  val = df$val
+  geo = df$geo
   names(val) = geo
 
   # Grap the map data frame for counties
@@ -393,7 +389,6 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 plot_line = function(x, range = NULL, col = 1:6, line_type = rep(1:6, each = length(col)),
                      title = NULL, params = list()) {
   # Set a title, if we need to (simple combo of data source, signal)
-  # TODO Support data frames with multiple signals correctly
   if (is.null(title)) title = paste0(unique(x$data_source), ": ",
                                      unique(x$signal))
 
@@ -404,8 +399,11 @@ plot_line = function(x, range = NULL, col = 1:6, line_type = rep(1:6, each = len
   if (is.null(ylab)) ylab = "Value"
 
   # Grab the values
-  df = x %>% dplyr::select(.data$value, .data$time_value, .data$geo_value)
+  df = x %>% dplyr::select(value, time_value, geo_value)
 
+  # Expand the range, if we need to
+  range = base::range(c(range, df$value))
+  
   # Create label and theme layers
   label_layer = ggplot2::labs(title = title, x = xlab, y = ylab)
   theme_layer = ggplot2::theme_bw() +
@@ -413,14 +411,16 @@ plot_line = function(x, range = NULL, col = 1:6, line_type = rep(1:6, each = len
     ggplot2::theme(legend.position = "bottom",
                    legend.title = ggplot2::element_blank())
 
-  # Create line layer
+  # Create line and lim layers
   line_layer = ggplot2::geom_line(ggplot2::aes(x = time_value, y = value,
                                                color = geo_value,
-                                               group = geo_value), data = df)
-
-  # TODO: implement colors and line types (currently ignored). Also, show
-  # standard error bands, and other features?
+                                               group = geo_value), data = df) 
+  lim_layer = ggplot2::lims(y = c(range[1], range[2]))
+  
+  # TODO: show standard error bands?
 
   # Put it all together and return
-  return(ggplot2::ggplot() + line_layer + label_layer + theme_layer)
+  return(ggplot2::ggplot() + line_layer + lim_layer + label_layer + theme_layer)
 }
+
+# TODO: plot functions for covidcast_signals objects (note the plural form)?

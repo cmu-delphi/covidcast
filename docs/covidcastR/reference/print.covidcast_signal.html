@@ -41,7 +41,8 @@
 
 <meta property="og:title" content="Print <code>covidcast_signal</code> objects — print.covidcast_signal" />
 <meta property="og:description" content="Prints a brief summary of the data source, signal, and geographic level, and
-then prints the underlying data frame." />
+then prints the underlying data frame, for objects returned by
+covidcast_signal()." />
 
 
 
@@ -73,7 +74,7 @@ then prints the underlying data frame." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -98,6 +99,9 @@ then prints the underlying data frame." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/correlation-utils.html">Correlation utilities</a>
+    </li>
     <li>
       <a href="../articles/plotting-signals.html">Plotting and mapping signals</a>
     </li>
@@ -134,7 +138,8 @@ then prints the underlying data frame." />
 
     <div class="ref-description">
     <p>Prints a brief summary of the data source, signal, and geographic level, and
-then prints the underlying data frame.</p>
+then prints the underlying data frame, for objects returned by
+<code><a href='covidcast_signal.html'>covidcast_signal()</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for covidcast_signal</span>
@@ -149,7 +154,7 @@ then prints the underlying data frame.</p>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Additional arguments passed to <code><a href='https://rdrr.io/r/graphics/plot.dataframe.html'>plot.data.frame()</a></code> to print the
+      <td><p>Additional arguments passed to <code><a href='https://rdrr.io/r/base/print.dataframe.html'>print.data.frame()</a></code> to print the
 data.</p></td>
     </tr>
     </table>

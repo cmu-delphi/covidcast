@@ -1,5 +1,5 @@
 # API base url
-COVIDCAST_BASE_URL <- 'https://delphi.cmu.edu/epidata/api.php'
+COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 
 .onAttach <- function(libname, pkgname) {
   msg <- c("We encourage COVIDcast API users to register on our mailing list:",

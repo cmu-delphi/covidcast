@@ -25,13 +25,13 @@ def test_plot_choropleth():
     test_df["value"] = test_df.value.astype("float")
 
     fig1 = plotting.plot_choropleth(test_df)
-    # get np array representation of plot
-    data1 = np.frombuffer(fig1.canvas.tostring_rgb(), dtype=np.uint8)
-    assert np.array_equal(data1, expected["expected_1"])
+    data1 = np.frombuffer(fig1.canvas.tostring_rgb(), dtype=np.uint8)  # get np array representation
+    # give margin of +-2 for floating point errors and platform discrepancies.
+    assert np.allclose(data1, expected["expected_1"], atol=2, rtol=0)
 
     fig2 = plotting.plot_choropleth(test_df, cmap="viridis", figsize=(5, 5), edgecolor="0.8")
     data2 = np.frombuffer(fig2.canvas.tostring_rgb(), dtype=np.uint8)
-    assert np.array_equal(data2, expected["expected_2"])
+    assert np.allclose(data2, expected["expected_2"], atol=2, rtol=0)
 
 
 def test_get_geo_df():

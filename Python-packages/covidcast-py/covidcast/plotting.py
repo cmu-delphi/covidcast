@@ -70,7 +70,7 @@ def get_geo_df(data: pd.DataFrame,
     `geopandas package <https://geopandas.org/>`__.
 
     Shapefiles are 1:5,000,000 scale and sourced from the 2019 US Census Cartographic Boundary Files
-    <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`__
+    <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`_
 
     After detecting the geography type (either county or state) for the input, loads the
     GeoDataFrame which contains state and geometry information from the Census for that geography

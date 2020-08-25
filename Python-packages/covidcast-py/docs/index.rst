@@ -62,8 +62,8 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   getting_started
    signals
    plotting
-   getting_started
    plot_examples
    changelog

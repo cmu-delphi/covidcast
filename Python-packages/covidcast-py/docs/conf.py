@@ -31,6 +31,7 @@ release = '0.0.8'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx_autodoc_typehints',
     'matplotlib.sphinxext.plot_directive'
 ]
 

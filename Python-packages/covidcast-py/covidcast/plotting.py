@@ -18,26 +18,31 @@ SHAPEFILE_PATHS = {"county": "shapefiles/cb_2019_us_county_5m.zip",
 def plot_choropleth(data: pd.DataFrame,
                     time_value: date = None,
                     **kwargs) -> gpd.GeoDataFrame:
-    """Given the output df of covidcast.signal(), plot a choropleth map.
+    """Given the output data frame of :py:func:`covidcast.signal`, plot a choropleth map.
 
-    Projections:
-    ESRI:102003 (USA Contiguous Albers Equal Area Conic) for the contiguous US and Puerto Rico
-    ESRI:102006 (Alaska Albers Equal Area Conic) for Alaska
-    ESRI:102007 (Hawaii Albers Equal Area Conic) for Hawaii
+    Projections used for plotting:
+
+    - ESRI:102003 (USA Contiguous Albers Equal Area Conic) for the contiguous US
+      and Puerto Rico
+    - ESRI:102006 (Alaska Albers Equal Area Conic) for Alaska
+    - ESRI:102007 (Hawaii Albers Equal Area Conic) for Hawaii
 
     For visual purposes, Alaska and Hawaii are moved the lower left corner of the contiguous US
     and Puerto Rico is moved closer to Florida.
 
-    By default, the colormap used is ``YlOrRd`` and is binned into the signal's mean value +- 3
-    standard deviations. Custom arguments can be passed in as kwargs for customizability. More
-    information on these arguments can be found in `the GeoPandas documentation
-    <https://geopandas.org/reference.html#geopandas.GeoSeries.plot>`__
+    By default, the colormap used is ``YlOrRd`` and is binned into the signal's
+    mean value +- 3 standard deviations. Custom arguments can be passed in as
+    ``kwargs`` for customizability. These arguments will be past to the
+    GeoPandas ``plot`` method; more information on these arguments can be found
+    in `the GeoPandas documentation
+    <https://geopandas.org/reference.html#geopandas.GeoSeries.plot>`__.
 
     :param data: DataFrame of values and geographies.
     :param time_value: If multiple days of data are present in ``data``, map only values from this \
         day. Defaults to plotting the most recent day of data in ``data``.
     :param kwargs: Optional keyword arguments passed to plot().
     :return: Matplotlib figure object.
+
     """
     data_source, signal, geo_type = _detect_metadata(data)  # pylint: disable=W0212
     meta = _signal_metadata(data_source, signal, geo_type)  # pylint: disable=W0212
@@ -83,7 +88,7 @@ def get_geo_df(data: pd.DataFrame,
     `geometry` (polygon for plotting) and `state_fips` (FIPS code which will be used in the
     plotting function to rearrange AK and HI) column. Coordinate system is GCS NAD83.
 
-    Default arguments for column names correspond to return of :py:func:`covidcast.signal`.
+    Default arguments for column names correspond to those used by :py:func:`covidcast.signal`.
     Currently only supports counties and states.
 
     :param data: DataFrame of values and geographies.

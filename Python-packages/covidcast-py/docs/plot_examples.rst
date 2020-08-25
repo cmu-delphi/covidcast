@@ -12,8 +12,8 @@ The returned DataFrame from :py:func:`covidcast.signal` can be plotted using the
 >>> from datetime import date
 >>> from matplotlib import pyplot as plt
 >>> data = covidcast.signal("fb-survey", "smoothed_cli",
-                             date(2020,8,3), date(2020,8,4),
-                             geo_type = "county")
+...                          date(2020, 8, 3), date(2020, 8, 4),
+...                          geo_type="county")
 >>> plotting.plot_choropleth(data)
 >>> plt.show()
 
@@ -27,8 +27,8 @@ The returned DataFrame from :py:func:`covidcast.signal` can be plotted using the
     plt.show()
 
 >>> data = covidcast.signal("fb-survey", "smoothed_cli",
-                             date(2020,8,3), date(2020,8,4),
-                             geo_type = "state")
+...                          date(2020, 8, 3), date(2020, 8, 4),
+...                          geo_type="state")
 >>> plotting.plot_choropleth(data)
 >>> plt.show()
 
@@ -47,7 +47,7 @@ available for the
 
 
 >>> plotting.plot_choropleth(data,
-...                          cmap ="viridis",
+...                          cmap="viridis",
 ...                          edgecolor="0.8")
 >>> plt.show()
 
@@ -56,8 +56,8 @@ available for the
     import covidcast
     from datetime import date
     from matplotlib import pyplot as plt
-    data = covidcast.signal("fb-survey","smoothed_cli", start_day = date(2020,8,3), end_day = date(2020,8,4), geo_type = "county")
-    covidcast.plot_choropleth(data, cmap ="viridis", edgecolor="0.8")
+    data = covidcast.signal("fb-survey", "smoothed_cli", start_day=date(2020,8,3), end_day=date(2020,8,4), geo_type="county")
+    covidcast.plot_choropleth(data, cmap="viridis", edgecolor="0.8")
     plt.show()
 
 The function returns a
@@ -72,20 +72,20 @@ Further Customization
 If more control is desired, the signal data can be passed to :py:func:`covidcast.get_geo_df`, which
 will return a
 `GeoPandas GeoDataFrame <https://geopandas.org/reference/geopandas.GeoDataFrame.html>`_ with
-relevant polgons that can be used with the `mappings tools <https://geopandas.org/mapping.html>`_
+relevant polgons that can be used with the `mapping tools <https://geopandas.org/mapping.html>`_
 provided by that package. The geometry information is sourced from the
-`2019 US Census Cartographic Boundary Files <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`_,
+`2019 US Census Cartographic Boundary Files <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`_.
 
-The :py:func:`covidcast.get_geo_df` can return different joins depending on your use case. By
+The :py:func:`covidcast.get_geo_df` method can return different joins depending on your use case. By
 default, it will try to compute the right join between the input data (left side of join) to the
 geometry data (right side of join), so that the returned GeoDataFrame will contain all the possible
 geometries with the signal values filled if present. Counties which do not have values but have
-a corresponding megacounty will have inherit the megacounty values. This operation depends on
+a corresponding megacounty will inherit the megacounty values. This operation depends on
 having only one row of signal information per geographic region. If this is not the the case, you
 must use another join.
 
 >>> data = covidcast.signal("fb-survey", "smoothed_cli",
-...                          date(2020,8,3), date(2020,8,4),
+...                          date(2020, 8, 3), date(2020, 8, 4),
 ...                          geo_type = "county")
 >>> covidcast.get_geo_df(data)
      geo_value time_value direction      issue  lag     value    stderr  sample_size geo_type data_source        signal                                           geometry state_fips
@@ -136,11 +136,10 @@ plotting California with a Mercator projection:
     import covidcast
     from datetime import date
     from matplotlib import pyplot as plt
-    data = covidcast.signal("fb-survey","smoothed_cli", start_day = date(2020,8,3), end_day = date(2020,8,4), geo_type = "county")
+    data = covidcast.signal("fb-survey", "smoothed_cli", start_day=date(2020, 8, 3), end_day=date(2020, 8, 4), geo_type="county")
     geo_data = covidcast.get_geo_df(data)
     CA = geo_data.loc[geo_data.state_fips == "06",:]
     CA = CA.to_crs("EPSG:3395")
     CA.plot(column="value", figsize=(5,5), legend=True)
     plt.axis("off")
     plt.show()
-

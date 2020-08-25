@@ -81,7 +81,7 @@ def _join_state_geo_df(data: pd.DataFrame,
     geo_info.STUSPS = [i.lower() for i in geo_info.STUSPS]  # lowercase for consistency
     merged = data.merge(geo_info, how=join_type, left_on=state_col, right_on="STUSPS",)
     # use full state list in the return
-    merged[state_col] = merged.STUSPS
+    merged[state_col] = [j if pd.isna(i) else i for i, j in zip(merged.STUSPS, merged[state_col])]
     return merged
 
 
@@ -109,5 +109,5 @@ def _join_county_geo_df(data: pd.DataFrame,
         merged = merged.merge(mega_county_df, how="left", left_on="STATEFP", right_on="state")
         merged["value"] = [j if pd.isna(i) else i for i, j in zip(merged.value_x, merged.value_y)]
     # use the full county FIPS list in the return
-    merged[county_col] = merged.GEOID
+    merged[county_col] = [j if pd.isna(i) else i for i, j in zip(merged.GEOID, merged[county_col])]
     return merged

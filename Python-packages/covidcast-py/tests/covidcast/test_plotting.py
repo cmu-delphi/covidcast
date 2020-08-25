@@ -21,10 +21,12 @@ def test_get_geo_df():
     output = plotting.get_geo_df(test_input)
     assert output.shape == (3233, test_input.shape[1]+2)
     assert not any(pd.isna(output.geometry))
+    assert not any(pd.isna(output.geo_value))  # all geo_values should be populated
 
     # test counties w/ right join
     output = plotting.get_geo_df(test_input, join_type="left")
     assert output.shape == (3, test_input.shape[1]+2)
+    assert not any(pd.isna(output.geo_value))
     assert sum(pd.isna(output.geometry)) == 1  # one megacounty should be nan
 
     # test states
@@ -32,6 +34,7 @@ def test_get_geo_df():
     output = plotting.get_geo_df(test_input)
     assert output.shape == (56, test_input.shape[1]+2)
     assert not any(pd.isna(output.geometry))
+    assert not any(pd.isna(output.geo_value))
 
     # just test output cols match, since the actual values are tested in the _join_*_geo_df methods
     assert set(output.columns) == {"geo_value", "value", "geo_type", "signal",

@@ -32,7 +32,7 @@ def get_geo_df(data: pd.DataFrame,
     For right joins on counties, all counties without a signal value will be given the value of
     the megacounty (if present). Other joins will not use megacounties.
 
-    Returns the columns containing the input columns along with a
+    Returns the columns from ``data`` along with
     `geometry` (polygon for plotting) and `state_fips` (FIPS code which will be used in the
     plotting function to rearrange AK and HI) column. Coordinate system is GCS NAD83.
 

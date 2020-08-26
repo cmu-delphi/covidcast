@@ -9,10 +9,11 @@
 \arguments{
 \item{x}{The \code{covidcast_signal} object.}
 
-\item{...}{Additional arguments passed to \code{plot.data.frame()} to print the
+\item{...}{Additional arguments passed to \code{print.data.frame()} to print the
 data.}
 }
 \description{
 Prints a brief summary of the data source, signal, and geographic level, and
-then prints the underlying data frame.
+then prints the underlying data frame, for objects returned by
+\code{covidcast_signal()}.
 }

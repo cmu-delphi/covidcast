@@ -11,6 +11,7 @@ save(county_census, file = "../covidcast/data/county_census.rda", compress = "bz
 
 ## MSA census data
 msa_census = read.csv("https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.csv", stringsAsFactors = FALSE)
+msa_census$CBSA = as.character(msa_census$CBSA)
 
 # Convert names to UTF-8
 msa_census$NAME <- iconv(msa_census$NAME, "latin1", "UTF-8")

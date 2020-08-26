@@ -1,209 +1,257 @@
 ---
-title: "Correlation Analyses for COVID-19 Indicators"
+title: "Basic Correlation Analyses for COVID-19 Indicators"
 author: "Delphi Group"
-output:
-  html_document:
-    code_folding: hide
+date: "May 20, 2020"
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(fig.width = 8, fig.height = 7)
+```{r, include=FALSE}
+knitr::opts_chunk$set(fig.width=10, fig.height=4)
 ```
 
-## County analysis
+Getting data from the Epidata API
+===
 
-TODO, write something
-
-### Getting data 
-
-TODO, write something
-
-```{r, message = FALSE}
-library(covidcast)
-library(dplyr)
-library(ggplot2)
-
-# Fetch the following sources and signals from the API 
-sources = c("doctor-visits", "fb-survey", "fb-survey", "hospital-admissions", 
-            "indicator-combination")
-signals = c("smoothed_adj_cli", "smoothed_cli", "smoothed_hh_cmnty_cli", 
-            "smoothed_adj_covid19", "nmf_day_doc_fbc_fbs_ght")
-names = c("Doctor visits", "Facebook CLI", "Facebook CLI-in-community", 
-          "Hospitalizations", "Combo indicator")
-
-start_day = "2020-04-15"
-end_day = NULL
-
-df_signals = vector("list", length(signals))
-for (i in 1:length(signals)) {
-  df_signals[[i]] = covidcast_signal(sources[i], signals[i], start_day, end_day)
-}
-
-# Fetch USAFacts confirmed case incidence proportion (smoothed with 7-day 
-# trailing average)
-df_cases = covidcast_signal("usa-facts", "confirmed_7dav_incidence_prop",
-                            start_day, end_day)
-```
-
-### Correlations sliced by time
-
-TODO, write something
-
-```{r, message = FALSE, warning = FALSE}
-# Consider only counties with at least 500 cumulative cases
-case_num = 500
-geo_values = covidcast_signal("usa-facts", "confirmed_cumulative_num",
-                              max(df_cases$time_value), 
-                              max(df_cases$time_value)) %>%
-  filter(value >= case_num) %>% pull(geo_value)
-
-df_cor = vector("list", length(signals))
-for (i in 1:length(signals)) {
-  df_cor[[i]] = covidcast_cor(df_signals[[i]] %>% 
-                                filter(geo_value %in% geo_values), 
-                              df_cases %>% 
-                                filter(geo_value %in% geo_values), 
-                              by = "time_value", method = "spearman")
-  df_cor[[i]]$signal = names[i]
-}
-df = do.call(rbind, df_cor)
-
-ggplot(df, aes(x = time_value, y = value)) +
-  geom_line(aes(color = signal)) +
-  guides(color = guide_legend(nrow = 2)) +
-  labs(title = "Correlation between signals and case rates",
-       subtitle = sprintf("Over all counties with at least %i cumulative cases",
-                          case_num), x = "Date", y = "Correlation") +
-  theme(legend.position = "bottom", legend.title = element_blank())
-```
-
-### Correlations sliced by county
-
-TODO, write something
-
-```{r, message = FALSE, warning = FALSE}
-df_cor = vector("list", length(signals))
-for (i in 1:length(signals)) {
-  df_cor[[i]] = covidcast_cor(df_signals[[i]] %>% 
-                                filter(geo_value %in% geo_values), 
-                              df_cases %>% 
-                                filter(geo_value %in% geo_values), 
-                              by = "geo_value", method = "spearman")
-  df_cor[[i]]$signal = names[i]
-}
-df = do.call(rbind, df_cor)
-
-ggplot(df, aes(value)) +
-  geom_density(aes(color = signal, fill = signal), alpha = 0.4) +
-  guides(color = guide_legend(nrow = 2)) +
-  labs(title = "Correlation between signals and case rates",
-       subtitle = sprintf("Over all counties with at least %i cumulative cases",
-                          case_num), x = "Date", y = "Correlation") +
-  theme(legend.position = "bottom", legend.title = element_blank())
-```
-
-TODO, write something
+First we're going to fetch our indicators from the [covidcast endpoint](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html) of our [Epidata API](https://cmu-delphi.github.io/delphi-epidata/api/). 
 
 ```{r}
-# Set some fields, then plot choropleth maps using covidcast functionality
-for (i in 1:length(signals)) {
-  df_cor[[i]]$time_value = start_day
-  df_cor[[i]]$issue = start_day
-  attributes(df_cor[[i]])$geo_type = "county"
-  class(df_cor[[i]]) = c("covidcast_signal", "data.frame")
+# This is where the basic R functionality lives
+source("https://raw.githubusercontent.com/cmu-delphi/delphi-epidata/master/src/client/delphi_epidata.R")
+
+# Helper function for fetching data from the API
+get_data = function(sources, signals, dates) {
+  N = length(sources)
+  signal_dfs = vector(mode="list", length=N)
+  days = dates$from:dates$to
+  day_dfs = vector(mode="list", length=length(days))
+  for (i in 1:N) {
+    cat(sprintf("(%i of %i) Fetching %s : %s ...\n", i, N, sources[i], signals[i]))
+    # Loop over individual days due to query row limit 
+    for (j in 1:length(days)) {
+      # If query_day is not a valid date (this can happen, for example, when dates$from and dates$to are in different months) then fetching from the API will fail gracefully and no rows will be added in the code below
+      query_day = as.character(days[j])
+      res_county = Epidata$covidcast(sources[i], signals[i], "day", "county", query_day, "*")
+      res_msa = Epidata$covidcast(sources[i], signals[i], "day", "msa", query_day, "*")
+
+      # Lump together, change all NULL values to NA, reformat to a matrix
+      dat = c(res_county$epidata, res_msa$epidata)
+      dat = lapply(dat, function(x) lapply(x, function(v) ifelse (is.null(v), NA, v)))
+      day_df = as.data.frame(matrix(as.numeric(unlist(dat)), nrow=length(dat), byrow=TRUE))
+      day_dfs[[j]] = cbind(day_df, c(rep(TRUE, length(res_county$epidata)), rep(FALSE, length(res_msa$epidata))))
+      if (length(dat) > 0) colnames(day_dfs[[j]]) = c(names(dat[[1]]), "is_county")
+    }
+    signal_dfs[[i]] = do.call("rbind", day_dfs)
+  }
+  if (N == 1) signal_dfs = signal_dfs[[1]] 
+  return(signal_dfs)
+}
+
+# Fetch the following sources and signals
+sources = c("doctor-visits", "fb-survey", "fb-survey", "google-survey", "ght", "indicator-combination")
+signals = c("smoothed_cli", "smoothed_cli", "smoothed_hh_cmnty_cli", "smoothed_cli", "smoothed_search", "nmf_day_doc_fbs_ght")
+post = c("", "(individual)", "(community)", "", "", "")
+dates = Epidata$range("20200411", "20200417") # Format is YYYYMMDD
+signal_dfs = get_data(sources, signals, dates)
+
+# Fetch incident confirmed cases
+cases = get_data("jhu-csse", "confirmed_incidence_prop", dates)
+```
+
+Correlations with JHU cases, county level
+===
+
+Now for each one of our indicators, we're going to:  
+
+1. Average this indicator over a 1 week period, for each county in which this indicator is available, giving us a vector $y$.
+2. Average the daily incidence of COVID-19 cases (new cases per 100,000 people) as reported in the JHU CSSE COVID-19 GitHub over the same 1 week period, for each county in which this is available, giving us a vector $x$.
+3. Find the commonly available counties between $x$ and $y$, and call the restrictions of $x$ and $y$ to this common set $\tilde{x}$ and $\tilde{y}$.
+4. Compute the Spearman or rank correlation between $\tilde{x}$ and $\tilde{y}$ (the usual Pearson correlation between $\mathrm{rank}(\tilde{x})$ and $\mathrm{rank}(\tilde{y})$, the vectors of ranks of $\tilde{x}$ and $\tilde{y}$).  
+
+To elaborate, in Step 4 we're actually going to compute the rank correlation for a *population sweep cut* of $\tilde{x}$ and $\tilde{y}$.  
+
+- A population cut of $\tilde{x}$ and $\tilde{y}$ means that we will further subset these vectors to only consider counties that have population at least $p$.  
+- A population sweep cut means that we will consider all population cuts over all possible values of $p$.
+
+In the plots below, the horizontal axis shows the population threshold (on a log scale), the vertical axis shows the corresponding rank correlation. (The top horizontal axis below the plot title shows the number of counties that survived the population cut, and were used to compute the rank correlation.)
+
+```{r}
+library(dplyr)
+
+# Handy function for plotting rank correlation of x and y, filtering over various population thresholds
+cor_plot = function(x, y, pop_df, min_obs = 100, main=NULL) {
+  # Join by geo identifier
+  z = inner_join(x, y, by="geo_value")
+    
+  # Filter out low population locations
+  z = inner_join(z, pop_df, by="geo_value") %>%
+    arrange(population)
+    
+  n = nrow(z); if (n < min_obs) { plot.new(); return() }
+  pop_vec = z$population[min_obs:n]
+  cor_vec = rep(NA, n-min_obs+1)
+  for (i in 1:(n-min_obs+1)) {
+    cor_vec[i] = cor(z$value.x[i:n], z$value.y[i:n], method="spearman")
+  }
   
-  print(plot(df_cor[[i]], range = c(-1, 1), choro_col = cm.colors(10),
-             title = sprintf("Correlations for %s", names[i])))
+  plot(pop_vec, cor_vec, type="l", log="x", main=main,
+       xlab="Population threshold", ylab="Rank correlation")
+  axis(3, at=pop_vec, labels=n:min_obs, cex.axis=0.8)
+  invisible(list(pop_vec=pop_vec, cor_vec=cor_vec))
+}
+
+# Get county population estimates from 2019
+county_pop = read.csv("https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.csv")
+county_pop$geo_value = county_pop$STATE * 1000 + county_pop$COUNTY # Create 5-digit FIPS code
+county_pop$population = county_pop$POPESTIMATE2019 # Create population column
+
+# Compute pairwise rank correlations
+inds_county = which(sapply(signal_dfs, function(df) sum(df$is_county) > 0))
+
+# Average over available weeks within each county
+x = cases %>% 
+  filter(is_county) %>%
+  group_by(geo_value) %>%
+  summarize(value = mean(value, na.rm=TRUE))
+
+par(mfrow=c(1, 3), mar=c(4.5, 4.5, 5.5, 0.5))
+for (i in inds_county) {
+  # Average over available weeks within each county 
+  y = signal_dfs[[i]] %>% 
+    filter(is_county) %>%
+    group_by(geo_value) %>%
+    summarize(value = mean(value, na.rm=TRUE))
+    
+  # Compute and plot rank correlations by pop threshold
+  cor_plot(x, y, county_pop, main=paste(sources[i],post[i]))
 }
 ```
 
-## Metro area analysis
+Correlations with JHU cases, MSA level
+===
 
-TODO, write something
+Same as in the last section, but for metropolitan statistical areas or MSAs, instead of counties.
 
-### Getting data 
+```{r}
+# Get MSA population estimates from 2019
+msa_pop = read.csv("https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.csv")
+msa_pop$geo_value = msa_pop$CBSA # Grab the CBSA code
+msa_pop$population = msa_pop$POPESTIMATE2019 # Create population column
 
-TODO, write something
+# Compute pairwise rank correlations
+inds_msa = which(sapply(signal_dfs, function(df) sum(!df$is_county) > 0))
 
-```{r, message = FALSE}
-# Fetch the following sources and signals from the API 
-sources = c("doctor-visits", "fb-survey", "fb-survey", "ght",
-            "hospital-admissions", "indicator-combination")
-signals = c("smoothed_adj_cli", "smoothed_cli", "smoothed_hh_cmnty_cli", 
-            "smoothed_search", "smoothed_adj_covid19", 
-            "nmf_day_doc_fbc_fbs_ght")
-names = c("Doctor visits", "Facebook CLI", "Facebook CLI-in-community", 
-          "Google trends", "Hospitalizations", "Combo indicator")
+# Average over available weeks within each MSA 
+x = cases %>% 
+  filter(!is_county) %>%
+  group_by(geo_value) %>%
+  summarize(value = mean(value, na.rm=TRUE))
 
-start_day = "2020-04-15"
-end_day = NULL
-
-df_signals = vector("list", length(signals))
-for (i in 1:length(signals)) {
-  df_signals[[i]] = covidcast_signal(sources[i], signals[i], start_day, end_day,
-                                     geo_type = "msa")
+par(mfrow=c(1, 3), mar=c(4.5, 4.5, 5.5, 0.5))
+for (i in inds_msa) {
+  # Average over available weeks within each MSA 
+  y = signal_dfs[[i]] %>% 
+    filter(!is_county) %>%
+    group_by(geo_value) %>%
+    summarize(value = mean(value, na.rm=TRUE))
+    
+  # Compute and plot rank correlations by pop threshold
+  cor_plot(x, y, msa_pop, main=paste(sources[i],post[i]))
 }
-
-# Fetch USAFacts confirmed case incidence proportion (smoothed with 7-day
-# trailing average)
-df_cases = covidcast_signal("usa-facts", "confirmed_7dav_incidence_prop",
-                            start_day, end_day, geo_type = "msa")
 ```
 
-### Correlations sliced by time
+Correlations to 1-week-ahead JHU cases
+===
 
-TODO, write something
+Same as in the last section, but now computing rank correlations against daily incident cases averaged over the *next* week (relative to the week we consider for our indicators).
 
-```{r, message = FALSE, warning = FALSE}
-# Consider only metro areas with at least 500 cumulative cases
-case_num = 500
-geo_values = covidcast_signal("usa-facts", "confirmed_cumulative_num",
-                              max(df_cases$time_value), 
-                              max(df_cases$time_value), 
-                              geo_type = "msa") %>%
-  filter(value >= case_num) %>% pull(geo_value)
+```{r}
+# Fetch 1-week-ahead JHU cases
+dates_ahead = Epidata$range("20200418", "20200424") # Format is YYYYMMDD
+cases_ahead = get_data("jhu-csse", "confirmed_incidence_prop", dates_ahead)
 
-df_cor = vector("list", length(signals))
-for (i in 1:length(signals)) {
-  df_cor[[i]] = covidcast_cor(df_signals[[i]] %>% 
-                                filter(geo_value %in% geo_values), 
-                              df_cases %>% 
-                                filter(geo_value %in% geo_values), 
-                              by = "time_value", method = "spearman")
-  df_cor[[i]]$signal = names[i]
+# Average over available weeks per county
+x = cases_ahead %>% 
+  filter(is_county) %>%
+  group_by(geo_value) %>%
+  summarize(value = mean(value, na.rm=TRUE))
+
+par(mfrow=c(1, 3), mar=c(4.5, 4.5, 5.5, 0.5))
+for (i in inds_county) {
+# Average over available weeks per county
+  y = signal_dfs[[i]] %>% 
+    filter(is_county) %>%
+    group_by(geo_value) %>%
+    summarize(value = mean(value, na.rm=TRUE))
+    
+  # Compute and plot rank correlations by pop threshold
+  cor_plot(x, y, county_pop, main=paste(sources[i],post[i]))
 }
-df = do.call(rbind, df_cor)
-
-ggplot(df, aes(x = time_value, y = value)) +
-  geom_line(aes(color = signal)) +
-  guides(color = guide_legend(nrow = 2)) +
-  labs(title = "Correlation between signals and case rates",
-       subtitle = sprintf("Over metro areas with at least %i cumulative cases",
-                          case_num), x = "Date", y = "Correlation") +
-  theme(legend.position = "bottom", legend.title = element_blank())
 ```
 
-### Correlations sliced by metro area
+```{r}
+# Average over available weeks per MSA
+x = cases_ahead %>% 
+  filter(!is_county) %>%
+  group_by(geo_value) %>%
+  summarize(value = mean(value, na.rm=TRUE))
 
-TODO, write something
-
-```{r, message = FALSE, warning = FALSE}
-df_cor = vector("list", length(signals))
-for (i in 1:length(signals)) {
-  df_cor[[i]] = covidcast_cor(df_signals[[i]] %>% 
-                                filter(geo_value %in% geo_values), 
-                              df_cases %>% 
-                                filter(geo_value %in% geo_values), 
-                              by = "geo_value", method = "spearman")
-  df_cor[[i]]$signal = names[i]
+par(mfrow=c(1, 3), mar=c(4.5, 4.5, 5.5, 0.5))
+for (i in inds_msa) {
+  # Average over available weeks per MSA
+  y = signal_dfs[[i]] %>% 
+    filter(!is_county) %>%
+    group_by(geo_value) %>%
+    summarize(value = mean(value, na.rm=TRUE))
+    
+  # Compute and plot rank correlations by pop threshold
+  cor_plot(x, y, msa_pop, main=paste(sources[i],post[i]))
 }
-df = do.call(rbind, df_cor)
+```
 
-ggplot(df, aes(value)) +
-  geom_density(aes(color = signal, fill = signal), alpha = 0.4) +
-  guides(color = guide_legend(nrow = 2)) +
-  labs(title = "Correlation between signals and case rates",
-       subtitle = sprintf("Over metro areas with at least %i cumulative cases",
-                          case_num), x = "Date", y = "Correlation") +
-  theme(legend.position = "bottom", legend.title = element_blank())
+Correlations to 2-week-ahead JHU deaths
+===
+
+Same as in the last section, but now computing rank correlations against daily incident deaths averaged over the *next-next* week (relative to the week we consider for our indicators).
+
+```{r}
+# Fetch 2-week-ahead JHU deaths
+dates_ahead = Epidata$range("20200425", "20200501") # Format is YYYYMMDD
+deaths_ahead = get_data("jhu-csse", "deaths_incidence_prop", dates_ahead)
+
+# Average over available weeks per county
+x = deaths_ahead %>% 
+  filter(is_county) %>%
+  group_by(geo_value) %>%
+  summarize(value = mean(value, na.rm=TRUE))
+
+par(mfrow=c(1, 3), mar=c(4.5, 4.5, 5.5, 0.5))
+for (i in inds_county) {
+# Average over available weeks per county
+  y = signal_dfs[[i]] %>% 
+    filter(is_county) %>%
+    group_by(geo_value) %>%
+    summarize(value = mean(value, na.rm=TRUE))
+    
+  # Compute and plot rank correlations by pop threshold
+  cor_plot(x, y, county_pop, main=paste(sources[i],post[i]))
+}
+```
+
+```{r}
+# Average over available weeks per MSA
+x = deaths_ahead %>% 
+  filter(!is_county) %>%
+  group_by(geo_value) %>%
+  summarize(value = mean(value, na.rm=TRUE))
+
+par(mfrow=c(1, 3), mar=c(4.5, 4.5, 5.5, 0.5))
+for (i in inds_msa) {
+  # Average over available weeks per MSA
+  y = signal_dfs[[i]] %>% 
+    filter(!is_county) %>%
+    group_by(geo_value) %>%
+    summarize(value = mean(value, na.rm=TRUE))
+    
+  # Compute and plot rank correlations by pop threshold
+  cor_plot(x, y, msa_pop, main=paste(sources[i],post[i]))
+}
 ```

@@ -1,37 +1,13 @@
 import os
 
 import geopandas as gpd
-import matplotlib
-
-matplotlib.use("agg")
-
 import pandas as pd
 from covidcast import plotting
-import numpy as np
 
 SHAPEFILE_PATHS = {"county": "../../covidcast/shapefiles/cb_2019_us_county_5m.zip",
                    "state": "../../covidcast/shapefiles/cb_2019_us_state_5m.zip"}
 
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
-
-
-def test_plot_choropleth():
-    matplotlib.use("agg")
-    # load expected choropleth as an array
-    expected = np.load(os.path.join(CURRENT_PATH, "../reference_data/expected_plot_array.npz"))
-    test_df = pd.read_csv(os.path.join(CURRENT_PATH, "../reference_data/test_signal.csv"),
-                          dtype=str)
-    test_df["time_value"] = test_df.time_value.astype("datetime64[D]")
-    test_df["value"] = test_df.value.astype("float")
-
-    fig1 = plotting.plot_choropleth(test_df)
-    data1 = np.frombuffer(fig1.canvas.tostring_rgb(), dtype=np.uint8)  # get np array representation
-    # give margin of +-2 for floating point errors and platform discrepancies.
-    assert np.allclose(data1, expected["expected_1"], atol=2, rtol=0)
-
-    fig2 = plotting.plot_choropleth(test_df, cmap="viridis", figsize=(5, 5), edgecolor="0.8")
-    data2 = np.frombuffer(fig2.canvas.tostring_rgb(), dtype=np.uint8)
-    assert np.allclose(data2, expected["expected_2"], atol=2, rtol=0)
 
 
 def test_get_geo_df():

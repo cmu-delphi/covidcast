@@ -58,6 +58,7 @@ def plot_choropleth(data: pd.DataFrame,
     ax.axis("off")
     sm = plt.cm.ScalarMappable(cmap=kwargs["cmap"],
                                norm=plt.Normalize(vmin=kwargs["vmin"], vmax=kwargs["vmax"]))
+    sm._A = []  # this is to remove the set_array error that occurs on some platforms
     plt.title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")
     for shape in _project_and_transform(data_w_geo):
         shape.plot("value", ax=ax, **kwargs)

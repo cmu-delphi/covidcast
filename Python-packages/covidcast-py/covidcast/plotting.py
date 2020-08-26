@@ -27,14 +27,14 @@ def get_geo_df(data: pd.DataFrame,
     After detecting the geography type (either county or state) for the input, loads the
     GeoDataFrame which contains state and geometry information from the Census for that geography
     type. By default, it will take the input data (left side) and geo data (right side) and right
-    join them, so all states/counties will always be present regardless of the input i.e. the
-    output dimension for a given geo_type is always the same regardless of input.
-    `left`, `outer`, `inner` joins are also supported.
+    join them, so all states/counties will always be present regardless whether ``data`` contains
+    values for those locations. ``left``, ``outer``, and ``inner`` joins are also supported and
+    can be selected with the ``join_type`` argument.
 
     For right joins on counties, all counties without a signal value will be given the value of
     the megacounty (if present). Other joins will not use megacounties.
 
-    Returns the columns containing the input columns along with a
+    Returns the columns from ``data`` along with
     `geometry` (polygon for plotting) and `state_fips` (FIPS code which will be used in the
     plotting function to rearrange AK and HI) column. Coordinate system is GCS NAD83.
 

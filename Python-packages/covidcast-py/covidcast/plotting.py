@@ -135,13 +135,8 @@ def _project_and_transform(data: gpd.GeoDataFrame) -> Tuple:
     Also scales and translates so Alaska and Hawaii are in the bottom left corner and Puerto Rico
     is closer to Hawaii.
 
-<<<<<<< HEAD
-    :param data: GeoDF with shape info and a column designating the state
-    :return: Tuple of four GeoDFs: Contiguous US, Alaska, Hawaii, and Puerto Rico
-=======
     :param data: GeoDF with shape info and a column designating the state.
     :return: Tuple of four GeoDFs: Contiguous US, Alaska, Hawaii, and Puerto Rico.
->>>>>>> plot_functions
     """
     cont = data.loc[[i not in ('02', '15', '72') for i in data.state_fips], :].to_crs(
         "ESRI:102003")

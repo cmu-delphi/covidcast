@@ -43,7 +43,7 @@ def get_geo_df(data: pd.DataFrame,
     :param geo_value_col: name of column containing values of interest
     :param geo_type_col: name of column containing geography type
     :param join_type: Type of join to do between input data (left side) and geo data (right side). \
-    must be one of `right`(default), `left`, `outer`, `inner`
+    Must be one of `right` (default), `left`, `outer`, or `inner`.
     :return: GeoDataFrame of all state and geometry info for given geo type w/ input data appended.
     """
     if join_type == "right" and any(data[geo_value_col].duplicated()):

@@ -1,4 +1,4 @@
-Fetching data
+Fetching Data
 =============
 
 Signals
@@ -6,7 +6,7 @@ Signals
 
 This package provides one key function to obtain any signal of interest as a
 Pandas data frame. Detailed examples are provided in the :ref:`usage examples
-<example-usage>`.
+<getting-started>`.
 
 .. autofunction:: covidcast.signal
 

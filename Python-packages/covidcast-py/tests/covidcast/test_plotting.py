@@ -20,6 +20,7 @@ def test_get_geo_df():
                                "data_source": ["b", "b", "b"]})
     # test counties
     output = plotting.get_geo_df(test_input)
+    assert type(output) is gpd.GeoDataFrame
     assert output.shape == (3233, test_input.shape[1]+2)
     assert not any(pd.isna(output.geometry))
     assert not any(pd.isna(output.geo_value))  # all geo_values should be populated
@@ -56,6 +57,7 @@ def test__join_state_geo_df():
                                "value": [1.5, 2.5, 3]})
     geo_info = gpd.read_file(os.path.join(CURRENT_PATH, SHAPEFILE_PATHS["state"]))
     output = plotting._join_state_geo_df(test_input, "state_code", geo_info)
+    assert type(output) is gpd.GeoDataFrame
     # test output df is the right dimensions
     assert output.shape == (56, test_input.shape[1]+2)
     # verify values correct
@@ -76,6 +78,7 @@ def test__join_county_geo_df():
                                "test_value2": [21.5, 32.5, 34]})
     geo_info = gpd.read_file(os.path.join(CURRENT_PATH, SHAPEFILE_PATHS["county"]))
     output = plotting._join_county_geo_df(test_input, "county_code", geo_info)
+    assert type(output) is gpd.GeoDataFrame
     assert output.shape == (3233, test_input.shape[1]+2)
     assert output.loc[output.county_code == "24510", "test_value"].iloc[0] == 1.5
     assert output.loc[output.county_code == "31169", "test_value"].iloc[0] == 2.5

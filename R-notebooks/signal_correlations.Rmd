@@ -1,6 +1,7 @@
 ---
 title: "Correlation Analyses for COVID-19 Indicators"
 author: "Delphi Group"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
   html_document:
     code_folding: hide

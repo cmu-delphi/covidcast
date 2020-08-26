@@ -14,5 +14,6 @@ Currently unused.}
 }
 \description{
 Prints a variety of summary statistics about the underlying data, such as
-median values, the date range included, sample sizes, and so on.
+median values, the date range included, sample sizes, and so on, for objects
+returned by \code{covidcast_signal()}.
 }

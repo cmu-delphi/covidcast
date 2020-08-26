@@ -6,6 +6,9 @@ from typing import Union, Iterable, Tuple, List
 import pandas as pd
 from delphi_epidata import Epidata
 
+# Point API requests to the AWS endpoint
+Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
+
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state"}
 
 

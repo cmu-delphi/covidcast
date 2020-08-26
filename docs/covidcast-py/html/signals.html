@@ -1,0 +1,292 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetching data &#8212; COVIDcast API client 0.0.8 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Example usage" href="examples.html" />
+    <link rel="prev" title="COVIDcast API client" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="fetching-data">
+<h1>Fetching data<a class="headerlink" href="#fetching-data" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="signals">
+<h2>Signals<a class="headerlink" href="#signals" title="Permalink to this headline">¶</a></h2>
+<p>This package provides one key function to obtain any signal of interest as a
+Pandas data frame. Detailed examples are provided in the <a class="reference internal" href="examples.html#example-usage"><span class="std std-ref">usage examples</span></a>.</p>
+<dl class="py function">
+<dt id="covidcast.signal">
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">signal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_source</span></em>, <em class="sig-param"><span class="n">signal</span></em>, <em class="sig-param"><span class="n">start_day</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">end_day</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">geo_type</span><span class="o">=</span><span class="default_value">'county'</span></em>, <em class="sig-param"><span class="n">geo_values</span><span class="o">=</span><span class="default_value">'*'</span></em>, <em class="sig-param"><span class="n">as_of</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">issues</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.signal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a Pandas data frame for one signal.</p>
+<p>Obtains data for selected date ranges for all geographic regions of the
+United States. Available data sources and signals are documented in the
+<a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">COVIDcast signal documentation</a>.
+Most (but not all) data sources are available at the county level, but the
+API can also return data aggregated to metropolitan statistical areas,
+hospital referral regions, or states, as desired, by using the <code class="docutils literal notranslate"><span class="pre">geo_type</span></code>
+argument.</p>
+<p>The COVIDcast API tracks updates and changes to its underlying data, and
+records the first date each observation became available. For example, a
+data source may report its estimate for a specific state on June 3rd on June
+5th, once records become available. This data is considered “issued” on June
+5th. Later, the data source may update its estimate for June 3rd based on
+revised data, creating a new issue on June 8th. By default, <code class="docutils literal notranslate"><span class="pre">signal()</span></code>
+returns the most recent issue available for every observation. The
+<code class="docutils literal notranslate"><span class="pre">as_of</span></code>, <code class="docutils literal notranslate"><span class="pre">issues</span></code>, and <code class="docutils literal notranslate"><span class="pre">lag</span></code> parameters allow the user to select
+specific issues instead, or to see all updates to observations. These
+options are mutually exclusive; if you specify more than one, <code class="docutils literal notranslate"><span class="pre">as_of</span></code> will
+take priority over <code class="docutils literal notranslate"><span class="pre">issues</span></code>, which will take priority over <code class="docutils literal notranslate"><span class="pre">lag</span></code>.</p>
+<p>Note that the API only tracks the initial value of an estimate and <em>changes</em>
+to that value. If a value was first issued on June 5th and never updated,
+asking for data issued on June 6th (using <code class="docutils literal notranslate"><span class="pre">issues</span></code> or <code class="docutils literal notranslate"><span class="pre">lag</span></code>) would <em>not</em>
+return that value, though asking for data <code class="docutils literal notranslate"><span class="pre">as_of</span></code> June 6th would.</p>
+<p>Note also that the API enforces a maximum result row limit; results beyond
+the maximum limit are truncated. This limit is sufficient to fetch
+observations in all counties in the United States on one day. This client
+automatically splits queries for multiple days across multiple API calls.
+However, if data for one day has been issued many times, using the
+<code class="docutils literal notranslate"><span class="pre">issues</span></code> argument may return more results than the query limit. A warning
+will be issued in this case. To see all results, split your query across
+multiple calls with different <code class="docutils literal notranslate"><span class="pre">issues</span></code> arguments.</p>
+<p>See the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API documentation</a> for more
+information on available geography types, signals, and data formats, and
+further discussion of issue dates and data versioning.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_source</strong> – String identifying the data source to query, such as
+<code class="docutils literal notranslate"><span class="pre">&quot;fb-survey&quot;</span></code>.</p></li>
+<li><p><strong>signal</strong> – String identifying the signal from that source to query,
+such as <code class="docutils literal notranslate"><span class="pre">&quot;smoothed_cli&quot;</span></code>.</p></li>
+<li><p><strong>start_day</strong> – Query data beginning on this date. Provided as a
+<code class="docutils literal notranslate"><span class="pre">datetime.date</span></code> object. If <code class="docutils literal notranslate"><span class="pre">start_day</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to the
+first day data is available for this signal.</p></li>
+<li><p><strong>end_day</strong> – Query data up to this date, inclusive. <code class="docutils literal notranslate"><span class="pre">datetime.date</span></code>
+object. If <code class="docutils literal notranslate"><span class="pre">end_day</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to the most recent day data
+is available for this signal.</p></li>
+<li><p><strong>geo_type</strong> – The geography type for which to request this data, such as
+<code class="docutils literal notranslate"><span class="pre">&quot;county&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;state&quot;</span></code>. Available types are described in the
+COVIDcast signal documentation. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;county&quot;</span></code>.</p></li>
+<li><p><strong>geo_values</strong> – The geographies to fetch data for. The default, <code class="docutils literal notranslate"><span class="pre">&quot;*&quot;</span></code>,
+fetches all geographies. To fetch one geography, specify its ID as a
+string; multiple geographies can be provided as an iterable (list, tuple,
+…) of strings.</p></li>
+<li><p><strong>as_of</strong> – Fetch only data that was available on or before this date,
+provided as a <code class="docutils literal notranslate"><span class="pre">datetime.date</span></code> object. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the default, return
+the most recent available data.</p></li>
+<li><p><strong>issues</strong> – Fetch only data that was published or updated (“issued”) on
+these dates. Provided as either a single <code class="docutils literal notranslate"><span class="pre">datetime.date</span></code> object,
+indicating a single date to fetch data issued on, or a tuple or list
+specifying (start, end) dates. In this case, return all data issued in
+this range. There may be multiple rows for each observation, indicating
+several updates to its value. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the default, return the most
+recently issued data.</p></li>
+<li><p><strong>lag</strong> – Integer. If, for example, <code class="docutils literal notranslate"><span class="pre">lag=3</span></code>, fetch only data that was
+published or updated exactly 3 days after the date. For example, a row
+with <code class="docutils literal notranslate"><span class="pre">time_value</span></code> of June 3 will only be included in the results if its
+data was issued or updated on June 6. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the default, return the
+most recently issued data regardless of its lag.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>A Pandas data frame with matching data. Each row is one
+observation on one day in one geographic location. Contains the following
+columns:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">geo_value</span></code></dt><dd><p>identifies the location, such as a state name or county FIPS code.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">time_value</span></code></dt><dd><p>contains a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html">pandas Timestamp object</a>
+identifying the date this estimate is for.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">issue</span></code></dt><dd><p>contains a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html">pandas Timestamp object</a>
+identifying the date this estimate was issued. For example, an estimate
+with a <code class="docutils literal notranslate"><span class="pre">time_value</span></code> of June 3 might have been issued on June 5, after
+the data for June 3rd was collected and ingested into the API.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">lag</span></code></dt><dd><p>an integer giving the difference between <code class="docutils literal notranslate"><span class="pre">issue</span></code> and <code class="docutils literal notranslate"><span class="pre">time_value</span></code>,
+in days.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">value</span></code></dt><dd><p>the signal quantity requested. For example, in a query for the
+<code class="docutils literal notranslate"><span class="pre">confirmed_cumulative_num</span></code> signal from the <code class="docutils literal notranslate"><span class="pre">usa-facts</span></code> source,
+this would be the cumulative number of confirmed cases in the area, as
+of the <code class="docutils literal notranslate"><span class="pre">time_value</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">stderr</span></code></dt><dd><p>the value’s standard error, if available.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">sample_size</span></code></dt><dd><p>indicates the sample size available in that geography on that day;
+sample size may not be available for all signals, due to privacy or
+other constraints.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">direction</span></code></dt><dd><p>uses a local linear fit to estimate whether the signal in this region is
+currently increasing or decreasing (reported as -1 for decreasing, 1 for
+increasing, and 0 for neither).</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<p>Consult the signal documentation for more details on how values and standard
+errors are calculated for specific signals.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="metadata">
+<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h2>
+<p>Many data sources and signals are available, so one can also obtain a data frame
+of all signals and their associated metadata:</p>
+<dl class="py function">
+<dt id="covidcast.metadata">
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch COVIDcast surveillance stream metadata.</p>
+<p>Obtains a data frame of metadata describing all publicly available data
+streams from the COVIDcast API. See the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">data source and signals
+documentation</a>
+for descriptions of the available sources.</p>
+<p>The returned data frame contains one row per available signal, with the
+following columns:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">data_source</span></code></dt><dd><p>Data source name.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">signal</span></code></dt><dd><p>Signal name.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">min_time</span></code></dt><dd><p>First day for which this signal is available.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">max_time</span></code></dt><dd><p>Most recent day for which this signal is available.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">geo_type</span></code></dt><dd><p>Geographic level for which this signal is available, such as county,
+state, msa, or hrr. Most signals are available at multiple geographic
+levels and will hence be listed in multiple rows with their own
+metadata.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">time_type</span></code></dt><dd><p>Temporal resolution at which this signal is reported. “day”, for
+example, means the signal is reported daily.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">num_locations</span></code></dt><dd><p>Number of distinct geographic locations available for this signal. For
+example, if <cite>geo_type</cite> is county, the number of counties for which this
+signal has ever been reported.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">min_value</span></code></dt><dd><p>The smallest value that has ever been reported.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">max_value</span></code></dt><dd><p>The largest value that has ever been reported.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">mean_value</span></code></dt><dd><p>The arithmetic mean of all reported values.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">stdev_value</span></code></dt><dd><p>The sample standard deviation of all reported values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">COVIDcast API client</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Fetching data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#signals">Signals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#metadata">Metadata</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Example usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+
+<hr />
+<ul>
+    
+    <li class="toctree-l1"><a href="https://delphi.cmu.edu/">Delphi group</a></li>
+    
+    <li class="toctree-l1"><a href="https://covidcast.cmu.edu/">COVIDcast maps</a></li>
+    
+    <li class="toctree-l1"><a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a></li>
+    
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">COVIDcast API client</a></li>
+      <li>Next: <a href="examples.html" title="next chapter">Example usage</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Delphi research group.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/signals.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

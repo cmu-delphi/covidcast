@@ -12,10 +12,11 @@ generates a choropleth map. Detailed examples are provided in the :ref:`usage ex
 
 .. autofunction:: covidcast.plot_choropleth
 
-GeoDataFrame
-------------
+Creating a GeoDataFrame
+-----------------------
 
-A function for generating a GeoPandas GeoDataFrame with signal information appended is also
+A function for generating a
+`GeoPandas GeoDataFrame <https://geopandas.org/reference/geopandas.GeoDataFrame.html>`_ with signal information appended is also
 provided if the user desires more control over their plotting.
 
 .. autofunction:: covidcast.get_geo_df

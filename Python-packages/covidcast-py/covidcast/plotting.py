@@ -77,7 +77,7 @@ def get_geo_df(data: pd.DataFrame,
     """Append polygons to a dataframe for a given geography and return a geoDF with this info.
 
     This method takes in a pandas DataFrame object and returns a GeoDataFrame object from the
-    `geopandas package <https://geopandas.org/>`__.
+    `GeoPandas package <https://geopandas.org/>`__.
 
     Shapefiles are 1:5,000,000 scale and sourced from the `2019 US Census Cartographic Boundary
     Files
@@ -111,7 +111,7 @@ def get_geo_df(data: pd.DataFrame,
     if join_type == "right" and any(data[geo_value_col].duplicated()):
         raise ValueError("join_type `right` is incompatible with duplicate values in a "
                          "given region. Use `left` or ensure your input data is a single signal for"
-                         "a single date and geography type. ")
+                         " a single date and geography type. ")
     geo_type = _detect_metadata(data, geo_type_col)[2]  # pylint: disable=W0212
     if geo_type not in ["state", "county"]:
         raise ValueError("Unsupported geography type; only state and county supported.")

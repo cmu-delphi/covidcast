@@ -85,7 +85,7 @@ having only one row of signal information per geographic region. If this is not 
 must use another join.
 
 >>> data = covidcast.signal("fb-survey", "smoothed_cli",
-...                          date(2020, 8, 3), date(2020, 8, 4),
+...                          date(2020, 8, 4), date(2020, 8, 4),
 ...                          geo_type = "county")
 >>> covidcast.get_geo_df(data)
      geo_value time_value  direction      issue  lag     value    stderr  sample_size geo_type data_source        signal                                           geometry state_fips
@@ -123,7 +123,7 @@ With the left join, there are 845 rows since the signal returned information for
 megacounties.
 
 With the GeoDataFrame, you can plot various data points in whatever style you prefer. For example,
-plotting California with a Mercator projection:
+plotting California on August 4, 2020 with a Mercator projection:
 
 >>> CA = geo_data.loc[geo_data.state_fips == "06",:]
 >>> CA.to_crs("EPSG:3395")
@@ -136,7 +136,7 @@ plotting California with a Mercator projection:
     import covidcast
     from datetime import date
     from matplotlib import pyplot as plt
-    data = covidcast.signal("fb-survey", "smoothed_cli", start_day=date(2020, 8, 3), end_day=date(2020, 8, 4), geo_type="county")
+    data = covidcast.signal("fb-survey", "smoothed_cli", start_day=date(2020, 8, 4), end_day=date(2020, 8, 4), geo_type="county")
     geo_data = covidcast.get_geo_df(data)
     CA = geo_data.loc[geo_data.state_fips == "06",:]
     CA = CA.to_crs("EPSG:3395")

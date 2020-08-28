@@ -3,6 +3,9 @@
 from datetime import date
 from typing import Tuple
 
+from datetime import date
+from typing import Tuple
+
 import geopandas as gpd
 import numpy as np
 import pandas as pd
@@ -42,7 +45,6 @@ def plot_choropleth(data: pd.DataFrame,
         day. Defaults to plotting the most recent day of data in ``data``.
     :param kwargs: Optional keyword arguments passed to plot().
     :return: Matplotlib figure object.
-
     """
     data_source, signal, geo_type = _detect_metadata(data)  # pylint: disable=W0212
     meta = _signal_metadata(data_source, signal, geo_type)  # pylint: disable=W0212
@@ -83,6 +85,9 @@ def get_geo_df(data: pd.DataFrame,
     Files
     <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`__
 
+
+    Shapefiles are 1:5,000,000 scale and sourced from the 2019 US Census Cartographic Boundary Files
+    <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`__
 
     After detecting the geography type (either county or state) for the input, loads the
     GeoDataFrame which contains state and geometry information from the Census for that geography

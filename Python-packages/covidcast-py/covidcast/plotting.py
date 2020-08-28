@@ -3,9 +3,6 @@
 from datetime import date
 from typing import Tuple
 
-from datetime import date
-from typing import Tuple
-
 import geopandas as gpd
 import numpy as np
 import pandas as pd
@@ -83,10 +80,6 @@ def get_geo_df(data: pd.DataFrame,
 
     Shapefiles are 1:5,000,000 scale and sourced from the `2019 US Census Cartographic Boundary
     Files
-    <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`__
-
-
-    Shapefiles are 1:5,000,000 scale and sourced from the 2019 US Census Cartographic Boundary Files
     <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`__
 
     After detecting the geography type (either county or state) for the input, loads the

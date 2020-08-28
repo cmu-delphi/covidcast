@@ -3,18 +3,25 @@
 Plotting Examples
 =================
 
-Built-in Functionality
+Built-in functionality
 ----------------------
 The returned DataFrame from :py:func:`covidcast.signal` can be plotted using the built-in
 :py:func:`covidcast.plot_choropleth`. Currently only state and county geography types are supported.
 
->>> from covidcast import covidcast, plotting
+County-level maps show estimates for each county, and color each state by the
+megacounty estimates, if available. (Megacounties represent all counties with
+insufficient sample size to report in that state; see the `geographic coding
+documentation
+<https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html>`_ for
+details.)
+
+>>> import covidcast
 >>> from datetime import date
 >>> from matplotlib import pyplot as plt
 >>> data = covidcast.signal("fb-survey", "smoothed_cli",
 ...                          date(2020, 8, 3), date(2020, 8, 4),
 ...                          geo_type="county")
->>> plotting.plot_choropleth(data)
+>>> covidcast.plot_choropleth(data)
 >>> plt.show()
 
 .. plot::
@@ -26,10 +33,12 @@ The returned DataFrame from :py:func:`covidcast.signal` can be plotted using the
     covidcast.plot_choropleth(data)
     plt.show()
 
+State-level data can also be mapped:
+
 >>> data = covidcast.signal("fb-survey", "smoothed_cli",
 ...                          date(2020, 8, 3), date(2020, 8, 4),
 ...                          geo_type="state")
->>> plotting.plot_choropleth(data)
+>>> covidcast.plot_choropleth(data)
 >>> plt.show()
 
 .. plot::
@@ -46,7 +55,7 @@ available for the
 `GeoPandas plot() function <https://geopandas.org/reference.html#geopandas.GeoSeries.plot>`_.
 
 
->>> plotting.plot_choropleth(data,
+>>> covidcast.plot_choropleth(data,
 ...                          cmap="viridis",
 ...                          edgecolor="0.8")
 >>> plt.show()
@@ -67,7 +76,7 @@ which can be stored and altered further.
 >>> fig = plotting.plot_choropleth(data)
 >>> fig.set_dpi(100)
 
-Further Customization
+Further customization
 ---------------------
 If more control is desired, the signal data can be passed to :py:func:`covidcast.get_geo_df`, which
 will return a
@@ -79,10 +88,12 @@ provided by that package. The geometry information is sourced from the
 The :py:func:`covidcast.get_geo_df` method can return different joins depending on your use case. By
 default, it will try to compute the right join between the input data (left side of join) to the
 geometry data (right side of join), so that the returned GeoDataFrame will contain all the possible
-geometries with the signal values filled if present. Counties which do not have values but have
-a corresponding megacounty will inherit the megacounty values. This operation depends on
-having only one row of signal information per geographic region. If this is not the the case, you
-must use another join.
+geometries with the signal values filled if present. When mapping counties, those that do not have values but have
+a corresponding megacounty will inherit the megacounty values.
+
+This operation depends on having only one row of signal information per
+geographic region. If this is not the the case, you must specify another join
+with the ``join_type`` argument.
 
 >>> data = covidcast.signal("fb-survey", "smoothed_cli",
 ...                          date(2020, 8, 4), date(2020, 8, 4),
@@ -122,8 +133,9 @@ Note that there are 3233 output rows for the 3233 counties present in the Census
 With the left join, there are 845 rows since the signal returned information for 845 counties and
 megacounties.
 
-With the GeoDataFrame, you can plot various data points in whatever style you prefer. For example,
-plotting California on August 4, 2020 with a Mercator projection:
+With the GeoDataFrame, you can plot various data points in whatever style you
+prefer. For example, plotting California on August 4, 2020 with a `Mercator
+projection <https://epsg.io/3395>`_:
 
 >>> CA = geo_data.loc[geo_data.state_fips == "06",:]
 >>> CA.to_crs("EPSG:3395")

@@ -1,9 +1,4 @@
-"""This contains the plotting and geo data management methods for the COVIDcast signals.
-
-Shapefiles are sourced from the 2019 US Census Cartographic Boundary Files
-https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html
-Scale is 1:5,000,000
-"""
+"""This contains the plotting and geo data management methods for the COVIDcast signals."""
 
 from datetime import date
 from typing import Tuple
@@ -23,22 +18,29 @@ SHAPEFILE_PATHS = {"county": "shapefiles/county/cb_2019_us_county_5m.shp",
 def plot_choropleth(data: pd.DataFrame,
                     time_value: date = None,
                     **kwargs) -> gpd.GeoDataFrame:
-    """Given the output df of covidcast.signal(), plot a choropleth map.
+    """Given the output data frame of :py:func:`covidcast.signal`, plot a choropleth map.
 
-    Projections:
-    ESRI:102003 (USA Contiguous Albers Equal Area Conic) for the contiguous US and Puerto Rico
-    ESRI:102006 (Alaska Albers Equal Area Conic) for Alaska
-    ESRI:102007 (Hawaii Albers Equal Area Conic) for Hawaii
+    Projections used for plotting:
+
+    - ESRI:102003 (USA Contiguous Albers Equal Area Conic) for the contiguous US
+      and Puerto Rico
+    - ESRI:102006 (Alaska Albers Equal Area Conic) for Alaska
+    - ESRI:102007 (Hawaii Albers Equal Area Conic) for Hawaii
+      (Hawaii Albers Equal Area Conic) for Hawaii
 
     For visual purposes, Alaska and Hawaii are moved the lower left corner of the contiguous US
     and Puerto Rico is moved closer to Florida.
 
-    By default, the colormap used is ``YlOrRd`` and is binned into the signal's mean value +- 3
-    standard deviations. Custom arguments can be passed in as kwargs for customizability.
+    By default, the colormap used is ``YlOrRd`` and is binned into the signal's
+    mean value +- 3 standard deviations. Custom arguments can be passed in as
+    ``kwargs`` for customizability. These arguments will be past to the
+    GeoPandas ``plot`` method; more information on these arguments can be found
+    in `the GeoPandas documentation
+    <https://geopandas.org/reference.html#geopandas.GeoSeries.plot>`__.
 
     :param data: DataFrame of values and geographies.
-    :param time_value: If multiple days of data are present in ``data``, map only values from this
-    day. Defaults to plotting the most recent day of data in ``data``.
+    :param time_value: If multiple days of data are present in ``data``, map only values from this \
+        day. Defaults to plotting the most recent day of data in ``data``.
     :param kwargs: Optional keyword arguments passed to plot().
     :return: Matplotlib figure object.
     """
@@ -75,9 +77,10 @@ def get_geo_df(data: pd.DataFrame,
     """Append polygons to a dataframe for a given geography and return a geoDF with this info.
 
     This method takes in a pandas DataFrame object and returns a GeoDataFrame object from the
-    `geopandas package <https://geopandas.org/>`__.
+    `GeoPandas package <https://geopandas.org/>`__.
 
-    Shapefiles are 1:5,000,000 scale and sourced from the 2019 US Census Cartographic Boundary Files
+    Shapefiles are 1:5,000,000 scale and sourced from the `2019 US Census Cartographic Boundary
+    Files
     <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`__
 
     After detecting the geography type (either county or state) for the input, loads the
@@ -94,7 +97,7 @@ def get_geo_df(data: pd.DataFrame,
     `geometry` (polygon for plotting) and `state_fips` (FIPS code which will be used in the
     plotting function to rearrange AK and HI) column. Coordinate system is GCS NAD83.
 
-    Default arguments for column names correspond to return of :py:func:`covidcast.signal`.
+    Default arguments for column names correspond to those used by :py:func:`covidcast.signal`.
     Currently only supports counties and states.
 
     :param data: DataFrame of values and geographies
@@ -107,7 +110,7 @@ def get_geo_df(data: pd.DataFrame,
     if join_type == "right" and any(data[geo_value_col].duplicated()):
         raise ValueError("join_type `right` is incompatible with duplicate values in a "
                          "given region. Use `left` or ensure your input data is a single signal for"
-                         "a single date and geography type. ")
+                         " a single date and geography type. ")
     geo_type = _detect_metadata(data, geo_type_col)[2]  # pylint: disable=W0212
     if geo_type not in ["state", "county"]:
         raise ValueError("Unsupported geography type; only state and county supported.")
@@ -162,7 +165,7 @@ def _join_state_geo_df(data: pd.DataFrame,
     # use full state list in the return
     merged[state_col] = [j if pd.isna(i) else i for i, j in zip(merged.STUSPS, merged[state_col])]
     merged.rename(columns={"STATEFP": "state_fips"}, inplace=True)
-    return merged[input_cols + ["geometry", "state_fips"]]
+    return gpd.GeoDataFrame(merged[input_cols + ["geometry", "state_fips"]])
 
 
 def _join_county_geo_df(data: pd.DataFrame,
@@ -193,4 +196,4 @@ def _join_county_geo_df(data: pd.DataFrame,
     # use the full county FIPS list in the return
     merged[county_col] = [j if pd.isna(i) else i for i, j in zip(merged.GEOID, merged[county_col])]
     merged.rename(columns={"STATEFP": "state_fips"}, inplace=True)
-    return merged[input_cols + ["geometry", "state_fips"]]
+    return gpd.GeoDataFrame(merged[input_cols + ["geometry", "state_fips"]])

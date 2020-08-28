@@ -167,6 +167,7 @@ def _join_state_geo_df(data: pd.DataFrame,
     return gpd.GeoDataFrame(merged[input_cols + ["geometry", "state_fips"]])
 
 
+
 def _join_county_geo_df(data: pd.DataFrame,
                         county_col: str,
                         geo_info: gpd.GeoDataFrame,

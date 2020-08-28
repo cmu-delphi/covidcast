@@ -5,14 +5,67 @@ https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-bo
 Scale is 1:5,000,000
 """
 
+from datetime import date
+from typing import Tuple
+
 import geopandas as gpd
+import numpy as np
 import pandas as pd
-
 import pkg_resources
-from covidcast.covidcast import _detect_metadata
+from matplotlib import pyplot as plt
 
-SHAPEFILE_PATHS = {"county": "shapefiles/cb_2019_us_county_5m.zip",
-                   "state": "shapefiles/cb_2019_us_state_5m.zip"}
+from .covidcast import _detect_metadata, _signal_metadata
+
+SHAPEFILE_PATHS = {"county": "shapefiles/county/cb_2019_us_county_5m.shp",
+                   "state": "shapefiles/state/cb_2019_us_state_5m.shp"}
+
+
+def plot_choropleth(data: pd.DataFrame,
+                    time_value: date = None,
+                    **kwargs) -> gpd.GeoDataFrame:
+    """Given the output df of covidcast.signal(), plot a choropleth map.
+
+    Projections:
+    ESRI:102003 (USA Contiguous Albers Equal Area Conic) for the contiguous US and Puerto Rico
+    ESRI:102006 (Alaska Albers Equal Area Conic) for Alaska
+    ESRI:102007 (Hawaii Albers Equal Area Conic) for Hawaii
+
+    For visual purposes, Alaska and Hawaii are moved the lower left corner of the contiguous US
+    and Puerto Rico is moved closer to Florida.
+
+    By default, the colormap used is ``YlOrRd`` and is binned into the signal's mean value +- 3
+    standard deviations. Custom arguments can be passed in as kwargs for customizability.
+
+    :param data: DataFrame of values and geographies.
+    :param time_value: If multiple days of data are present in ``data``, map only values from this
+    day. Defaults to plotting the most recent day of data in ``data``.
+    :param kwargs: Optional keyword arguments passed to plot().
+    :return: Matplotlib figure object.
+    """
+    data_source, signal, geo_type = _detect_metadata(data)  # pylint: disable=W0212
+    meta = _signal_metadata(data_source, signal, geo_type)  # pylint: disable=W0212
+    # use most recent date in data if none provided
+    day_to_plot = time_value if time_value else max(data.time_value)
+    day_data = data.loc[data.time_value == day_to_plot, :]
+    data_w_geo = get_geo_df(day_data)
+
+    kwargs["vmin"] = kwargs.get("vmin", 0)
+    kwargs["vmax"] = kwargs.get("vmax", meta["mean_value"] + 3 * meta["stdev_value"])
+    kwargs["cmap"] = kwargs.get("cmap", "YlOrRd")
+    kwargs["figsize"] = kwargs.get("figsize", (12.8, 9.6))
+
+    fig, ax = plt.subplots(1, figsize=kwargs["figsize"])
+    ax.axis("off")
+    sm = plt.cm.ScalarMappable(cmap=kwargs["cmap"],
+                               norm=plt.Normalize(vmin=kwargs["vmin"], vmax=kwargs["vmax"]))
+    # this is to remove the set_array error that occurs on some platforms
+    sm._A = []  # pylint: disable=W0212
+    plt.title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")
+    for shape in _project_and_transform(data_w_geo):
+        shape.plot("value", ax=ax, **kwargs)
+    plt.colorbar(sm, ticks=np.linspace(kwargs["vmin"], kwargs["vmax"], 8), ax=ax,
+                 orientation="horizontal", fraction=0.02, pad=0.05)
+    return fig
 
 
 def get_geo_df(data: pd.DataFrame,
@@ -23,6 +76,9 @@ def get_geo_df(data: pd.DataFrame,
 
     This method takes in a pandas DataFrame object and returns a GeoDataFrame object from the
     `geopandas package <https://geopandas.org/>`__.
+
+    Shapefiles are 1:5,000,000 scale and sourced from the 2019 US Census Cartographic Boundary Files
+    <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`__
 
     After detecting the geography type (either county or state) for the input, loads the
     GeoDataFrame which contains state and geometry information from the Census for that geography
@@ -56,16 +112,38 @@ def get_geo_df(data: pd.DataFrame,
     if geo_type not in ["state", "county"]:
         raise ValueError("Unsupported geography type; only state and county supported.")
 
-    output_cols = list(data.columns) + ["geometry", "state_fips"]
     shapefile_path = pkg_resources.resource_filename(__name__, SHAPEFILE_PATHS[geo_type])
-    geo_info = gpd.read_file("zip://" + shapefile_path)
+    geo_info = gpd.read_file(shapefile_path)
 
     if geo_type == "state":
         output = _join_state_geo_df(data, geo_value_col, geo_info, join_type)
     else:  # geo_type must be "county"
         output = _join_county_geo_df(data, geo_value_col, geo_info, join_type)
-    output.rename(columns={"STATEFP": "state_fips"}, inplace=True)
-    return output[output_cols]
+    return output
+
+
+def _project_and_transform(data: gpd.GeoDataFrame) -> Tuple:
+    """Segment and break GeoDF into Continental US, Alaska, Puerto Rico, and Hawaii for plotting.
+
+    Given GeoDF with state fips column, break into Continental US, Alaska, Puerto Rico, and Hawaii
+    GeoDFs with their own Albers Equal Area Conic Projections.
+
+    Also scales and translates so Alaska and Hawaii are in the bottom left corner and Puerto Rico
+    is closer to Hawaii.
+
+    :param data: GeoDF with shape info and a column designating the state.
+    :return: Tuple of four GeoDFs: Contiguous US, Alaska, Hawaii, and Puerto Rico.
+    """
+    cont = data.loc[[i not in ('02', '15', '72') for i in data.state_fips], :].to_crs(
+        "ESRI:102003")
+    alaska = data.loc[data.state_fips == '02', :].to_crs("ESRI:102006")
+    pr = data.loc[data.state_fips == '72', :].to_crs("ESRI:102003")
+    hawaii = data.loc[data.state_fips == '15', :].to_crs("ESRI:102007")
+
+    alaska.geometry = alaska.geometry.scale(0.35, 0.35, origin=(0, 0)).translate(-1.8e6, -1.6e6)
+    hawaii.geometry = hawaii.geometry.translate(-1e6, -2e6)
+    pr.geometry = pr.geometry.translate(-0.9e6, 1e6).rotate(-16, origin=(0, 0))
+    return cont, alaska, pr, hawaii
 
 
 def _join_state_geo_df(data: pd.DataFrame,
@@ -78,11 +156,13 @@ def _join_state_geo_df(data: pd.DataFrame,
     :param state_col: cname of column in `data` containing state info to join on
     :param geo_info: GeoDF of state shape info read from Census shapefiles
     """
+    input_cols = list(data.columns)
     geo_info.STUSPS = [i.lower() for i in geo_info.STUSPS]  # lowercase for consistency
     merged = data.merge(geo_info, how=join_type, left_on=state_col, right_on="STUSPS",)
     # use full state list in the return
     merged[state_col] = [j if pd.isna(i) else i for i, j in zip(merged.STUSPS, merged[state_col])]
-    return merged
+    merged.rename(columns={"STATEFP": "state_fips"}, inplace=True)
+    return merged[input_cols + ["geometry", "state_fips"]]
 
 
 def _join_county_geo_df(data: pd.DataFrame,
@@ -98,16 +178,19 @@ def _join_county_geo_df(data: pd.DataFrame,
     :param county_col: name of column in `data` containing county info to join on
     :param geo_info: GeoDF of county shape info read from Census shapefiles
     """
+    input_cols = list(data.columns)
     # create state FIPS code in copy, otherwise original gets modified
     data = data.assign(state=[i[:2] for i in data[county_col]])
     # join all counties with valid FIPS
     merged = data.merge(geo_info, how=join_type, left_on=county_col, right_on="GEOID")
-    mega_county_df = data.loc[[i.endswith("000") for i in data[county_col]],
-                              ["state", "value"]]
+    mega_county_df = data.loc[[i.endswith("000") for i in data[county_col]], :]
     if not mega_county_df.empty and join_type == "right":
-        # if mega counties exist, join them on state, and then use that value if no original signal
+        # if mega counties exist, join them on state
         merged = merged.merge(mega_county_df, how="left", left_on="STATEFP", right_on="state")
-        merged["value"] = [j if pd.isna(i) else i for i, j in zip(merged.value_x, merged.value_y)]
+        # if no county value present, us the megacounty values
+        for c in input_cols:
+            merged[c] = [j if pd.isna(i) else i for i, j in zip(merged[f"{c}_x"], merged[f"{c}_y"])]
     # use the full county FIPS list in the return
     merged[county_col] = [j if pd.isna(i) else i for i, j in zip(merged.GEOID, merged[county_col])]
-    return merged
+    merged.rename(columns={"STATEFP": "state_fips"}, inplace=True)
+    return merged[input_cols + ["geometry", "state_fips"]]

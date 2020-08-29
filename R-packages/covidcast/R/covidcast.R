@@ -653,7 +653,7 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_va
                     nrow(dat[[i]]$epidata)))
 
     if (dat[[i]]$message != "success") {
-      warning("Fetching data for ", day,
+      warning("Fetching ", signal, " from ", data_source, " for ", day,
               " in geography '", geo_value, "': ", dat[[i]]$message)
     }
   }

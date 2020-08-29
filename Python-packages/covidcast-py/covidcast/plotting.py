@@ -165,7 +165,7 @@ def _join_state_geo_df(data: pd.DataFrame,
     # use full state list in the return
     merged[state_col] = [j if pd.isna(i) else i for i, j in zip(merged.STUSPS, merged[state_col])]
     merged.rename(columns={"STATEFP": "state_fips"}, inplace=True)
-    return gpd.GeoDataFrame(merged[input_cols + ["geometry", "state_fips"]])
+    return gpd.GeoDataFrame(merged[input_cols + ["state_fips", "geometry"]])
 
 
 def _join_county_geo_df(data: pd.DataFrame,
@@ -196,4 +196,4 @@ def _join_county_geo_df(data: pd.DataFrame,
     # use the full county FIPS list in the return
     merged[county_col] = [j if pd.isna(i) else i for i, j in zip(merged.GEOID, merged[county_col])]
     merged.rename(columns={"STATEFP": "state_fips"}, inplace=True)
-    return gpd.GeoDataFrame(merged[input_cols + ["geometry", "state_fips"]])
+    return gpd.GeoDataFrame(merged[input_cols + ["state_fips", "geometry"]])

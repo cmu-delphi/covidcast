@@ -103,9 +103,9 @@ def test__join_county_geo_df():
     pd.testing.assert_frame_equal(expected1, output1)
 
     # test left join
-    output = plotting._join_county_geo_df(test_input, "county_code", geo_info, "left")
+    output2 = plotting._join_county_geo_df(test_input, "county_code", geo_info, "left")
     expected2 = gpd.read_file(
         os.path.join(CURRENT_PATH, "../reference_data/expected__join_county_geo_df_left.gpkg"),
         dtype={"geo_value": str})
-    pd.testing.assert_frame_equal(expected2, output)
+    pd.testing.assert_frame_equal(expected2, output2)
 

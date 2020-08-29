@@ -161,7 +161,7 @@ def _join_state_geo_df(data: pd.DataFrame,
     """
     input_cols = list(data.columns)
     geo_info.STUSPS = [i.lower() for i in geo_info.STUSPS]  # lowercase for consistency
-    merged = data.merge(geo_info, how=join_type, left_on=state_col, right_on="STUSPS",)
+    merged = data.merge(geo_info, how=join_type, left_on=state_col, right_on="STUSPS", sort=True)
     # use full state list in the return
     merged[state_col] = [j if pd.isna(i) else i for i, j in zip(merged.STUSPS, merged[state_col])]
     merged.rename(columns={"STATEFP": "state_fips"}, inplace=True)
@@ -185,11 +185,12 @@ def _join_county_geo_df(data: pd.DataFrame,
     # create state FIPS code in copy, otherwise original gets modified
     data = data.assign(state=[i[:2] for i in data[county_col]])
     # join all counties with valid FIPS
-    merged = data.merge(geo_info, how=join_type, left_on=county_col, right_on="GEOID")
+    merged = data.merge(geo_info, how=join_type, left_on=county_col, right_on="GEOID",  sort=True)
     mega_county_df = data.loc[[i.endswith("000") for i in data[county_col]], :]
     if not mega_county_df.empty and join_type == "right":
         # if mega counties exist, join them on state
-        merged = merged.merge(mega_county_df, how="left", left_on="STATEFP", right_on="state")
+        merged = merged.merge(mega_county_df, how="left", left_on="STATEFP",
+                              right_on="state", sort=True)
         # if no county value present, us the megacounty values
         for c in input_cols:
             merged[c] = [j if pd.isna(i) else i for i, j in zip(merged[f"{c}_x"], merged[f"{c}_y"])]

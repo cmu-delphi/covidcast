@@ -70,9 +70,9 @@ def signal(data_source: str,
     :param start_day: Query data beginning on this date. Provided as a
       ``datetime.date`` object. If ``start_day`` is ``None``, defaults to the
       first day data is available for this signal.
-    :param end_day: Query data up to this date, inclusive. ``datetime.date``
-      object. If ``end_day`` is ``None``, defaults to the most recent day data
-      is available for this signal.
+    :param end_day: Query data up to this date, inclusive. Provided as a
+      ``datetime.date`` object. If ``end_day`` is ``None``, defaults to the most
+      recent day data is available for this signal.
     :param geo_type: The geography type for which to request this data, such as
       ``"county"`` or ``"state"``. Available types are described in the
       COVIDcast signal documentation. Defaults to ``"county"``.
@@ -100,7 +100,10 @@ def signal(data_source: str,
       columns:
 
       ``geo_value``
-        identifies the location, such as a state name or county FIPS code.
+        identifies the location, such as a state name or county FIPS code. The
+        geographic coding used by COVIDcast is described in the `API
+        documentation here
+        <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html>`_.
 
       ``time_value``
         contains a `pandas Timestamp object
@@ -137,8 +140,10 @@ def signal(data_source: str,
         currently increasing or decreasing (reported as -1 for decreasing, 1 for
         increasing, and 0 for neither).
 
-    Consult the signal documentation for more details on how values and standard
-    errors are calculated for specific signals.
+    Consult the `signal documentation
+    <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html>`_
+    for more details on how values and standard errors are calculated for
+    specific signals.
 
     """
 
@@ -190,47 +195,48 @@ def metadata() -> pd.DataFrame:
     <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html>`_
     for descriptions of the available sources.
 
-    The returned data frame contains one row per available signal, with the
-    following columns:
+    :returns: A data frame containing one row per available signal, with the
+      following columns:
 
-    ``data_source``
+      ``data_source``
         Data source name.
 
-    ``signal``
+      ``signal``
         Signal name.
 
-    ``min_time``
+      ``min_time``
         First day for which this signal is available.
 
-    ``max_time``
+      ``max_time``
         Most recent day for which this signal is available.
 
-    ``geo_type``
+      ``geo_type``
         Geographic level for which this signal is available, such as county,
         state, msa, or hrr. Most signals are available at multiple geographic
         levels and will hence be listed in multiple rows with their own
         metadata.
 
-    ``time_type``
+      ``time_type``
         Temporal resolution at which this signal is reported. "day", for
         example, means the signal is reported daily.
 
-    ``num_locations``
+      ``num_locations``
         Number of distinct geographic locations available for this signal. For
         example, if `geo_type` is county, the number of counties for which this
         signal has ever been reported.
 
-    ``min_value``
+      ``min_value``
         The smallest value that has ever been reported.
 
-    ``max_value``
+      ``max_value``
         The largest value that has ever been reported.
 
-    ``mean_value``
+      ``mean_value``
         The arithmetic mean of all reported values.
 
-    ``stdev_value``
+      ``stdev_value``
         The sample standard deviation of all reported values.
+
     """
 
     meta = Epidata.covidcast_meta()

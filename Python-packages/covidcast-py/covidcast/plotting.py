@@ -81,21 +81,20 @@ def get_geo_df(data: pd.DataFrame,
                join_type: str = "right") -> gpd.GeoDataFrame:
     """Augment a :py:func:`covidcast.signal` data frame with the shape of each geography.
 
-    This method takes in a pandas DataFrame object and returns a GeoDataFrame object from the
-    `GeoPandas package <https://geopandas.org/>`_.
-
-    Shapefiles are 1:5,000,000 scale and sourced from the `2019 US Census Cartographic Boundary
-    Files
-    <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`_.
+    This method takes in a pandas DataFrame object and returns a GeoDataFrame
+    object from the `GeoPandas package <https://geopandas.org/>`_. The
+    GeoDataFrame will contain the geographic shape corresponding to every row in
+    its ``geometry`` colummn; for example, a data frame of county-level signal
+    observations will be returned with the shape of every county.
 
     After detecting the geography type (only county and state are currently
-    supported) of the input, builds a GeoDataFrame that contains state and
-    geometry information from the Census for that geography type. By default, it
-    will take the signal data (left side) and geo data (right side) and right
-    join them, so all states/counties will always be present regardless whether
-    ``data`` contains values for those locations. ``left``, ``outer``, and
-    ``inner`` joins are also supported and can be selected with the
-    ``join_type`` argument.
+    supported) of the input, this function builds a GeoDataFrame that contains
+    state and geometry information from the Census for that geography type. By
+    default, it will take the signal data (left side) and geo data (right side)
+    and right join them, so all states/counties will always be present
+    regardless whether ``data`` contains values for those locations. ``left``,
+    ``outer``, and ``inner`` joins are also supported and can be selected with
+    the ``join_type`` argument.
 
     For right joins on counties, all counties without a signal value will be
     given the value of the megacounty (if present). Other joins will not use
@@ -103,8 +102,15 @@ def get_geo_df(data: pd.DataFrame,
     <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html>`_
     for information about megacounties.
 
-    Default arguments for column names correspond to those used by
-    :py:func:`covidcast.signal`. Currently only supports counties and states.
+    By default, this function identifies the geography for each row of the input
+    data frame using its ``geo_value`` column, matching data frames returned by
+    :py:func:`covidcast.signal`, but the ``geo_value_col`` and ``geo_type_col``
+    arguments can be provided to match geographies for data frames with
+    different column names.
+
+    Geographic data is sourced from 1:5,000,000-scale shapefiles from the `2019
+    US Census Cartographic Boundary Files
+    <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`_.
 
     :param data: DataFrame of values and geographies
     :param geo_value_col: name of column containing values of interest
@@ -115,6 +121,7 @@ def get_geo_df(data: pd.DataFrame,
       with a ``geometry`` column (containing a polygon) and a ``state_fips``
       column (a two-digit FIPS code identifying the US state containing this
       geography). The geometry is given in the GCS NAD83 coordinate system.
+
     """
 
     if join_type == "right" and any(data[geo_value_col].duplicated()):

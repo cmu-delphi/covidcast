@@ -1,7 +1,7 @@
-.. _example-usage:
+.. _getting-started:
 
-Example usage
-=============
+Getting Started
+===============
 
 Basic examples
 --------------

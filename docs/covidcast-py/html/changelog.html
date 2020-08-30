@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Changelog &#8212; COVIDcast API client 0.0.8 documentation</title>
+    <title>Changelog &#8212; COVIDcast API client 0.0.9 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -15,7 +15,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Example usage" href="examples.html" />
+    <link rel="prev" title="Plotting Examples" href="plot_examples.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -34,6 +34,15 @@
             
   <div class="section" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="v0-0-9-august-30-2020">
+<h2>v0.0.9, August 30, 2020<a class="headerlink" href="#v0-0-9-august-30-2020" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>New feature: <a class="reference internal" href="plotting.html#covidcast.plot_choropleth" title="covidcast.plot_choropleth"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot_choropleth()</span></code></a> and <a class="reference internal" href="plotting.html#covidcast.get_geo_df" title="covidcast.get_geo_df"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.get_geo_df()</span></code></a>
+add mapping and plotting capabilities that can be used with the data returned by
+<a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a>. See the <a class="reference internal" href="plotting.html#plotting-data"><span class="std std-ref">function documentation</span></a>
+and <a class="reference internal" href="plot_examples.html#plotting-examples"><span class="std std-ref">plotting examples</span></a> for more details.</p></li>
+</ul>
+</div>
 <div class="section" id="v0-0-8-july-26-2020">
 <h2>v0.0.8, July 26, 2020<a class="headerlink" href="#v0-0-8-july-26-2020" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -85,9 +94,12 @@ argument that can include multiple geographies, rather than a single
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="signals.html">Fetching data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html">Example usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="signals.html">Fetching Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_examples.html">Plotting Examples</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#v0-0-9-august-30-2020">v0.0.9, August 30, 2020</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-8-july-26-2020">v0.0.8, July 26, 2020</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-7-june-29-2020">v0.0.7, June 29, 2020</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-6-june-22-2020">v0.0.6, June 22, 2020</a></li>
@@ -111,7 +123,7 @@ argument that can include multiple geographies, rather than a single
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="examples.html" title="previous chapter">Example usage</a></li>
+      <li>Previous: <a href="plot_examples.html" title="previous chapter">Plotting Examples</a></li>
   </ul></li>
 </ul>
 </div>

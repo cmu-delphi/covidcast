@@ -36,7 +36,7 @@ def plot_choropleth(data: pd.DataFrame,
     <https://matplotlib.org/tutorials/colors/colormaps.html>`_ used is
     ``YlOrRd`` and is binned into the signal's historical mean value ± 3
     standard deviations. Custom arguments can be passed in as ``kwargs`` for
-    customizability. These arguments will be past to the GeoPandas ``plot``
+    customizability. These arguments will be passed to the GeoPandas ``plot``
     method; more information on these arguments can be found in `the GeoPandas
     documentation
     <https://geopandas.org/reference.html#geopandas.GeoDataFrame.plot>`_.
@@ -92,7 +92,7 @@ def get_geo_df(data: pd.DataFrame,
     state and geometry information from the Census for that geography type. By
     default, it will take the signal data (left side) and geo data (right side)
     and right join them, so all states/counties will always be present
-    regardless whether ``data`` contains values for those locations. ``left``,
+    regardless of whether ``data`` contains values for those locations. ``left``,
     ``outer``, and ``inner`` joins are also supported and can be selected with
     the ``join_type`` argument.
 
@@ -112,9 +112,9 @@ def get_geo_df(data: pd.DataFrame,
     US Census Cartographic Boundary Files
     <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`_.
 
-    :param data: DataFrame of values and geographies
-    :param geo_value_col: name of column containing values of interest
-    :param geo_type_col: name of column containing geography type
+    :param data: DataFrame of values and geographies.
+    :param geo_value_col: Name of column containing values of interest.
+    :param geo_type_col: Name of column containing geography type.
     :param join_type: Type of join to do between input data (left side) and geo data (right side).
       Must be one of `right` (default), `left`, `outer`, or `inner`.
     :return: GeoDataFrame containing all columns from the input ``data``, along

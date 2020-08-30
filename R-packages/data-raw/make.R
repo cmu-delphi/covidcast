@@ -20,6 +20,13 @@ save(msa_census, file = "../covidcast/data/msa_census.rda")
 
 # State census data
 state_census = read.csv("https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/state/detail/SCPRC-EST2019-18+POP-RES.csv", stringsAsFactors = FALSE)
+state_abbr = character(nrow(state_census))
+names(state_abbr) = state_census$NAME
+state_abbr[state.name] = state.abb
+state_abbr["United States"] = "US"
+state_abbr["District of Columbia"] = "DC"
+state_abbr["Puerto Rico Commonwealth"] = "PR"
+state_census$ABBR = state_abbr
 save(state_census, file = "../covidcast/data/state_census.rda")
 
 # County geo data from https://www.weather.gov/gis/Counties

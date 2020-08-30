@@ -36,3 +36,11 @@ When you develop a new package version, there are several steps to consider:
 
     If you make changes to `index.rst`, you can simply run `make html` to
     rebuild without needing to reinstall the package.
+4. Upload to PyPI. It should be as easy as
+
+    ```sh
+    twine upload dist/covidcast-0.0.9*
+    ```
+
+    with whatever glob matches the appropriate release. The PyPI username is
+    `__token__`, and should be used with our COVIDcast API token.

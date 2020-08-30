@@ -1,6 +1,14 @@
 Changelog
 =========
 
+v0.0.9, August 30, 2020
+-----------------------
+
+- New feature: :py:func:`covidcast.plot_choropleth` and :py:func:`covidcast.get_geo_df`
+  add mapping and plotting capabilities that can be used with the data returned by
+  :py:func:`covidcast.signal`. See the :ref:`function documentation <plotting-data>`
+  and :ref:`plotting examples <plotting-examples>` for more details.
+
 v0.0.8, July 26, 2020
 ---------------------
 

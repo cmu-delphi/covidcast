@@ -10,7 +10,8 @@ name_to_fips(
   ignore.case = FALSE,
   perl = FALSE,
   fixed = FALSE,
-  ties_method = c("first", "all")
+  ties_method = c("first", "all"),
+  state = NULL
 )
 
 name_to_cbsa(
@@ -18,7 +19,8 @@ name_to_cbsa(
   ignore.case = FALSE,
   perl = FALSE,
   fixed = FALSE,
-  ties_method = c("first", "all")
+  ties_method = c("first", "all"),
+  state = NULL
 )
 }
 \arguments{
@@ -31,6 +33,14 @@ are used; to match against a fixed string (no regular expressions), set
 
 \item{ties_method}{If "first", then only the first match for each name is
 returned. If "all", then all matches for each name are returned.}
+
+\item{state}{Two letter state abbreviation (case insensitive) indicating a
+parent state used to restrict the search. For example, when \code{state = "NY"},
+then \code{name_to_fips()} searches only over only counties lying in New York
+state, whereas \code{name_to_fips()} searches over the metropolitan areas lying,
+either fully or partially (as a metropolitan area can span several states),
+in New York state. If \code{NULL}, the default, then the search is performed
+US-wide (not restricted to any state in particular).}
 }
 \value{
 A vector of FIPS or CBSA codes if \code{ties_method} equals "first", and a

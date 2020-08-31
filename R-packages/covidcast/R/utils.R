@@ -63,6 +63,13 @@ earliest_issue <- function(df) {
 #'   `fixed = TRUE`.
 #' @param ties_method If "first", then only the first match for each name is
 #'   returned. If "all", then all matches for each name are returned.
+#' @param state Two letter state abbreviation (case insensitive) indicating a
+#'   parent state used to restrict the search. For example, when `state = "NY"`,
+#'   then `name_to_fips()` searches only over only counties lying in New York
+#'   state, whereas `name_to_fips()` searches over the metropolitan areas lying, 
+#'   either fully or partially (as a metropolitan area can span several states),
+#'   in New York state. If `NULL`, the default, then the search is performed
+#'   US-wide (not restricted to any state in particular). 
 #'
 #' @return A vector of FIPS or CBSA codes if `ties_method` equals "first", and a
 #'   list of FIPS or CBSA codes otherwise.
@@ -77,10 +84,15 @@ earliest_issue <- function(df) {
 #' @seealso [fips_to_name()], [cbsa_to_name()]
 #' @export
 name_to_fips = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
-                        ties_method = c("first", "all")) {
-  # First remove states from county_census
-  df = county_census %>% dplyr::filter(.data$COUNTY != 0)
+                        ties_method = c("first", "all"), state = NULL) {
+  # Leave states in county_census (so we can find state fips)
+  df = county_census # %>% dplyr::filter(COUNTY != 0)
 
+  # Restrict to a particular state, if we're asked to
+  if (!is.null(state)) {
+    df = df %>% dplyr::filter(STNAME == abbr_to_name(toupper(state)))
+  }
+  
   # Now perform the grep-based look up
   grep_lookup(key = name, keys = df$CTYNAME, values = df$FIPS,
               ignore.case = ignore.case, perl = perl, fixed = fixed,
@@ -90,9 +102,14 @@ name_to_fips = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 #' @rdname name_to_fips
 #' @export
 name_to_cbsa = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
-                        ties_method = c("first", "all")) {
-  # First restrict msa_census to metro areas
-  df = msa_census %>% dplyr::filter(.data$LSAD == "Metropolitan Statistical Area")
+                        ties_method = c("first", "all"), state = NULL) {
+  # Restrict msa_census to metro areas
+  df = msa_census %>% dplyr::filter(LSAD == "Metropolitan Statistical Area")
+
+  # Restrict to a particular state, if we're asked to
+  if (!is.null(state)) { 
+    df = df %>% dplyr::slice(grep(toupper(state), df$STATE))
+  }
 
   # Now perform the grep-based look up
   grep_lookup(key = name, keys = df$NAME, values = df$CBSA,
@@ -130,8 +147,8 @@ name_to_cbsa = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 #' @export
 fips_to_name = function(code, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
-  # First remove states from county_census
-  df = county_census %>% dplyr::filter(.data$COUNTY != 0)
+  # Leave states in county_census (so we can find state fips)
+  df = county_census # %>% dplyr::filter(COUNTY != 0)
 
   # Now perform the grep-based look up
   grep_lookup(key = code, keys = df$FIPS, values = df$CTYNAME,
@@ -143,11 +160,79 @@ fips_to_name = function(code, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 #' @export
 cbsa_to_name = function(code, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
-  # First restrict msa_census to metro areas
-  df = msa_census %>% dplyr::filter(.data$LSAD == "Metropolitan Statistical Area")
+  # Restrict msa_census to metro areas
+  df = msa_census %>% dplyr::filter(LSAD == "Metropolitan Statistical Area")
 
   # Now perform the grep-based look up
   grep_lookup(key = code, keys = df$CBSA, values = df$NAME,
+              ignore.case = ignore.case, perl = perl, fixed = fixed,
+              ties_method = ties_method)
+}
+
+#' Get state abbreviations from state names
+#'
+#' Look up state abbreviations by state names (including District of Columbia
+#' and Puerto Rico); this function is based on `grep()`, and hence allows for
+#' regular expressions. 
+#'
+#' @param name Vector of state names to look up.
+#' @param ignore.case,perl,fixed Arguments to pass to `grep()`, with the same
+#'   defaults as in the latter function. Hence, by default, regular expressions
+#'   are used; to match against a fixed string (no regular expressions), set
+#'   `fixed = TRUE`.
+#' @param ties_method If "first", then only the first match for each name is
+#'   returned. If "all", then all matches for each name are returned.
+#'
+#' @return A vector of state abbreviations if `ties_method` equals "first", and
+#'   a list of state abbreviations otherwise. 
+#'
+#' @examples
+#' name_to_abbr("Penn") 
+#' name_to_abbr(c("Penn", "New"), ties_method = "all")
+#'
+#' @seealso [abbr_to_name()]
+#' @export
+name_to_abbr = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
+                        ties_method = c("first", "all")) {
+  # First get rid of United States from state_census 
+  df = state_census %>% dplyr::filter(STATE > 0)
+  
+  # Now perform the grep-based look up
+  grep_lookup(key = name, keys = df$NAME, values = df$ABBR,
+              ignore.case = ignore.case, perl = perl, fixed = fixed,
+              ties_method = ties_method)
+}
+
+#' Get state names from state abbreviations
+#'
+#' Look up state names by state abbreviations (including District of Columbia
+#' and Puerto Rico); this function is based on `grep()`, and hence allows for
+#' regular expressions. 
+#'
+#' @param abbr Vector of state abbreviations to look up.
+#' @param ignore.case,perl,fixed Arguments to pass to `grep()`, with the same
+#'   defaults as in the latter function. Hence, by default, regular expressions
+#'   are used; to match against a fixed string (no regular expressions), set
+#'   `fixed = TRUE`.
+#' @param ties_method If "first", then only the first match for each name is
+#'   returned. If "all", then all matches for each name are returned.
+#'
+#' @return A vector of state names if `ties_method` equals "first", and a list
+#'   of state names otherwise.  
+#'
+#' @examples
+#' abbr_to_name("PA")
+#' abbr_to_name(c("PA", "PR", "DC"))
+#'
+#' @seealso [name_to_abbr()]
+#' @export
+abbr_to_name = function(abbr, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
+                        ties_method = c("first", "all")) {
+  # First get rid of United States from state_census 
+  df = state_census %>% dplyr::filter(STATE > 0)
+  
+  # Perform the grep-based look up
+  grep_lookup(key = abbr, keys = df$ABBR, values = df$NAME,
               ignore.case = ignore.case, perl = perl, fixed = fixed,
               ties_method = ties_method)
 }

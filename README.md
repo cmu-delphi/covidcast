@@ -20,7 +20,7 @@ our signals:
 - [Signal correlations](https://cmu-delphi.github.io/covidcast/R-notebooks/signal_correlations.html)
 - [Facebook survey dashboard](https://cmu-delphi.github.io/covidcast/R-notebooks/fb_dashboard.html)
 
-## R notebooks
+## Presentations
 
 This repository also includes some talks we've given about the COVIDcast project: 
 

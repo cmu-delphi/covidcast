@@ -190,7 +190,7 @@ plot(sympt, plot_type = "line", range = range(sympt$value),
 
 # API Specification
 
-The COVIDcast API is based on HTTP GET queries and returns data in JSON form. The base URL is https://delphi.cmu.edu/epidata/api.php?source=covidcast
+The COVIDcast API is based on HTTP GET queries and returns data in JSON form. The base URL is https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast 
 
 <br>
 
@@ -205,11 +205,11 @@ The COVIDcast API is based on HTTP GET queries and returns data in JSON form. Th
 
 # Example: API Query
 
-Estimated % COVID-like illness on April 6, 2020 from the Facebook survey, in Allegheny County: https://delphi.cmu.edu/epidata/api.php?source=covidcast&data_source=fb-survey&signal=raw_cli&time_type=day&geo_type=county&time_values=20200406&geo_value=42003 
+Estimated % COVID-like illness on April 6, 2020 from the Facebook survey, in Allegheny County: https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&data_source=fb-survey&signal=raw_cli&time_type=day&geo_type=county&time_values=20200406&geo_value=42003 
 
 ```{r}
 library(jsonlite)
-res = readLines("https://delphi.cmu.edu/epidata/api.php?source=covidcast&data_source=fb-survey&signal=raw_cli&time_type=day&geo_type=county&time_values=20200406&geo_value=42003")
+res = readLines("https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&data_source=fb-survey&signal=raw_cli&time_type=day&geo_type=county&time_values=20200406&geo_value=42003")
 prettify(res)
 ```
 
@@ -238,7 +238,7 @@ By default the API returns the most recent data for each `time_value`. We also p
 Why would we need this? Because many data sources are subject to `r col("revisions")`:
 
 - Case and death counts frequently corrected/adjusted by authorities
-- Medical claims data can take days to be submitted and/or processed
+- Medical claims data can take weeks to be submitted and/or processed
 - Testing/lab data can be backlogged for a variety of reasons, etc.
 
 This presents a challenge to modelers: e.g., we have to learn how to forecast based on the `r col("data we'd have at the time")`, not updates that would arrive later

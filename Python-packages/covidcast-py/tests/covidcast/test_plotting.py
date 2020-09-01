@@ -45,20 +45,29 @@ def test_get_geo_df():
         dtype={"geo_value": str})
     pd.testing.assert_frame_equal(expected3, output3)
 
+    # test MSAs
+    test_input["geo_type"] = "msa"
+    test_input["geo_value"] = ["10420", "10580", "ca"]
+    output4 = plotting.get_geo_df(test_input)
+    expected4 = gpd.read_file(
+        os.path.join(CURRENT_PATH, "../reference_data/expected_get_geo_df_msa.gpkg"),
+        dtype={"geo_value": str})
+    pd.testing.assert_frame_equal(expected4, output4)
+
     # test with sample signal
     test_input2 = pd.read_csv(
         os.path.join(CURRENT_PATH, "../reference_data/test_input_county_signal.csv"),
         dtype={"geo_value": str}, parse_dates=["time_value", "issue"]
     )
-    expected4 = gpd.read_file(
+    expected5 = gpd.read_file(
         os.path.join(CURRENT_PATH, "../reference_data/expected_get_geo_df_right_2.gpkg"),
         dtype={"geo_value": str})
     # geopandas reads file types slightly differently than pandas so need to recast
-    expected4["time_value"] = expected4.time_value.astype("datetime64[ns]")
-    expected4["issue"] = expected4.issue.astype("datetime64[ns]")
-    expected4["direction"] = np.nan
-    output4 = plotting.get_geo_df(test_input2)
-    pd.testing.assert_frame_equal(expected4, output4)
+    expected5["time_value"] = expected5.time_value.astype("datetime64[ns]")
+    expected5["issue"] = expected5.issue.astype("datetime64[ns]")
+    expected5["direction"] = np.nan
+    output5 = plotting.get_geo_df(test_input2)
+    pd.testing.assert_frame_equal(expected5, output5)
 
     # test a non county or state geo_type
     with pytest.raises(ValueError):

@@ -111,7 +111,7 @@ def get_geo_df(data: pd.DataFrame,
     its ``geometry`` colummn; for example, a data frame of county-level signal
     observations will be returned with the shape of every county.
 
-    After detecting the geography type (only county and state are currently
+    After detecting the geography type (state, county, and MSA are currently
     supported) of the input, this function builds a GeoDataFrame that contains
     state and geometry information from the Census for that geography type. By
     default, it will take the signal data (left side) and geo data (right side)
@@ -144,7 +144,8 @@ def get_geo_df(data: pd.DataFrame,
     :return: GeoDataFrame containing all columns from the input ``data``, along
       with a ``geometry`` column (containing a polygon) and a ``state_fips``
       column (a two-digit FIPS code identifying the US state containing this
-      geography). The geometry is given in the GCS NAD83 coordinate system.
+      geography). For MSAs which span multiple state, the first state in the MSA name is provided.
+      The geometry is given in the GCS NAD83 coordinate system.
 
     """
 

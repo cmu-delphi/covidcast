@@ -98,7 +98,7 @@ Next talks: Facebook surveys, medical claims data, etc.
 
 How many people have died from COVID-19 per day, in my state, since March 1?
 
-```{r, fig.width=7, fig.height=5}
+```{r, fig.width=8, fig.height=6}
 library(covidcast)
 deaths = covidcast_signal(data_source = "jhu-csse", 
                           signal = "deaths_7dav_incidence_num", 
@@ -113,7 +113,7 @@ plot(deaths, plot_type = "line",
 
 What percentage of daily hospital admissions are due to COVID-19 in PA, NY, TX?
 
-```{r, fig.width=7, fig.height=5}
+```{r, fig.width=8, fig.height=6}
 hosp = covidcast_signal(data_source = "hospital-admissions", 
                         signal = "smoothed_adj_covid19",
                         start_day = "2020-03-01", geo_type = "state", 
@@ -162,7 +162,7 @@ plot(cases, choro_col = c("#D3D3D3", "#FFC0CB"),
 
 How do some major cities compare in terms of doctor's visits due to COVID-like illness?
 
-```{r, fig.width=7, fig.height=5}
+```{r, fig.width=8, fig.height=6}
 dv = covidcast_signal(data_source = "doctor-visits", 
                       signal = "smoothed_adj_cli", 
                       start_day = "2020-03-01", geo_type = "msa", 
@@ -177,7 +177,7 @@ plot(dv, plot_type = "line",
 
 How do my county and my friend's county compare in terms of people reporting that they know somebody with COVID symptoms?
 
-```{r, fig.width=7, fig.height=5}
+```{r, fig.width=8, fig.height=6}
 sympt = covidcast_signal(data_source = "fb-survey", 
                          signal = "smoothed_hh_cmnty_cli",
                          start_day = "2020-04-15", 
@@ -296,7 +296,7 @@ ggplot(dv_as_of, aes(x = time_value, y = value)) +
 
 Now let's examine the correlations between COVID-19 cases and deaths, per day, across counties. We'll look at Spearman correlation, starting March 1. Then repeat but for cases and deaths 7-days-ahead:
 
-```{r, fig.width=7, fig.height=5}
+```{r, fig.width=8, fig.height=6}
 # Fetch JHU confirmed cases and deaths, at the county level, since March 1
 start_day = "2020-03-01"
 cases = covidcast_signal("jhu-csse", "confirmed_7dav_incidence_num", start_day)

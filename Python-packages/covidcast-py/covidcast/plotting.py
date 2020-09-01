@@ -172,9 +172,9 @@ def get_geo_df(data: pd.DataFrame,
 
 def _project_and_transform(data: gpd.GeoDataFrame,
                            state_col: str = "state_fips") -> Tuple:
-    """Segment and break GeoDF into Continental US, Alaska, Puerto Rico, and Hawaii for plotting.
+    """Segment and break GeoDF into Contiguous US, Alaska, Puerto Rico, and Hawaii for plotting.
 
-    Given GeoDF with state fips column, break into Continental US, Alaska, Puerto Rico, and Hawaii
+    Given GeoDF with state fips column, break into Contiguous US, Alaska, Puerto Rico, and Hawaii
     GeoDFs with their own Albers Equal Area Conic Projections.
 
     Also scales and translates so Alaska and Hawaii are in the bottom left corner and Puerto Rico

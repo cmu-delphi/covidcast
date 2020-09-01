@@ -27,10 +27,11 @@ STATE_ABBR_TO_FIPS = {"AL": "01", "MN": "27", "ME": "23", "WA": "53", "LA": "22"
                       "TX": "48", "UT": "49", "ND": "38", "KS": "20", "SD": "46", "NC": "37",
                       "NJ": "34", "ID": "16"}
 
-CONTINENTAL_FIPS = ["01", "04", "05", "06", "08", "09", "10", "11", "12", "13", "16", "17", "18",
-                    "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31",
-                    "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45",
-                    "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
+# states within the contiguous US
+CONTIGUOUS_FIPS = ["01", "04", "05", "06", "08", "09", "10", "11", "12", "13", "16", "17", "18",
+                   "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31",
+                   "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45",
+                   "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
 
 
 def plot_choropleth(data: pd.DataFrame,
@@ -183,7 +184,7 @@ def _project_and_transform(data: gpd.GeoDataFrame,
     :param state_col: Name of column with state FIPS codes.
     :return: Tuple of four GeoDFs: Contiguous US, Alaska, Hawaii, and Puerto Rico.
     """
-    cont = data.loc[[i in CONTINENTAL_FIPS for i in data[state_col]], :].to_crs("ESRI:102003")
+    cont = data.loc[[i in CONTIGUOUS_FIPS for i in data[state_col]], :].to_crs("ESRI:102003")
     alaska = data.loc[data[state_col] == "02", :].to_crs("ESRI:102006")
     pr = data.loc[data[state_col] == "72", :].to_crs("ESRI:102003")
     hawaii = data.loc[data[state_col] == "15", :].to_crs("ESRI:102007")

@@ -6,7 +6,8 @@ Plotting Examples
 Built-in functionality
 ----------------------
 The returned DataFrame from :py:func:`covidcast.signal` can be plotted using the built-in
-:py:func:`covidcast.plot_choropleth`. Currently only state and county geography types are supported.
+:py:func:`covidcast.plot_choropleth`. Currently only state, county, and MSA geography types
+are supported.
 
 County-level maps show estimates for each county, and color each state by the
 megacounty estimates, if available. (Megacounties represent all counties with
@@ -29,7 +30,7 @@ details.)
     import covidcast
     from datetime import date
     from matplotlib import pyplot as plt
-    data = covidcast.signal("fb-survey", "smoothed_cli", start_day = date(2020,8,3), end_day = date(2020,8,4), geo_type = "county")
+    data = covidcast.signal("fb-survey", "smoothed_cli", start_day = date(2020,8,4), end_day = date(2020,8,4), geo_type = "county")
     covidcast.plot_choropleth(data)
     plt.show()
 
@@ -46,9 +47,28 @@ State-level data can also be mapped:
     import covidcast
     from datetime import date
     from matplotlib import pyplot as plt
-    data = covidcast.signal("fb-survey", "smoothed_cli", start_day = date(2020,8,3), end_day = date(2020,8,4), geo_type = "state")
+    data = covidcast.signal("fb-survey", "smoothed_cli", start_day = date(2020,8,4), end_day = date(2020,8,4), geo_type = "state")
     covidcast.plot_choropleth(data)
     plt.show()
+
+Regions where no information is present are presented in light grey, as demonstrated by this MSA
+plot.
+
+>>> data = covidcast.signal("fb-survey", "smoothed_cli",
+...                         date(2020, 8, 3), date(2020, 8, 4),
+...                         geo_type="msa")
+>>> covidcast.plot_choropleth(data)
+>>> plt.show()
+
+.. plot::
+
+    import covidcast
+    from datetime import date
+    from matplotlib import pyplot as plt
+    data = covidcast.signal("fb-survey", "smoothed_cli", start_day = date(2020,8,4), end_day = date(2020,8,4), geo_type = "msa")
+    covidcast.plot_choropleth(data)
+    plt.show()
+
 
 Additional keyword arguments can also be provided. These correspond to most of the arguments
 available for the

@@ -37,7 +37,7 @@ returned. If "all", then all matches for each name are returned.}
 \item{state}{Two letter state abbreviation (case insensitive) indicating a
 parent state used to restrict the search. For example, when \code{state = "NY"},
 then \code{name_to_fips()} searches only over only counties lying in New York
-state, whereas \code{name_to_fips()} searches over the metropolitan areas lying,
+state, whereas \code{name_to_cbsa()} searches over the metropolitan areas lying,
 either fully or partially (as a metropolitan area can span several states),
 in New York state. If \code{NULL}, the default, then the search is performed
 US-wide (not restricted to any state in particular).}

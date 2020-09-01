@@ -599,9 +599,9 @@ summary.covidcast_meta = function(object, ...) {
     dplyr::summarize(county = ifelse("county" %in% geo_type, "*", ""),
                      msa = ifelse("msa" %in% geo_type, "*", ""),
                      hrr = ifelse("hrr" %in% geo_type, "*", ""),
-                     state = ifelse("state" %in% geo_type, "*", ""),
-                     min_time = max(min_time),
-                     max_time = min(max_time)) %>%
+                     state = ifelse("state" %in% geo_type, "*", "")) %>% 
+                     # min_time = max(min_time),
+                     # max_time = min(max_time)) %>%
     dplyr::ungroup()
   )
   print(as.data.frame(df), right = FALSE, row.names = FALSE)

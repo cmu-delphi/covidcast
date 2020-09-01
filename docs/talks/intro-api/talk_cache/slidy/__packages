@@ -1,0 +1,7 @@
+base
+dplyr
+purrr
+ggplot2
+gridExtra
+covidcast
+jsonlite

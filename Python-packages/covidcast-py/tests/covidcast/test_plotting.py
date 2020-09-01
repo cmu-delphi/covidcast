@@ -7,7 +7,8 @@ import pytest
 from covidcast import plotting
 
 SHAPEFILE_PATHS = {"county": "../../covidcast/shapefiles/county/cb_2019_us_county_5m.shp",
-                   "state": "../../covidcast/shapefiles/state/cb_2019_us_state_5m.shp"}
+                   "state": "../../covidcast/shapefiles/state/cb_2019_us_state_5m.shp",
+                   "msa": "../../covidcast/shapefiles/msa/cb_2019_us_cbsa_5m.shp"}
 
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -109,3 +110,26 @@ def test__join_county_geo_df():
         dtype={"geo_value": str})
     pd.testing.assert_frame_equal(expected2, output2)
 
+
+def test__join_msa_geo_df():
+    test_input = pd.DataFrame({"msa": ["10180", "10420", "10580"],
+                               "test_value": [1.5, 2.5, 3],
+                               "test_value2": [21.5, 32.5, 34]})
+    geo_info = gpd.read_file(os.path.join(CURRENT_PATH, SHAPEFILE_PATHS["msa"]))
+    # test right join
+    output1 = plotting._join_msa_geo_df(test_input, "msa", geo_info)
+    assert type(output1) is gpd.GeoDataFrame
+    # check that state parsing is working as intended
+    assert all(output1[output1.msa == "35620"].state_fips == "36")
+
+    expected1 = gpd.read_file(
+        os.path.join(CURRENT_PATH, "../reference_data/expected__join_msa_geo_df_right.gpkg"),
+        dtype={"geo_value": str})
+    pd.testing.assert_frame_equal(expected1, output1)
+
+    # test left join
+    output2 = plotting._join_msa_geo_df(test_input, "msa", geo_info, "left")
+    expected2 = gpd.read_file(
+        os.path.join(CURRENT_PATH, "../reference_data/expected__join_msa_geo_df_left.gpkg"),
+        dtype={"geo_value": str})
+    pd.testing.assert_frame_equal(expected2, output2)

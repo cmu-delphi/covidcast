@@ -251,6 +251,8 @@ def _join_msa_geo_df(data: pd.DataFrame,
                      join_type: str = "right") -> gpd.GeoDataFrame:
     """Join DF information to polygon information in a GeoDF at the state level.
 
+    For MSAs which span multiple states, the first state in the name is returned for the state FIPS.
+
     :param data: DF with state info
     :param msa_col: cname of column in `data` containing state info to join on
     :param geo_info: GeoDF of state shape info read from Census shapefiles
@@ -261,5 +263,6 @@ def _join_msa_geo_df(data: pd.DataFrame,
     merged = data.merge(geo_info, how=join_type, left_on=msa_col, right_on="GEOID")
     # use full state list in the return
     merged[msa_col] = merged.GEOID.combine_first(merged[msa_col])
-    merged["state_fips"] = [STATE_ABBR_TO_FIPS.get(i[-2:]) for i in merged.NAME]
+    # get the first state, which will be the first two characters after the comma and whitespace
+    merged["state_fips"] = [STATE_ABBR_TO_FIPS.get(i.split(",")[1][1:3]) for i in merged.NAME]
     return gpd.GeoDataFrame(merged[input_cols + ["state_fips", "geometry"]])

@@ -8,18 +8,19 @@ output:
 ---
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(fig.width = 8, fig.height = 7)
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, fig.width = 8, 
+                      fig.height = 7)
 ```
 
 ## County analysis
 
-TODO, write something
+First, we'll look at counties. 
 
 ### Getting data 
 
-TODO, write something
+We fetch various signals from our API, from April 15 through to the current day.
 
-```{r, message = FALSE}
+```{r}
 library(covidcast)
 library(dplyr)
 library(ggplot2)
@@ -48,9 +49,12 @@ df_cases = covidcast_signal("usa-facts", "confirmed_7dav_incidence_prop",
 
 ### Correlations sliced by time
 
-TODO, write something
+Here we look at Spearman (rank) correlations between our signals and COVID-19
+case incidence rates, sliced by time. That is, for each day, we compute the 
+correlation between each signal and COVID-19 case incidence rates, over all  
+counties (with at least 500 cumulative cases). 
 
-```{r, message = FALSE, warning = FALSE}
+```{r}
 # Consider only counties with at least 500 cumulative cases
 case_num = 500
 geo_values = covidcast_signal("usa-facts", "confirmed_cumulative_num",
@@ -80,9 +84,12 @@ ggplot(df, aes(x = time_value, y = value)) +
 
 ### Correlations sliced by county
 
-TODO, write something
+Now we look at Spearman (rank) correlations between our signals and COVID-19
+case incidence rates, sliced by county. That is, for each county (with at least
+500 cumulative cases), we compute the correlation between each signal and 
+COVID-19 case incidence rates, over all time.
 
-```{r, message = FALSE, warning = FALSE}
+```{r}
 df_cor = vector("list", length(signals))
 for (i in 1:length(signals)) {
   df_cor[[i]] = covidcast_cor(df_signals[[i]] %>% 
@@ -103,7 +110,8 @@ ggplot(df, aes(value)) +
   theme(legend.position = "bottom", legend.title = element_blank())
 ```
 
-TODO, write something
+We can also look at choropleth maps to get a geographic sense of the correlation
+distribution for each signal.
 
 ```{r}
 # Set some fields, then plot choropleth maps using covidcast functionality
@@ -120,13 +128,13 @@ for (i in 1:length(signals)) {
 
 ## Metro area analysis
 
-TODO, write something
+Next, we'll look at metro areas. 
 
 ### Getting data 
 
-TODO, write something
+We fetch various signals from our API, from April 15 through to the current day.
 
-```{r, message = FALSE}
+```{r}
 # Fetch the following sources and signals from the API 
 sources = c("doctor-visits", "fb-survey", "fb-survey", "ght",
             "hospital-admissions", "indicator-combination")
@@ -153,9 +161,12 @@ df_cases = covidcast_signal("usa-facts", "confirmed_7dav_incidence_prop",
 
 ### Correlations sliced by time
 
-TODO, write something
+Here we look at Spearman (rank) correlations between our signals and COVID-19
+case incidence rates, sliced by time. That is, for each day, we compute the 
+correlation between each signal and COVID-19 case incidence rates, over all 
+metro areas (with at least 500 cumulative cases). 
 
-```{r, message = FALSE, warning = FALSE}
+```{r}
 # Consider only metro areas with at least 500 cumulative cases
 case_num = 500
 geo_values = covidcast_signal("usa-facts", "confirmed_cumulative_num",
@@ -186,9 +197,12 @@ ggplot(df, aes(x = time_value, y = value)) +
 
 ### Correlations sliced by metro area
 
-TODO, write something
+Now we look at Spearman (rank) correlations between our signals and COVID-19
+case incidence rates, sliced by metro area That is, for each metro area (with at 
+least 500 cumulative cases), we compute the correlation between each signal and 
+COVID-19 case incidence rates, over all time.
 
-```{r, message = FALSE, warning = FALSE}
+```{r}
 df_cor = vector("list", length(signals))
 for (i in 1:length(signals)) {
   df_cor[[i]] = covidcast_cor(df_signals[[i]] %>% 

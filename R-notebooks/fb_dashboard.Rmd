@@ -7,9 +7,13 @@ output:
     code_folding: hide
 ---
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
 ## Sampling
 
-```{r, message = FALSE, warning = FALSE, fig.width = 6, fig.height = 5}
+```{r, fig.width = 7, fig.height = 5}
 library(covidcast)
 library(dplyr)
 library(ggplot2)
@@ -40,7 +44,7 @@ ggplot(county_per_week, aes(x = time_value, y = n)) +
 
 ## Coverage
 
-```{r, message = FALSE, warning = FALSE, fig.width = 10, fig.height = 8}
+```{r, fig.width = 10, fig.height = 8}
 county_totals = df_fb1 %>% 
   group_by(geo_value) %>%
   summarize(value = n()) %>% ungroup() %>%
@@ -58,7 +62,7 @@ plot(county_totals, title = "Which counties ever appear in our CLI signals?",
 
 ## Correlation
 
-```{r, message = FALSE, warning = FALSE, fig.width = 6, fig.height = 5}
+```{r, fig.width = 7, fig.height = 5}
 df_fb2 = covidcast_signal("fb-survey", "smoothed_hh_cmnty_cli")
 df_in = covidcast_signal("jhu-csse", "confirmed_7dav_incidence_prop", 
                          start_day = min(df_fb1$time_value))

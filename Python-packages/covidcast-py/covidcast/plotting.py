@@ -155,7 +155,7 @@ def get_geo_df(data: pd.DataFrame,
                          " a single date and geography type. ")
     geo_type = _detect_metadata(data, geo_type_col)[2]  # pylint: disable=W0212
     if geo_type not in ["state", "county", "msa"]:
-        raise ValueError("Unsupported geography type; only state and county supported.")
+        raise ValueError("Unsupported geography type; only `state`, `county`, and `msa` supported.")
 
     shapefile_path = pkg_resources.resource_filename(__name__, SHAPEFILE_PATHS[geo_type])
     geo_info = gpd.read_file(shapefile_path)

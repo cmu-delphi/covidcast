@@ -254,7 +254,24 @@ def metadata() -> pd.DataFrame:
     return meta_df
 
 
-def aggregate_signals(signals: list, dt: list = None) -> pd.DataFrame:
+def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") -> pd.DataFrame:
+    """Given a list of DataFrames, [optionally] lag each one and join them into one DataFrame.
+
+    This method takes a list of DataFrames containing signal information for geographic regions
+    across time, and outputs a single DataFrame with a column for each signal value for each region/
+    time. Input DataFrames must all be of the same geography type.
+
+    Each signal's time value can be shifted for analysis on lagged signals using the ``dt``
+    argument, which takes a list of integer days to lag each signal's date.
+
+    :param signals: List of DataFrames to join.
+    :param dt: List of lags in days for each of the input DataFrames in ``signals``.
+      Defaults to `None`. Lagging a signal by +1 day means that all the dates get shifted forward by
+      1 day (e.g. Jan 1 becomes Jan 2).
+    :param join_type: Type of join to be done between the DataFrames in ``signals``.
+      Defaults to `outer`.
+    :return: DataFrame of aggregated signals.
+    """
     join_cols = ["time", "geo_value"]
     if dt is not None and len(dt) != len(signals):
         raise ValueError("Length of `lags` must be same as length of `signals`")
@@ -269,7 +286,7 @@ def aggregate_signals(signals: list, dt: list = None) -> pd.DataFrame:
             columns={i: f"{source}_{signal_type}_{i}" for i in df_c.columns if i not in join_cols},
             inplace=True)
         dt_dfs.append(df_c)
-    joined_df = reduce(lambda x, y: pd.merge(x, y, on=join_cols, how="outer", sort=True), dt_dfs)
+    joined_df = reduce(lambda x, y: pd.merge(x, y, on=join_cols, how=join_type, sort=True), dt_dfs)
     joined_df["geo_type"] = geo_type
     return joined_df
 

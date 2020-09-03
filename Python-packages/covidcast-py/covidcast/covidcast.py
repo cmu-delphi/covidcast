@@ -2,6 +2,7 @@
 import warnings
 from datetime import timedelta, date
 from typing import Union, Iterable, Tuple, List
+from functools import reduce
 
 import pandas as pd
 from delphi_epidata import Epidata
@@ -171,7 +172,7 @@ def signal(data_source: str,
     dfs = [
         _fetch_single_geo(
             data_source, signal, start_day, end_day, geo_type, geo_value,
-            as_of, issues, lag)  # type: ignore
+            as_of, issues, lag)
         for geo_value in geo_values
     ]
 
@@ -251,6 +252,26 @@ def metadata() -> pd.DataFrame:
     meta_df["max_time"] = pd.to_datetime(meta_df["max_time"], format="%Y%m%d")
 
     return meta_df
+
+
+def aggregate_signals(signals: list, dt: list = None) -> pd.DataFrame:
+    join_cols = ["time", "geo_value"]
+    if dt is not None and len(dt) != len(signals):
+        raise ValueError("Length of `lags` must be same as length of `signals`")
+    dt_dfs = []
+    for df, lag in zip(signals, dt):
+        df_c = df.copy()  # make a copy so we don't modify originals
+        source, signal_type, geo_type = _detect_metadata(df_c)
+        # TODO error if >1 geo_types detected  # pylint: disable=W0511
+        df_c["time"] = [day + timedelta(lag) for day in df_c["time"]]  # lag dates
+        df_c.drop(["signal", "data_source", "geo_type"], axis=1, inplace=True)
+        df_c.rename(
+            columns={i: f"{source}_{signal_type}_{i}" for i in df_c.columns if i not in join_cols},
+            inplace=True)
+        dt_dfs.append(df_c)
+    joined_df = reduce(lambda x, y: pd.merge(x, y, on=join_cols, how="outer", sort=True), dt_dfs)
+    joined_df["geo_type"] = geo_type
+    return joined_df
 
 
 def _detect_metadata(data: pd.DataFrame,
@@ -364,8 +385,8 @@ def _signal_metadata(data_source: str,
                              geo_type=geo_type))
 
     assert matches.shape[0] == 1, "it should be impossible to have two identical signals"
-
-    return matches.to_dict("records")[0]
+    output: dict = matches.to_dict("records")[0]
+    return output
 
 
 def _date_to_api_string(date: date) -> str:  # pylint: disable=W0621

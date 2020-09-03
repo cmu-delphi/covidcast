@@ -6,6 +6,7 @@ import matplotlib
 matplotlib.use("AGG")
 
 import pandas as pd
+import numpy as np
 import pytest
 from covidcast import covidcast
 
@@ -95,6 +96,56 @@ def test_metadata(mock_covidcast_meta):
     # test failed response raises RuntimeError
     with pytest.raises(RuntimeError):
         covidcast.metadata()
+
+
+def test_aggregate_signals():
+    test_input1 = pd.DataFrame(
+        {"geo_value": ["a", "b", "c", "a"],
+         "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2)],
+         "value": [2, 4, 6, 8],
+         "signal": ["i", "i", "i", "i"],
+         "geo_type": ["state", "state", "state", "state"],
+         "data_source": ["x", "x", "x", "x"]})
+    test_input2 = pd.DataFrame(
+        {"geo_value": ["a", "b", "c", "d"],
+         "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1)],
+         "value": [1, 3, 5, 7],
+         "signal": ["j", "j", "j", "j"],
+         "geo_type": ["state", "state", "state", "state"],
+         "data_source": ["y", "y", "y", "y"]})
+    test_input3 = pd.DataFrame(
+        {"geo_value": ["b", "c", "d", "b"],
+         "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2)],
+         "value": [0.5, 1.5, 2.5, 3.5],
+         "signal": ["k", "k", "k", "k"],
+         "geo_type": ["state", "state", "state", "state"],
+         "data_source": ["z", "z", "z", "z"]})
+    # test 3 signals from 3 sources
+    expected1 = pd.DataFrame(
+        {"geo_value": ["a", "b", "c", "d", "a", "b", "c", "d", "b"],
+         "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1),
+                  date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 2),
+                  date(2020, 1, 3)],
+         "x_i_value": [2, 4, 6, np.nan, 8, np.nan, np.nan, np.nan, np.nan],
+         "y_j_value": [1, 3, 5, 7, np.nan, np.nan, np.nan, np.nan, np.nan],
+         "z_k_value": [np.nan, np.nan, np.nan, np.nan, np.nan, 0.5, 1.5, 2.5, 3.5],
+         "geo_type": ["state"]*9})
+    assert covidcast.aggregate_signals(
+        [test_input1, test_input2, test_input3], dt=[0, 0, 1]).equals(expected1)
+
+    # test same signal twice with a lag
+    expected2 = pd.DataFrame(
+        {"geo_value": ["a", "b", "c", "a", "b", "c", "a"],
+         "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2),
+                  date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 3)],
+         "x_i_1": [2, 4, 6, 8, np.nan, np.nan, np.nan],
+         "x_i_2": [np.nan, np.nan, np.nan, 2, 4, 6, 8]})
+
+    #assert covidcast.aggregate_signals([test_input1, test_input1], lags=[0, 1]).equals(expected2)
+
+    # test invalid lag length
+    with pytest.raises(ValueError):
+        covidcast.aggregate_signals([test_input1, test_input1], dt=[0])
 
 
 def test__detect_metadata():

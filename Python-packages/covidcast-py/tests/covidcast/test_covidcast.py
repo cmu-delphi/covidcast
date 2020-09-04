@@ -112,7 +112,8 @@ def test_aggregate_signals():
          "value": [1, 3, 5, 7],
          "signal": ["j", "j", "j", "j"],
          "geo_type": ["state", "state", "state", "state"],
-         "data_source": ["y", "y", "y", "y"]})
+         "data_source": ["y", "y", "y", "y"],
+         "extra_col": ["0", "0", "0", "0"]})
     test_input3 = pd.DataFrame(
         {"geo_value": ["b", "c", "d", "b"],
          "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2)],
@@ -126,9 +127,10 @@ def test_aggregate_signals():
          "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1),
                   date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 2),
                   date(2020, 1, 3)],
-         "x_i_value": [2, 4, 6, np.nan, 8, np.nan, np.nan, np.nan, np.nan],
-         "y_j_value": [1, 3, 5, 7, np.nan, np.nan, np.nan, np.nan, np.nan],
-         "z_k_value": [np.nan, np.nan, np.nan, np.nan, np.nan, 0.5, 1.5, 2.5, 3.5],
+         "x_i_0_value": [2, 4, 6, np.nan, 8, np.nan, np.nan, np.nan, np.nan],
+         "y_j_1_value": [1, 3, 5, 7, np.nan, np.nan, np.nan, np.nan, np.nan],
+         "y_j_1_extra_col": ["0", "0", "0", "0", np.nan, np.nan, np.nan, np.nan, np.nan],
+         "z_k_2_value": [np.nan, np.nan, np.nan, np.nan, np.nan, 0.5, 1.5, 2.5, 3.5],
          "geo_type": ["state"]*9})
     assert covidcast.aggregate_signals(
         [test_input1, test_input2, test_input3], dt=[0, 0, 1]).equals(expected1)
@@ -138,14 +140,26 @@ def test_aggregate_signals():
         {"geo_value": ["a", "b", "c", "a", "b", "c", "a"],
          "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2),
                   date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 3)],
-         "x_i_1": [2, 4, 6, 8, np.nan, np.nan, np.nan],
-         "x_i_2": [np.nan, np.nan, np.nan, 2, 4, 6, 8]})
+         "x_i_0_value": [2, 4, 6, 8, np.nan, np.nan, np.nan],
+         "x_i_1_value": [np.nan, np.nan, np.nan, 2, 4, 6, 8],
+         "geo_type": ["state"]*7})
 
-    #assert covidcast.aggregate_signals([test_input1, test_input1], lags=[0, 1]).equals(expected2)
+    assert covidcast.aggregate_signals([test_input1, test_input1], dt=[0, 1]).equals(expected2)
 
     # test invalid lag length
     with pytest.raises(ValueError):
         covidcast.aggregate_signals([test_input1, test_input1], dt=[0])
+
+    # test mixed geo_types
+    test_input4 = pd.DataFrame(
+        {"geo_value": ["b", "c", "d", "b"],
+         "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2)],
+         "value": [0.5, 1.5, 2.5, 3.5],
+         "signal": ["k", "k", "k", "k"],
+         "geo_type": ["county", "county", "county", "county"],
+         "data_source": ["z", "z", "z", "z"]})
+    with pytest.raises(ValueError):
+        covidcast.aggregate_signals([test_input1, test_input4], dt=[0, 1])
 
 
 def test__detect_metadata():

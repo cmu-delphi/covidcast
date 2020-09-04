@@ -276,14 +276,16 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
     if dt is not None and len(dt) != len(signals):
         raise ValueError("Length of `lags` must be same as length of `signals`")
     dt_dfs = []
-    for df, lag in zip(signals, dt):
+    first_geo_type = _detect_metadata(signals[0])[2]
+    for i, (df, lag) in enumerate(zip(signals, dt)):
         df_c = df.copy()  # make a copy so we don't modify originals
-        source, signal_type, geo_type = _detect_metadata(df_c)
-        # TODO error if >1 geo_types detected  # pylint: disable=W0511
+        source, sig_type, geo_type = _detect_metadata(df_c)
+        if geo_type != first_geo_type:
+            raise ValueError("Multiple geo_types detected. Only a single geo_type is supported.")
         df_c["time"] = [day + timedelta(lag) for day in df_c["time"]]  # lag dates
         df_c.drop(["signal", "data_source", "geo_type"], axis=1, inplace=True)
         df_c.rename(
-            columns={i: f"{source}_{signal_type}_{i}" for i in df_c.columns if i not in join_cols},
+            columns={j: f"{source}_{sig_type}_{i}_{j}" for j in df_c.columns if j not in join_cols},
             inplace=True)
         dt_dfs.append(df_c)
     joined_df = reduce(lambda x, y: pd.merge(x, y, on=join_cols, how=join_type, sort=True), dt_dfs)

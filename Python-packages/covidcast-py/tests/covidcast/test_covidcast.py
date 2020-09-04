@@ -121,7 +121,7 @@ def test_aggregate_signals():
          "signal": ["k", "k", "k", "k"],
          "geo_type": ["state", "state", "state", "state"],
          "data_source": ["z", "z", "z", "z"]})
-    # test 3 signals from 3 sources
+    # test 3 signals from 3 sources with outer join
     expected1 = pd.DataFrame(
         {"geo_value": ["a", "b", "c", "d", "a", "b", "c", "d", "b"],
          "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1),
@@ -135,8 +135,22 @@ def test_aggregate_signals():
     assert covidcast.aggregate_signals(
         [test_input1, test_input2, test_input3], dt=[0, 0, 1]).equals(expected1)
 
-    # test same signal twice with a lag
+    # test 3 signals from 3 sources with inner join has no intersection
+    assert covidcast.aggregate_signals(
+        [test_input1, test_input2, test_input3], dt=[0, 0, 1], join_type="inner").empty
+
+    # test 2 signals from same source (one lagged) with inner join
     expected2 = pd.DataFrame(
+        {"geo_value": ["a"],
+         "time": [date(2020, 1, 2)],
+         "x_i_0_value": [8],
+         "x_i_1_value": [2],
+         "geo_type": ["state"]})
+    assert covidcast.aggregate_signals(
+        [test_input1, test_input1], dt=[0, 1], join_type="inner").equals(expected2)
+
+    # test same signal twice with a lag
+    expected3 = pd.DataFrame(
         {"geo_value": ["a", "b", "c", "a", "b", "c", "a"],
          "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2),
                   date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 3)],
@@ -144,7 +158,7 @@ def test_aggregate_signals():
          "x_i_1_value": [np.nan, np.nan, np.nan, 2, 4, 6, 8],
          "geo_type": ["state"]*7})
 
-    assert covidcast.aggregate_signals([test_input1, test_input1], dt=[0, 1]).equals(expected2)
+    assert covidcast.aggregate_signals([test_input1, test_input1], dt=[0, 1]).equals(expected3)
 
     # test invalid lag length
     with pytest.raises(ValueError):

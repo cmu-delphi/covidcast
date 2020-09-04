@@ -259,15 +259,19 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
 
     This method takes a list of DataFrames containing signal information for geographic regions
     across time, and outputs a single DataFrame with a column for each signal value for each region/
-    time. Input DataFrames must all be of the same geography type.
+    time. The data_source, signal, and index of each DataFrame in ``signals`` are appended to the
+    front of each output column name separated by underscores (e.g. `source_signal_0_inputcolumn`),
+    and the original data_source and signal columns will be dropped. The input DataFrames must all
+    be of the same geography type, and a single geo_type column will be returned in the final
+    DataFrame.
 
     Each signal's time value can be shifted for analysis on lagged signals using the ``dt``
-    argument, which takes a list of integer days to lag each signal's date.
+    argument, which takes a list of integer days to lag each signal's date. Lagging a signal by +1
+    day means that all the dates get shifted forward by 1 day (e.g. Jan 1 becomes Jan 2).
 
     :param signals: List of DataFrames to join.
     :param dt: List of lags in days for each of the input DataFrames in ``signals``.
-      Defaults to `None`. Lagging a signal by +1 day means that all the dates get shifted forward by
-      1 day (e.g. Jan 1 becomes Jan 2).
+      Defaults to `None`.
     :param join_type: Type of join to be done between the DataFrames in ``signals``.
       Defaults to `outer`.
     :return: DataFrame of aggregated signals.

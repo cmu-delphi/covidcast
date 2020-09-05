@@ -58,5 +58,6 @@ def _lookup(key, keys, values, ignore_case=False, fixed=False, ties_method="firs
                 if ties_method == "first":
                     return {k: v}
                 result[k] = result.get(k, []) + [v]
-        output.append(result)
+        if result:  # this prevents an empty output of [{}], which is Truthy
+            output.append(result)
     return output

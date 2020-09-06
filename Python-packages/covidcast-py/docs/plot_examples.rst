@@ -6,7 +6,7 @@ Plotting Examples
 Built-in functionality
 ----------------------
 The returned DataFrame from :py:func:`covidcast.signal` can be plotted using the built-in
-:py:func:`covidcast.plot_choropleth`. Currently only state, county, and MSA geography types
+:py:func:`covidcast.plot_choropleth`. Currently only state, county, and metropolitan statistical area (MSA) geography types
 are supported.
 
 County-level maps show estimates for each county, and color each state by the

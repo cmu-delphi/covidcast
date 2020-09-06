@@ -262,7 +262,7 @@ def _join_msa_geo_df(data: pd.DataFrame,
     """
     geo_info = geo_info[geo_info.LSAD == "M1"]
     input_cols = list(data.columns)
-    merged = data.merge(geo_info, how=join_type, left_on=msa_col, right_on="GEOID")
+    merged = data.merge(geo_info, how=join_type, left_on=msa_col, right_on="GEOID", sort=True)
     # use full state list in the return
     merged[msa_col] = merged.GEOID.combine_first(merged[msa_col])
     # get the first state, which will be the first two characters after the comma and whitespace

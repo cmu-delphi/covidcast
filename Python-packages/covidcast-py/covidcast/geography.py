@@ -12,7 +12,6 @@ STATE_CENSUS = pd.read_csv(
 
 # Filter undesired rows from CSVs.
 # They're not removed from the files to keep them identical to rda files.
-COUNTY_CENSUS = COUNTY_CENSUS.loc[COUNTY_CENSUS.COUNTY != "0"]
 STATE_CENSUS = STATE_CENSUS.loc[STATE_CENSUS.STATE != "0"]
 MSA_CENSUS = MSA_CENSUS.loc[MSA_CENSUS.LSAD == "Metropolitan Statistical Area"]
 
@@ -49,7 +48,7 @@ def _lookup(key, keys, values, ignore_case=False, fixed=False, ties_method="firs
         raise ValueError("Invalid `ties_method`. Must be one of `first` or `all`.")
     key = [key] if isinstance(key, str) else key
     re_func = re.fullmatch if fixed else re.search
-    case = re.IGNORECASE if ignore_case else 0
+    case = re.IGNORECASE if (ignore_case and not fixed) else 0
     output = []
     for i in key:
         result = {}

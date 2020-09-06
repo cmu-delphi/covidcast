@@ -145,7 +145,7 @@ def get_geo_df(data: pd.DataFrame,
     :return: GeoDataFrame containing all columns from the input ``data``, along
       with a ``geometry`` column (containing a polygon) and a ``state_fips``
       column (a two-digit FIPS code identifying the US state containing this
-      geography). For MSAs which span multiple state, the first state in the MSA name is provided.
+      geography). For MSAs that span multiple states, the first state in the MSA name is provided.
       The geometry is given in the GCS NAD83 coordinate system.
 
     """

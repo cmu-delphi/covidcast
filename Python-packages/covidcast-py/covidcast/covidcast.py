@@ -278,7 +278,7 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
     """
     join_cols = ["time", "geo_value"]
     if dt is not None and len(dt) != len(signals):
-        raise ValueError("Length of `lags` must be same as length of `signals`")
+        raise ValueError("Length of `dt` must be same as length of `signals`")
     dt_dfs = []
     first_geo_type = _detect_metadata(signals[0])[2]
     for i, (df, lag) in enumerate(zip(signals, dt)):

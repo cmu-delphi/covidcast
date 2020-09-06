@@ -28,10 +28,10 @@ STATE_ABBR_TO_FIPS = {"AL": "01", "MN": "27", "ME": "23", "WA": "53", "LA": "22"
                       "NJ": "34", "ID": "16"}
 
 # states within the contiguous US
-CONTIGUOUS_FIPS = ["01", "04", "05", "06", "08", "09", "10", "11", "12", "13", "16", "17", "18",
+CONTIGUOUS_FIPS = {"01", "04", "05", "06", "08", "09", "10", "11", "12", "13", "16", "17", "18",
                    "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31",
                    "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45",
-                   "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
+                   "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"}
 
 
 def plot_choropleth(data: pd.DataFrame,
@@ -145,7 +145,7 @@ def get_geo_df(data: pd.DataFrame,
     :return: GeoDataFrame containing all columns from the input ``data``, along
       with a ``geometry`` column (containing a polygon) and a ``state_fips``
       column (a two-digit FIPS code identifying the US state containing this
-      geography). For MSAs which span multiple state, the first state in the MSA name is provided.
+      geography). For MSAs that span multiple states, the first state in the MSA name is provided.
       The geometry is given in the GCS NAD83 coordinate system.
 
     """
@@ -204,7 +204,7 @@ def _join_state_geo_df(data: pd.DataFrame,
     :param data: DF with state info
     :param state_col: cname of column in `data` containing state info to join on
     :param geo_info: GeoDF of state shape info read from Census shapefiles
-    :return: ``data`` with state polygon and state fips joined.
+    :return: ``data`` with state polygon and state FIPS joined.
     """
     input_cols = list(data.columns)
     geo_info.STUSPS = [i.lower() for i in geo_info.STUSPS]  # lowercase for consistency

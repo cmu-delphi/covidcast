@@ -204,7 +204,7 @@ def _join_state_geo_df(data: pd.DataFrame,
     :param data: DF with state info
     :param state_col: cname of column in `data` containing state info to join on
     :param geo_info: GeoDF of state shape info read from Census shapefiles
-    :return: ``data`` with state polygon and state fips joined.
+    :return: ``data`` with state polygon and state FIPS joined.
     """
     input_cols = list(data.columns)
     geo_info.STUSPS = [i.lower() for i in geo_info.STUSPS]  # lowercase for consistency

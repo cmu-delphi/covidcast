@@ -285,7 +285,8 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
         df_c = df.copy()  # make a copy so we don't modify originals
         source, sig_type, geo_type = _detect_metadata(df_c)
         if geo_type != first_geo_type:
-            raise ValueError("Multiple geo_types detected. All signals must have the same geo_type to be aggregated.")
+            raise ValueError("Multiple geo_types detected. "
+                             "All signals must have the same geo_type to be aggregated.")
         df_c["time"] = [day + timedelta(lag) for day in df_c["time"]]  # lag dates
         df_c.drop(["signal", "data_source", "geo_type"], axis=1, inplace=True)
         df_c.rename(

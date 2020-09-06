@@ -1,4 +1,5 @@
 import re
+import warnings
 
 import pandas as pd
 import pkg_resources
@@ -33,13 +34,20 @@ def name_to_abbr(abbr, ignore_case=False, fixed=False, ties_method="first"):
 
 
 def name_to_cbsa(name, ignore_case=False, fixed=False, ties_method="first", state=None):
-    df = MSA_CENSUS.loc[MSA_CENSUS.STATE == state.upper()] if state else MSA_CENSUS
+    if state:
+        state = state.upper()
+        df = MSA_CENSUS.loc[MSA_CENSUS.STATE == state]
+    else:
+        df = MSA_CENSUS
     return _lookup(name, df.NAME, df.CBSA, ignore_case, fixed, ties_method)
 
 
 def name_to_fips(name, ignore_case=False, fixed=False, ties_method="first", state=None):
-    df = COUNTY_CENSUS.loc[COUNTY_CENSUS.STNAME == abbr_to_name(state)[state].upper()] if state \
-        else COUNTY_CENSUS
+    if state:
+        state = state.upper()
+        df = COUNTY_CENSUS.loc[COUNTY_CENSUS.STNAME == abbr_to_name(state)[state]]
+    else:
+        df = COUNTY_CENSUS
     return _lookup(name, df.CTYNAME, df.FIPS, ignore_case, fixed, ties_method)
 
 
@@ -54,9 +62,19 @@ def _lookup(key, keys, values, ignore_case=False, fixed=False, ties_method="firs
         result = {}
         for k, v in zip(keys, values):
             if re_func(i, k, case):
-                if ties_method == "first":
-                    return {k: v}
                 result[k] = result.get(k, []) + [v]
         if result:  # this prevents an empty output of [{}], which is Truthy
             output.append(result)
+    if ties_method == "first":
+        return _get_first_tie(output)
     return output
+
+
+def _get_first_tie(dict_list: list):
+    """Needs to be Python 3.6+ for this to work. Earlier versions don't preserve insertion order."""
+    for d in dict_list:
+        if len(d) > 1 or any(len(val) > 1 for val in d.values()):
+            warnings.warn("Some inputs were not uniquely matched; "
+                          "returning only the first match in each case.")
+    first_items = [list(d.items())[0] for d in dict_list]
+    return {i[0]: i[1][0] for i in first_items}

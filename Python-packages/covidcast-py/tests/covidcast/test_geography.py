@@ -41,6 +41,20 @@ def test_fips_to_name(test_key, test_kwargs, expected):
             {},
             {"38300": "Pittsburgh, PA"}
     ),
+    (
+            "389",
+            {"ties_method": "all"},
+            [{"38900": ["Portland-Vancouver-Hillsboro, OR-WA"], "38940": ["Port St. Lucie, FL"]}]
+    ),
+    (
+            ["38300", "389"],
+            {"ties_method": "all"},
+            [
+                {"38300": ["Pittsburgh, PA"]},
+                {"38900": ["Portland-Vancouver-Hillsboro, OR-WA"], "38940": ["Port St. Lucie, FL"]}
+            ]
+
+    )
 ])
 def test_cbsa_to_name(test_key, test_kwargs, expected):
     assert geography.cbsa_to_name(test_key, **test_kwargs) == expected
@@ -109,6 +123,11 @@ def test_name_to_abbr(test_key, test_kwargs, expected):
             "New",
             {"state": "CA"},
             {}
+    ),
+    (
+            "New",
+            {},
+            {"Boston-Cambridge-Newton, MA-NH": "14460"}
     )
 ])
 def test_name_to_cbsa(test_key, test_kwargs, expected):
@@ -168,9 +187,44 @@ def test_name_to_fips(test_key, test_kwargs, expected):
             {"a": "x", "b": "y"}
     ),
     (
-            (["A"], ["aa", "a"], ["x", "y"]),
+            (["a", "b"], ["a", "a", "aa", "b"], ["w", "x", "y", "z"]),
+            {"ties_method": "all"},
+            [{"a": ["w", "x"], "aa": ["y"]}, {"b": ["z"]}]
+    ),
+    (
+            (["a", "b"], ["A", "aa", "b"], ["x", "y", "z"]),
+            {"ignore_case": True},
+            {"A": "x", "b": "z"}
+    ),
+    (
+            (["a", "b"], ["a", "aa", "b"], ["x", "y", "z"]),
+            {"fixed": True},
+            {"a": "x", "b": "z"}
+    ),
+    (
+            (["a", "b"], ["a", "aa", "b"], ["x", "y", "z"]),
+            {"ties_method": "all", "fixed": True},
+            [{"a": ["x"]}, {"b": ["z"]}]
+    ),
+    (
+            (["a", "b"], ["A", "aa", "b"], ["x", "y", "z"]),
+            {"ties_method": "all", "ignore_case": True},
+            [{"A": ["x"], "aa": ["y"]}, {"b": ["z"]}]
+    ),
+    (
+            (["a", "b"], ["A", "aa", "b"], ["x", "y", "z"]),
+            {"ties_method": "all", "fixed": True, "ignore_case": True},
+            [{"b": ["z"]}]
+    ),
+    (
+            ("A", ["aa", "a"], ["x", "y"]),
             {},
             {}
+    ),
+    (
+            ("A", ["aa", "a"], ["x", "y"]),
+            {"ignore_case": True},
+            {"aa": "x"}
     ),
     (
             (["A"], ["aa", "a"], ["x", "y"]),
@@ -178,27 +232,47 @@ def test_name_to_fips(test_key, test_kwargs, expected):
             {"aa": "x"}
     ),
     (
-            (["a"], ["a", "a"], ["x", "y"]),
+            ("A", ["aa", "a"], ["x", "y"]),
+            {"ignore_case": True, "ties_method": "all"},
+            [{"aa": ["x"], "a": ["y"]}]
+    ),
+    (
+            (["A"], ["aa", "a"], ["x", "y"]),
+            {"ignore_case": True, "ties_method": "all"},
+            [{"aa": ["x"], "a": ["y"]}]
+    ),
+    (
+            ("A", ["aa", "a"], ["x", "y"]),
+            {"ignore_case": True, "ties_method": "all"},
+            [{"aa": ["x"], "a": ["y"]}]
+    ),
+    (
+            ("A", ["aa", "a"], ["x", "y"]),
+            {"ignore_case": True},
+            {"aa": "x"}
+    ),
+    (
+            ("a", ["a", "a"], ["x", "y"]),
             {"ties_method": "all"},
             [{"a": ["x", "y"]}]
     ),
     (
-            (["a"], ["aa", "a"], ["x", "y"]),
-             {"ties_method": "all"},
+            ("a", ["aa", "a"], ["x", "y"]),
+            {"ties_method": "all"},
             [{"aa": ["x"], "a": ["y"]}]
     ),
     (
-            (["a"], ["aa", "a"], ["x", "y"]),
+            ("a", ["aa", "a"], ["x", "y"]),
             {"ties_method": "all", "fixed": True},
             [{"a": ["y"]}]
     ),
     (
-            (["A"], ["aa", "a"], ["x", "y"]),
+            ("A", ["aa", "a"], ["x", "y"]),
             {"ties_method": "all", "fixed": True, "ignore_case": True},
             []
     ),
     (
-            (["A"], ["a", "a"], ["x", "y"]),
+            ("A", ["a", "a"], ["x", "y"]),
             {"ties_method": "all", "ignore_case": True},
             [{"a": ["x", "y"]}]
     )

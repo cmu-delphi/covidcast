@@ -28,13 +28,13 @@ def fips_to_name(code: Union[str, Iterable],
 
     :param code: Individual or list of FIPS codes or regular expressions.
     :param ignore_case: Boolean for whether or not to be case insensitive in the regular
-      expression. If ``fixed=True``, this argument is ignored. Defaults to `False`.
-    :param fixed: Conduct an exact case sensitive match with the input string. Defaults to `False`.
+      expression. If ``fixed=True``, this argument is ignored. Defaults to ``False``.
+    :param fixed: Conduct an exact case sensitive match with the input string. Defaults to ``False``.
     :param ties_method: Method for determining how to deal with multiple outputs for a given input.
-      Must be one of `"all"` or `"first"`. If `"first"`, then only the first match for each code is
-      returned. If `"all"`, then all matches for each code are returned. Defaults to `first`.
+      Must be one of ``"all"`` or ``"first"``. If ``"first"``, then only the first match for each code is
+      returned. If ``"all"``, then all matches for each code are returned. Defaults to ``"first"``.
     :return: If ``ties_method="first"``, returns a dictionary of each input code to the first
-      corresponding name found. If `ties_method="all"`, returns a list of dicts, one for each input,
+      corresponding name found. If ``ties_method="all"``, returns a list of dicts, one for each input,
       with keys corresponding to all matched input keys and values corresponding to the list of
       county names.
     """
@@ -52,13 +52,13 @@ def cbsa_to_name(code: Union[str, Iterable],
 
     :param code: Individual or list of FIPS codes or regular expressions.
     :param ignore_case: Boolean for whether or not to be case insensitive in the regular
-      expression. If ``fixed=True``, this argument is ignored. Defaults to `False`.
-    :param fixed: Conduct an exact case sensitive match with the input string. Defaults to `False`.
+      expression. If ``fixed=True``, this argument is ignored. Defaults to ``False``.
+    :param fixed: Conduct an exact case sensitive match with the input string. Defaults to ``False``.
     :param ties_method: Method for determining how to deal with multiple outputs for a given input.
-      Must be one of `"all"` or `"first"`. If `"first"`, then only the first match for each code is
-      returned. If `"all"`, then all matches for each code are returned. Defaults to `first`.
+      Must be one of ``"all"`` or ``"first"``. If ``"first"``, then only the first match for each code is
+      returned. If ``"all"``, then all matches for each code are returned. Defaults to ``first``.
     :return: If ``ties_method="first"``, returns a dictionary of each input code to the first
-      corresponding name found. If `ties_method="all"`, returns a list of dicts, one for each input,
+      corresponding name found. If ``ties_method="all"``, returns a list of dicts, one for each input,
       with keys corresponding to all matched input keys and values corresponding to the list of
       MSA names.
     """
@@ -76,13 +76,13 @@ def abbr_to_name(abbr: Union[str, Iterable],
 
     :param abbr: Individual or list of state abbreviations or regular expressions.
     :param ignore_case: Boolean for whether or not to be case insensitive in the regular
-      expression. If ``fixed=True``, this argument is ignored. Defaults to `False`.
-    :param fixed: Conduct an exact case sensitive match with the input string. Defaults to `False`.
+      expression. If ``fixed=True``, this argument is ignored. Defaults to ``False``.
+    :param fixed: Conduct an exact case sensitive match with the input string. Defaults to ``False``.
     :param ties_method: Method for determining how to deal with multiple outputs for a given input.
-      Must be one of `"all"` or `"first"`. If `"first"`, then only the first match for each code is
-      returned. If `"all"`, then all matches for each code are returned. Defaults to `first`.
+      Must be one of ``"all"`` or ``"first"``. If ``"first"``, then only the first match for each code is
+      returned. If ``"all"``, then all matches for each code are returned. Defaults to ``first``.
     :return: If ``ties_method="first"``, returns a dictionary of each input code to the first
-      corresponding name found. If `ties_method="all"`, returns a list of dicts, one for each input,
+      corresponding name found. If ``ties_method="all"``, returns a list of dicts, one for each input,
       with keys corresponding to all matched input keys and values corresponding to the list of
       state names.
     """
@@ -100,13 +100,13 @@ def name_to_abbr(name: Union[str, Iterable],
 
     :param name: Individual or list of state names or regular expressions.
     :param ignore_case: Boolean for whether or not to be case insensitive in the regular
-      expression. If ``fixed=True``, this argument is ignored. Defaults to `False`.
-    :param fixed: Conduct an exact case sensitive match with the input string. Defaults to `False`.
+      expression. If ``fixed=True``, this argument is ignored. Defaults to ``False``.
+    :param fixed: Conduct an exact case sensitive match with the input string. Defaults to ``False``.
     :param ties_method: Method for determining how to deal with multiple outputs for a given input.
-      Must be one of `"all"` or `"first"`. If `"first"`, then only the first match for each code is
-      returned. If `"all"`, then all matches for each code are returned. Defaults to `first`.
+      Must be one of ``"all"`` or ``"first"``. If ``"first"``, then only the first match for each code is
+      returned. If ``"all"``, then all matches for each code are returned. Defaults to ``first``.
     :return: If ``ties_method="first"``, returns a dictionary of each input code to the first
-      corresponding name found. If `ties_method="all"`, returns a list of dicts, one for each input,
+      corresponding name found. If ``ties_method="all"``, returns a list of dicts, one for each input,
       with keys corresponding to all matched input keys and values corresponding to the list of
       state abbreviations.
     """
@@ -125,14 +125,14 @@ def name_to_cbsa(name: Union[str, Iterable],
 
     :param name: Individual or list of MSA names or regular expressions.
     :param ignore_case: Boolean for whether or not to be case insensitive in the regular
-      expression. If ``fixed=True``, this argument is ignored. Defaults to `False`.
-    :param fixed: Conduct an exact case sensitive match with the input string. Defaults to `False`.
+      expression. If ``fixed=True``, this argument is ignored. Defaults to ``False``.
+    :param fixed: Conduct an exact case sensitive match with the input string. Defaults to ``False``.
     :param ties_method: Method for determining how to deal with multiple outputs for a given input.
-      Must be one of `"all"` or `"first"`. If `"first"`, then only the first match for each code is
-      returned. If `"all"`, then all matches for each code are returned. Defaults to `first`.
+      Must be one of ``"all"`` or ``"first"``. If ``"first"``, then only the first match for each code is
+      returned. If ``"all"``, then all matches for each code are returned. Defaults to ``first``.
     :param state: 2 letter state code, case insensitive, to restrict results to.
     :return: If ``ties_method="first"``, returns a dictionary of each input name to the first
-      corresponding name found. If `ties_method="all"`, returns a list of dicts, one for each input,
+      corresponding name found. If ``ties_method="all"``, returns a list of dicts, one for each input,
       with keys corresponding to all matched input keys and values corresponding to the list of
       MSA codes.
     """
@@ -156,14 +156,14 @@ def name_to_fips(name: Union[str, Iterable],
 
     :param name: Individual or list of county names or regular expressions.
     :param ignore_case: Boolean for whether or not to be case insensitive in the regular
-      expression. If ``fixed=True``, this argument is ignored. Defaults to `False`.
-    :param fixed: Conduct an exact case sensitive match with the input string. Defaults to `False`.
+      expression. If ``fixed=True``, this argument is ignored. Defaults to ``False``.
+    :param fixed: Conduct an exact case sensitive match with the input string. Defaults to ``False``.
     :param ties_method: Method for determining how to deal with multiple outputs for a given input.
-      Must be one of `"all"` or `"first"`. If `"first"`, then only the first match for each code is
-      returned. If `"all"`, then all matches for each code are returned. Defaults to `first`.
+      Must be one of ``"all"`` or ``"first"``. If ``"first"``, then only the first match for each code is
+      returned. If ``"all"``, then all matches for each code are returned. Defaults to ``first``.
     :param state: 2 letter state code, case insensitive, to restrict results to.
     :return: If ``ties_method="first"``, returns a dictionary of each input name to the first
-      corresponding name found. If `ties_method="all"`, returns a list of dicts, one for each input,
+      corresponding name found. If ``ties_method="all"``, returns a list of dicts, one for each input,
       with keys corresponding to all matched input keys and values corresponding to the list of
       FIPS.
     """
@@ -187,13 +187,13 @@ def _lookup(key: Union[str, Iterable],
     :param keys: List of keys to be searched
     :param values: List of values that correspond to keys.
     :param ignore_case: Boolean for whether or not to be case insensitive in the regular expression.
-      If ``fixed=True``, this argument is ignored. Defaults to `False`.
-    :param fixed: Conduct an exact case sensitive match with the input string. Defaults to `False`.
+      If ``fixed=True``, this argument is ignored. Defaults to ``False``.
+    :param fixed: Conduct an exact case sensitive match with the input string. Defaults to ``False``.
     :param ties_method: Method for determining how to deal with multiple outputs for a given input.
-      Must be one of `"all"` or `"first"`. If `"first"`, then only the first match for each code is
-      returned. If `"all"`, then all matches for each code are returned. Defaults to `first`.
+      Must be one of ``"all"`` or ``"first"``. If ``"first"``, then only the first match for each code is
+      returned. If `"all"`, then all matches for each code are returned. Defaults to ``first``.
     :return: If ``ties_method="first"``, returns a dictionary of each input code to the first
-      corresponding key found. If `ties_method="all"`, returns a list of dicts, one for each input,
+      corresponding key found. If ``ties_method="all"``, returns a list of dicts, one for each input,
       with keys corresponding to all matched input keys and values corresponding to the list of
       values.
     """

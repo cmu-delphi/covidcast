@@ -283,21 +283,32 @@ def test__lookup(test_args, test_kwargs, expected):
         geography._lookup(None, None, None, ties_method="not a real method")
 
 
-@pytest.mark.parametrize("test_dict_list, expected", [
+@pytest.mark.parametrize("test_dict_list, expected_return, expected_stdout", [
     (
             [{"a": ["x", "y"]}],
-            {"a": "x"}
+            {"a": "x"},
+            "Some inputs were not uniquely matched; returning only the first match in "
+            "each case. To return all matches, set `ties_method='all'`\n"
     ),
     (
             [{"a": ["x", "y"], "b": ["i", "j", "k"]}],
-            {"a": "x"}
+            {"a": "x"},
+            "Some inputs were not uniquely matched; returning only the first match in "
+            "each case. To return all matches, set `ties_method='all'`\n"
     ),
     (
             [{"a": ["x", "y"]}, {"b": ["i", "j", "k"]}],
-            {"a": "x", "b": "i"}
+            {"a": "x", "b": "i"},
+            "Some inputs were not uniquely matched; returning only the first match in "
+            "each case. To return all matches, set `ties_method='all'`\n"
+    ),
+    (
+            [{"a": ["x"]}],
+            {"a": "x"},
+            ""
     )
 ])
-def test__get_first_tie(test_dict_list, expected):
-    with pytest.warns(UserWarning):
-        assert geography._get_first_tie(test_dict_list) == expected
-    assert geography._get_first_tie([{"a": ["x"]}]) == {"a": "x"}
+def test__get_first_tie(test_dict_list, expected_return, expected_stdout, capfd):
+    assert geography._get_first_tie(test_dict_list) == expected_return
+    out, _ = capfd.readouterr()
+    assert out == expected_stdout

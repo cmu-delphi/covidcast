@@ -222,9 +222,12 @@ def _get_first_tie(dict_list: list) -> dict:
     :param dict_list: List of str:list dicts.
     :return: Dictionary of the first key and first value for that key for each of the input dicts.
     """
+    not_unique = False
     for d in dict_list:
         if len(d) > 1 or any(len(val) > 1 for val in d.values()):
-            warnings.warn("Some inputs were not uniquely matched; "
-                          "returning only the first match in each case.")
+            not_unique = True
+    if not_unique:
+        print("Some inputs were not uniquely matched; returning only the first match in each case. "
+              "To return all matches, set `ties_method='all'`")
     first_items = [list(d.items())[0] for d in dict_list]
     return {i[0]: i[1][0] for i in first_items}

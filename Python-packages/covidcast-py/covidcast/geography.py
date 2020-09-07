@@ -1,6 +1,6 @@
 import re
-import warnings
 from typing import Union, Iterable
+
 import pandas as pd
 import pkg_resources
 

@@ -1,5 +1,7 @@
 import os
 
+import matplotlib
+import platform
 import geopandas as gpd
 import numpy as np
 import pandas as pd
@@ -14,6 +16,26 @@ CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 NON_GEOMETRY_COLS = ["geo_value", "time_value", "direction", "issue", "lag", "value", "stderr",
                      "sample_size", "geo_type", "data_source", "signal", "state_fips"]
+
+
+@pytest.mark.skipif(platform.system() != "Linux", reason="Linux specific plot rendering expected.")
+def test_plot_choropleth():
+    matplotlib.use("agg")
+    # load expected choropleth as an array
+    expected = np.load(os.path.join(CURRENT_PATH, "../reference_data/expected_plot_arrays.npz"))
+    test_df = pd.read_csv(os.path.join(CURRENT_PATH, "../reference_data/test_input_county_signal.csv"),
+                          dtype=str)
+    test_df["time_value"] = test_df.time_value.astype("datetime64[D]")
+    test_df["value"] = test_df.value.astype("float")
+
+    fig1 = plotting.plot_choropleth(test_df)
+    data1 = np.frombuffer(fig1.canvas.tostring_rgb(), dtype=np.uint8)  # get np array representation
+    # give margin of +-2 for floating point errors and platform discrepancies.
+    assert np.allclose(data1, expected["expected1"], atol=2, rtol=0)
+
+    fig2 = plotting.plot_choropleth(test_df, cmap="viridis", figsize=(5, 5), edgecolor="0.8")
+    data2 = np.frombuffer(fig2.canvas.tostring_rgb(), dtype=np.uint8)
+    assert np.allclose(data2, expected["expected2"], atol=2, rtol=0)
 
 
 def test_get_geo_df():

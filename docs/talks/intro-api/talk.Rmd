@@ -1,9 +1,8 @@
 ---
-title: 'Delphi''s COVIDcast Project: <br> API and Client Access Tools'
-author: Katie Mazaitis\* and Ryan Tibshirani^†^ <br> \*^†^Machine Learning and ^†^Statistics
-  <br> Carnegie Mellon University <br> ^†^Amazon Scholar, AWS AI Labs
+title: "Delphi's COVIDcast Project: <br> API and Client Access Tools"
+author: Katie Mazaitis\* and Ryan Tibshirani^†^ <br> \*^†^Machine Learning and ^†^Statistics <br> Carnegie Mellon University <br> ^†^Amazon Scholar, AWS AI Labs
 date: "<br> ![](delphi.png) ![](cmu.png) <br><br> September 1, 2020"
-footer: 'Get the slides at: cmu-delphi.github.io/covidcast/talks/intro-api/talk.html'
+footer: "Get the slides at: cmu-delphi.github.io/covidcast/talks/intro-api/talk.html"
 output: 
   slidy_presentation:
     theme: cerulean
@@ -90,6 +89,7 @@ Today: COVIDcast API and client access in R. Outline:
 - Few more examples
 
 Note: examples are meant to be demos, all code included
+
 <br>
 
 Next talks: Facebook surveys, medical claims data, etc.

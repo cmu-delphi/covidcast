@@ -90,11 +90,11 @@ Through recruitment partnership with Facebook, we survey about `r col("75,000 pe
 - mask wearing (as of yesterday)
 - demographics
 
-A [parallel, international effort](https://covidmap.umd.edu/) by the University of Maryland reaches 100+ countries in 55 languages
+A [parallel, international effort](https://covidmap.umd.edu/) by the University of Maryland reaches 100+ countries in 55 languages; 20 million responses so far
 
 # Our Facebook Survey (Continued)
 
-- This survey is implemented on Qualtrics, managed by CMU
+- The US survey is implemented on Qualtrics, managed by CMU
 - Facebook never receives any individual responses
 - Designed to take about 10 minutes; about 35 questions
 - Questions selected for relevance to forecasting and nowcasting

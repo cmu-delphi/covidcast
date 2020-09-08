@@ -30,7 +30,7 @@ def test_plot_choropleth():
 
     fig1 = plotting.plot_choropleth(test_df)
     data1 = np.frombuffer(fig1.canvas.tostring_rgb(), dtype=np.uint8)  # get np array representation
-    # give margin of +-2 for floating point errors and platform discrepancies.
+    # give margin of +-2 for floating point errors
     assert np.allclose(data1, expected["expected1"], atol=2, rtol=0)
 
     fig2 = plotting.plot_choropleth(test_df, cmap="viridis", figsize=(5, 5), edgecolor="0.8")

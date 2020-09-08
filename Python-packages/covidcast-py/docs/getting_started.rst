@@ -36,7 +36,7 @@ We can also request all data on a signal after a specific date. Here, for
 example, we obtain ``smoothed_cli`` in each state for every day since
 2020-05-01:
 
->>> data = covidcast.signal("fb-survey", "smoothed_cli", 
+>>> data = covidcast.signal("fb-survey", "smoothed_cli",
 ...                         date(2020, 5, 1), geo_type="state")
 >>> data.head()
    direction geo_value      issue  lag  sample_size    stderr time_value     value
@@ -142,7 +142,7 @@ issues 7 days after the corresponding ``time_value``:
 
 >>> covidcast.signal("doctor-visits", "smoothed_cli",
 ...                  start_day=date(2020, 5, 1), end_day=date(2020, 5, 7),
-...                  geo_type="state", geo_values="pa", lag=7) 
+...                  geo_type="state", geo_values="pa", lag=7)
    direction geo_value      issue  lag sample_size stderr time_value     value
 0          0        pa 2020-05-08    7        None   None 2020-05-01  2.897032
 0         -1        pa 2020-05-09    7        None   None 2020-05-02  2.802238
@@ -165,3 +165,35 @@ on May 10th (a 7-day lag), but in fact the value was not updated on that day:
 2         -1        pa 2020-05-13   10        None   None 2020-05-03  3.006860
 3         -1        pa 2020-05-14   11        None   None 2020-05-03  2.970561
 4         -1        pa 2020-05-15   12        None   None 2020-05-03  3.038054
+
+Dealing with geographies
+------------------------
+
+As seen above, the COVIDcast API identifies counties by their FIPS code and
+states by two-letter abbreviations. Metropolitan statistical areas are also
+identified by unique codes, called CBSA IDs. If you want to find a specific area
+by name, this package provides convenience functions:
+
+>>> covidcast.name_to_cbsa(["Houston", "San Antonio"])
+{'Houston-The Woodlands-Sugar Land, TX': '26420', 'San Antonio-New Braunfels, TX': '41700'}
+
+We can use these functions to quickly query data for specific regions:
+
+>>> counties = covidcast.name_to_fips(["Allegheny", "Los Angeles", "Miami-Dade"])
+>>> d = covidcast.signal("doctor-visits", "smoothed_cli",
+...                      start_day=date(2020, 5, 1), end_day=date(2020, 5, 1),
+...                      geo_values=counties.values())
+>>> d
+   direction geo_value      issue  lag sample_size        signal stderr time_value     value geo_type    data_source
+0         -1     42003 2020-07-04   64        None  smoothed_cli   None 2020-05-01  1.336086   county  doctor-visits
+0          0     06037 2020-07-04   64        None  smoothed_cli   None 2020-05-01  5.787655   county  doctor-visits
+0         -1     12086 2020-07-04   64        None  smoothed_cli   None 2020-05-01  6.405477   county  doctor-visits
+
+We can also quickly convert back from the IDs returned by the API to
+human-readable names:
+
+>>> covidcast.fips_to_name(d.geo_value)
+{'42003': 'Allegheny County', '06037': 'Los Angeles County', '12086': 'Miami-Dade County'}
+
+See :ref:`working-with-geos` for details on each of these functions and their
+optional arguments.

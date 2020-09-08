@@ -1,9 +1,8 @@
 ---
-title: 'Delphi''s COVIDcast Project: <br> COVID-19 Symptom Surveys Through Facebook'
-author: Alex Reinhart\* and Ryan Tibshirani^†^ <br> \*^†^Statistics and ^†^Machine Learning
-  <br> Carnegie Mellon University <br> ^†^Amazon Scholar, AWS AI Labs
+title: "Delphi's COVIDcast Project: <br> COVID-19 Symptom Surveys Through Facebook"
+author: "Alex Reinhart and Ryan Tibshirani^†^ <br> Statistics and ^†^Machine Learning <br> Carnegie Mellon University <br> ^†^Amazon Scholar, AWS AI Labs"
 date: "<br> ![](delphi.png) ![](cmu.png) <br><br> September 8, 2020"
-footer: 'Get the slides at: cmu-delphi.github.io/covidcast/talks/fb-survey/talk.Rmd'
+footer: "Get the slides at: cmu-delphi.github.io/covidcast/talks/fb-survey/talk.html"
 output: 
   slidy_presentation:
     theme: cerulean
@@ -56,8 +55,8 @@ The COVIDcast project has many parts:
 
 Today: Our COVID-19 symptom surveys through Facebook. Outline:
 
-- The survey
-- Its value as an indicator of COVID activity
+- Survey background and basics
+- Early indicator of COVID activity?
 - Other data available from the survey
 
 <br>
@@ -72,6 +71,7 @@ Back in March 2020, we began discussions with Facebook and Google about running 
 - One run by Google through Google's Opinions Reward app, AdMob, etc.
 
 <br>
+
 Both are `r col("massive")`. But they are are very different:
 
 - Facebook survey: long, and no control over geo-sampling distribution 
@@ -85,14 +85,14 @@ Through recruitment partnership with Facebook, we survey about `r col("75,000 pe
 
 - COVID symptoms (common and rare)
 - COVID testing
-- mental health
-- social contacts and behavior
-- mask wearing (as of yesterday)
-- demographics
+- Mental health
+- Social contacts and behavior
+- Mask wearing (launched today!)
+- Demographics
 
-A [parallel, international effort](https://covidmap.umd.edu/) by the University of Maryland reaches 100+ countries in 55 languages; 20 million responses so far
+A [parallel, international effort](https://covidmap.umd.edu/) by the University of Maryland reaches 100+ countries in 55 languages; over 20 million responses so far
 
-# Our Facebook Survey (Continued)
+# Our Facebook Survey (Cont.)
 
 - The US survey is implemented on Qualtrics, managed by CMU
 - Facebook never receives any individual responses
@@ -103,19 +103,28 @@ A [parallel, international effort](https://covidmap.umd.edu/) by the University 
 
 This is the largest non-Census research survey `r col("ever conducted")` (that we know of)
 
+# COVID-Like Illness
+
+Using the survey data we generate daily, county-level estimates of:
+
+- `r col("% CLI")`: the percentage of people with COVID-like illness
+- `r col("% CLI-in-community")`: the percentage of people who know someone in their local community with COVID-like illness
+
+(Note that COVID-like illness or CLI is defined as *fever of at least 100 °F, along with cough, shortness of breath, or difficulty breathing*. We also ask people to report on more rare symptoms)
+
 # Why % CLI-in-Community? 
 
-We ask people to report on their own symptoms, and also if they know anyone locally who is sick. You'd be surprised ... the latter appears to be a lot more valuable! 
+Why ask a proxy question (have people report on others)? You'd be surprised ... this appears to be pretty valuable! Here's Spearman correlations to COVID-19 case rates sliced by time: 
 
 ```{r, fig.width=7, fig.height=5}
+library(covidcast)
+
 # Fetch Facebook % CLI signal, % CLI-in-community signal and JHU confirmed case
 # incidence proportions
-library(covidcast)
 start_day = "2020-04-15"
-end_day = "2020-09-05"
-sympt1 = covidcast_signal("fb-survey", "smoothed_cli", start_day, end_day)
-sympt2 = covidcast_signal("fb-survey", "smoothed_hh_cmnty_cli", start_day, end_day)
-cases = covidcast_signal("jhu-csse", "confirmed_7dav_incidence_prop", start_day, end_day)
+sympt1 = covidcast_signal("fb-survey", "smoothed_cli", start_day)
+sympt2 = covidcast_signal("fb-survey", "smoothed_hh_cmnty_cli", start_day)
+cases = covidcast_signal("jhu-csse", "confirmed_7dav_incidence_prop", start_day)
 
 # Consider only counties with at least 500 cumulative cases so far
 case_num = 500
@@ -132,12 +141,16 @@ df_cor1 = covidcast_cor(sympt1_act, cases_act, by = "time_value",
 df_cor2 = covidcast_cor(sympt2_act, cases_act, by = "time_value", 
                         method = "spearman")
 
+# Red, blue (similar to ggplot defaults), then yellow
+ggplot_colors = c("#FC4E07", "#00AFBB", "#E7B800")
+
 # Stack rowwise into one data frame, then plot time series
 df_cor = rbind(df_cor1, df_cor2)
 df_cor$signal = c(rep("% CLI", nrow(df_cor1)), 
                   rep("% CLI-in-community", nrow(df_cor2)))
 ggplot(df_cor, aes(x = time_value, y = value)) + 
   geom_line(aes(color = signal)) +
+  scale_color_manual(values = ggplot_colors[c(3, 1)]) +
   labs(title = "Correlation between survey signals and case rates (by time)",
        subtitle = sprintf("Over all counties with at least %i cumulative cases",
                           case_num), x = "Date", y = "Correlation") +
@@ -145,6 +158,8 @@ ggplot(df_cor, aes(x = time_value, y = value)) +
 ```
 
 # Why % CLI-in-Community? (Cont.)
+
+Now here's Spearman correlations to COVID-19 case rates sliced by county: 
 
 ```{r, fig.width=7, fig.height=5}
 # Compute correlations, per time, over all counties
@@ -159,6 +174,8 @@ df_cor$signal = c(rep("% CLI", nrow(df_cor1)),
                   rep("% CLI-in-community", nrow(df_cor2)))
 ggplot(df_cor, aes(value)) + geom_density(aes(color = signal, fill = signal), 
                                           alpha = 0.4) +
+  scale_color_manual(values = ggplot_colors[c(3,1)]) +
+  scale_fill_manual(values = ggplot_colors[c(3,1)]) +
   labs(title = "Correlation between survey signals and case rates (by county)",
        subtitle = sprintf("Over all counties with at least %i cumulative cases",
                           case_num), x = "Date", y = "Correlation") +
@@ -167,17 +184,17 @@ ggplot(df_cor, aes(value)) + geom_density(aes(color = signal, fill = signal),
 
 # An Early Indicator?
 
-Let's take a look at case counts in Miami-Dade, from June 1 to July 15, and compare it to the % CLI-in-community indicator based on our survey
+Let's take a look at case counts in Miami-Dade, from June 1 to July 15, and compare it to the % CLI-in-community indicator based on our survey: 
 
-```{r, echo=FALSE, fig.width=7, fig.height=5}
+```{r, fig.width=7, fig.height=5}
 # Fetch Facebook % CLI-in-community signal and JHU confirmed case incidence
-# numbers at the county level
+# numbers from June 1 to July 15
 start_day = "2020-06-01"
 end_day = "2020-07-15"
-sympt = covidcast_signal("fb-survey", "smoothed_hh_cmnty_cli", start_day, 
-                         end_day)
-cases = covidcast_signal("jhu-csse", "confirmed_7dav_incidence_num", start_day, 
-                         end_day)
+sympt = covidcast_signal("fb-survey", "smoothed_hh_cmnty_cli", 
+                         start_day, end_day)
+cases = covidcast_signal("jhu-csse", "confirmed_7dav_incidence_num",
+                         start_day, end_day)
 
 # Function to transform from one range to another
 trans = function(x, from_range, to_range) {
@@ -201,11 +218,10 @@ plot_one = function(geo_value, title = NULL, xlab = NULL,
   trans12 = function(x) trans(x, range1, range2)
   trans21 = function(x) trans(x, range2, range1)
 
-  # First find the state, find abbreviation, then set title
-  state_name = state_census %>%
-    filter(STATE == as.numeric(substr(geo_value, 1, 2))) %>% pull(NAME)
-  state_abb = state.abb[state.name == state_name]
-  title = paste0(fips_to_name(geo_value), ", ", state_abb)
+  # Find state name, find abbreviation, then set title
+  state_name = fips_to_name(paste0(substr(geo_value, 1, 2), "000"))
+  state_abbr = name_to_abbr(state_name)
+  title = paste0(fips_to_name(geo_value), ", ", state_abbr)
 
   # Transform the combined signal to the incidence range, then stack
   # these rowwise into one data frame
@@ -216,10 +232,11 @@ plot_one = function(geo_value, title = NULL, xlab = NULL,
   
   # Finally, plot both signals
   pos = ifelse(legend, "bottom", "none")
-  return(ggplot(df, aes(x = time_value, y = value)) + 
+  return(ggplot(df, aes(x = time_value, y = value)) +
            geom_line(aes(color = signal)) +
-           scale_y_continuous(name = ylab1, limits = range1, 
-                              sec.axis = sec_axis(trans = trans12, 
+           scale_color_manual(values = ggplot_colors[1:2]) +
+           scale_y_continuous(name = ylab1, limits = range1,
+                              sec.axis = sec_axis(trans = trans12,
                                                   name = ylab2)) +
            labs(title = title, x = xlab) + theme_bw() +
            theme(legend.pos = pos, legend.title = element_blank()))
@@ -229,8 +246,10 @@ plot_one = function(geo_value, title = NULL, xlab = NULL,
 plot_one(name_to_fips("Miami-Dade"), xlab = "Date",
          ylab1 = "Daily new confirmed COVID-19 cases",
          ylab2 = "% of people who know someone with CLI") +
-  geom_vline(xintercept = as.numeric(as.Date("2020-06-19")), linetype = 2) +
-  geom_vline(xintercept = as.numeric(as.Date("2020-06-25")), linetype = 2)
+  geom_vline(xintercept = as.numeric(as.Date("2020-06-19")),
+             linetype = 2, size = 1, color = ggplot_colors[1]) +
+  geom_vline(xintercept = as.numeric(as.Date("2020-06-25")),
+             linetype = 2, size = 1, color = ggplot_colors[2])
 ```
 
 # An Early Indicator? (Cont.) 
@@ -250,7 +269,7 @@ for (i in 1:num) {
 do.call(grid.arrange, c(p_list, nrow = 5, ncol = 4))
 ```
 
-# An Early Indicator? (Continued) 
+# An Early Indicator? (Cont.) 
 
 - Facebook % CLI-in-community indicator is never lagging, `r col("sometimes leading")`
 - Similar results hold with doctor's visit indicator (but, remember: latency and backfill!)
@@ -268,7 +287,7 @@ New revision of the survey will allow us to calculate new aggregates:
 - Mask wearing
 - Anxiety, depression, isolation
 
-Data to become available this month.
+Data to become available later this month
 
 # Access to Survey Microdata
 
@@ -278,17 +297,22 @@ Want to study a problem that can be answered with 10 million US survey responses
 - Test rates and availability by employment and occupation
 - Mental health impacts of interventions
 - Disparate impacts on minorities and disadvantaged groups
-- ...anything you can think of
+- ... anything else you can think of
 
-Raw response data is freely available to researchers who can sign DUAs to protect confidentiality of responses.
+Raw response data is freely available to researchers who sign a [data use agreement](https://dataforgood.fb.com/docs/covid-19-symptom-survey-request-for-data-access/) to protect confidentiality of responses
 
-We're building a network of academic and non-profit researchers to learn from the survey.
+We're `r col("building a network")` of academic and non-profit researchers to learn from the survey. Join us!
 
-<https://cmu-delphi.github.io/delphi-epidata/symptom-survey/>
+# More Links
+
+- [Technical documentation for our Facebook signals](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html)
+- [Full description of survey questions and coding](https://cmu-delphi.github.io/delphi-epidata/symptom-survey/)
+- [Blog post on exploring our Facebook signals](https://delphi.cmu.edu/blog/2020/08/26/covid-19-symptom-surveys-through-facebook/)
+- [Symptom survey challenge (100k in prizes!)](https://www.symptomchallenge.org)
 
 # Thanks
 
-Many thanks to:
+Many thanks to: 
 
 - The [whole Delphi team](https://covidcast.cmu.edu/covid19-response-team.html), and various CMU units
 - Google, Facebook, and Amazon Web Services
@@ -296,5 +320,7 @@ Many thanks to:
 - Centers for Disease Control and Prevention
 
 Go to: <https://covidcast.cmu.edu> ... you'll find everything linked from there!
+
+<br>
 
 ![Delphi](delphi.png) ![Carnegie Mellon University](cmu.png)

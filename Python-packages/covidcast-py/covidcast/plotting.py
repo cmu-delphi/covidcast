@@ -14,7 +14,8 @@ from .covidcast import _detect_metadata, _signal_metadata
 
 SHAPEFILE_PATHS = {"county": "shapefiles/county/cb_2019_us_county_5m.shp",
                    "state": "shapefiles/state/cb_2019_us_state_5m.shp",
-                   "msa": "shapefiles/msa/cb_2019_us_cbsa_5m.shp"}
+                   "msa": "shapefiles/msa/cb_2019_us_cbsa_5m.shp",
+                   "hrr": "shapefiles/hrr/geo_export_ad86cff5-e5ed-432e-9ec2-2ce8732099ee.shp"}
 
 STATE_ABBR_TO_FIPS = {"AL": "01", "MN": "27", "ME": "23", "WA": "53", "LA": "22", "PA": "42",
                       "MD": "24", "CO": "08", "TN": "47", "MI": "26", "FL": "12", "VA": "51",
@@ -94,7 +95,8 @@ def plot_choropleth(data: pd.DataFrame,
         state.plot(color="0.9", ax=ax)
 
     for shape in _project_and_transform(data_w_geo):
-        shape.plot("value", ax=ax, **kwargs)
+        if not shape.empty:  # only plot nonempty ones to avoid matplotlib warning.
+            shape.plot("value", ax=ax, **kwargs)
     plt.colorbar(sm, ticks=np.linspace(kwargs["vmin"], kwargs["vmax"], 8), ax=ax,
                  orientation="horizontal", fraction=0.02, pad=0.05)
     return fig
@@ -112,7 +114,7 @@ def get_geo_df(data: pd.DataFrame,
     its ``geometry`` colummn; for example, a data frame of county-level signal
     observations will be returned with the shape of every county.
 
-    After detecting the geography type (state, county, and MSA are currently
+    After detecting the geography type (state, county, HRR, and MSA are currently
     supported) of the input, this function builds a GeoDataFrame that contains
     state and geometry information from the Census for that geography type. By
     default, it will take the signal data (left side) and geo data (right side)
@@ -155,8 +157,9 @@ def get_geo_df(data: pd.DataFrame,
                          "given region. Use `left` or ensure your input data is a single signal for"
                          " a single date and geography type. ")
     geo_type = _detect_metadata(data, geo_type_col)[2]  # pylint: disable=W0212
-    if geo_type not in ["state", "county", "msa"]:
-        raise ValueError("Unsupported geography type; only `state`, `county`, and `msa` supported.")
+    if geo_type not in ["state", "county", "msa", "hrr"]:
+        raise ValueError("Unsupported geography type; "
+                         "only `state`, `county`, `hrr`, and `msa` supported.")
 
     shapefile_path = pkg_resources.resource_filename(__name__, SHAPEFILE_PATHS[geo_type])
     geo_info = gpd.read_file(shapefile_path)
@@ -165,6 +168,8 @@ def get_geo_df(data: pd.DataFrame,
         output = _join_state_geo_df(data, geo_value_col, geo_info, join_type)
     elif geo_type == "msa":
         output = _join_msa_geo_df(data, geo_value_col, geo_info, join_type)
+    elif geo_type == "hrr":
+        output = _join_hrr_geo_df(data, geo_value_col, geo_info, join_type)
     else:  # geo_type must be "county"
         output = _join_county_geo_df(data, geo_value_col, geo_info, join_type)
     return output
@@ -251,7 +256,7 @@ def _join_msa_geo_df(data: pd.DataFrame,
                      msa_col: str,
                      geo_info: gpd.GeoDataFrame,
                      join_type: str = "right") -> gpd.GeoDataFrame:
-    """Join DF information to polygon information in a GeoDF at the state level.
+    """Join DF information to polygon information in a GeoDF at the MSA level.
 
     For MSAs which span multiple states, the first state in the name is returned for the state FIPS.
 
@@ -267,4 +272,27 @@ def _join_msa_geo_df(data: pd.DataFrame,
     merged[msa_col] = merged.GEOID.combine_first(merged[msa_col])
     # get the first state, which will be the first two characters after the comma and whitespace
     merged["state_fips"] = [STATE_ABBR_TO_FIPS.get(i.split(",")[1][1:3]) for i in merged.NAME]
+    return gpd.GeoDataFrame(merged[input_cols + ["state_fips", "geometry"]])
+
+
+def _join_hrr_geo_df(data: pd.DataFrame,
+                     msa_col: str,
+                     geo_info: gpd.GeoDataFrame,
+                     join_type: str = "right") -> gpd.GeoDataFrame:
+    """Join DF information to polygon information in a GeoDF at the HRR level.
+
+    For HRRss which span multiple states, the first state in the name is returned for the state FIPS.
+
+    :param data: DF with state info
+    :param msa_col: cname of column in `data` containing state info to join on
+    :param geo_info: GeoDF of state shape info read from Census shapefiles
+    :return: ``data`` with HRR polygon and state fips joined.
+    """
+    geo_info["hrr_num"] = geo_info.hrr_num.astype("int").astype(str)
+    input_cols = list(data.columns)
+    merged = data.merge(geo_info, how=join_type, left_on=msa_col, right_on="hrr_num", sort=True)
+    # use full state list in the return
+    merged[msa_col] = merged.hrr_num.combine_first(merged[msa_col])
+    # get the first state, which will be the first two characters in the HRR name
+    merged["state_fips"] = [STATE_ABBR_TO_FIPS.get(i[:2]) for i in merged.hrr_name]
     return gpd.GeoDataFrame(merged[input_cols + ["state_fips", "geometry"]])

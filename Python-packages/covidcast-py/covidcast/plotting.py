@@ -266,7 +266,7 @@ def _join_msa_geo_df(data: pd.DataFrame,
     :param geo_info: GeoDF of state shape info read from Census shapefiles
     :return: ``data`` with cbsa polygon and state fips joined.
     """
-    geo_info = geo_info[geo_info.LSAD == "M1"]
+    geo_info = geo_info[geo_info.LSAD == "M1"]  # only get metro and not micropolitan areas
     input_cols = list(data.columns)
     merged = data.merge(geo_info, how=join_type, left_on=msa_col, right_on="GEOID", sort=True)
     # use full state list in the return
@@ -287,7 +287,7 @@ def _join_hrr_geo_df(data: pd.DataFrame,
     :param geo_info: GeoDF of state shape info read from Census shapefiles
     :return: ``data`` with HRR polygon and state fips joined.
     """
-    geo_info["hrr_num"] = geo_info.hrr_num.astype("int").astype(str)
+    geo_info["hrr_num"] = geo_info.hrr_num.astype("int").astype(str)  # original col was a float
     input_cols = list(data.columns)
     merged = data.merge(geo_info, how=join_type, left_on=msa_col, right_on="hrr_num", sort=True)
     # use full state list in the return

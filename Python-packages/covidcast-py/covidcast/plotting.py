@@ -148,7 +148,8 @@ def get_geo_df(data: pd.DataFrame,
       with a ``geometry`` column (containing a polygon) and a ``state_fips``
       column (a two-digit FIPS code identifying the US state containing this
       geography). For MSAs that span multiple states, the first state in the MSA name is provided.
-      The geometry is given in the GCS NAD83 coordinate system.
+      The geometry is given in the GCS NAD83 coordinate system for states, counties, and MSAs, and
+      WGS84 for HRRs.
 
     """
 

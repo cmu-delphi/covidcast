@@ -111,12 +111,12 @@ def get_geo_df(data: pd.DataFrame,
     This method takes in a pandas DataFrame object and returns a GeoDataFrame
     object from the `GeoPandas package <https://geopandas.org/>`_. The
     GeoDataFrame will contain the geographic shape corresponding to every row in
-    its ``geometry`` colummn; for example, a data frame of county-level signal
+    its ``geometry`` column; for example, a data frame of county-level signal
     observations will be returned with the shape of every county.
 
     After detecting the geography type (state, county, HRR, and MSA are currently
     supported) of the input, this function builds a GeoDataFrame that contains
-    state and geometry information from the Census for that geography type. By
+    state and geometry information from the Census or CMS for that geography type. By
     default, it will take the signal data (left side) and geo data (right side)
     and right join them, so all states/counties will always be present
     regardless of whether ``data`` contains values for those locations. ``left``,
@@ -137,8 +137,8 @@ def get_geo_df(data: pd.DataFrame,
 
     Geographic data is sourced from 1:5,000,000-scale shapefiles from the `2019
     US Census Cartographic Boundary Files
-    <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`_.
-
+    <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`_
+    and the `CMS Data Website <https://data.cms.gov/widgets/ia25-mrsk>`_.
     :param data: DataFrame of values and geographies.
     :param geo_value_col: Name of column containing values of interest.
     :param geo_type_col: Name of column containing geography type.
@@ -280,8 +280,6 @@ def _join_hrr_geo_df(data: pd.DataFrame,
                      geo_info: gpd.GeoDataFrame,
                      join_type: str = "right") -> gpd.GeoDataFrame:
     """Join DF information to polygon information in a GeoDF at the HRR level.
-
-    For HRRss which span multiple states, the first state in the name is returned for the state FIPS.
 
     :param data: DF with state info
     :param msa_col: cname of column in `data` containing state info to join on

@@ -56,20 +56,30 @@ def test_get_geo_df():
         dtype={"geo_value": str})
     pd.testing.assert_frame_equal(expected4, output4)
 
+    # test HRRs
+    # test MSAs
+    test_input["geo_type"] = "hrr"
+    test_input["geo_value"] = ["10420", "102", "96"]
+    output5 = plotting.get_geo_df(test_input)
+    expected5 = gpd.read_file(
+        os.path.join(CURRENT_PATH, "../reference_data/expected_get_geo_df_hrr.gpkg"),
+        dtype={"geo_value": str})
+    pd.testing.assert_frame_equal(expected5, output5)
+
     # test with sample signal
-    test_input2 = pd.read_csv(
+    test_signal = pd.read_csv(
         os.path.join(CURRENT_PATH, "../reference_data/test_input_county_signal.csv"),
         dtype={"geo_value": str}, parse_dates=["time_value", "issue"]
     )
-    expected5 = gpd.read_file(
+    expected_geo_signal = gpd.read_file(
         os.path.join(CURRENT_PATH, "../reference_data/expected_get_geo_df_right_2.gpkg"),
         dtype={"geo_value": str})
-    # geopandas reads file types slightly differently than pandas so need to recast
-    expected5["time_value"] = expected5.time_value.astype("datetime64[ns]")
-    expected5["issue"] = expected5.issue.astype("datetime64[ns]")
-    expected5["direction"] = np.nan
-    output5 = plotting.get_geo_df(test_input2)
-    pd.testing.assert_frame_equal(expected5, output5)
+    # geopandas reads file types slightly differently than pandas so need t`o recast
+    expected_geo_signal["time_value"] = expected_geo_signal.time_value.astype("datetime64[ns]")
+    expected_geo_signal["issue"] = expected_geo_signal.issue.astype("datetime64[ns]")
+    expected_geo_signal["direction"] = np.nan
+    output5 = plotting.get_geo_df(test_signal)
+    pd.testing.assert_frame_equal(expected_geo_signal, output5)
 
     # test a non county or state geo_type
     with pytest.raises(ValueError):
@@ -144,6 +154,7 @@ def test__join_msa_geo_df():
         os.path.join(CURRENT_PATH, "../reference_data/expected__join_msa_geo_df_left.gpkg"),
         dtype={"geo_value": str})
     pd.testing.assert_frame_equal(expected2, output2)
+
 
 def test__join_hrr_geo_df():
     test_input = pd.DataFrame({"hrr": ["1", "102", "96"],

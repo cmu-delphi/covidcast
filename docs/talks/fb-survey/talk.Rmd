@@ -1,6 +1,6 @@
 ---
 title: "Delphi's COVIDcast Project: <br> COVID-19 Symptom Surveys Through Facebook"
-author: "Alex Reinhart and Ryan Tibshirani^†^ <br> Statistics and ^†^Machine Learning <br> Carnegie Mellon University <br> ^†^Amazon Scholar, AWS AI Labs"
+author: Alex Reinhart\* and Ryan Tibshirani^†^ <br> \*^†^Statistics and ^†^Machine Learning <br> Carnegie Mellon University <br> ^†^Amazon Scholar, AWS AI Labs
 date: "<br> ![](delphi.png) ![](cmu.png) <br><br> September 8, 2020"
 footer: "Get the slides at: cmu-delphi.github.io/covidcast/talks/fb-survey/talk.html"
 output: 

@@ -230,4 +230,4 @@ def _get_first_tie(dict_list: list) -> dict:
         print("Some inputs were not uniquely matched; returning only the first match in each case. "
               "To return all matches, set `ties_method='all'`")
     first_items = [list(d.items())[0] for d in dict_list]
-    return {i[0]: i[1][0] for i in first_items}
+    return [i[1][0] for i in first_items]

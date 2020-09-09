@@ -256,7 +256,7 @@ plot_one(name_to_fips("Miami-Dade"), xlab = "Date",
 
 Ok, that was just one county... let's look at the top 20 in terms of the rise in case counts:
 
-```{r, echo=FALSE, fig.width=10, fig.height=10}
+```{r, fig.width=10, fig.height=10}
 num = 20
 geo_values = cases %>% group_by(geo_value) %>%
   summarize(diff = last(value) - first(value)) %>%

@@ -170,6 +170,7 @@ def get_geo_df(data: pd.DataFrame,
     elif geo_type == "msa":
         output = _join_msa_geo_df(data, geo_value_col, geo_info, join_type)
     elif geo_type == "hrr":
+        geo_info["geometry"] = geo_info["geometry"].translate(0, -0.185)  # fix projection shift bug
         output = _join_hrr_geo_df(data, geo_value_col, geo_info, join_type)
     else:  # geo_type must be "county"
         output = _join_county_geo_df(data, geo_value_col, geo_info, join_type)

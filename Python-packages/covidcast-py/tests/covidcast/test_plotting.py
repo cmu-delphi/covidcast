@@ -21,7 +21,6 @@ NON_GEOMETRY_COLS = ["geo_value", "time_value", "direction", "issue", "lag", "va
 @pytest.mark.skipif(platform.system() != "Linux", reason="Linux specific plot rendering expected.")
 def test_plot_choropleth():
     matplotlib.use("agg")
-    from matplotlib import pyplot as plt
     # load expected choropleth as an array
     expected = np.load(os.path.join(CURRENT_PATH, "../reference_data/expected_plot_arrays.npz"))
 

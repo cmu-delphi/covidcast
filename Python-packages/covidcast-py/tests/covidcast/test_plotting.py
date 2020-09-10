@@ -18,6 +18,7 @@ NON_GEOMETRY_COLS = ["geo_value", "time_value", "direction", "issue", "lag", "va
 
 
 def test_plot_choropleth():
+    # see PR #72
     test_county = pd.read_csv(
         os.path.join(CURRENT_PATH, "../reference_data/test_input_county_signal.csv"), dtype=str)
     test_county["time_value"] = test_county.time_value.astype("datetime64[D]")

@@ -36,6 +36,7 @@ CONTIGUOUS_FIPS = {"01", "04", "05", "06", "08", "09", "10", "11", "12", "13", "
 
 def plot_choropleth(data: pd.DataFrame,
                     time_value: date = None,
+                    plot_type: str = "choropleth",
                     **kwargs) -> matplotlib.figure.Figure:
     """Given the output data frame of :py:func:`covidcast.signal`, plot a choropleth map.
 
@@ -72,31 +73,52 @@ def plot_choropleth(data: pd.DataFrame,
     # use most recent date in data if none provided
     day_to_plot = time_value if time_value else max(data.time_value)
     day_data = data.loc[data.time_value == day_to_plot, :]
-    data_w_geo = get_geo_df(day_data)
 
-    kwargs["vmin"] = kwargs.get("vmin", 0)
     kwargs["vmax"] = kwargs.get("vmax", meta["mean_value"] + 3 * meta["stdev_value"])
     kwargs["cmap"] = kwargs.get("cmap", "YlOrRd")
     kwargs["figsize"] = kwargs.get("figsize", (12.8, 9.6))
 
     fig, ax = plt.subplots(1, figsize=kwargs["figsize"])
     ax.axis("off")
-    sm = plt.cm.ScalarMappable(cmap=kwargs["cmap"],
-                               norm=plt.Normalize(vmin=kwargs["vmin"], vmax=kwargs["vmax"]))
-    # this is to remove the set_array error that occurs on some platforms
-    sm._A = []  # pylint: disable=W0212
     plt.title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")
 
     # plot all states as light grey first
     state_shapefile_path = pkg_resources.resource_filename(__name__, SHAPEFILE_PATHS["state"])
     state = gpd.read_file(state_shapefile_path)
     for state in _project_and_transform(state, "STATEFP"):
-        state.plot(color="0.9", ax=ax)
+        state.plot(color="0.9", ax=ax, edgecolor="0.7")
+    ax.set_xlim(plt.xlim())
+    ax.set_ylim(plt.ylim())
 
-    for shape in _project_and_transform(data_w_geo):
-        shape.plot("value", ax=ax, **kwargs)
-    plt.colorbar(sm, ticks=np.linspace(kwargs["vmin"], kwargs["vmax"], 8), ax=ax,
-                 orientation="horizontal", fraction=0.02, pad=0.05)
+    if plot_type == "choropleth":
+        kwargs["vmin"] = kwargs.get("vmin", 0)
+        data_w_geo = get_geo_df(day_data)
+        for shape in _project_and_transform(data_w_geo):
+            shape.plot(column="value", ax=ax, **kwargs)
+        sm = plt.cm.ScalarMappable(cmap=kwargs["cmap"],
+                                   norm=plt.Normalize(vmin=kwargs["vmin"], vmax=kwargs["vmax"]))
+        # this is to remove the set_array error that occurs on some platforms
+        sm._A = []  # pylint: disable=W0212
+        plt.colorbar(sm, ticks=np.linspace(kwargs["vmin"], kwargs["vmax"], 8), ax=ax,
+                     orientation="horizontal", fraction=0.02, pad=0.05)
+    else:
+        kwargs["vmin"] = kwargs.get("vmin", 0.1)
+        data_w_geo = get_geo_df(day_data, join_type="inner")
+        bubble_scale = 50/max(data_w_geo.value)
+        label_bins, step = np.linspace(kwargs["vmin"], kwargs["vmax"], 8, retstep=True)
+        value_bins = [min(data_w_geo.value) - 1] + list(label_bins)[1:] + [max(data_w_geo.value)+1]
+        data_w_geo["binval"] = pd.cut(data_w_geo.value,
+                                      labels=label_bins,
+                                      bins=value_bins)
+        data_w_geo["binval"] = data_w_geo.binval.astype(float) * bubble_scale
+        for shape in _project_and_transform(data_w_geo):
+            shape.plot(color="1", ax=ax, legend=True, edgecolor="0.6")
+            shape["geometry"] = shape["geometry"].centroid
+            shape.plot(markersize="binval", color="purple", ax=ax, legend=True, alpha=0.5)
+        for b in label_bins:
+            ax.scatter([1e10], [1e10], color="purple",
+                       alpha=0.5, s=b*bubble_scale, label=str(round(b, 2)))
+        ax.legend(labelspacing=1.5, frameon=False, ncol=8, loc="lower center")
     return fig
 
 

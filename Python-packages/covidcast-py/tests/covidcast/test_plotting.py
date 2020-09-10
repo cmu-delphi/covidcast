@@ -21,21 +21,42 @@ NON_GEOMETRY_COLS = ["geo_value", "time_value", "direction", "issue", "lag", "va
 @pytest.mark.skipif(platform.system() != "Linux", reason="Linux specific plot rendering expected.")
 def test_plot_choropleth():
     matplotlib.use("agg")
+    from matplotlib import pyplot as plt
     # load expected choropleth as an array
     expected = np.load(os.path.join(CURRENT_PATH, "../reference_data/expected_plot_arrays.npz"))
-    test_df = pd.read_csv(os.path.join(CURRENT_PATH, "../reference_data/test_input_county_signal.csv"),
-                          dtype=str)
-    test_df["time_value"] = test_df.time_value.astype("datetime64[D]")
-    test_df["value"] = test_df.value.astype("float")
 
-    fig1 = plotting.plot_choropleth(test_df)
+    # test state plots
+    test_county = pd.read_csv(
+        os.path.join(CURRENT_PATH, "../reference_data/test_input_county_signal.csv"), dtype=str)
+    test_county["time_value"] = test_county.time_value.astype("datetime64[D]")
+    test_county["value"] = test_county.value.astype("float")
+
+    fig1 = plotting.plot_choropleth(test_county)
     data1 = np.frombuffer(fig1.canvas.tostring_rgb(), dtype=np.uint8)  # get np array representation
-    # give margin of +-2 for floating point errors
-    assert np.allclose(data1, expected["expected1"], atol=2, rtol=0)
+    # give margin of +-5 for floating point errors and weird variations
+    assert np.allclose(data1, expected["expected_1"], atol=5, rtol=0)
 
-    fig2 = plotting.plot_choropleth(test_df, cmap="viridis", figsize=(5, 5), edgecolor="0.8")
+    fig2 = plotting.plot_choropleth(test_county, cmap="viridis", figsize=(5, 5), edgecolor="0.8")
     data2 = np.frombuffer(fig2.canvas.tostring_rgb(), dtype=np.uint8)
-    assert np.allclose(data2, expected["expected2"], atol=2, rtol=0)
+    assert np.allclose(data2, expected["expected_2"], atol=5, rtol=0)
+
+    # test state
+    test_state = pd.read_csv(
+        os.path.join(CURRENT_PATH, "../reference_data/test_input_state_signal.csv"), dtype=str)
+    test_state["time_value"] = test_state.time_value.astype("datetime64[D]")
+    test_state["value"] = test_state.value.astype("float")
+    fig3 = plotting.plot_choropleth(test_state)
+    data3 = np.frombuffer(fig3.canvas.tostring_rgb(), dtype=np.uint8)
+    assert np.allclose(data3, expected["expected_3"], atol=5, rtol=0)
+
+    # test MSA
+    test_msa = pd.read_csv(
+        os.path.join(CURRENT_PATH, "../reference_data/test_input_msa_signal.csv"), dtype=str)
+    test_msa["time_value"] = test_msa.time_value.astype("datetime64[D]")
+    test_msa["value"] = test_msa.value.astype("float")
+    fig4 = plotting.plot_choropleth(test_msa)
+    data4 = np.frombuffer(fig4.canvas.tostring_rgb(), dtype=np.uint8)
+    assert np.allclose(data4, expected["expected_4"], atol=5, rtol=0)
 
 
 def test_get_geo_df():

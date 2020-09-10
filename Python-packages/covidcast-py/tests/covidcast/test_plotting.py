@@ -24,7 +24,7 @@ def test_plot_choropleth():
     # load expected choropleth as an array
     expected = np.load(os.path.join(CURRENT_PATH, "../reference_data/expected_plot_arrays.npz"))
 
-    # test state plots
+    # test county plots
     test_county = pd.read_csv(
         os.path.join(CURRENT_PATH, "../reference_data/test_input_county_signal.csv"), dtype=str)
     test_county["time_value"] = test_county.time_value.astype("datetime64[D]")

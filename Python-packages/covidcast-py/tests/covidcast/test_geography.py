@@ -7,12 +7,13 @@ from covidcast import geography
     (
             "not a fips",
             {},
-            {}
+            [None]
     ),
     (
             "42003",
             {},
-            {"42003": "Allegheny County"}),
+            ["Allegheny County"],
+    ),
     (
             "4200",
             {"ties_method": "all"},
@@ -23,7 +24,7 @@ from covidcast import geography
     (
             "4200",
             {},
-            {"42000": "Pennsylvania"}
+            ["Pennsylvania"]
     )
 ])
 def test_fips_to_name(test_key, test_kwargs, expected):
@@ -34,12 +35,12 @@ def test_fips_to_name(test_key, test_kwargs, expected):
     (
             "not a cbsa",
             {},
-            {}
+            [None]
     ),
     (
             "38300",
             {},
-            {"38300": "Pittsburgh, PA"}
+            ["Pittsburgh, PA"]
     ),
     (
             "389",
@@ -64,23 +65,22 @@ def test_cbsa_to_name(test_key, test_kwargs, expected):
     (
             "CA",
             {},
-            {"CA": "California"}
+            ["California"]
     ),
     (
             "CAA",
             {},
-            {}
+            [None]
     ),
     (
-            ["CA",
-             "PA"],
+            ["CA", "PA"],
             {},
-            {"CA": "California", "PA": "Pennsylvania"}
+            ["California", "Pennsylvania"]
     ),
     (
             ["CAAA", "PA"],
             {},
-            {"PA": "Pennsylvania"}
+            [None, "Pennsylvania"]
     ),
 ])
 def test_abbr_to_name(test_key, test_kwargs, expected):
@@ -91,22 +91,27 @@ def test_abbr_to_name(test_key, test_kwargs, expected):
     (
             "California",
             {},
-            {"California": "CA"}
+            ["CA"]
     ),
     (
             "Californiaaaaa",
             {},
-            {}
+            [None]
     ),
     (
             ["California", "Pennsylvania"],
             {},
-            {"California": "CA", "Pennsylvania": "PA"}
+            ["CA", "PA"]
     ),
     (
             ["California", "Pennsylvaniaa"],
             {},
-            {"California": "CA"}
+            ["CA", None]
+    ),
+    (
+            ["California", "Pennsylvania", "California"],
+            {},
+            ["CA", "PA", "CA"]
     ),
 ])
 def test_name_to_abbr(test_key, test_kwargs, expected):
@@ -117,17 +122,17 @@ def test_name_to_abbr(test_key, test_kwargs, expected):
     (
             "Pittsburgh",
             {},
-            {"Pittsburgh, PA": "38300"}
+            ["38300"]
     ),
     (
             "New",
             {"state": "CA"},
-            {}
+            [None]
     ),
     (
             "New",
             {},
-            {"Boston-Cambridge-Newton, MA-NH": "14460"}
+            ["14460"]
     )
 ])
 def test_name_to_cbsa(test_key, test_kwargs, expected):
@@ -138,12 +143,12 @@ def test_name_to_cbsa(test_key, test_kwargs, expected):
     (
             "Allegheny",
             {},
-            {"Allegheny County": "42003"}
+            ["42003"]
     ),
     (
             "Miami",
             {},
-            {"Miami-Dade County": "12086"}
+            ["12086"]
     ),
     (
             "Miami",
@@ -168,7 +173,7 @@ def test_name_to_cbsa(test_key, test_kwargs, expected):
     (
             ["Allegheny", "Miami", "New "],
             {},
-            {"Allegheny County": "42003", "Miami-Dade County": "12086", "New Haven County": "09009"}
+            ["42003", "12086", "09009"]
     ),
     (
             "New ",
@@ -184,7 +189,7 @@ def test_name_to_fips(test_key, test_kwargs, expected):
     (
             (["a", "b"], ["a", "b", "c"], ["x", "y", "z"]),
             {},
-            {"a": "x", "b": "y"}
+            ["x", "y"]
     ),
     (
             (["a", "b"], ["a", "a", "aa", "b"], ["w", "x", "y", "z"]),
@@ -194,12 +199,12 @@ def test_name_to_fips(test_key, test_kwargs, expected):
     (
             (["a", "b"], ["A", "aa", "b"], ["x", "y", "z"]),
             {"ignore_case": True},
-            {"A": "x", "b": "z"}
+            ["x", "z"]
     ),
     (
             (["a", "b"], ["a", "aa", "b"], ["x", "y", "z"]),
             {"fixed": True},
-            {"a": "x", "b": "z"}
+            ["x", "z"]
     ),
     (
             (["a", "b"], ["a", "aa", "b"], ["x", "y", "z"]),
@@ -214,22 +219,22 @@ def test_name_to_fips(test_key, test_kwargs, expected):
     (
             (["a", "b"], ["A", "aa", "b"], ["x", "y", "z"]),
             {"ties_method": "all", "fixed": True, "ignore_case": True},
-            [{"b": ["z"]}]
+            [{}, {"b": ["z"]}]
     ),
     (
             ("A", ["aa", "a"], ["x", "y"]),
             {},
-            {}
+            [None]
     ),
     (
             ("A", ["aa", "a"], ["x", "y"]),
             {"ignore_case": True},
-            {"aa": "x"}
+            ["x"]
     ),
     (
             (["A"], ["aa", "a"], ["x", "y"]),
             {"ignore_case": True},
-            {"aa": "x"}
+            ["x"]
     ),
     (
             ("A", ["aa", "a"], ["x", "y"]),
@@ -249,7 +254,7 @@ def test_name_to_fips(test_key, test_kwargs, expected):
     (
             ("A", ["aa", "a"], ["x", "y"]),
             {"ignore_case": True},
-            {"aa": "x"}
+            ["x"]
     ),
     (
             ("a", ["a", "a"], ["x", "y"]),
@@ -269,7 +274,7 @@ def test_name_to_fips(test_key, test_kwargs, expected):
     (
             ("A", ["aa", "a"], ["x", "y"]),
             {"ties_method": "all", "fixed": True, "ignore_case": True},
-            []
+            [{}]
     ),
     (
             ("A", ["a", "a"], ["x", "y"]),
@@ -286,25 +291,25 @@ def test__lookup(test_args, test_kwargs, expected):
 @pytest.mark.parametrize("test_dict_list, expected_return, expected_stdout", [
     (
             [{"a": ["x", "y"]}],
-            {"a": "x"},
+            ["x"],
             "Some inputs were not uniquely matched; returning only the first match in "
             "each case. To return all matches, set `ties_method='all'`\n"
     ),
     (
             [{"a": ["x", "y"], "b": ["i", "j", "k"]}],
-            {"a": "x"},
+            ["x"],
             "Some inputs were not uniquely matched; returning only the first match in "
             "each case. To return all matches, set `ties_method='all'`\n"
     ),
     (
             [{"a": ["x", "y"]}, {"b": ["i", "j", "k"]}],
-            {"a": "x", "b": "i"},
+            ["x", "i"],
             "Some inputs were not uniquely matched; returning only the first match in "
             "each case. To return all matches, set `ties_method='all'`\n"
     ),
     (
             [{"a": ["x"]}],
-            {"a": "x"},
+            ["x"],
             ""
     )
 ])

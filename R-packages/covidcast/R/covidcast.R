@@ -212,7 +212,7 @@ covidcast_signal <- function(data_source, signal,
     issues <- as.Date(issues)
   }
 
-  df <- purrr::map_dfr(geo_values, function(geo_val) {
+  df <- purrr::map_dfr(unique(geo_values), function(geo_val) {
     single_geo(data_source, signal, start_day, end_day, geo_type, geo_val,
                as_of, issues, lag)
   })

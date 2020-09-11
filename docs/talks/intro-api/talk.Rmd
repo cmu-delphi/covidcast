@@ -1,6 +1,6 @@
 ---
 title: "Delphi's COVIDcast Project: <br> API and Client Access Tools"
-author: Katie Mazaitis\* and Ryan Tibshirani^†^ <br> \*^†^Machine Learning and ^†^Statistics <br> Carnegie Mellon University <br> ^†^Amazon Scholar, AWS AI Labs
+author: Katie Mazaitis\* and Ryan Tibshirani^†^ <br> \*^†^Machine Learning and ^†^Statistics <br> Carnegie Mellon University <br> ^†^Amazon Scholar, AWS Labs
 date: "<br> ![](delphi.png) ![](cmu.png) <br><br> September 1, 2020"
 footer: "Get the slides at: cmu-delphi.github.io/covidcast/talks/intro-api/talk.html"
 output: 
@@ -100,10 +100,10 @@ How many people have died from COVID-19 per day, in my state, since March 1?
 
 ```{r, fig.width=8, fig.height=6}
 library(covidcast)
-deaths = covidcast_signal(data_source = "jhu-csse", 
+deaths = covidcast_signal(data_source = "usa-facts", 
                           signal = "deaths_7dav_incidence_num", 
-                          start_day = "2020-03-01", geo_type = "state", 
-                          geo_values = "pa")
+                          start_day = "2020-03-01", end_day = "2020-08-30",
+                          geo_type = "state", geo_values = "pa")
 
 plot(deaths, plot_type = "line", 
      title = "COVID-19 deaths in PA (7-day trailing avg)")
@@ -116,8 +116,8 @@ What percentage of daily hospital admissions are due to COVID-19 in PA, NY, TX?
 ```{r, fig.width=8, fig.height=6}
 hosp = covidcast_signal(data_source = "hospital-admissions", 
                         signal = "smoothed_adj_covid19",
-                        start_day = "2020-03-01", geo_type = "state", 
-                        geo_values = c("pa", "ny", "tx"))
+                        start_day = "2020-03-01", end_day = "2020-08-28",
+                        geo_type = "state", geo_values = c("pa", "ny", "tx"))
 
 plot(hosp, plot_type = "line", 
      title = "% of hospital admissions due to COVID-19")
@@ -128,9 +128,9 @@ plot(hosp, plot_type = "line",
 What does the current COVID-19 incident case rate look like, nationwide?
 
 ```{r, fig.width=9, fig.height=7}
-cases = covidcast_signal(data_source = "jhu-csse", 
+cases = covidcast_signal(data_source = "usa-facts", 
                          signal = "confirmed_7dav_incidence_prop",
-                         start_day = "2020-08-30")
+                         start_day = "2020-08-30", end_day = "2020-08-30")
 
 plot(cases, title = "Daily new COVID-19 cases per 100,000 people")
 ```
@@ -140,9 +140,9 @@ plot(cases, title = "Daily new COVID-19 cases per 100,000 people")
 What does the current COVID-19 cumulative case rate look like, nationwide?
 
 ```{r, fig.width=9, fig.height=7}
-cases = covidcast_signal(data_source = "jhu-csse", 
+cases = covidcast_signal(data_source = "usa-facts", 
                          signal = "confirmed_cumulative_prop",
-                         start_day = "2020-08-30")
+                         start_day = "2020-08-30", end_day = "2020-08-30")
 
 plot(cases, title = "Cumulative COVID-19 cases per 100,000 people", 
      choro_params = list(legend_n = 6))
@@ -165,7 +165,8 @@ How do some major cities compare in terms of doctor's visits due to COVID-like i
 ```{r, fig.width=8, fig.height=6}
 dv = covidcast_signal(data_source = "doctor-visits", 
                       signal = "smoothed_adj_cli", 
-                      start_day = "2020-03-01", geo_type = "msa", 
+                      start_day = "2020-03-01", end_day = "2020-08-28",
+                      geo_type = "msa", 
                       geo_values = name_to_cbsa(c("Pittsburgh", "New York", 
                                                   "San Antonio", "Miami")))
 
@@ -180,7 +181,7 @@ How do my county and my friend's county compare in terms of people reporting tha
 ```{r, fig.width=8, fig.height=6}
 sympt = covidcast_signal(data_source = "fb-survey", 
                          signal = "smoothed_hh_cmnty_cli",
-                         start_day = "2020-04-15", 
+                         start_day = "2020-04-15", end_day = "2020-08-30",
                          geo_values = c(name_to_fips("Allegheny"),
                                         name_to_fips("Fulton", state = "GA")))
 
@@ -297,14 +298,17 @@ ggplot(dv_as_of, aes(x = time_value, y = value)) +
 Now let's examine the correlations between COVID-19 cases and deaths, per day, across counties. We'll look at Spearman correlation, starting March 1. Then repeat but for cases and deaths 7-days-ahead:
 
 ```{r, fig.width=8, fig.height=6}
-# Fetch JHU confirmed cases and deaths, at the county level, since March 1
+# Fetch confirmed cases and deaths, at the county level, since March 1
 start_day = "2020-03-01"
-cases = covidcast_signal("jhu-csse", "confirmed_7dav_incidence_num", start_day)
-deaths = covidcast_signal("jhu-csse", "deaths_7dav_incidence_num", start_day)
+end_day = "2020-08-30"
+cases = covidcast_signal("usa-facts", "confirmed_7dav_incidence_num", 
+                         start_day, end_day)
+deaths = covidcast_signal("usa-facts", "deaths_7dav_incidence_num", 
+                          start_day, end_day)
 
 # Consider only "active" counties with at least 500 cumulative cases so far
 case_num = 500
-geo_values = covidcast_signal("jhu-csse", "confirmed_cumulative_num",
+geo_values = covidcast_signal("usa-facts", "confirmed_cumulative_num",
                               max(cases$time), max(cases$time)) %>%
   filter(value >= case_num) %>% pull(geo_value)
 cases_act = cases %>% filter(geo_value %in% geo_values)

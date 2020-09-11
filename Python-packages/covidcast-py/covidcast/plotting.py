@@ -71,7 +71,7 @@ def plot_choropleth(data: pd.DataFrame,
     meta = _signal_metadata(data_source, signal, geo_type)  # pylint: disable=W0212
     # use most recent date in data if none provided
     day_to_plot = time_value if time_value else max(data.time_value)
-    day_data = data.loc[data.time_value == day_to_plot, :]
+    day_data = data.loc[data.time_value == pd.to_datetime(day_to_plot), :]
     data_w_geo = get_geo_df(day_data)
 
     kwargs["vmin"] = kwargs.get("vmin", 0)

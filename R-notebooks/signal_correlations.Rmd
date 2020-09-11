@@ -198,9 +198,9 @@ ggplot(df, aes(x = time_value, y = value)) +
 ### Correlations sliced by metro area
 
 Now we look at Spearman (rank) correlations between our signals and COVID-19
-case incidence rates, sliced by metro area That is, for each metro area (with at 
-least 500 cumulative cases), we compute the correlation between each signal and 
-COVID-19 case incidence rates, over all time.
+case incidence rates, sliced by metro area. That is, for each metro area (with 
+at least 500 cumulative cases), we compute the correlation between each signal 
+and COVID-19 case incidence rates, over all time.
 
 ```{r}
 df_cor = vector("list", length(signals))

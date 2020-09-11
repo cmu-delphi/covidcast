@@ -1,4 +1,5 @@
 import os
+from datetime import date
 
 import matplotlib
 import platform
@@ -30,7 +31,7 @@ def test_plot_choropleth():
     test_county["time_value"] = test_county.time_value.astype("datetime64[D]")
     test_county["value"] = test_county.value.astype("float")
 
-    fig1 = plotting.plot_choropleth(test_county)
+    fig1 = plotting.plot_choropleth(test_county, time_value=date(2020, 8, 4))
     data1 = np.frombuffer(fig1.canvas.tostring_rgb(), dtype=np.uint8)  # get np array representation
     # give margin of +-5 for floating point errors and weird variations
     assert np.allclose(data1, expected["expected_1"], atol=5, rtol=0)

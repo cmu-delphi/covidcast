@@ -65,5 +65,6 @@ Contents
    getting_started
    signals
    plotting
+   geography
    plot_examples
    changelog

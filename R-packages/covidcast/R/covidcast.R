@@ -393,7 +393,7 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
 
   # Set range, if we need to (to mean +/- 3 standard deviations, from metadata)
   if (is.null(range)) {
-    if (is.null(attributes(x)$metadata)) {
+    if (is.null(attributes(x)$metadata) || length(attributes(x)$metadata) == 0) {
       warning("Metadata for signal mean and standard deviation not available; ",
               "defaulting to observed mean and standard deviation to set plot range.")
       mean_value <- mean(x$value)

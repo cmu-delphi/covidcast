@@ -288,32 +288,40 @@ def test__lookup(test_args, test_kwargs, expected):
         geography._lookup(None, None, None, ties_method="not a real method")
 
 
-@pytest.mark.parametrize("test_dict_list, expected_return, expected_stdout", [
+@pytest.mark.parametrize("test_dict_list, expected_return, warn, expected_warning", [
     (
             [{"a": ["x", "y"]}],
             ["x"],
+            1,
             "Some inputs were not uniquely matched; returning only the first match in "
-            "each case. To return all matches, set `ties_method='all'`\n"
+            "each case. To return all matches, set `ties_method='all'`"
     ),
     (
             [{"a": ["x", "y"], "b": ["i", "j", "k"]}],
             ["x"],
+            1,
             "Some inputs were not uniquely matched; returning only the first match in "
-            "each case. To return all matches, set `ties_method='all'`\n"
+            "each case. To return all matches, set `ties_method='all'`"
     ),
     (
             [{"a": ["x", "y"]}, {"b": ["i", "j", "k"]}],
             ["x", "i"],
+            1,
             "Some inputs were not uniquely matched; returning only the first match in "
-            "each case. To return all matches, set `ties_method='all'`\n"
+            "each case. To return all matches, set `ties_method='all'`"
     ),
     (
             [{"a": ["x"]}],
             ["x"],
-            ""
+            0,
+            None
     )
 ])
-def test__get_first_tie(test_dict_list, expected_return, expected_stdout, capfd):
-    assert geography._get_first_tie(test_dict_list) == expected_return
-    out, _ = capfd.readouterr()
-    assert out == expected_stdout
+def test__get_first_tie(test_dict_list, expected_return, warn, expected_warning):
+    if warn:
+        with pytest.warns(UserWarning) as record:
+            assert geography._get_first_tie(test_dict_list) == expected_return
+            assert record[0].message.args[0] == expected_warning
+    else:
+        assert geography._get_first_tie(test_dict_list) == expected_return
+

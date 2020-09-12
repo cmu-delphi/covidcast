@@ -1,4 +1,5 @@
 import os
+from datetime import date
 
 import geopandas as gpd
 import numpy as np
@@ -16,6 +17,16 @@ CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 NON_GEOMETRY_COLS = ["geo_value", "time_value", "direction", "issue", "lag", "value", "stderr",
                      "sample_size", "geo_type", "data_source", "signal", "state_fips"]
+
+
+def test_plot_choropleth():
+    # see PR #72
+    test_county = pd.read_csv(
+        os.path.join(CURRENT_PATH, "../reference_data/test_input_county_signal.csv"), dtype=str)
+    test_county["time_value"] = test_county.time_value.astype("datetime64[D]")
+    test_county["value"] = test_county.value.astype("float")
+    assert plotting.plot_choropleth(test_county, time_value=date(2020, 8, 4))
+    assert plotting.plot_choropleth(test_county)
 
 
 def test_get_geo_df():

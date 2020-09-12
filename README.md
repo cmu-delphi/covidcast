@@ -24,4 +24,5 @@ our signals:
 
 This repository also includes some talks we've given about the COVIDcast project: 
 
-- [COVIDcast intro, our API](https://cmu-delphi.github.io/covidcast/talks/intro-api/talk.html)
+- [COVIDcast intro, our API](https://cmu-delphi.github.io/covidcast/talks/intro-api/talk.html) 
+- [Our Surveys Through Facebook](https://cmu-delphi.github.io/covidcast/talks/fb-survey/talk.html)

@@ -61,6 +61,19 @@ def test_signal(mock_covidcast, mock_metadata):
                             )
     assert sort_df(response).equals(sort_df(expected))
 
+    # test duplicate geo values
+    response = covidcast.signal("source", "signal", start_day=date(2020, 8, 1),
+                                end_day=date(2020, 8, 8), geo_values=["CA", "CA"])
+    expected = pd.DataFrame({"time_value": [datetime(2020, 6, 22)]*8,
+                             "issue": datetime(2020, 7, 24),
+                             "geo_type": "county",
+                             "data_source": "source",
+                             "signal": "signal"
+                             },
+                            index=[0]*8,
+                            )
+    assert sort_df(response).equals(sort_df(expected))
+
     # test no df output
     assert not covidcast.signal("source", "signal", geo_values=[])
 

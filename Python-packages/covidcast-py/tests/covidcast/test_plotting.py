@@ -41,12 +41,12 @@ def test_plot_choropleth(mock_metadata):
 
     fig1 = plotting.plot_choropleth(test_county, time_value=date(2020, 8, 4))
     data1 = np.frombuffer(fig1.canvas.tostring_rgb(), dtype=np.uint8)  # get np array representation
-    # give margin of +-5 for floating point errors and weird variations
-    assert np.allclose(data1, expected["expected_1"], atol=5, rtol=0)
+    # give margin of +-2 for floating point errors and weird variations (1 isn't consistent)
+    assert np.allclose(data1, expected["expected_1"], atol=2, rtol=0)
 
     fig2 = plotting.plot_choropleth(test_county, cmap="viridis", figsize=(5, 5), edgecolor="0.8")
     data2 = np.frombuffer(fig2.canvas.tostring_rgb(), dtype=np.uint8)
-    assert np.allclose(data2, expected["expected_2"], atol=5, rtol=0)
+    assert np.allclose(data2, expected["expected_2"], atol=2, rtol=0)
 
     # test state
     test_state = pd.read_csv(
@@ -55,7 +55,7 @@ def test_plot_choropleth(mock_metadata):
     test_state["value"] = test_state.value.astype("float")
     fig3 = plotting.plot_choropleth(test_state)
     data3 = np.frombuffer(fig3.canvas.tostring_rgb(), dtype=np.uint8)
-    assert np.allclose(data3, expected["expected_3"], atol=5, rtol=0)
+    assert np.allclose(data3, expected["expected_3"], atol=2, rtol=0)
 
     # test MSA
     test_msa = pd.read_csv(
@@ -64,7 +64,7 @@ def test_plot_choropleth(mock_metadata):
     test_msa["value"] = test_msa.value.astype("float")
     fig4 = plotting.plot_choropleth(test_msa)
     data4 = np.frombuffer(fig4.canvas.tostring_rgb(), dtype=np.uint8)
-    assert np.allclose(data4, expected["expected_4"], atol=5, rtol=0)
+    assert np.allclose(data4, expected["expected_4"], atol=2, rtol=0)
 
 
 def test_get_geo_df():

@@ -1,5 +1,6 @@
 import os
 from datetime import date
+from unittest.mock import patch
 
 import matplotlib
 import platform
@@ -20,7 +21,14 @@ NON_GEOMETRY_COLS = ["geo_value", "time_value", "direction", "issue", "lag", "va
 
 
 @pytest.mark.skipif(platform.system() != "Linux", reason="Linux specific plot rendering expected.")
-def test_plot_choropleth():
+@patch("covidcast.plotting._signal_metadata")
+def test_plot_choropleth(mock_metadata):
+    mock_metadata.side_effect = [
+        {"mean_value": 0.5330011, "stdev_value": 0.4683431},
+        {"mean_value": 0.5330011, "stdev_value": 0.4683431},
+        {"mean_value": 0.5304083, "stdev_value": 0.235302},
+        {"mean_value": 0.5705364, "stdev_value": 0.4348706},
+    ]
     matplotlib.use("agg")
     # load expected choropleth as an array
     expected = np.load(os.path.join(CURRENT_PATH, "../reference_data/expected_plot_arrays.npz"))

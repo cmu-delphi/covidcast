@@ -175,25 +175,24 @@ identified by unique codes, called CBSA IDs. If you want to find a specific area
 by name, this package provides convenience functions:
 
 >>> covidcast.name_to_cbsa(["Houston", "San Antonio"])
-{'Houston-The Woodlands-Sugar Land, TX': '26420', 'San Antonio-New Braunfels, TX': '41700'}
+['26420', '41700']
 
 We can use these functions to quickly query data for specific regions:
 
 >>> counties = covidcast.name_to_fips(["Allegheny", "Los Angeles", "Miami-Dade"])
->>> d = covidcast.signal("doctor-visits", "smoothed_cli",
-...                      start_day=date(2020, 5, 1), end_day=date(2020, 5, 1),
-...                      geo_values=counties.values())
->>> d
-   direction geo_value      issue  lag sample_size        signal stderr time_value     value geo_type    data_source
-0         -1     42003 2020-07-04   64        None  smoothed_cli   None 2020-05-01  1.336086   county  doctor-visits
-0          0     06037 2020-07-04   64        None  smoothed_cli   None 2020-05-01  5.787655   county  doctor-visits
-0         -1     12086 2020-07-04   64        None  smoothed_cli   None 2020-05-01  6.405477   county  doctor-visits
+>>> df = covidcast.signal("doctor-visits", "smoothed_cli", start_day=date(2020, 5, 1), end_day=date(2020, 5, 1), geo_values=counties)
+>>> df
+  geo_value        signal time_value  direction      issue  lag     value stderr sample_size geo_type    data_source
+0     42003  smoothed_cli 2020-05-01         -1 2020-07-04   64  1.336086   None        None   county  doctor-visits
+0     06037  smoothed_cli 2020-05-01          0 2020-07-04   64  5.787655   None        None   county  doctor-visits
+0     12086  smoothed_cli 2020-05-01         -1 2020-07-04   64  6.405477   None        None   county  doctor-visits
+
 
 We can also quickly convert back from the IDs returned by the API to
 human-readable names:
 
->>> covidcast.fips_to_name(d.geo_value)
-{'42003': 'Allegheny County', '06037': 'Los Angeles County', '12086': 'Miami-Dade County'}
+covidcast.fips_to_name(df.geo_value)
+['Allegheny County', 'Los Angeles County', 'Miami-Dade County']
 
 See :ref:`working-with-geos` for details on each of these functions and their
 optional arguments.

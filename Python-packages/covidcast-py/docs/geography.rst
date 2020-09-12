@@ -1,7 +1,7 @@
-.. _plotting-examples:
+.. _working-with-geos:
 
-Geographic Lookup
-=================
+Working with Geographies
+========================
 
 County and MSA Lookup
 ---------------------

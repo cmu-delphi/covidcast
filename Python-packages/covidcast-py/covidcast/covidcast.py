@@ -257,12 +257,14 @@ def metadata() -> pd.DataFrame:
 def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") -> pd.DataFrame:
     """Given a list of DataFrames, [optionally] lag each one and join them into one DataFrame.
 
-    This method takes a list of DataFrames containing signal information for geographic regions
-    across time, and outputs a single DataFrame with a column for each signal value for each region/
-    time. The data_source, signal, and index of each DataFrame in ``signals`` are appended to the
-    front of each output column name separated by underscores (e.g. `source_signal_0_inputcolumn`),
-    and the original data_source and signal columns will be dropped. The input DataFrames must all
-    be of the same geography type, and a single geo_type column will be returned in the final
+    This method takes a list of DataFrames containing signal information for
+    geographic regions across time, and outputs a single DataFrame with a column
+    for each signal value for each region/time. The ``data_source``,
+    ``signal``, and index of each DataFrame in ``signals`` are appended to the
+    front of each output column name separated by underscores (e.g.
+    ``source_signal_0_inputcolumn``), and the original data_source and signal
+    columns will be dropped. The input DataFrames must all be of the same
+    geography type, and a single ``geo_type`` column will be returned in the final
     DataFrame.
 
     Each signal's time value can be shifted for analysis on lagged signals using the ``dt``
@@ -271,10 +273,12 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
 
     :param signals: List of DataFrames to join.
     :param dt: List of lags in days for each of the input DataFrames in ``signals``.
-      Defaults to `None`.
+      Defaults to ``None``. When provided, must be the same length as ``signals``.
     :param join_type: Type of join to be done between the DataFrames in ``signals``.
-      Defaults to `outer`.
+      Defaults to ``"outer"``, so the output DataFrame contains all region/time
+      combinations at which at least one signal was observed.
     :return: DataFrame of aggregated signals.
+
     """
     if dt is not None and len(dt) != len(signals):
         raise ValueError("Length of `dt` must be same as length of `signals`")

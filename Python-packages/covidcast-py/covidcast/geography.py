@@ -34,12 +34,12 @@ def fips_to_name(code: Union[str, Iterable],
       Defaults to ``False``.
     :param ties_method: Method for determining how to deal with multiple outputs for a given input.
       Must be one of ``"all"`` or ``"first"``. If ``"first"``, then only the first match for each
-      code is returned. If `"all"`, then all matches for each code are returned.
+      code is returned. If ``"all"``, then all matches for each code are returned.
       Defaults to ``first``.
     :return: If ``ties_method="first"``, returns a list of the first value found for each input key.
       If ``ties_method="all"``, returns a list of dicts, one for each input, with keys
       corresponding to all matched input keys and values corresponding to the list of county names.
-      The returned list will be the same length as the input, with None or {} if no values are found
+      The returned list will be the same length as the input, with ``None`` or ``{}`` if no values are found
       for ``ties_method="first"`` and ``ties_method="all"``, respectively.
     """
     return _lookup(code, COUNTY_CENSUS.FIPS, COUNTY_CENSUS.CTYNAME, ignore_case, fixed, ties_method)
@@ -61,12 +61,12 @@ def cbsa_to_name(code: Union[str, Iterable],
       Defaults to ``False``.
     :param ties_method: Method for determining how to deal with multiple outputs for a given input.
       Must be one of ``"all"`` or ``"first"``. If ``"first"``, then only the first match for each
-      code is returned. If `"all"`, then all matches for each code are returned.
+      code is returned. If ``"all"``, then all matches for each code are returned.
       Defaults to ``first``.
     :return: If ``ties_method="first"``, returns a list of the first value found for each input key.
       If ``ties_method="all"``, returns a list of dicts, one for each input, with keys
       corresponding to all matched input keys and values corresponding to the list of MSA names.
-      The returned list will be the same length as the input, with None or {} if no values are found
+      The returned list will be the same length as the input, with ``None`` or ``{}`` if no values are found
       for ``ties_method="first"`` and ``ties_method="all"``, respectively.
     """
     return _lookup(code, MSA_CENSUS.CBSA, MSA_CENSUS.NAME, ignore_case, fixed, ties_method)
@@ -88,12 +88,12 @@ def abbr_to_name(abbr: Union[str, Iterable],
       Defaults to ``False``.
     :param ties_method: Method for determining how to deal with multiple outputs for a given input.
       Must be one of ``"all"`` or ``"first"``. If ``"first"``, then only the first match for each
-      code is returned. If `"all"`, then all matches for each code are returned.
+      code is returned. If ``"all"``, then all matches for each code are returned.
       Defaults to ``first``.
     :return: If ``ties_method="first"``, returns a list of the first value found for each input key.
       If ``ties_method="all"``, returns a list of dicts, one for each input, with keys
       corresponding to all matched input keys and values corresponding to the list of state names.
-      The returned list will be the same length as the input, with None or {} if no values are found
+      The returned list will be the same length as the input, with ``None`` or ``{}`` if no values are found
       for ``ties_method="first"`` and ``ties_method="all"``, respectively.
     """
     return _lookup(abbr, STATE_CENSUS.ABBR, STATE_CENSUS.NAME, ignore_case, fixed, ties_method)
@@ -115,13 +115,13 @@ def name_to_abbr(name: Union[str, Iterable],
       Defaults to ``False``.
     :param ties_method: Method for determining how to deal with multiple outputs for a given input.
       Must be one of ``"all"`` or ``"first"``. If ``"first"``, then only the first match for each
-      code is returned. If `"all"`, then all matches for each code are returned.
+      code is returned. If ``"all"``, then all matches for each code are returned.
       Defaults to ``first``.
     :return: If ``ties_method="first"``, returns a list of the first value found for each input key.
       If ``ties_method="all"``, returns a list of dicts, one for each input, with keys
       corresponding to all matched input keys and values corresponding to the list of
-      state abbreviations. The returned list will be the same length as the input, with None or
-      {} if no values are found for ``ties_method="first"`` and ``ties_method="all"``, respectively.
+      state abbreviations. The returned list will be the same length as the input, with ``None`` or
+      ``{}`` if no values are found for ``ties_method="first"`` and ``ties_method="all"``, respectively.
     """
     return _lookup(name, STATE_CENSUS.NAME, STATE_CENSUS.ABBR, ignore_case, fixed, ties_method)
 
@@ -143,13 +143,13 @@ def name_to_cbsa(name: Union[str, Iterable],
       Defaults to ``False``.
     :param ties_method: Method for determining how to deal with multiple outputs for a given input.
       Must be one of ``"all"`` or ``"first"``. If ``"first"``, then only the first match for each
-      code is returned. If `"all"`, then all matches for each code are returned.
+      code is returned. If ``"all"``, then all matches for each code are returned.
       Defaults to ``first``.
     :param state: 2 letter state code, case insensitive, to restrict results to.
     :return: If ``ties_method="first"``, returns a list of the first value found for each input key.
       If ``ties_method="all"``, returns a list of dicts, one for each input, with keys
       corresponding to all matched input keys and values corresponding to the list of MSA codes.
-      The returned list will be the same length as the input, with None or {} if no values are found
+      The returned list will be the same length as the input, with ``None`` or ``{}`` if no values are found
       for ``ties_method="first"`` and ``ties_method="all"``, respectively.
     """
     if state:
@@ -177,13 +177,13 @@ def name_to_fips(name: Union[str, Iterable],
       Defaults to ``False``.
     :param ties_method: Method for determining how to deal with multiple outputs for a given input.
       Must be one of ``"all"`` or ``"first"``. If ``"first"``, then only the first match for each
-      code is returned. If `"all"`, then all matches for each code are returned.
+      code is returned. If ``"all"``, then all matches for each code are returned.
       Defaults to ``first``.
     :param state: 2 letter state code, case insensitive, to restrict results to.
     :return: If ``ties_method="first"``, returns a list of the first value found for each input key.
       If ``ties_method="all"``, returns a list of dicts, one for each input, with keys
       corresponding to all matched input keys and values corresponding to the list of FIPS.
-      The returned list will be the same length as the input, with None or {} if no values are found
+      The returned list will be the same length as the input, with ``None`` or ``{}`` if no values are found
       for ``ties_method="first"`` and ``ties_method="all"``, respectively.
     """
     if state:

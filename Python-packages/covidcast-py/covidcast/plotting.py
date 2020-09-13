@@ -202,7 +202,7 @@ def _join_state_geo_df(data: pd.DataFrame,
     """Join DF information to polygon information in a GeoDF at the state level.
 
     :param data: DF with state info
-    :param state_col: cname of column in `data` containing state info to join on
+    :param state_col: name of column in `data` containing state info to join on
     :param geo_info: GeoDF of state shape info read from Census shapefiles
     :return: ``data`` with state polygon and state FIPS joined.
     """

@@ -12,5 +12,5 @@ Functions:
 
 """
 
-from .covidcast import signal, metadata
+from .covidcast import signal, metadata, aggregate_signals
 from .plotting import plot_choropleth, get_geo_df

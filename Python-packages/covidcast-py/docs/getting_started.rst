@@ -36,7 +36,7 @@ We can also request all data on a signal after a specific date. Here, for
 example, we obtain ``smoothed_cli`` in each state for every day since
 2020-05-01:
 
->>> data = covidcast.signal("fb-survey", "smoothed_cli", 
+>>> data = covidcast.signal("fb-survey", "smoothed_cli",
 ...                         date(2020, 5, 1), geo_type="state")
 >>> data.head()
    direction geo_value      issue  lag  sample_size    stderr time_value     value
@@ -142,7 +142,7 @@ issues 7 days after the corresponding ``time_value``:
 
 >>> covidcast.signal("doctor-visits", "smoothed_cli",
 ...                  start_day=date(2020, 5, 1), end_day=date(2020, 5, 7),
-...                  geo_type="state", geo_values="pa", lag=7) 
+...                  geo_type="state", geo_values="pa", lag=7)
    direction geo_value      issue  lag sample_size stderr time_value     value
 0          0        pa 2020-05-08    7        None   None 2020-05-01  2.897032
 0         -1        pa 2020-05-09    7        None   None 2020-05-02  2.802238
@@ -165,3 +165,46 @@ on May 10th (a 7-day lag), but in fact the value was not updated on that day:
 2         -1        pa 2020-05-13   10        None   None 2020-05-03  3.006860
 3         -1        pa 2020-05-14   11        None   None 2020-05-03  2.970561
 4         -1        pa 2020-05-15   12        None   None 2020-05-03  3.038054
+
+Dealing with geographies
+------------------------
+
+As seen above, the COVIDcast API identifies counties by their FIPS code and
+states by two-letter abbreviations. Metropolitan statistical areas are also
+identified by unique codes, called CBSA IDs. If you want to find a specific area
+by name, this package provides convenience functions:
+
+>>> covidcast.name_to_cbsa(["Houston", "San Antonio"])
+['26420', '41700']
+
+We can use these functions to quickly query data for specific regions:
+
+>>> counties = covidcast.name_to_fips(["Allegheny", "Los Angeles", "Miami-Dade"])
+>>> df = covidcast.signal("doctor-visits", "smoothed_cli",
+...                       start_day=date(2020, 5, 1), end_day=date(2020, 5, 1),
+...                       geo_values=counties)
+>>> df
+  geo_value        signal time_value  direction      issue  lag     value stderr sample_size geo_type    data_source
+0     42003  smoothed_cli 2020-05-01         -1 2020-07-04   64  1.336086   None        None   county  doctor-visits
+0     06037  smoothed_cli 2020-05-01          0 2020-07-04   64  5.787655   None        None   county  doctor-visits
+0     12086  smoothed_cli 2020-05-01         -1 2020-07-04   64  6.405477   None        None   county  doctor-visits
+
+
+We can also quickly convert back from the IDs returned by the API to
+human-readable names:
+
+>>> covidcast.fips_to_name(df.geo_value)
+['Allegheny County', 'Los Angeles County', 'Miami-Dade County']
+
+Because the functions support regular expression matching, we can quickly find
+all regions meeting certain criteria. For example, the five-digit FIPS codes
+used to identify counties use their first two digits to identify the state. We
+can find all counties in the state of Pennsylvania by querying for FIPS codes
+beginning with 42 and requesting all matches:
+
+>>> pa_counties = covidcast.fips_to_name("^42.*", ties_method="all")
+>>> pa_counties[0]
+{'42000': ['Pennsylvania'], '42001': ['Adams County'], '42003': ['Allegheny County'], '42005': ['Armstrong County'], '42007': ['Beaver County'], '42009': ['Bedford County'], '42011': ['Berks County'], '42013': ['Blair County'], '42015': ['Bradford County'], '42017': ['Bucks County'], '42019': ['Butler County'], '42021': ['Cambria County'], '42023': ['Cameron County'], '42025': ['Carbon County'], '42027': ['Centre County'], '42029': ['Chester County'], '42031': ['Clarion County'], '42033': ['Clearfield County'], '42035': ['Clinton County'], '42037': ['Columbia County'], '42039': ['Crawford County'], '42041': ['Cumberland County'], '42043': ['Dauphin County'], '42045': ['Delaware County'], '42047': ['Elk County'], '42049': ['Erie County'], '42051': ['Fayette County'], '42053': ['Forest County'], '42055': ['Franklin County'], '42057': ['Fulton County'], '42059': ['Greene County'], '42061': ['Huntingdon County'], '42063': ['Indiana County'], '42065': ['Jefferson County'], '42067': ['Juniata County'], '42069': ['Lackawanna County'], '42071': ['Lancaster County'], '42073': ['Lawrence County'], '42075': ['Lebanon County'], '42077': ['Lehigh County'], '42079': ['Luzerne County'], '42081': ['Lycoming County'], '42083': ['McKean County'], '42085': ['Mercer County'], '42087': ['Mifflin County'], '42089': ['Monroe County'], '42091': ['Montgomery County'], '42093': ['Montour County'], '42095': ['Northampton County'], '42097': ['Northumberland County'], '42099': ['Perry County'], '42101': ['Philadelphia County'], '42103': ['Pike County'], '42105': ['Potter County'], '42107': ['Schuylkill County'], '42109': ['Snyder County'], '42111': ['Somerset County'], '42113': ['Sullivan County'], '42115': ['Susquehanna County'], '42117': ['Tioga County'], '42119': ['Union County'], '42121': ['Venango County'], '42123': ['Warren County'], '42125': ['Washington County'], '42127': ['Wayne County'], '42129': ['Westmoreland County'], '42131': ['Wyoming County'], '42133': ['York County']}
+
+See :ref:`working-with-geos` for details on each of these functions and their
+optional arguments.

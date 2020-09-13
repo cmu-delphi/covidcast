@@ -101,14 +101,14 @@ def test_metadata(mock_covidcast_meta):
 def test_aggregate_signals():
     test_input1 = pd.DataFrame(
         {"geo_value": ["a", "b", "c", "a"],
-         "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2)],
+         "time_value": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2)],
          "value": [2, 4, 6, 8],
          "signal": ["i", "i", "i", "i"],
          "geo_type": ["state", "state", "state", "state"],
          "data_source": ["x", "x", "x", "x"]})
     test_input2 = pd.DataFrame(
         {"geo_value": ["a", "b", "c", "d"],
-         "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1)],
+         "time_value": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1)],
          "value": [1, 3, 5, 7],
          "signal": ["j", "j", "j", "j"],
          "geo_type": ["state", "state", "state", "state"],
@@ -116,7 +116,7 @@ def test_aggregate_signals():
          "extra_col": ["0", "0", "0", "0"]})
     test_input3 = pd.DataFrame(
         {"geo_value": ["b", "c", "d", "b"],
-         "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2)],
+         "time_value": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2)],
          "value": [0.5, 1.5, 2.5, 3.5],
          "signal": ["k", "k", "k", "k"],
          "geo_type": ["state", "state", "state", "state"],
@@ -124,9 +124,9 @@ def test_aggregate_signals():
     # test 3 signals from 3 sources with outer join
     expected1 = pd.DataFrame(
         {"geo_value": ["a", "b", "c", "d", "a", "b", "c", "d", "b"],
-         "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1),
-                  date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 2),
-                  date(2020, 1, 3)],
+         "time_value": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1),
+                        date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 2),
+                        date(2020, 1, 3)],
          "x_i_0_value": [2, 4, 6, np.nan, 8, np.nan, np.nan, np.nan, np.nan],
          "y_j_1_value": [1, 3, 5, 7, np.nan, np.nan, np.nan, np.nan, np.nan],
          "y_j_1_extra_col": ["0", "0", "0", "0", np.nan, np.nan, np.nan, np.nan, np.nan],
@@ -142,7 +142,7 @@ def test_aggregate_signals():
     # test 2 signals from same source (one lagged) with inner join
     expected2 = pd.DataFrame(
         {"geo_value": ["a"],
-         "time": [date(2020, 1, 2)],
+         "time_value": [date(2020, 1, 2)],
          "x_i_0_value": [8],
          "x_i_1_value": [2],
          "geo_type": ["state"]})
@@ -152,8 +152,8 @@ def test_aggregate_signals():
     # test same signal twice with a lag
     expected3 = pd.DataFrame(
         {"geo_value": ["a", "b", "c", "a", "b", "c", "a"],
-         "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2),
-                  date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 3)],
+         "time_value": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2),
+                        date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 3)],
          "x_i_0_value": [2, 4, 6, 8, np.nan, np.nan, np.nan],
          "x_i_1_value": [np.nan, np.nan, np.nan, 2, 4, 6, 8],
          "geo_type": ["state"]*7})
@@ -167,7 +167,7 @@ def test_aggregate_signals():
     # test mixed geo_types
     test_input4 = pd.DataFrame(
         {"geo_value": ["b", "c", "d", "b"],
-         "time": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2)],
+         "time_value": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2)],
          "value": [0.5, 1.5, 2.5, 3.5],
          "signal": ["k", "k", "k", "k"],
          "geo_type": ["county", "county", "county", "county"],

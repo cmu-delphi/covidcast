@@ -96,7 +96,7 @@ def plot_choropleth(data: pd.DataFrame,
     for shape in _project_and_transform(data_w_geo):
         shape.plot("value", ax=ax, **kwargs)
     plt.colorbar(sm, ticks=np.linspace(kwargs["vmin"], kwargs["vmax"], 8), ax=ax,
-                 orientation="horizontal", fraction=0.02, pad=0.05)
+                 orientation="horizontal", fraction=0.045, pad=0.04, format="%.2f")
     return fig
 
 

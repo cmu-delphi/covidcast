@@ -257,8 +257,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 
   # Create breaks, if we need to
   breaks = params$breaks
-  if (!is.null(breaks)) num_bins = length(breaks)
-  else {
+  if (is.null(breaks)) {
     # Set a lower bound if range[1] == 0 and we're removing zeros
     lower_bd = range[1]
     if (!isFALSE(params$remove_zero) && range[1] == 0) {
@@ -267,21 +266,14 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     breaks = seq(lower_bd, range[2], length = num_bins)
   }
 
-  # Create bubble sizes
+  # Set minimum and maximum bubble sizes (radii) to fit in typical counties or
+  # states
   min_size = params$min_size
   max_size = params$max_size
   if (is.null(min_size)) min_size = ifelse(attributes(x)$geo_type == "county",
                                            0.1, 1)
   if (is.null(max_size)) max_size = ifelse(attributes(x)$geo_type == "county",
                                            4, 12)
-  sizes = seq(min_size, max_size, length = num_bins)
-
-  # Create discretization function
-  dis_fun = function(val) {
-    val_out = rep(NA, length(val))
-    for (i in 1:length(breaks)) val_out[val >= breaks[i]] = breaks[i]
-    return(val_out)
-  }
 
   # Set some basic layers
   element_text = ggplot2::element_text
@@ -354,15 +346,11 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 
   # Overwrite the values for observed locations
   cur_obs = cur_geo[cur_geo %in% geo]
-  cur_val[cur_geo %in% geo] = dis_fun(val[cur_obs])
-
-  # Important: make into a factor and set the levels (for the legend)
-  cur_val = factor(cur_val, levels = breaks)
+  cur_val[cur_geo %in% geo] = val[cur_obs]
 
   # Explicitly drop zeros (and from levels) unless we're asked not to
   if (!isFALSE(params$remove_zero)) {
     cur_val[cur_val == 0] = NA
-    levels(cur_val)[levels(cur_val) == 0] = NA
   }
 
   # Create the bubble layer
@@ -376,9 +364,12 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   # Create the scale layer
   labels = round(breaks, 2)
   guide = ggplot2::guide_legend(title = NULL, horizontal = TRUE, nrow = 1)
-  scale_layer = ggplot2::scale_size_manual(values = sizes, breaks = breaks,
-                                           labels = labels, drop = FALSE,
-                                           guide = guide)
+  scale_layer = ggplot2::scale_size(
+    breaks = breaks, labels = labels,
+    guide = guide, range = c(min_size, max_size))
+  ## scale_layer = ggplot2::scale_size_manual(values = sizes, breaks = breaks,
+  ##                                          labels = labels, drop = FALSE,
+  ##                                          guide = guide)
 
   # Put it all together and return
   return(ggplot2::ggplot() + polygon_layer + ggplot2::coord_equal() +

@@ -64,10 +64,12 @@ def plot_choropleth(data: pd.DataFrame,
     :param time_value: If multiple days of data are present in ``data``, map only values from this
       day. Defaults to plotting the most recent day of data in ``data``.
     :param kwargs: Optional keyword arguments passed to ``GeoDataFrame.plot()``.
+    :param plot_type:
     :return: Matplotlib figure object.
 
     """
-
+    if plot_type not in {"choropleth", "bubble"}:
+        raise ValueError("`plot_type` must be 'choropleth' or 'bubble'.")
     data_source, signal, geo_type = _detect_metadata(data)  # pylint: disable=W0212
     meta = _signal_metadata(data_source, signal, geo_type)  # pylint: disable=W0212
     # use most recent date in data if none provided
@@ -75,51 +77,86 @@ def plot_choropleth(data: pd.DataFrame,
     day_data = data.loc[data.time_value == day_to_plot, :]
 
     kwargs["vmax"] = kwargs.get("vmax", meta["mean_value"] + 3 * meta["stdev_value"])
-    kwargs["cmap"] = kwargs.get("cmap", "YlOrRd")
     kwargs["figsize"] = kwargs.get("figsize", (12.8, 9.6))
 
-    fig, ax = plt.subplots(1, figsize=kwargs["figsize"])
-    ax.axis("off")
-    plt.title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")
+    fig, ax = _plot_background_states(kwargs["figsize"])
+    if plot_type == "choropleth":
+        _plot_choro(ax, day_data, kwargs)
+    else:
+        _plot_bubble(ax, day_data, kwargs)
+    ax.set_title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")
+    return fig
 
-    # plot all states as light grey first
+
+def _plot_choro(ax, data, kwargs):
+    """Generate a choropleth map on a given Figure/Axes from a GeoDataFrame.
+
+    :param ax: Matplotlib axes to plot on.
+    :param data: GeoDataFrame with information to plot.
+    :param kwargs: Optional keyword arguments passed to ``GeoDataFrame.plot()``.
+    :return: Matplotlib axes with the plot added.
+    """
+    kwargs["vmin"] = kwargs.get("vmin", 0)
+    kwargs["cmap"] = kwargs.get("cmap", "YlOrRd")
+    data_w_geo = get_geo_df(data)
+    for shape in _project_and_transform(data_w_geo):
+        shape.plot(column="value", ax=ax, **kwargs)
+    sm = plt.cm.ScalarMappable(cmap=kwargs["cmap"],
+                               norm=plt.Normalize(vmin=kwargs["vmin"], vmax=kwargs["vmax"]))
+    # this is to remove the set_array error that occurs on some platforms
+    sm._A = []  # pylint: disable=W0212
+    plt.colorbar(sm, ticks=np.linspace(kwargs["vmin"], kwargs["vmax"], 8), ax=ax,
+                 orientation="horizontal", fraction=0.02, pad=0.05)
+    return ax
+
+
+def _plot_bubble(ax, data, kwargs):
+    """Generate a bubble map on a given Figure/Axes from a GeoDataFrame.
+
+    :param ax: Matplotlib axes to plot on.
+    :param data: GeoDataFrame with information to plot.
+    :param kwargs: Optional keyword arguments passed to ``GeoDataFrame.plot()``.
+    :return: Matplotlib axes with the plot added.
+    """
+    kwargs["vmin"] = kwargs.get("vmin", 0.1)
+    kwargs["color"] = kwargs.get("color", "purple")
+    kwargs["alpha"] = kwargs.get("alpha", 0.5)
+    data_w_geo = get_geo_df(data, join_type="inner")
+    bubble_scale = 75 / max(data_w_geo.value)  # cap bubbles at size 75
+    # discretize into 8 bins
+    label_bins, step = np.linspace(kwargs["vmin"], kwargs["vmax"], 8, retstep=True)
+    value_bins = [min(data_w_geo.value) - 1] + list(label_bins)[1:] + [max(data_w_geo.value) + 1]
+    data_w_geo["binval"] = pd.cut(data_w_geo.value, labels=label_bins, bins=value_bins)
+    data_w_geo["binval"] = data_w_geo.binval.astype(float) * bubble_scale
+    for shape in _project_and_transform(data_w_geo):
+        # plot counties in white
+        shape.plot(color="1", ax=ax, legend=True, edgecolor="0.6", linewidth=0.5)
+        # plot bubbles at the centroid of the polygon
+        shape["geometry"] = shape["geometry"].centroid
+        shape.plot(markersize="binval", color=kwargs["color"], ax=ax, alpha=kwargs["alpha"])
+    # to generate the legend, need to plot the reference points as scatter plots off the map
+    for b in label_bins:
+        ax.scatter([1e10], [1e10], color="purple", alpha=0.5,
+                   s=b * bubble_scale, label=str(round(b, 2)))
+    ax.legend(labelspacing=1.5, frameon=False, ncol=8, loc="lower center")
+    return ax
+
+
+def _plot_background_states(figsize: tuple):
+    """Plot US states in light grey as the background for other plots.
+
+    :param figsize: Dimensions of plot.
+    :return: Matplotlib figure and axes.
+    """
+    fig, ax = plt.subplots(1, figsize=figsize)
+    ax.axis("off")
     state_shapefile_path = pkg_resources.resource_filename(__name__, SHAPEFILE_PATHS["state"])
     state = gpd.read_file(state_shapefile_path)
     for state in _project_and_transform(state, "STATEFP"):
         state.plot(color="0.9", ax=ax, edgecolor="0.7")
     ax.set_xlim(plt.xlim())
     ax.set_ylim(plt.ylim())
-
-    if plot_type == "choropleth":
-        kwargs["vmin"] = kwargs.get("vmin", 0)
-        data_w_geo = get_geo_df(day_data)
-        for shape in _project_and_transform(data_w_geo):
-            shape.plot(column="value", ax=ax, **kwargs)
-        sm = plt.cm.ScalarMappable(cmap=kwargs["cmap"],
-                                   norm=plt.Normalize(vmin=kwargs["vmin"], vmax=kwargs["vmax"]))
-        # this is to remove the set_array error that occurs on some platforms
-        sm._A = []  # pylint: disable=W0212
-        plt.colorbar(sm, ticks=np.linspace(kwargs["vmin"], kwargs["vmax"], 8), ax=ax,
-                     orientation="horizontal", fraction=0.02, pad=0.05)
-    else:
-        kwargs["vmin"] = kwargs.get("vmin", 0.1)
-        data_w_geo = get_geo_df(day_data, join_type="inner")
-        bubble_scale = 50/max(data_w_geo.value)
-        label_bins, step = np.linspace(kwargs["vmin"], kwargs["vmax"], 8, retstep=True)
-        value_bins = [min(data_w_geo.value) - 1] + list(label_bins)[1:] + [max(data_w_geo.value)+1]
-        data_w_geo["binval"] = pd.cut(data_w_geo.value,
-                                      labels=label_bins,
-                                      bins=value_bins)
-        data_w_geo["binval"] = data_w_geo.binval.astype(float) * bubble_scale
-        for shape in _project_and_transform(data_w_geo):
-            shape.plot(color="1", ax=ax, legend=True, edgecolor="0.6")
-            shape["geometry"] = shape["geometry"].centroid
-            shape.plot(markersize="binval", color="purple", ax=ax, legend=True, alpha=0.5)
-        for b in label_bins:
-            ax.scatter([1e10], [1e10], color="purple",
-                       alpha=0.5, s=b*bubble_scale, label=str(round(b, 2)))
-        ax.legend(labelspacing=1.5, frameon=False, ncol=8, loc="lower center")
-    return fig
+    return fig, ax
 
 
 def get_geo_df(data: pd.DataFrame,

@@ -74,7 +74,7 @@ def plot_choropleth(data: pd.DataFrame,
     meta = _signal_metadata(data_source, signal, geo_type)  # pylint: disable=W0212
     # use most recent date in data if none provided
     day_to_plot = time_value if time_value else max(data.time_value)
-    day_data = data.loc[data.time_value == day_to_plot, :]
+    day_data = data.loc[data.time_value == pd.to_datetime(day_to_plot), :]
 
     kwargs["vmax"] = kwargs.get("vmax", meta["mean_value"] + 3 * meta["stdev_value"])
     kwargs["figsize"] = kwargs.get("figsize", (12.8, 9.6))

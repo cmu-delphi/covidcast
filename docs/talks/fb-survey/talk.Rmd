@@ -1,6 +1,6 @@
 ---
 title: "Delphi's COVIDcast Project: <br> COVID-19 Symptom Surveys Through Facebook"
-author: Alex Reinhart\* and Ryan Tibshirani^†^ <br> \*^†^Statistics and ^†^Machine Learning <br> Carnegie Mellon University <br> ^†^Amazon Scholar, AWS AI Labs
+author: Alex Reinhart\* and Ryan Tibshirani^†^ <br> \*^†^Statistics and ^†^Machine Learning <br> Carnegie Mellon University <br> ^†^Amazon Scholar, AWS Labs
 date: "<br> ![](delphi.png) ![](cmu.png) <br><br> September 8, 2020"
 footer: "Get the slides at: cmu-delphi.github.io/covidcast/talks/fb-survey/talk.html"
 output: 
@@ -119,16 +119,20 @@ Why ask a proxy question (have people report on others)? You'd be surprised ... 
 ```{r, fig.width=7, fig.height=5}
 library(covidcast)
 
-# Fetch Facebook % CLI signal, % CLI-in-community signal and JHU confirmed case
+# Fetch Facebook % CLI signal, % CLI-in-community signal and confirmed case
 # incidence proportions
 start_day = "2020-04-15"
-sympt1 = covidcast_signal("fb-survey", "smoothed_cli", start_day)
-sympt2 = covidcast_signal("fb-survey", "smoothed_hh_cmnty_cli", start_day)
-cases = covidcast_signal("jhu-csse", "confirmed_7dav_incidence_prop", start_day)
+end_day = "2020-09-05"
+sympt1 = covidcast_signal("fb-survey", "smoothed_cli", 
+                          start_day, end_day)
+sympt2 = covidcast_signal("fb-survey", "smoothed_hh_cmnty_cli", 
+                          start_day, end_day)
+cases = covidcast_signal("usa-facts", "confirmed_7dav_incidence_prop", 
+                         start_day, end_day)
 
 # Consider only counties with at least 500 cumulative cases so far
 case_num = 500
-geo_values = covidcast_signal("jhu-csse", "confirmed_cumulative_num",
+geo_values = covidcast_signal("usa-facts", "confirmed_cumulative_num",
                               max(cases$time), max(cases$time)) %>%
   filter(value >= case_num) %>% pull(geo_value)
 sympt1_act = sympt1 %>% filter(geo_value %in% geo_values)
@@ -187,13 +191,13 @@ ggplot(df_cor, aes(value)) + geom_density(aes(color = signal, fill = signal),
 Let's take a look at case counts in Miami-Dade, from June 1 to July 15, and compare it to the % CLI-in-community indicator based on our survey: 
 
 ```{r, fig.width=7, fig.height=5}
-# Fetch Facebook % CLI-in-community signal and JHU confirmed case incidence
-# numbers from June 1 to July 15
+# Fetch Facebook % CLI-in-community signal and confirmed case incidence numbers
+# from June 1 to July 15
 start_day = "2020-06-01"
 end_day = "2020-07-15"
 sympt = covidcast_signal("fb-survey", "smoothed_hh_cmnty_cli", 
                          start_day, end_day)
-cases = covidcast_signal("jhu-csse", "confirmed_7dav_incidence_num",
+cases = covidcast_signal("usa-facts", "confirmed_7dav_incidence_num",
                          start_day, end_day)
 
 # Function to transform from one range to another

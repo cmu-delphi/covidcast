@@ -32,5 +32,5 @@ jobs:
         mypy Python-packages/covidcast-py/covidcast --config-file Python-packages/covidcast-py/mypy.ini
     - name: Test with pytest
       run: |
-        pytest Python-packages/covidcast-py/
+        pytest Python-packages/covidcast-py/ -W ignore::UserWarning
 

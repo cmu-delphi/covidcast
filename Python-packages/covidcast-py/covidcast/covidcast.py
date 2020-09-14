@@ -173,7 +173,7 @@ def signal(data_source: str,
         _fetch_single_geo(
             data_source, signal, start_day, end_day, geo_type, geo_value,
             as_of, issues, lag)
-        for geo_value in geo_values
+        for geo_value in set(geo_values)
     ]
 
     try:

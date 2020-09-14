@@ -131,7 +131,7 @@ def test_aggregate_signals():
 
     # test 3 signals from 3 sources with inner join has no intersection
     assert covidcast.aggregate_signals(
-        [test_input1, test_input2, test_input3], dt=[0, 0, 1], join_type="inner").empty
+        [test_input1, test_input3], dt=[0, 1], join_type="inner").empty
 
     # test 2 signals from same source (one lagged) with inner join
     expected2 = pd.DataFrame(
@@ -167,7 +167,7 @@ def test_aggregate_signals():
          "geo_type": ["county", "county", "county", "county"],
          "data_source": ["z", "z", "z", "z"]})
     with pytest.raises(ValueError):
-        covidcast.aggregate_signals([test_input1, test_input4], dt=[0, 1])
+        covidcast.aggregate_signals([test_input1, test_input4])
 
 
 def test__detect_metadata():

@@ -282,7 +282,7 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
     """
     if dt is not None and len(dt) != len(signals):
         raise ValueError("Length of `dt` must be same as length of `signals`")
-
+    dt = [0] * len(signals) if not dt else dt
     join_cols = ["time_value", "geo_value"]
     dt_dfs = []
     first_geo_type = _detect_metadata(signals[0])[2]

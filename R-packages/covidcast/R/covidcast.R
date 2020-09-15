@@ -151,10 +151,11 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 #' covidcast_signal("fb-survey", "raw_cli", geo_type = "msa",
 #'                  geo_values = name_to_cbsa("Pittsburgh"))
 #' }
-#' 
+#'
 #' @seealso [plot.covidcast_signal()], [`county_census`], [`msa_census`],
 #'     [`state_census`]
 #' @export
+#' @importFrom rlang abort
 #' @importFrom dplyr %>%
 covidcast_signal <- function(data_source, signal,
                              start_day = NULL, end_day = NULL,
@@ -179,11 +180,17 @@ covidcast_signal <- function(data_source, signal,
 
   if (is.null(start_day) || is.null(end_day)) {
     if (is.null(relevant_meta$max_time) || is.null(relevant_meta$min_time)) {
-      stop("No match in metadata for source '", data_source,
-           "', signal '", signal, "', and geo_type '", geo_type,
-           "' at the daily level. ",
-           "Check that the source and signal are correctly spelled and that ",
-           "the signal is available at this geographic level.")
+      abort(
+        paste0("No match in metadata for source '", data_source,
+               "', signal '", signal, "', and geo_type '", geo_type,
+               "' at the daily level. ",
+               "Check that the source and signal are correctly spelled and ",
+               "that the signal is available at this geographic level."),
+        data_source = data_source,
+        signal = signal,
+        geo_type = geo_type,
+        class = "covidcast_meta_not_found"
+      )
     }
   }
 
@@ -375,6 +382,7 @@ summary.covidcast_signal = function(object, ...) {
 #'
 #' @method plot covidcast_signal
 #' @importFrom stats sd
+#' @importFrom rlang warn
 #' @export
 plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
                                   time_value = NULL, include = c(),
@@ -394,8 +402,12 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
   # Set range, if we need to (to mean +/- 3 standard deviations, from metadata)
   if (is.null(range)) {
     if (is.null(attributes(x)$metadata)) {
-      warning("Metadata for signal mean and standard deviation not available; ",
-              "defaulting to observed mean and standard deviation to set plot range.")
+      warn(
+        paste0("Metadata for signal mean and standard deviation not available; ",
+               "defaulting to observed mean and standard deviation to set plot range."),
+        class = "covidcast_plot_meta_not_found"
+      )
+
       mean_value <- mean(x$value)
       stdev_value <- sd(x$value)
     } else {
@@ -628,8 +640,8 @@ summary.covidcast_meta = function(object, ...) {
 
 # Helper function, not user-facing, to fetch a single geo-value.
 # covidcast_signal can then loop over multiple geos to produce its result.
-single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_value,
-                       as_of, issues, lag) {
+single_geo <- function(data_source, signal, start_day, end_day, geo_type,
+                       geo_value, as_of, issues, lag) {
   ndays <- as.numeric(end_day - start_day)
   dat <- list()
 
@@ -653,14 +665,20 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type, geo_va
                     nrow(dat[[i]]$epidata)))
 
     if (dat[[i]]$message != "success") {
-      warning("Fetching ", signal, " from ", data_source, " for ", day,
-              " in geography '", geo_value, "': ", dat[[i]]$message)
+      warn(paste0("Fetching ", signal, " from ", data_source, " for ", day,
+                  " in geography '", geo_value, "': ", dat[[i]]$message),
+           data_source = data_source,
+           signal = signal,
+           day = day,
+           geo_value = geo_value,
+           msg = dat[[i]]$message,
+           class = "covidcast_fetch_failed")
     }
   }
 
   df <- dat %>%
     purrr::map("epidata") %>% # just want $epidata part
-    purrr::map(purrr::compact) %>% # this removes the list elements that are NULL
+    purrr::map(purrr::compact) %>% # remove the list elements that are NULL
     dplyr::bind_rows() # make this into a data frame
 
   if (nrow(df) > 0) {

@@ -32,5 +32,5 @@ jobs:
         mypy Python-packages/covidcast-py/covidcast --ignore-missing-imports
     - name: Test with pytest
       run: |
-        pytest Python-packages/covidcast-py/
+        pytest Python-packages/covidcast-py/ -W ignore::UserWarning
 

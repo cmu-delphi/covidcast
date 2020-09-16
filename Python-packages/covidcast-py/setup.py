@@ -28,7 +28,8 @@ setuptools.setup(
         "numpy",
         "descartes",
         "imageio-ffmpeg",
-        "imageio"
+        "imageio",
+        "tqdm"
     ],
     package_data={"covidcast": ["shapefiles/*", "geo_mappings/*"]}
 )

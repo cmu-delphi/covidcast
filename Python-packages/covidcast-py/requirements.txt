@@ -9,3 +9,4 @@ numpy
 descartes
 imageio-ffmpeg
 imageio
+tqdm

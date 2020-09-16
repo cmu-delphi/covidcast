@@ -3,6 +3,7 @@
 import tempfile
 from datetime import date, timedelta
 from typing import Tuple
+import io
 
 import geopandas as gpd
 import imageio
@@ -11,6 +12,7 @@ import numpy as np
 import pandas as pd
 import pkg_resources
 from matplotlib import pyplot as plt
+from tqdm import tqdm
 
 from .covidcast import _detect_metadata, _signal_metadata
 
@@ -179,19 +181,20 @@ def animate(data: pd.DataFrame, filepath: str, fps: int = 3, dpi: int = 150, **k
     :param filepath: Path where video will be saved.
     :param fps: Frame rate in frames per second for animation. Defaults to 3.
     :param dpi: Dots per inch for output video. Defaults to 150 on a 12.8x9.6 figure (1920x1440).
+    :param kwargs:  Optional keyword arguments passed to ``plot_choropleth()``
     :return: None
     """
     # probesize is set to avoid warning by ffmpeg on frame rate up to 4k resolution.
     writer = imageio.get_writer(filepath, fps=fps, input_params=["-probesize", "75M"])
     num_days = (max(data.time_value) - min(data.time_value)).days
     day_list = [min(data.time_value) + timedelta(days=x) for x in range(num_days+1)]
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        for d in day_list:
-            print(f"Processing {d.date()}")
-            plot_choropleth(data, time_value=d, **kwargs)
-            plt.savefig(f"{tmpdirname}/{d}.jpg", format="jpg", dpi=dpi)
-            plt.close()
-            writer.append_data(imageio.imread(f"{tmpdirname}/{d}.jpg"))
+    for d in tqdm(day_list):
+        buf = io.BytesIO()
+        plot_choropleth(data, time_value=d, **kwargs)
+        plt.savefig(buf, dpi=dpi)
+        plt.close()
+        buf.seek(0)
+        writer.append_data(imageio.imread(buf))
     writer.close()
 
 

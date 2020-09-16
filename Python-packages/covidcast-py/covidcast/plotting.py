@@ -1,9 +1,8 @@
 """This contains the plotting and geo data management methods for the COVIDcast signals."""
 
-import tempfile
+import io
 from datetime import date, timedelta
 from typing import Tuple
-import io
 
 import geopandas as gpd
 import imageio

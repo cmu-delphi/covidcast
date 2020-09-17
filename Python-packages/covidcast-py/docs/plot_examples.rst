@@ -96,6 +96,16 @@ which can be stored and altered further.
 >>> fig = plotting.plot_choropleth(data)
 >>> fig.set_dpi(100)
 
+Animations
+----------
+.. video:: videos/test_animation.mp4
+   :width: 960
+   :height: 720
+   :autoplay:
+   :loop:
+
+
+
 Further customization
 ---------------------
 If more control is desired, the signal data can be passed to :py:func:`covidcast.get_geo_df`, which

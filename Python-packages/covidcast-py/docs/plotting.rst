@@ -13,6 +13,14 @@ signal and generates a choropleth map, using `matplotlib
 
 .. autofunction:: covidcast.plot_choropleth
 
+Animate a signal over time
+--------------------------
+
+A signal DataFrame can be used to generate an animated choropleth of the signal values over time.
+
+.. autofunction:: covidcast.animate
+
+
 Creating a GeoDataFrame
 -----------------------
 
@@ -21,3 +29,5 @@ A function for generating a
 provided if the user desires more control over their plotting.
 
 .. autofunction:: covidcast.get_geo_df
+
+

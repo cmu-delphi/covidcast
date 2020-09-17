@@ -32,6 +32,7 @@ release = '0.0.9'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx_autodoc_typehints',
+    'sphinxcontrib.video',
     'matplotlib.sphinxext.plot_directive'
 ]
 

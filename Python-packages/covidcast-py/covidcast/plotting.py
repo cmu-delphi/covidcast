@@ -174,13 +174,18 @@ def get_geo_df(data: pd.DataFrame,
 
 
 def animate(data: pd.DataFrame, filepath: str, fps: int = 3, dpi: int = 150, **kwargs) -> None:
-    """Generate an animated mp4 file of a signal over time.
+    """Generate an animated video file of a signal over time.
+
+    Given a signal DataFrame, generates the choropleth for each day to form an animation of each
+    day. Accepts arguments for video parameters as well as optional plotting arguments.
+    Supported output formats are available in the
+    `imageio ffmpeg documentation <https://imageio.readthedocs.io/en/stable/format_ffmpeg.html>`_
 
     :param data: DataFrame for a single signal over time.
-    :param filepath: Path where video will be saved.
+    :param filepath: Path where video will be saved. Filename must contain supported extension.
     :param fps: Frame rate in frames per second for animation. Defaults to 3.
     :param dpi: Dots per inch for output video. Defaults to 150 on a 12.8x9.6 figure (1920x1440).
-    :param kwargs:  Optional keyword arguments passed to ``plot_choropleth()``
+    :param kwargs: Optional keyword arguments passed to ``plot_choropleth()``
     :return: None
     """
     # probesize is set to avoid warning by ffmpeg on frame rate up to 4k resolution.

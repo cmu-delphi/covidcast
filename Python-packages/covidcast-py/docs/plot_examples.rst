@@ -104,7 +104,7 @@ which can be stored and altered further.
 
 Animations
 ----------
-To create an enimation, simply pass the signal Dataframe to :py:func:`covidcast.animate`
+To create an animation, simply pass the signal Dataframe to :py:func:`covidcast.animate`
 The following code creates an MP4 file named `test_plot.mp4` which animates our daily signal for
 the month of August.
 
@@ -117,12 +117,13 @@ the month of August.
 
 .. raw:: html
 
-    <video width="640" height="480" autoplay loop>
+    <video width="640" height="480" playsinline autoplay muted loop>
       <source src="_static/example_default_animation.mp4" type="video/mp4">
+        Your browser does not support the HTML5 Video element
     </video>
 
-Video parameters are adjustable, and just like the static maps, additional plotting keyword
-arguments can be provided.
+Video frame rate and resolution are adjustable. Like the static maps, additional plotting
+keyword arguments can be provided.
 
 >>> covidcast.animate(df,
 ...                   "test_plot2.mp4",
@@ -131,8 +132,9 @@ arguments can be provided.
 
 .. raw:: html
 
-    <video width="640" height="480" autoplay loop>
+    <video width="640" height="480" playsinline autoplay muted loop>
       <source src="_static/example_custom_animation.mp4" type="video/mp4">
+        Your browser does not support the HTML5 Video element
     </video>
 
 Further customization

@@ -121,7 +121,8 @@ the month of August.
       <source src="_static/example_default_animation.mp4" type="video/mp4">
     </video>
 
-Additional customization can be made to the videos and plots.
+Video parameters are adjustable, and just like the static maps, additional plotting keyword
+arguments can be provided.
 
 >>> covidcast.animate(df,
 ...                   "test_plot2.mp4",

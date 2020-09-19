@@ -106,7 +106,7 @@ deaths = covidcast_signal(data_source = "usa-facts",
                           geo_type = "state", geo_values = "pa")
 
 plot(deaths, plot_type = "line", 
-     title = "COVID-19 deaths in PA (7-day trailing avg)")
+     title = "COVID-19 deaths in PA (7 day trailing avg)")
 ```
 
 # Example: Hospitalizations
@@ -295,7 +295,7 @@ ggplot(dv_as_of, aes(x = time_value, y = value)) +
 
 # Example: Correlations Between Cases and Deaths
 
-Now let's examine the correlations between COVID-19 cases and deaths, per day, across counties. We'll look at Spearman correlation, starting March 1. Then repeat but for cases and deaths 7-days-ahead:
+Now let's examine the correlations between COVID-19 cases and deaths, per day, across counties. We'll look at Spearman correlation, starting March 1. Then repeat but for cases and deaths 7 days ahead:
 
 ```{r, fig.width=8, fig.height=6}
 # Fetch confirmed cases and deaths, at the county level, since March 1

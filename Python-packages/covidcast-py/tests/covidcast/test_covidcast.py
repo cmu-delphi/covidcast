@@ -26,39 +26,33 @@ def test_signal(mock_covidcast, mock_metadata):
     mock_metadata.return_value = {"max_time": pd.Timestamp("2020-08-04 00:00:00"),
                                   "min_time": pd.Timestamp("2020-08-03 00:00:00")}
 
+    return_rows = {"time_value": [datetime(2020, 6, 22)],
+                   "issue": datetime(2020, 7, 24),
+                   "geo_type": "county",
+                   "data_source": "source",
+                   "signal": "signal"
+                   }
     # test happy path with no start or end day and one geo_value
     response = covidcast.signal("source", "signal", geo_values="CA")
-    expected = pd.DataFrame({"time_value": [datetime(2020, 6, 22)]*2,
-                             "issue": datetime(2020, 7, 24),
-                             "geo_type": "county",
-                             "data_source": "source",
-                             "signal": "signal"
-                             },
-                            index=[0]*2)
+    expected = pd.DataFrame(return_rows, index=[0]*2)
     assert sort_df(response).equals(sort_df(expected))
 
     # test happy path with no start or end day and two geo_values
     response = covidcast.signal("source", "signal", geo_values=["CA", "AL"])
-    expected = pd.DataFrame({"time_value": [datetime(2020, 6, 22)]*4,
-                             "issue": datetime(2020, 7, 24),
-                             "geo_type": "county",
-                             "data_source": "source",
-                             "signal": "signal"
-                             },
-                            index=[0]*4)
+    expected = pd.DataFrame(return_rows, index=[0]*4)
     assert sort_df(response).equals(sort_df(expected))
 
     # test happy path with start and end day (8 days apart) and one geo_value
     response = covidcast.signal("source", "signal", start_day=date(2020, 8, 1),
                                 end_day=date(2020, 8, 8), geo_values="CA")
-    expected = pd.DataFrame({"time_value": [datetime(2020, 6, 22)]*8,
-                             "issue": datetime(2020, 7, 24),
-                             "geo_type": "county",
-                             "data_source": "source",
-                             "signal": "signal"
-                             },
-                            index=[0]*8,
-                            )
+    expected = pd.DataFrame(return_rows, index=[0]*8)
+    assert sort_df(response).equals(sort_df(expected))
+
+    # test duplicate geo values
+    response = covidcast.signal("source", "signal", start_day=date(2020, 8, 1),
+                                end_day=date(2020, 8, 8), geo_values=["CA", "CA"])
+    expected = pd.DataFrame(return_rows, index=[0]*8)
+
     assert sort_df(response).equals(sort_df(expected))
 
     # test no df output

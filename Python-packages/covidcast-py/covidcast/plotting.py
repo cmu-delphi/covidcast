@@ -96,7 +96,7 @@ def plot_choropleth(data: pd.DataFrame,
     for shape in _project_and_transform(data_w_geo):
         shape.plot("value", ax=ax, **kwargs)
     plt.colorbar(sm, ticks=np.linspace(kwargs["vmin"], kwargs["vmax"], 8), ax=ax,
-                 orientation="horizontal", fraction=0.02, pad=0.05)
+                 orientation="horizontal", fraction=0.045, pad=0.04, format="%.2f")
     return fig
 
 
@@ -202,7 +202,7 @@ def _join_state_geo_df(data: pd.DataFrame,
     """Join DF information to polygon information in a GeoDF at the state level.
 
     :param data: DF with state info
-    :param state_col: cname of column in `data` containing state info to join on
+    :param state_col: name of column in `data` containing state info to join on
     :param geo_info: GeoDF of state shape info read from Census shapefiles
     :return: ``data`` with state polygon and state FIPS joined.
     """

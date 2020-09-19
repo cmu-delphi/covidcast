@@ -28,5 +28,5 @@ setuptools.setup(
         'numpy',
         'descartes'
     ],
-    package_data={'covidcast': ['shapefiles/*']}
+    package_data={'covidcast': ['shapefiles/*', 'geo_mappings/*']}
 )

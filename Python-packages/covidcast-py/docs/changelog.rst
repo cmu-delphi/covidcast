@@ -1,6 +1,20 @@
 Changelog
 =========
 
+v0.0.10, TODO
+-------------
+
+- New feature: Functions :py:func:`covidcast.fips_to_name`,
+  :py:func:`covidcast.cbsa_to_name`, and :py:func:`covidcast.abbr_to_name` are
+  provided to convert FIPS codes, CBSA IDs, and two-lettr abbreviations to
+  county names, meeteropolitan statistical area names, and state names,
+  respectively.
+
+- New feature: Functions :py:func:`covidcast.name_to_fips`,
+  :py:func:`covidcast.name_to_cbsa`, and :py:func:`covidcast.name_to_fips` are
+  provided to convert human-readable names into FIPS codes, CBSA IDs, and state
+  abbreviations, for use when querying the COVIDcast API.
+
 v0.0.9, August 30, 2020
 -----------------------
 

@@ -1,3 +1,20 @@
+# covidcast 0.3.1
+
+Release September 20, 2020.
+
+- When `covidcast_signal()` raises warnings, for instance because a signal is
+  not available on a specific date, it now uses `rlang::warn()` to raise
+  warnings with custom classes. This allows callers to use
+  `withCallingHandlers()` to intercept these warnings and deal with them
+  appropriately, such as by logging them to a file. Similarly, fatal errors now
+  use `rlang::abort()` and can be caught with `tryCatch()` as needed.
+
+- When `covidcast_signal()` is called with the `geo_values` argument, and some
+  `geo_values` are duplicates, the duplicates are now ignored (rather than
+  duplicate data being fetched).
+
+- Minor documentation fixes.
+
 # covidcast 0.3.0
 
 Released August 22, 2020.

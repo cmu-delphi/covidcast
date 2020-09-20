@@ -104,7 +104,7 @@ which can be stored and altered further.
 
 Animations
 ----------
-To create an animation, simply pass the signal Dataframe to :py:func:`covidcast.animate`
+To create an animation, simply pass the signal DataFrame to :py:func:`covidcast.animate`.
 The following code creates an MP4 file named `test_plot.mp4` which animates our daily signal for
 the month of August.
 

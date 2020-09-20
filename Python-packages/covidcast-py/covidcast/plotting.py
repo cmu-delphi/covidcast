@@ -176,8 +176,8 @@ def get_geo_df(data: pd.DataFrame,
 def animate(data: pd.DataFrame, filepath: str, fps: int = 3, dpi: int = 150, **kwargs) -> None:
     """Generate an animated video file of a signal over time.
 
-    Given a signal DataFrame, generates the choropleth for each day to form an animation of each
-    day. Accepts arguments for video parameters as well as optional plotting arguments.
+    Given a signal DataFrame, generates the choropleth for each day to form an animation of the
+    signal. Accepts arguments for video parameters as well as optional plotting arguments.
     Supported output formats are available in the
     `imageio ffmpeg documentation <https://imageio.readthedocs.io/en/stable/format_ffmpeg.html>`_
 

@@ -179,7 +179,7 @@ def animate(data: pd.DataFrame, filepath: str, fps: int = 3, dpi: int = 150, **k
     Given a signal DataFrame, generates the choropleth for each day to form an animation of the
     signal. Accepts arguments for video parameters as well as optional plotting arguments.
     Supported output formats are listed in the
-    `imageio ffmpeg documentation <https://imageio.readthedocs.io/en/stable/format_ffmpeg.html>`_
+    `imageio ffmpeg documentation <https://imageio.readthedocs.io/en/stable/format_ffmpeg.html>`_.
 
     :param data: DataFrame for a single signal over time.
     :param filepath: Path where video will be saved. Filename must contain supported extension.

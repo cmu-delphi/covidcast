@@ -65,34 +65,34 @@ We can request multiple states by providing a list, such as ``["pa", "ny",
 
 Sometimes it may be useful to join multiple signals into a single data frame.
 For example, suppose I'd like to look at the relationships between cases at each
-location and the number of deaths one week later. The
+location and the number of deaths three days later. The
 :py:func:`covidcast.aggregate_signals` function can combine multiple data frames
 into a single one, optionally with lag. In this case, I use it as follows:
 
 >>> cases = covidcast.signal("indicator-combination", "confirmed_incidence_num",
 ...                          date(2020, 5, 1), date(2020, 5, 31),
-...                          geo_type="state", geo_values=["pa", "ny", "mo"])
+...                          geo_type="state", geo_values="pa")
 >>> deaths = covidcast.signal("indicator-combination", "deaths_incidence_num",
 ...                           date(2020, 5, 1), date(2020, 5, 31),
-...                           geo_type="state", geo_values=["pa", "ny", "mo"])
->>> cases_v_deaths = covidcast.aggregate_signals([cases, deaths], dt=[7, 0])
+...                           geo_type="state", geo_values="pa")
+>>> cases_v_deaths = covidcast.aggregate_signals([cases, deaths], dt=[3, 0])
 >>> cases_v_deaths = cases_v_deaths.rename(
 ...     columns={"indicator-combination_confirmed_incidence_num_0_value": "cases",
 ...              "indicator-combination_deaths_incidence_num_1_value": "deaths"})
 >>> cases_v_deaths[["time_value", "geo_value", "cases", "deaths"]].head()
-  time_value geo_value  cases  deaths
-0 2020-05-01        mo    NaN     8.0
-1 2020-05-01        ny    NaN   343.0
-2 2020-05-01        pa    NaN    62.0
-3 2020-05-02        mo    NaN    14.0
-4 2020-05-02        ny    NaN   232.0
+  time_value geo_value   cases  deaths
+0 2020-05-01        pa     NaN    62.0
+1 2020-05-02        pa     NaN    65.0
+2 2020-05-03        pa     NaN    24.0
+3 2020-05-04        pa  1209.0    13.0
+4 2020-05-05        pa  1332.0   547.0
 
 The resulting ``cases_v_deaths`` data frame contains one row per location per
 day. The death value is the number of deaths on that day; the cases value is the
-number of cases *7 days prior*, matching the ``dt`` provided to
-:py:func:`covidcast.aggregate_signals`. The case values shown above are ``NaN``
-because the input data frame did not contain case numbers for late April; rows
-for mid-May contain both case and death values.
+number of cases *3 days prior*, matching the ``dt`` provided to
+:py:func:`covidcast.aggregate_signals`. The first three case values shown above
+are ``NaN`` because the input data frame did not contain case numbers for late
+April.
 
 Note the long column names used by default to prevent ambiguity or name
 collisions.

@@ -2,6 +2,7 @@
 import warnings
 from datetime import timedelta, date
 from typing import Union, Iterable, Tuple, List
+from functools import reduce
 
 import pandas as pd
 from delphi_epidata import Epidata
@@ -171,7 +172,7 @@ def signal(data_source: str,
     dfs = [
         _fetch_single_geo(
             data_source, signal, start_day, end_day, geo_type, geo_value,
-            as_of, issues, lag)  # type: ignore
+            as_of, issues, lag)
         for geo_value in set(geo_values)
     ]
 
@@ -251,6 +252,58 @@ def metadata() -> pd.DataFrame:
     meta_df["max_time"] = pd.to_datetime(meta_df["max_time"], format="%Y%m%d")
 
     return meta_df
+
+
+def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") -> pd.DataFrame:
+    """Given a list of DataFrames, [optionally] lag each one and join them into one DataFrame.
+
+    This method takes a list of DataFrames containing signal information for
+    geographic regions across time, and outputs a single DataFrame with a column
+    for each signal value for each region/time. The ``data_source``,
+    ``signal``, and index of each DataFrame in ``signals`` are appended to the
+    front of each output column name separated by underscores (e.g.
+    ``source_signal_0_inputcolumn``), and the original data_source and signal
+    columns will be dropped. The input DataFrames must all be of the same
+    geography type, and a single ``geo_type`` column will be returned in the final
+    DataFrame.
+
+    Each signal's time value can be shifted for analysis on lagged signals using the ``dt``
+    argument, which takes a list of integer days to lag each signal's date. Lagging a signal by +1
+    day means that all the dates get shifted forward by 1 day (e.g. Jan 1 becomes Jan 2).
+
+    :param signals: List of DataFrames to join.
+    :param dt: List of lags in days for each of the input DataFrames in ``signals``.
+      Defaults to ``None``. When provided, must be the same length as ``signals``.
+    :param join_type: Type of join to be done between the DataFrames in ``signals``.
+      Defaults to ``"outer"``, so the output DataFrame contains all region/time
+      combinations at which at least one signal was observed.
+    :return: DataFrame of aggregated signals.
+
+    """
+    if dt is not None and len(dt) != len(signals):
+        raise ValueError("Length of `dt` must be same as length of `signals`")
+    dt = [0] * len(signals) if not dt else dt
+    join_cols = ["time_value", "geo_value"]
+    dt_dfs = []
+    first_geo_type = _detect_metadata(signals[0])[2]
+
+    for i, (df, lag) in enumerate(zip(signals, dt)):
+        df_c = df.copy()  # make a copy so we don't modify originals
+        source, sig_type, geo_type = _detect_metadata(df_c)
+        if geo_type != first_geo_type:
+            raise ValueError("Multiple geo_types detected. "
+                             "All signals must have the same geo_type to be aggregated.")
+
+        df_c["time_value"] = [day + timedelta(lag) for day in df_c["time_value"]]  # lag dates
+        df_c.drop(["signal", "data_source", "geo_type"], axis=1, inplace=True)
+        df_c.rename(
+            columns={j: f"{source}_{sig_type}_{i}_{j}" for j in df_c.columns if j not in join_cols},
+            inplace=True)
+        dt_dfs.append(df_c)
+
+    joined_df = reduce(lambda x, y: pd.merge(x, y, on=join_cols, how=join_type, sort=True), dt_dfs)
+    joined_df["geo_type"] = geo_type
+    return joined_df
 
 
 def _detect_metadata(data: pd.DataFrame,
@@ -364,8 +417,8 @@ def _signal_metadata(data_source: str,
                              geo_type=geo_type))
 
     assert matches.shape[0] == 1, "it should be impossible to have two identical signals"
-
-    return matches.to_dict("records")[0]
+    output: dict = matches.to_dict("records")[0]
+    return output
 
 
 def _date_to_api_string(date: date) -> str:  # pylint: disable=W0621

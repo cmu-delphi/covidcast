@@ -1,7 +1,7 @@
 """This contains the plotting and geo data management methods for the COVIDcast signals."""
 
 from datetime import date
-from typing import Tuple
+from typing import Tuple, Any
 
 import geopandas as gpd
 import numpy as np
@@ -36,7 +36,7 @@ CONTIGUOUS_FIPS = {"01", "04", "05", "06", "08", "09", "10", "11", "12", "13", "
 
 def plot_choropleth(data: pd.DataFrame,
                     time_value: date = None,
-                    **kwargs) -> matplotlib.figure.Figure:
+                    **kwargs: Any) -> matplotlib.figure.Figure:
     """Given the output data frame of :py:func:`covidcast.signal`, plot a choropleth map.
 
     Projections used for plotting:

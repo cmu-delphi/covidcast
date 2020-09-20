@@ -181,7 +181,7 @@ def get_geo_df(data: pd.DataFrame,
     return output
 
 
-def animate(data: pd.DataFrame, filepath: str, fps: int = 3, dpi: int = 150, **kwargs) -> None:
+def animate(data: pd.DataFrame, filepath: str, fps: int = 3, dpi: int = 150, **kwargs: Any) -> None:
     """Generate an animated video file of a signal over time.
 
     Given a signal DataFrame, generates the choropleth for each day to form an animation of the

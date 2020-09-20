@@ -185,7 +185,7 @@ def animate(data: pd.DataFrame, filepath: str, fps: int = 3, dpi: int = 150, **k
     :param filepath: Path where video will be saved. Filename must contain supported extension.
     :param fps: Frame rate in frames per second for animation. Defaults to 3.
     :param dpi: Dots per inch for output video. Defaults to 150 on a 12.8x9.6 figure (1920x1440).
-    :param kwargs: Optional keyword arguments passed to ``plot_choropleth()``
+    :param kwargs: Optional keyword arguments passed to :py:func:`covidcast.plot_choropleth`.
     :return: None
     """
     # probesize is set to avoid warning by ffmpeg on frame rate up to 4k resolution.

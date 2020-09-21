@@ -106,7 +106,7 @@ deaths = covidcast_signal(data_source = "usa-facts",
                           geo_type = "state", geo_values = "pa")
 
 plot(deaths, plot_type = "line", 
-     title = "COVID-19 deaths in PA (7 day trailing avg)")
+     title = "COVID-19 deaths in PA (7-day trailing average)")
 ```
 
 # Example: Hospitalizations

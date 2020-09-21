@@ -85,7 +85,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="covidcast_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Get started with covidcast</h1>
@@ -119,20 +119,20 @@
                    <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"county"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">cli</span>)</pre></body></html></div>
-<pre><code>##   geo_value time_value direction      issue lag     value    stderr sample_size
-## 1     01000 2020-05-01         0 2020-05-23  22 0.8230798 0.1255734   1722.4551
-## 2     01001 2020-05-01         1 2020-05-23  22 1.2612613 0.8004444    115.8025
-## 3     01003 2020-05-01         0 2020-05-23  22 0.6651292 0.3086796    584.3194
-## 4     01015 2020-05-01         0 2020-05-23  22 0.5747126 0.5265904    122.5577
-## 5     01031 2020-05-01        NA 2020-05-23  22 0.4081633 0.3474498    114.8318
-## 6     01045 2020-05-01        NA 2020-05-23  22 0.9259259 0.4660393    110.6544
-##   data_source       signal
-## 1   fb-survey smoothed_cli
-## 2   fb-survey smoothed_cli
-## 3   fb-survey smoothed_cli
-## 4   fb-survey smoothed_cli
-## 5   fb-survey smoothed_cli
-## 6   fb-survey smoothed_cli</code></pre>
+<pre><code>##   geo_value       signal time_value direction      issue lag     value
+## 1     01000 smoothed_cli 2020-05-01        NA 2020-09-03 125 0.8254101
+## 2     01001 smoothed_cli 2020-05-01        NA 2020-09-03 125 1.2994255
+## 3     01003 smoothed_cli 2020-05-01        NA 2020-09-03 125 0.6965968
+## 4     01015 smoothed_cli 2020-05-01        NA 2020-09-03 125 0.4282713
+## 5     01031 smoothed_cli 2020-05-01        NA 2020-09-03 125 0.0255788
+## 6     01045 smoothed_cli 2020-05-01        NA 2020-09-03 125 1.0495589
+##      stderr sample_size data_source
+## 1 0.1360033   1722.4551   fb-survey
+## 2 0.9671356    115.8025   fb-survey
+## 3 0.3247531    584.3194   fb-survey
+## 4 0.5485655    122.5577   fb-survey
+## 5 0.3608268    114.8318   fb-survey
+## 6 0.7086324    110.6544   fb-survey</code></pre>
 <p>Each row represents one observation in one county on one day. The county FIPS code is given in the <code>geo_value</code> column, the date in the <code>time_value</code> column. Here <code>value</code> is the requested signal—in this case, the smoothed estimate of the percentage of people with COVID-like illness, based on the symptom surveys, and <code>stderr</code> is its standard error. See the <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> documentation for details on the returned data frame.</p>
 <p>Notice the use of <code><a href="https://rdrr.io/r/base/message.html">suppressMessages()</a></code> to hide progress reporting from the function as it downloads the data; if you download particularly large amounts of data, you may prefer to allow the progress reporting so you know how long to wait.</p>
 <p>To get a basic summary of the returned data frame:</p>
@@ -153,20 +153,20 @@
                    <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">cli</span>)</pre></body></html></div>
-<pre><code>##   geo_value time_value direction      issue lag     value    stderr sample_size
-## 1        ak 2020-05-01        -1 2020-05-23  22 0.4607721 0.1588797    1606.000
-## 2        al 2020-05-01         0 2020-05-23  22 0.6995113 0.0825528    7540.244
-## 3        ar 2020-05-01        -1 2020-05-23  22 0.7597977 0.1036508    4921.483
-## 4        az 2020-05-01         0 2020-05-23  22 0.5669367 0.0617943   11220.959
-## 5        ca 2020-05-01         0 2020-05-23  22 0.3649080 0.0228033   51870.138
-## 6        co 2020-05-01        -1 2020-05-23  22 0.6458274 0.0684669   10105.894
-##   data_source       signal
-## 1   fb-survey smoothed_cli
-## 2   fb-survey smoothed_cli
-## 3   fb-survey smoothed_cli
-## 4   fb-survey smoothed_cli
-## 5   fb-survey smoothed_cli
-## 6   fb-survey smoothed_cli</code></pre>
+<pre><code>##   geo_value       signal time_value direction      issue lag     value
+## 1        ak smoothed_cli 2020-05-01        NA 2020-09-03 125 0.4607721
+## 2        al smoothed_cli 2020-05-01        NA 2020-09-03 125 0.6994761
+## 3        ar smoothed_cli 2020-05-01        NA 2020-09-03 125 0.7597720
+## 4        az smoothed_cli 2020-05-01        NA 2020-09-03 125 0.5669361
+## 5        ca smoothed_cli 2020-05-01        NA 2020-09-03 125 0.3649079
+## 6        co smoothed_cli 2020-05-01        NA 2020-09-03 125 0.6458274
+##      stderr sample_size data_source
+## 1 0.1591131    1606.000   fb-survey
+## 2 0.0826180    7540.244   fb-survey
+## 3 0.1036828    4921.483   fb-survey
+## 4 0.0618211   11220.959   fb-survey
+## 5 0.0228051   51870.138   fb-survey
+## 6 0.0684792   10105.894   fb-survey</code></pre>
 <p>One can also select a specific geographic region by its ID. For example, this is the FIPS code for Allegheny County, Pennsylvania:</p>
 <div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">cli</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
   <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"fb-survey"</span>, <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"smoothed_cli"</span>,
@@ -174,20 +174,20 @@
                    <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"county"</span>, <span class="kw">geo_value</span> <span class="kw">=</span> <span class="st">"42003"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">cli</span>)</pre></body></html></div>
-<pre><code>##   geo_value time_value direction      issue lag     value    stderr sample_size
-## 1     42003 2020-05-01         0 2020-05-23  22 0.3988456 0.1046833    2635.136
-## 2     42003 2020-05-02         0 2020-05-23  21 0.3802972 0.1069189    2589.751
-## 3     42003 2020-05-03        -1 2020-05-23  20 0.3369257 0.1042580    2552.011
-## 4     42003 2020-05-04        -1 2020-05-23  19 0.1358908 0.0638397    2568.443
-## 5     42003 2020-05-05        -1 2020-05-23  18 0.1438140 0.0668755    2482.389
-## 6     42003 2020-05-06        -1 2020-05-23  17 0.2489833 0.0887830    2530.457
-##   data_source       signal
-## 1   fb-survey smoothed_cli
-## 2   fb-survey smoothed_cli
-## 3   fb-survey smoothed_cli
-## 4   fb-survey smoothed_cli
-## 5   fb-survey smoothed_cli
-## 6   fb-survey smoothed_cli</code></pre>
+<pre><code>##   geo_value       signal time_value direction      issue lag     value
+## 1     42003 smoothed_cli 2020-05-01        NA 2020-09-03 125 0.3990346
+## 2     42003 smoothed_cli 2020-05-02        NA 2020-09-03 124 0.3804239
+## 3     42003 smoothed_cli 2020-05-03        NA 2020-09-03 123 0.3370994
+## 4     42003 smoothed_cli 2020-05-04        NA 2020-09-03 122 0.1359437
+## 5     42003 smoothed_cli 2020-05-05        NA 2020-09-03 121 0.1438750
+## 6     42003 smoothed_cli 2020-05-06        NA 2020-09-03 120 0.2492732
+##      stderr sample_size data_source
+## 1 0.1050942    2635.136   fb-survey
+## 2 0.1073435    2589.751   fb-survey
+## 3 0.1046873    2552.011   fb-survey
+## 4 0.0638714    2568.443   fb-survey
+## 5 0.0669286    2482.389   fb-survey
+## 6 0.0890122    2530.457   fb-survey</code></pre>
 <p>This package provides convenient functions for plotting and mapping these signals. For more details and examples, see <code><a href="../articles/plotting-signals.html">vignette("plotting-signals")</a></code>.</p>
 <div id="finding-counties-and-metro-areas" class="section level3">
 <h3 class="hasAnchor">
@@ -233,26 +233,26 @@
 <div class="sourceCode" id="cb22"><html><body><pre class="r"><span class="no">meta</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_meta.html">covidcast_meta</a></span>()
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">meta</span>)</pre></body></html></div>
 <pre><code>##     data_source           signal time_type geo_type   min_time   max_time
-## 1 doctor-visits smoothed_adj_cli       day   county 2020-02-01 2020-08-16
-## 2 doctor-visits smoothed_adj_cli       day      hrr 2020-02-01 2020-08-16
-## 3 doctor-visits smoothed_adj_cli       day      msa 2020-02-01 2020-08-16
-## 4 doctor-visits smoothed_adj_cli       day    state 2020-02-01 2020-08-16
-## 5 doctor-visits     smoothed_cli       day   county 2020-02-01 2020-08-16
-## 6 doctor-visits     smoothed_cli       day      hrr 2020-02-01 2020-08-16
+## 1 doctor-visits smoothed_adj_cli       day   county 2020-02-01 2020-09-02
+## 2 doctor-visits smoothed_adj_cli       day      hrr 2020-02-01 2020-09-02
+## 3 doctor-visits smoothed_adj_cli       day      msa 2020-02-01 2020-09-02
+## 4 doctor-visits smoothed_adj_cli       day    state 2020-02-01 2020-09-02
+## 5 doctor-visits     smoothed_cli       day   county 2020-02-01 2020-09-02
+## 6 doctor-visits     smoothed_cli       day      hrr 2020-02-01 2020-09-02
 ##   num_locations min_value max_value mean_value stdev_value last_update
-## 1          2510         0  87.67083   2.330678    3.317489  1597878034
-## 2           306         0  47.95543   2.745629    3.127763  1597878034
-## 3           380         0  32.76515   2.452506    2.988213  1597878034
-## 4            51         0  20.56443   2.808507    2.697534  1597878034
-## 5          2514         0  76.56961   1.963440    2.839929  1597878034
-## 6           306         0  44.29551   2.580218    3.048659  1597878034
+## 1          2512         0  87.67083   2.479606    3.352144  1599346864
+## 2           306         0  47.95543   2.890406    3.129863  1599346865
+## 3           380         0  32.76515   2.592552    3.023184  1599346865
+## 4            51         0  20.56443   2.953131    2.700140  1599346865
+## 5          2516         0  76.56961   2.086353    2.864810  1599346865
+## 6           306         0  44.29551   2.721986    3.062019  1599346865
 ##    max_issue min_lag max_lag
-## 1 2020-08-19       2     129
-## 2 2020-08-19       3     129
-## 3 2020-08-19       3     129
-## 4 2020-08-19       3     129
-## 5 2020-08-19       2     129
-## 6 2020-08-19       3     129</code></pre>
+## 1 2020-09-05       2     129
+## 2 2020-09-05       3     129
+## 3 2020-09-05       3     129
+## 4 2020-09-05       3     129
+## 5 2020-09-05       2     129
+## 6 2020-09-05       3     129</code></pre>
 <p>The <code><a href="../reference/covidcast_meta.html">covidcast_meta()</a></code> documentation describes the columns and their meanings. The metadata data frame can be filtered and sliced as desired to obtain information about signals of interest. To get a basic summary of the metadata:</p>
 <div class="sourceCode" id="cb24"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">meta</span>)</pre></body></html></div>
 <p>(We silenced the evaluation because the output of <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> here is still quite long.)</p>
@@ -273,10 +273,10 @@
 ## signal      : smoothed_cli
 ## geo_type    : state
 ## 
-##   geo_value time_value direction      issue lag   value stderr sample_size
-## 1        pa 2020-05-01        -1 2020-05-07   6 2.32192     NA          NA
-##     data_source       signal
-## 1 doctor-visits smoothed_cli</code></pre>
+##   geo_value       signal time_value direction      issue lag   value stderr
+## 1        pa smoothed_cli 2020-05-01        -1 2020-05-07   6 2.32192     NA
+##   sample_size   data_source
+## 1          NA doctor-visits</code></pre>
 <p>This shows that an estimate of about 2.3% was issued on May 7. If we don’t specify <code>as_of</code>, we get the most recent estimate available:</p>
 <div class="sourceCode" id="cb27"><html><body><pre class="r"><span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"doctor-visits"</span>, <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"smoothed_cli"</span>,
                  <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-05-01"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-05-01"</span>,
@@ -287,10 +287,10 @@
 ## signal      : smoothed_cli
 ## geo_type    : state
 ## 
-##   geo_value time_value direction      issue lag    value stderr sample_size
-## 1        pa 2020-05-01        -1 2020-07-04  64 5.075015     NA          NA
-##     data_source       signal
-## 1 doctor-visits smoothed_cli</code></pre>
+##   geo_value       signal time_value direction      issue lag    value stderr
+## 1        pa smoothed_cli 2020-05-01        -1 2020-07-04  64 5.075015     NA
+##   sample_size   data_source
+## 1          NA doctor-visits</code></pre>
 <p>Note the substantial change in the estimate, to over 5%, reflecting new data that became available <em>after</em> May 7 about visits occurring on May 1. This illustrates the importance of issue date tracking, particularly for forecasting tasks. To backtest a forecasting model on past data, it is important to use the data that would have been available <em>at the time</em>, not data that arrived much later.</p>
 <p>By using the <code>issues</code> argument, we can request all issues in a certain time period:</p>
 <div class="sourceCode" id="cb29"><html><body><pre class="r"><span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"doctor-visits"</span>, <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"smoothed_cli"</span>,
@@ -303,49 +303,51 @@
 ## signal      : smoothed_cli
 ## geo_type    : state
 ## 
-##   geo_value time_value direction      issue lag    value stderr sample_size
-## 1        pa 2020-05-01        -1 2020-05-07   6 2.321920     NA          NA
-## 2        pa 2020-05-01         0 2020-05-08   7 2.897032     NA          NA
-## 3        pa 2020-05-01         0 2020-05-09   8 2.956456     NA          NA
-## 4        pa 2020-05-01         0 2020-05-12  11 3.190634     NA          NA
-## 5        pa 2020-05-01         0 2020-05-13  12 3.220023     NA          NA
-## 6        pa 2020-05-01         0 2020-05-14  13 3.231314     NA          NA
-## 7        pa 2020-05-01         0 2020-05-15  14 3.239970     NA          NA
-##     data_source       signal
-## 1 doctor-visits smoothed_cli
-## 2 doctor-visits smoothed_cli
-## 3 doctor-visits smoothed_cli
-## 4 doctor-visits smoothed_cli
-## 5 doctor-visits smoothed_cli
-## 6 doctor-visits smoothed_cli
-## 7 doctor-visits smoothed_cli</code></pre>
+##   geo_value       signal time_value direction      issue lag    value stderr
+## 1        pa smoothed_cli 2020-05-01        -1 2020-05-07   6 2.321920     NA
+## 2        pa smoothed_cli 2020-05-01         0 2020-05-08   7 2.897032     NA
+## 3        pa smoothed_cli 2020-05-01         0 2020-05-09   8 2.956456     NA
+## 4        pa smoothed_cli 2020-05-01         0 2020-05-12  11 3.190634     NA
+## 5        pa smoothed_cli 2020-05-01         0 2020-05-13  12 3.220023     NA
+## 6        pa smoothed_cli 2020-05-01         0 2020-05-14  13 3.231314     NA
+## 7        pa smoothed_cli 2020-05-01         0 2020-05-15  14 3.239970     NA
+##   sample_size   data_source
+## 1          NA doctor-visits
+## 2          NA doctor-visits
+## 3          NA doctor-visits
+## 4          NA doctor-visits
+## 5          NA doctor-visits
+## 6          NA doctor-visits
+## 7          NA doctor-visits</code></pre>
 <p>This estimate was clearly updated many times as new data for May 1st arrived. Note that these results include only data issued or updated between 2020-05-01 and 2020-05-15. If a value was first reported on 2020-04-15, and never updated, a query for issues between 2020-05-01 and 2020-05-15 will not include that value among its results.</p>
 <p>Finally, we can use the <code>lag</code> argument to request only data reported with a certain lag. For example, requesting a lag of 7 days means to request only issues 7 days after the corresponding <code>time_value</code>:</p>
 <div class="sourceCode" id="cb31"><html><body><pre class="r"><span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"doctor-visits"</span>, <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"smoothed_cli"</span>,
                  <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-05-01"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-05-07"</span>,
                  <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>, <span class="kw">geo_values</span> <span class="kw">=</span> <span class="st">"pa"</span>, <span class="kw">lag</span> <span class="kw">=</span> <span class="fl">7</span>)</pre></body></html></div>
 <pre><code>## Warning in single_geo(data_source, signal, start_day, end_day, geo_type, :
-## Fetching data for 20200503 in geography 'pa': no results</code></pre>
+## Fetching smoothed_cli from doctor-visits for 20200503 in geography 'pa': no
+## results</code></pre>
 <pre><code>## Warning in single_geo(data_source, signal, start_day, end_day, geo_type, :
-## Fetching data for 20200504 in geography 'pa': no results</code></pre>
+## Fetching smoothed_cli from doctor-visits for 20200504 in geography 'pa': no
+## results</code></pre>
 <pre><code>## A `covidcast_signal` data frame with 5 rows and 10 columns.
 ## 
 ## data_source : doctor-visits
 ## signal      : smoothed_cli
 ## geo_type    : state
 ## 
-##   geo_value time_value direction      issue lag    value stderr sample_size
-## 1        pa 2020-05-01         0 2020-05-08   7 2.897032     NA          NA
-## 2        pa 2020-05-02        -1 2020-05-09   7 2.802238     NA          NA
-## 3        pa 2020-05-05         0 2020-05-12   7 3.483125     NA          NA
-## 4        pa 2020-05-06         0 2020-05-13   7 2.968670     NA          NA
-## 5        pa 2020-05-07         0 2020-05-14   7 2.400255     NA          NA
-##     data_source       signal
-## 1 doctor-visits smoothed_cli
-## 2 doctor-visits smoothed_cli
-## 3 doctor-visits smoothed_cli
-## 4 doctor-visits smoothed_cli
-## 5 doctor-visits smoothed_cli</code></pre>
+##   geo_value       signal time_value direction      issue lag    value stderr
+## 1        pa smoothed_cli 2020-05-01         0 2020-05-08   7 2.897032     NA
+## 2        pa smoothed_cli 2020-05-02        -1 2020-05-09   7 2.802238     NA
+## 3        pa smoothed_cli 2020-05-05         0 2020-05-12   7 3.483125     NA
+## 4        pa smoothed_cli 2020-05-06         0 2020-05-13   7 2.968670     NA
+## 5        pa smoothed_cli 2020-05-07         0 2020-05-14   7 2.400255     NA
+##   sample_size   data_source
+## 1          NA doctor-visits
+## 2          NA doctor-visits
+## 3          NA doctor-visits
+## 4          NA doctor-visits
+## 5          NA doctor-visits</code></pre>
 <p>Note that though this query requested all values between 2020-05-01 and 2020-05-07, May 3rd and May 4th were <em>not</em> included in the results set. This is because the query will only include a result for May 3rd if a value were issued on May 10th (a 7-day lag), but in fact the value was not updated on that day:</p>
 <div class="sourceCode" id="cb35"><html><body><pre class="r"><span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"doctor-visits"</span>, <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"smoothed_cli"</span>,
                  <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-05-03"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-05-03"</span>,
@@ -357,18 +359,18 @@
 ## signal      : smoothed_cli
 ## geo_type    : state
 ## 
-##   geo_value time_value direction      issue lag    value stderr sample_size
-## 1        pa 2020-05-03        -1 2020-05-09   6 2.749537     NA          NA
-## 2        pa 2020-05-03        -1 2020-05-12   9 2.989626     NA          NA
-## 3        pa 2020-05-03        -1 2020-05-13  10 3.006860     NA          NA
-## 4        pa 2020-05-03        -1 2020-05-14  11 2.970561     NA          NA
-## 5        pa 2020-05-03        -1 2020-05-15  12 3.038054     NA          NA
-##     data_source       signal
-## 1 doctor-visits smoothed_cli
-## 2 doctor-visits smoothed_cli
-## 3 doctor-visits smoothed_cli
-## 4 doctor-visits smoothed_cli
-## 5 doctor-visits smoothed_cli</code></pre>
+##   geo_value       signal time_value direction      issue lag    value stderr
+## 1        pa smoothed_cli 2020-05-03        -1 2020-05-09   6 2.749537     NA
+## 2        pa smoothed_cli 2020-05-03        -1 2020-05-12   9 2.989626     NA
+## 3        pa smoothed_cli 2020-05-03        -1 2020-05-13  10 3.006860     NA
+## 4        pa smoothed_cli 2020-05-03        -1 2020-05-14  11 2.970561     NA
+## 5        pa smoothed_cli 2020-05-03        -1 2020-05-15  12 3.038054     NA
+##   sample_size   data_source
+## 1          NA doctor-visits
+## 2          NA doctor-visits
+## 3          NA doctor-visits
+## 4          NA doctor-visits
+## 5          NA doctor-visits</code></pre>
 </div>
   </div>
 

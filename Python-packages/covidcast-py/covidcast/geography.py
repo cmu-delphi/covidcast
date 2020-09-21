@@ -189,7 +189,7 @@ def name_to_fips(name: Union[str, Iterable],
     """
     if state:
         state = state.upper()
-        df = COUNTY_CENSUS.loc[COUNTY_CENSUS.STNAME == abbr_to_name(state)[0]]  # type:ignore
+        df = COUNTY_CENSUS.loc[COUNTY_CENSUS.STNAME == abbr_to_name(state)[0]]
     else:
         df = COUNTY_CENSUS
     return _lookup(name, df.CTYNAME, df.FIPS, ignore_case, fixed, ties_method)

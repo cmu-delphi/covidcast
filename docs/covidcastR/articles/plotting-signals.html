@@ -85,7 +85,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="plotting-signals_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Plotting and mapping signals</h1>
@@ -108,7 +108,7 @@
                    <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-07-01"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-07-14"</span>)
 )
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">df_comb</span>)</pre></body></html></div>
-<pre><code>## A `covidcast_signal` data frame with 28921 rows and 10 columns.
+<pre><code>## A `covidcast_signal` data frame with 29073 rows and 10 columns.
 ## 
 ## data_source : indicator-combination
 ## signal      : nmf_day_doc_fbc_fbs_ght
@@ -116,7 +116,7 @@
 ## 
 ## first date                          : 2020-07-01
 ## last date                           : 2020-07-14
-## median number of geo_values per day : 2064</code></pre>
+## median number of geo_values per day : 2076</code></pre>
 <div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">df_inum</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
   <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"jhu-csse"</span>,
                    <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"confirmed_7dav_incidence_num"</span>,

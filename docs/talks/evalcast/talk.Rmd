@@ -1,0 +1,358 @@
+---
+title: "Delphi's COVIDcast Project: <br> Tools for Comprehensive Evaluation of Forecasters"
+author: Jacob Bien <br> Data Science and Operations  <br> University of Southern California <br> 
+date: "<br> ![](delphi.png) ![](cmu.png) <br><br> September 22, 2020"
+footer: "Get the slides at: cmu-delphi.github.io/covidcast/talks/evalcast/talk.html"
+output: 
+  slidy_presentation:
+    theme: cerulean
+    highlight: tango
+    font_adjustment: +1
+    css: style.css
+    includes: 
+      after_body: script.html
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, cache=TRUE, autodep=TRUE, 
+                      cache.comments=TRUE)
+library(tidyverse)
+library(covidcast)
+library(gridExtra)
+
+col = function(x, color = "#bb0000") {
+  sprintf("<span style='color: %s;'>%s</span>", color, x)
+}
+```
+
+# COVIDcast (recall from past talks)
+
+The COVIDcast project has many parts: 
+    
+1. Unique relationships with partners in tech and healthcare granting us to access to data on pandemic activity
+2. Code and infrastructure to build `r col("COVID-19 indicators")`, continuously-updated and geographically comprehensive
+3. A historical database of all indicators, including `r col("revision tracking")`, with over 500 million observations
+4. A [public API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html) serving new indicators daily (and [R and Python packages](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_clients.html) for client support)
+5. [Interactive maps and graphics](https://covidcast.cmu.edu) to display our indicators
+6. `r col("Forecasting and modeling")` work building on the indicators
+
+# This Talk
+
+Today: How to `r col("evaluate")` forecaster performance?
+
+- The newest Delphi R package: `evalcast`
+
+```{r, eval=FALSE}
+devtools::install_github("cmu-delphi/covidcast", ref = "evalcast", subdir = "R-packages/evalcast")
+```
+
+
+- Handling backfill
+
+- Our favorite plots and error measures
+
+- Mixed effects model for comparing forecasters
+
+Reproducible talk: all code included
+
+<br>
+
+# Using `evalcast`: 3 Steps
+
+**Step #1.** Run your forecaster to create a `r col("predictions card")`.
+
+- Define `signals`: Which [COVIDcast signals](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html) will your forecaster use?
+
+```{r}
+signals <- tibble(data_source = "jhu-csse", 
+                  signal = c("deaths_incidence_num", "confirmed_incidence_num"), 
+                  start_day = "2020-06-15")
+```
+ 
+- Use `evalcast::get_predictions` to define the task and run your forecaster.
+
+```{r,cache=TRUE}
+library(evalcast)
+# input the forecaster and define the exact task
+predictions_cards <- get_predictions(
+  baseline_forecaster, # put your forecaster here
+  name_of_forecaster = "baseline", # give it a name
+  signals, # with what data?
+  forecast_dates = c("2020-07-20", "2020-07-27"), # on what days?
+  incidence_period = "epiweek", # over what period?
+  ahead = 3, # at what horizon?
+  geo_type = "state" # at what geographic scale?
+  )
+```
+
+# Using `evalcast`: 3 Steps
+
+**Step #1.** Run your forecaster to create a `r col("predictions card")`.
+
+23 quantiles at every location...
+
+```{r}
+predictions_cards[[1]] # first of two dates
+```
+
+# Using `evalcast`: 3 Steps
+
+**Step #1.** Run your forecaster to create a `r col("predictions card")`.
+
+23 quantiles in Alabama...
+
+```{r}
+predictions_cards[[1]]$forecast_distribution[[1]] # Alabama
+```
+
+
+# Using `evalcast`: 3 Steps
+
+**Step #2.** Create a `r col("score card")`.
+
+- Define some error measures (or use our defaults)
+
+- Run `evalcast::evaluate_predictions` to generate your forecaster's `r col("score card")`.
+
+```{r, cache=TRUE, results='hide'}
+scorecard <- evaluate_predictions(predictions_cards, backfill_buffer = 10)
+```
+
+# Using `evalcast`: 3 Steps
+
+**Step #3.** Analyze forecaster performance.
+
+- Make plots
+
+- Compare forecasters across locations and times
+
+# Why does `evalcast::get_predictions` run the forecaster?
+
+- Couldn't we just let the user produce the predictions card?
+
+
+- For accurate evaluation, need to account for `r col("data revision")` ...[see COVIDcast API slides](https://cmu-delphi.github.io/covidcast/talks/intro-api/talk.html#(21))
+
+# Example: Backfill in Doctor's Visits Signal
+
+The last two weeks of August in CA...
+
+```{r, fig.width=9, fig.height=6,cache=TRUE}
+# Let's get the data that was available as of 9/21 about the last two weeks 
+# of August in CA:
+dv <- covidcast_signal(data_source = "doctor-visits", 
+                      signal = "smoothed_adj_cli",
+                      start_day = "2020-08-15",
+                      end_day = "2020-08-31",
+                      geo_type = "state",
+                      geo_values = "ca",
+                      as_of = "2020-09-21")
+ggplot(dv, aes(x = time_value, y = value)) + 
+  geom_line() +
+  xlim(as.Date("2020-08-15", origin = "1970-01-01"),
+       as.Date("2020-09-21", origin = "1970-01-01")) +
+  ylim(3.83, 5.92) +
+  geom_vline(aes(xintercept = as.Date("2020-09-21", origin = "1970-01-01")), lty = 2) +
+  labs(x = "Date", y = "% doctor's visits due to CLI",
+       title = "California, end of August") +
+  #theme_bw() + 
+  theme(legend.pos = "bottom")
+```
+
+
+# Example: Backfill in Doctor's Visits Signal
+
+The last two weeks of August in CA...
+
+```{r, fig.width=9, fig.height=6, cache=TRUE}
+# Loop over "as of" dates, fetch data from the API for each one
+as_ofs = seq(as.Date("2020-09-01"), as.Date("2020-09-21"), length = 6)[-6]
+dv_as_of = map_dfr(as_ofs, function(as_of) {
+  covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
+                   start_day = "2020-08-15", end_day = "2020-08-31", 
+                   geo_type = "state", geo_values = "ca", as_of = as_of)
+})
+# Now plot the each "as of" time series curve
+dv_as_of %>% 
+  filter(issue == as.Date("2020-09-01")) %>% 
+  ggplot(aes(x = time_value, y = value)) + 
+  geom_line(aes(color = factor(issue))) + 
+  geom_vline(aes(color = factor(issue), xintercept = issue), lty = 2) +
+  xlim(as.Date("2020-08-15", origin = "1970-01-01"),
+       as.Date("2020-09-21", origin = "1970-01-01")) +
+  ylim(3.83, 5.92) +
+  labs(color = "as of", x = "Date", y = "% doctor's visits due to CLI",
+       title = "California, end of August") +
+  geom_line(data = dv, aes(x = time_value, y = value)) +
+  geom_vline(aes(xintercept = as.Date("2020-09-21", origin = "1970-01-01")), lty = 2) +
+  #theme_bw() + 
+  theme(legend.pos = "none")
+```
+
+# Example: Backfill in Doctor's Visits Signal
+
+The last two weeks of August in CA...
+
+```{r, fig.width=9, fig.height=6, cache=TRUE}
+# Loop over "as of" dates, fetch data from the API for each one
+as_ofs = seq(as.Date("2020-09-01"), as.Date("2020-09-21"), length = 6)[-6]
+dv_as_of = map_dfr(as_ofs, function(as_of) {
+  covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
+                   start_day = "2020-08-15", end_day = "2020-08-31", 
+                   geo_type = "state", geo_values = "ca", as_of = as_of)
+})
+# Now plot the each "as of" time series curve
+dv_as_of %>% 
+  ggplot(aes(x = time_value, y = value)) + 
+  geom_line(aes(color = factor(issue))) + 
+  geom_vline(aes(color = factor(issue), xintercept = issue), lty = 2) +
+  xlim(as.Date("2020-08-15", origin = "1970-01-01"),
+       as.Date("2020-09-21", origin = "1970-01-01")) +
+  ylim(3.83, 5.92) +
+  labs(color = "as of", x = "Date", y = "% doctor's visits due to CLI",
+       title = "California, end of August") +
+  geom_line(data = dv, aes(x = time_value, y = value)) +
+  geom_vline(aes(xintercept = as.Date("2020-09-21", origin = "1970-01-01")), lty = 2) +
+  #theme_bw() + 
+  theme(legend.pos = "none")
+```
+
+# Implications for Forecasting and Evaluation
+
+1. In backtesting, we should provide the forecaster the data that `r col("would have been available")` as of the forecast date.  Otherwise, performance assessment may be naively optimistic.
+
+2. Trained forecasters that do not account for backfill may learn to rely too heavily on recent data.
+
+3. Evaluation relies on the "actual outcome", but this might not be reliably known until some time has passed.
+
+Note: `evalcast::evaluate_predictions` has a `backfill_buffer` parameter that forces one to wait a certain amount of time before trying to evaluate.
+
+# Evaluation Plots
+
+- user can define any error measure
+
+- a few are built-in
+
+```{r}
+err_measures <- list(ae = absolute_error,
+                     wis = weighted_interval_score,
+                     coverage_80 = interval_coverage(alpha = 0.2))
+```
+
+For more on weighted interval score, see [Bracher et al. (2020)](https://arxiv.org/pdf/2005.12881.pdf).
+
+# Comparing COVID Hub Forecasters
+
+`evalcast::get_covidhub_predictions` gets data submitted to [reichlab/covid19-forecast-hub](https://github.com/reichlab/covid19-forecast-hub/tree/master/data-processed).
+
+```{r scorecards, cache=TRUE, results='hide'}
+forecast_dates <- seq(lubridate::ymd("2020-08-03"),
+                      lubridate::ymd("2020-08-17"), by = 7)
+CH_baseline <- get_covidhub_predictions("COVIDhub-baseline",
+                                        forecast_dates, 
+                                        ahead = 3,
+                                        geo_type = "state", 
+                                        response_signal = "deaths_incidence_num")
+CH_ensemble <- get_covidhub_predictions("COVIDhub-ensemble", 
+                                        forecast_dates, 
+                                        ahead = 3,
+                                        geo_type = "state", 
+                                        response_signal = "deaths_incidence_num")
+scorecard_CH_baseline <- evaluate_predictions(CH_baseline)[[1]]
+scorecard_CH_ensemble <- evaluate_predictions(CH_ensemble)[[1]]
+scorecards <- list(scorecard_CH_baseline, scorecard_CH_ensemble)
+```
+
+# Absolute error
+
+```{r}
+scorecards <- list(scorecard_CH_baseline, scorecard_CH_ensemble)
+plot_measure(scorecards, err_name = "ae", type = "dotplot") +
+  labs(x = "Absolute Error", y = "")
+```
+
+# Weighted Interval Score
+
+```{r}
+scorecards <- list(scorecard_CH_baseline, scorecard_CH_ensemble)
+plot_measure(scorecards, err_name = "wis", type = "dotplot") +
+  labs(x = "Weighted Interval Score", y = "")
+```
+
+# Calibration
+
+```{r, fig.width=12, fig.height=4}
+plot_calibration(scorecard_CH_ensemble, type = "wedgeplot")
+```
+
+# Proportion Above/Below
+
+A miscalibrated 80\% interval
+
+```{r, fig.width=7, fig.height=5}
+# Blue, red (similar to ggplot defaults)
+ggplot_colors = c("#00AFBB", "#FC4E07")
+x = seq(-3, 3, length = 1000)
+y = dnorm(x)
+q1 = qnorm(0.1); q1_hat = qnorm(0.07)
+q2 = qnorm(0.9); q2_hat = qnorm(0.85)
+par(mar = c(0,0,0,0))
+plot(x, dnorm(x), type = "l", axes = FALSE)
+abline(v = c(q1, q2), lwd = 2, lty = 2, col = "gray")
+abline(v = c(q1_hat, q2_hat), lwd = 2, lty = 2, col = ggplot_colors)
+polygon(c(x[x < q1_hat], max(x[x < q1_hat])), 
+        c(y[x < q1_hat], min(y[x < q1_hat])),
+        col = adjustcolor(ggplot_colors[1], alpha.f = 0.5), border = NA)
+polygon(c(min(x[x > q2_hat]), x[x > q2_hat]), 
+        c(min(y[x > q2_hat]), y[x > q2_hat]),
+        col = adjustcolor(ggplot_colors[2], alpha.f = 0.5), border = NA)
+text(min(x), max(y[x < q1_hat]), labels = "0.07 (should be 0.1)", pos = 4)
+text(max(x), max(y[x < q1_hat]), labels = "0.15 (should be 0.1)", pos = 2)
+```
+
+*Image credit: Ryan Tibshirani*
+
+# Interval Width
+
+```{r, fig.width=12, fig.height=4}
+plot_width(scorecards) + scale_y_log10()
+```
+
+# Do We Have Evidence That One Forecaster Is Better than Another?
+
+- **Challenge:** Dependence induced by common locations and common forecast dates
+
+- **Approach:** Mixed effects models for forecaster comparison based on an error measure $E_{\ell t f}$
+
+- e.g., $E_{\ell tf} = \log(\text{Absolute Error}_{\ell tf})$
+
+
+$$
+E_{\ell tf} = \mu + \alpha_f + a_\ell + b_t + \epsilon_{\ell tf},
+$$
+
+- Location-specific random effects $a_\ell$
+
+- Time-specific random effects $b_t$
+
+- $\mu$ - expected performance of baseline forecaster 
+
+- Forecaster-specific fixed effects $\alpha_f$ are of primary interest.  E.g., $\alpha_f>0$?
+
+- Coming soon to `evalcast`
+
+# Thanks
+
+- The [whole Delphi team](https://covidcast.cmu.edu/covid19-response-team.html), and various CMU units
+- especially: Alden Green, Ryan Tibshirani, Balasubramanian Narasimhan, Samyak Rajanala, Rob Tibshirani
+- Reich Lab
+- Centers for Disease Control and Prevention
+
+- `evalcast` R package [here](https://github.com/cmu-delphi/covidcast/tree/evalcast/R-packages/evalcast)
+
+Go to: <https://covidcast.cmu.edu> ... you'll find everything linked from there!
+
+<br>
+
+![Delphi](delphi.png) ![Carnegie Mellon University](cmu.png)
+

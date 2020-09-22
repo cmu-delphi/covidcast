@@ -233,26 +233,26 @@
 <div class="sourceCode" id="cb22"><html><body><pre class="r"><span class="no">meta</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/covidcast_meta.html">covidcast_meta</a></span>()
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">meta</span>)</pre></body></html></div>
 <pre><code>##     data_source           signal time_type geo_type   min_time   max_time
-## 1 doctor-visits smoothed_adj_cli       day   county 2020-02-01 2020-09-02
-## 2 doctor-visits smoothed_adj_cli       day      hrr 2020-02-01 2020-09-02
-## 3 doctor-visits smoothed_adj_cli       day      msa 2020-02-01 2020-09-02
-## 4 doctor-visits smoothed_adj_cli       day    state 2020-02-01 2020-09-02
-## 5 doctor-visits     smoothed_cli       day   county 2020-02-01 2020-09-02
-## 6 doctor-visits     smoothed_cli       day      hrr 2020-02-01 2020-09-02
+## 1 doctor-visits smoothed_adj_cli       day   county 2020-02-01 2020-09-15
+## 2 doctor-visits smoothed_adj_cli       day      hrr 2020-02-01 2020-09-15
+## 3 doctor-visits smoothed_adj_cli       day      msa 2020-02-01 2020-09-15
+## 4 doctor-visits smoothed_adj_cli       day    state 2020-02-01 2020-09-15
+## 5 doctor-visits     smoothed_cli       day   county 2020-02-01 2020-09-15
+## 6 doctor-visits     smoothed_cli       day      hrr 2020-02-01 2020-09-15
 ##   num_locations min_value max_value mean_value stdev_value last_update
-## 1          2512         0  87.67083   2.479606    3.352144  1599346864
-## 2           306         0  47.95543   2.890406    3.129863  1599346865
-## 3           380         0  32.76515   2.592552    3.023184  1599346865
-## 4            51         0  20.56443   2.953131    2.700140  1599346865
-## 5          2516         0  76.56961   2.086353    2.864810  1599346865
-## 6           306         0  44.29551   2.721986    3.062019  1599346865
+## 1          2514         0  87.67083   2.573882    3.358055  1600470729
+## 2           306         0  47.95543   2.997670    3.132400  1600470729
+## 3           380         0  32.76515   2.696446    3.050960  1600470729
+## 4            52         0  32.79256   3.065387    2.743400  1600470729
+## 5          2517         0  76.56961   2.167686    2.872418  1600470729
+## 6           306         0  44.29551   2.823368    3.063776  1600470729
 ##    max_issue min_lag max_lag
-## 1 2020-09-05       2     129
-## 2 2020-09-05       3     129
-## 3 2020-09-05       3     129
-## 4 2020-09-05       3     129
-## 5 2020-09-05       2     129
-## 6 2020-09-05       3     129</code></pre>
+## 1 2020-09-18       2     129
+## 2 2020-09-18       3     129
+## 3 2020-09-18       3     129
+## 4 2020-09-18       3     129
+## 5 2020-09-18       2     129
+## 6 2020-09-18       3     129</code></pre>
 <p>The <code><a href="../reference/covidcast_meta.html">covidcast_meta()</a></code> documentation describes the columns and their meanings. The metadata data frame can be filtered and sliced as desired to obtain information about signals of interest. To get a basic summary of the metadata:</p>
 <div class="sourceCode" id="cb24"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">meta</span>)</pre></body></html></div>
 <p>(We silenced the evaluation because the output of <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> here is still quite long.)</p>
@@ -324,12 +324,10 @@
 <div class="sourceCode" id="cb31"><html><body><pre class="r"><span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"doctor-visits"</span>, <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"smoothed_cli"</span>,
                  <span class="kw">start_day</span> <span class="kw">=</span> <span class="st">"2020-05-01"</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="st">"2020-05-07"</span>,
                  <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>, <span class="kw">geo_values</span> <span class="kw">=</span> <span class="st">"pa"</span>, <span class="kw">lag</span> <span class="kw">=</span> <span class="fl">7</span>)</pre></body></html></div>
-<pre><code>## Warning in single_geo(data_source, signal, start_day, end_day, geo_type, :
-## Fetching smoothed_cli from doctor-visits for 20200503 in geography 'pa': no
-## results</code></pre>
-<pre><code>## Warning in single_geo(data_source, signal, start_day, end_day, geo_type, :
-## Fetching smoothed_cli from doctor-visits for 20200504 in geography 'pa': no
-## results</code></pre>
+<pre><code>## Warning: Fetching smoothed_cli from doctor-visits for 20200503 in geography
+## 'pa': no results</code></pre>
+<pre><code>## Warning: Fetching smoothed_cli from doctor-visits for 20200504 in geography
+## 'pa': no results</code></pre>
 <pre><code>## A `covidcast_signal` data frame with 5 rows and 10 columns.
 ## 
 ## data_source : doctor-visits

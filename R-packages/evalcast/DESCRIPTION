@@ -1,0 +1,57 @@
+Package: evalcast
+Type: Package
+Title: Evaluating COVID-19 Forecasters Built on covidcast
+Version: 0.1.0
+Authors@R: 
+  c(
+    person(given = "Jacob",
+           family = "Bien",
+           role = c("aut", "cre"),
+           email = "jbien@usc.edu"),
+    person(given = "Alden",
+           family = "Green",
+           role = "aut"),
+    person(given = "Balasubramanian",
+           family = "Narasimhan",
+           role = "aut"),
+    person(given = "Samyak",
+           family = "Rajanala",
+           role = "ctb"),
+    person(given = "Aaron",
+           family = "Rumack",
+           role = "ctb"),
+    person(given = "Ryan",
+           family = "Tibshirani",
+           role = "ctb"))
+Description: This package is a tool for those developing probabilistic COVID-19
+    forecasters.  It provides functionality for accurately evaluating 
+    forecaster performance.  Crucially, evalcast leverages the covidcast R 
+    package's "as of" capability, which allows one to get the data that would 
+    have been known as of a particular date in the past.  This is important for
+    honest evaluation of COVID-19 forecasters because data sources often
+    perform "backfill" in which previous estimates about the past are updated.
+    Without properly accounting for backfill, traditional backtesting can lead
+    to overly optimistic evaluations of one's forecaster.  Furthermore, naively
+    training on historical data that has already been backfilled may lead a 
+    trained model to rely too heavily on the most recent data that has yet to
+    settle.  Such forecasters may end up performing far worse in prospective 
+    evaluation than in backtesting.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.1
+Remotes: github::cmu-delphi/covidcast/R-packages/covidcast@main
+Imports: 
+    covidcast,
+    dplyr,
+    magrittr,
+    lubridate,
+    purrr,
+    tibble,
+    tidyr,
+    stringr,
+    readr,
+    MMWRweek,
+    zoo
+Suggests: 
+    testthat

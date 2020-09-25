@@ -253,11 +253,12 @@ def _combine_megacounties(data, county_col, geo_info):
     merged = data.merge(geo_info, how="left", left_on=county_col, right_on="GEOID", sort=True)
     missing = set(geo_info.GEOID) - set(data.geo_value)
     for i, row in merged.iterrows():
-        if row.geo_value.endswith("000"):
+        if _is_megacounty(row.geo_value):
             state = row.geo_value[:2]
             state_missing = [j for j in missing if j.startswith(state)]
             combined_poly = geo_info.loc[geo_info.GEOID.isin(state_missing), "geometry"].unary_union
             # pandas has a bug when assigning MultiPolygons, so you need to do this weird workaround
+            # https://github.com/geopandas/geopandas/issues/992
             merged.loc[[i], "geometry"] = gpd.GeoSeries(combined_poly).values
             merged.loc[[i], "STATEFP"] = state
     return merged
@@ -266,7 +267,7 @@ def _combine_megacounties(data, county_col, geo_info):
 def _distribute_megacounties(data, county_col, geo_info, join_type, input_cols):
     # join all counties with valid FIPS
     merged = data.merge(geo_info, how=join_type, left_on=county_col, right_on="GEOID", sort=True)
-    mega_df = data.loc[[i.endswith("000") for i in data[county_col]], :]
+    mega_df = data.loc[[_is_megacounty(i) for i in data[county_col]], :]
     if not mega_df.empty and join_type == "right":
         # if mega counties exist, join them on state
         merged = merged.merge(mega_df, how="left", left_on="STATEFP", right_on="state", sort=True)
@@ -318,3 +319,7 @@ def _join_hrr_geo_df(data: pd.DataFrame,
     # get the first state, which will be the first two characters in the HRR name
     merged["state_fips"] = [STATE_ABBR_TO_FIPS.get(i[:2]) for i in merged.hrr_name]
     return gpd.GeoDataFrame(merged[input_cols + ["state_fips", "geometry"]])
+
+
+def _is_megacounty(fips: str) -> bool:
+    return fips.endswith("000") and len(fips) == 5

@@ -19,8 +19,10 @@ details.)
 >>> import covidcast
 >>> from datetime import date
 >>> from matplotlib import pyplot as plt
->>> data = covidcast.signal("fb-survey", "smoothed_cli",
-...                         date(2020, 8, 3), date(2020, 8, 4),
+>>> data = covidcast.signal("fb-survey",
+...                         "smoothed_cli",
+...                         date(2020, 8, 3),
+...                         date(2020, 8, 4),
 ...                         geo_type="county")
 >>> covidcast.plot_choropleth(data)
 >>> plt.show()
@@ -36,8 +38,10 @@ details.)
 
 State-level data can also be mapped:
 
->>> data = covidcast.signal("fb-survey", "smoothed_cli",
-...                         date(2020, 8, 3), date(2020, 8, 4),
+>>> data = covidcast.signal("fb-survey",
+...                         "smoothed_cli",
+...                         date(2020, 8, 3),
+...                         date(2020, 8, 4),
 ...                         geo_type="state")
 >>> covidcast.plot_choropleth(data)
 >>> plt.show()
@@ -54,8 +58,10 @@ State-level data can also be mapped:
 Regions where no information is present are presented in light grey, as demonstrated by these MSA
 and HRR plots.
 
->>> data = covidcast.signal("fb-survey", "smoothed_cli",
-...                         date(2020, 8, 3), date(2020, 8, 4),
+>>> data = covidcast.signal("fb-survey",
+...                         "smoothed_cli",
+...                         date(2020, 8, 3),
+...                         date(2020, 8, 4),
 ...                         geo_type="msa")
 >>> covidcast.plot_choropleth(data)
 >>> plt.show()
@@ -111,6 +117,41 @@ which can be stored and altered further.
 >>> fig = plotting.plot_choropleth(data)
 >>> fig.set_dpi(100)
 
+Animations
+----------
+To create an animation, simply pass the signal DataFrame to :py:func:`covidcast.animate`.
+The following code creates an MP4 file named `test_plot.mp4` which animates our daily signal for
+the month of August.
+
+>>> data = covidcast.signal("fb-survey",
+...                         "smoothed_cli",
+...                         date(2020, 8, 1),
+...                         date(2020, 8, 31),
+...                         geo_type = "county")
+>>> covidcast.animate(data, "test_plot.mp4")
+
+.. raw:: html
+
+    <video width="640" height="480" playsinline autoplay muted loop>
+      <source src="_static/example_default_animation.mp4" type="video/mp4">
+        Your browser does not support the HTML5 Video element
+    </video>
+
+Video frame rate and resolution are adjustable. Like the static maps, additional plotting
+keyword arguments can be provided and are passed to :py:func:`covidcast.plot_choropleth`.
+
+>>> covidcast.animate(df,
+...                   "test_plot2.mp4",
+...                   fps=2,
+...                   cmap="viridis")
+
+.. raw:: html
+
+    <video width="640" height="480" playsinline autoplay muted loop>
+      <source src="_static/example_custom_animation.mp4" type="video/mp4">
+        Your browser does not support the HTML5 Video element
+    </video>
+
 Further customization
 ---------------------
 If more control is desired, the signal data can be passed to :py:func:`covidcast.get_geo_df`, which
@@ -130,8 +171,10 @@ This operation depends on having only one row of signal information per
 geographic region. If this is not the the case, you must specify another join
 with the ``join_type`` argument.
 
->>> data = covidcast.signal("fb-survey", "smoothed_cli",
-...                         date(2020, 8, 4), date(2020, 8, 4),
+>>> data = covidcast.signal("fb-survey",
+...                         "smoothed_cli",
+...                         date(2020, 8, 4),
+...                         date(2020, 8, 4),
 ...                         geo_type = "county")
 >>> covidcast.get_geo_df(data)
      geo_value time_value  direction      issue  lag     value    stderr  sample_size geo_type data_source        signal                                           geometry state_fips

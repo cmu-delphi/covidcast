@@ -1,14 +1,18 @@
 """This contains the plotting and geo data management methods for the COVIDcast signals."""
 
-from datetime import date
+import io
+from datetime import date, timedelta
 from typing import Tuple, Any
 
+
 import geopandas as gpd
+import imageio
+import matplotlib.figure
 import numpy as np
 import pandas as pd
 import pkg_resources
 from matplotlib import pyplot as plt
-import matplotlib.figure
+from tqdm import tqdm
 
 from .covidcast import _detect_metadata, _signal_metadata
 
@@ -175,6 +179,35 @@ def get_geo_df(data: pd.DataFrame,
     else:  # geo_type must be "county"
         output = _join_county_geo_df(data, geo_value_col, geo_info, join_type)
     return output
+
+
+def animate(data: pd.DataFrame, filepath: str, fps: int = 3, dpi: int = 150, **kwargs: Any) -> None:
+    """Generate an animated video file of a signal over time.
+
+    Given a signal DataFrame, generates the choropleth for each day to form an animation of the
+    signal. Accepts arguments for video parameters as well as optional plotting arguments.
+    Supported output formats are listed in the
+    `imageio ffmpeg documentation <https://imageio.readthedocs.io/en/stable/format_ffmpeg.html>`_.
+
+    :param data: DataFrame for a single signal over time.
+    :param filepath: Path where video will be saved. Filename must contain supported extension.
+    :param fps: Frame rate in frames per second for animation. Defaults to 3.
+    :param dpi: Dots per inch for output video. Defaults to 150 on a 12.8x9.6 figure (1920x1440).
+    :param kwargs: Optional keyword arguments passed to :py:func:`covidcast.plot_choropleth`.
+    :return: None
+    """
+    # probesize is set to avoid warning by ffmpeg on frame rate up to 4k resolution.
+    writer = imageio.get_writer(filepath, fps=fps, input_params=["-probesize", "75M"])
+    num_days = (max(data.time_value) - min(data.time_value)).days
+    day_list = [min(data.time_value) + timedelta(days=x) for x in range(num_days+1)]
+    for d in tqdm(day_list):
+        buf = io.BytesIO()
+        plot_choropleth(data, time_value=d, **kwargs)
+        plt.savefig(buf, dpi=dpi)
+        plt.close()
+        buf.seek(0)
+        writer.append_data(imageio.imread(buf))
+    writer.close()
 
 
 def _project_and_transform(data: gpd.GeoDataFrame,

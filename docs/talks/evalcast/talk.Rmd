@@ -131,6 +131,8 @@ scorecard <- evaluate_predictions(predictions_cards, backfill_buffer = 10)
 
 - Compare forecasters across locations and times
 
+(Examples coming later)
+
 # Why Does `evalcast::get_predictions()` Run the Forecaster?
 
 - Couldn't we just let the user produce the predictions card?

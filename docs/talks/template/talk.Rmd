@@ -25,7 +25,18 @@ col = function(x, color = "#bb0000") {
 }
 ```
 
+# Test
 
+expanded code
+
+```{r, fig.width=7, fig.height=5, class.source="show"}
+plot(iris)
+```
+
+collapsed code
+```{r, fig.width=7, fig.height=5}
+plot(iris)
+```
 
 # Thanks
 

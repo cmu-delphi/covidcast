@@ -8,3 +8,6 @@ home:
 
     - text: View the COVIDcast map
       href: https://covidcast.cmu.edu/
+
+    - text: Browse API documentation
+      href: https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html

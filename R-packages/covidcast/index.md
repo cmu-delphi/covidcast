@@ -8,6 +8,11 @@ COVID-related signals Delphi that builds and maintains, from sources like
 symptom surveys and medical claims data, and also standard signals that we
 simply mirror, like confirmed cases and deaths.
 
+## Get started
+
+**To get started** installing and using this package, view the Getting Started
+guide at `vignette("covidcast")`.
+
 Consult the [COVIDcast API
 documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html)
 for details on the data included in the API, licensing, and how to cite this
@@ -20,6 +25,8 @@ list](https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api)** to
 be notified of package updates, new data sources, corrections, and other
 updates.
 
+## Important terms and conditions
+
 **Warning:** If you use data from the COVIDcast API to power a product,
 dashboard, app, or other service, please download the data you need and store it
 centrally rather than making API requests for every user. Our server resources
@@ -29,5 +36,3 @@ See also the [COVIDcast Terms of
 Use](https://covidcast.cmu.edu/terms-of-use.html), noting that the data is a
 research product and not warranted for a particular purpose.
 
-**To get started** using this package, view the Getting Started guide at
-`vignette("covidcast")`.

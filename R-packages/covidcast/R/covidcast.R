@@ -619,21 +619,11 @@ summary.covidcast_meta = function(object, ...) {
     dplyr::summarize(county = ifelse("county" %in% geo_type, "*", ""),
                      msa = ifelse("msa" %in% geo_type, "*", ""),
                      hrr = ifelse("hrr" %in% geo_type, "*", ""),
-                     state = ifelse("state" %in% geo_type, "*", "")) %>% 
-                     # min_time = max(min_time),
-                     # max_time = min(max_time)) %>%
+                     state = ifelse("state" %in% geo_type, "*", ""))
     dplyr::ungroup()
   )
   print(as.data.frame(df), right = FALSE, row.names = FALSE)
   invisible(df)
-  
-  # TODO should we do anything more intelligent here in summarizing min_time and
-  # max_time?  Currently it looks to me (based on the metadata on 08/18/2020)
-  # these are always equal across all geo_type's, for a given data_source x
-  # signal pair. (In other words, data became available at all geographies at
-  # the same time.)  The way I've implemented above is a bit of a safeguard for
-  # when this is not the case---it returns the last min_time, and the first
-  # max_time, so it's a conversative way to report these.
 }
 
 ##########

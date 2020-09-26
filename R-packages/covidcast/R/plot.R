@@ -266,14 +266,10 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     breaks = seq(lower_bd, range[2], length = num_bins)
   }
 
-  # Set minimum and maximum bubble sizes (radii) to fit in typical counties or
-  # states
-  min_size = params$min_size
+  # Set maximum bubble sizes (area) to fit in typical counties or states
   max_size = params$max_size
-  if (is.null(min_size)) min_size = ifelse(attributes(x)$geo_type == "county",
-                                           0.1, 1)
   if (is.null(max_size)) max_size = ifelse(attributes(x)$geo_type == "county",
-                                           4, 12)
+                                           2, 3.5)
 
   # Set some basic layers
   element_text = ggplot2::element_text
@@ -312,7 +308,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 
   # Warn if there's any missing locations
   if (sum(map_mis == 1) > 0) {
-    warning("Bubble maps can be hard to read when there is missing data;",
+    warning("Bubble maps can be hard to read when there is missing data; ",
             "the locations without data are filled in gray.")
   }
 
@@ -361,15 +357,15 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
                                      data = bubble_trans, color = col,
                                      alpha = alpha, na.rm = TRUE)
 
-  # Create the scale layer
+  # Create the scale layer. Note that while we use oob_squish so large values
+  # get put into the largest size bin instead of growing huge, code above
+  # removes values smaller than the smallest bin so they disappear entirely.
   labels = round(breaks, 2)
   guide = ggplot2::guide_legend(title = NULL, horizontal = TRUE, nrow = 1)
-  scale_layer = ggplot2::scale_size(
-    breaks = breaks, labels = labels,
-    guide = guide, range = c(min_size, max_size))
-  ## scale_layer = ggplot2::scale_size_manual(values = sizes, breaks = breaks,
-  ##                                          labels = labels, drop = FALSE,
-  ##                                          guide = guide)
+  scale_layer = ggplot2::scale_size_area(
+    breaks = breaks, labels = labels, limits = range(breaks),
+    guide = guide, max_size = max_size,
+    oob = scales::oob_squish)
 
   # Put it all together and return
   return(ggplot2::ggplot() + polygon_layer + ggplot2::coord_equal() +

@@ -27,7 +27,8 @@ Imports:
   maptools,
   ggplot2,
   grDevices,
-  rlang
+  rlang,
+  scales
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,

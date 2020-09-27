@@ -31,11 +31,13 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   border_size = params$border_size
   legend_height = params$legend_height
   legend_width = params$legend_width
+  legend_digits = params$legend_digits
   if (is.null(missing_col)) missing_col = "gray"
   if (is.null(border_col)) border_col = "white"
   if (is.null(border_size)) border_size = 0.1
   if (is.null(legend_height)) legend_height = 0.5
   if (is.null(legend_width)) legend_width = 15
+  if (is.null(legend_digits)) legend_digits = 2
 
   # For intensity, create a continuous color function, if we need to
   breaks = params$breaks
@@ -144,14 +146,14 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   geom_args$mapping = ggplot2::aes(x = map_df$x, y = map_df$y,
                                    group = map_df$group)
   polygon_layer = do.call(ggplot2::geom_polygon, geom_args)
-
+  
   # For intensity and continuous color scale, create a legend layer
   if (!direction && is.null(breaks)) {
-    # Create legend breaks and legend labels
+    # Create legend breaks and legend labels, if we need to
     n = params$legend_n
     if (is.null(n)) n = 8
-    legend_breaks = seq(range[1], range[2], length = n)
-    legend_labels = round(legend_breaks, 2)
+    legend_breaks = seq(range[1], range[2], len = n)
+    legend_labels = round(legend_breaks, legend_digits)
 
     # Create a dense set of breaks, for the color gradient (especially important
     # if many colors were passed)
@@ -176,7 +178,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     # Create legend breaks and legend labels
     n = length(breaks)
     legend_breaks = breaks
-    legend_labels = round(legend_breaks, 2)
+    legend_labels = round(legend_breaks, legend_digits)
 
     # Now the legend layer (hidden + scale)
     hidden_df = data.frame(x = rep(Inf, n), z = as.factor(legend_breaks))
@@ -196,16 +198,17 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   # For direction, create a legend layer
   else {
     # Create legend breaks and legend labels
+    n = 3
     legend_breaks = -1:1
     legend_labels = c("Decreasing", "Steady", "Increasing")
 
     # Now the legend layer (hidden + scale)
-    hidden_df = data.frame(x = rep(Inf, 3), z = as.factor(legend_breaks))
+    hidden_df = data.frame(x = rep(Inf, n), z = as.factor(legend_breaks))
     hidden_layer = ggplot2::geom_polygon(ggplot2::aes(x = x, y = x, fill = z),
                                          data = hidden_df, alpha = 1)
     guide = ggplot2::guide_legend(title = NULL, horizontal = TRUE, nrow = 1,
                                   keyheight = legend_height,
-                                  keywidth = legend_width / 3,
+                                  keywidth = legend_width / n,
                                   label.position = "bottom",
                                   override.aes = list(alpha = 1))
     scale_layer = ggplot2::scale_fill_manual(values = dir_col,
@@ -249,12 +252,14 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   border_size = params$border_size
   legend_height = params$legend_height
   legend_width = params$legend_width
+  legend_digits = params$legend_digits
   if (is.null(missing_col)) missing_col = "gray"
   if (is.null(border_col)) border_col = "darkgray"
   if (is.null(border_size)) border_size = 0.1
   if (is.null(legend_height)) legend_height = 0.5
   if (is.null(legend_width)) legend_width = 15
-
+  if (is.null(legend_digits)) legend_digits = 2
+  
   # Create breaks, if we need to
   breaks = params$breaks
   if (!is.null(breaks)) num_bins = length(breaks)
@@ -374,7 +379,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
                                      alpha = alpha, na.rm = TRUE)
 
   # Create the scale layer
-  labels = round(breaks, 2)
+  labels = round(breaks, legend_digits)
   guide = ggplot2::guide_legend(title = NULL, horizontal = TRUE, nrow = 1)
   scale_layer = ggplot2::scale_size_manual(values = sizes, breaks = breaks,
                                            labels = labels, drop = FALSE,
@@ -419,7 +424,7 @@ plot_line = function(x, range = NULL, title = NULL, params = list()) {
   line_layer = ggplot2::geom_line(ggplot2::aes(y = value,
                                                color = geo_value,
                                                group = geo_value))
-  poly_layer = NULL
+  ribb_layer = NULL
   if (stderr_bands) {
     ribb_layer = ggplot2::geom_ribbon(ggplot2::aes(ymin = value - stderr,
                                                    ymax = value + stderr,

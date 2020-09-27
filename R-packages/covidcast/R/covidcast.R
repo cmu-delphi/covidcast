@@ -358,12 +358,16 @@ summary.covidcast_signal = function(object, ...) {
 #'   choropleth maps, or the `i`th size for bubble maps, if and only if the
 #'   given value satisfies `breaks[i] <= value < breaks[i+1]`, where we take by 
 #'   convention `breaks[0] = -Inf` and `breaks[N+1] = Inf` for `N =
-#'   length(breaks)`.}   
+#'   length(breaks)`.}
+#' \item{`legend_digits`}{Number of decimal places to show for the legend
+#'   labels.}  
 #' }
 #'
 #' For choropleth maps only:
 #' \describe{
-#' \item{`legend_n`}{Number of values to label on the color bar.}
+#' \item{`legend_n`}{Number of values to label on the legend color bar. Ignored
+#'   for discrete color scales (when `breaks` is set manually) and for direction 
+#'   maps.} 
 #' }
 #'
 #' For bubble maps only:

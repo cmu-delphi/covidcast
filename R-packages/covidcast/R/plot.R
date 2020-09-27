@@ -386,23 +386,26 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 }
 
 # Plot a line (time series) graph of a covidcast_signal object.
-plot_line = function(x, range = NULL, col = 1:6, line_type = rep(1:6, each = length(col)),
-                     title = NULL, params = list()) {
+plot_line = function(x, range = NULL, title = NULL, params = list()) {
   # Set a title, if we need to (simple combo of data source, signal)
   if (is.null(title)) title = paste0(unique(x$data_source), ": ",
                                      unique(x$signal))
 
-  # Set other map parameters, if we need to
+  # Set other plot parameters, if we need to
   xlab = params$xlab
   ylab = params$ylab
+  stderr_bands = params$stderr_bands
+  stderr_alpha = params$stderr_alpha
   if (is.null(xlab)) xlab = "Date"
   if (is.null(ylab)) ylab = "Value"
-
+  if (is.null(stderr_bands)) stderr_bands = FALSE
+  if (is.null(stderr_alpha)) stderr_alpha = 0.5
+  
   # Grab the values
-  df = x %>% dplyr::select(value, time_value, geo_value)
+  df = x %>% dplyr::select(value, time_value, geo_value, stderr)
 
-  # Expand the range, if we need to
-  range = base::range(c(range, df$value))
+  # Set the range, if we need to
+  if (is.null(range)) range = base::range(df$value, na.rm = TRUE)
   
   # Create label and theme layers
   label_layer = ggplot2::labs(title = title, x = xlab, y = ylab)
@@ -411,16 +414,22 @@ plot_line = function(x, range = NULL, col = 1:6, line_type = rep(1:6, each = len
     ggplot2::theme(legend.position = "bottom",
                    legend.title = ggplot2::element_blank())
 
-  # Create line and lim layers
-  line_layer = ggplot2::geom_line(ggplot2::aes(x = time_value, y = value,
+  # Create lim, line, and ribbon layers
+  lim_layer = ggplot2::lims(y = range)
+  line_layer = ggplot2::geom_line(ggplot2::aes(y = value,
                                                color = geo_value,
-                                               group = geo_value), data = df) 
-  lim_layer = ggplot2::lims(y = c(range[1], range[2]))
-  
-  # TODO: show standard error bands?
+                                               group = geo_value))
+  poly_layer = NULL
+  if (stderr_bands) {
+    ribb_layer = ggplot2::geom_ribbon(ggplot2::aes(ymin = value - stderr,
+                                                   ymax = value + stderr,
+                                                   fill = geo_value),
+                                      alpha = stderr_alpha)
+  }
 
   # Put it all together and return
-  return(ggplot2::ggplot() + line_layer + lim_layer + label_layer + theme_layer)
+  return(ggplot2::ggplot(ggplot2::aes(x = time_value), data = df) +
+         line_layer + ribb_layer + lim_layer + label_layer + theme_layer)
 }
 
 # TODO: plot functions for covidcast_signals objects (note the plural form)?

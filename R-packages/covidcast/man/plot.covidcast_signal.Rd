@@ -106,11 +106,15 @@ for choropleth maps. This works as follows: we assign the \code{i}th color for
 choropleth maps, or the \code{i}th size for bubble maps, if and only if the
 given value satisfies \verb{breaks[i] <= value < breaks[i+1]}, where we take by
 convention \code{breaks[0] = -Inf} and \code{breaks[N+1] = Inf} for \code{N = length(breaks)}.}
+\item{\code{legend_digits}}{Number of decimal places to show for the legend
+labels.}
 }
 
 For choropleth maps only:
 \describe{
-\item{\code{legend_n}}{Number of values to label on the color bar.}
+\item{\code{legend_n}}{Number of values to label on the legend color bar. Ignored
+for discrete color scales (when \code{breaks} is set manually) and for direction
+maps.}
 }
 
 For bubble maps only:

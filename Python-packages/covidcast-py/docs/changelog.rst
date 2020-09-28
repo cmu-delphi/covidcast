@@ -19,16 +19,17 @@ v0.1.0, TODO
   :py:func:`covidcast.signal` and generate an animated video of the signal over time.
 
 - New feature: Function :py:func:`covidcast.plot_choropleth` can now plot signals for
-  hospital referral regions (HRRs) and metropolitan statistical areas (MSAs).
+  hospital referral regions (HRRs) and metropolitan statistical areas (MSAs), in addition
+  to states and counties.
 
-- New feature: Function :py:func:`covidcast.aggregate_signals` combines and shifts
+- New feature: Function :py:func:`covidcast.aggregate_signals` shifts and combines
   multiple signals into a single DataFrame for convenient signal comparisons across
   time.
 
 - Bug fix: The `time_value` argument to the :py:func:`covidcast.plot_choropleth`
   function can now accept `datetime <https://docs.python.org/3/library/datetime.html>`_
   `datetime` and `date` objects, instead of only `pandas Timestamps
-  <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`.
+  <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_.
 
 - Bug fix: :py:func:`covidcast.signal` no longer returns duplicate values if duplicate
   `geo_values` are provided in the function call.

@@ -65,7 +65,8 @@ df_cor1 = covidcast_cor(df_inum_act, df_dnum_act, by = "time_value")
 # Plot the correlation time series
 ggplot(df_cor1, aes(x = time_value, y = value)) + geom_line() + 
   labs(title = "Correlation between cases and deaths",
-       subtitle = sprintf("Per day, over counties with at least %i cases", case_num),
+       subtitle = sprintf("Per day, over counties with at least %i cases", 
+                          case_num),
        x = "Date", y = "Correlation") 
 ```
 
@@ -89,7 +90,8 @@ df_cor$Shift = as.factor(c(rep(0, nrow(df_cor1)), rep(10, nrow(df_cor2))))
 ggplot(df_cor, aes(x = time_value, y = value)) + 
   geom_line(aes(color = Shift)) + 
   labs(title = "Correlation between cases and deaths",
-       subtitle = sprintf("Per day, over counties with at least %i cases", case_num),
+       subtitle = sprintf("Per day, over counties with at least %i cases", 
+                          case_num),
        x = "Date", y = "Correlation") + 
   theme(legend.position = "bottom")
 ```

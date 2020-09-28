@@ -70,7 +70,8 @@ covidcast.cmu.edu.}
 \item{bubble_col}{Bubble color for the bubble map. Default is "purple".}
 
 \item{num_bins}{Number of bins for determining the bubble sizes for the
-bubble map. Default is 6. These bins are evenly-spaced in between the min
+bubble map (here and throughout, to be precise, by bubble size we mean
+bubble area). Default is 8. These bins are evenly-spaced in between the min
 and max as specified through the \code{range} parameter. Each bin is assigned
 the same bubble size. Also, values of zero special: it has its own separate
 (small) bin, and values mapped to the zero bin are not drawn.}
@@ -99,6 +100,7 @@ For both choropleth and bubble maps:
 \item{\code{missing_col}}{Color assigned to missing or NA geo locations.}
 \item{\code{border_col}}{Border color for geo locations.}
 \item{\code{border_size}}{Border size for geo locations.}
+\item{\code{legend_position}}{Position for legend; use "none" to hide legend.}
 \item{\code{legend_height}, \code{legend_width}}{Height and width of the legend.}
 \item{\code{breaks}}{Breaks for a custom (discrete) color or size scale.  Note
 that we must set \code{breaks} to be a vector of the same length as \code{choro_col}

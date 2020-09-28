@@ -331,7 +331,8 @@ summary.covidcast_signal = function(object, ...) {
 #'   covidcast.cmu.edu.
 #' @param bubble_col Bubble color for the bubble map. Default is "purple".
 #' @param num_bins Number of bins for determining the bubble sizes for the
-#'   bubble map. Default is 6. These bins are evenly-spaced in between the min
+#'   bubble map (here and throughout, to be precise, by bubble size we mean
+#'   bubble area). Default is 8. These bins are evenly-spaced in between the min
 #'   and max as specified through the `range` parameter. Each bin is assigned
 #'   the same bubble size. Also, values of zero special: it has its own separate
 #'   (small) bin, and values mapped to the zero bin are not drawn.
@@ -351,6 +352,7 @@ summary.covidcast_signal = function(object, ...) {
 #' \item{`missing_col`}{Color assigned to missing or NA geo locations.}
 #' \item{`border_col`}{Border color for geo locations.}
 #' \item{`border_size`}{Border size for geo locations.}
+#' \item{`legend_position`}{Position for legend; use "none" to hide legend.} 
 #' \item{`legend_height`, `legend_width`}{Height and width of the legend.} 
 #' \item{`breaks`}{Breaks for a custom (discrete) color or size scale.  Note
 #'   that we must set `breaks` to be a vector of the same length as `choro_col`
@@ -358,7 +360,7 @@ summary.covidcast_signal = function(object, ...) {
 #'   choropleth maps, or the `i`th size for bubble maps, if and only if the
 #'   given value satisfies `breaks[i] <= value < breaks[i+1]`, where we take by 
 #'   convention `breaks[0] = -Inf` and `breaks[N+1] = Inf` for `N =
-#'   length(breaks)`.}
+#'   length(breaks)`.}   
 #' \item{`legend_digits`}{Number of decimal places to show for the legend
 #'   labels.}  
 #' }
@@ -405,10 +407,11 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
   # from metadata) 
   if (is.null(range) && plot_type == "choro" || plot_type == "bubble") {
     if (is.null(attributes(x)$metadata)) { 
-      warn(paste0("Metadata for signal mean and standard deviation not ",
-                  "available; defaulting to observed mean and standard ",
-                  "deviation to set plot range."),
-           class = "covidcast_plot_meta_not_found")
+      warn(
+        paste0("Metadata for signal mean and standard deviation not ",
+               "available; defaulting to observed mean and standard ",
+               "deviation to set plot range."),
+        class = "covidcast_plot_meta_not_found")
       mean_value <- mean(x$value)
       stdev_value <- sd(x$value)
     } else {

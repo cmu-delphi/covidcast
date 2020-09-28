@@ -143,6 +143,7 @@ def get_geo_df(data: pd.DataFrame,
     US Census Cartographic Boundary Files
     <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`_
     and the `CMS Data Website <https://data.cms.gov/widgets/ia25-mrsk>`_.
+
     :param data: DataFrame of values and geographies.
     :param geo_value_col: Name of column containing values of interest.
     :param geo_type_col: Name of column containing geography type.

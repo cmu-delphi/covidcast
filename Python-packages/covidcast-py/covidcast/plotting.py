@@ -64,6 +64,9 @@ def plot_choropleth(data: pd.DataFrame,
     :param data: Data frame of signal values, as returned from :py:func:`covidcast.signal`.
     :param time_value: If multiple days of data are present in ``data``, map only values from this
       day. Defaults to plotting the most recent day of data in ``data``.
+    :param combine_megacounties: For each state, display all counties without a signal value as a
+      single polygon with the megacounty value, as opposed to plotting all the county boundaries.
+      Defaults to `True`.
     :param kwargs: Optional keyword arguments passed to ``GeoDataFrame.plot()``.
     :return: Matplotlib figure object.
 
@@ -212,6 +215,7 @@ def _join_state_geo_df(data: pd.DataFrame,
     :param data: DF with state info
     :param state_col: name of column in `data` containing state info to join on
     :param geo_info: GeoDF of state shape info read from Census shapefiles
+    :param join_type: Type of join to do between input data (left side) and geo data (right side).
     :return: ``data`` with state polygon and state FIPS joined.
     """
     input_cols = list(data.columns)
@@ -235,6 +239,7 @@ def _join_county_geo_df(data: pd.DataFrame,
     :param data: DF with county info.
     :param county_col: name of column in `data` containing county info to join on.
     :param geo_info: GeoDF of county shape info read from Census shapefiles.
+    :param join_type: Type of join to do between input data (left side) and geo data (right side).
     :return: ``data`` with county polygon and state fips joined.
     """
     input_cols = list(data.columns)
@@ -250,6 +255,19 @@ def _join_county_geo_df(data: pd.DataFrame,
 
 
 def _combine_megacounties(data, county_col, geo_info):
+    """Join a DataFrame of county signals with a GeoDataFrame of polygons for plotting.
+
+    Merges a DataFrame of counties and signals with a DataFrame of county polygons. Megacounties,
+    if present, are assigned a polygon which is the union of all counties in the state with no
+    signal value.
+
+    :param data: DataFrame of county signals.
+    :param county_col: Name of column containing county.
+    :parm geo_info: GeoDataFrame of counties and corresponding polygons.
+    :return: ``data`` with county polygon and state fips joined. No polgyon information is
+      provided for counties without a signal value since they are captured by the megacounty
+      polygon.
+    """
     merged = data.merge(geo_info, how="left", left_on=county_col, right_on="GEOID", sort=True)
     missing = set(geo_info.GEOID) - set(data.geo_value)
     for i, row in merged.iterrows():
@@ -264,7 +282,19 @@ def _combine_megacounties(data, county_col, geo_info):
     return merged
 
 
-def _distribute_megacounties(data, county_col, geo_info, join_type, input_cols):
+def _distribute_megacounties(data, county_col, geo_info, join_type):
+    """Join a DataFrame of county signals with a GeoDataFrame of polygons for plotting.
+
+    Merges a DataFrame of counties and signals with a DataFrame of county polygons. Counties
+    without a value but with a corresponding megacounty take on the megacounty value.
+
+    :param data: DataFrame of county signals.
+    :param county_col: Name of column containing county.
+    :parm geo_info: GeoDataFrame of counties and corresponding polygons.
+    :param join_type: Type of join to do between input data (left side) and geo data (right side).
+    :return: ``data`` with county polygon and state fips joined. No polgyon information is
+      provided for megacounties.
+    """
     # join all counties with valid FIPS
     merged = data.merge(geo_info, how=join_type, left_on=county_col, right_on="GEOID", sort=True)
     mega_df = data.loc[[_is_megacounty(i) for i in data[county_col]], :]
@@ -272,7 +302,7 @@ def _distribute_megacounties(data, county_col, geo_info, join_type, input_cols):
         # if mega counties exist, join them on state
         merged = merged.merge(mega_df, how="left", left_on="STATEFP", right_on="state", sort=True)
         # if no county value present, us the megacounty values
-        for c in input_cols:
+        for c in data.columns:
             merged[c] = merged[f"{c}_x"].combine_first(merged[f"{c}_y"])
     return merged
 
@@ -288,6 +318,7 @@ def _join_msa_geo_df(data: pd.DataFrame,
     :param data: DF with state info
     :param msa_col: cname of column in `data` containing state info to join on
     :param geo_info: GeoDF of state shape info read from Census shapefiles
+    :param join_type: Type of join to do between input data (left side) and geo data (right side).
     :return: ``data`` with cbsa polygon and state fips joined.
     """
     geo_info = geo_info[geo_info.LSAD == "M1"]  # only get metro and not micropolitan areas
@@ -309,6 +340,7 @@ def _join_hrr_geo_df(data: pd.DataFrame,
     :param data: DF with state info
     :param msa_col: cname of column in `data` containing state info to join on
     :param geo_info: GeoDF of state shape info read from Census shapefiles
+    :param join_type: Type of join to do between input data (left side) and geo data (right side).
     :return: ``data`` with HRR polygon and state fips joined.
     """
     geo_info["hrr_num"] = geo_info.hrr_num.astype("int").astype(str)  # original col was a float

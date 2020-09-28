@@ -137,7 +137,7 @@ the month of August.
         Your browser does not support the HTML5 Video element
     </video>
 
-Video frame rate and resolution are adjustable. Like the static maps, additional plotting
+Video format, frame rate, and resolution are adjustable. Like the static maps, additional plotting
 keyword arguments can be provided and are passed to :py:func:`covidcast.plot_choropleth`.
 
 >>> covidcast.animate(df,

@@ -2,7 +2,7 @@
 title: Plotting and mapping signals
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Plotting and mapping signals}
+  %\VignetteIndexEntry{1. Plotting and mapping signals}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

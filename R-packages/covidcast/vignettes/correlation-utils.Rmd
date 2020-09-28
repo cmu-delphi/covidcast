@@ -2,7 +2,7 @@
 title: Correlation utilities
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Correlation utilities}
+  %\VignetteIndexEntry{2. Correlation utilities}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

@@ -125,12 +125,12 @@ def _plot_bubble(ax, data, kwargs):
     bubble_scale = 75 / max(data_w_geo.value)  # cap bubbles at size 75
     # discretize into 8 bins
     label_bins, step = np.linspace(kwargs["vmin"], kwargs["vmax"], 8, retstep=True)
-    value_bins = [min(data_w_geo.value) - 1] + list(label_bins)[1:] + [max(data_w_geo.value) + 1]
+    value_bins = list(label_bins) + [max(data_w_geo.value) + kwargs["vmax"]]
     data_w_geo["binval"] = pd.cut(data_w_geo.value, labels=label_bins, bins=value_bins)
     data_w_geo["binval"] = data_w_geo.binval.astype(float) * bubble_scale
     for shape in _project_and_transform(data_w_geo):
         # plot counties in white
-        shape.plot(color="1", ax=ax, legend=True, edgecolor="0.6", linewidth=0.5)
+        shape.plot(color="1", ax=ax, legend=True, edgecolor="0.8", linewidth=0.5)
         # plot bubbles at the centroid of the polygon
         shape["geometry"] = shape["geometry"].centroid
         shape.plot(markersize="binval", color=kwargs["color"], ax=ax, alpha=kwargs["alpha"])
@@ -153,7 +153,7 @@ def _plot_background_states(figsize: tuple):
     state_shapefile_path = pkg_resources.resource_filename(__name__, SHAPEFILE_PATHS["state"])
     state = gpd.read_file(state_shapefile_path)
     for state in _project_and_transform(state, "STATEFP"):
-        state.plot(color="0.9", ax=ax, edgecolor="0.7")
+        state.plot(color="0.9", ax=ax, edgecolor="0.8", linewidth=0.5)
     ax.set_xlim(plt.xlim())
     ax.set_ylim(plt.ylim())
     return fig, ax

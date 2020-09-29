@@ -16,8 +16,6 @@
   dir_col = c("#6F9CC6", "#E4E4E4", "#C56B59"),
   bubble_col = "purple",
   num_bins = 8,
-  line_col = 1:6,
-  line_type = rep(1:6, each = length(line_col)),
   title = NULL,
   choro_params = list(),
   bubble_params = list(),
@@ -47,9 +45,11 @@ all states.}
 \item{range}{Vector of two values: min and max, in this order, to use when
 defining the color scale for choropleth maps and the size scale for bubble
 maps, or the range of the y-axis for the time series plot. If \code{NULL}, the
-default, then the min and max are set to be the mean +/- 3 standard
-deviations, where this mean and standard deviation are as provided in the
-meta data for the given data source and signal.}
+default, then for the maps, the min and max are set to be the mean +/- 3
+standard deviations, where this mean and standard deviation are as provided
+in the metadata for the given data source and signal; and for the time
+series plot, they are set to be the observed min and max of the values over
+the given time period.}
 
 \item{choro_col}{Vector of colors, as specified in hex code, to use for the
 choropleth color scale. Can be arbitrary in length. Default is similar to
@@ -70,16 +70,11 @@ covidcast.cmu.edu.}
 \item{bubble_col}{Bubble color for the bubble map. Default is "purple".}
 
 \item{num_bins}{Number of bins for determining the bubble sizes for the
-bubble map. Default is 6. These bins are evenly-spaced in between the min
+bubble map (here and throughout, to be precise, by bubble size we mean
+bubble area). Default is 8. These bins are evenly-spaced in between the min
 and max as specified through the \code{range} parameter. Each bin is assigned
 the same bubble size. Also, values of zero special: it has its own separate
 (small) bin, and values mapped to the zero bin are not drawn.}
-
-\item{line_col}{Vector of colors for the time series plot. This will be
-recycled as necessary. Default is \code{1:6}.}
-
-\item{line_type}{Vector of line types for the time series plot. This will be
-recycled as necessary. Default is \code{rep(1:6, each = length(col))}.}
 
 \item{title}{Title for the plot. If \code{NULL}, the default, then a simple title
 is used based on the given data source, signal, and time values.}
@@ -105,6 +100,7 @@ For both choropleth and bubble maps:
 \item{\code{missing_col}}{Color assigned to missing or NA geo locations.}
 \item{\code{border_col}}{Border color for geo locations.}
 \item{\code{border_size}}{Border size for geo locations.}
+\item{\code{legend_position}}{Position for legend; use "none" to hide legend.}
 \item{\code{legend_height}, \code{legend_width}}{Height and width of the legend.}
 \item{\code{breaks}}{Breaks for a custom (discrete) color or size scale.  Note
 that we must set \code{breaks} to be a vector of the same length as \code{choro_col}
@@ -112,11 +108,15 @@ for choropleth maps. This works as follows: we assign the \code{i}th color for
 choropleth maps, or the \code{i}th size for bubble maps, if and only if the
 given value satisfies \verb{breaks[i] <= value < breaks[i+1]}, where we take by
 convention \code{breaks[0] = -Inf} and \code{breaks[N+1] = Inf} for \code{N = length(breaks)}.}
+\item{\code{legend_digits}}{Number of decimal places to show for the legend
+labels.}
 }
 
 For choropleth maps only:
 \describe{
-\item{\code{legend_n}}{Number of values to label on the color bar.}
+\item{\code{legend_n}}{Number of values to label on the legend color bar. Ignored
+for discrete color scales (when \code{breaks} is set manually) and for direction
+maps.}
 }
 
 For bubble maps only:
@@ -129,5 +129,7 @@ effectively drawn as bubbles of zero size)?}
 For line graphs:
 \describe{
 \item{\code{xlab}, \code{ylab}}{Labels for the x-axis and y-axis.}
+\item{\code{stderr_bands}}{Should standard error bands be drawn?}
+\item{\code{stderr_alpha}}{Transparency level for the standard error bands.}
 }
 }

@@ -312,9 +312,11 @@ summary.covidcast_signal = function(object, ...) {
 #' @param range Vector of two values: min and max, in this order, to use when
 #'   defining the color scale for choropleth maps and the size scale for bubble
 #'   maps, or the range of the y-axis for the time series plot. If `NULL`, the
-#'   default, then the min and max are set to be the mean +/- 3 standard
-#'   deviations, where this mean and standard deviation are as provided in the
-#'   meta data for the given data source and signal.
+#'   default, then for the maps, the min and max are set to be the mean +/- 3
+#'   standard deviations, where this mean and standard deviation are as provided
+#'   in the metadata for the given data source and signal; and for the time
+#'   series plot, they are set to be the observed min and max of the values over  
+#'   the given time period.
 #' @param choro_col Vector of colors, as specified in hex code, to use for the
 #'   choropleth color scale. Can be arbitrary in length. Default is similar to
 #'   that from covidcast.cmu.edu.
@@ -329,14 +331,11 @@ summary.covidcast_signal = function(object, ...) {
 #'   covidcast.cmu.edu.
 #' @param bubble_col Bubble color for the bubble map. Default is "purple".
 #' @param num_bins Number of bins for determining the bubble sizes for the
-#'   bubble map. Default is 6. These bins are evenly-spaced in between the min
+#'   bubble map (here and throughout, to be precise, by bubble size we mean
+#'   bubble area). Default is 8. These bins are evenly-spaced in between the min
 #'   and max as specified through the `range` parameter. Each bin is assigned
 #'   the same bubble size. Also, values of zero special: it has its own separate
 #'   (small) bin, and values mapped to the zero bin are not drawn.
-#' @param line_col Vector of colors for the time series plot. This will be
-#'   recycled as necessary. Default is `1:6`.
-#' @param line_type Vector of line types for the time series plot. This will be
-#'   recycled as necessary. Default is `rep(1:6, each = length(col))`.
 #' @param title Title for the plot. If `NULL`, the default, then a simple title
 #'   is used based on the given data source, signal, and time values.
 #' @param choro_params,bubble_params,line_params Additional parameter lists for
@@ -353,6 +352,7 @@ summary.covidcast_signal = function(object, ...) {
 #' \item{`missing_col`}{Color assigned to missing or NA geo locations.}
 #' \item{`border_col`}{Border color for geo locations.}
 #' \item{`border_size`}{Border size for geo locations.}
+#' \item{`legend_position`}{Position for legend; use "none" to hide legend.} 
 #' \item{`legend_height`, `legend_width`}{Height and width of the legend.} 
 #' \item{`breaks`}{Breaks for a custom (discrete) color or size scale.  Note
 #'   that we must set `breaks` to be a vector of the same length as `choro_col`
@@ -361,11 +361,15 @@ summary.covidcast_signal = function(object, ...) {
 #'   given value satisfies `breaks[i] <= value < breaks[i+1]`, where we take by 
 #'   convention `breaks[0] = -Inf` and `breaks[N+1] = Inf` for `N =
 #'   length(breaks)`.}   
+#' \item{`legend_digits`}{Number of decimal places to show for the legend
+#'   labels.}  
 #' }
 #'
 #' For choropleth maps only:
 #' \describe{
-#' \item{`legend_n`}{Number of values to label on the color bar.}
+#' \item{`legend_n`}{Number of values to label on the legend color bar. Ignored
+#'   for discrete color scales (when `breaks` is set manually) and for direction 
+#'   maps.} 
 #' }
 #'
 #' For bubble maps only:
@@ -378,6 +382,8 @@ summary.covidcast_signal = function(object, ...) {
 #' For line graphs:
 #' \describe{
 #' \item{`xlab`, `ylab`}{Labels for the x-axis and y-axis.}
+#' \item{`stderr_bands`}{Should standard error bands be drawn?}
+#' \item{`stderr_alpha`}{Transparency level for the standard error bands.}
 #' }
 #'
 #' @method plot covidcast_signal
@@ -391,23 +397,21 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
                                   alpha = 0.5, direction = FALSE,
                                   dir_col = c("#6F9CC6", "#E4E4E4", "#C56B59"),
                                   bubble_col = "purple", num_bins = 8,
-                                  line_col = 1:6,
-                                  line_type = rep(1:6, each = length(line_col)),
                                   title = NULL, choro_params = list(),
                                   bubble_params = list(), line_params = list(),
                                   ...) {
   plot_type <- match.arg(plot_type)
   x <- latest_issue(x)
 
-  # Set range, if we need to (to mean +/- 3 standard deviations, from metadata)
-  if (is.null(range)) {
-    if (is.null(attributes(x)$metadata)) {
+  # For the maps, set range, if we need to (to mean +/- 3 standard deviations,
+  # from metadata) 
+  if (is.null(range) && (plot_type == "choro" || plot_type == "bubble")) {
+    if (is.null(attributes(x)$metadata)) { 
       warn(
-        paste0("Metadata for signal mean and standard deviation not available; ",
-               "defaulting to observed mean and standard deviation to set plot range."),
-        class = "covidcast_plot_meta_not_found"
-      )
-
+        paste0("Metadata for signal mean and standard deviation not ",
+               "available; defaulting to observed mean and standard ",
+               "deviation to set plot range."),
+        class = "covidcast_plot_meta_not_found")
       mean_value <- mean(x$value)
       stdev_value <- sd(x$value)
     } else {
@@ -416,8 +420,7 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
       mean_value <- attributes(x)$metadata$mean_value
       stdev_value <- attributes(x)$metadata$stdev_value
     }
-    range <- c(mean_value - 3 * stdev_value,
-               mean_value + 3 * stdev_value)
+    range <- c(mean_value - 3 * stdev_value, mean_value + 3 * stdev_value)
     range <- pmax(0, range)
     # TODO: figure out for which signals we need to clip the top of the range.
     # For example, for percentages, we need to clip it at 100
@@ -454,8 +457,7 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
 
   # Line (time series) plot
   else {
-    plot_line(x, range = range, col = line_col, line_type = line_type,
-              title = title, params = line_params)
+    plot_line(x, range = range, title = title, params = line_params)
   }
 }
 
@@ -619,21 +621,11 @@ summary.covidcast_meta = function(object, ...) {
     dplyr::summarize(county = ifelse("county" %in% geo_type, "*", ""),
                      msa = ifelse("msa" %in% geo_type, "*", ""),
                      hrr = ifelse("hrr" %in% geo_type, "*", ""),
-                     state = ifelse("state" %in% geo_type, "*", "")) %>% 
-                     # min_time = max(min_time),
-                     # max_time = min(max_time)) %>%
+                     state = ifelse("state" %in% geo_type, "*", "")) %>%
     dplyr::ungroup()
   )
   print(as.data.frame(df), right = FALSE, row.names = FALSE)
   invisible(df)
-  
-  # TODO should we do anything more intelligent here in summarizing min_time and
-  # max_time?  Currently it looks to me (based on the metadata on 08/18/2020)
-  # these are always equal across all geo_type's, for a given data_source x
-  # signal pair. (In other words, data became available at all geographies at
-  # the same time.)  The way I've implemented above is a bit of a safeguard for
-  # when this is not the case---it returns the last min_time, and the first
-  # max_time, so it's a conversative way to report these.
 }
 
 ##########

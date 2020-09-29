@@ -365,4 +365,10 @@ def _join_hrr_geo_df(data: pd.DataFrame,
 
 
 def _is_megacounty(fips: str) -> bool:
+    """Determine if a code is a megacounty.
+
+    :param fips: FIPS code to test.
+    :return: Boolean for if the input code is a megacounty or not.
+
+    """
     return fips.endswith("000") and len(fips) == 5

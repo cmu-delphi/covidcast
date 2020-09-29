@@ -249,3 +249,9 @@ def test__join_hrr_geo_df():
         os.path.join(CURRENT_PATH, "../reference_data/expected__join_hrr_geo_df_left.gpkg"),
         dtype={"geo_value": str})
     pd.testing.assert_frame_equal(expected2, output2)
+
+
+def test__is_megacounty():
+    assert plotting._is_megacounty("12000")
+    assert not plotting._is_megacounty("12001")
+    assert not plotting._is_megacounty("120000")

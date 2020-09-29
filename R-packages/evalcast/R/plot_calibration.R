@@ -57,7 +57,11 @@ plot_calibration <- function(scorecard,
 #'
 #' @param scorecards a list of different forecasters scorecards, all on the
 #' same forecasting task (i.e., same ahead, etc.)
-#' @param location of vertical line
+#' @param alpha location of vertical line if type = "all" is 1-alpha; if
+#' type="one" then 1-alpha is the nominal coverage probability shown.
+#' @param type whether to show coverage across all nominal levels
+#' (in which case averaging is performed across forecast dates and locations)
+#' or whether to show it for one specific alpha value.
 #' @export
 plot_coverage <- function(scorecards, alpha = 0.2, type = c("all", "one")) {
   type <- match.arg(type)

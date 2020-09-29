@@ -26,13 +26,13 @@ v0.1.0, TODO
   multiple signals into a single DataFrame for convenient signal comparisons across
   time.
 
-- Bug fix: The `time_value` argument to the :py:func:`covidcast.plot_choropleth`
+- Bug fix: The ``time_value`` argument to the :py:func:`covidcast.plot_choropleth`
   function can now accept `datetime <https://docs.python.org/3/library/datetime.html>`_
-  `datetime` and `date` objects, instead of only `pandas Timestamps
+  ``datetime`` and ``date`` objects, instead of only `pandas Timestamps
   <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_.
 
 - Bug fix: :py:func:`covidcast.signal` no longer returns duplicate values if duplicate
-  `geo_values` are provided in the function call.
+  ``geo_values`` are provided in the function call.
 
 v0.0.9, August 30, 2020
 -----------------------

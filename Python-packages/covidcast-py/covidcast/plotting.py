@@ -127,9 +127,11 @@ def get_geo_df(data: pd.DataFrame,
     ``outer``, and ``inner`` joins are also supported and can be selected with
     the ``join_type`` argument.
 
-    For right joins on counties, all counties without a signal value will be
-    given the value of the megacounty (if present). Other joins will not use
-    megacounties. See the `geographic coding documentation
+    If ``combine_megacounties=False`` (default) all counties without a signal value will be
+    given the value of the megacounty if present. If ``combine_megacounties=True``, a left join
+    will be conducted and the megacounty rows will be given a polygon of the union of all
+    constituent counties without a value. Other joins will not use megacounties.
+    See the `geographic coding documentation
     <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html>`_
     for information about megacounties.
 
@@ -148,6 +150,8 @@ def get_geo_df(data: pd.DataFrame,
     :param geo_type_col: Name of column containing geography type.
     :param join_type: Type of join to do between input data (left side) and geo data (right side).
       Must be one of `right` (default), `left`, `outer`, or `inner`.
+    :param combine_megacounties: For each state, return all counties without a signal value as a
+      single row and polygon with the megacounty value. Defaults to `False`.
     :return: GeoDataFrame containing all columns from the input ``data``, along
       with a ``geometry`` column (containing a polygon) and a ``state_fips``
       column (a two-digit FIPS code identifying the US state containing this
@@ -240,6 +244,8 @@ def _join_county_geo_df(data: pd.DataFrame,
     :param county_col: name of column in `data` containing county info to join on.
     :param geo_info: GeoDF of county shape info read from Census shapefiles.
     :param join_type: Type of join to do between input data (left side) and geo data (right side).
+    :param combine_megacounties: For each state, return all counties without a signal value as a
+      single polygon with the megacounty value.
     :return: ``data`` with county polygon and state fips joined.
     """
     input_cols = list(data.columns)
@@ -248,13 +254,15 @@ def _join_county_geo_df(data: pd.DataFrame,
     if combine_megacounties:
         merged = _combine_megacounties(data, county_col, geo_info)
     else:
-        merged = _distribute_megacounties(data, county_col, geo_info, join_type, input_cols)
+        merged = _distribute_megacounties(data, county_col, geo_info, join_type)
     merged[county_col] = merged.GEOID.combine_first(merged[county_col])
     merged.rename(columns={"STATEFP": "state_fips"}, inplace=True)
     return gpd.GeoDataFrame(merged[input_cols + ["state_fips", "geometry"]])
 
 
-def _combine_megacounties(data, county_col, geo_info):
+def _combine_megacounties(data: pd.DataFrame,
+                          county_col: str,
+                          geo_info: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     """Join a DataFrame of county signals with a GeoDataFrame of polygons for plotting.
 
     Merges a DataFrame of counties and signals with a DataFrame of county polygons. Megacounties,
@@ -269,10 +277,10 @@ def _combine_megacounties(data, county_col, geo_info):
       polygon.
     """
     merged = data.merge(geo_info, how="left", left_on=county_col, right_on="GEOID", sort=True)
-    missing = set(geo_info.GEOID) - set(data.geo_value)
+    missing = set(geo_info.GEOID) - set(data[county_col])
     for i, row in merged.iterrows():
-        if _is_megacounty(row.geo_value):
-            state = row.geo_value[:2]
+        if _is_megacounty(row[county_col]):
+            state = row[county_col][:2]
             state_missing = [j for j in missing if j.startswith(state)]
             combined_poly = geo_info.loc[geo_info.GEOID.isin(state_missing), "geometry"].unary_union
             # pandas has a bug when assigning MultiPolygons, so you need to do this weird workaround
@@ -282,7 +290,10 @@ def _combine_megacounties(data, county_col, geo_info):
     return merged
 
 
-def _distribute_megacounties(data, county_col, geo_info, join_type):
+def _distribute_megacounties(data: pd.DataFrame,
+                             county_col: str,
+                             geo_info: gpd.GeoDataFrame,
+                             join_type: str = "right") -> gpd.GeoDataFrame:
     """Join a DataFrame of county signals with a GeoDataFrame of polygons for plotting.
 
     Merges a DataFrame of counties and signals with a DataFrame of county polygons. Counties

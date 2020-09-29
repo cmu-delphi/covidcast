@@ -370,6 +370,27 @@ E_{\ell tf} = \mu + \alpha_f + a_\ell + b_t + \epsilon_{\ell tf},
 <li><p>Coming soon to evalcast!</p></li>
 </ul>
 </div>
+<div id="example-comparing-forecasters-to-the-covidhub-baseline" class="slide section level1">
+<h1>Example: Comparing Forecasters to the COVIDhub-baseline</h1>
+<p>Fit mixed effects model on 5 methods (using 9 forecast dates): - Three long-running forecasters on the COVID Hub (let's call them F1, F2, F3) - COVIDhub-Ensemble - COVIDhub-baseline - we'll choose this as the baseline</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(lme4)
+<span class="kw">load</span>(<span class="st">&quot;talk_files/scorecard_df.Rdata&quot;</span>)
+fit &lt;-<span class="st"> </span><span class="kw">lmer</span>(<span class="kw">log</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>ae) <span class="op">~</span><span class="st"> </span>forecaster <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>location) <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>forecast_date),
+            <span class="dt">data =</span> sc_df)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confint</span>(fit) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">as_tibble</span>(<span class="dt">rownames =</span> <span class="st">&quot;var&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(<span class="kw">str_starts</span>(var, <span class="st">&quot;forecaster&quot;</span>))</code></pre></div>
+<pre><code>## # A tibble: 4 x 3
+##   var                         `2.5 %` `97.5 %`
+##   &lt;chr&gt;                         &lt;dbl&gt;    &lt;dbl&gt;
+## 1 forecasterCOVIDhub-ensemble -0.359   -0.134 
+## 2 forecasterF1                 0.0363   0.265 
+## 3 forecasterF2                -0.251   -0.0258
+## 4 forecasterF3                 0.0313   0.257</code></pre>
+<ul>
+<li>Evidence that F2 and COVIDhub-ensemble outperform baseline in absolute error; F1 and F3 appear to underperform</li>
+</ul>
+</div>
 <div id="thanks" class="slide section level1">
 <h1>Thanks</h1>
 <ul>

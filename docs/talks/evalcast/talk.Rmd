@@ -346,6 +346,28 @@ $$
 
 - Coming soon to evalcast!
 
+# Example: Comparing Forecasters to the COVIDhub-baseline
+
+Fit mixed effects model on 5 methods (using 9 forecast dates):
+- Three long-running forecasters on the COVID Hub (let's call them F1, F2, F3)
+- COVIDhub-Ensemble
+- COVIDhub-baseline - we'll choose this as the baseline
+
+```{r}
+library(lme4)
+load("talk_files/scorecard_df.Rdata")
+fit <- lmer(log(1 + ae) ~ forecaster + (1|location) + (1|forecast_date),
+            data = sc_df)
+```
+
+```{r}
+confint(fit) %>%
+  as_tibble(rownames = "var") %>%
+  filter(str_starts(var, "forecaster"))
+```
+
+- Evidence that F2 and COVIDhub-ensemble outperform baseline in absolute error; F1 and F3 appear to underperform
+
 # Thanks
 
 - The [whole Delphi team](https://covidcast.cmu.edu/covid19-response-team.html), and various CMU units

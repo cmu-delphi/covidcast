@@ -77,6 +77,10 @@ get_covidhub_predictions <- function(covid_hub_forecaster_name,
   flatten(pcards) %>% filter_predictions(...)
 }
 
+#' Get Available Forecast Dates for Forecaster on COVID Hub
+#'
+#' @param covid_hub_forecaster_name the name of a forecaster on the COVID Hub.
+#' @export
 get_forecast_dates <- function(covid_hub_forecaster_name) {
   url <- "https://github.com/reichlab/covid19-forecast-hub/tree/master/data-processed/"
   out <- xml2::read_html(paste0(url, covid_hub_forecaster_name)) %>%

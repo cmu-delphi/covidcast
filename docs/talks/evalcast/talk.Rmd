@@ -282,6 +282,19 @@ plot_measure(scorecards, err_name = "wis", type = "dotplot") +
   labs(x = "Weighted Interval Score", y = "")
 ```
 
+# Interval Coverage
+
+```{r, fig.width=12, fig.height=4, class.source="show"}
+plot_coverage(scorecard_CH_ensemble)
+```
+
+# Interval Coverage over Time
+
+```{r, fig.width=12, fig.height=4, class.source="show"}
+plot_coverage(scorecard_CH_ensemble, alpha = 0.2, type = "one")
+```
+
+
 # Calibration
 
 ```{r, fig.width=12, fig.height=4, class.source="show"}

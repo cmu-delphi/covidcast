@@ -428,7 +428,7 @@ plot_line = function(x, range = NULL, title = NULL, params = list()) {
 
   # Create lim, line, and ribbon layers
   aes = ggplot2::aes
-  lim_layer = ggplot2::lims(y = range)
+  lim_layer = ggplot2::coord_cartesian(ylim = range)
   line_layer = ggplot2::geom_line(aes(y = value, color = geo_value,
                                       group = geo_value))
   ribbon_layer = NULL

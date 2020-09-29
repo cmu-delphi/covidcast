@@ -79,6 +79,9 @@ get_covidhub_predictions <- function(covid_hub_forecaster_name,
 
 #' Get Available Forecast Dates for Forecaster on COVID Hub
 #'
+#' Retrieves the forecast dates that a forecaster submitted to
+#' the COVID Hub https://github.com/reichlab/covid19-forecast-hub/
+#'
 #' @param covid_hub_forecaster_name the name of a forecaster on the COVID Hub.
 #' @export
 get_forecast_dates <- function(covid_hub_forecaster_name) {

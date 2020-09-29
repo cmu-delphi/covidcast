@@ -10,7 +10,12 @@ plot_coverage(scorecards, alpha = 0.2, type = c("all", "one"))
 \item{scorecards}{a list of different forecasters scorecards, all on the
 same forecasting task (i.e., same ahead, etc.)}
 
-\item{location}{of vertical line}
+\item{alpha}{location of vertical line if type = "all" is 1-alpha; if
+type="one" then 1-alpha is the nominal coverage probability shown.}
+
+\item{type}{whether to show coverage across all nominal levels
+(in which case averaging is performed across forecast dates and locations)
+or whether to show it for one specific alpha value.}
 }
 \description{
 Plot the interval coverage

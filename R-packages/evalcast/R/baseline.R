@@ -3,6 +3,8 @@
 #' This serves as a template for a forecaster.  It's not intended to be a great
 #' forecaster.
 #'
+#' @param df a data frame of the format that is outputted by
+#'   \code{\link[covidcast]{covidcast_signal}}.
 #' @param forecast_date date on which forecasts will be made about some period
 #'   (e.g., epiweek).  For example, if forecast_date is ymd("2020-05-11"),
 #'   incidence_period is "day",  and ahead = 3, then, we'd be making forecasts

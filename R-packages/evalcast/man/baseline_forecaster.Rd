@@ -14,6 +14,9 @@ baseline_forecaster(
 )
 }
 \arguments{
+\item{df}{a data frame of the format that is outputted by
+\code{\link[covidcast]{covidcast_signal}}.}
+
 \item{forecast_date}{date on which forecasts will be made about some period
 (e.g., epiweek).  For example, if forecast_date is ymd("2020-05-11"),
 incidence_period is "day",  and ahead = 3, then, we'd be making forecasts

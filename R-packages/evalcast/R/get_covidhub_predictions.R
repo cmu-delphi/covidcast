@@ -16,9 +16,11 @@
 #' @export
 #' @importFrom readr read_csv
 get_covidhub_predictions <- function(covid_hub_forecaster_name,
-                                     forecast_dates, ...) {
+                                     forecast_dates = NULL, ...) {
   url <- "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed"
   pcards <- list()
+  if (is.null(forecast_dates))
+    forecast_dates <- get_forecast_dates(covid_hub_forecaster_name)
   forecast_dates <- as.character(forecast_dates)
   for (forecast_date in forecast_dates) {
     filename <- sprintf("%s/%s/%s-%s.csv",
@@ -94,3 +96,13 @@ get_forecast_dates <- function(covid_hub_forecaster_name) {
                           covid_hub_forecaster_name))
   out[[1]][, 2]
 }
+
+get_covid_hub_forecaster_names <- function() {
+  warning("This should be done with the github API.")
+  url <- "https://github.com/reichlab/covid19-forecast-hub/tree/master/data-processed/"
+  xml2::read_html(url) %>%
+    rvest::html_nodes(xpath="//*[@id=\"js-repo-pjax-container\"]/div[2]/div/div[3]//a[@class='js-navigation-open link-gray-dark']") %>%
+    rvest::html_text() %>%
+    str_subset("\\.[md|Rmd|txt|png|R]", negate = TRUE)
+}
+

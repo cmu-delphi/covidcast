@@ -405,7 +405,7 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
 
   # For the maps, set range, if we need to (to mean +/- 3 standard deviations,
   # from metadata) 
-  if (is.null(range) && plot_type == "choro" || plot_type == "bubble") {
+  if (is.null(range) && (plot_type == "choro" || plot_type == "bubble")) {
     if (is.null(attributes(x)$metadata)) { 
       warn(
         paste0("Metadata for signal mean and standard deviation not ",

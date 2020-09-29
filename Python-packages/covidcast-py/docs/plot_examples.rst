@@ -132,7 +132,7 @@ the month of August.
 
 .. raw:: html
 
-    <video width="640" height="480" playsinline autoplay muted loop>
+    <video width="640" height="480" playsinline autoplay muted loop controls>
       <source src="_static/example_default_animation.mp4" type="video/mp4">
         Your browser does not support the HTML5 Video element
     </video>
@@ -147,7 +147,7 @@ keyword arguments can be provided and are passed to :py:func:`covidcast.plot_cho
 
 .. raw:: html
 
-    <video width="640" height="480" playsinline autoplay muted loop>
+    <video width="640" height="480" playsinline autoplay muted loop controls>
       <source src="_static/example_custom_animation.mp4" type="video/mp4">
         Your browser does not support the HTML5 Video element
     </video>

@@ -28,6 +28,7 @@ def test_plot_choropleth(mock_metadata):
     mock_metadata.side_effect = [
         {"mean_value": 0.5330011, "stdev_value": 0.4683431},
         {"mean_value": 0.5330011, "stdev_value": 0.4683431},
+        {"mean_value": 0.5330011, "stdev_value": 0.4683431},
         {"mean_value": 0.5304083, "stdev_value": 0.235302},
         {"mean_value": 0.5705364, "stdev_value": 0.4348706},
     ]
@@ -41,32 +42,42 @@ def test_plot_choropleth(mock_metadata):
     test_county["time_value"] = test_county.time_value.astype("datetime64[D]")
     test_county["value"] = test_county.value.astype("float")
 
-    fig1 = plotting.plot_choropleth(test_county, time_value=date(2020, 8, 4))
-    data1 = np.frombuffer(fig1.canvas.tostring_rgb(), dtype=np.uint8)  # get np array representation
+    # w/o megacounties
+    no_mega_fig1 = plotting.plot_choropleth(test_county, time_value=date(2020, 8, 4),
+                                    combine_megacounties=False)
+    # get np array representation
+    no_mega_data1 = np.frombuffer(no_mega_fig1.canvas.tostring_rgb(), dtype=np.uint8)
     # give margin of +-2 for floating point errors and weird variations (1 isn't consistent)
-    assert np.allclose(data1, expected["expected_1"], atol=2, rtol=0)
+    assert np.allclose(no_mega_data1, expected["no_mega1"], atol=2, rtol=0)
 
-    fig2 = plotting.plot_choropleth(test_county, cmap="viridis", figsize=(5, 5), edgecolor="0.8")
-    data2 = np.frombuffer(fig2.canvas.tostring_rgb(), dtype=np.uint8)
-    assert np.allclose(data2, expected["expected_2"], atol=2, rtol=0)
+    no_mega_fig2 = plotting.plot_choropleth(test_county, cmap="viridis", figsize=(5, 5), edgecolor="0.8",
+                                    combine_megacounties=False)
+    no_mega_data2 = np.frombuffer(no_mega_fig2.canvas.tostring_rgb(), dtype=np.uint8)
+    assert np.allclose(no_mega_data2, expected["no_mega2"], atol=2, rtol=0)
+
+    # w/ megacounties
+    mega_fig = plotting.plot_choropleth(test_county, time_value=date(2020, 8, 4))
+    mega_data = np.frombuffer(mega_fig.canvas.tostring_rgb(), dtype=np.uint8)  # get np array representation
+    # give margin of +-2 for floating point errors and weird variations (1 isn't consistent)
+    assert np.allclose(mega_data, expected["mega"], atol=2, rtol=0)
 
     # test state
     test_state = pd.read_csv(
         os.path.join(CURRENT_PATH, "../reference_data/test_input_state_signal.csv"), dtype=str)
     test_state["time_value"] = test_state.time_value.astype("datetime64[D]")
     test_state["value"] = test_state.value.astype("float")
-    fig3 = plotting.plot_choropleth(test_state)
-    data3 = np.frombuffer(fig3.canvas.tostring_rgb(), dtype=np.uint8)
-    assert np.allclose(data3, expected["expected_3"], atol=2, rtol=0)
+    state_fig = plotting.plot_choropleth(test_state)
+    state_data = np.frombuffer(state_fig.canvas.tostring_rgb(), dtype=np.uint8)
+    assert np.allclose(state_data, expected["state"], atol=2, rtol=0)
 
     # test MSA
     test_msa = pd.read_csv(
         os.path.join(CURRENT_PATH, "../reference_data/test_input_msa_signal.csv"), dtype=str)
     test_msa["time_value"] = test_msa.time_value.astype("datetime64[D]")
     test_msa["value"] = test_msa.value.astype("float")
-    fig4 = plotting.plot_choropleth(test_msa)
-    data4 = np.frombuffer(fig4.canvas.tostring_rgb(), dtype=np.uint8)
-    assert np.allclose(data4, expected["expected_4"], atol=2, rtol=0)
+    msa_fig = plotting.plot_choropleth(test_msa)
+    msa_data = np.frombuffer(msa_fig.canvas.tostring_rgb(), dtype=np.uint8)
+    assert np.allclose(msa_data, expected["msa"], atol=2, rtol=0)
 
 
 def test_get_geo_df():
@@ -167,20 +178,31 @@ def test__join_county_geo_df():
                                "test_value": [1.5, 2.5, 3],
                                "test_value2": [21.5, 32.5, 34]})
     geo_info = gpd.read_file(os.path.join(CURRENT_PATH, SHAPEFILE_PATHS["county"]))
+    # test w/o megacounty combine
     # test right join
-    output1 = plotting._join_county_geo_df(test_input, "county_code", geo_info)
-    assert type(output1) is gpd.GeoDataFrame
-    expected1 = gpd.read_file(
-        os.path.join(CURRENT_PATH, "../reference_data/expected__join_county_geo_df_right.gpkg"),
+    no_mega_r = plotting._join_county_geo_df(test_input, "county_code", geo_info)
+    assert type(no_mega_r) is gpd.GeoDataFrame
+    expected_no_mega_r = gpd.read_file(
+        os.path.join(CURRENT_PATH,
+                     "../reference_data/expected__join_county_geo_df_no_mega_right.gpkg"),
         dtype={"geo_value": str})
-    pd.testing.assert_frame_equal(expected1, output1)
+    pd.testing.assert_frame_equal(expected_no_mega_r, no_mega_r)
 
     # test left join
-    output2 = plotting._join_county_geo_df(test_input, "county_code", geo_info, "left")
-    expected2 = gpd.read_file(
-        os.path.join(CURRENT_PATH, "../reference_data/expected__join_county_geo_df_left.gpkg"),
+    no_mega_l = plotting._join_county_geo_df(test_input, "county_code", geo_info, "left")
+    expected_no_mega_l = gpd.read_file(
+        os.path.join(CURRENT_PATH,
+                     "../reference_data/expected__join_county_geo_df_no_mega_left.gpkg"),
         dtype={"geo_value": str})
-    pd.testing.assert_frame_equal(expected2, output2)
+    pd.testing.assert_frame_equal(expected_no_mega_l, no_mega_l)
+
+    # test w/ megacounty combine
+    mega = plotting._join_county_geo_df(test_input, "county_code", geo_info, "left", True)
+    expected_mega = gpd.read_file(
+        os.path.join(CURRENT_PATH,
+                     "../reference_data/expected__join_county_geo_df_mega.gpkg"),
+        dtype={"geo_value": str})
+    pd.testing.assert_frame_equal(expected_mega, mega)
 
 
 def test__join_msa_geo_df():

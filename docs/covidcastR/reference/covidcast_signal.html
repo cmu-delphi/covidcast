@@ -308,13 +308,13 @@ messages for each day of data it downloads. To suppress these, use
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='co'>## Fetch all counties from 2020-05-10 to the most recent available data</span>
-<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='st'>"20200510"</span>)
+<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='st'>"2020-05-10"</span>)
 <span class='co'>## Fetch all counties on just 2020-05-10 and no other days</span>
-<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='st'>"20200510"</span>,
-                 <span class='kw'>end_day</span> <span class='kw'>=</span> <span class='st'>"20200510"</span>)
+<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='st'>"2020-05-10"</span>,
+                 <span class='kw'>end_day</span> <span class='kw'>=</span> <span class='st'>"2020-05-10"</span>)
 <span class='co'>## Fetch all states on 2020-05-10, 2020-05-11, 2020-05-12</span>
-<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='st'>"20200510"</span>,
-                 <span class='kw'>end_day</span> <span class='kw'>=</span> <span class='st'>"20200512"</span>, <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='st'>"state"</span>)
+<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='st'>"2020-05-10"</span>,
+                 <span class='kw'>end_day</span> <span class='kw'>=</span> <span class='st'>"2020-05-12"</span>, <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='st'>"state"</span>)
 <span class='co'>## Fetch all available data for just Pennsylvania and New Jersey</span>
 <span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='st'>"state"</span>,
                  <span class='kw'>geo_values</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pa"</span>, <span class='st'>"nj"</span>))

@@ -7,3 +7,6 @@ mypy
 matplotlib
 numpy
 descartes
+imageio-ffmpeg
+imageio
+tqdm

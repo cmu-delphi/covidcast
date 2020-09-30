@@ -147,7 +147,8 @@ regular expressions.</p>
   <span class='kw'>ignore.case</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>perl</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>fixed</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>ties_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first"</span>, <span class='st'>"all"</span>)
+  <span class='kw'>ties_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first"</span>, <span class='st'>"all"</span>),
+  <span class='kw'>state</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )
 
 <span class='fu'>name_to_cbsa</span>(
@@ -155,7 +156,8 @@ regular expressions.</p>
   <span class='kw'>ignore.case</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>perl</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>fixed</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>ties_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first"</span>, <span class='st'>"all"</span>)
+  <span class='kw'>ties_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first"</span>, <span class='st'>"all"</span>),
+  <span class='kw'>state</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -176,6 +178,16 @@ are used; to match against a fixed string (no regular expressions), set
       <th>ties_method</th>
       <td><p>If "first", then only the first match for each name is
 returned. If "all", then all matches for each name are returned.</p></td>
+    </tr>
+    <tr>
+      <th>state</th>
+      <td><p>Two letter state abbreviation (case insensitive) indicating a
+parent state used to restrict the search. For example, when <code>state = "NY"</code>,
+then <code>name_to_fips()</code> searches only over only counties lying in New York
+state, whereas <code>name_to_cbsa()</code> searches over the metropolitan areas lying,
+either fully or partially (as a metropolitan area can span several states),
+in New York state. If <code>NULL</code>, the default, then the search is performed
+US-wide (not restricted to any state in particular).</p></td>
     </tr>
     </table>
 
@@ -205,6 +217,8 @@ list of FIPS or CBSA codes otherwise.</p>
 #&gt; [[3]]
 #&gt;   New Haven County  New London County  New Castle County  New Madrid County 
 #&gt;            "09009"            "09011"            "10003"            "29143" 
+#&gt;      New Hampshire         New Jersey         New Mexico           New York 
+#&gt;            "33000"            "34000"            "35000"            "36000" 
 #&gt;    New York County New Hanover County    New Kent County 
 #&gt;            "36061"            "37129"            "51127" 
 #&gt; </div><div class='input'>

@@ -2,7 +2,7 @@
 title: Plotting and mapping signals
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Plotting and mapping signals}
+  %\VignetteIndexEntry{1. Plotting and mapping signals}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -60,7 +60,7 @@ counties, and title:
 
 ```{r}
 plot(df_comb, time_value = "2020-07-04", choro_col = cm.colors(10), alpha = 0.4,
-     title = "Combination of COVID-19 Indicators on 2020-07-04")
+     title = "Combination of COVID-19 indicators on 2020-07-04")
 ```
 
 By providing `breaks` and `colors`, we can create custom color scales, for
@@ -76,7 +76,7 @@ colors <- c("#D3D3D3", "#FFFFCC", "#FEDDA2", "#FDBB79", "#FD9950", "#EB7538",
 # where we take breaks[0] = -Inf and breaks[N+1] = Inf, for N = length(breaks)
 
 plot(df_inum, choro_col = colors, choro_params = list(breaks = breaks),
-     title = "New COVID Cases (7 Day Trailing Average) on 2020-07-14")
+     title = "New COVID cases (7-day trailing average) on 2020-07-14")
 ```
 
 Lastly, we show how we can use custom breaks to (visually) answer the question: 
@@ -92,8 +92,9 @@ df_cprop <- suppressMessages(
 breaks <- c(0, 1000)
 colors <- c("#D3D3D3", "#FFC0CB")
 
-plot(df_cprop, choro_col = colors, choro_params = list(breaks = breaks, legend_width = 5), 
-     title = "Cumulative COVID Cases per 100k People on 2020-07-14")
+plot(df_cprop, choro_col = colors, 
+     choro_params = list(breaks = breaks, legend_width = 3), 
+     title = "Cumulative COVID cases per 100k people on 2020-07-14")
 ```
 
 ## Bubble maps
@@ -112,7 +113,8 @@ first bin do not get drawn, this map is much sparser, and highlights areas with
 larger case counts.
 
 ```{r}
-plot(df_inum, plot_type = "bubble", bubble_params = list(breaks = seq(20, 200, len = 6)))
+plot(df_inum, plot_type = "bubble", 
+     bubble_params = list(breaks = seq(20, 200, len = 6)))
 ```
 
 ```{r, include = FALSE}
@@ -136,15 +138,17 @@ Then we make two maps side-by-side with custom ranges:
 ```{r}
 library(gridExtra)
 
-breaks1 <- c(0, 1, 10, 100, 1000)
-breaks2 <- c(0, 10, 50, 100, 500)
+breaks1 <- c(1, 10, 100, 1000)
+breaks2 <- c(10, 50, 100, 500)
 
-p1 <- plot(df_inum, plot_type = "bubble", bubble_params = list(breaks = breaks1, max_size = 6),
+p1 <- plot(df_inum, plot_type = "bubble", 
+           bubble_params = list(breaks = breaks1, max_size = 6),
            include = "TX", bubble_col = "red",
-           title = paste("Incidence Number on", max(df_inum$time_value)))
-p2 <- plot(df_iprop, plot_type = "bubble", bubble_params = list(breaks = breaks2, max_size = 6),
+           title = paste("Incidence number on", max(df_inum$time_value)))
+p2 <- plot(df_iprop, plot_type = "bubble", 
+           bubble_params = list(breaks = breaks2, max_size = 6),
            include = "TX", bubble_col = "red",
-           title = paste("Incidence Proportion on", max(df_iprop$time_value)))
+           title = paste("Incidence rate on", max(df_iprop$time_value)))
 
 grid.arrange(p1, p2, nrow = 1)
 ```
@@ -160,14 +164,14 @@ than for all counties. This will make the time series plots more manageable.
 
 ```{r}
 suppressMessages({
-  df_comb_st <- covidcast_signal(data_source = "indicator-combination",
-                                 signal = "nmf_day_doc_fbc_fbs_ght",
-                                 start_day = "2020-04-15", end_day = "2020-07-01",
-                                 geo_type = "state")
-  df_inum_st <- covidcast_signal(data_source = "jhu-csse",
-                                 signal = "confirmed_7dav_incidence_num",
-                                 start_day = "2020-04-15", end_day = "2020-07-01",
-                                 geo_type = "state")
+df_comb_st <- covidcast_signal(data_source = "indicator-combination",
+                               signal = "nmf_day_doc_fbc_fbs_ght",
+                               start_day = "2020-04-15", end_day = "2020-07-01",
+                               geo_type = "state")
+df_inum_st <- covidcast_signal(data_source = "jhu-csse",
+                               signal = "confirmed_7dav_incidence_num",
+                               start_day = "2020-04-15", end_day = "2020-07-01",
+                               geo_type = "state")
 })
 ```
 
@@ -179,7 +183,7 @@ states and plot all data for them:
 library(dplyr)
 
 states <- c("ca", "pa", "tx", "ny")
-plot(df_comb_st %>% filter(geo_value %in% states), plot_type = "line")
+plot(df_comb_st %>% filter(geo_value %in% states), plot_type = "line") 
 plot(df_inum_st %>% filter(geo_value %in% states), plot_type = "line")
 ```
 
@@ -200,14 +204,14 @@ For example:
 library(ggplot2)
 
 suppressMessages({
-  df_comb_md <- covidcast_signal(data_source = "indicator-combination",
-                                 signal = "nmf_day_doc_fbc_fbs_ght",
-                                 start_day = "2020-06-01", end_day = "2020-07-15",
-                                 geo_values = name_to_fips("Miami-Dade"))
-  df_inum_md <- covidcast_signal(data_source = "jhu-csse",
-                                 signal = "confirmed_7dav_incidence_num",
-                                 start_day = "2020-06-01", end_day = "2020-07-15",
-                                 geo_values = name_to_fips("Miami-Dade"))
+df_comb_md <- covidcast_signal(data_source = "indicator-combination",
+                               signal = "nmf_day_doc_fbc_fbs_ght",
+                               start_day = "2020-06-01", end_day = "2020-07-15",
+                               geo_values = name_to_fips("Miami-Dade"))
+df_inum_md <- covidcast_signal(data_source = "jhu-csse",
+                               signal = "confirmed_7dav_incidence_num",
+                               start_day = "2020-06-01", end_day = "2020-07-15",
+                               geo_values = name_to_fips("Miami-Dade"))
 })
 
 # Compute the ranges of the two signals
@@ -236,7 +240,7 @@ ggplot(df, aes(x = time_value, y = value)) +
   labs(x = "Date", title = "Miami-Dade County") +
   geom_line(aes(color = signal)) +
   scale_y_continuous(
-    name = "New COVID-19 cases (7-day trailing avg)",
+    name = "New COVID-19 cases (7-day trailing average)",
     sec.axis = sec_axis(trans12, name = "Combination of COVID-19 indicators")
   ) +
   theme(legend.position = "bottom",

@@ -1,21 +1,31 @@
 """This contains the plotting and geo data management methods for the COVIDcast signals."""
 
+<<<<<<< HEAD
 from datetime import date
 from typing import Tuple
 import warnings
+=======
+import io
+from datetime import date, timedelta
+from typing import Tuple, Any
+
+>>>>>>> main
 
 import geopandas as gpd
+import imageio
+import matplotlib.figure
 import numpy as np
 import pandas as pd
 import pkg_resources
 from matplotlib import pyplot as plt
-import matplotlib.figure
+from tqdm import tqdm
 
 from .covidcast import _detect_metadata, _signal_metadata
 
 SHAPEFILE_PATHS = {"county": "shapefiles/county/cb_2019_us_county_5m.shp",
                    "state": "shapefiles/state/cb_2019_us_state_5m.shp",
-                   "msa": "shapefiles/msa/cb_2019_us_cbsa_5m.shp"}
+                   "msa": "shapefiles/msa/cb_2019_us_cbsa_5m.shp",
+                   "hrr": "shapefiles/hrr/geo_export_ad86cff5-e5ed-432e-9ec2-2ce8732099ee.shp"}
 
 STATE_ABBR_TO_FIPS = {"AL": "01", "MN": "27", "ME": "23", "WA": "53", "LA": "22", "PA": "42",
                       "MD": "24", "CO": "08", "TN": "47", "MI": "26", "FL": "12", "VA": "51",
@@ -104,6 +114,111 @@ def plot_choropleth(data: pd.DataFrame,
     return plot(data, time_value, **kwargs)
 
 
+def get_geo_df(data: pd.DataFrame,
+               geo_value_col: str = "geo_value",
+               geo_type_col: str = "geo_type",
+               join_type: str = "right") -> gpd.GeoDataFrame:
+    """Augment a :py:func:`covidcast.signal` data frame with the shape of each geography.
+
+    This method takes in a pandas DataFrame object and returns a GeoDataFrame
+    object from the `GeoPandas package <https://geopandas.org/>`_. The
+    GeoDataFrame will contain the geographic shape corresponding to every row in
+    its ``geometry`` column; for example, a data frame of county-level signal
+    observations will be returned with the shape of every county.
+
+    After detecting the geography type (state, county, HRR, and MSA are currently
+    supported) of the input, this function builds a GeoDataFrame that contains
+    state and geometry information from the Census or CMS for that geography type. By
+    default, it will take the signal data (left side) and geo data (right side)
+    and right join them, so all states/counties will always be present
+    regardless of whether ``data`` contains values for those locations. ``left``,
+    ``outer``, and ``inner`` joins are also supported and can be selected with
+    the ``join_type`` argument.
+
+    For right joins on counties, all counties without a signal value will be
+    given the value of the megacounty (if present). Other joins will not use
+    megacounties. See the `geographic coding documentation
+    <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html>`_
+    for information about megacounties.
+
+    By default, this function identifies the geography for each row of the input
+    data frame using its ``geo_value`` column, matching data frames returned by
+    :py:func:`covidcast.signal`, but the ``geo_value_col`` and ``geo_type_col``
+    arguments can be provided to match geographies for data frames with
+    different column names.
+
+    Geographic data is sourced from 1:5,000,000-scale shapefiles from the `2019
+    US Census Cartographic Boundary Files
+    <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`_
+    and the `CMS Data Website <https://data.cms.gov/widgets/ia25-mrsk>`_.
+
+    :param data: DataFrame of values and geographies.
+    :param geo_value_col: Name of column containing values of interest.
+    :param geo_type_col: Name of column containing geography type.
+    :param join_type: Type of join to do between input data (left side) and geo data (right side).
+      Must be one of `right` (default), `left`, `outer`, or `inner`.
+    :return: GeoDataFrame containing all columns from the input ``data``, along
+      with a ``geometry`` column (containing a polygon) and a ``state_fips``
+      column (a two-digit FIPS code identifying the US state containing this
+      geography). For MSAs that span multiple states, the first state in the MSA name is provided.
+      The geometry is given in the GCS NAD83 coordinate system for states, counties, and MSAs, and
+      WGS84 for HRRs.
+
+    """
+
+    if join_type == "right" and any(data[geo_value_col].duplicated()):
+        raise ValueError("join_type `right` is incompatible with duplicate values in a "
+                         "given region. Use `left` or ensure your input data is a single signal for"
+                         " a single date and geography type. ")
+    geo_type = _detect_metadata(data, geo_type_col)[2]  # pylint: disable=W0212
+    if geo_type not in ["state", "county", "msa", "hrr"]:
+        raise ValueError("Unsupported geography type; "
+                         "only `state`, `county`, `hrr`, and `msa` supported.")
+
+    shapefile_path = pkg_resources.resource_filename(__name__, SHAPEFILE_PATHS[geo_type])
+    geo_info = gpd.read_file(shapefile_path)
+
+    if geo_type == "state":
+        output = _join_state_geo_df(data, geo_value_col, geo_info, join_type)
+    elif geo_type == "msa":
+        output = _join_msa_geo_df(data, geo_value_col, geo_info, join_type)
+    elif geo_type == "hrr":
+        geo_info["geometry"] = geo_info["geometry"].translate(0, -0.185)  # fix projection shift bug
+        output = _join_hrr_geo_df(data, geo_value_col, geo_info, join_type)
+    else:  # geo_type must be "county"
+        output = _join_county_geo_df(data, geo_value_col, geo_info, join_type)
+    return output
+
+
+def animate(data: pd.DataFrame, filepath: str, fps: int = 3, dpi: int = 150, **kwargs: Any) -> None:
+    """Generate an animated video file of a signal over time.
+
+    Given a signal DataFrame, generates the choropleth for each day to form an animation of the
+    signal. Accepts arguments for video parameters as well as optional plotting arguments.
+    Supported output formats are listed in the
+    `imageio ffmpeg documentation <https://imageio.readthedocs.io/en/stable/format_ffmpeg.html>`_.
+
+    :param data: DataFrame for a single signal over time.
+    :param filepath: Path where video will be saved. Filename must contain supported extension.
+    :param fps: Frame rate in frames per second for animation. Defaults to 3.
+    :param dpi: Dots per inch for output video. Defaults to 150 on a 12.8x9.6 figure (1920x1440).
+    :param kwargs: Optional keyword arguments passed to :py:func:`covidcast.plot_choropleth`.
+    :return: None
+    """
+    # probesize is set to avoid warning by ffmpeg on frame rate up to 4k resolution.
+    writer = imageio.get_writer(filepath, fps=fps, input_params=["-probesize", "75M"])
+    num_days = (max(data.time_value) - min(data.time_value)).days
+    day_list = [min(data.time_value) + timedelta(days=x) for x in range(num_days+1)]
+    for d in tqdm(day_list):
+        buf = io.BytesIO()
+        plot_choropleth(data, time_value=d, **kwargs)
+        plt.savefig(buf, dpi=dpi)
+        plt.close()
+        buf.seek(0)
+        writer.append_data(imageio.imread(buf))
+    writer.close()
+
+
 def _plot_choro(ax, data, kwargs):
     """Generate a choropleth map on a given Figure/Axes from a GeoDataFrame.
 
@@ -173,76 +288,6 @@ def _plot_background_states(figsize: tuple):
     ax.set_xlim(plt.xlim())
     ax.set_ylim(plt.ylim())
     return fig, ax
-
-
-def get_geo_df(data: pd.DataFrame,
-               geo_value_col: str = "geo_value",
-               geo_type_col: str = "geo_type",
-               join_type: str = "right") -> gpd.GeoDataFrame:
-    """Augment a :py:func:`covidcast.signal` data frame with the shape of each geography.
-
-    This method takes in a pandas DataFrame object and returns a GeoDataFrame
-    object from the `GeoPandas package <https://geopandas.org/>`_. The
-    GeoDataFrame will contain the geographic shape corresponding to every row in
-    its ``geometry`` colummn; for example, a data frame of county-level signal
-    observations will be returned with the shape of every county.
-
-    After detecting the geography type (state, county, and MSA are currently
-    supported) of the input, this function builds a GeoDataFrame that contains
-    state and geometry information from the Census for that geography type. By
-    default, it will take the signal data (left side) and geo data (right side)
-    and right join them, so all states/counties will always be present
-    regardless of whether ``data`` contains values for those locations. ``left``,
-    ``outer``, and ``inner`` joins are also supported and can be selected with
-    the ``join_type`` argument.
-
-    For right joins on counties, all counties without a signal value will be
-    given the value of the megacounty (if present). Other joins will not use
-    megacounties. See the `geographic coding documentation
-    <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html>`_
-    for information about megacounties.
-
-    By default, this function identifies the geography for each row of the input
-    data frame using its ``geo_value`` column, matching data frames returned by
-    :py:func:`covidcast.signal`, but the ``geo_value_col`` and ``geo_type_col``
-    arguments can be provided to match geographies for data frames with
-    different column names.
-
-    Geographic data is sourced from 1:5,000,000-scale shapefiles from the `2019
-    US Census Cartographic Boundary Files
-    <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html>`_.
-
-    :param data: DataFrame of values and geographies.
-    :param geo_value_col: Name of column containing values of interest.
-    :param geo_type_col: Name of column containing geography type.
-    :param join_type: Type of join to do between input data (left side) and geo data (right side).
-      Must be one of `right` (default), `left`, `outer`, or `inner`.
-    :return: GeoDataFrame containing all columns from the input ``data``, along
-      with a ``geometry`` column (containing a polygon) and a ``state_fips``
-      column (a two-digit FIPS code identifying the US state containing this
-      geography). For MSAs that span multiple states, the first state in the MSA name is provided.
-      The geometry is given in the GCS NAD83 coordinate system.
-
-    """
-
-    if join_type == "right" and any(data[geo_value_col].duplicated()):
-        raise ValueError("join_type `right` is incompatible with duplicate values in a "
-                         "given region. Use `left` or ensure your input data is a single signal for"
-                         " a single date and geography type. ")
-    geo_type = _detect_metadata(data, geo_type_col)[2]  # pylint: disable=W0212
-    if geo_type not in ["state", "county", "msa"]:
-        raise ValueError("Unsupported geography type; only `state`, `county`, and `msa` supported.")
-
-    shapefile_path = pkg_resources.resource_filename(__name__, SHAPEFILE_PATHS[geo_type])
-    geo_info = gpd.read_file(shapefile_path)
-
-    if geo_type == "state":
-        output = _join_state_geo_df(data, geo_value_col, geo_info, join_type)
-    elif geo_type == "msa":
-        output = _join_msa_geo_df(data, geo_value_col, geo_info, join_type)
-    else:  # geo_type must be "county"
-        output = _join_county_geo_df(data, geo_value_col, geo_info, join_type)
-    return output
 
 
 def _project_and_transform(data: gpd.GeoDataFrame,
@@ -326,7 +371,7 @@ def _join_msa_geo_df(data: pd.DataFrame,
                      msa_col: str,
                      geo_info: gpd.GeoDataFrame,
                      join_type: str = "right") -> gpd.GeoDataFrame:
-    """Join DF information to polygon information in a GeoDF at the state level.
+    """Join DF information to polygon information in a GeoDF at the MSA level.
 
     For MSAs which span multiple states, the first state in the name is returned for the state FIPS.
 
@@ -335,11 +380,32 @@ def _join_msa_geo_df(data: pd.DataFrame,
     :param geo_info: GeoDF of state shape info read from Census shapefiles
     :return: ``data`` with cbsa polygon and state fips joined.
     """
-    geo_info = geo_info[geo_info.LSAD == "M1"]
+    geo_info = geo_info[geo_info.LSAD == "M1"]  # only get metro and not micropolitan areas
     input_cols = list(data.columns)
     merged = data.merge(geo_info, how=join_type, left_on=msa_col, right_on="GEOID", sort=True)
     # use full state list in the return
     merged[msa_col] = merged.GEOID.combine_first(merged[msa_col])
     # get the first state, which will be the first two characters after the comma and whitespace
     merged["state_fips"] = [STATE_ABBR_TO_FIPS.get(i.split(",")[1][1:3]) for i in merged.NAME]
+    return gpd.GeoDataFrame(merged[input_cols + ["state_fips", "geometry"]])
+
+
+def _join_hrr_geo_df(data: pd.DataFrame,
+                     msa_col: str,
+                     geo_info: gpd.GeoDataFrame,
+                     join_type: str = "right") -> gpd.GeoDataFrame:
+    """Join DF information to polygon information in a GeoDF at the HRR level.
+
+    :param data: DF with state info
+    :param msa_col: cname of column in `data` containing state info to join on
+    :param geo_info: GeoDF of state shape info read from Census shapefiles
+    :return: ``data`` with HRR polygon and state fips joined.
+    """
+    geo_info["hrr_num"] = geo_info.hrr_num.astype("int").astype(str)  # original col was a float
+    input_cols = list(data.columns)
+    merged = data.merge(geo_info, how=join_type, left_on=msa_col, right_on="hrr_num", sort=True)
+    # use full state list in the return
+    merged[msa_col] = merged.hrr_num.combine_first(merged[msa_col])
+    # get the first state, which will be the first two characters in the HRR name
+    merged["state_fips"] = [STATE_ABBR_TO_FIPS.get(i[:2]) for i in merged.hrr_name]
     return gpd.GeoDataFrame(merged[input_cols + ["state_fips", "geometry"]])

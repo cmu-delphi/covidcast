@@ -6,7 +6,7 @@ Plotting Reference
 Choropleth maps
 ---------------
 
-This package provides a plotting function that takes a county or state level
+This package provides a plotting function that takes a state, county, HRR, or MSA
 signal and generates a choropleth map, using `matplotlib
 <https://matplotlib.org/>`_ underneath. Detailed examples are provided in the
 :ref:`usage examples <plotting-examples>`.

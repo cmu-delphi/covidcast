@@ -1,23 +1,17 @@
 """This contains the plotting and geo data management methods for the COVIDcast signals."""
 
-<<<<<<< HEAD
-from datetime import date
-from typing import Tuple
-import warnings
-=======
 import io
+import warnings
 from datetime import date, timedelta
 from typing import Tuple, Any
 
->>>>>>> main
-
 import geopandas as gpd
 import imageio
-import matplotlib.figure
 import numpy as np
 import pandas as pd
 import pkg_resources
 from matplotlib import pyplot as plt
+from matplotlib import figure, axes
 from tqdm import tqdm
 
 from .covidcast import _detect_metadata, _signal_metadata
@@ -48,7 +42,7 @@ CONTIGUOUS_FIPS = {"01", "04", "05", "06", "08", "09", "10", "11", "12", "13", "
 def plot(data: pd.DataFrame,
          time_value: date = None,
          plot_type: str = "choropleth",
-         **kwargs) -> matplotlib.figure.Figure:
+         **kwargs: Any) -> figure.Figure:
     """Given the output data frame of :py:func:`covidcast.signal`, plot a choropleth map.
 
     Projections used for plotting:
@@ -93,15 +87,15 @@ def plot(data: pd.DataFrame,
     fig, ax = _plot_background_states(kwargs["figsize"])
     ax.set_title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")
     if plot_type == "choropleth":
-        _plot_choro(ax, day_data, kwargs)
+        _plot_choro(ax, day_data, **kwargs)
     else:
-        _plot_bubble(ax, day_data, kwargs)
+        _plot_bubble(ax, day_data, **kwargs)
     return fig
 
 
 def plot_choropleth(data: pd.DataFrame,
                     time_value: date = None,
-                    **kwargs) -> matplotlib.figure.Figure:
+                    **kwargs: Any) -> figure.Figure:
     """Deprecated function for plotting choropleths. Has been generalized to plot().
 
     :param data: Data frame of signal values, as returned from :py:func:`covidcast.signal`.
@@ -219,7 +213,7 @@ def animate(data: pd.DataFrame, filepath: str, fps: int = 3, dpi: int = 150, **k
     writer.close()
 
 
-def _plot_choro(ax, data, kwargs):
+def _plot_choro(ax: axes.Axes, data: gpd.GeoDataFrame, **kwargs: Any) -> None:
     """Generate a choropleth map on a given Figure/Axes from a GeoDataFrame.
 
     :param ax: Matplotlib axes to plot on.
@@ -238,10 +232,9 @@ def _plot_choro(ax, data, kwargs):
     sm._A = []  # pylint: disable=W0212
     plt.colorbar(sm, ticks=np.linspace(kwargs["vmin"], kwargs["vmax"], 8), ax=ax,
                  orientation="horizontal", fraction=0.02, pad=0.05)
-    return ax
 
 
-def _plot_bubble(ax, data, kwargs):
+def _plot_bubble(ax: axes.Axes, data: gpd.GeoDataFrame, **kwargs: Any) -> None:
     """Generate a bubble map on a given Figure/Axes from a GeoDataFrame.
 
     :param ax: Matplotlib axes to plot on.
@@ -255,25 +248,22 @@ def _plot_bubble(ax, data, kwargs):
     data_w_geo = get_geo_df(data, join_type="inner")
     bubble_scale = 75 / max(data_w_geo.value)  # cap bubbles at size 75
     # discretize into 8 bins
-    label_bins, step = np.linspace(kwargs["vmin"], kwargs["vmax"], 8, retstep=True)
+    label_bins = np.linspace(kwargs["vmin"], kwargs["vmax"], 8)
     value_bins = list(label_bins) + [max(data_w_geo.value) + kwargs["vmax"]]
     data_w_geo["binval"] = pd.cut(data_w_geo.value, labels=label_bins, bins=value_bins)
     data_w_geo["binval"] = data_w_geo.binval.astype(float) * bubble_scale
     for shape in _project_and_transform(data_w_geo):
         # plot counties in white
         shape.plot(color="1", ax=ax, legend=True, edgecolor="0.8", linewidth=0.5)
-        # plot bubbles at the centroid of the polygon
-        shape["geometry"] = shape["geometry"].centroid
+        shape["geometry"] = shape["geometry"].centroid  # plot bubbles at each polgyon's centroid
         shape.plot(markersize="binval", color=kwargs["color"], ax=ax, alpha=kwargs["alpha"])
     # to generate the legend, need to plot the reference points as scatter plots off the map
-    for b in label_bins:
-        ax.scatter([1e10], [1e10], color="purple", alpha=0.5,
-                   s=b * bubble_scale, label=str(round(b, 2)))
+    for bubble in label_bins * bubble_scale:
+        ax.scatter([1e10], [1e10], color="purple", alpha=0.5, s=bubble, label=str(round(bubble, 2)))
     ax.legend(labelspacing=1.5, frameon=False, ncol=8, loc="lower center")
-    return ax
 
 
-def _plot_background_states(figsize: tuple):
+def _plot_background_states(figsize: tuple) -> tuple:
     """Plot US states in light grey as the background for other plots.
 
     :param figsize: Dimensions of plot.

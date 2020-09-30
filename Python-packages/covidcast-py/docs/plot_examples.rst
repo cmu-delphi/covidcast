@@ -6,7 +6,7 @@ Plotting Examples
 Built-in functionality
 ----------------------
 The returned DataFrame from :py:func:`covidcast.signal` can be plotted using the built-in
-:py:func:`covidcast.plot_choropleth`. Currently only state, county, hospital referral regions
+:py:func:`covidcast.plot_choropleth`. Currently, state, county, hospital referral regions
 (HRR), and metropolitan statistical area (MSA) geography types are supported.
 
 County-level maps show estimates for each county, and color each state by the
@@ -132,12 +132,12 @@ the month of August.
 
 .. raw:: html
 
-    <video width="640" height="480" playsinline autoplay muted loop>
+    <video width="640" height="480" playsinline autoplay muted loop controls>
       <source src="_static/example_default_animation.mp4" type="video/mp4">
         Your browser does not support the HTML5 Video element
     </video>
 
-Video frame rate and resolution are adjustable. Like the static maps, additional plotting
+Video format, frame rate, and resolution are adjustable. Like the static maps, additional plotting
 keyword arguments can be provided and are passed to :py:func:`covidcast.plot_choropleth`.
 
 >>> covidcast.animate(df,
@@ -147,7 +147,7 @@ keyword arguments can be provided and are passed to :py:func:`covidcast.plot_cho
 
 .. raw:: html
 
-    <video width="640" height="480" playsinline autoplay muted loop>
+    <video width="640" height="480" playsinline autoplay muted loop controls>
       <source src="_static/example_custom_animation.mp4" type="video/mp4">
         Your browser does not support the HTML5 Video element
     </video>

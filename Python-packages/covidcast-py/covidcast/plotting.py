@@ -2,6 +2,7 @@
 
 from datetime import date
 from typing import Tuple
+import warnings
 
 import geopandas as gpd
 import numpy as np
@@ -34,10 +35,10 @@ CONTIGUOUS_FIPS = {"01", "04", "05", "06", "08", "09", "10", "11", "12", "13", "
                    "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"}
 
 
-def plot_choropleth(data: pd.DataFrame,
-                    time_value: date = None,
-                    plot_type: str = "choropleth",
-                    **kwargs) -> matplotlib.figure.Figure:
+def plot(data: pd.DataFrame,
+         time_value: date = None,
+         plot_type: str = "choropleth",
+         **kwargs) -> matplotlib.figure.Figure:
     """Given the output data frame of :py:func:`covidcast.signal`, plot a choropleth map.
 
     Projections used for plotting:
@@ -64,7 +65,7 @@ def plot_choropleth(data: pd.DataFrame,
     :param time_value: If multiple days of data are present in ``data``, map only values from this
       day. Defaults to plotting the most recent day of data in ``data``.
     :param kwargs: Optional keyword arguments passed to ``GeoDataFrame.plot()``.
-    :param plot_type:
+    :param plot_type: Type of plot to create. Either choropleth (default) or bubble map.
     :return: Matplotlib figure object.
 
     """
@@ -72,7 +73,7 @@ def plot_choropleth(data: pd.DataFrame,
         raise ValueError("`plot_type` must be 'choropleth' or 'bubble'.")
     data_source, signal, geo_type = _detect_metadata(data)  # pylint: disable=W0212
     meta = _signal_metadata(data_source, signal, geo_type)  # pylint: disable=W0212
-    # use most recent date in data if none provided
+    # use most recent date if none provided
     day_to_plot = time_value if time_value else max(data.time_value)
     day_data = data.loc[data.time_value == pd.to_datetime(day_to_plot), :]
 
@@ -80,12 +81,27 @@ def plot_choropleth(data: pd.DataFrame,
     kwargs["figsize"] = kwargs.get("figsize", (12.8, 9.6))
 
     fig, ax = _plot_background_states(kwargs["figsize"])
+    ax.set_title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")
     if plot_type == "choropleth":
         _plot_choro(ax, day_data, kwargs)
     else:
         _plot_bubble(ax, day_data, kwargs)
-    ax.set_title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")
     return fig
+
+
+def plot_choropleth(data: pd.DataFrame,
+                    time_value: date = None,
+                    **kwargs) -> matplotlib.figure.Figure:
+    """Deprecated function for plotting choropleths. Has been generalized to plot().
+
+    :param data: Data frame of signal values, as returned from :py:func:`covidcast.signal`.
+    :param time_value: If multiple days of data are present in ``data``, map only values from this
+      day. Defaults to plotting the most recent day of data in ``data``.
+    :param kwargs: Optional keyword arguments passed to ``GeoDataFrame.plot()``.
+    :return: Matplotlib figure object.
+    """
+    warnings.warn("Function `plot_choropleth` is deprecated. Use `plot()` instead.")
+    return plot(data, time_value, **kwargs)
 
 
 def _plot_choro(ax, data, kwargs):

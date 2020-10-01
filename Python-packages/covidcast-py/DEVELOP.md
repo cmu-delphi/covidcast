@@ -7,7 +7,7 @@ few other pieces I found.
 
 When you develop a new package version, there are several steps to consider:
 
-1. Increment the package version in `setup.py`.
+1. Increment the package version in `setup.py` and in Sphinx's `conf.py`.
 2. Rebuild the package. You will need to install the `wheel` package:
 
     ```sh

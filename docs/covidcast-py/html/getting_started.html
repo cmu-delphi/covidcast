@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Getting Started &#8212; COVIDcast API client 0.0.9 documentation</title>
+    <title>Getting Started &#8212; COVIDcast API client 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -35,10 +35,21 @@
             
   <div class="section" id="getting-started">
 <span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>This package provides access to data from the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a>, which
+provides numerous COVID-related data streams, updated daily. To begin, you’ll
+want to browse the available data streams and determine which signals are useful
+to you. The <a class="reference external" href="https://covidcast.cmu.edu/">COVIDcast interactive map</a> displays a
+selection of the signals, and by selecting the Export Data feature, you can get
+example Python code to access each of the signals.</p>
+<p>To browse in more detail, the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">data sources and signal documentation</a> lists
+the available signals, including many not shown on the interactive map. Simply
+obtain the data source and signal names from the list. Below we will demonstrate
+how to use these names to access each data stream.</p>
 <div class="section" id="basic-examples">
 <h2>Basic examples<a class="headerlink" href="#basic-examples" title="Permalink to this headline">¶</a></h2>
-<p>To obtain smoothed estimates of COVID-like illness from our Facebook survey for
-every county in the United States between 2020-05-01 and 2020-05-07:</p>
+<p>To obtain smoothed estimates of COVID-like illness from our symptom survey,
+distributed through Facebook, for every county in the United States between
+2020-05-01 and 2020-05-07:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">covidcast</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span> <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
@@ -62,6 +73,11 @@ indicates when this data was reported; in this case, the survey estimates for
 May 1st were updated on May 23rd based on new data, giving a <code class="docutils literal notranslate"><span class="pre">lag</span></code> of 22 days.
 See the <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a> documentation for details on the returned
 data frame.</p>
+<p>The API documentation lists each available signal and provides technical details
+on how it is estimated and how its standard error is calculated. In this case,
+for example, the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html">symptom surveys documentation page</a>
+explains the definition of “COVID-like illness”, links to the exact survey text,
+and describes the mathematical derivation of the estimates.</p>
 <p>We can also request all data on a signal after a specific date. Here, for
 example, we obtain <code class="docutils literal notranslate"><span class="pre">smoothed_cli</span></code> in each state for every day since
 2020-05-01:</p>
@@ -92,6 +108,38 @@ such as the state of Pennsylvania for the month of May 2020:</p>
 </div>
 <p>We can request multiple states by providing a list, such as <code class="docutils literal notranslate"><span class="pre">[&quot;pa&quot;,</span> <span class="pre">&quot;ny&quot;,</span>
 <span class="pre">&quot;mo&quot;]</span></code>.</p>
+<p>Sometimes it may be useful to join multiple signals into a single data frame.
+For example, suppose I’d like to look at the relationships between cases at each
+location and the number of deaths three days later. The
+<a class="reference internal" href="signals.html#covidcast.aggregate_signals" title="covidcast.aggregate_signals"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.aggregate_signals()</span></code></a> function can combine multiple data frames
+into a single one, optionally with lag. In this case, I use it as follows:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cases</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;indicator-combination&quot;</span><span class="p">,</span> <span class="s2">&quot;confirmed_incidence_num&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
+<span class="gp">... </span>                         <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">geo_values</span><span class="o">=</span><span class="s2">&quot;pa&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">deaths</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;indicator-combination&quot;</span><span class="p">,</span> <span class="s2">&quot;deaths_incidence_num&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
+<span class="gp">... </span>                          <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">geo_values</span><span class="o">=</span><span class="s2">&quot;pa&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cases_v_deaths</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">aggregate_signals</span><span class="p">([</span><span class="n">cases</span><span class="p">,</span> <span class="n">deaths</span><span class="p">],</span> <span class="n">dt</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cases_v_deaths</span> <span class="o">=</span> <span class="n">cases_v_deaths</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;indicator-combination_confirmed_incidence_num_0_value&quot;</span><span class="p">:</span> <span class="s2">&quot;cases&quot;</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="s2">&quot;indicator-combination_deaths_incidence_num_1_value&quot;</span><span class="p">:</span> <span class="s2">&quot;deaths&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cases_v_deaths</span><span class="p">[[</span><span class="s2">&quot;time_value&quot;</span><span class="p">,</span> <span class="s2">&quot;geo_value&quot;</span><span class="p">,</span> <span class="s2">&quot;cases&quot;</span><span class="p">,</span> <span class="s2">&quot;deaths&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="go">  time_value geo_value   cases  deaths</span>
+<span class="go">0 2020-05-01        pa     NaN    62.0</span>
+<span class="go">1 2020-05-02        pa     NaN    65.0</span>
+<span class="go">2 2020-05-03        pa     NaN    24.0</span>
+<span class="go">3 2020-05-04        pa  1209.0    13.0</span>
+<span class="go">4 2020-05-05        pa  1332.0   547.0</span>
+</pre></div>
+</div>
+<p>The resulting <code class="docutils literal notranslate"><span class="pre">cases_v_deaths</span></code> data frame contains one row per location per
+day. The death value is the number of deaths on that day; the cases value is the
+number of cases <em>3 days prior</em>, matching the <code class="docutils literal notranslate"><span class="pre">dt</span></code> provided to
+<a class="reference internal" href="signals.html#covidcast.aggregate_signals" title="covidcast.aggregate_signals"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.aggregate_signals()</span></code></a>. The first three case values shown above
+are <code class="docutils literal notranslate"><span class="pre">NaN</span></code> because the input data frame did not contain case numbers for late
+April.</p>
+<p>Note the long column names used by default to prevent ambiguity or name
+collisions.</p>
 </div>
 <div class="section" id="tracking-issues-and-updates">
 <h2>Tracking issues and updates<a class="headerlink" href="#tracking-issues-and-updates" title="Permalink to this headline">¶</a></h2>
@@ -190,6 +238,49 @@ on May 10th (a 7-day lag), but in fact the value was not updated on that day:</p
 </pre></div>
 </div>
 </div>
+<div class="section" id="dealing-with-geographies">
+<h2>Dealing with geographies<a class="headerlink" href="#dealing-with-geographies" title="Permalink to this headline">¶</a></h2>
+<p>As seen above, the COVIDcast API identifies counties by their FIPS code and
+states by two-letter abbreviations. Metropolitan statistical areas are also
+identified by unique codes, called CBSA IDs. (Exact details and exceptions are
+given in the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">geographic coding documentation</a>.) If
+you want to find a specific area by name, this package provides convenience
+functions:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">name_to_cbsa</span><span class="p">([</span><span class="s2">&quot;Houston&quot;</span><span class="p">,</span> <span class="s2">&quot;San Antonio&quot;</span><span class="p">])</span>
+<span class="go">[&#39;26420&#39;, &#39;41700&#39;]</span>
+</pre></div>
+</div>
+<p>We can use these functions to quickly query data for specific regions:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">counties</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">name_to_fips</span><span class="p">([</span><span class="s2">&quot;Allegheny&quot;</span><span class="p">,</span> <span class="s2">&quot;Los Angeles&quot;</span><span class="p">,</span> <span class="s2">&quot;Miami-Dade&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;doctor-visits&quot;</span><span class="p">,</span> <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                      <span class="n">start_day</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">end_day</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<span class="gp">... </span>                      <span class="n">geo_values</span><span class="o">=</span><span class="n">counties</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span>
+<span class="go">  geo_value        signal time_value  direction      issue  lag     value stderr sample_size geo_type    data_source</span>
+<span class="go">0     42003  smoothed_cli 2020-05-01         -1 2020-07-04   64  1.336086   None        None   county  doctor-visits</span>
+<span class="go">0     06037  smoothed_cli 2020-05-01          0 2020-07-04   64  5.787655   None        None   county  doctor-visits</span>
+<span class="go">0     12086  smoothed_cli 2020-05-01         -1 2020-07-04   64  6.405477   None        None   county  doctor-visits</span>
+</pre></div>
+</div>
+<p>We can also quickly convert back from the IDs returned by the API to
+human-readable names:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">fips_to_name</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">geo_value</span><span class="p">)</span>
+<span class="go">[&#39;Allegheny County&#39;, &#39;Los Angeles County&#39;, &#39;Miami-Dade County&#39;]</span>
+</pre></div>
+</div>
+<p>Because the functions support regular expression matching, we can quickly find
+all regions meeting certain criteria. For example, the five-digit FIPS codes
+used to identify counties use their first two digits to identify the state. We
+can find all counties in the state of Pennsylvania by querying for FIPS codes
+beginning with 42 and requesting all matches:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pa_counties</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">fips_to_name</span><span class="p">(</span><span class="s2">&quot;^42.*&quot;</span><span class="p">,</span> <span class="n">ties_method</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pa_counties</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">{&#39;42000&#39;: [&#39;Pennsylvania&#39;], &#39;42001&#39;: [&#39;Adams County&#39;], &#39;42003&#39;: [&#39;Allegheny County&#39;], &#39;42005&#39;: [&#39;Armstrong County&#39;], &#39;42007&#39;: [&#39;Beaver County&#39;], &#39;42009&#39;: [&#39;Bedford County&#39;], &#39;42011&#39;: [&#39;Berks County&#39;], &#39;42013&#39;: [&#39;Blair County&#39;], &#39;42015&#39;: [&#39;Bradford County&#39;], &#39;42017&#39;: [&#39;Bucks County&#39;], &#39;42019&#39;: [&#39;Butler County&#39;], &#39;42021&#39;: [&#39;Cambria County&#39;], &#39;42023&#39;: [&#39;Cameron County&#39;], &#39;42025&#39;: [&#39;Carbon County&#39;], &#39;42027&#39;: [&#39;Centre County&#39;], &#39;42029&#39;: [&#39;Chester County&#39;], &#39;42031&#39;: [&#39;Clarion County&#39;], &#39;42033&#39;: [&#39;Clearfield County&#39;], &#39;42035&#39;: [&#39;Clinton County&#39;], &#39;42037&#39;: [&#39;Columbia County&#39;], &#39;42039&#39;: [&#39;Crawford County&#39;], &#39;42041&#39;: [&#39;Cumberland County&#39;], &#39;42043&#39;: [&#39;Dauphin County&#39;], &#39;42045&#39;: [&#39;Delaware County&#39;], &#39;42047&#39;: [&#39;Elk County&#39;], &#39;42049&#39;: [&#39;Erie County&#39;], &#39;42051&#39;: [&#39;Fayette County&#39;], &#39;42053&#39;: [&#39;Forest County&#39;], &#39;42055&#39;: [&#39;Franklin County&#39;], &#39;42057&#39;: [&#39;Fulton County&#39;], &#39;42059&#39;: [&#39;Greene County&#39;], &#39;42061&#39;: [&#39;Huntingdon County&#39;], &#39;42063&#39;: [&#39;Indiana County&#39;], &#39;42065&#39;: [&#39;Jefferson County&#39;], &#39;42067&#39;: [&#39;Juniata County&#39;], &#39;42069&#39;: [&#39;Lackawanna County&#39;], &#39;42071&#39;: [&#39;Lancaster County&#39;], &#39;42073&#39;: [&#39;Lawrence County&#39;], &#39;42075&#39;: [&#39;Lebanon County&#39;], &#39;42077&#39;: [&#39;Lehigh County&#39;], &#39;42079&#39;: [&#39;Luzerne County&#39;], &#39;42081&#39;: [&#39;Lycoming County&#39;], &#39;42083&#39;: [&#39;McKean County&#39;], &#39;42085&#39;: [&#39;Mercer County&#39;], &#39;42087&#39;: [&#39;Mifflin County&#39;], &#39;42089&#39;: [&#39;Monroe County&#39;], &#39;42091&#39;: [&#39;Montgomery County&#39;], &#39;42093&#39;: [&#39;Montour County&#39;], &#39;42095&#39;: [&#39;Northampton County&#39;], &#39;42097&#39;: [&#39;Northumberland County&#39;], &#39;42099&#39;: [&#39;Perry County&#39;], &#39;42101&#39;: [&#39;Philadelphia County&#39;], &#39;42103&#39;: [&#39;Pike County&#39;], &#39;42105&#39;: [&#39;Potter County&#39;], &#39;42107&#39;: [&#39;Schuylkill County&#39;], &#39;42109&#39;: [&#39;Snyder County&#39;], &#39;42111&#39;: [&#39;Somerset County&#39;], &#39;42113&#39;: [&#39;Sullivan County&#39;], &#39;42115&#39;: [&#39;Susquehanna County&#39;], &#39;42117&#39;: [&#39;Tioga County&#39;], &#39;42119&#39;: [&#39;Union County&#39;], &#39;42121&#39;: [&#39;Venango County&#39;], &#39;42123&#39;: [&#39;Warren County&#39;], &#39;42125&#39;: [&#39;Washington County&#39;], &#39;42127&#39;: [&#39;Wayne County&#39;], &#39;42129&#39;: [&#39;Westmoreland County&#39;], &#39;42131&#39;: [&#39;Wyoming County&#39;], &#39;42133&#39;: [&#39;York County&#39;]}</span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="signals.html#working-with-geos"><span class="std std-ref">Working with geographic identifiers</span></a> for details on each of these functions and their
+optional arguments.</p>
+</div>
 </div>
 
 
@@ -213,11 +304,12 @@ on May 10th (a 7-day lag), but in fact the value was not updated on that day:</p
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#basic-examples">Basic examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#tracking-issues-and-updates">Tracking issues and updates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dealing-with-geographies">Dealing with geographies</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="signals.html">Fetching Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_examples.html">Plotting Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 

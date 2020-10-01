@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plotting Examples &#8212; COVIDcast API client 0.0.9 documentation</title>
+    <title>Plotting Examples &#8212; COVIDcast API client 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -15,8 +15,8 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Changelog" href="changelog.html" />
-    <link rel="prev" title="Plotting Reference" href="plotting.html" />
+    <link rel="next" title="Plotting Reference" href="plotting.html" />
+    <link rel="prev" title="Fetching Data" href="signals.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -38,7 +38,8 @@
 <div class="section" id="built-in-functionality">
 <h2>Built-in functionality<a class="headerlink" href="#built-in-functionality" title="Permalink to this headline">¶</a></h2>
 <p>The returned DataFrame from <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a> can be plotted using the built-in
-<a class="reference internal" href="plotting.html#covidcast.plot_choropleth" title="covidcast.plot_choropleth"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot_choropleth()</span></code></a>. Currently only state and county geography types are supported.</p>
+<a class="reference internal" href="plotting.html#covidcast.plot_choropleth" title="covidcast.plot_choropleth"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot_choropleth()</span></code></a>. Currently, state, county, hospital referral regions
+(HRR), and metropolitan statistical area (MSA) geography types are supported.</p>
 <p>County-level maps show estimates for each county, and color each state by the
 megacounty estimates, if available. (Megacounties represent all counties with
 insufficient sample size to report in that state; see the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">geographic coding
@@ -47,8 +48,10 @@ details.)</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">covidcast</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span> <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+<span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
 <span class="gp">... </span>                        <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;county&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">plot_choropleth</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -59,8 +62,10 @@ details.)</p>
 <img alt="_images/plot_examples-1.png" src="_images/plot_examples-1.png" />
 </div>
 <p>State-level data can also be mapped:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span> <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+<span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
 <span class="gp">... </span>                        <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;state&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">plot_choropleth</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -69,6 +74,32 @@ details.)</p>
 <p>(<a class="reference external" href=".//plot_examples-2.py">Source code</a>, <a class="reference external" href=".//plot_examples-2.png">png</a>, <a class="reference external" href=".//plot_examples-2.hires.png">hires.png</a>, <a class="reference external" href=".//plot_examples-2.pdf">pdf</a>)</p>
 <div class="figure align-default">
 <img alt="_images/plot_examples-2.png" src="_images/plot_examples-2.png" />
+</div>
+<p>Regions where no information is present are presented in light grey, as demonstrated by these MSA
+and HRR plots.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+<span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+<span class="gp">... </span>                        <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;msa&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">plot_choropleth</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href=".//plot_examples-3.py">Source code</a>, <a class="reference external" href=".//plot_examples-3.png">png</a>, <a class="reference external" href=".//plot_examples-3.hires.png">hires.png</a>, <a class="reference external" href=".//plot_examples-3.pdf">pdf</a>)</p>
+<div class="figure align-default">
+<img alt="_images/plot_examples-3.png" src="_images/plot_examples-3.png" />
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span> <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+<span class="gp">... </span>                        <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;hrr&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">plot_choropleth</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href=".//plot_examples-4.py">Source code</a>, <a class="reference external" href=".//plot_examples-4.png">png</a>, <a class="reference external" href=".//plot_examples-4.hires.png">hires.png</a>, <a class="reference external" href=".//plot_examples-4.pdf">pdf</a>)</p>
+<div class="figure align-default">
+<img alt="_images/plot_examples-4.png" src="_images/plot_examples-4.png" />
 </div>
 <p>Additional keyword arguments can also be provided. These correspond to most of the arguments
 available for the
@@ -79,9 +110,9 @@ available for the
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>(<a class="reference external" href=".//plot_examples-3.py">Source code</a>, <a class="reference external" href=".//plot_examples-3.png">png</a>, <a class="reference external" href=".//plot_examples-3.hires.png">hires.png</a>, <a class="reference external" href=".//plot_examples-3.pdf">pdf</a>)</p>
+<p>(<a class="reference external" href=".//plot_examples-5.py">Source code</a>, <a class="reference external" href=".//plot_examples-5.png">png</a>, <a class="reference external" href=".//plot_examples-5.hires.png">hires.png</a>, <a class="reference external" href=".//plot_examples-5.pdf">pdf</a>)</p>
 <div class="figure align-default">
-<img alt="_images/plot_examples-3.png" src="_images/plot_examples-3.png" />
+<img alt="_images/plot_examples-5.png" src="_images/plot_examples-5.png" />
 </div>
 <p>The function returns a
 <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure">Matplotlib Figure object</a>
@@ -91,6 +122,34 @@ which can be stored and altered further.</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="animations">
+<h2>Animations<a class="headerlink" href="#animations" title="Permalink to this headline">¶</a></h2>
+<p>To create an animation, simply pass the signal DataFrame to <a class="reference internal" href="plotting.html#covidcast.animate" title="covidcast.animate"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.animate()</span></code></a>.
+The following code creates an MP4 file named <cite>test_plot.mp4</cite> which animates our daily signal for
+the month of August.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
+<span class="gp">... </span>                        <span class="n">geo_type</span> <span class="o">=</span> <span class="s2">&quot;county&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;test_plot.mp4&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<video width="640" height="480" playsinline autoplay muted loop controls>
+  <source src="_static/example_default_animation.mp4" type="video/mp4">
+    Your browser does not support the HTML5 Video element
+</video><p>Video format, frame rate, and resolution are adjustable. Like the static maps, additional plotting
+keyword arguments can be provided and are passed to <a class="reference internal" href="plotting.html#covidcast.plot_choropleth" title="covidcast.plot_choropleth"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot_choropleth()</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">df</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="s2">&quot;test_plot2.mp4&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="n">fps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<video width="640" height="480" playsinline autoplay muted loop controls>
+  <source src="_static/example_custom_animation.mp4" type="video/mp4">
+    Your browser does not support the HTML5 Video element
+</video></div>
 <div class="section" id="further-customization">
 <h2>Further customization<a class="headerlink" href="#further-customization" title="Permalink to this headline">¶</a></h2>
 <p>If more control is desired, the signal data can be passed to <a class="reference internal" href="plotting.html#covidcast.get_geo_df" title="covidcast.get_geo_df"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.get_geo_df()</span></code></a>, which
@@ -107,8 +166,10 @@ a corresponding megacounty will inherit the megacounty values.</p>
 <p>This operation depends on having only one row of signal information per
 geographic region. If this is not the the case, you must specify another join
 with the <code class="docutils literal notranslate"><span class="pre">join_type</span></code> argument.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span> <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+<span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
 <span class="gp">... </span>                        <span class="n">geo_type</span> <span class="o">=</span> <span class="s2">&quot;county&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">get_geo_df</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="go">     geo_value time_value  direction      issue  lag     value    stderr  sample_size geo_type data_source        signal                                           geometry state_fips</span>
@@ -155,9 +216,9 @@ projection</a>:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>(<a class="reference external" href=".//plot_examples-4.py">Source code</a>, <a class="reference external" href=".//plot_examples-4.png">png</a>, <a class="reference external" href=".//plot_examples-4.hires.png">hires.png</a>, <a class="reference external" href=".//plot_examples-4.pdf">pdf</a>)</p>
+<p>(<a class="reference external" href=".//plot_examples-6.py">Source code</a>, <a class="reference external" href=".//plot_examples-6.png">png</a>, <a class="reference external" href=".//plot_examples-6.hires.png">hires.png</a>, <a class="reference external" href=".//plot_examples-6.pdf">pdf</a>)</p>
 <div class="figure align-default">
-<img alt="_images/plot_examples-4.png" src="_images/plot_examples-4.png" />
+<img alt="_images/plot_examples-6.png" src="_images/plot_examples-6.png" />
 </div>
 </div>
 </div>
@@ -182,12 +243,13 @@ projection</a>:</p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="signals.html">Fetching Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Plotting Examples</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#built-in-functionality">Built-in functionality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#animations">Animations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#further-customization">Further customization</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
@@ -206,8 +268,8 @@ projection</a>:</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="plotting.html" title="previous chapter">Plotting Reference</a></li>
-      <li>Next: <a href="changelog.html" title="next chapter">Changelog</a></li>
+      <li>Previous: <a href="signals.html" title="previous chapter">Fetching Data</a></li>
+      <li>Next: <a href="plotting.html" title="next chapter">Plotting Reference</a></li>
   </ul></li>
 </ul>
 </div>

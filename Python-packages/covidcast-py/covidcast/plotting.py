@@ -58,7 +58,7 @@ def plot(data: pd.DataFrame,
 
     By default, choropleths use the `colormap
     <https://matplotlib.org/tutorials/colors/colormaps.html>`_
-    ``YlOrRd`` and is scaled between 0 and the signal's historical mean value + 3
+    ``YlOrRd``, with colors scaled between 0 and the signal's historical mean value + 3
     standard deviations. Custom arguments can be passed in as ``kwargs`` for
     customizability. These arguments will be passed to the GeoPandas ``plot``
     method; more information on these arguments can be found in `the GeoPandas

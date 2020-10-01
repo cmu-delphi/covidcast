@@ -68,7 +68,7 @@ def plot(data: pd.DataFrame,
     Bubble maps use a purple bubble by default, with all values discretized into 8 bins between 0.1
     and the signal's historical mean value + 3 standard deviations. Values below 0 are have no
     bubble but have the region displayed in white, and values above the mean + 3 std dev are binned
-    into the highest bubble.
+    into the highest bubble. Bubbles are scaled by area.
 
     :param data: Data frame of signal values, as returned from :py:func:`covidcast.signal`.
     :param time_value: If multiple days of data are present in ``data``, map only values from this
@@ -230,7 +230,8 @@ def _plot_choro(ax: axes.Axes, data: gpd.GeoDataFrame, **kwargs: Any) -> None:
     kwargs["cmap"] = kwargs.get("cmap", "YlOrRd")
     data_w_geo = get_geo_df(data)
     for shape in _project_and_transform(data_w_geo):
-        shape.plot(column="value", ax=ax, **kwargs)
+        if not shape.empty:
+            shape.plot(column="value", ax=ax, **kwargs)
     sm = plt.cm.ScalarMappable(cmap=kwargs["cmap"],
                                norm=plt.Normalize(vmin=kwargs["vmin"], vmax=kwargs["vmax"]))
     # this is to remove the set_array error that occurs on some platforms
@@ -258,13 +259,15 @@ def _plot_bubble(ax: axes.Axes, data: gpd.GeoDataFrame, **kwargs: Any) -> None:
     data_w_geo["binval"] = pd.cut(data_w_geo.value, labels=label_bins, bins=value_bins)
     data_w_geo["binval"] = data_w_geo.binval.astype(float) * bubble_scale
     for shape in _project_and_transform(data_w_geo):
-        # plot counties in white
-        shape.plot(color="1", ax=ax, legend=True, edgecolor="0.8", linewidth=0.5)
-        shape["geometry"] = shape["geometry"].centroid  # plot bubbles at each polgyon's centroid
-        shape.plot(markersize="binval", color=kwargs["color"], ax=ax, alpha=kwargs["alpha"])
+        if not shape.empty:
+            # plot counties in white
+            shape.plot(color="1", ax=ax, legend=True, edgecolor="0.8", linewidth=0.5)
+            shape["geometry"] = shape["geometry"].centroid  # plot bubbles at each polgyon centroid
+            shape.plot(markersize="binval", color=kwargs["color"], ax=ax, alpha=kwargs["alpha"])
     # to generate the legend, need to plot the reference points as scatter plots off the map
-    for bubble in label_bins * bubble_scale:
-        ax.scatter([1e10], [1e10], color="purple", alpha=0.5, s=bubble, label=str(round(bubble, 2)))
+    for bubble in label_bins:
+        ax.scatter([1e10], [1e10], color="purple", alpha=0.5, s=bubble * bubble_scale,
+                   label=str(round(bubble, 2)))
     ax.legend(labelspacing=1.5, frameon=False, ncol=8, loc="lower center")
 
 

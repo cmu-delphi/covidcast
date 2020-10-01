@@ -43,7 +43,7 @@ def plot(data: pd.DataFrame,
          time_value: date = None,
          plot_type: str = "choropleth",
          **kwargs: Any) -> figure.Figure:
-    """Given the output data frame of :py:func:`covidcast.signal`, plot a choropleth map.
+    """Given the output data frame of :py:func:`covidcast.signal`, plot a choropleth or bubble map.
 
     Projections used for plotting:
 
@@ -56,14 +56,19 @@ def plot(data: pd.DataFrame,
     For visual purposes, Alaska and Hawaii are moved the lower left corner of the contiguous US
     and Puerto Rico is moved closer to Florida.
 
-    By default, the `colormap
-    <https://matplotlib.org/tutorials/colors/colormaps.html>`_ used is
-    ``YlOrRd`` and is binned into the signal's historical mean value ± 3
+    By default, choropleths use the `colormap
+    <https://matplotlib.org/tutorials/colors/colormaps.html>`_
+    ``YlOrRd`` and is scaled between 0 and the signal's historical mean value + 3
     standard deviations. Custom arguments can be passed in as ``kwargs`` for
     customizability. These arguments will be passed to the GeoPandas ``plot``
     method; more information on these arguments can be found in `the GeoPandas
     documentation
     <https://geopandas.org/reference.html#geopandas.GeoDataFrame.plot>`_.
+
+    Bubble maps use a purple bubble by default, with all values discretized into 8 bins between 0.1
+    and the signal's historical mean value + 3 standard deviations. Values below 0 are have no
+    bubble but have the region displayed in white, and values above the mean + 3 std dev are binned
+    into the highest bubble.
 
     :param data: Data frame of signal values, as returned from :py:func:`covidcast.signal`.
     :param time_value: If multiple days of data are present in ``data``, map only values from this
@@ -196,7 +201,7 @@ def animate(data: pd.DataFrame, filepath: str, fps: int = 3, dpi: int = 150, **k
     :param filepath: Path where video will be saved. Filename must contain supported extension.
     :param fps: Frame rate in frames per second for animation. Defaults to 3.
     :param dpi: Dots per inch for output video. Defaults to 150 on a 12.8x9.6 figure (1920x1440).
-    :param kwargs: Optional keyword arguments passed to :py:func:`covidcast.plot_choropleth`.
+    :param kwargs: Optional keyword arguments passed to :py:func:`covidcast.plot`.
     :return: None
     """
     # probesize is set to avoid warning by ffmpeg on frame rate up to 4k resolution.
@@ -205,7 +210,7 @@ def animate(data: pd.DataFrame, filepath: str, fps: int = 3, dpi: int = 150, **k
     day_list = [min(data.time_value) + timedelta(days=x) for x in range(num_days+1)]
     for d in tqdm(day_list):
         buf = io.BytesIO()
-        plot_choropleth(data, time_value=d, **kwargs)
+        plot(data, time_value=d, **kwargs)
         plt.savefig(buf, dpi=dpi)
         plt.close()
         buf.seek(0)

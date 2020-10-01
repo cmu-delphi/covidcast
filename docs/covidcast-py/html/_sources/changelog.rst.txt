@@ -1,6 +1,39 @@
 Changelog
 =========
 
+v0.1.0, October 1, 2020
+-----------------------
+
+- New feature: Functions :py:func:`covidcast.fips_to_name`,
+  :py:func:`covidcast.cbsa_to_name`, and :py:func:`covidcast.abbr_to_name` are
+  provided to convert FIPS codes, CBSA IDs, and two-letter abbreviations to
+  county names, metropolitan statistical area (MSA) names, and state names,
+  respectively.
+
+- New feature: Functions :py:func:`covidcast.name_to_fips`,
+  :py:func:`covidcast.name_to_cbsa`, and :py:func:`covidcast.name_to_fips` are
+  provided to convert human-readable names into FIPS codes, CBSA IDs, and state
+  abbreviations, for use when querying the COVIDcast API.
+
+- New feature: Function :py:func:`covidcast.animate` can take a DataFrame returned by
+  :py:func:`covidcast.signal` and generate an animated video of the signal over time.
+
+- New feature: Function :py:func:`covidcast.plot_choropleth` can now plot signals for
+  hospital referral regions (HRRs) and metropolitan statistical areas (MSAs), in addition
+  to states and counties.
+
+- New feature: Function :py:func:`covidcast.aggregate_signals` shifts and combines
+  multiple signals into a single DataFrame for convenient signal comparisons across
+  time.
+
+- Bug fix: The ``time_value`` argument to the :py:func:`covidcast.plot_choropleth`
+  function can now accept `datetime <https://docs.python.org/3/library/datetime.html>`_
+  ``datetime`` and ``date`` objects, instead of only `pandas Timestamps
+  <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_.
+
+- Bug fix: :py:func:`covidcast.signal` no longer returns duplicate values if duplicate
+  ``geo_values`` are provided in the function call.
+
 v0.0.9, August 30, 2020
 -----------------------
 

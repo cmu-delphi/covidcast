@@ -82,7 +82,7 @@ def plot(data: pd.DataFrame,
         raise ValueError("`plot_type` must be 'choropleth' or 'bubble'.")
     data_source, signal, geo_type = _detect_metadata(data)  # pylint: disable=W0212
     meta = _signal_metadata(data_source, signal, geo_type)  # pylint: disable=W0212
-    # use most recent date if none provided
+    # use most recent date in data if none provided
     day_to_plot = time_value if time_value else max(data.time_value)
     day_data = data.loc[data.time_value == pd.to_datetime(day_to_plot), :]
 
@@ -242,6 +242,9 @@ def _plot_choro(ax: axes.Axes, data: gpd.GeoDataFrame, **kwargs: Any) -> None:
 
 def _plot_bubble(ax: axes.Axes, data: gpd.GeoDataFrame, geo_type: str, **kwargs: Any) -> None:
     """Generate a bubble map on a given Figure/Axes from a GeoDataFrame.
+
+    The maximum bubble size is set to the figure area / 1.5, with a x3 multiple if the geo_type
+    is ``state``.
 
     :param ax: Matplotlib axes to plot on.
     :param data: GeoDataFrame with information to plot.

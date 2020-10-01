@@ -270,7 +270,8 @@ def _plot_bubble(ax: axes.Axes, data: gpd.GeoDataFrame, geo_type: str, **kwargs:
             shape.plot(markersize="binval", color=kwargs["color"], ax=ax, alpha=kwargs["alpha"])
     # to generate the legend, need to plot the reference points as scatter plots off the map
     for b in label_bins:
-        ax.scatter([1e10], [1e10], color="purple", alpha=0.5, s=b*bubble_scale, label=round(b, 2))
+        ax.scatter([1e10], [1e10], color=kwargs["color"], alpha=kwargs["alpha"],
+                   s=b*bubble_scale, label=round(b, 2))
     ax.legend(frameon=False, ncol=8, loc="lower center", bbox_to_anchor=(0.5, -0.1))
 
 

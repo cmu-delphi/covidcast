@@ -94,7 +94,7 @@ def plot(data: pd.DataFrame,
     if plot_type == "choropleth":
         _plot_choro(ax, day_data, **kwargs)
     else:
-        _plot_bubble(ax, day_data, **kwargs)
+        _plot_bubble(ax, day_data, geo_type, **kwargs)
     return fig
 
 
@@ -240,7 +240,7 @@ def _plot_choro(ax: axes.Axes, data: gpd.GeoDataFrame, **kwargs: Any) -> None:
                  orientation="horizontal", fraction=0.02, pad=0.05)
 
 
-def _plot_bubble(ax: axes.Axes, data: gpd.GeoDataFrame, **kwargs: Any) -> None:
+def _plot_bubble(ax: axes.Axes, data: gpd.GeoDataFrame, geo_type: str, **kwargs: Any) -> None:
     """Generate a bubble map on a given Figure/Axes from a GeoDataFrame.
 
     :param ax: Matplotlib axes to plot on.
@@ -252,23 +252,23 @@ def _plot_bubble(ax: axes.Axes, data: gpd.GeoDataFrame, **kwargs: Any) -> None:
     kwargs["color"] = kwargs.get("color", "purple")
     kwargs["alpha"] = kwargs.get("alpha", 0.5)
     data_w_geo = get_geo_df(data, join_type="inner")
-    bubble_scale = 75 / max(data_w_geo.value)  # cap bubbles at size 75
-    # discretize into 8 bins
-    label_bins = np.linspace(kwargs["vmin"], kwargs["vmax"], 8)
-    value_bins = list(label_bins) + [max(data_w_geo.value) + kwargs["vmax"]]
-    data_w_geo["binval"] = pd.cut(data_w_geo.value, labels=label_bins, bins=value_bins)
+    label_bins = np.linspace(kwargs["vmin"], kwargs["vmax"], 8)  # set bin labels
+    value_bins = list(label_bins) + [np.inf]  # set ranges for bins by adding +inf for largest bin
+    # set max bubble size proportional to figure size, with a multiplier for state plots
+    state_multiple = 3 if geo_type == "state" else 1
+    bubble_scale = np.prod(kwargs["figsize"]) / 1.5 / kwargs["vmax"] * state_multiple
+    # discretize data and scale labels to correct sizes
+    data_w_geo["binval"] = pd.cut(data_w_geo.value, labels=label_bins, bins=value_bins, right=False)
     data_w_geo["binval"] = data_w_geo.binval.astype(float) * bubble_scale
     for shape in _project_and_transform(data_w_geo):
-        if not shape.empty:
-            # plot counties in white
+        if not shape.empty and not shape.binval.isnull().values.all():
             shape.plot(color="1", ax=ax, legend=True, edgecolor="0.8", linewidth=0.5)
             shape["geometry"] = shape["geometry"].centroid  # plot bubbles at each polgyon centroid
             shape.plot(markersize="binval", color=kwargs["color"], ax=ax, alpha=kwargs["alpha"])
     # to generate the legend, need to plot the reference points as scatter plots off the map
-    for bubble in label_bins:
-        ax.scatter([1e10], [1e10], color="purple", alpha=0.5, s=bubble * bubble_scale,
-                   label=str(round(bubble, 2)))
-    ax.legend(labelspacing=1.5, frameon=False, ncol=8, loc="lower center")
+    for b in label_bins:
+        ax.scatter([1e10], [1e10], color="purple", alpha=0.5, s=b*bubble_scale, label=round(b, 2))
+    ax.legend(frameon=False, ncol=8, loc="lower center", bbox_to_anchor=(0.5, -0.1))
 
 
 def _plot_background_states(figsize: tuple) -> tuple:

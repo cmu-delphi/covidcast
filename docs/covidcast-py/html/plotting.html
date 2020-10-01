@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plotting Reference &#8212; COVIDcast API client 0.0.9 documentation</title>
+    <title>Plotting Reference &#8212; COVIDcast API client 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -15,8 +15,8 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Plotting Examples" href="plot_examples.html" />
-    <link rel="prev" title="Fetching Data" href="signals.html" />
+    <link rel="next" title="Changelog" href="changelog.html" />
+    <link rel="prev" title="Plotting Examples" href="plot_examples.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -37,7 +37,7 @@
 <span id="plotting-data"></span><h1>Plotting Reference<a class="headerlink" href="#plotting-reference" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="choropleth-maps">
 <h2>Choropleth maps<a class="headerlink" href="#choropleth-maps" title="Permalink to this headline">¶</a></h2>
-<p>This package provides a plotting function that takes a county or state level
+<p>This package provides a plotting function that takes a state, county, HRR, or MSA
 signal and generates a choropleth map, using <a class="reference external" href="https://matplotlib.org/">matplotlib</a> underneath. Detailed examples are provided in the
 <a class="reference internal" href="plot_examples.html#plotting-examples"><span class="std std-ref">usage examples</span></a>.</p>
 <dl class="py function">
@@ -54,8 +54,8 @@ and Puerto Rico</p></li>
 </ul>
 <p>For visual purposes, Alaska and Hawaii are moved the lower left corner of the contiguous US
 and Puerto Rico is moved closer to Florida.</p>
-<p>By default, the <a class="reference external" href="https://matplotlib.org/tutorials/colors/colormaps.html">colormap</a> used is
-<code class="docutils literal notranslate"><span class="pre">YlOrRd</span></code> and is binned into the signal’s historical mean value ± 3
+<p>By default, choropleths use the <a class="reference external" href="https://matplotlib.org/tutorials/colors/colormaps.html">colormap</a>
+<code class="docutils literal notranslate"><span class="pre">YlOrRd</span></code>, with colors scaled between 0 and the signal’s historical mean value + 3
 standard deviations. Custom arguments can be passed in as <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> for
 customizability. These arguments will be passed to the GeoPandas <code class="docutils literal notranslate"><span class="pre">plot</span></code>
 method; more information on these arguments can be found in <a class="reference external" href="https://geopandas.org/reference.html#geopandas.GeoDataFrame.plot">the GeoPandas
@@ -66,7 +66,7 @@ documentation</a>.</p>
 <li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – Data frame of signal values, as returned from <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a>.</p></li>
 <li><p><strong>time_value</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code>]) – If multiple days of data are present in <code class="docutils literal notranslate"><span class="pre">data</span></code>, map only values from this
 day. Defaults to plotting the most recent day of data in <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p></li>
-<li><p><strong>kwargs</strong> – Optional keyword arguments passed to <code class="docutils literal notranslate"><span class="pre">GeoDataFrame.plot()</span></code>.</p></li>
+<li><p><strong>kwargs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – Optional keyword arguments passed to <code class="docutils literal notranslate"><span class="pre">GeoDataFrame.plot()</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -74,6 +74,37 @@ day. Defaults to plotting the most recent day of data in <code class="docutils l
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Matplotlib figure object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="animate-a-signal-over-time">
+<h2>Animate a signal over time<a class="headerlink" href="#animate-a-signal-over-time" title="Permalink to this headline">¶</a></h2>
+<p>A signal DataFrame can be used to generate an animated choropleth of the signal values over time.</p>
+<dl class="py function">
+<dt id="covidcast.animate">
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">animate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">filepath</span></em>, <em class="sig-param"><span class="n">fps</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">dpi</span><span class="o">=</span><span class="default_value">150</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.animate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an animated video file of a signal over time.</p>
+<p>Given a signal DataFrame, generates the choropleth for each day to form an animation of the
+signal. Accepts arguments for video parameters as well as optional plotting arguments.
+Supported output formats are listed in the
+<a class="reference external" href="https://imageio.readthedocs.io/en/stable/format_ffmpeg.html">imageio ffmpeg documentation</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – DataFrame for a single signal over time.</p></li>
+<li><p><strong>filepath</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Path where video will be saved. Filename must contain supported extension.</p></li>
+<li><p><strong>fps</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Frame rate in frames per second for animation. Defaults to 3.</p></li>
+<li><p><strong>dpi</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Dots per inch for output video. Defaults to 150 on a 12.8x9.6 figure (1920x1440).</p></li>
+<li><p><strong>kwargs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – Optional keyword arguments passed to <a class="reference internal" href="#covidcast.plot_choropleth" title="covidcast.plot_choropleth"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot_choropleth()</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -91,11 +122,11 @@ provided if the user desires more control over their plotting.</p>
 <p>This method takes in a pandas DataFrame object and returns a GeoDataFrame
 object from the <a class="reference external" href="https://geopandas.org/">GeoPandas package</a>. The
 GeoDataFrame will contain the geographic shape corresponding to every row in
-its <code class="docutils literal notranslate"><span class="pre">geometry</span></code> colummn; for example, a data frame of county-level signal
+its <code class="docutils literal notranslate"><span class="pre">geometry</span></code> column; for example, a data frame of county-level signal
 observations will be returned with the shape of every county.</p>
-<p>After detecting the geography type (only county and state are currently
+<p>After detecting the geography type (state, county, HRR, and MSA are currently
 supported) of the input, this function builds a GeoDataFrame that contains
-state and geometry information from the Census for that geography type. By
+state and geometry information from the Census or CMS for that geography type. By
 default, it will take the signal data (left side) and geo data (right side)
 and right join them, so all states/counties will always be present
 regardless of whether <code class="docutils literal notranslate"><span class="pre">data</span></code> contains values for those locations. <code class="docutils literal notranslate"><span class="pre">left</span></code>,
@@ -111,7 +142,8 @@ data frame using its <code class="docutils literal notranslate"><span class="pre
 arguments can be provided to match geographies for data frames with
 different column names.</p>
 <p>Geographic data is sourced from 1:5,000,000-scale shapefiles from the <a class="reference external" href="https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html">2019
-US Census Cartographic Boundary Files</a>.</p>
+US Census Cartographic Boundary Files</a>
+and the <a class="reference external" href="https://data.cms.gov/widgets/ia25-mrsk">CMS Data Website</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -129,7 +161,9 @@ Must be one of <cite>right</cite> (default), <cite>left</cite>, <cite>outer</cit
 <dd class="field-odd"><p>GeoDataFrame containing all columns from the input <code class="docutils literal notranslate"><span class="pre">data</span></code>, along
 with a <code class="docutils literal notranslate"><span class="pre">geometry</span></code> column (containing a polygon) and a <code class="docutils literal notranslate"><span class="pre">state_fips</span></code>
 column (a two-digit FIPS code identifying the US state containing this
-geography). The geometry is given in the GCS NAD83 coordinate system.</p>
+geography). For MSAs that span multiple states, the first state in the MSA name is provided.
+The geometry is given in the GCS NAD83 coordinate system for states, counties, and MSAs, and
+WGS84 for HRRs.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -157,12 +191,13 @@ geography). The geometry is given in the GCS NAD83 coordinate system.</p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="signals.html">Fetching Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_examples.html">Plotting Examples</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Plotting Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#choropleth-maps">Choropleth maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#animate-a-signal-over-time">Animate a signal over time</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#creating-a-geodataframe">Creating a GeoDataFrame</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="plot_examples.html">Plotting Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
@@ -181,8 +216,8 @@ geography). The geometry is given in the GCS NAD83 coordinate system.</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="signals.html" title="previous chapter">Fetching Data</a></li>
-      <li>Next: <a href="plot_examples.html" title="next chapter">Plotting Examples</a></li>
+      <li>Previous: <a href="plot_examples.html" title="previous chapter">Plotting Examples</a></li>
+      <li>Next: <a href="changelog.html" title="next chapter">Changelog</a></li>
   </ul></li>
 </ul>
 </div>

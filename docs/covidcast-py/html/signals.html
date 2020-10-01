@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fetching Data &#8212; COVIDcast API client 0.0.9 documentation</title>
+    <title>Fetching Data &#8212; COVIDcast API client 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -15,7 +15,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Plotting Reference" href="plotting.html" />
+    <link rel="next" title="Plotting Examples" href="plot_examples.html" />
     <link rel="prev" title="Getting Started" href="getting_started.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -37,7 +37,7 @@
 <h1>Fetching Data<a class="headerlink" href="#fetching-data" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="signals">
 <h2>Signals<a class="headerlink" href="#signals" title="Permalink to this headline">¶</a></h2>
-<p>This package provides one key function to obtain any signal of interest as a
+<p>This package provides a key function to obtain any signal of interest as a
 Pandas data frame. Detailed examples are provided in the <a class="reference internal" href="getting_started.html#getting-started"><span class="std std-ref">usage examples</span></a>.</p>
 <dl class="py function">
 <dt id="covidcast.signal">
@@ -160,6 +160,46 @@ for more details on how values and standard errors are calculated for
 specific signals.</p>
 </dd></dl>
 
+<p>Sometimes you would like to work with multiple signals – for example, to obtain
+several signals at every location, as part of building models of features at
+each location. For convenience, the package provides a function to produce a
+single data frame containing multiple signals at each location.</p>
+<dl class="py function">
+<dt id="covidcast.aggregate_signals">
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">aggregate_signals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">signals</span></em>, <em class="sig-param"><span class="n">dt</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">join_type</span><span class="o">=</span><span class="default_value">'outer'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.aggregate_signals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of DataFrames, [optionally] lag each one and join them into one DataFrame.</p>
+<p>This method takes a list of DataFrames containing signal information for
+geographic regions across time, and outputs a single DataFrame with a column
+for each signal value for each region/time. The <code class="docutils literal notranslate"><span class="pre">data_source</span></code>,
+<code class="docutils literal notranslate"><span class="pre">signal</span></code>, and index of each DataFrame in <code class="docutils literal notranslate"><span class="pre">signals</span></code> are appended to the
+front of each output column name separated by underscores (e.g.
+<code class="docutils literal notranslate"><span class="pre">source_signal_0_inputcolumn</span></code>), and the original data_source and signal
+columns will be dropped. The input DataFrames must all be of the same
+geography type, and a single <code class="docutils literal notranslate"><span class="pre">geo_type</span></code> column will be returned in the final
+DataFrame.</p>
+<p>Each signal’s time value can be shifted for analysis on lagged signals using the <code class="docutils literal notranslate"><span class="pre">dt</span></code>
+argument, which takes a list of integer days to lag each signal’s date. Lagging a signal by +1
+day means that all the dates get shifted forward by 1 day (e.g. Jan 1 becomes Jan 2).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signals</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>) – List of DataFrames to join.</p></li>
+<li><p><strong>dt</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>]) – List of lags in days for each of the input DataFrames in <code class="docutils literal notranslate"><span class="pre">signals</span></code>.
+Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>. When provided, must be the same length as <code class="docutils literal notranslate"><span class="pre">signals</span></code>.</p></li>
+<li><p><strong>join_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Type of join to be done between the DataFrames in <code class="docutils literal notranslate"><span class="pre">signals</span></code>.
+Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;outer&quot;</span></code>, so the output DataFrame contains all region/time
+combinations at which at least one signal was observed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>DataFrame of aggregated signals.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="metadata">
 <h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h2>
@@ -216,6 +256,226 @@ signal has ever been reported.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="working-with-geographic-identifiers">
+<span id="working-with-geos"></span><h2>Working with geographic identifiers<a class="headerlink" href="#working-with-geographic-identifiers" title="Permalink to this headline">¶</a></h2>
+<p>The COVIDcast API identifies each geographic region – such as a county or state
+– using unique codes. For example, counties are identified by their FIPS codes,
+while states are identified by a two-letter abbreviation; more detail is given
+in the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">geographic coding documentation</a>.</p>
+<p>When fetching data from the API, you may need to quickly convert between
+human-readable names and unique identifiers. The following functions are
+provided for your convenience.</p>
+<div class="section" id="counties">
+<h3>Counties<a class="headerlink" href="#counties" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="covidcast.fips_to_name">
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">fips_to_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">code</span></em>, <em class="sig-param"><span class="n">ignore_case</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fixed</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ties_method</span><span class="o">=</span><span class="default_value">'first'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.fips_to_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Look up county names by FIPS codes with regular expression support.</p>
+<p>Given an individual or list of FIPS codes or regular expressions, look up the corresponding
+county names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>code</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>) – Individual or list of FIPS codes or regular expressions.</p></li>
+<li><p><strong>ignore_case</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Boolean for whether or not to be case insensitive in the regular expression.
+If <code class="docutils literal notranslate"><span class="pre">fixed=True</span></code>, this argument is ignored. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>fixed</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Conduct an exact case sensitive match with the input string.
+Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>ties_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Method for determining how to deal with multiple outputs for a given input.
+Must be one of <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code>. If <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code>, then only the first match for each
+code is returned. If <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>, then all matches for each code are returned.
+Defaults to <code class="docutils literal notranslate"><span class="pre">first</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>If <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code>, returns a list of the first value found for each input key.
+If <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>, returns a list of dicts, one for each input, with keys
+corresponding to all matched input keys and values corresponding to the list of county names.
+The returned list will be the same length as the input, with <code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">{}</span></code> if no values
+are found for <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>, respectively.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="covidcast.name_to_fips">
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">name_to_fips</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">ignore_case</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fixed</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ties_method</span><span class="o">=</span><span class="default_value">'first'</span></em>, <em class="sig-param"><span class="n">state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.name_to_fips" title="Permalink to this definition">¶</a></dt>
+<dd><p>Look up FIPS codes by county names with regular expression support.</p>
+<p>Given an individual or list of county names or regular expressions, look up the corresponding
+FIPS codes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>) – Individual or list of county names or regular expressions.</p></li>
+<li><p><strong>ignore_case</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Boolean for whether or not to be case insensitive in the regular expression.
+If <code class="docutils literal notranslate"><span class="pre">fixed=True</span></code>, this argument is ignored. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>fixed</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Conduct an exact case sensitive match with the input string.
+Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>ties_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Method for determining how to deal with multiple outputs for a given input.
+Must be one of <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code>. If <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code>, then only the first match for each
+code is returned. If <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>, then all matches for each code are returned.
+Defaults to <code class="docutils literal notranslate"><span class="pre">first</span></code>.</p></li>
+<li><p><strong>state</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – 2 letter state code, case insensitive, to restrict results to.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>If <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code>, returns a list of the first value found for each input key.
+If <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>, returns a list of dicts, one for each input, with keys
+corresponding to all matched input keys and values corresponding to the list of FIPS.
+The returned list will be the same length as the input, with <code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">{}</span></code> if no values
+are found for <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>, respectively.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="metropolitan-statistical-areas">
+<h3>Metropolitan statistical areas<a class="headerlink" href="#metropolitan-statistical-areas" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="covidcast.cbsa_to_name">
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">cbsa_to_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">code</span></em>, <em class="sig-param"><span class="n">ignore_case</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fixed</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ties_method</span><span class="o">=</span><span class="default_value">'first'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.cbsa_to_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Look up MSA names by codes with regular expression support.</p>
+<p>Given an individual or list of FIPS codes or regular expressions, look up the corresponding
+MSA names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>code</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>) – Individual or list of FIPS codes or regular expressions.</p></li>
+<li><p><strong>ignore_case</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Boolean for whether or not to be case insensitive in the regular expression.
+If <code class="docutils literal notranslate"><span class="pre">fixed=True</span></code>, this argument is ignored. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>fixed</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Conduct an exact case sensitive match with the input string.
+Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>ties_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Method for determining how to deal with multiple outputs for a given input.
+Must be one of <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code>. If <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code>, then only the first match for each
+code is returned. If <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>, then all matches for each code are returned.
+Defaults to <code class="docutils literal notranslate"><span class="pre">first</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>If <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code>, returns a list of the first value found for each input key.
+If <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>, returns a list of dicts, one for each input, with keys
+corresponding to all matched input keys and values corresponding to the list of MSA names.
+The returned list will be the same length as the input, with <code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">{}</span></code> if no values
+are found for <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>, respectively.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="covidcast.name_to_cbsa">
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">name_to_cbsa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">ignore_case</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fixed</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ties_method</span><span class="o">=</span><span class="default_value">'first'</span></em>, <em class="sig-param"><span class="n">state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.name_to_cbsa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Look up MSA codes by names with regular expression support.</p>
+<p>Given an individual or list of names or regular expressions, look up the corresponding
+MSA codes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>) – Individual or list of MSA names or regular expressions.</p></li>
+<li><p><strong>ignore_case</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Boolean for whether or not to be case insensitive in the regular expression.
+If <code class="docutils literal notranslate"><span class="pre">fixed=True</span></code>, this argument is ignored. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>fixed</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Conduct an exact case sensitive match with the input string.
+Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>ties_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Method for determining how to deal with multiple outputs for a given input.
+Must be one of <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code>. If <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code>, then only the first match for each
+code is returned. If <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>, then all matches for each code are returned.
+Defaults to <code class="docutils literal notranslate"><span class="pre">first</span></code>.</p></li>
+<li><p><strong>state</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – 2 letter state code, case insensitive, to restrict results to.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>If <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code>, returns a list of the first value found for each input key.
+If <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>, returns a list of dicts, one for each input, with keys
+corresponding to all matched input keys and values corresponding to the list of MSA codes.
+The returned list will be the same length as the input, with <code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">{}</span></code> if no values
+are found for <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>, respectively.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="states">
+<h3>States<a class="headerlink" href="#states" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="covidcast.abbr_to_name">
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">abbr_to_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">abbr</span></em>, <em class="sig-param"><span class="n">ignore_case</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fixed</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ties_method</span><span class="o">=</span><span class="default_value">'first'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.abbr_to_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Look up state name by abbreviation with regular expression support.</p>
+<p>Given an individual or list of state abbreviations or regular expressions, look up the
+corresponding state names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>abbr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>) – Individual or list of state abbreviations or regular expressions.</p></li>
+<li><p><strong>ignore_case</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Boolean for whether or not to be case insensitive in the regular expression.
+If <code class="docutils literal notranslate"><span class="pre">fixed=True</span></code>, this argument is ignored. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>fixed</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Conduct an exact case sensitive match with the input string.
+Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>ties_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Method for determining how to deal with multiple outputs for a given input.
+Must be one of <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code>. If <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code>, then only the first match for each
+code is returned. If <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>, then all matches for each code are returned.
+Defaults to <code class="docutils literal notranslate"><span class="pre">first</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>If <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code>, returns a list of the first value found for each input key.
+If <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>, returns a list of dicts, one for each input, with keys
+corresponding to all matched input keys and values corresponding to the list of state names.
+The returned list will be the same length as the input, with <code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">{}</span></code> if no values
+are found for <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>, respectively.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="covidcast.name_to_abbr">
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">name_to_abbr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">ignore_case</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fixed</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ties_method</span><span class="o">=</span><span class="default_value">'first'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.name_to_abbr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Look up state abbreviation by name with regular expression support.</p>
+<p>Given an individual or list of state names or regular expressions, look up the
+corresponding state abbreviations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>) – Individual or list of state names or regular expressions.</p></li>
+<li><p><strong>ignore_case</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Boolean for whether or not to be case insensitive in the regular expression.
+If <code class="docutils literal notranslate"><span class="pre">fixed=True</span></code>, this argument is ignored. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>fixed</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Conduct an exact case sensitive match with the input string.
+Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>ties_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Method for determining how to deal with multiple outputs for a given input.
+Must be one of <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code>. If <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code>, then only the first match for each
+code is returned. If <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>, then all matches for each code are returned.
+Defaults to <code class="docutils literal notranslate"><span class="pre">first</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>If <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code>, returns a list of the first value found for each input key.
+If <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>, returns a list of dicts, one for each input, with keys
+corresponding to all matched input keys and values corresponding to the list of
+state abbreviations. The returned list will be the same length as the input, with <code class="docutils literal notranslate"><span class="pre">None</span></code> or
+<code class="docutils literal notranslate"><span class="pre">{}</span></code> if no values are found for <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>,
+respectively.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
 </div>
 
 
@@ -240,10 +500,11 @@ signal has ever been reported.</p>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Fetching Data</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#signals">Signals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#metadata">Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#working-with-geographic-identifiers">Working with geographic identifiers</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_examples.html">Plotting Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
@@ -263,7 +524,7 @@ signal has ever been reported.</p>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="getting_started.html" title="previous chapter">Getting Started</a></li>
-      <li>Next: <a href="plotting.html" title="next chapter">Plotting Reference</a></li>
+      <li>Next: <a href="plot_examples.html" title="next chapter">Plotting Examples</a></li>
   </ul></li>
 </ul>
 </div>

@@ -1,8 +1,8 @@
 Changelog
 =========
 
-v0.1.0, TODO
--------------
+v0.1.0, October 1, 2020
+-----------------------
 
 - New feature: Functions :py:func:`covidcast.fips_to_name`,
   :py:func:`covidcast.cbsa_to_name`, and :py:func:`covidcast.abbr_to_name` are

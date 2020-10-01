@@ -55,9 +55,9 @@ def plot_choropleth(data: pd.DataFrame,
     For visual purposes, Alaska and Hawaii are moved the lower left corner of the contiguous US
     and Puerto Rico is moved closer to Florida.
 
-    By default, the `colormap
-    <https://matplotlib.org/tutorials/colors/colormaps.html>`_ used is
-    ``YlOrRd`` and is binned into the signal's historical mean value ± 3
+    By default, choropleths use the `colormap
+    <https://matplotlib.org/tutorials/colors/colormaps.html>`_
+    ``YlOrRd`` and is scaled between 0 and the signal's historical mean value + 3
     standard deviations. Custom arguments can be passed in as ``kwargs`` for
     customizability. These arguments will be passed to the GeoPandas ``plot``
     method; more information on these arguments can be found in `the GeoPandas

@@ -3,11 +3,26 @@
 Getting Started
 ===============
 
+This package provides access to data from the `COVIDcast API
+<https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html>`_, which
+provides numerous COVID-related data streams, updated daily. To begin, you'll
+want to browse the available data streams and determine which signals are useful
+to you. The `COVIDcast interactive map <https://covidcast.cmu.edu/>`_ displays a
+selection of the signals, and by selecting the Export Data feature, you can get
+example Python code to access each of the signals.
+
+To browse in more detail, the `data sources and signal documentation
+<https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html>`_ lists
+the available signals, including many not shown on the interactive map. Simply
+obtain the data source and signal names from the list. Below we will demonstrate
+how to use these names to access each data stream.
+
 Basic examples
 --------------
 
-To obtain smoothed estimates of COVID-like illness from our Facebook survey for
-every county in the United States between 2020-05-01 and 2020-05-07:
+To obtain smoothed estimates of COVID-like illness from our symptom survey,
+distributed through Facebook, for every county in the United States between
+2020-05-01 and 2020-05-07:
 
 >>> from datetime import date
 >>> import covidcast
@@ -31,6 +46,13 @@ indicates when this data was reported; in this case, the survey estimates for
 May 1st were updated on May 23rd based on new data, giving a ``lag`` of 22 days.
 See the :py:func:`covidcast.signal` documentation for details on the returned
 data frame.
+
+The API documentation lists each available signal and provides technical details
+on how it is estimated and how its standard error is calculated. In this case,
+for example, the `symptom surveys documentation page
+<https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html>`_
+explains the definition of "COVID-like illness", links to the exact survey text,
+and describes the mathematical derivation of the estimates.
 
 We can also request all data on a signal after a specific date. Here, for
 example, we obtain ``smoothed_cli`` in each state for every day since
@@ -205,8 +227,11 @@ Dealing with geographies
 
 As seen above, the COVIDcast API identifies counties by their FIPS code and
 states by two-letter abbreviations. Metropolitan statistical areas are also
-identified by unique codes, called CBSA IDs. If you want to find a specific area
-by name, this package provides convenience functions:
+identified by unique codes, called CBSA IDs. (Exact details and exceptions are
+given in the `geographic coding documentation
+<https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html>`_.) If
+you want to find a specific area by name, this package provides convenience
+functions:
 
 >>> covidcast.name_to_cbsa(["Houston", "San Antonio"])
 ['26420', '41700']

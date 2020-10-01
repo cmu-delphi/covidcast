@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Getting Started &#8212; COVIDcast API client 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -35,10 +35,21 @@
             
   <div class="section" id="getting-started">
 <span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>This package provides access to data from the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a>, which
+provides numerous COVID-related data streams, updated daily. To begin, you’ll
+want to browse the available data streams and determine which signals are useful
+to you. The <a class="reference external" href="https://covidcast.cmu.edu/">COVIDcast interactive map</a> displays a
+selection of the signals, and by selecting the Export Data feature, you can get
+example Python code to access each of the signals.</p>
+<p>To browse in more detail, the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">data sources and signal documentation</a> lists
+the available signals, including many not shown on the interactive map. Simply
+obtain the data source and signal names from the list. Below we will demonstrate
+how to use these names to access each data stream.</p>
 <div class="section" id="basic-examples">
 <h2>Basic examples<a class="headerlink" href="#basic-examples" title="Permalink to this headline">¶</a></h2>
-<p>To obtain smoothed estimates of COVID-like illness from our Facebook survey for
-every county in the United States between 2020-05-01 and 2020-05-07:</p>
+<p>To obtain smoothed estimates of COVID-like illness from our symptom survey,
+distributed through Facebook, for every county in the United States between
+2020-05-01 and 2020-05-07:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">covidcast</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span> <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
@@ -62,6 +73,11 @@ indicates when this data was reported; in this case, the survey estimates for
 May 1st were updated on May 23rd based on new data, giving a <code class="docutils literal notranslate"><span class="pre">lag</span></code> of 22 days.
 See the <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a> documentation for details on the returned
 data frame.</p>
+<p>The API documentation lists each available signal and provides technical details
+on how it is estimated and how its standard error is calculated. In this case,
+for example, the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html">symptom surveys documentation page</a>
+explains the definition of “COVID-like illness”, links to the exact survey text,
+and describes the mathematical derivation of the estimates.</p>
 <p>We can also request all data on a signal after a specific date. Here, for
 example, we obtain <code class="docutils literal notranslate"><span class="pre">smoothed_cli</span></code> in each state for every day since
 2020-05-01:</p>
@@ -226,8 +242,10 @@ on May 10th (a 7-day lag), but in fact the value was not updated on that day:</p
 <h2>Dealing with geographies<a class="headerlink" href="#dealing-with-geographies" title="Permalink to this headline">¶</a></h2>
 <p>As seen above, the COVIDcast API identifies counties by their FIPS code and
 states by two-letter abbreviations. Metropolitan statistical areas are also
-identified by unique codes, called CBSA IDs. If you want to find a specific area
-by name, this package provides convenience functions:</p>
+identified by unique codes, called CBSA IDs. (Exact details and exceptions are
+given in the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">geographic coding documentation</a>.) If
+you want to find a specific area by name, this package provides convenience
+functions:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">name_to_cbsa</span><span class="p">([</span><span class="s2">&quot;Houston&quot;</span><span class="p">,</span> <span class="s2">&quot;San Antonio&quot;</span><span class="p">])</span>
 <span class="go">[&#39;26420&#39;, &#39;41700&#39;]</span>
 </pre></div>
@@ -290,8 +308,8 @@ optional arguments.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="signals.html">Fetching Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_examples.html">Plotting Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
@@ -341,7 +359,7 @@ optional arguments.</p>
       &copy;2020, Delphi research group.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

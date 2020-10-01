@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plotting Reference &#8212; COVIDcast API client 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,8 +15,8 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Plotting Examples" href="plot_examples.html" />
-    <link rel="prev" title="Fetching Data" href="signals.html" />
+    <link rel="next" title="Changelog" href="changelog.html" />
+    <link rel="prev" title="Plotting Examples" href="plot_examples.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -54,8 +54,8 @@ and Puerto Rico</p></li>
 </ul>
 <p>For visual purposes, Alaska and Hawaii are moved the lower left corner of the contiguous US
 and Puerto Rico is moved closer to Florida.</p>
-<p>By default, the <a class="reference external" href="https://matplotlib.org/tutorials/colors/colormaps.html">colormap</a> used is
-<code class="docutils literal notranslate"><span class="pre">YlOrRd</span></code> and is binned into the signal’s historical mean value ± 3
+<p>By default, choropleths use the <a class="reference external" href="https://matplotlib.org/tutorials/colors/colormaps.html">colormap</a>
+<code class="docutils literal notranslate"><span class="pre">YlOrRd</span></code>, with colors scaled between 0 and the signal’s historical mean value + 3
 standard deviations. Custom arguments can be passed in as <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> for
 customizability. These arguments will be passed to the GeoPandas <code class="docutils literal notranslate"><span class="pre">plot</span></code>
 method; more information on these arguments can be found in <a class="reference external" href="https://geopandas.org/reference.html#geopandas.GeoDataFrame.plot">the GeoPandas
@@ -191,13 +191,13 @@ WGS84 for HRRs.</p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="signals.html">Fetching Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_examples.html">Plotting Examples</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Plotting Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#choropleth-maps">Choropleth maps</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#animate-a-signal-over-time">Animate a signal over time</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#creating-a-geodataframe">Creating a GeoDataFrame</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="plot_examples.html">Plotting Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
@@ -216,8 +216,8 @@ WGS84 for HRRs.</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="signals.html" title="previous chapter">Fetching Data</a></li>
-      <li>Next: <a href="plot_examples.html" title="next chapter">Plotting Examples</a></li>
+      <li>Previous: <a href="plot_examples.html" title="previous chapter">Plotting Examples</a></li>
+      <li>Next: <a href="changelog.html" title="next chapter">Changelog</a></li>
   </ul></li>
 </ul>
 </div>
@@ -247,7 +247,7 @@ WGS84 for HRRs.</p>
       &copy;2020, Delphi research group.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

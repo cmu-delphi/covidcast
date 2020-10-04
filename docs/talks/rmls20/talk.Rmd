@@ -615,7 +615,7 @@ In this pandemic, it'll take an entire community to find answers to all the impo
 
 - The [whole Delphi team](https://covidcast.cmu.edu/covid19-response-team.html), and various CMU units
 - Google, Facebook, and Amazon Web Services
-- SafeGraph, Quidel, Qualtrics
+- SafeGraph, Quidel, Qualtrics, Change Healthcare
 - Centers for Disease Control and Prevention
 
 <br>

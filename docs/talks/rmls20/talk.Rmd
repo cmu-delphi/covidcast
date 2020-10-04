@@ -618,8 +618,6 @@ In this pandemic, it'll take an entire community to find answers to all the impo
 - SafeGraph, Quidel, Qualtrics
 - Centers for Disease Control and Prevention
 
-Go to: <https://covidcast.cmu.edu> ... you'll find everything linked from there!
-
 <br>
 
 ![Delphi](delphi.png) ![Carnegie Mellon University](cmu.png)

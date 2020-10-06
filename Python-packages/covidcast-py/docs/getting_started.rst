@@ -29,8 +29,6 @@ your favorite Python package manager:
    pip install covidcast
 
 
-.. _signal-overview:
-
 Signal Overview
 ---------------
 The `Delphi Epidata documentation
@@ -69,7 +67,6 @@ the source would be ``ght`` and the signal would be ``raw_search``, as shown on 
 `page for that signal <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/ght.html>`_.
 These values will be provided as the arguments for the :py:func:`covidcast.signal` function to
 retrieve the desired data.
-
 
 
 Basic examples

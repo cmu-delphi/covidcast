@@ -12,7 +12,7 @@ This package provides access to data from the `COVIDcast API
 provides numerous COVID-related data streams, updated daily. The data is retrieved
 live from the server when you make a request, and is not stored within the package
 itself. This means that each time you make a request, you will be receiving the latest
-data. If you are conducting an analysis or powering a service which will require
+data available. If you are conducting an analysis or powering a service which will require
 repeated access to the same signal, please download the data rather than making repeated
 requests.
 
@@ -31,14 +31,14 @@ your favorite Python package manager:
 
 Signal Overview
 ---------------
-The `Delphi Epidata documentation
+The `API documentation
 <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html>`_ lists
 the available signals, including many not shown on the
 `COVIDcast interactive map
 <https://covidcast.cmu.edu/>`_.
 
 The data come from a variety of sources and cover information including official case counts,
-internet search trends, hospital encounters, testing volume, survey responses, and more. Below is
+internet search trends, hospital encounters, survey responses, and more. Below is
 a brief overview of each source, with links to their full descriptions.
 
 - `Doctor Visits <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html>`_

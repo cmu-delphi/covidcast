@@ -28,6 +28,7 @@ your favorite Python package manager:
 
    pip install covidcast
 
+This will install the package as well as all required dependencies.
 
 Signal Overview
 ---------------
@@ -64,7 +65,8 @@ To specify a signal, you will need the "Source Name" and "Signal" value, which a
 listed for each source/signal combination on their respective page.
 For example, to obtain the raw Google search volume for COVID-related topics,
 the source would be ``ght`` and the signal would be ``raw_search``, as shown on the
-`page for that signal <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/ght.html>`_.
+`Google Health Trends page
+<https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/ght.html>`_.
 These values will be provided as the arguments for the :py:func:`covidcast.signal` function to
 retrieve the desired data.
 

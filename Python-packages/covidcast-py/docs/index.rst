@@ -23,6 +23,8 @@ all the data sources and signals available through this API.
 The package source code and bug tracker can be found `on GitHub
 <https://github.com/cmu-delphi/covidcast>`_.
 
+To get started, check out :ref:`<getting-started>`.
+
 
 .. note :: **You should consider subscribing** to the `API mailing list
    <https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api>`_ to be

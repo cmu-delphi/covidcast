@@ -1,6 +1,8 @@
 Fetching Data
 =============
 
+.. _obtaining-signals:
+
 Signals
 -------
 

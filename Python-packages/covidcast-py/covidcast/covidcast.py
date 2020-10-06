@@ -101,45 +101,57 @@ def signal(data_source: str,
       columns:
 
       ``geo_value``
-        identifies the location, such as a state name or county FIPS code. The
+        Identifies the location, such as a state name or county FIPS code. The
         geographic coding used by COVIDcast is described in the `API
         documentation here
         <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html>`_.
 
+      ``signal``
+        Name of the signal, same as the value of the ``signal`` input argument. Used for
+        downstream functions to recognize where this signal is from.
+
       ``time_value``
-        contains a `pandas Timestamp object
+        Contains a `pandas Timestamp object
         <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_
         identifying the date this estimate is for.
 
+      ``direction``
+        Uses a local linear fit to estimate whether the signal in this region is
+        currently increasing or decreasing (reported as -1 for decreasing, 1 for
+        increasing, and 0 for neither).
+
       ``issue``
-        contains a `pandas Timestamp object
+        Contains a `pandas Timestamp object
         <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_
         identifying the date this estimate was issued. For example, an estimate
         with a ``time_value`` of June 3 might have been issued on June 5, after
         the data for June 3rd was collected and ingested into the API.
 
       ``lag``
-        an integer giving the difference between ``issue`` and ``time_value``,
+        Integer giving the difference between ``issue`` and ``time_value``,
         in days.
 
       ``value``
-        the signal quantity requested. For example, in a query for the
+        The signal quantity requested. For example, in a query for the
         ``confirmed_cumulative_num`` signal from the ``usa-facts`` source,
         this would be the cumulative number of confirmed cases in the area, as
         of the ``time_value``.
 
       ``stderr``
-        the value's standard error, if available.
+        The value's standard error, if available.
 
       ``sample_size``
-        indicates the sample size available in that geography on that day;
+        Indicates the sample size available in that geography on that day;
         sample size may not be available for all signals, due to privacy or
         other constraints.
 
-      ``direction``
-        uses a local linear fit to estimate whether the signal in this region is
-        currently increasing or decreasing (reported as -1 for decreasing, 1 for
-        increasing, and 0 for neither).
+      ``geo_type``
+        Geography type for the signal, same as the value of the ``geo_type`` input argument.
+        Used for downstream functions to parse ``geo_value`` correctly
+
+      ``data_source``
+        Name of the signal source, same as the value of the ``data_source`` input argument. Used for
+        downstream functions to recognize where this signal is from.
 
     Consult the `signal documentation
     <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html>`_

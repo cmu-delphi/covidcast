@@ -14,7 +14,7 @@ live from the server when you make a request, and is not stored within the packa
 itself. This means that each time you make a request, you will be receiving the latest
 data. If you are conducting an analysis or powering a service which will require
 repeated access to the same signal, please download the data rather than making repeated
-requests. For more information on data latency and refreshes, see :ref:`obtaining-signals`
+requests.
 
 
 Installation
@@ -63,7 +63,7 @@ a brief overview of each source, with links to their full descriptions.
     - Confirmed COVID cases and deaths based on reports made available by USAFacts.
 
 To specify a signal, you will need the "Source Name" and "Signal" value, which are
-listed for each source/signal combination in their full description.
+listed for each source/signal combination on their respective page.
 For example, to obtain the raw Google search volume for COVID-related topics,
 the source would be ``ght`` and the signal would be ``raw_search``, as shown on the
 `page for that signal <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/ght.html>`_.

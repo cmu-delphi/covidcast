@@ -1,5 +1,6 @@
 pylint
 pytest
+pydocstyle
 delphi_epidata
 pandas
 geopandas

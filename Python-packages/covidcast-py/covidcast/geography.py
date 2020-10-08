@@ -1,3 +1,4 @@
+"""Functions for converting and mapping between geographic types."""
 import re
 import warnings
 from typing import Union, Iterable
@@ -237,7 +238,7 @@ def _lookup(key: Union[str, Iterable],
 
 
 def _get_first_tie(dict_list: list) -> list:
-    """Return a list with the first value for the first key for each of the input dicts
+    """Return a list with the first value for the first key for each of the input dicts.
 
     Needs to be Python 3.6+ for this to work, since earlier versions don't preserve insertion order.
 

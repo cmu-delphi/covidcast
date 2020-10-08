@@ -155,8 +155,6 @@ objects returned by <code><a href='covidcast_signal.html'>covidcast_signal()</a>
   <span class='kw'>dir_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"#6F9CC6"</span>, <span class='st'>"#E4E4E4"</span>, <span class='st'>"#C56B59"</span>),
   <span class='kw'>bubble_col</span> <span class='kw'>=</span> <span class='st'>"purple"</span>,
   <span class='kw'>num_bins</span> <span class='kw'>=</span> <span class='fl'>8</span>,
-  <span class='kw'>line_col</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>6</span>,
-  <span class='kw'>line_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span>:<span class='fl'>6</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>line_col</span>)),
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>choro_params</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
   <span class='kw'>bubble_params</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
@@ -198,9 +196,11 @@ all states.</p></td>
       <td><p>Vector of two values: min and max, in this order, to use when
 defining the color scale for choropleth maps and the size scale for bubble
 maps, or the range of the y-axis for the time series plot. If <code>NULL</code>, the
-default, then the min and max are set to be the mean +/- 3 standard
-deviations, where this mean and standard deviation are as provided in the
-meta data for the given data source and signal.</p></td>
+default, then for the maps, the min and max are set to be the mean +/- 3
+standard deviations, where this mean and standard deviation are as provided
+in the metadata for the given data source and signal; and for the time
+series plot, they are set to be the observed min and max of the values over
+the given time period.</p></td>
     </tr>
     <tr>
       <th>choro_col</th>
@@ -233,20 +233,11 @@ covidcast.cmu.edu.</p></td>
     <tr>
       <th>num_bins</th>
       <td><p>Number of bins for determining the bubble sizes for the
-bubble map. Default is 6. These bins are evenly-spaced in between the min
+bubble map (here and throughout, to be precise, by bubble size we mean
+bubble area). Default is 8. These bins are evenly-spaced in between the min
 and max as specified through the <code>range</code> parameter. Each bin is assigned
 the same bubble size. Also, values of zero special: it has its own separate
 (small) bin, and values mapped to the zero bin are not drawn.</p></td>
-    </tr>
-    <tr>
-      <th>line_col</th>
-      <td><p>Vector of colors for the time series plot. This will be
-recycled as necessary. Default is <code>1:6</code>.</p></td>
-    </tr>
-    <tr>
-      <th>line_type</th>
-      <td><p>Vector of line types for the time series plot. This will be
-recycled as necessary. Default is <code><a href='https://rdrr.io/r/base/rep.html'>rep(1:6, each = length(col))</a></code>.</p></td>
     </tr>
     <tr>
       <th>title</th>
@@ -274,6 +265,7 @@ unused.</p></td>
 <dt><code>missing_col</code></dt><dd><p>Color assigned to missing or NA geo locations.</p></dd>
 <dt><code>border_col</code></dt><dd><p>Border color for geo locations.</p></dd>
 <dt><code>border_size</code></dt><dd><p>Border size for geo locations.</p></dd>
+<dt><code>legend_position</code></dt><dd><p>Position for legend; use "none" to hide legend.</p></dd>
 <dt><code>legend_height</code>, <code>legend_width</code></dt><dd><p>Height and width of the legend.</p></dd>
 <dt><code>breaks</code></dt><dd><p>Breaks for a custom (discrete) color or size scale.  Note
 that we must set <code>breaks</code> to be a vector of the same length as <code>choro_col</code>
@@ -281,11 +273,15 @@ for choropleth maps. This works as follows: we assign the <code>i</code>th color
 choropleth maps, or the <code>i</code>th size for bubble maps, if and only if the
 given value satisfies <code>breaks[i] &lt;= value &lt; breaks[i+1]</code>, where we take by
 convention <code>breaks[0] = -Inf</code> and <code>breaks[N+1] = Inf</code> for <code>N = length(breaks)</code>.</p></dd>
+<dt><code>legend_digits</code></dt><dd><p>Number of decimal places to show for the legend
+labels.</p></dd>
 
 </dl>
 
 <p>For choropleth maps only:</p><dl'>
-<dt><code>legend_n</code></dt><dd><p>Number of values to label on the color bar.</p></dd>
+<dt><code>legend_n</code></dt><dd><p>Number of values to label on the legend color bar. Ignored
+for discrete color scales (when <code>breaks</code> is set manually) and for direction
+maps.</p></dd>
 
 </dl>
 
@@ -298,6 +294,8 @@ effectively drawn as bubbles of zero size)?</p></dd>
 
 <p>For line graphs:</p><dl'>
 <dt><code>xlab</code>, <code>ylab</code></dt><dd><p>Labels for the x-axis and y-axis.</p></dd>
+<dt><code>stderr_bands</code></dt><dd><p>Should standard error bands be drawn?</p></dd>
+<dt><code>stderr_alpha</code></dt><dd><p>Transparency level for the standard error bands.</p></dd>
 
 </dl>
 

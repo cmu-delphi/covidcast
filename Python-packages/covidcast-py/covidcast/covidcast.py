@@ -205,11 +205,9 @@ def metadata() -> pd.DataFrame:
       ``signal``
         Signal name.
 
-      ``min_time``
-        First day for which this signal is available.
-
-      ``max_time``
-        Most recent day for which this signal is available.
+      ``time_type``
+        Temporal resolution at which this signal is reported. "day", for
+        example, means the signal is reported daily.
 
       ``geo_type``
         Geographic level for which this signal is available, such as county,
@@ -217,9 +215,11 @@ def metadata() -> pd.DataFrame:
         levels and will hence be listed in multiple rows with their own
         metadata.
 
-      ``time_type``
-        Temporal resolution at which this signal is reported. "day", for
-        example, means the signal is reported daily.
+      ``min_time``
+        First day for which this signal is available.
+
+      ``max_time``
+        Most recent day for which this signal is available.
 
       ``num_locations``
         Number of distinct geographic locations available for this signal. For
@@ -238,6 +238,17 @@ def metadata() -> pd.DataFrame:
       ``stdev_value``
         The sample standard deviation of all reported values.
 
+      ``last_update``
+        The Unix time for when the signal value was last updated.
+
+      ``max_issue``
+        Most recent date data was issued.
+
+      ``min_lag``
+        Smallest lag from observation to issue, in days.
+
+      ``max_lag``
+        Largest lag from observation to issue, in days.
     """
 
     meta = Epidata.covidcast_meta()

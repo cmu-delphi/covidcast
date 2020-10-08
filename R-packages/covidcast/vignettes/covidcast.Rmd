@@ -25,9 +25,9 @@ devtools::install_github("cmu-delphi/covidcast", ref = "main",
                          subdir = "R-packages/covidcast")
 ```
 
-Building vignettes takes a substantial amount of time, so they are not included
-by default. If you wish to include vignettes, use this modified command
-instead:
+Building the vignettes, such as this Getting Started guide, takes a substantial
+amount of time. They are not included in the package by default. If you wish to
+include vignettes, use this modified command:
 
 ```{r, eval = FALSE}
 devtools::install_github("cmu-delphi/covidcast", ref = "main",

@@ -9,7 +9,7 @@ for organization and namespace purposes.
 Sphinx documentation is in the `docs/` folder. See "Building the Package and Documentation" below 
 for information on how to build the documentation.
 
-The CI workflow is stored in the repos top level directory in `.github/workflows/python_ci.yml`
+The CI workflow is stored in the repo's top level directory in `.github/workflows/python_ci.yml`
 
 ## Development
 These are general recommendations for developing. They do not have to be strictly followed, 
@@ -33,7 +33,7 @@ __Style__
 `pylint` in `.pylintrc` and for `mypy` in `mypy.ini`.
 
 __Testing__
-- `pytest` is the framework used in this package
+- `pytest` is the framework used in this package.
 - Each function should have corresponding unit tests. 
 - Tests should be deterministic.
 - Similarly, tests should not make network calls.

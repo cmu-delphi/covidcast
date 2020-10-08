@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute correlations between two <code>covidcast_signal</code> data frames — covidcast_cor • covidcast</title>
+<title>Compute correlations between two covidcast_signal data frames — covidcast_cor • covidcast</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Compute correlations between two <code>covidcast_signal</code> data frames — covidcast_cor" />
+<meta property="og:title" content="Compute correlations between two covidcast_signal data frames — covidcast_cor" />
 <meta property="og:description" content="Computes correlations between two covidcast_signal() data frames, allowing
 for slicing by geo location, or by time. (The latest issue from each data
 frame is used when computing correlations.) See
@@ -144,15 +144,15 @@ frame is used when computing correlations.) See
 <code><a href='../articles/correlation-utils.html'>vignette("correlation-utils")</a></code> for examples.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>covidcast_cor</span>(
-  <span class='no'>x</span>,
-  <span class='no'>y</span>,
-  <span class='kw'>dt_x</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>dt_y</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"geo_value"</span>, <span class='st'>"time_value"</span>),
-  <span class='kw'>use</span> <span class='kw'>=</span> <span class='st'>"na.or.complete"</span>,
-  <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pearson"</span>, <span class='st'>"kendall"</span>, <span class='st'>"spearman"</span>)
-)</pre>
+    <pre class="usage"><span class='fu'>covidcast_cor</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>y</span>,
+  dt_x <span class='op'>=</span> <span class='fl'>0</span>,
+  dt_y <span class='op'>=</span> <span class='fl'>0</span>,
+  by <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"geo_value"</span>, <span class='st'>"time_value"</span><span class='op'>)</span>,
+  use <span class='op'>=</span> <span class='st'>"na.or.complete"</span>,
+  method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"pearson"</span>, <span class='st'>"kendall"</span>, <span class='st'>"spearman"</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -205,7 +205,7 @@ on <code>by</code>), and second column <code>value</code>, which gives the corre
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

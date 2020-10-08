@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot <code>covidcast_signal</code> objects — plot.covidcast_signal • covidcast</title>
+<title>Plot covidcast_signal objects — plot.covidcast_signal • covidcast</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Plot <code>covidcast_signal</code> objects — plot.covidcast_signal" />
+<meta property="og:title" content="Plot covidcast_signal objects — plot.covidcast_signal" />
 <meta property="og:description" content="Several plot types are provided, including choropleth plots (maps), bubble
 plots, and time series plots showing the change of signals over time, for
 objects returned by covidcast_signal()." />
@@ -143,26 +143,24 @@ objects returned by <code><a href='covidcast_signal.html'>covidcast_signal()</a>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for covidcast_signal</span>
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(
-  <span class='no'>x</span>,
-  <span class='kw'>plot_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"choro"</span>, <span class='st'>"bubble"</span>, <span class='st'>"line"</span>),
-  <span class='kw'>time_value</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>include</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(),
-  <span class='kw'>range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>choro_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"#FFFFCC"</span>, <span class='st'>"#FD893C"</span>, <span class='st'>"#800026"</span>),
-  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
-  <span class='kw'>direction</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>dir_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"#6F9CC6"</span>, <span class='st'>"#E4E4E4"</span>, <span class='st'>"#C56B59"</span>),
-  <span class='kw'>bubble_col</span> <span class='kw'>=</span> <span class='st'>"purple"</span>,
-  <span class='kw'>num_bins</span> <span class='kw'>=</span> <span class='fl'>8</span>,
-  <span class='kw'>line_col</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>6</span>,
-  <span class='kw'>line_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span>:<span class='fl'>6</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>line_col</span>)),
-  <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>choro_params</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>bubble_params</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>line_params</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='no'>...</span>
-)</pre>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  plot_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"choro"</span>, <span class='st'>"bubble"</span>, <span class='st'>"line"</span><span class='op'>)</span>,
+  time_value <span class='op'>=</span> <span class='cn'>NULL</span>,
+  include <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>)</span>,
+  range <span class='op'>=</span> <span class='cn'>NULL</span>,
+  choro_col <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"#FFFFCC"</span>, <span class='st'>"#FD893C"</span>, <span class='st'>"#800026"</span><span class='op'>)</span>,
+  alpha <span class='op'>=</span> <span class='fl'>0.5</span>,
+  direction <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  dir_col <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"#6F9CC6"</span>, <span class='st'>"#E4E4E4"</span>, <span class='st'>"#C56B59"</span><span class='op'>)</span>,
+  bubble_col <span class='op'>=</span> <span class='st'>"purple"</span>,
+  num_bins <span class='op'>=</span> <span class='fl'>8</span>,
+  title <span class='op'>=</span> <span class='cn'>NULL</span>,
+  choro_params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  bubble_params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  line_params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -198,9 +196,11 @@ all states.</p></td>
       <td><p>Vector of two values: min and max, in this order, to use when
 defining the color scale for choropleth maps and the size scale for bubble
 maps, or the range of the y-axis for the time series plot. If <code>NULL</code>, the
-default, then the min and max are set to be the mean +/- 3 standard
-deviations, where this mean and standard deviation are as provided in the
-meta data for the given data source and signal.</p></td>
+default, then for the maps, the min and max are set to be the mean +/- 3
+standard deviations, where this mean and standard deviation are as provided
+in the metadata for the given data source and signal; and for the time
+series plot, they are set to be the observed min and max of the values over
+the given time period.</p></td>
     </tr>
     <tr>
       <th>choro_col</th>
@@ -233,20 +233,11 @@ covidcast.cmu.edu.</p></td>
     <tr>
       <th>num_bins</th>
       <td><p>Number of bins for determining the bubble sizes for the
-bubble map. Default is 6. These bins are evenly-spaced in between the min
+bubble map (here and throughout, to be precise, by bubble size we mean
+bubble area). Default is 8. These bins are evenly-spaced in between the min
 and max as specified through the <code>range</code> parameter. Each bin is assigned
 the same bubble size. Also, values of zero special: it has its own separate
 (small) bin, and values mapped to the zero bin are not drawn.</p></td>
-    </tr>
-    <tr>
-      <th>line_col</th>
-      <td><p>Vector of colors for the time series plot. This will be
-recycled as necessary. Default is <code>1:6</code>.</p></td>
-    </tr>
-    <tr>
-      <th>line_type</th>
-      <td><p>Vector of line types for the time series plot. This will be
-recycled as necessary. Default is <code><a href='https://rdrr.io/r/base/rep.html'>rep(1:6, each = length(col))</a></code>.</p></td>
     </tr>
     <tr>
       <th>title</th>
@@ -260,7 +251,7 @@ the different plot types, for further customization. See details below.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Additional arguments, for compatibility with <code><a href='https://rdrr.io/r/base/plot.html'>plot()</a></code>. Currently
+      <td><p>Additional arguments, for compatibility with <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot()</a></code>. Currently
 unused.</p></td>
     </tr>
     </table>
@@ -269,11 +260,12 @@ unused.</p></td>
 
     <p>The following named arguments are supported through the lists
 <code>choro_params</code>, <code>bubble_params</code>, and <code>line_params</code>.</p>
-<p>For both choropleth and bubble maps:</p><dl'>
+<p>For both choropleth and bubble maps:</p><dl>
 <dt><code>subtitle</code></dt><dd><p>Subtitle for the map.</p></dd>
 <dt><code>missing_col</code></dt><dd><p>Color assigned to missing or NA geo locations.</p></dd>
 <dt><code>border_col</code></dt><dd><p>Border color for geo locations.</p></dd>
 <dt><code>border_size</code></dt><dd><p>Border size for geo locations.</p></dd>
+<dt><code>legend_position</code></dt><dd><p>Position for legend; use "none" to hide legend.</p></dd>
 <dt><code>legend_height</code>, <code>legend_width</code></dt><dd><p>Height and width of the legend.</p></dd>
 <dt><code>breaks</code></dt><dd><p>Breaks for a custom (discrete) color or size scale.  Note
 that we must set <code>breaks</code> to be a vector of the same length as <code>choro_col</code>
@@ -281,23 +273,29 @@ for choropleth maps. This works as follows: we assign the <code>i</code>th color
 choropleth maps, or the <code>i</code>th size for bubble maps, if and only if the
 given value satisfies <code>breaks[i] &lt;= value &lt; breaks[i+1]</code>, where we take by
 convention <code>breaks[0] = -Inf</code> and <code>breaks[N+1] = Inf</code> for <code>N = length(breaks)</code>.</p></dd>
+<dt><code>legend_digits</code></dt><dd><p>Number of decimal places to show for the legend
+labels.</p></dd>
 
 </dl>
 
-<p>For choropleth maps only:</p><dl'>
-<dt><code>legend_n</code></dt><dd><p>Number of values to label on the color bar.</p></dd>
+<p>For choropleth maps only:</p><dl>
+<dt><code>legend_n</code></dt><dd><p>Number of values to label on the legend color bar. Ignored
+for discrete color scales (when <code>breaks</code> is set manually) and for direction
+maps.</p></dd>
 
 </dl>
 
-<p>For bubble maps only:</p><dl'>
+<p>For bubble maps only:</p><dl>
 <dt><code>remove_zero</code></dt><dd><p>Should zeros be excluded from the size scale (hence
 effectively drawn as bubbles of zero size)?</p></dd>
 <dt><code>min_size</code>, <code>max_size</code></dt><dd><p>Min size for the size scale.</p></dd>
 
 </dl>
 
-<p>For line graphs:</p><dl'>
+<p>For line graphs:</p><dl>
 <dt><code>xlab</code>, <code>ylab</code></dt><dd><p>Labels for the x-axis and y-axis.</p></dd>
+<dt><code>stderr_bands</code></dt><dd><p>Should standard error bands be drawn?</p></dd>
+<dt><code>stderr_alpha</code></dt><dd><p>Transparency level for the standard error bands.</p></dd>
 
 </dl>
 
@@ -317,7 +315,7 @@ effectively drawn as bubbles of zero size)?</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -1,6 +1,6 @@
 """This is the client side library for accessing the COVIDcast API."""
 import warnings
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 from typing import Union, Iterable, Tuple, List
 from functools import reduce
 
@@ -239,7 +239,7 @@ def metadata() -> pd.DataFrame:
         The sample standard deviation of all reported values.
 
       ``last_update``
-        The Unix time for when the signal value was last updated.
+        The UTC datetime for when the signal value was last updated.
 
       ``max_issue``
         Most recent date data was issued.
@@ -261,7 +261,7 @@ def metadata() -> pd.DataFrame:
     meta_df = pd.DataFrame.from_dict(meta["epidata"])
     meta_df["min_time"] = pd.to_datetime(meta_df["min_time"], format="%Y%m%d")
     meta_df["max_time"] = pd.to_datetime(meta_df["max_time"], format="%Y%m%d")
-
+    meta_df["last_update"] = meta_df.last_update.map(datetime.utcfromtimestamp)
     return meta_df
 
 

@@ -261,7 +261,7 @@ def metadata() -> pd.DataFrame:
     meta_df = pd.DataFrame.from_dict(meta["epidata"])
     meta_df["min_time"] = pd.to_datetime(meta_df["min_time"], format="%Y%m%d")
     meta_df["max_time"] = pd.to_datetime(meta_df["max_time"], format="%Y%m%d")
-    meta_df["last_update"] = meta_df.last_update.map(datetime.utcfromtimestamp)
+    meta_df["last_update"] = pd.to_datetime(meta_df["last_update"], unit="s")
     return meta_df
 
 

@@ -1,8 +1,8 @@
 """This is the client side library for accessing the COVIDcast API."""
 import warnings
-from datetime import timedelta, date, datetime
-from typing import Union, Iterable, Tuple, List
+from datetime import timedelta, date
 from functools import reduce
+from typing import Union, Iterable, Tuple, List
 
 import pandas as pd
 from delphi_epidata import Epidata

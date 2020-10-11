@@ -147,7 +147,6 @@ def signal(data_source: str,
     specific signals.
 
     """
-
     if geo_type not in VALID_GEO_TYPES:
         raise ValueError("geo_type must be one of " + ", ".join(VALID_GEO_TYPES))
 
@@ -239,7 +238,6 @@ def metadata() -> pd.DataFrame:
         The sample standard deviation of all reported values.
 
     """
-
     meta = Epidata.covidcast_meta()
 
     if meta["result"] != 1:
@@ -351,7 +349,6 @@ def _fetch_single_geo(data_source: str,
     entries.
 
     """
-
     as_of_str = _date_to_api_string(as_of) if as_of is not None else None
     issues_strs = _dates_to_api_strings(issues) if issues is not None else None
 
@@ -398,7 +395,6 @@ def _signal_metadata(data_source: str,
                      signal: str,  # pylint: disable=W0621
                      geo_type: str) -> dict:
     """Fetch metadata for a single signal as a dict."""
-
     meta = metadata()
 
     mask = ((meta.data_source == data_source) &
@@ -423,13 +419,11 @@ def _signal_metadata(data_source: str,
 
 def _date_to_api_string(date: date) -> str:  # pylint: disable=W0621
     """Convert a date object to a YYYYMMDD string expected by the API."""
-
     return date.strftime("%Y%m%d")
 
 
 def _dates_to_api_strings(dates: Union[date, list, tuple]) -> str:
     """Convert a date object, or pair of (start, end) objects, to YYYYMMDD strings."""
-
     if not isinstance(dates, (list, tuple)):
         return _date_to_api_string(dates)
 

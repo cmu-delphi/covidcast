@@ -29,7 +29,7 @@ This repository also includes some talks we've given about the COVIDcast project
 - [Medical Claims Indicators](https://docs.google.com/presentation/d/1Pt2qMwIHyyuyGwwigZyndPGjcjILAS6RYxBcXKuuQ4U/edit?usp=sharing)
 - [Forecast Evaluation Toolkit](https://cmu-delphi.github.io/covidcast/talks/evalcast/talk.html)
 
-## Related GitHub repos
+## Related repos
 
 - [www-covidcast](https://github.com/cmu-delphi/www-covidcast/): Front end for
   Delphi's [COVIDcast map](https://covidcast.cmu.edu) 

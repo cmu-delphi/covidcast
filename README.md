@@ -31,9 +31,11 @@ This repository also includes some talks we've given about the COVIDcast project
 
 ## Related repos
 
-- [www-covidcast](https://github.com/cmu-delphi/www-covidcast/): Front end for
-  Delphi's [COVIDcast map](https://covidcast.cmu.edu) 
+- [delphi-epidata](https://github.com/cmu-delphi/delphi-epidata/): Back end for
+  Delphi's Epidata API 
 - [covidcast-indicators](https://github.com/cmu-delphi/covidcast-indicators/):
   Back end for Delphi's COVID indicators 
+- [www-covidcast](https://github.com/cmu-delphi/www-covidcast/): Front end for
+  Delphi's [COVIDcast map](https://covidcast.cmu.edu) 
 - [covid-19-forecast](https://github.com/cmu-delphi/covid-19-forecast/): Public
   repo for Delphi's COVID forecasters 

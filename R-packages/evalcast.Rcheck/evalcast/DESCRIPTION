@@ -41,20 +41,16 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 Remotes: github::cmu-delphi/covidcast/R-packages/covidcast@main
-Imports: 
-    covidcast,
-    dplyr,
-    magrittr,
-    lubridate,
-    purrr,
-    tibble,
-    tidyr,
-    stringr,
-    readr,
-    MMWRweek,
-    zoo,
-    rvest,
-    xml2,
-    rlang
-Suggests: 
-    testthat
+Imports: covidcast, dplyr, magrittr, lubridate, purrr, tibble, tidyr,
+        stringr, readr, MMWRweek, zoo, rvest, xml2, rlang
+Suggests: testthat
+NeedsCompilation: no
+Packaged: 2020-10-12 14:58:55 UTC; naras
+Author: Jacob Bien [aut, cre],
+  Alden Green [aut],
+  Balasubramanian Narasimhan [aut],
+  Samyak Rajanala [ctb],
+  Aaron Rumack [ctb],
+  Ryan Tibshirani [ctb]
+Maintainer: Jacob Bien <jbien@usc.edu>
+Built: R 4.0.2; ; 2020-10-12 14:59:16 UTC; unix

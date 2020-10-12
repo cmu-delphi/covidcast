@@ -1,0 +1,29 @@
+absolute_error          Compute absolute error
+all_attr                Return list of attributes
+baseline_forecaster     Baseline forecaster
+check_valid_forecaster_output
+                        Check that forecaster's output is valid
+download_signal         Download signal from covidcast
+evalcast-package        evalcast
+evaluate_predictions    Create a list of scorecards
+filter_predictions      Filter a list of predictions cards based on
+                        attributes
+get_covidhub_predictions
+                        Get predictions from a forecaster on COVIDHub
+get_forecast_dates      Get Available Forecast Dates for Forecaster on
+                        COVID Hub
+get_predictions         Get predictions
+get_predictions_single_date
+                        Get predictions cards for a single date
+get_target_response     returns data frame with column names
+                        "forecast_date", "location", "target_start",
+                        "target_end", "actual"
+intersect_locations     Remove locations that are not in all cards
+interval_coverage       Generate interval coverage error measure
+                        function
+plot_coverage           Plot the interval coverage
+plot_measure            Plot a measure
+plot_width              Plot the interval width
+unique_attr             Return unique value of attribute or throw error
+weighted_interval_score
+                        Compute weighted interval score

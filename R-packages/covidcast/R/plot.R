@@ -350,9 +350,13 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   if (attributes(x)$geo_type == "county") {
     g = county_geo[county_geo$FIPS %in% map_geo, ]
     cur_geo = g$FIPS
-    cur_lon = g$LON
-    cur_lat = g$LAT
+#    cur_lon = g$LON
+#    cur_lat = g$LAT
     cur_val = rep(NA, length(cur_geo))
+    centroids = utils::read.csv(system.file("extdata", paste0("us_counties_centroids.csv"), package = "usmap"))
+    centroids[nchar(centroids$fips) == 4,]$fips = paste0("0", centroids[nchar(centroids$fips) == 4,]$fips)
+    cur_centroid = centroids[centroids$fips %in% g$FIPS,]
+    cur_centroid = cur_centroid[match(g$FIPS, cur_centroid$fips),]
   }
 
   # Set the lats and lons for states
@@ -360,15 +364,17 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     state_geo$STATE = tolower(state_geo$STATE)
     g = state_geo[state_geo$STATE %in% map_geo, ]
     cur_geo = g$STATE
-    cur_lon = g$LON
-    cur_lat = g$LAT
+#    cur_lon = g$LON
+#    cur_lat = g$LAT
     cur_val = rep(NA, length(cur_geo))
+    centroids = utils::read.csv(system.file("extdata", paste0("us_states_centroids.csv"), package = "usmap"))
+    cur_centroid = centroids[centroids$fips %in% map_geo,]
   }
 
   # Overwrite the values for observed locations
   cur_obs = cur_geo[cur_geo %in% geo]
   cur_val[cur_geo %in% geo] = dis_fun(val[cur_obs])
-
+  
   # Important: make into a factor and set the levels (for the legend)
   cur_val = factor(cur_val, levels = breaks)
 
@@ -379,10 +385,10 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   }
   
   # Create the bubble layer
-  bubble_df = data.frame(lon = cur_lon, lat = cur_lat, val = cur_val)
-  suppressWarnings({ bubble_trans = usmap::usmap_transform(bubble_df) })
-  bubble_layer = ggplot2::geom_point(aes(x = lon.1, y = lat.1, size = val),
-                                     data = bubble_trans, color = col,
+  bubble_df = data.frame(lat = cur_centroid$x, lon = cur_centroid$y, val = cur_val)
+  #suppressWarnings({ bubble_trans = usmap::usmap_transform(bubble_df) })
+  bubble_layer = ggplot2::geom_point(aes(x = lat, y = lon, size = val),
+                                     data = bubble_df, color = col,
                                      alpha = alpha, na.rm = TRUE)
 
   # Create the scale layer

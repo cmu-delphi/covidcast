@@ -348,27 +348,24 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 
   # Set the lats and lons for counties
   if (attributes(x)$geo_type == "county") {
-    g = county_geo[county_geo$FIPS %in% map_geo, ]
-    cur_geo = g$FIPS
-#    cur_lon = g$LON
-#    cur_lat = g$LAT
-    cur_val = rep(NA, length(cur_geo))
     centroids = utils::read.csv(system.file("extdata", paste0("us_counties_centroids.csv"), package = "usmap"))
     centroids[nchar(centroids$fips) == 4,]$fips = paste0("0", centroids[nchar(centroids$fips) == 4,]$fips)
-    cur_centroid = centroids[centroids$fips %in% g$FIPS,]
-    cur_centroid = cur_centroid[match(g$FIPS, cur_centroid$fips),]
+    centroids = centroids[centroids$fips %in% map_geo,]
+    centroids = centroids[match(map_geo, centroids$fips),]
+     
+    cur_geo = centroids$fips
+    cur_val = rep(NA, length(cur_geo))
   }
 
   # Set the lats and lons for states
   else if (attributes(x)$geo_type == "state") {
-    state_geo$STATE = tolower(state_geo$STATE)
-    g = state_geo[state_geo$STATE %in% map_geo, ]
-    cur_geo = g$STATE
-#    cur_lon = g$LON
-#    cur_lat = g$LAT
-    cur_val = rep(NA, length(cur_geo))
     centroids = utils::read.csv(system.file("extdata", paste0("us_states_centroids.csv"), package = "usmap"))
-    cur_centroid = centroids[centroids$fips %in% map_geo,]
+    centroids$abbr = tolower(centroids$abbr)
+    centroids = centroids[centroids$abbr %in% map_geo,]
+    centroids = centroids[match(map_geo, centroids$abbr),]
+    
+    cur_geo = centroids$abbr
+    cur_val = rep(NA, length(cur_geo))
   }
 
   # Overwrite the values for observed locations
@@ -385,7 +382,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   }
   
   # Create the bubble layer
-  bubble_df = data.frame(lat = cur_centroid$x, lon = cur_centroid$y, val = cur_val)
+  bubble_df = data.frame(lat = centroids$x, lon = centroids$y, val = cur_val)
   #suppressWarnings({ bubble_trans = usmap::usmap_transform(bubble_df) })
   bubble_layer = ggplot2::geom_point(aes(x = lat, y = lon, size = val),
                                      data = bubble_df, color = col,

@@ -359,9 +359,6 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     centroids = utils::read.csv(centroid_file,
                                 colClasses = centroid_col_classes)
     centroids = centroids[centroids$fips %in% map_geo, ]
-
-    # Ordering must match due to plotting code
-    centroids = centroids[match(map_geo, centroids$fips), ]
     cur_geo = centroids$fips
     cur_val = rep(NA, length(cur_geo))
   }
@@ -373,7 +370,6 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
                                 colClasses = centroid_col_classes)
     centroids$abbr = tolower(centroids$abbr)
     centroids = centroids[centroids$abbr %in% map_geo, ]
-    centroids = centroids[match(map_geo, centroids$abbr), ]
 
     cur_geo = centroids$abbr
     cur_val = rep(NA, length(cur_geo))

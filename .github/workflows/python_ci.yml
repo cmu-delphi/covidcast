@@ -33,5 +33,5 @@ jobs:
         make lint
     - name: Test with pytest
       run: |
-        pytest Python-packages/covidcast-py/ -W ignore::UserWarning
+        make test
 

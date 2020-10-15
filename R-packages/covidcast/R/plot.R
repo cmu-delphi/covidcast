@@ -318,12 +318,16 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   if (attributes(x)$geo_type == "county") {
     map_df = usmap::us_map("county", include = include)
     map_geo = map_df$fips
+    centroid_col_classes = c("numeric", "numeric", "character", "character",
+                         "character", "character")
   }
 
   # Grap the map data frame for states
   else if (attributes(x)$geo_type == "state") {
     map_df = usmap::us_map("state", include = include)
     map_geo = tolower(map_df$abbr)
+    centroid_col_classes = c("numeric", "numeric", "character", "character",
+                         "character")
   }
 
   # Determine which locations are missing
@@ -346,24 +350,31 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   geom_args$data = map_df
   polygon_layer = do.call(ggplot2::geom_polygon, geom_args)
 
-  # Set the lats and lons for counties
+  # Retrieve coordinates for mapping
+  # Reading from usmap files to ensure consistency with borders
   if (attributes(x)$geo_type == "county") {
-    centroids = utils::read.csv(system.file("extdata", paste0("us_counties_centroids.csv"), package = "usmap"))
-    centroids[nchar(centroids$fips) == 4,]$fips = paste0("0", centroids[nchar(centroids$fips) == 4,]$fips)
-    centroids = centroids[centroids$fips %in% map_geo,]
-    centroids = centroids[match(map_geo, centroids$fips),]
-     
+    centroid_file = system.file("extdata",
+                                "us_counties_centroids.csv",
+                                package = "usmap")
+    centroids = utils::read.csv(centroid_file,
+                                colClasses = centroid_col_classes)
+    centroids = centroids[centroids$fips %in% map_geo, ]
+
+    # Ordering must match due to plotting code
+    centroids = centroids[match(map_geo, centroids$fips), ]
     cur_geo = centroids$fips
     cur_val = rep(NA, length(cur_geo))
   }
-
-  # Set the lats and lons for states
   else if (attributes(x)$geo_type == "state") {
-    centroids = utils::read.csv(system.file("extdata", paste0("us_states_centroids.csv"), package = "usmap"))
+    centroid_file = system.file("extdata",
+                                "us_states_centroids.csv",
+                                package = "usmap")
+    centroids = utils::read.csv(centroid_file,
+                                colClasses = centroid_col_classes)
     centroids$abbr = tolower(centroids$abbr)
-    centroids = centroids[centroids$abbr %in% map_geo,]
-    centroids = centroids[match(map_geo, centroids$abbr),]
-    
+    centroids = centroids[centroids$abbr %in% map_geo, ]
+    centroids = centroids[match(map_geo, centroids$abbr), ]
+
     cur_geo = centroids$abbr
     cur_val = rep(NA, length(cur_geo))
   }
@@ -383,7 +394,6 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   
   # Create the bubble layer
   bubble_df = data.frame(lat = centroids$x, lon = centroids$y, val = cur_val)
-  #suppressWarnings({ bubble_trans = usmap::usmap_transform(bubble_df) })
   bubble_layer = ggplot2::geom_point(aes(x = lat, y = lon, size = val),
                                      data = bubble_df, color = col,
                                      alpha = alpha, na.rm = TRUE)

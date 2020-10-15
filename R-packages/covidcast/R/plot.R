@@ -382,7 +382,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   # Overwrite the values for observed locations
   cur_obs = cur_geo[cur_geo %in% geo]
   cur_val[cur_geo %in% geo] = dis_fun(val[cur_obs])
-  
+
   # Important: make into a factor and set the levels (for the legend)
   cur_val = factor(cur_val, levels = breaks)
 

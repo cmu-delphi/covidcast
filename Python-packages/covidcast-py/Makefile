@@ -1,7 +1,7 @@
 .PHONY = lint, test, install-requirements, build-and-install
 
 install-requirements:
-	pip install -r requirements.txt
+	pip install -r requirements_ci.txt
 	pip install -r requirements_dev.txt
 
 build-and-install: install-requirements

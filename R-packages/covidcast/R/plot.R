@@ -370,7 +370,6 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
                                 colClasses = centroid_col_classes)
     centroids$abbr = tolower(centroids$abbr)
     centroids = centroids[centroids$abbr %in% map_geo, ]
-
     cur_geo = centroids$abbr
     cur_val = rep(NA, length(cur_geo))
   }

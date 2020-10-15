@@ -101,7 +101,7 @@ def plot(data: pd.DataFrame,
 def plot_choropleth(data: pd.DataFrame,
                     time_value: date = None,
                     **kwargs: Any) -> figure.Figure:
-    """Deprecated function for plotting choropleths. Has been generalized to plot().
+    """Plot choropleths for a signal. This method is deprecated and has been generalized to plot().
 
     :param data: Data frame of signal values, as returned from :py:func:`covidcast.signal`.
     :param time_value: If multiple days of data are present in ``data``, map only values from this

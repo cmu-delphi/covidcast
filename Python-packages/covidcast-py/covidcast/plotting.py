@@ -164,7 +164,6 @@ def get_geo_df(data: pd.DataFrame,
       WGS84 for HRRs.
 
     """
-
     if join_type == "right" and any(data[geo_value_col].duplicated()):
         raise ValueError("join_type `right` is incompatible with duplicate values in a "
                          "given region. Use `left` or ensure your input data is a single signal for"

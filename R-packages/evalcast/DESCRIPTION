@@ -52,6 +52,11 @@ Imports:
     stringr,
     readr,
     MMWRweek,
-    zoo
+    zoo,
+    DBI,
+    RSQLite,
+    rlang
 Suggests: 
     testthat
+Depends: 
+    R (>= 2.10)

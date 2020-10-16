@@ -31,7 +31,7 @@
 #'
 #' @param predictions_cards a list of prediction cards from the same forecaster
 #' that are all for the same prediction task, meaning they are for the same
-#' response, incidence_period, ahead, and geo_type. Each should
+#' response, incidence_period, ahead, and geo_type. Each shouldts.
 #' be from a different forecast date.  A predictions card is created by the
 #' function \code{\link{get_predictions}}.
 #' @param err_measures a named list of one or more functions, where each function
@@ -51,8 +51,9 @@ evaluate_predictions <- function(
 ) {
   responses <- all_attr(predictions_cards, "signals") %>%
     map(~ .x[1, ])
-  if (length(unique(responses)) > 1)
-    stop("All predictions cards should have the same response.")
+  assert_that(length(unique(responses)) <= 1,
+              msg="All predictions cards should have the 
+                  same response.")
   unique_attr(predictions_cards, "incidence_period")
   unique_attr(predictions_cards, "geo_type")
 
@@ -85,27 +86,27 @@ evaluate_predictions_single_ahead <- function(
                                          att$ahead,
                                          att$geo_type)
   as_of <- attr(target_response, "as_of")
-  if (as_of <= max(target_response$end) + backfill_buffer) {
-    problem <- target_response %>%
-      filter(end == max(end))
-    stop("Reliable data for evaluation is not yet available for forecast_date ",
-         problem$forecast_date[1],
-         " because target period extends to ",
-         problem$end[1],
-         " which is too recent to be reliable according to the provided ",
-         " backfill_buffer of ",
-         backfill_buffer)
-  }
+  assert_that(as_of > max(target_response$end) + backfill_buffer,
+              msg=(target_response %>% filter(end == max(end)) %>%
+                  stringr::str_glue_data(
+                  "Reliable data for evaluation is not yet available for 
+                  forecast_date {forecast_date} because target period 
+                  extends to {end} which is too recent to be reliable 
+                  according to the provided backfill_buffer of 
+                  {backfill_buffer}.",
+                  forecast_date=.$forecast_date[1],
+                  end=.$end[1],
+                  backfill_buffer=backfill_buffer)))
   # combine all prediction cards into a single data frame with an additional
   # column called forecast_date:
   predicted <- map2_dfr(predictions_cards, att$forecast_dates,
                         ~ mutate(.x, forecast_date = .y))
   invalid <- check_valid_forecaster_output(predicted)
-  if (nrow(invalid) > 0)
-    stop("The following forecast_date, location pairs have invalid forecasts:\n",
-         invalid %>%
-           stringr::str_glue_data("({forecast_date}, {location})") %>%
-           paste0(collapse = "\n"))
+  assert_that(nrow(invalid) == 0,
+              msg=paste0("The following forecast_date, location pairs have invalid 
+                  forecasts:\n", invalid %>%
+                  stringr::str_glue_data("({forecast_date}, {location})") %>%
+                  paste0(collapse = "\n")))
   # join together the data frames target_response and predicted:
   score_card <- target_response %>%
     inner_join(predicted, by = c("location", "forecast_date")) %>%

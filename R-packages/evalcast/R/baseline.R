@@ -25,7 +25,8 @@ baseline_forecaster <- function(df,
                                 incidence_period,
                                 ahead,
                                 geo_type) {
-  stopifnot(incidence_period %in% c("epiweek", "day"))
+  assert_that(incidence_period %in% c("epiweek", "day"),
+              msg="incidence_period must be epiweek or day.")
   forecast_date <- lubridate::ymd(forecast_date)
   target_period <- get_target_period(forecast_date, incidence_period, ahead)
   incidence_length <- ifelse(incidence_period == "epiweek", 7, 1)

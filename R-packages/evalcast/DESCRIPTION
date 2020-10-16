@@ -1,7 +1,7 @@
 Package: evalcast
 Type: Package
 Title: Evaluating COVID-19 Forecasters Built on Covidcast
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
   c(
     person(given = "Jacob",
@@ -39,6 +39,7 @@ Description: This package is a tool for those developing probabilistic COVID-19
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Remotes: github::cmu-delphi/covidcast/R-packages/covidcast@main
 Imports: 
@@ -55,6 +56,7 @@ Imports:
     zoo,
     rvest,
     xml2,
-    rlang
+    rlang,
+    ggplot2
 Suggests: 
     testthat

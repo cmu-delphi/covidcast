@@ -18,6 +18,7 @@
 #'   The quantiles column gives the probs-quantile of the forecast distribution
 #'   for that location and ahead.
 #'
+#' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @importFrom lubridate ymd
 #' @importFrom dplyr filter group_by arrange mutate select group_by group_modify ungroup bind_rows lag

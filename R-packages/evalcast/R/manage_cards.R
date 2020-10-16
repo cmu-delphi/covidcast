@@ -5,8 +5,8 @@ get_and_check_pc_attributes <- function(predictions_cards) {
   forecast_dates <- do.call("c",
                             predictions_cards %>%
                               map(~ attr(.x, "forecast_date")))
-  if (length(unique(forecast_dates)) < length(forecast_dates))
-    stop("Each predictions card must have a distinct forecast date.")
+  assert_that(length(unique(forecast_dates)) == length(forecast_dates),
+              msg="Each predictions card must have a distinct forecast date.")
   list(
     forecast_dates = forecast_dates,
     name_of_forecaster = unique_attr(predictions_cards, "name_of_forecaster"),
@@ -24,9 +24,10 @@ get_and_check_pc_attributes <- function(predictions_cards) {
 #' @param attribute name of attribute
 unique_attr <- function(cards, attribute) {
   attr_list <- all_attr(cards, attribute)
-  if (length(unique(attr_list)) > 1)
-    stop(sprintf("These cards do not all have the same %s.", attribute))
-  attr_list[[1]]
+  assert_that(length(unique(attr_list)) <= 1,
+              msg=sprintf("These cards do not all have the same %s.",
+                          attribute))
+  return(attr_list[[1]])
 }
 
 #' Return list of attributes
@@ -37,7 +38,7 @@ unique_attr <- function(cards, attribute) {
 #' @param cards a list of predictions cards or a list of scorecards
 #' @param attribute name of attribute
 all_attr <- function(cards, attribute) {
-  cards %>% map(~ attr(.x, attribute))
+  return(cards %>% map(~ attr(.x, attribute)))
 }
 
 

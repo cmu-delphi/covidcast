@@ -39,7 +39,7 @@ get_predictions <- function(forecaster,
                             ahead,
                             geo_type,
                             geo_values = "*") {
-  if (!is_tibble(signals)) stop("signals should be a tibble.")
+  assert_that(is_tibble(signals), msg="signals should be a tibble.")
   forecast_dates %>%
     map(~ get_predictions_single_date(
       forecaster = forecaster,

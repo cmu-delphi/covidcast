@@ -42,6 +42,7 @@ LazyData: true
 RoxygenNote: 7.1.1
 Remotes: github::cmu-delphi/covidcast/R-packages/covidcast@main
 Imports: 
+    assertthat,
     covidcast,
     dplyr,
     magrittr,

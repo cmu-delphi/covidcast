@@ -10,6 +10,8 @@ plot_measure(scorecards, err_name, type = "boxplot")
 \item{scorecards}{a list of scorecards}
 
 \item{err_name}{the name of a column appearing in all scorecards}
+
+\item{type}{the plot type, default boxplot}
 }
 \description{
 Plot a measure

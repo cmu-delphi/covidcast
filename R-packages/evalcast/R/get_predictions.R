@@ -55,6 +55,15 @@ get_predictions <- function(forecaster,
 }
 
 #' Get predictions cards for a single date
+#'
+#' @template forecaster-template
+#' @template name_of_forecaster-template
+#' @template signals-template
+#' @template forecast_date-template
+#' @template incidence_period-template
+#' @template ahead-template
+#' @template geo_type-template
+#' @template geo_value-template
 #' @importFrom stringr str_glue
 get_predictions_single_date <- function(forecaster,
                                         name_of_forecaster,

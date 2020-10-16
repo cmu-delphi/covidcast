@@ -2,12 +2,37 @@
 % Please edit documentation in R/target.R
 \name{get_target_response}
 \alias{get_target_response}
-\title{returns data frame with column names
+\title{Returns data frame with column names
 "forecast_date", "location", "target_start", "target_end", "actual"}
 \usage{
 get_target_response(signals, forecast_dates, incidence_period, ahead, geo_type)
 }
+\arguments{
+\item{signals}{a tibble with columns "data_source" and "signal" that
+specifies which variables from the covidcast API will be used by
+my_forecaster. The first row of signals is taken to be the response.   If
+using incidence_period "epiweek", thre response should be something for
+which summing daily values over an epiweek makes sense (e.g., counts or
+proportions but not log(counts) or log(proportions)).  Available data
+sources and signals are documented in the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{COVIDcast signal documentation}
+documentation.  Can optionally include a column "first_day" giving the
+earliest day of data needed from that data source.}
+
+\item{forecast_dates}{the vector of forecast dates}
+
+\item{incidence_period}{either "epiweek" or "day"}
+
+\item{ahead}{vector of (one or more) integers.  How many epiweeks/days ahead
+are you forecasting?  If incidence_period is "epiweek" and forecast_date is
+Sunday or Monday, then ahead = 1 means the epiweek that includes the
+forecast date;  if forecast_date is Tuesday-Saturday, then it is the
+following epiweek. If incidence_period is "day" then ahead = 1 means the
+day after forecast date.}
+
+\item{geo_type}{one of the geographical types, matching the terms used on the
+api ("county", "dma", "hrr", "msa", "state")}
+}
 \description{
-returns data frame with column names
+Returns data frame with column names
 "forecast_date", "location", "target_start", "target_end", "actual"
 }

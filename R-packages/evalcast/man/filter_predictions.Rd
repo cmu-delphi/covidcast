@@ -17,6 +17,26 @@ filter_predictions(
 }
 \arguments{
 \item{predictions_cards}{a list of predictions cards}
+
+\item{name_of_forecaster}{the name of the forecaster}
+
+\item{response_data_source}{the response data source}
+
+\item{response_signal}{the response signal}
+
+\item{forecast_date}{the forecast date}
+
+\item{incidence_period}{either "epiweek" or "day"}
+
+\item{ahead}{vector of (one or more) integers.  How many epiweeks/days ahead
+are you forecasting?  If incidence_period is "epiweek" and forecast_date is
+Sunday or Monday, then ahead = 1 means the epiweek that includes the
+forecast date;  if forecast_date is Tuesday-Saturday, then it is the
+following epiweek. If incidence_period is "day" then ahead = 1 means the
+day after forecast date.}
+
+\item{geo_type}{one of the geographical types, matching the terms used on the
+api ("county", "dma", "hrr", "msa", "state")}
 }
 \description{
 Filter a list of predictions cards based on attributes

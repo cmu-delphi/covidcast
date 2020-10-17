@@ -30,10 +30,10 @@
 #' signal you are predicting, then you can set backfill_buffer to 0.
 #'
 #' @param predictions_cards a list of prediction cards from the same forecaster
-#' that are all for the same prediction task, meaning they are for the same
-#' response, incidence_period, ahead, and geo_type. Each shouldts.
-#' be from a different forecast date.  A predictions card is created by the
-#' function \code{\link{get_predictions}}.
+#'   that are all for the same prediction task, meaning they are for the same
+#'   response, incidence_period, ahead, and geo_type. Each should be from a
+#'   different forecast date.  A predictions card is created by the function
+#'   \code{\link{get_predictions}}.
 #' @param err_measures a named list of one or more functions, where each function
 #'   takes a data frame with two columns "probs" and "quantiles" and an actual
 #'   (i.e. observed) scalar value and returns some measure of error.  If empty,

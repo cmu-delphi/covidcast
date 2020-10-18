@@ -35,4 +35,4 @@ global_vars  <- c(
   "forecast_date",
   "dist_from_interval"
 )
-utils::globalVariables(global_vars)
+##utils::globalVariables(global_vars)

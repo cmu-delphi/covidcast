@@ -6,6 +6,11 @@
 \usage{
 weighted_interval_score(quantile_forecasts, actual_value)
 }
+\arguments{
+\item{quantile_forecasts}{the tibble of quantile forecasts (23 rows typically)}
+
+\item{actual_value}{the actual value for median}
+}
 \description{
 For more details, see https://arxiv.org/abs/2005.12881
 }

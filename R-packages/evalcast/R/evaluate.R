@@ -44,7 +44,7 @@
 #'
 #' @importFrom purrr map
 #' @importFrom magrittr %>%
-#'
+#' @importFrom assertthat assert_that
 #' @export
 evaluate_predictions <- function(
   predictions_cards,
@@ -56,7 +56,7 @@ evaluate_predictions <- function(
   responses <- all_attr(predictions_cards, "signals") %>%
     map(~ .x[1, ])
   assert_that(length(unique(responses)) <= 1,
-              msg="All predictions cards should have the 
+              msg="All predictions cards should have the
                   same response.")
   unique_attr(predictions_cards, "incidence_period")
   unique_attr(predictions_cards, "geo_type")
@@ -81,6 +81,7 @@ evaluate_predictions <- function(
 #' @importFrom dplyr filter select inner_join mutate rowwise ungroup
 #' @importFrom stringr str_glue_data
 #' @importFrom rlang :=
+#' @importFrom assertthat assert_that
 evaluate_predictions_single_ahead <- function(
   predictions_cards,
   err_measures,
@@ -95,13 +96,14 @@ evaluate_predictions_single_ahead <- function(
                                          att$ahead,
                                          att$geo_type)
   as_of <- attr(target_response, "as_of")
+  . <- "got this idea from https://github.com/tidyverse/magrittr/issues/29"
   assert_that(as_of > max(target_response$end) + backfill_buffer,
               msg=(target_response %>% filter(.data$end == max(.data$end)) %>%
                   stringr::str_glue_data(
-                  "Reliable data for evaluation is not yet available for 
-                  forecast_date {forecast_date} because target period 
-                  extends to {end} which is too recent to be reliable 
-                  according to the provided backfill_buffer of 
+                  "Reliable data for evaluation is not yet available for
+                  forecast_date {forecast_date} because target period
+                  extends to {end} which is too recent to be reliable
+                  according to the provided backfill_buffer of
                   {backfill_buffer}.",
                   forecast_date=.$forecast_date[1],
                   end=.$end[1],
@@ -112,7 +114,7 @@ evaluate_predictions_single_ahead <- function(
                         ~ mutate(.x, forecast_date = .y))
   invalid <- check_valid_forecaster_output(predicted)
   assert_that(nrow(invalid) == 0,
-              msg=paste0("The following forecast_date, location pairs have invalid 
+              msg=paste0("The following forecast_date, location pairs have invalid
                   forecasts:\n", invalid %>%
                   stringr::str_glue_data("({forecast_date}, {location})") %>%
                   paste0(collapse = "\n")))

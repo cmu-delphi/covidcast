@@ -1,6 +1,13 @@
 #' Filter a list of predictions cards based on attributes
 #'
 #' @param predictions_cards a list of predictions cards
+#' @param name_of_forecaster the name of the forecaster
+#' @param response_data_source the response data source
+#' @param response_signal the response signal
+#' @param forecast_date the forecast date
+#' @template incidence_period-template
+#' @template ahead-template
+#' @template geo_type-template
 #' @export
 filter_predictions <- function(predictions_cards,
                                name_of_forecaster = NULL,

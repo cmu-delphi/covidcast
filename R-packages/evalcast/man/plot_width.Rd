@@ -10,7 +10,7 @@ plot_width(cards, alpha = 0.2)
 \item{cards}{a list of different forecasters scorecards (or predictions
 cards), all on the same forecasting task (i.e., same ahead, etc.)}
 
-\item{location}{of vertical line}
+\item{alpha}{location of vertical line}
 }
 \description{
 Interval width does not depend on the actual outcome, so this function can

@@ -4,7 +4,7 @@
 \alias{get_covidhub_predictions}
 \title{Get predictions from a forecaster on COVIDHub}
 \usage{
-get_covidhub_predictions(covid_hub_forecaster_name, forecast_dates, ...)
+get_covidhub_predictions(covid_hub_forecaster_name, forecast_dates = NULL, ...)
 }
 \arguments{
 \item{covid_hub_forecaster_name}{the name of the forecaster matching what it is called on covid hub}

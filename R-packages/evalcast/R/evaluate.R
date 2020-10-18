@@ -41,6 +41,10 @@
 #' @param backfill_buffer How many days until response is deemed trustworthy
 #'   enough to be taken as correct? See details for more.
 #' @return a list of score cards (one for each ahead)
+#'
+#' @importFrom purrr map
+#' @importFrom magrittr %>%
+#'
 #' @export
 evaluate_predictions <- function(
   predictions_cards,
@@ -70,7 +74,12 @@ evaluate_predictions <- function(
 }
 
 #'
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#' @importFrom purrr map2_dfr map
+#' @importFrom dplyr filter select inner_join mutate rowwise ungroup
 #' @importFrom stringr str_glue_data
+#' @importFrom rlang :=
 evaluate_predictions_single_ahead <- function(
   predictions_cards,
   err_measures,
@@ -87,7 +96,7 @@ evaluate_predictions_single_ahead <- function(
   as_of <- attr(target_response, "as_of")
   if (as_of <= max(target_response$end) + backfill_buffer) {
     problem <- target_response %>%
-      filter(end == max(end))
+      filter(.data$end == max(.data$end))
     stop("Reliable data for evaluation is not yet available for forecast_date ",
          problem$forecast_date[1],
          " because target period extends to ",
@@ -109,17 +118,17 @@ evaluate_predictions_single_ahead <- function(
   # join together the data frames target_response and predicted:
   score_card <- target_response %>%
     inner_join(predicted, by = c("location", "forecast_date")) %>%
-    select(location,
-           forecast_date,
-           start,
-           end,
-           actual,
-           forecast_distribution)
+    select(.data$location,
+           .data$forecast_date,
+           .data$start,
+           .data$end,
+           .data$actual,
+           .data$forecast_distribution)
   # compute the error
   for (err in names(err_measures)) {
     score_card <- score_card %>%
       rowwise() %>%
-      mutate(!!err := err_measures[[err]](forecast_distribution, actual)) %>%
+      mutate(!!err := err_measures[[err]](.data$forecast_distribution, .data$actual)) %>%
       ungroup()
   }
   pc_attributes_list <- predictions_cards %>%

@@ -1,4 +1,14 @@
+#' Plot the calibration curves for a scorecard
+#'
+#' @template scorecard-template
+#' @param type one of `"wedgeplot"` or `"traditional"`.
+#' @param alpha the alpha value
+#' @return a ggplot object
 #' @export
+#' @importFrom rlang .data
+#' @importFrom ggplot2 ggplot aes geom_point geom_abline geom_vline labs scale_colour_discrete scale_alpha_continuous scale_size_continuous guides facet_wrap xlim ylim theme_bw
+#' @importFrom dplyr filter mutate
+#' @importFrom tidyr pivot_longer
 plot_calibration <- function(scorecard,
                              type = c("wedgeplot", "traditional"),
                              alpha = 0.1) {
@@ -10,14 +20,14 @@ plot_calibration <- function(scorecard,
       pivot_longer(contains("prop"),
                    names_to = "coverage_type",
                    values_to = "proportion") %>%
-      filter(coverage_type != "prop_covered") %>%
-      mutate(emph = ifelse((coverage_type == "prop_above" & nominal_quantile < 0.5) |
-                              (coverage_type == "prop_below" & nominal_quantile >= 0.5), 0.5, 1)) %>%
-      ggplot(aes(x = nominal_quantile,
-                 y = proportion,
-                 colour = coverage_type)) +
-      geom_line(aes(alpha = emph, size = emph)) +
-      geom_point(aes(alpha = emph, size = emph)) +
+      filter(.data$coverage_type != "prop_covered") %>%
+      mutate(emph = ifelse((.data$coverage_type == "prop_above" & .data$nominal_quantile < 0.5) |
+                              (.data$coverage_type == "prop_below" & .data$nominal_quantile >= 0.5), 0.5, 1)) %>%
+      ggplot(aes(x = .data$nominal_quantile,
+                 y = .data$proportion,
+                 colour = .data$coverage_type)) +
+      geom_line(aes(alpha = .data$emph, size = .data$emph)) +
+      geom_point(aes(alpha = .data$emph, size = .data$emph)) +
       geom_abline(intercept = 0, slope = 1) +
       geom_abline(intercept = 1, slope = -1) +
       labs(x = "Nominal quantile level",
@@ -34,7 +44,7 @@ plot_calibration <- function(scorecard,
   } else if (type == "traditional") {
     calib <- compute_actual_vs_nominal_prob(scorecard)
     g <- calib %>%
-      ggplot(aes(x = nominal_prob, y = prop_below)) +
+      ggplot(aes(x = .data$nominal_prob, y = .data$prop_below)) +
       geom_line(color = "red") +
       geom_point(color = "red") +
       geom_abline(slope = 1, intercept = 0) +
@@ -63,6 +73,9 @@ plot_calibration <- function(scorecard,
 #' (in which case averaging is performed across forecast dates and locations)
 #' or whether to show it for one specific alpha value.
 #' @export
+#' @importFrom rlang .data set_names
+#' @importFrom purrr map_dfr
+#' @importFrom ggplot2 ggplot geom_abline geom_vline labs facet_wrap xlim ylim theme_bw
 plot_coverage <- function(scorecards, alpha = 0.2, type = c("all", "one")) {
   type <- match.arg(type)
   unique_attr(scorecards, "ahead")
@@ -77,9 +90,9 @@ plot_coverage <- function(scorecards, alpha = 0.2, type = c("all", "one")) {
     map_dfr(compute_coverage, .id = "forecaster")
   if (type == "all") {
     cover %>%
-      ggplot(aes(x = nominal_coverage_prob,
-                 y = prop_covered,
-                 color = forecaster)) +
+      ggplot(aes(x = .data$nominal_coverage_prob,
+                 y = .data$prop_covered,
+                 color = .data$forecaster)) +
       geom_line() +
       geom_abline(slope = 1, intercept = 0) +
       geom_vline(xintercept = 1 - alpha, lty = 2) +

@@ -21,6 +21,7 @@ compute_actual_vs_nominal_prob <- function(score_card) {
 #' @importFrom rlang .data
 #' @importFrom purrr map_dfr map_dbl
 #' @importFrom dplyr group_by summarize mutate select
+#' @importFrom assertthat assert_that
 compute_coverage <- function(score_card) {
   assert_that(nrow(score_card) != 0,
               msg="Can't compute coverage for an empty score_card.")
@@ -49,6 +50,7 @@ compute_coverage <- function(score_card) {
 #' @importFrom rlang .data
 #' @importFrom purrr map_dfr map_dbl
 #' @importFrom dplyr group_by summarize mutate select
+#' @importFrom assertthat assert_that
 compute_calibration <- function(score_card) {
   probs <- score_card$forecast_distribution[[1]]$probs
   assert_that(length(probs) %% 2 == 1 & all(abs(probs + rev(probs) - 1) < 1e-3),

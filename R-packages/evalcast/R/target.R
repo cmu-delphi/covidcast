@@ -7,6 +7,7 @@
 #' @export
 #' @importFrom MMWRweek MMWRweek  MMWRweek2Date
 #' @importFrom lubridate wday
+#' @importFrom assertthat assert_that
 get_target_period <- function(forecast_date, incidence_period, ahead) {
   # This function gives the start and end dates of the target period,
   # based on the system described in the COVIDHub rules here:
@@ -52,6 +53,7 @@ get_target_period <- function(forecast_date, incidence_period, ahead) {
 #' @importFrom tibble enframe
 #' @importFrom dplyr mutate
 #' @importFrom purrr pmap pmap_dfr
+#' @importFrom assertthat assert_that
 get_target_response <- function(signals,
                                 forecast_dates,
                                 incidence_period,
@@ -83,7 +85,7 @@ get_target_response <- function(signals,
 
   problem_date <- out %>% map_lgl(~ nrow(.x) == 0) %>% which()
   assert_that(length(problem_date) == 0,
-              msg=paste0("No data available for the target periods of these forecast 
+              msg=paste0("No data available for the target periods of these forecast
                   dates: ",
                   paste(forecast_dates[problem_date], collapse = ", ")))
   names(out) <- forecast_dates

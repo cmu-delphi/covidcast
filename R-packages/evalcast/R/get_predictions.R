@@ -30,6 +30,7 @@
 #' @param geo_values see \link[covidcast]{covidcast_signal} for a description
 #'   of this parameter.
 #' @return a list of predictions cards
+#' @importFrom assertthat assert_that
 #' @export
 get_predictions <- function(forecaster,
                             name_of_forecaster,

@@ -6,6 +6,11 @@
 \usage{
 absolute_error(quantile_forecasts, actual_value)
 }
+\arguments{
+\item{quantile_forecasts}{the quantile forecasts tibble}
+
+\item{actual_value}{the actual value}
+}
 \description{
 Computes absolute error between the actual value and the median of the
 forecast distribution.

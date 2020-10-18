@@ -9,6 +9,6 @@ A package to evaluate forecasters using the \code{covidcast} R package.
 }
 \author{
 Jacob Bien
-Maintainer: Jacob Bien <jbien@usc.edu>
+Maintainer: Jacob Bien \href{mailto:jbien@usc.edu}{jbien@usc.edu}
 }
 \keyword{package}

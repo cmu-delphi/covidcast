@@ -32,9 +32,7 @@ baseline_forecaster <- function(df,
                                 incidence_period = c("epiweek", "day"),
                                 ahead,
                                 geo_type) {
-    incidence_period <- match.arg(incidence_period)
-    ##assertthat::assert_that(incidence_period %in% c("epiweek", "day"),
-    ##                      msg = "evalcast::baseline_forecaster: need incidence_period to be one of c('epiweek', 'day')")
+  incidence_period <- match.arg(incidence_period)
   forecast_date <- lubridate::ymd(forecast_date)
   target_period <- get_target_period(forecast_date, incidence_period, ahead)
   incidence_length <- ifelse(incidence_period == "epiweek", 7, 1)

@@ -7,6 +7,7 @@
 #' @author Jacob Bien
 #' Maintainer: Jacob Bien <jbien@usc.edu>
 #' @keywords package
+#' @import assertthat
 #' @import covidcast
 #' @import dplyr
 #' @import purrr

@@ -22,12 +22,16 @@ weighted_interval_score <- function(quantile_forecasts, actual_value) {
   # where dfi_k = dist_from_interval_k
   if (is.na(actual_value)) return(NA)
   num_prob <- nrow(quantile_forecasts) # 23
-  stopifnot(num_prob %% 2 == 1, num_prob >= 3)
+  assert_that(num_prob %% 2 == 1 & num_prob >= 3,
+              msg="Number of quantiles computed must be odd number 
+                  greater than or equal to 3.")
   num_intervals <- (num_prob - 1) / 2 # 11
   q <- quantile_forecasts$quantiles
   probs <- quantile_forecasts$probs
-  stopifnot(abs(probs + rev(probs) - 1) < 1e-8)
-  stopifnot(diff(q) >= 0 | is.na(diff(q)))
+  assert_that(all(abs(probs + rev(probs) - 1) < 1e-8), 
+              msg="Quantile levels need to be symmetric around 0.5 (and include 0.5).")
+  assert_that(diff(q) >= 0 | is.na(diff(q)),
+              msg="Quantiles must be in increasing order.")
   # note: I will treat the median as a 0% predictive interval
   # (alpha = 1) of width 0.  This is equivalent to the expression above
   int <- tibble::tibble(lower = q[1:(num_intervals + 1)],
@@ -71,8 +75,10 @@ absolute_error <- function(quantile_forecasts, actual_value) {
 #' @importFrom dplyr filter pull
 interval_coverage <- function(alpha) {
   function(quantile_forecasts, actual_value) {
-    stopifnot(any(abs(quantile_forecasts$probs - alpha / 2) < 1e-10))
-    stopifnot(any(abs(quantile_forecasts$probs - (1 - alpha / 2)) < 1e-10))
+    assert_that(any(abs(quantile_forecasts$probs - alpha / 2) < 1e-10) &
+                any(abs(quantile_forecasts$probs - (1 - alpha / 2)) < 1e-10),
+                msg="Forecaster must return values to cover a (1-alpha) interval
+                     centered at 0.5.")
     lower <- quantile_forecasts %>%
       filter(abs(.data$probs - alpha / 2) < 1e-10) %>%
       pull(.data$quantiles)

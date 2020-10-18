@@ -19,7 +19,8 @@ get_target_period <- function(forecast_date, incidence_period, ahead) {
   forecast_date <- lubridate::ymd(forecast_date)
   if (incidence_period == "day")
     return(tibble(start = forecast_date + ahead, end = forecast_date + ahead))
-  if (incidence_period != "epiweek") stop("Unsupported incidence_period")
+  assert_that(incidence_period == "epiweek",
+              msg="Unsupported incidence_period")
   # incidence_period: epiweek
   ew_frcst_date <- MMWRweek(forecast_date) # get epiweek of forecast_dates
   sunday_of_ew_frcst_date <- MMWRweek2Date(MMWRyear = ew_frcst_date$MMWRyear,
@@ -69,11 +70,10 @@ get_target_response <- function(signals,
   # - sum up the response over the target incidence period
   problems <- target_periods %>%
     mutate(not_available = .data$end > Sys.Date())
-  if (any(problems$not_available)) {
-    stop("For ahead = ", ahead, " it is too soon to evaluate forecasts on ",
-         "these forecast dates: ",
-         paste(forecast_dates[problems$not_available], collapse = ", "))
-  }
+  assert_that(!any(problems$not_available),
+              msg=paste0("For ahead = ", ahead, " it is too soon to evaluate forecasts on ",
+                  "these forecast dates: ",
+                  paste(forecast_dates[problems$not_available], collapse = ", ")))
   out <- target_periods %>%
     rename(start_day = .data$start, end_day = .data$end) %>%
     mutate(data_source = response$data_source,
@@ -82,9 +82,10 @@ get_target_response <- function(signals,
     pmap(download_signal)
 
   problem_date <- out %>% map_lgl(~ nrow(.x) == 0) %>% which()
-  if (length(problem_date) > 0)
-    stop("No data available for the target periods of these forecast dates: ",
-         paste(forecast_dates[problem_date], collapse = ", "))
+  assert_that(length(problem_date) == 0,
+              msg=paste0("No data available for the target periods of these forecast 
+                  dates: ",
+                  paste(forecast_dates[problem_date], collapse = ", ")))
   names(out) <- forecast_dates
   out <- out %>%
     bind_rows(.id = "forecast_date") %>%

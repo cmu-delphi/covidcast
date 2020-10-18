@@ -34,11 +34,11 @@ This function performs backtesting.  It does the following:
 \enumerate{
 \item Takes a list of predictions cards (as created by
 \code{\link{get_predictions}}).  These should be from a single
- forecaster, each card corresponding to a different forecast date.
+forecaster, each card corresponding to a different forecast date.
 \item Downloads from the covidcast API the latest available data to compute
-  what actually occurred (summing the response over the incidence period).
-  \item Computes various user-specified error measures.
-  }
+what actually occurred (summing the response over the incidence period).
+\item Computes various user-specified error measures.
+}
 The result is a list of score cards, where each list element corresponds to a
 distinct value of ahead. A scorecard is a data frame in which each row
 corresponds to a location-day pair, and the columns give the values of the

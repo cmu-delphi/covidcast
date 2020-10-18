@@ -15,6 +15,12 @@
 #' @return a list of predictions cards
 #' @export
 #' @importFrom readr read_csv
+#' @importFrom rlang .data
+#' @importFrom purrr flatten
+#' @importFrom dplyr rename filter select mutate group_by group_modify group_map summarize case_when
+#' @importFrom tidyr separate
+#' @importFrom tibble tibble
+#' @importFrom stringr str_detect
 get_covidhub_predictions <- function(covid_hub_forecaster_name,
                                      forecast_dates = NULL, ...) {
   url <- "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed"
@@ -40,18 +46,18 @@ get_covidhub_predictions <- function(covid_hub_forecaster_name,
                        type = col_character()
                      ))
     pcards[[forecast_date]] <- pred %>%
-      rename(probs = quantile, quantiles = value) %>%
-      filter(str_detect(target, "wk ahead inc")) %>%
-      filter(type == "quantile") %>%
-      separate(target,
+      rename(probs = .data$quantile, quantiles = .data$value) %>%
+      filter(str_detect(.data$target, "wk ahead inc")) %>%
+      filter(.data$type == "quantile") %>%
+      separate(.data$target,
                into = c("ahead", NA, NA, NA, "response"),
                remove = TRUE) %>%
-      select(-forecast_date, -type, -target_end_date) %>%
-      mutate(geo_type = case_when(nchar(location) == 2 ~ "state",
-                                  nchar(location) == 5 ~ "county")) %>%
-      group_by(ahead, response, location, geo_type) %>%
+      select(-.data$forecast_date, -.data$type, -.data$target_end_date) %>%
+      mutate(geo_type = case_when(nchar(.data$location) == 2 ~ "state",
+                                  nchar(.data$location) == 5 ~ "county")) %>%
+      group_by(.data$ahead, .data$response, .data$location, .data$geo_type) %>%
       group_modify(~ tibble(forecast_distribution = list(.))) %>%
-      group_by(ahead, response, geo_type) %>%
+      group_by(.data$ahead, .data$response, .data$geo_type) %>%
       group_map(~ {
         if (.y$response == "death") {
           signals <- tibble(data_source = "jhu-csse",
@@ -85,24 +91,30 @@ get_covidhub_predictions <- function(covid_hub_forecaster_name,
 #' the COVID Hub https://github.com/reichlab/covid19-forecast-hub/
 #'
 #' @param covid_hub_forecaster_name the name of a forecaster on the COVID Hub.
+#' @importFrom rvest html_nodes html_text
+#' @importFrom xml2 read_html
+#' @importFrom stringr str_remove_all str_match_all
 #' @export
 get_forecast_dates <- function(covid_hub_forecaster_name) {
   url <- "https://github.com/reichlab/covid19-forecast-hub/tree/master/data-processed/"
   out <- xml2::read_html(paste0(url, covid_hub_forecaster_name)) %>%
     rvest::html_nodes(xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div/div[3]") %>%
     rvest::html_text() %>%
-    str_remove_all("\\n") %>%
-    str_match_all(sprintf("(20\\d{2}-\\d{2}-\\d{2})-%s.csv",
-                          covid_hub_forecaster_name))
+    stringr::str_remove_all("\\n") %>%
+    stringr::str_match_all(sprintf("(20\\d{2}-\\d{2}-\\d{2})-%s.csv",
+                                   covid_hub_forecaster_name))
   out[[1]][, 2]
 }
 
+#' @importFrom rvest html_nodes html_text
+#' @importFrom xml2 read_html
+#' @importFrom stringr str_subset
 get_covid_hub_forecaster_names <- function() {
   warning("This should be done with the github API.")
   url <- "https://github.com/reichlab/covid19-forecast-hub/tree/master/data-processed/"
   xml2::read_html(url) %>%
     rvest::html_nodes(xpath="//*[@id=\"js-repo-pjax-container\"]/div[2]/div/div[3]//a[@class='js-navigation-open link-gray-dark']") %>%
     rvest::html_text() %>%
-    str_subset("\\.[md|Rmd|txt|png|R]", negate = TRUE)
+    stringr::str_subset("\\.[md|Rmd|txt|png|R]", negate = TRUE)
 }
 

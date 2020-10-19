@@ -66,7 +66,7 @@ def plot(data: pd.DataFrame,
     <https://geopandas.org/reference.html#geopandas.GeoDataFrame.plot>`_.
 
     Bubble maps use a purple bubble by default, with all values discretized into 8 bins between 0.1
-    and the signal's historical mean value + 3 standard deviations. Values below 0 are have no
+    and the signal's historical mean value + 3 standard deviations. Values below 0 have no
     bubble but have the region displayed in white, and values above the mean + 3 std dev are binned
     into the highest bubble. Bubbles are scaled by area.
 

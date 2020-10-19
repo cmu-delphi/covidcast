@@ -242,7 +242,7 @@ def _plot_choro(ax: axes.Axes, data: gpd.GeoDataFrame, **kwargs: Any) -> None:
 def _plot_bubble(ax: axes.Axes, data: gpd.GeoDataFrame, geo_type: str, **kwargs: Any) -> None:
     """Generate a bubble map on a given Figure/Axes from a GeoDataFrame.
 
-    The maximum bubble size is set to the figure area / 1.5, with a x3 multiple if the geo_type
+    The maximum bubble size is set to the figure area / 1.5, with a x3 multiplier if the geo_type
     is ``state``.
 
     :param ax: Matplotlib axes to plot on.

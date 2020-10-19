@@ -6,7 +6,7 @@ Plotting Examples
 Built-in functionality
 ----------------------
 The returned DataFrame from :py:func:`covidcast.signal` can be plotted using the built-in
-:py:func:`covidcast.plot_choropleth`. Currently, state, county, hospital referral regions
+:py:func:`covidcast.plot`. Currently, state, county, hospital referral regions
 (HRR), and metropolitan statistical area (MSA) geography types are supported.
 
 County-level maps show estimates for each county, and color each state by the
@@ -24,7 +24,7 @@ details.)
 ...                         date(2020, 8, 3),
 ...                         date(2020, 8, 4),
 ...                         geo_type="county")
->>> covidcast.plot_choropleth(data)
+>>> covidcast.plot(data)
 >>> plt.show()
 
 .. plot::
@@ -33,7 +33,7 @@ details.)
     from datetime import date
     from matplotlib import pyplot as plt
     data = covidcast.signal("fb-survey", "smoothed_cli", start_day = date(2020,8,4), end_day = date(2020,8,4), geo_type = "county")
-    covidcast.plot_choropleth(data)
+    covidcast.plot(data)
     plt.show()
 
 State-level data can also be mapped:
@@ -43,7 +43,7 @@ State-level data can also be mapped:
 ...                         date(2020, 8, 3),
 ...                         date(2020, 8, 4),
 ...                         geo_type="state")
->>> covidcast.plot_choropleth(data)
+>>> covidcast.plot(data)
 >>> plt.show()
 
 .. plot::
@@ -52,7 +52,7 @@ State-level data can also be mapped:
     from datetime import date
     from matplotlib import pyplot as plt
     data = covidcast.signal("fb-survey", "smoothed_cli", start_day = date(2020,8,4), end_day = date(2020,8,4), geo_type = "state")
-    covidcast.plot_choropleth(data)
+    covidcast.plot(data)
     plt.show()
 
 Regions where no information is present are presented in light grey, as demonstrated by these MSA
@@ -63,7 +63,7 @@ and HRR plots.
 ...                         date(2020, 8, 3),
 ...                         date(2020, 8, 4),
 ...                         geo_type="msa")
->>> covidcast.plot_choropleth(data)
+>>> covidcast.plot(data)
 >>> plt.show()
 
 .. plot::
@@ -72,13 +72,13 @@ and HRR plots.
     from datetime import date
     from matplotlib import pyplot as plt
     data = covidcast.signal("fb-survey", "smoothed_cli", start_day = date(2020,8,4), end_day = date(2020,8,4), geo_type = "msa")
-    covidcast.plot_choropleth(data)
+    covidcast.plot(data)
     plt.show()
 
 >>> data = covidcast.signal("fb-survey", "smoothed_cli",
 ...                         date(2020, 8, 3), date(2020, 8, 4),
 ...                         geo_type="hrr")
->>> covidcast.plot_choropleth(data)
+>>> covidcast.plot(data)
 >>> plt.show()
 
 .. plot::
@@ -87,18 +87,32 @@ and HRR plots.
     from datetime import date
     from matplotlib import pyplot as plt
     data = covidcast.signal("fb-survey", "smoothed_cli", start_day = date(2020,8,4), end_day = date(2020,8,4), geo_type = "hrr")
-    covidcast.plot_choropleth(data)
+    covidcast.plot(data)
     plt.show()
 
+As an alternative to choropleths, bubble plots can be created with the ``plot_type="bubble"``
+argument.
+
+>>> covidcast.plot(data, plot_type="bubble")
+>>> plt.show()
+
+.. plot::
+
+    import covidcast
+    from datetime import date
+    from matplotlib import pyplot as plt
+    data = covidcast.signal("fb-survey", "smoothed_cli", start_day = date(2020,8,4), end_day = date(2020,8,4), geo_type = "msa")
+    covidcast.plot(data, plot_type="bubble")
+    plt.show()
 
 Additional keyword arguments can also be provided. These correspond to most of the arguments
 available for the
 `GeoPandas plot() function <https://geopandas.org/reference.html#geopandas.GeoSeries.plot>`_.
 
 
->>> covidcast.plot_choropleth(data,
-...                           cmap="viridis",
-...                           edgecolor="0.8")
+>>> covidcast.plot(data,
+...                cmap="viridis",
+...                edgecolor="0.8")
 >>> plt.show()
 
 .. plot::
@@ -107,14 +121,14 @@ available for the
     from datetime import date
     from matplotlib import pyplot as plt
     data = covidcast.signal("fb-survey", "smoothed_cli", start_day=date(2020,8,3), end_day=date(2020,8,4), geo_type="county")
-    covidcast.plot_choropleth(data, cmap="viridis", edgecolor="0.8")
+    covidcast.plot(data, cmap="viridis", edgecolor="0.8")
     plt.show()
 
 The function returns a
 `Matplotlib Figure object <https://matplotlib.org/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure>`_
 which can be stored and altered further.
 
->>> fig = plotting.plot_choropleth(data)
+>>> fig = plotting.plot(data)
 >>> fig.set_dpi(100)
 
 Animations
@@ -138,7 +152,7 @@ the month of August.
     </video>
 
 Video format, frame rate, and resolution are adjustable. Like the static maps, additional plotting
-keyword arguments can be provided and are passed to :py:func:`covidcast.plot_choropleth`.
+keyword arguments can be provided and are passed to :py:func:`covidcast.plot`.
 
 >>> covidcast.animate(df,
 ...                   "test_plot2.mp4",

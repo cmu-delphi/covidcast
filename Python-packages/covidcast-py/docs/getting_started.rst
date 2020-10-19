@@ -3,11 +3,80 @@
 Getting Started
 ===============
 
+
+Overview
+------------
+
+This package provides access to data from the `COVIDcast API
+<https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html>`_, which
+provides numerous COVID-related data streams, updated daily. The data is retrieved
+live from the server when you make a request, and is not stored within the package
+itself. This means that each time you make a request, you will be receiving the latest
+data available. If you are conducting an analysis or powering a service which will require
+repeated access to the same signal, please download the data rather than making repeated
+requests.
+
+
+Installation
+------------
+
+This package is available on PyPI as `covidcast
+<https://pypi.org/project/covidcast/>`_, and can be installed using ``pip`` or
+your favorite Python package manager:
+
+.. code-block:: sh
+
+   pip install covidcast
+
+This will install the package as well as all required dependencies.
+
+Signal Overview
+---------------
+The `API documentation
+<https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html>`_ lists
+the available signals, including many not shown on the
+`COVIDcast interactive map
+<https://covidcast.cmu.edu/>`_.
+
+The data come from a variety of sources and cover information including official case counts,
+internet search trends, hospital encounters, survey responses, and more. Below is
+a brief overview of each source, with links to their full descriptions.
+
+- `Doctor Visits <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html>`_
+    - Outpatient visits with COVID-related symptoms.
+- `Google Health Trends <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/ght.html>`_
+    - COVID-related Google search volume.
+- `Hospital Admissions <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/hospital-admissions.html>`_
+    - Hospital admissions with COVID-associated diagnoses.
+- `Indicator Combination <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/indicator-combination.html>`_
+    - Aggregated signal of other sources to provide a single COVID activity indicator.
+- `JHU Cases and Deaths <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/jhu-csse.html>`_
+    - Confirmed COVID cases and deaths based on reports made available by Johns Hopkins University.
+- `Quidel <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/quidel.html>`_
+    - Positive COVID antigen tests.
+- `SafeGraph Mobility <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/safegraph.html>`_
+    - Mobility (movement) data based on phone location data
+- `Symptom Surveys <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html>`_
+    - Various responses to the CMU symptom survey.
+- `USAFacts Cases and Deaths <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html>`_
+    - Confirmed COVID cases and deaths based on reports made available by USAFacts.
+
+To specify a signal, you will need the "Source Name" and "Signal" value, which are
+listed for each source/signal combination on their respective page.
+For example, to obtain the raw Google search volume for COVID-related topics,
+the source would be ``ght`` and the signal would be ``raw_search``, as shown on the
+`Google Health Trends page
+<https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/ght.html>`_.
+These values will be provided as the arguments for the :py:func:`covidcast.signal` function to
+retrieve the desired data.
+
+
 Basic examples
 --------------
 
-To obtain smoothed estimates of COVID-like illness from our Facebook survey for
-every county in the United States between 2020-05-01 and 2020-05-07:
+To obtain smoothed estimates of COVID-like illness from our symptom survey,
+distributed through Facebook, for every county in the United States between
+2020-05-01 and 2020-05-07:
 
 >>> from datetime import date
 >>> import covidcast
@@ -31,6 +100,13 @@ indicates when this data was reported; in this case, the survey estimates for
 May 1st were updated on May 23rd based on new data, giving a ``lag`` of 22 days.
 See the :py:func:`covidcast.signal` documentation for details on the returned
 data frame.
+
+The API documentation lists each available signal and provides technical details
+on how it is estimated and how its standard error is calculated. In this case,
+for example, the `symptom surveys documentation page
+<https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html>`_
+explains the definition of "COVID-like illness", links to the exact survey text,
+and describes the mathematical derivation of the estimates.
 
 We can also request all data on a signal after a specific date. Here, for
 example, we obtain ``smoothed_cli`` in each state for every day since
@@ -205,8 +281,11 @@ Dealing with geographies
 
 As seen above, the COVIDcast API identifies counties by their FIPS code and
 states by two-letter abbreviations. Metropolitan statistical areas are also
-identified by unique codes, called CBSA IDs. If you want to find a specific area
-by name, this package provides convenience functions:
+identified by unique codes, called CBSA IDs. (Exact details and exceptions are
+given in the `geographic coding documentation
+<https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html>`_.) If
+you want to find a specific area by name, this package provides convenience
+functions:
 
 >>> covidcast.name_to_cbsa(["Houston", "San Antonio"])
 ['26420', '41700']

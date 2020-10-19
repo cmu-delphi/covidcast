@@ -31,11 +31,13 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   border_size = params$border_size
   legend_height = params$legend_height
   legend_width = params$legend_width
+  legend_digits = params$legend_digits
   if (is.null(missing_col)) missing_col = "gray"
   if (is.null(border_col)) border_col = "white"
   if (is.null(border_size)) border_size = 0.1
   if (is.null(legend_height)) legend_height = 0.5
   if (is.null(legend_width)) legend_width = 15
+  if (is.null(legend_digits)) legend_digits = 2
 
   # For intensity, create a continuous color function, if we need to
   breaks = params$breaks
@@ -137,21 +139,22 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   }
 
   # Create the polygon layer
+  aes = ggplot2::aes
   geom_args = list()
   geom_args$color = border_col
   geom_args$size = border_size
   geom_args$fill = map_col
-  geom_args$mapping = ggplot2::aes(x = map_df$x, y = map_df$y,
-                                   group = map_df$group)
+  geom_args$mapping = aes(x = x, y = y, group = group)
+  geom_args$data = map_df
   polygon_layer = do.call(ggplot2::geom_polygon, geom_args)
-
+  
   # For intensity and continuous color scale, create a legend layer
   if (!direction && is.null(breaks)) {
-    # Create legend breaks and legend labels
+    # Create legend breaks and legend labels, if we need to
     n = params$legend_n
     if (is.null(n)) n = 8
-    legend_breaks = seq(range[1], range[2], length = n)
-    legend_labels = round(legend_breaks, 2)
+    legend_breaks = seq(range[1], range[2], len = n)
+    legend_labels = round(legend_breaks, legend_digits)
 
     # Create a dense set of breaks, for the color gradient (especially important
     # if many colors were passed)
@@ -159,7 +162,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
 
     # Now the legend layer (hidden + scale)
     hidden_df = data.frame(x = rep(Inf, n), z = legend_breaks)
-    hidden_layer = ggplot2::geom_point(ggplot2::aes(x = x, y = x, color = z),
+    hidden_layer = ggplot2::geom_point(aes(x = x, y = x, color = z),
                                        data = hidden_df, alpha = 0)
     guide = ggplot2::guide_colorbar(title = NULL, horizontal = TRUE,
                                     barheight = legend_height,
@@ -176,11 +179,11 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     # Create legend breaks and legend labels
     n = length(breaks)
     legend_breaks = breaks
-    legend_labels = round(legend_breaks, 2)
+    legend_labels = round(legend_breaks, legend_digits)
 
     # Now the legend layer (hidden + scale)
     hidden_df = data.frame(x = rep(Inf, n), z = as.factor(legend_breaks))
-    hidden_layer = ggplot2::geom_polygon(ggplot2::aes(x = x, y = x, fill = z),
+    hidden_layer = ggplot2::geom_polygon(aes(x = x, y = x, fill = z),
                                          data = hidden_df, alpha = 0)
     guide = ggplot2::guide_legend(title = NULL, horizontal = TRUE, nrow = 1,
                                   keyheight = legend_height,
@@ -196,16 +199,17 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   # For direction, create a legend layer
   else {
     # Create legend breaks and legend labels
+    n = 3
     legend_breaks = -1:1
     legend_labels = c("Decreasing", "Steady", "Increasing")
 
     # Now the legend layer (hidden + scale)
-    hidden_df = data.frame(x = rep(Inf, 3), z = as.factor(legend_breaks))
-    hidden_layer = ggplot2::geom_polygon(ggplot2::aes(x = x, y = x, fill = z),
+    hidden_df = data.frame(x = rep(Inf, n), z = as.factor(legend_breaks))
+    hidden_layer = ggplot2::geom_polygon(aes(x = x, y = x, fill = z),
                                          data = hidden_df, alpha = 1)
     guide = ggplot2::guide_legend(title = NULL, horizontal = TRUE, nrow = 1,
                                   keyheight = legend_height,
-                                  keywidth = legend_width / 3,
+                                  keywidth = legend_width / n,
                                   label.position = "bottom",
                                   override.aes = list(alpha = 1))
     scale_layer = ggplot2::scale_fill_manual(values = dir_col,
@@ -249,12 +253,16 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   border_size = params$border_size
   legend_height = params$legend_height
   legend_width = params$legend_width
+  legend_digits = params$legend_digits
+  legend_pos = params$legend_position
   if (is.null(missing_col)) missing_col = "gray"
   if (is.null(border_col)) border_col = "darkgray"
   if (is.null(border_size)) border_size = 0.1
   if (is.null(legend_height)) legend_height = 0.5
   if (is.null(legend_width)) legend_width = 15
-
+  if (is.null(legend_digits)) legend_digits = 2
+  if (is.null(legend_pos)) legend_pos = "bottom"
+  
   # Create breaks, if we need to
   breaks = params$breaks
   if (!is.null(breaks)) num_bins = length(breaks)
@@ -267,14 +275,18 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     breaks = seq(lower_bd, range[2], length = num_bins)
   }
 
-  # Create bubble sizes
+  # Max and min bubble sizes
   min_size = params$min_size
   max_size = params$max_size
   if (is.null(min_size)) min_size = ifelse(attributes(x)$geo_type == "county",
                                            0.1, 1)
   if (is.null(max_size)) max_size = ifelse(attributes(x)$geo_type == "county",
                                            4, 12)
-  sizes = seq(min_size, max_size, length = num_bins)
+
+  # Bubble sizes. Important note the way we set sizes later, via
+  # scale_size_manual(), this actually sets the *radius* not the *area*, so we
+  # need to define these sizes to be evenly-spaced on the squared scale
+  sizes = sqrt(seq(min_size^2, max_size^2, length = num_bins))
 
   # Create discretization function
   dis_fun = function(val) {
@@ -282,7 +294,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     for (i in 1:length(breaks)) val_out[val >= breaks[i]] = breaks[i]
     return(val_out)
   }
-
+  
   # Set some basic layers
   element_text = ggplot2::element_text
   margin = ggplot2::margin
@@ -291,7 +303,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     ggplot2::theme(plot.title = element_text(hjust = 0.5, size = 12),
                    plot.subtitle = element_text(hjust = 0.5, size = 10,
                                                 margin = margin(t = 5)),
-                   legend.position = "bottom")
+                   legend.position = legend_pos)
 
   # Grab the values
   given_time_value = time_value
@@ -325,12 +337,13 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   }
 
   # Create the polygon layer
+  aes = ggplot2::aes
   geom_args = list()
   geom_args$color = border_col
   geom_args$size = border_size
   geom_args$fill = c("white", missing_col)[map_mis + 1]
-  geom_args$mapping = ggplot2::aes(x = map_df$x, y = map_df$y,
-                                   group = map_df$group)
+  geom_args$mapping = aes(x = x, y = y, group = group)
+  geom_args$data = map_df
   polygon_layer = do.call(ggplot2::geom_polygon, geom_args)
 
   # Set the lats and lons for counties
@@ -364,45 +377,47 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     cur_val[cur_val == 0] = NA
     levels(cur_val)[levels(cur_val) == 0] = NA
   }
-
+  
   # Create the bubble layer
   bubble_df = data.frame(lon = cur_lon, lat = cur_lat, val = cur_val)
-  bubble_trans = usmap::usmap_transform(bubble_df)
-  bubble_layer = ggplot2::geom_point(ggplot2::aes(x = lon.1, y = lat.1,
-                                                  size = val),
+  suppressWarnings({ bubble_trans = usmap::usmap_transform(bubble_df) })
+  bubble_layer = ggplot2::geom_point(aes(x = lon.1, y = lat.1, size = val),
                                      data = bubble_trans, color = col,
                                      alpha = alpha, na.rm = TRUE)
 
   # Create the scale layer
-  labels = round(breaks, 2)
+  labels = round(breaks, legend_digits)
   guide = ggplot2::guide_legend(title = NULL, horizontal = TRUE, nrow = 1)
   scale_layer = ggplot2::scale_size_manual(values = sizes, breaks = breaks,
                                            labels = labels, drop = FALSE,
                                            guide = guide)
-
+  
   # Put it all together and return
   return(ggplot2::ggplot() + polygon_layer + ggplot2::coord_equal() +
          title_layer + bubble_layer + scale_layer + theme_layer)
 }
 
 # Plot a line (time series) graph of a covidcast_signal object.
-plot_line = function(x, range = NULL, col = 1:6, line_type = rep(1:6, each = length(col)),
-                     title = NULL, params = list()) {
+plot_line = function(x, range = NULL, title = NULL, params = list()) {
   # Set a title, if we need to (simple combo of data source, signal)
   if (is.null(title)) title = paste0(unique(x$data_source), ": ",
                                      unique(x$signal))
 
-  # Set other map parameters, if we need to
+  # Set other plot parameters, if we need to
   xlab = params$xlab
   ylab = params$ylab
+  stderr_bands = params$stderr_bands
+  stderr_alpha = params$stderr_alpha
   if (is.null(xlab)) xlab = "Date"
   if (is.null(ylab)) ylab = "Value"
-
+  if (is.null(stderr_bands)) stderr_bands = FALSE
+  if (is.null(stderr_alpha)) stderr_alpha = 0.5
+  
   # Grab the values
-  df = x %>% dplyr::select(value, time_value, geo_value)
+  df = x %>% dplyr::select(value, time_value, geo_value, stderr)
 
-  # Expand the range, if we need to
-  range = base::range(c(range, df$value))
+  # Set the range, if we need to
+  if (is.null(range)) range = base::range(df$value, na.rm = TRUE)
   
   # Create label and theme layers
   label_layer = ggplot2::labs(title = title, x = xlab, y = ylab)
@@ -411,16 +426,22 @@ plot_line = function(x, range = NULL, col = 1:6, line_type = rep(1:6, each = len
     ggplot2::theme(legend.position = "bottom",
                    legend.title = ggplot2::element_blank())
 
-  # Create line and lim layers
-  line_layer = ggplot2::geom_line(ggplot2::aes(x = time_value, y = value,
-                                               color = geo_value,
-                                               group = geo_value), data = df) 
-  lim_layer = ggplot2::lims(y = c(range[1], range[2]))
-  
-  # TODO: show standard error bands?
+  # Create lim, line, and ribbon layers
+  aes = ggplot2::aes
+  lim_layer = ggplot2::coord_cartesian(ylim = range)
+  line_layer = ggplot2::geom_line(aes(y = value, color = geo_value,
+                                      group = geo_value))
+  ribbon_layer = NULL
+  if (stderr_bands) {
+    ribbon_layer = ggplot2::geom_ribbon(aes(ymin = value - stderr,
+                                            ymax = value + stderr,
+                                            fill = geo_value),
+                                        alpha = stderr_alpha)
+  }
 
   # Put it all together and return
-  return(ggplot2::ggplot() + line_layer + lim_layer + label_layer + theme_layer)
+  return(ggplot2::ggplot(aes(x = time_value), data = df) +
+         line_layer + ribbon_layer + lim_layer + label_layer + theme_layer)
 }
 
 # TODO: plot functions for covidcast_signals objects (note the plural form)?

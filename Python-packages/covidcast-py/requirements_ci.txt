@@ -1,5 +1,6 @@
 pylint
 pytest
+pydocstyle
 delphi_epidata
 pandas
 geopandas
@@ -7,3 +8,6 @@ mypy
 matplotlib
 numpy
 descartes
+imageio-ffmpeg
+imageio
+tqdm

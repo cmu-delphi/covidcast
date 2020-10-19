@@ -50,9 +50,9 @@ your favorite Python package manager:
 
    pip install covidcast
 
-The package requires `pandas <https://pandas.pydata.org/>`_ and `requests
-<https://requests.readthedocs.io/en/master/>`_; these should be installed
-automatically. It also uses the `delphi-epidata
+The package requires `pandas <https://pandas.pydata.org/>`_, `requests
+<https://requests.readthedocs.io/en/master/>`_, and several other packages;
+these should be installed automatically. It also uses the `delphi-epidata
 <https://pypi.org/project/delphi-epidata/>`_ package to access Delphi's Epidata
 API.
 
@@ -64,6 +64,6 @@ Contents
 
    getting_started
    signals
-   plotting
    plot_examples
+   plotting
    changelog

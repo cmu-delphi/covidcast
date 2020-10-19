@@ -1,0 +1,31 @@
+<script>
+  (function () {
+    function initializeCodeFolding(showAll) {
+      Array.from(
+        document.querySelectorAll(
+          "pre.r, pre.python, pre.bash, pre.sql, pre.cpp, pre.stan, pre.julia, pre.foldable"
+        )
+      ).forEach((elem) => {
+        const wrapper = document.createElement("details");
+        wrapper.classList.add("code-wrapper");
+        wrapper.style.outline = "none";
+        wrapper.open = showAll || elem.classList.contains("show");
+        elem.parentElement.replaceChild(wrapper, elem);
+        const summary = document.createElement("summary");
+        summary.style.outline = "none";
+        summary.style.cursor = "pointer";
+        summary.innerText = "Code";
+        wrapper.appendChild(summary);
+        wrapper.appendChild(elem);
+        wrapper.addEventListener("click", function (e) {
+          // stop going to next slide
+          e.stopPropagation();
+        });
+      });
+    }
+    // use the jquery construct on purpose such that it will run after the CMU jquery handler
+    $(document).ready(function () {
+      initializeCodeFolding(false);
+    });
+  })();
+</script>

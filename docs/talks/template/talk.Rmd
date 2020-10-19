@@ -1,0 +1,54 @@
+---
+title: "Delphi's COVIDcast Project: <br> TODO"
+author: TODO
+date: "<br> ![](delphi.png) ![](cmu.png) <br><br> DATE"
+footer: "Get the slides at: cmu-delphi.github.io/covidcast/talks/TODO/talk.html"
+output:
+  slidy_presentation:
+    theme: cerulean
+    highlight: tango
+    font_adjustment: +1
+    css: style.css
+    includes:
+      after_body: script.html
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, cache=TRUE, autodep=TRUE,
+                      cache.comments=TRUE)
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+
+col = function(x, color = "#bb0000") {
+  sprintf("<span style='color: %s;'>%s</span>", color, x)
+}
+```
+
+# Test
+
+expanded code
+
+```{r, fig.width=7, fig.height=5, class.source="show"}
+plot(iris)
+```
+
+collapsed code
+```{r, fig.width=7, fig.height=5}
+plot(iris)
+```
+
+# Thanks
+
+Many thanks to:
+
+- The [whole Delphi team](https://covidcast.cmu.edu/covid19-response-team.html), and various CMU units
+- Google, Facebook, and Amazon Web Services
+- SafeGraph, Quidel, Qualtrics
+- Centers for Disease Control and Prevention
+
+Go to: <https://covidcast.cmu.edu> ... you'll find everything linked from there!
+
+<br>
+
+![Delphi](delphi.png) ![Carnegie Mellon University](cmu.png)

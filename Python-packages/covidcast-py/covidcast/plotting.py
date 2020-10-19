@@ -301,7 +301,7 @@ def _distribute_megacounties(data: pd.DataFrame,
 
     :param data: DataFrame of county signals.
     :param county_col: Name of column containing county.
-    :parm geo_info: GeoDataFrame of counties and corresponding polygons.
+    :param geo_info: GeoDataFrame of counties and corresponding polygons.
     :param join_type: Type of join to do between input data (left side) and geo data (right side).
     :return: ``data`` with county polygon and state fips joined. No polgyon information is
       provided for megacounties.

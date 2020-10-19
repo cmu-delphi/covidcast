@@ -53,14 +53,14 @@ def test_plot(mock_metadata):
                                  time_value=date(2020, 8, 4),
                                  combine_megacounties=False)
     # give margin of +-2 for floating point errors and weird variations (1 isn't consistent)
-    assert np.allclose(_convert_to_array(no_mega_fig1), expected["no_mega1"], atol=2, rtol=0)
+    assert np.allclose(_convert_to_array(no_mega_fig1), expected["no_mega_1"], atol=2, rtol=0)
 
     no_mega_fig2 = plotting.plot_choropleth(test_county,
                                             cmap="viridis",
                                             figsize=(5, 5),
                                             edgecolor="0.8",
                                             combine_megacounties=False)
-    assert np.allclose(_convert_to_array(no_mega_fig2), expected["no_mega2"], atol=2, rtol=0)
+    assert np.allclose(_convert_to_array(no_mega_fig2), expected["no_mega_2"], atol=2, rtol=0)
 
     # w/ megacounties
     mega_fig = plotting.plot_choropleth(test_county, time_value=date(2020, 8, 4))
@@ -85,6 +85,8 @@ def test_plot(mock_metadata):
 
     # test bubble
     msa_bubble_fig = plotting.plot(test_msa, plot_type="bubble")
+    from matplotlib import pyplot as plt
+    plt.savefig("bubble")
     assert np.allclose(_convert_to_array(msa_bubble_fig), expected["msa_bubble"], atol=2, rtol=0)
 
 

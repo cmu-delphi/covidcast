@@ -248,7 +248,7 @@ def _plot_choro(ax: axes.Axes,
     # this is to remove the set_array error that occurs on some platforms
     sm._A = []  # pylint: disable=W0212
     plt.colorbar(sm, ticks=np.linspace(kwargs["vmin"], kwargs["vmax"], 8), ax=ax,
-                 orientation="horizontal", fraction=0.02, pad=0.05)
+                 orientation="horizontal", fraction=0.045, pad=0.04, format="%.2f")
 
 
 def _plot_bubble(ax: axes.Axes, data: gpd.GeoDataFrame, geo_type: str, **kwargs: Any) -> None:
@@ -338,6 +338,7 @@ def _join_state_geo_df(data: pd.DataFrame,
     :param state_col: name of column in `data` containing state info to join on
     :param geo_info: GeoDF of state shape info read from Census shapefiles
     :param join_type: Type of join to do between input data (left side) and geo data (right side).
+      Must be one of {‘left’, ‘right’, ‘outer’, ‘inner’}.
     :return: ``data`` with state polygon and state FIPS joined.
     """
     input_cols = list(data.columns)
@@ -362,6 +363,7 @@ def _join_county_geo_df(data: pd.DataFrame,
     :param county_col: name of column in `data` containing county info to join on.
     :param geo_info: GeoDF of county shape info read from Census shapefiles.
     :param join_type: Type of join to do between input data (left side) and geo data (right side).
+      Must be one of {‘left’, ‘right’, ‘outer’, ‘inner’}.
     :param combine_megacounties: For each state, return all counties without a signal value as a
       single polygon with the megacounty value.
     :return: ``data`` with county polygon and state fips joined.
@@ -421,6 +423,7 @@ def _distribute_megacounties(data: pd.DataFrame,
     :param county_col: Name of column containing county.
     :param geo_info: GeoDataFrame of counties and corresponding polygons.
     :param join_type: Type of join to do between input data (left side) and geo data (right side).
+      Must be one of {‘left’, ‘right’, ‘outer’, ‘inner’}.
     :return: ``data`` with county polygon and state fips joined. No polgyon information is
       provided for megacounties.
     """
@@ -448,6 +451,7 @@ def _join_msa_geo_df(data: pd.DataFrame,
     :param msa_col: cname of column in `data` containing state info to join on
     :param geo_info: GeoDF of state shape info read from Census shapefiles
     :param join_type: Type of join to do between input data (left side) and geo data (right side).
+      Must be one of {‘left’, ‘right’, ‘outer’, ‘inner’}.
     :return: ``data`` with cbsa polygon and state fips joined.
     """
     geo_info = geo_info[geo_info.LSAD == "M1"]  # only get metro and not micropolitan areas
@@ -470,6 +474,7 @@ def _join_hrr_geo_df(data: pd.DataFrame,
     :param msa_col: cname of column in `data` containing state info to join on
     :param geo_info: GeoDF of state shape info read from Census shapefiles
     :param join_type: Type of join to do between input data (left side) and geo data (right side).
+      Must be one of {‘left’, ‘right’, ‘outer’, ‘inner’}.
     :return: ``data`` with HRR polygon and state fips joined.
     """
     geo_info["hrr_num"] = geo_info.hrr_num.astype("int").astype(str)  # original col was a float

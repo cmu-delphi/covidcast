@@ -31,21 +31,11 @@ download_signal <- function(...) {
     )
   }
   message(msg)
-  ## Why two calls below?? Commented out one
-  ## base::suppressMessages({covidcast_signal(...)})
+  
   out <- base::suppressMessages({covidcast_signal(...)})
   if (args$geo_type == "state") {
-      e  <- new.env(parent = emptyenv())
-      county_geo  <- utils::data("county_geo", package = "covidcast", envir = e)
-      state_fips <- e$county_geo %>%
-          select(.data$STATE, .data$COUNTYNAME, .data$FIPS) %>%
-          mutate(fips = str_sub(.data$FIPS, end = 2),
-                 geo_value = tolower(.data$STATE)) %>%
-          distinct(.data$geo_value, .data$fips)
-    out <- out %>%
-      left_join(state_fips, by = "geo_value") %>%
-      mutate(geo_value = .data$fips) %>%
-      select(-.data$fips)
+    out$geo_value = covidcast::name_to_fips(paste0("^",
+      covidcast::abbr_to_name(toupper(out$geo_value)), "$"))
   }
   out %>% rename(location = .data$geo_value)
 }

@@ -114,7 +114,7 @@ def signal(data_source: str,
         Contains a `pandas Timestamp object
         <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_
         identifying the date this estimate is for.
-        
+
       ``issue``
         Contains a `pandas Timestamp object
         <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_

@@ -318,16 +318,12 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   if (attributes(x)$geo_type == "county") {
     map_df = usmap::us_map("county", include = include)
     map_geo = map_df$fips
-    centroid_col_classes = c("numeric", "numeric", "character", "character",
-                         "character", "character")
   }
 
   # Grap the map data frame for states
   else if (attributes(x)$geo_type == "state") {
     map_df = usmap::us_map("state", include = include)
     map_geo = tolower(map_df$abbr)
-    centroid_col_classes = c("numeric", "numeric", "character", "character",
-                         "character")
   }
 
   # Determine which locations are missing
@@ -353,21 +349,12 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   # Retrieve coordinates for mapping
   # Reading from usmap files to ensure consistency with borders
   if (attributes(x)$geo_type == "county") {
-    centroid_file = system.file("extdata",
-                                "us_counties_centroids.csv",
-                                package = "usmap")
-    centroids = utils::read.csv(centroid_file,
-                                colClasses = centroid_col_classes)
-    centroids = centroids[centroids$fips %in% map_geo, ]
+    centroids = county_geo[county_geo$fips %in% map_geo, ]
     cur_geo = centroids$fips
     cur_val = rep(NA, length(cur_geo))
   }
   else if (attributes(x)$geo_type == "state") {
-    centroid_file = system.file("extdata",
-                                "us_states_centroids.csv",
-                                package = "usmap")
-    centroids = utils::read.csv(centroid_file,
-                                colClasses = centroid_col_classes)
+    centroids = state_geo
     centroids$abbr = tolower(centroids$abbr)
     centroids = centroids[centroids$abbr %in% map_geo, ]
     cur_geo = centroids$abbr

@@ -136,11 +136,6 @@ def signal(data_source: str,
         sample size may not be available for all signals, due to privacy or
         other constraints.
 
-      ``direction``
-        uses a local linear fit to estimate whether the signal in this region is
-        currently increasing or decreasing (reported as -1 for decreasing, 1 for
-        increasing, and 0 for neither).
-
     Consult the `signal documentation
     <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html>`_
     for more details on how values and standard errors are calculated for
@@ -380,7 +375,7 @@ def _fetch_single_geo(data_source: str,
 
     if len(dfs) > 0:
         out = pd.concat(dfs)
-
+        out.drop("direction", axis=1, inplace=True)
         out["time_value"] = pd.to_datetime(out["time_value"], format="%Y%m%d")
         out["issue"] = pd.to_datetime(out["issue"], format="%Y%m%d")
         out["geo_type"] = geo_type

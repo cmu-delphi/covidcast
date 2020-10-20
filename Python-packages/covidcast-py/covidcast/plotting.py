@@ -1,17 +1,17 @@
 """This contains the plotting and geo data management methods for the COVIDcast signals."""
 
 import io
+import warnings
 from datetime import date, timedelta
 from typing import Tuple, Any
 
-
 import geopandas as gpd
 import imageio
-import matplotlib.figure
 import numpy as np
 import pandas as pd
 import pkg_resources
 from matplotlib import pyplot as plt
+from matplotlib import figure, axes
 from tqdm import tqdm
 
 from .covidcast import _detect_metadata, _signal_metadata
@@ -39,10 +39,11 @@ CONTIGUOUS_FIPS = {"01", "04", "05", "06", "08", "09", "10", "11", "12", "13", "
                    "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"}
 
 
-def plot_choropleth(data: pd.DataFrame,
-                    time_value: date = None,
-                    **kwargs: Any) -> matplotlib.figure.Figure:
-    """Given the output data frame of :py:func:`covidcast.signal`, plot a choropleth map.
+def plot(data: pd.DataFrame,
+         time_value: date = None,
+         plot_type: str = "choropleth",
+         **kwargs: Any) -> figure.Figure:
+    """Given the output data frame of :py:func:`covidcast.signal`, plot a choropleth or bubble map.
 
     Projections used for plotting:
 
@@ -64,46 +65,52 @@ def plot_choropleth(data: pd.DataFrame,
     documentation
     <https://geopandas.org/reference.html#geopandas.GeoDataFrame.plot>`_.
 
+    Bubble maps use a purple bubble by default, with all values discretized into 8 bins between 0.1
+    and the signal's historical mean value + 3 standard deviations. Values below 0 have no
+    bubble but have the region displayed in white, and values above the mean + 3 std dev are binned
+    into the highest bubble. Bubbles are scaled by area.
+
     :param data: Data frame of signal values, as returned from :py:func:`covidcast.signal`.
     :param time_value: If multiple days of data are present in ``data``, map only values from this
       day. Defaults to plotting the most recent day of data in ``data``.
     :param kwargs: Optional keyword arguments passed to ``GeoDataFrame.plot()``.
+    :param plot_type: Type of plot to create. Either choropleth (default) or bubble map.
     :return: Matplotlib figure object.
 
     """
-
+    if plot_type not in {"choropleth", "bubble"}:
+        raise ValueError("`plot_type` must be 'choropleth' or 'bubble'.")
     data_source, signal, geo_type = _detect_metadata(data)  # pylint: disable=W0212
     meta = _signal_metadata(data_source, signal, geo_type)  # pylint: disable=W0212
     # use most recent date in data if none provided
     day_to_plot = time_value if time_value else max(data.time_value)
     day_data = data.loc[data.time_value == pd.to_datetime(day_to_plot), :]
-    data_w_geo = get_geo_df(day_data)
 
-    kwargs["vmin"] = kwargs.get("vmin", 0)
     kwargs["vmax"] = kwargs.get("vmax", meta["mean_value"] + 3 * meta["stdev_value"])
-    kwargs["cmap"] = kwargs.get("cmap", "YlOrRd")
     kwargs["figsize"] = kwargs.get("figsize", (12.8, 9.6))
 
-    fig, ax = plt.subplots(1, figsize=kwargs["figsize"])
-    ax.axis("off")
-    sm = plt.cm.ScalarMappable(cmap=kwargs["cmap"],
-                               norm=plt.Normalize(vmin=kwargs["vmin"], vmax=kwargs["vmax"]))
-    # this is to remove the set_array error that occurs on some platforms
-    sm._A = []  # pylint: disable=W0212
-    plt.title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")
-
-    # plot all states as light grey first
-    state_shapefile_path = pkg_resources.resource_filename(__name__, SHAPEFILE_PATHS["state"])
-    state = gpd.read_file(state_shapefile_path)
-    for state in _project_and_transform(state, "STATEFP"):
-        state.plot(color="0.9", ax=ax)
-
-    for shape in _project_and_transform(data_w_geo):
-        if not shape.empty:  # only plot nonempty ones to avoid matplotlib warning.
-            shape.plot("value", ax=ax, **kwargs)
-    plt.colorbar(sm, ticks=np.linspace(kwargs["vmin"], kwargs["vmax"], 8), ax=ax,
-                 orientation="horizontal", fraction=0.045, pad=0.04, format="%.2f")
+    fig, ax = _plot_background_states(kwargs["figsize"])
+    ax.set_title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")
+    if plot_type == "choropleth":
+        _plot_choro(ax, day_data, **kwargs)
+    else:
+        _plot_bubble(ax, day_data, geo_type, **kwargs)
     return fig
+
+
+def plot_choropleth(data: pd.DataFrame,
+                    time_value: date = None,
+                    **kwargs: Any) -> figure.Figure:
+    """Plot choropleths for a signal. This method is deprecated and has been generalized to plot().
+
+    :param data: Data frame of signal values, as returned from :py:func:`covidcast.signal`.
+    :param time_value: If multiple days of data are present in ``data``, map only values from this
+      day. Defaults to plotting the most recent day of data in ``data``.
+    :param kwargs: Optional keyword arguments passed to ``GeoDataFrame.plot()``.
+    :return: Matplotlib figure object.
+    """
+    warnings.warn("Function `plot_choropleth` is deprecated. Use `plot()` instead.")
+    return plot(data, time_value, **kwargs)
 
 
 def get_geo_df(data: pd.DataFrame,
@@ -157,7 +164,6 @@ def get_geo_df(data: pd.DataFrame,
       WGS84 for HRRs.
 
     """
-
     if join_type == "right" and any(data[geo_value_col].duplicated()):
         raise ValueError("join_type `right` is incompatible with duplicate values in a "
                          "given region. Use `left` or ensure your input data is a single signal for"
@@ -194,7 +200,7 @@ def animate(data: pd.DataFrame, filepath: str, fps: int = 3, dpi: int = 150, **k
     :param filepath: Path where video will be saved. Filename must contain supported extension.
     :param fps: Frame rate in frames per second for animation. Defaults to 3.
     :param dpi: Dots per inch for output video. Defaults to 150 on a 12.8x9.6 figure (1920x1440).
-    :param kwargs: Optional keyword arguments passed to :py:func:`covidcast.plot_choropleth`.
+    :param kwargs: Optional keyword arguments passed to :py:func:`covidcast.plot`.
     :return: None
     """
     # probesize is set to avoid warning by ffmpeg on frame rate up to 4k resolution.
@@ -203,12 +209,86 @@ def animate(data: pd.DataFrame, filepath: str, fps: int = 3, dpi: int = 150, **k
     day_list = [min(data.time_value) + timedelta(days=x) for x in range(num_days+1)]
     for d in tqdm(day_list):
         buf = io.BytesIO()
-        plot_choropleth(data, time_value=d, **kwargs)
+        plot(data, time_value=d, **kwargs)
         plt.savefig(buf, dpi=dpi)
         plt.close()
         buf.seek(0)
         writer.append_data(imageio.imread(buf))
     writer.close()
+
+
+def _plot_choro(ax: axes.Axes, data: gpd.GeoDataFrame, **kwargs: Any) -> None:
+    """Generate a choropleth map on a given Figure/Axes from a GeoDataFrame.
+
+    :param ax: Matplotlib axes to plot on.
+    :param data: GeoDataFrame with information to plot.
+    :param kwargs: Optional keyword arguments passed to ``GeoDataFrame.plot()``.
+    :return: Matplotlib axes with the plot added.
+    """
+    kwargs["vmin"] = kwargs.get("vmin", 0)
+    kwargs["cmap"] = kwargs.get("cmap", "YlOrRd")
+    data_w_geo = get_geo_df(data)
+    for shape in _project_and_transform(data_w_geo):
+        if not shape.empty:
+            shape.plot(column="value", ax=ax, **kwargs)
+    sm = plt.cm.ScalarMappable(cmap=kwargs["cmap"],
+                               norm=plt.Normalize(vmin=kwargs["vmin"], vmax=kwargs["vmax"]))
+    # this is to remove the set_array error that occurs on some platforms
+    sm._A = []  # pylint: disable=W0212
+    plt.colorbar(sm, ticks=np.linspace(kwargs["vmin"], kwargs["vmax"], 8), ax=ax,
+                 orientation="horizontal", fraction=0.02, pad=0.05)
+
+
+def _plot_bubble(ax: axes.Axes, data: gpd.GeoDataFrame, geo_type: str, **kwargs: Any) -> None:
+    """Generate a bubble map on a given Figure/Axes from a GeoDataFrame.
+
+    The maximum bubble size is set to the figure area / 1.5, with a x3 multiplier if the geo_type
+    is ``state``.
+
+    :param ax: Matplotlib axes to plot on.
+    :param data: GeoDataFrame with information to plot.
+    :param kwargs: Optional keyword arguments passed to ``GeoDataFrame.plot()``.
+    :return: Matplotlib axes with the plot added.
+    """
+    kwargs["vmin"] = kwargs.get("vmin", 0.1)
+    kwargs["color"] = kwargs.get("color", "purple")
+    kwargs["alpha"] = kwargs.get("alpha", 0.5)
+    data_w_geo = get_geo_df(data, join_type="inner")
+    label_bins = np.linspace(kwargs["vmin"], kwargs["vmax"], 8)  # set bin labels
+    value_bins = list(label_bins) + [np.inf]  # set ranges for bins by adding +inf for largest bin
+    # set max bubble size proportional to figure size, with a multiplier for state plots
+    state_multiple = 3 if geo_type == "state" else 1
+    bubble_scale = np.prod(kwargs["figsize"]) / 1.5 / kwargs["vmax"] * state_multiple
+    # discretize data and scale labels to correct sizes
+    data_w_geo["binval"] = pd.cut(data_w_geo.value, labels=label_bins, bins=value_bins, right=False)
+    data_w_geo["binval"] = data_w_geo.binval.astype(float) * bubble_scale
+    for shape in _project_and_transform(data_w_geo):
+        if not shape.empty and not shape.binval.isnull().values.all():
+            shape.plot(color="1", ax=ax, legend=True, edgecolor="0.8", linewidth=0.5)
+            shape["geometry"] = shape["geometry"].centroid  # plot bubbles at each polgyon centroid
+            shape.plot(markersize="binval", color=kwargs["color"], ax=ax, alpha=kwargs["alpha"])
+    # to generate the legend, need to plot the reference points as scatter plots off the map
+    for b in label_bins:
+        ax.scatter([1e10], [1e10], color=kwargs["color"], alpha=kwargs["alpha"],
+                   s=b*bubble_scale, label=round(b, 2))
+    ax.legend(frameon=False, ncol=8, loc="lower center", bbox_to_anchor=(0.5, -0.1))
+
+
+def _plot_background_states(figsize: tuple) -> tuple:
+    """Plot US states in light grey as the background for other plots.
+
+    :param figsize: Dimensions of plot.
+    :return: Matplotlib figure and axes.
+    """
+    fig, ax = plt.subplots(1, figsize=figsize)
+    ax.axis("off")
+    state_shapefile_path = pkg_resources.resource_filename(__name__, SHAPEFILE_PATHS["state"])
+    state = gpd.read_file(state_shapefile_path)
+    for state in _project_and_transform(state, "STATEFP"):
+        state.plot(color="0.9", ax=ax, edgecolor="0.8", linewidth=0.5)
+    ax.set_xlim(plt.xlim())
+    ax.set_ylim(plt.ylim())
+    return fig, ax
 
 
 def _project_and_transform(data: gpd.GeoDataFrame,

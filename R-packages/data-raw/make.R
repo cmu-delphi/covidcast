@@ -30,22 +30,15 @@ state_abbr["Puerto Rico Commonwealth"] = "PR"
 state_census$ABBR = state_abbr
 save(state_census, file = "../covidcast/data/state_census.rda")
 
-# County geo data from https://www.weather.gov/gis/Counties
-library(sf)
-county_geo = st_read("c_03mr20/c_03mr20.shp")
-county_geo$STATE = as.character(county_geo$STATE)
-county_geo$CWA = as.character(county_geo$CWA)
-county_geo$FE_AREA = as.character(county_geo$FE_AREA)
-county_geo$COUNTYNAME = as.character(county_geo$COUNTYNAME)
-county_geo$TIME_ZONE = NULL
-county_geo$geometry = NULL
-county_geo = data.frame(county_geo)
+# County geo centroids from usmap
+county_col_classes = c("numeric", "numeric", "character", "character",
+                       "character", "character")
+county_file = system.file("extdata", "us_counties_centroids.csv", package = "usmap")
+county_geo = utils::read.csv(county_file, colClasses = county_col_classes)
 save(county_geo, file = "../covidcast/data/county_geo.rda", compress = "bzip2")
 
-county_census$FIPS[!county_census$FIPS %in% county_geo$FIPS] # Just the states themselves
-county_geo[!county_geo$FIPS %in% county_census$FIPS, ] # AS, PR, VI, GU, etc.
-
-# State geo data from https://developers.google.com/public-data/docs/canonical/states_csv
-state_geo = read.table("state-geo.txt", sep = "\t", stringsAsFactors = FALSE)
-colnames(state_geo) = c("STATE", "LAT", "LON", "NAME")
+# State geo centroids from usmap
+state_col_classes = c("numeric", "numeric", "character", "character", "character")
+state_file = system.file("extdata", "us_states_centroids.csv", package = "usmap")
+state_geo = utils::read.csv(state_file, colClasses = state_col_classes)
 save(state_geo, file = "../covidcast/data/state_geo.rda")

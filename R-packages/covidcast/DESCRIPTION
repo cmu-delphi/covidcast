@@ -24,6 +24,7 @@ Imports:
   purrr,
   jsonlite,
   usmap,
+  utils,
   maptools,
   ggplot2,
   grDevices,

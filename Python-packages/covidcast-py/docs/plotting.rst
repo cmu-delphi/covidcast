@@ -11,7 +11,7 @@ signal and generates a choropleth map, using `matplotlib
 <https://matplotlib.org/>`_ underneath. Detailed examples are provided in the
 :ref:`usage examples <plotting-examples>`.
 
-.. autofunction:: covidcast.plot_choropleth
+.. autofunction:: covidcast.plot
 
 Animate a signal over time
 --------------------------

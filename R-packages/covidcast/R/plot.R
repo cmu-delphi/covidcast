@@ -346,22 +346,18 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   geom_args$data = map_df
   polygon_layer = do.call(ggplot2::geom_polygon, geom_args)
 
-  # Set the lats and lons for counties
+  # Retrieve coordinates for mapping
+  # Reading from usmap files to ensure consistency with borders
   if (attributes(x)$geo_type == "county") {
-    g = county_geo[county_geo$FIPS %in% map_geo, ]
-    cur_geo = g$FIPS
-    cur_lon = g$LON
-    cur_lat = g$LAT
+    centroids = county_geo[county_geo$fips %in% map_geo, ]
+    cur_geo = centroids$fips
     cur_val = rep(NA, length(cur_geo))
   }
-
-  # Set the lats and lons for states
   else if (attributes(x)$geo_type == "state") {
-    state_geo$STATE = tolower(state_geo$STATE)
-    g = state_geo[state_geo$STATE %in% map_geo, ]
-    cur_geo = g$STATE
-    cur_lon = g$LON
-    cur_lat = g$LAT
+    centroids = state_geo
+    centroids$abbr = tolower(centroids$abbr)
+    centroids = centroids[centroids$abbr %in% map_geo, ]
+    cur_geo = centroids$abbr
     cur_val = rep(NA, length(cur_geo))
   }
 
@@ -379,10 +375,9 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   }
   
   # Create the bubble layer
-  bubble_df = data.frame(lon = cur_lon, lat = cur_lat, val = cur_val)
-  suppressWarnings({ bubble_trans = usmap::usmap_transform(bubble_df) })
-  bubble_layer = ggplot2::geom_point(aes(x = lon.1, y = lat.1, size = val),
-                                     data = bubble_trans, color = col,
+  bubble_df = data.frame(lat = centroids$x, lon = centroids$y, val = cur_val)
+  bubble_layer = ggplot2::geom_point(aes(x = lat, y = lon, size = val),
+                                     data = bubble_df, color = col,
                                      alpha = alpha, na.rm = TRUE)
 
   # Create the scale layer

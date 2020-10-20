@@ -114,12 +114,7 @@ def signal(data_source: str,
         Contains a `pandas Timestamp object
         <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_
         identifying the date this estimate is for.
-
-      ``direction``
-        Uses a local linear fit to estimate whether the signal in this region is
-        currently increasing or decreasing (reported as -1 for decreasing, 1 for
-        increasing, and 0 for neither).
-
+        
       ``issue``
         Contains a `pandas Timestamp object
         <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_
@@ -159,7 +154,6 @@ def signal(data_source: str,
     specific signals.
 
     """
-
     if geo_type not in VALID_GEO_TYPES:
         raise ValueError("geo_type must be one of " + ", ".join(VALID_GEO_TYPES))
 
@@ -251,7 +245,6 @@ def metadata() -> pd.DataFrame:
         The sample standard deviation of all reported values.
 
     """
-
     meta = Epidata.covidcast_meta()
 
     if meta["result"] != 1:
@@ -363,7 +356,6 @@ def _fetch_single_geo(data_source: str,
     entries.
 
     """
-
     as_of_str = _date_to_api_string(as_of) if as_of is not None else None
     issues_strs = _dates_to_api_strings(issues) if issues is not None else None
 
@@ -395,7 +387,7 @@ def _fetch_single_geo(data_source: str,
 
     if len(dfs) > 0:
         out = pd.concat(dfs)
-
+        out.drop("direction", axis=1, inplace=True)
         out["time_value"] = pd.to_datetime(out["time_value"], format="%Y%m%d")
         out["issue"] = pd.to_datetime(out["issue"], format="%Y%m%d")
         out["geo_type"] = geo_type
@@ -410,7 +402,6 @@ def _signal_metadata(data_source: str,
                      signal: str,  # pylint: disable=W0621
                      geo_type: str) -> dict:
     """Fetch metadata for a single signal as a dict."""
-
     meta = metadata()
 
     mask = ((meta.data_source == data_source) &
@@ -435,13 +426,11 @@ def _signal_metadata(data_source: str,
 
 def _date_to_api_string(date: date) -> str:  # pylint: disable=W0621
     """Convert a date object to a YYYYMMDD string expected by the API."""
-
     return date.strftime("%Y%m%d")
 
 
 def _dates_to_api_strings(dates: Union[date, list, tuple]) -> str:
     """Convert a date object, or pair of (start, end) objects, to YYYYMMDD strings."""
-
     if not isinstance(dates, (list, tuple)):
         return _date_to_api_string(dates)
 

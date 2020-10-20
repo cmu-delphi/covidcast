@@ -22,7 +22,7 @@ Authors@R:
     person(given = "Alex",
            family = "Reinhart",
            role = c("aut", "cre"),
-					 email = "areinhar@stat.cmu.edu"),
+           email = "areinhar@stat.cmu.edu"),
     person(given = "Ryan",
            family = "Tibshirani",
            role = "aut"))

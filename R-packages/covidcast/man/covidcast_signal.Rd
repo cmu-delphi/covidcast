@@ -54,11 +54,11 @@ issued in this range. There may be multiple rows for each observation,
 indicating several updates to its value. If \code{NULL}, the default, return the
 most recently issued data.}
 
-\item{lag}{Integer. If, for example, \code{lag=3}, fetch only data that was
-published or updated exactly 3 days after the date. For example, a row with
-\code{time_value} of June 3 will only be included in the results if its data was
-issued or updated on June 6. If \code{NULL}, the default, return the most
-recently issued data regardless of its lag.}
+\item{lag}{Integer. If, for example, \code{lag = 3}, then we fetch only data that
+was published or updated exactly 3 days after the date. For example, a row
+with \code{time_value} of June 3 will only be included in the results if its
+data was issued or updated on June 6. If \code{NULL}, the default, return the
+most recently issued data regardless of its lag.}
 }
 \value{
 Data frame with matching data. Each row is one observation of one

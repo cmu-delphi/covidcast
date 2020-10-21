@@ -8,7 +8,7 @@
 #' @importFrom covidcast covidcast_signal
 #' @importFrom utils data
 #' @importFrom stringr str_glue str_sub
-#' @importFrom dplyr select mutate distinct left_join rename
+#' @importFrom dplyr select mutate distinct rename
 download_signal <- function(...) {
   args <- list(...)
   if (is.null(args$start_day)) {
@@ -38,7 +38,7 @@ download_signal <- function(...) {
         covidcast::abbr_to_name(toupper(out$geo_value)), "$"),
         ties_method = "all")
     out$geo_value = sapply(fips_list, FUN = function(x) {
-      return(x[substr(x, 3, 5) == "000"])
+      return(substr(x[substr(x, 3, 5) == "000"], 1, 2))
     })
   }
   out %>% rename(location = .data$geo_value)

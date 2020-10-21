@@ -44,7 +44,9 @@ for details on how to specify these IDs.}
 
 \item{as_of}{Fetch only data that was available on or before this date,
 provided as a \code{Date} object or string in the form \code{"YYYY-MM-DD"}. If
-\code{NULL}, the default, return the most recent available data.}
+\code{NULL}, the default, return the most recent available data. Note that only
+one of \code{as_of}, \code{issues}, and \code{lag} should be provided; it does not make
+sense to specify more than one.}
 
 \item{issues}{Fetch only data that was published or updated ("issued") on
 these dates. Provided as either a single \code{Date} object (or string in the
@@ -116,8 +118,8 @@ data, creating a new issue on June 8th. By default, \code{covidcast_signal()}
 returns the most recent issue available for every observation. The \code{as_of},
 \code{issues}, and \code{lag} parameters allow the user to select specific issues
 instead, or to see all updates to observations. These options are mutually
-exclusive; if you specify more than one, \code{as_of} will take priority over
-\code{issues}, which will take priority over \code{lag}.
+exclusive, and you should only specify one; if you specify more than one, you
+may get an error or confusing results.
 
 Note that the API only tracks the initial value of an estimate and \emph{changes}
 to that value. If a value was first issued on June 5th and never updated,

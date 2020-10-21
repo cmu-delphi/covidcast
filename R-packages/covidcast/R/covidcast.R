@@ -35,8 +35,8 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 #' returns the most recent issue available for every observation. The `as_of`,
 #' `issues`, and `lag` parameters allow the user to select specific issues
 #' instead, or to see all updates to observations. These options are mutually
-#' exclusive; if you specify more than one, `as_of` will take priority over
-#' `issues`, which will take priority over `lag`.
+#' exclusive, and you should only specify one; if you specify more than one, you
+#' may get an error or confusing results.
 #'
 #' Note that the API only tracks the initial value of an estimate and *changes*
 #' to that value. If a value was first issued on June 5th and never updated,
@@ -83,7 +83,9 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 #'   for details on how to specify these IDs.
 #' @param as_of Fetch only data that was available on or before this date,
 #'   provided as a `Date` object or string in the form `"YYYY-MM-DD"`. If
-#'   `NULL`, the default, return the most recent available data.
+#'   `NULL`, the default, return the most recent available data. Note that only
+#'   one of `as_of`, `issues`, and `lag` should be provided; it does not make
+#'   sense to specify more than one.
 #' @param issues Fetch only data that was published or updated ("issued") on
 #'   these dates. Provided as either a single `Date` object (or string in the
 #'   form `"YYYY-MM-DD"`), indicating a single date to fetch data issued on, or
@@ -96,7 +98,7 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 #'   with `time_value` of June 3 will only be included in the results if its
 #'   data was issued or updated on June 6. If `NULL`, the default, return the
 #'   most recently issued data regardless of its lag.
-#' 
+#'
 #' @return Data frame with matching data. Each row is one observation of one
 #'   signal on one day in one geographic location. Contains the following
 #'   columns:

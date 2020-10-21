@@ -13,7 +13,7 @@
 #' @importFrom ggplot2 ggplot aes geom_line geom_vline facet_wrap labs
 #' @importFrom stats median
 #' @export
-plot_width <- function(cards, alpha = 0.2) {
+plot_width <- function(scorecards, alpha = 0.2) {
   unique_attr(scorecards, "ahead")
   unique_attr(scorecards, "geo_type")
   unique_attr(scorecards, "incidence_period")

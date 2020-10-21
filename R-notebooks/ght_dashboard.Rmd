@@ -93,6 +93,5 @@ states_present$issue = "2020-04-15"
 attributes(states_present)$geo_type = "state"
 class(states_present) = c("covidcast_signal", "data.frame")
 
-breaks <- c(0, 1, 2, 5, 28)
 plot(states_present, title = "How frequently do states appear in last 28 days?", range=c(0, 28))
 ```

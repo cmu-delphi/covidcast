@@ -1,23 +1,64 @@
-create_corrections_db <- function(...,
-                                  correction_mutation = list(corrected = value),
+#' Create or overwrite a corrections database
+#'
+#' This function pulls data from the covidcast api, creates new variables as
+#' necessary, writes a file to a database, and optionally returns the modified
+#' dataframe.
+#'
+#'
+#' @param data_source String identifying the data source to query. See the
+#'   [signal
+#'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)
+#'   for a list of available data sources.
+#' @param signal String identifying the signal from that source to query. Again,
+#'   see the [signal
+#'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)
+#'   for a list of available signals.
+#' @template geo_type-template
+#' @template geo_value-template
+#' @param subsetter a function that receives the data frame downloaded from covidcast and
+#'   returns a subset of its rows
+#' @param corrector a function that receives the subset and adds desired columns. At least
+#'   one of these columns should be names "corrected" with the replacement values desired.
+#'   If a logical column is named "flag", only `geo_values` containing an instance of `TRUE`
+#'   will be optionally returned.
+#' @param write_db a path to an SQLite database where any rows with `corrected` != `value`
+#'   will be stored. This file will be created if it doesn't already exist.
+#' @param db_object_name the name of the data frame in which to store the corrections
+#' @param ... additional arguments passed to \link[covidcast]{covidcast_signal()}
+#'
+#' @return Optionally returns the wide, subset data frame created by `corrector`
+#' @export
+create_corrections_db <- function(data_source,
+                                  signal,
+                                  geo_type = c("county", "hrr", "msa", "dma", "state"),
+                                  geo_values = "*",
+                                  subsetter = function(x) x,
+                                  corrector = function(x) x,
                                   write_db = FALSE,
-                                  db_object_name = NULL) {
-  # need "corrected" as one name, all list elements need to be named
-  # check that no other weird stuff in the list
-  args <- list(...)
-  orig_data <- download_signal(args)
-  orig_data <- covidcast:::latest_issue(orig_data) # as_of?
+                                  db_object_name = NULL,
+                                  ...
+                                  ) {
+  # need "corrected" as one name, all elements in correction_mutation need
+  # to make sense. No idea how to check these
+  orig_data <- download_signal(data_source, signal, geo_type, geo_values, ...)
+
+  # orig_data <- covidcast:::latest_issue(orig_data) # as_of?,
+  # above line doesnt work since download_signal renames geo_value to location
   covidcast_schema <- tibble::as_tibble(orig_data[FALSE,])
 
-  # we want to pass a named list of new columns to dplyr::mutate()
-  # see https://community.rstudio.com/t/passing-named-list-to-mutate-and-probably-other-dplyr-verbs/2553/6
-  new_cols <- rlang::enexpr(correction_mutation)
-  list_of_new_cols <- rlang::lang_args(new_cols)
-  wide_data <- dplyr::mutate(orig_data, !!! list_of_new_cols)
+  filtered_data <- subsetter(orig_data)
+  wide_data <- corrector(orig_data)
+
+  # check if we made a column called corrected, and didn't delete anything important
+  if(!any(names(wide_data)=="corrected")) {
+    wide_data$corrected = wide_data$value
+    warning("You didn't create any corrections. Adding a column with the original values.")
+  }
 
   corrected_data <- dplyr::select(
     wide_data,
     dplyr::matches(c(names(covidcast_schema),"corrected")))
+
 
   if(!is.null(db_object_name) && write_db){
     update_corrections(write_db, db_object_name, corrected_data)
@@ -28,6 +69,7 @@ create_corrections_db <- function(...,
       object = db_object_name,
       .sep = " "
     )
+    message(msg)
   }
   class(wide_data) <- c("covidcast_corrected", class(orig_data))
   invisible(wide_data)
@@ -46,7 +88,7 @@ plot.covidcast_corrected <- function(x,
   # Set a title, if we need to (simple combo of data source, signal)
   if (is.null(title)) title = paste0(unique(x$data_source), ": ",
                                      unique(x$signal))
-
+  params = line_params
   # Set other plot parameters, if we need to
   xlab = params$xlab
   ylab = params$ylab
@@ -60,7 +102,7 @@ plot.covidcast_corrected <- function(x,
   # Grab the values
   df = x %>%
     dplyr::select(value, corrected, time_value, location) %>%
-    pivot_longer(value:corrected)
+    tidyr::pivot_longer(value:corrected)
 
 
   # Create label and theme layers
@@ -82,19 +124,20 @@ plot.covidcast_corrected <- function(x,
       alpha = stderr_alpha)
   }
 
-  facet_layer <- NULL
-  scales <- ifelse(is.null(line_params$scales), "fixed", line_params$scales)
-  facet_labels <- ifelse(
-    attributes(x)$geo_type == county,
-    county_label_lookup,
-    "label_value")
-
-  if(!is.null(facet_by)){
-    facet_layer <- ggplot2::facet_wrap(
-      facet_by, scales=scales, labeller=labeller(location=facet_labels))
-  }
+  # facet_layer <- NULL
+  # scales <- ifelse(is.null(params$scales), "fixed", params$scales)
+  # facet_labels <- ifelse(
+  #   attributes(x)$geo_type == "county",
+  #   county_label_lookup,
+  #   "label_value")
+  #
+  # if(!is.null(facet_by)){
+  #   facet_layer <- ggplot2::facet_wrap(
+  #     facet_by, scales=scales, labeller=labeller(location=facet_labels))
+  # }
 
   # Put it all together and return
   ggplot2::ggplot(aes(x = time_value), data = df) + line_layer +
-    ribbon_layer + facet_layer + label_layer + theme_layer
+    ribbon_layer + #facet_layer +
+    label_layer + theme_layer
 }

@@ -10,5 +10,6 @@ get_forecast_dates(covid_hub_forecaster_name)
 \item{covid_hub_forecaster_name}{the name of a forecaster on the COVID Hub.}
 }
 \description{
-Get Available Forecast Dates for Forecaster on COVID Hub
+Retrieves the forecast dates that a forecaster submitted to
+the COVID Hub https://github.com/reichlab/covid19-forecast-hub/
 }

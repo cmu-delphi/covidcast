@@ -26,29 +26,29 @@ see the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.
 for a list of available signals.}
 
 \item{start_day}{Query data beginning on this date. Date object, or string in
-the form \code{"YYYY-MM-DD"}. If \code{start_day} is \code{NULL}, defaults to first day
+the form "YYYY-MM-DD". If \code{start_day} is \code{NULL}, defaults to first day
 data is available for this signal.}
 
 \item{end_day}{Query data up to this date, inclusive. Date object or string
-in the form \code{"YYYY-MM-DD"}. If \code{end_day} is \code{NULL}, defaults to the most
+in the form "YYYY-MM-DD". If \code{end_day} is \code{NULL}, defaults to the most
 recent day data is available for this signal.}
 
 \item{geo_type}{The geography type for which to request this data, such as
-\code{"county"} or \code{"state"}. Defaults to \code{"county"}. See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
+"county" or "state". Defaults to "county". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
 for details on which types are available.}
 
-\item{geo_values}{Which geographies to return. The default, \code{"*"}, fetches
+\item{geo_values}{Which geographies to return. The default, "*", fetches
 all geographies. To fetch specific geographies, specify their IDs as a
 vector or list of strings. See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
 for details on how to specify these IDs.}
 
 \item{as_of}{Fetch only data that was available on or before this date,
-provided as a \code{Date} object or string in the form \code{"YYYY-MM-DD"}. If
+provided as a \code{Date} object or string in the form "YYYY-MM-DD". If
 \code{NULL}, the default, return the most recent available data.}
 
 \item{issues}{Fetch only data that was published or updated ("issued") on
 these dates. Provided as either a single \code{Date} object (or string in the
-form \code{"YYYY-MM-DD"}), indicating a single date to fetch data issued on, or
+form "YYYY-MM-DD"), indicating a single date to fetch data issued on, or
 a vector specifying two dates, start and end. In this case, return all data
 issued in this range. There may be multiple rows for each observation,
 indicating several updates to its value. If \code{NULL}, the default, return the

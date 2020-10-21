@@ -67,26 +67,26 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 #'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)
 #'   for a list of available signals.
 #' @param start_day Query data beginning on this date. Date object, or string in
-#'   the form `"YYYY-MM-DD"`. If `start_day` is `NULL`, defaults to first day
+#'   the form "YYYY-MM-DD". If `start_day` is `NULL`, defaults to first day
 #'   data is available for this signal.
 #' @param end_day Query data up to this date, inclusive. Date object or string
-#'   in the form `"YYYY-MM-DD"`. If `end_day` is `NULL`, defaults to the most
+#'   in the form "YYYY-MM-DD". If `end_day` is `NULL`, defaults to the most
 #'   recent day data is available for this signal.
 #' @param geo_type The geography type for which to request this data, such as
-#'   `"county"` or `"state"`. Defaults to `"county"`. See the [geographic coding
+#'   "county" or "state". Defaults to "county". See the [geographic coding
 #'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html)
 #'   for details on which types are available.
-#' @param geo_values Which geographies to return. The default, `"*"`, fetches
+#' @param geo_values Which geographies to return. The default, "*", fetches
 #'   all geographies. To fetch specific geographies, specify their IDs as a
 #'   vector or list of strings. See the [geographic coding
 #'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html)
 #'   for details on how to specify these IDs.
 #' @param as_of Fetch only data that was available on or before this date,
-#'   provided as a `Date` object or string in the form `"YYYY-MM-DD"`. If
+#'   provided as a `Date` object or string in the form "YYYY-MM-DD". If
 #'   `NULL`, the default, return the most recent available data.
 #' @param issues Fetch only data that was published or updated ("issued") on
 #'   these dates. Provided as either a single `Date` object (or string in the
-#'   form `"YYYY-MM-DD"`), indicating a single date to fetch data issued on, or
+#'   form "YYYY-MM-DD"), indicating a single date to fetch data issued on, or
 #'   a vector specifying two dates, start and end. In this case, return all data
 #'   issued in this range. There may be multiple rows for each observation,
 #'   indicating several updates to its value. If `NULL`, the default, return the
@@ -301,7 +301,7 @@ summary.covidcast_signal = function(object, ...) {
 #' @param plot_type One of "choro", "bubble", "line" indicating whether to plot
 #'   a choropleth map, bubble map, or line (time series) graph, respectively.
 #'   The default is "choro".
-#' @param time_value Date object (or string in the form `"YYYY-MM-DD"`)
+#' @param time_value Date object (or string in the form "YYYY-MM-DD")
 #'   specifying the day to map, for choropleth and bubble maps. If `NULL`, the
 #'   default, then the last date in `x` is used for the maps. Time series plots
 #'   always include all available time values in `x`.
@@ -718,7 +718,7 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
     } else if (length(issues) == 1) {
       params$issues <- date_to_string(issues)
     } else {
-      stop("`issues` must be either a single date or a date interval")
+      stop('`issues` must be either a single date or a date interval')
     }
   }
 

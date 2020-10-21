@@ -131,8 +131,8 @@ name_to_cbsa = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 #' @param ties_method If "first", then only the first match for each code is
 #'   returned. If "all", then all matches for each code are returned.
 #'
-#' @return A vector of FIPS or CBSA codes if `ties_method` equals "first", and a
-#'   list of FIPS or CBSA codes otherwise.
+#' @return A vector of county or metro names if `ties_method` equals "first",
+#'   and a list of county or names otherwise.
 #'
 #' @examples
 #' fips_to_name("42003")
@@ -233,6 +233,85 @@ abbr_to_name = function(abbr, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
   
   # Perform the grep-based look up
   grep_lookup(key = abbr, keys = df$ABBR, values = df$NAME,
+              ignore.case = ignore.case, perl = perl, fixed = fixed,
+              ties_method = ties_method)
+}
+
+#' Get FIPS codes from state abbreviations 
+#'
+#' Look up FIPS codes by state abbreviations (including District of Columbia and
+#' Puerto Rico); this function is based on `grep()`, and hence allows for
+#' regular expressions.  
+#'
+#' @param abbr Vector of state abbreviations to look up.
+#' @param ignore.case,perl,fixed Arguments to pass to `grep()`, with the same
+#'   defaults as in the latter function. Hence, by default, regular expressions
+#'   are used; to match against a fixed string (no regular expressions), set
+#'   `fixed = TRUE`.
+#' @param ties_method If "first", then only the first match for each name is
+#'   returned. If "all", then all matches for each name are returned.
+#'
+#' @return A vector of FIPS codes if `ties_method` equals "first", and a list of
+#'   FIPS codes otherwise. 
+#'
+#' @examples
+#' abbr_to_fips("PA")
+#' abbr_to_fips(c("PA", "PR", "DC"))
+#'
+#' # Note that name_to_fips() works for state names too:
+#' name_to_fips("^Pennsylvania$")
+#' 
+#' @seealso [abbr_to_name()]
+#' @export
+abbr_to_fips = function(abbr, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
+                        ties_method = c("first", "all")) {
+  # First get rid of United States from state_census, then convert FIPS codes to
+  # appropriate character format 
+  df = state_census %>% dplyr::filter(STATE > 0) %>%
+    mutate(STATE = sprintf("%02d000", STATE))
+
+  # Now perform the grep-based look up
+  grep_lookup(key = abbr, keys = df$ABBR, values = df$STATE,
+              ignore.case = ignore.case, perl = perl, fixed = fixed,
+              ties_method = ties_method)
+}
+
+#' Get state abbreviations from FIPS codes
+#'
+#' Look up state abbreviations by FIPS codes (including District of Columbia and 
+#' Puerto Rico); this function is based on `grep()`, and hence allows for
+#' regular expressions.  
+#'
+#' @param code Vector of FIPS codes to look up; codes can have either two digits
+#'   (as in "42") or five digits (as in "42000"), either is allowed.
+#' @param ignore.case,perl,fixed Arguments to pass to `grep()`, with the same
+#'   defaults as in the latter function. Hence, by default, regular expressions
+#'   are used; to match against a fixed string (no regular expressions), set
+#'   `fixed = TRUE`.
+#' @param ties_method If "first", then only the first match for each code is
+#'   returned. If "all", then all matches for each code are returned.
+#'
+#' @return A vector of state abbreviations if `ties_method` equals "first", and
+#'   a list of state abbreviations otherwise.
+#'
+#' @examples
+#' fips_to_abbr("42000")
+#' fips_to_abbr(c("42", "72", "11"))
+#'
+#' # Note that fips_to_name() works for state names too:
+#' fips_to_name("42000")
+#'
+#' @seealso [abbr_to_fips()]
+#' @export
+fips_to_abbr = function(code, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
+                        ties_method = c("first", "all")) {
+  # First get rid of United States from state_census, then convert FIPS codes to
+  # appropriate character format 
+  df = state_census %>% dplyr::filter(STATE > 0) %>%
+    mutate(STATE = sprintf("%02d000", STATE))
+
+  # Now perform the grep-based look up
+  grep_lookup(key = code, keys = df$STATE, values = df$ABBR,
               ignore.case = ignore.case, perl = perl, fixed = fixed,
               ties_method = ties_method)
 }

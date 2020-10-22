@@ -140,7 +140,8 @@ def fips_to_abbr(code: Union[str, Iterable],
     """Look up state abbreviation by FIPS codes with regular expression support.
 
     Given an individual or list of FIPS codes or regular expressions, look up the corresponding
-    state abbreviation
+    state abbreviation. FIPS codes can be the 2 digit code (``covidcast.fips_to_abbr("12")``) or
+    the 2 digit code with 000 appended to the end (``covidcast.fips_to_abbr("12000")``.
 
     :param code: Individual or list of FIPS codes or regular expressions.
     :param ignore_case: Boolean for whether or not to be case insensitive in the regular expression.
@@ -201,8 +202,8 @@ def abbr_to_fips(code: Union[str, Iterable],
     """Look up state FIPS codes by abbreviation with regular expression support.
 
     Given an individual or list of state abbreviations or regular expressions,
-    look up the corresponding state FIPS codes. The returned codes are 5 digits and
-    end with 000.
+    look up the corresponding state FIPS codes. The returned codes are 5 digits: the
+    2 digit state fips and 000 appeneded to the end.
 
     :param code: Individual or list of abbreviations or regular expressions.
     :param ignore_case: Boolean for whether or not to be case insensitive in the regular expression.

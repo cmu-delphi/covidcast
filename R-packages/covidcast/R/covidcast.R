@@ -102,27 +102,24 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 #'   columns:
 #'
 #'   \item{data_source}{Data source from which this observation was obtained.}
-#'   \item{signal}{The signal from which this observation was obtained.}
-#'   \item{geo_value}{identifies the location, such as a state name or county
-#'   FIPS code}
-#'   \item{time_value}{a `Date` object identifying the date of this observation}
-#'   \item{issue}{a `Date` object identifying the date this estimate was issued.
+#'   \item{signal}{Signal from which this observation was obtained.}
+#'   \item{geo_value}{String identifying the location, such as a state name or
+#'   county FIPS code.}
+#'   \item{time_value}{Date object identifying the date of this observation.}
+#'   \item{issue}{Date object identifying the date this estimate was issued.
 #'   For example, an estimate with a `time_value` of June 3 might have been
 #'   issued on June 5, after the data for June 3rd was collected and ingested
 #'   into the API.}
-#'   \item{lag}{an integer giving the difference between ``issue`` and
-#'   ``time_value``, in days.}
-#'   \item{value}{the signal quantity requested. For example, in a query for the
-#'   `confirmed_cumulative_num` signal from the `usa-facts` source, this would
-#'   be the cumulative number of confirmed cases in the area, as of the
+#'   \item{lag}{Integer giving the difference between `issue` and `time_value`,
+#'   in days.}
+#'   \item{value}{Signal value being requested. For example, in a query for the
+#'   "confirmed_cumulative_num" signal from the "usa-facts" source, this would
+#'   be the cumulative number of confirmed cases in the area, as of the given
 #'   `time_value`.}
-#'   \item{stderr}{the value's standard error, if available}
-#'   \item{sample_size}{indicates the sample size available in that geography on
-#'   that day; sample size may not be available for all signals, due to privacy
-#'   or other constraints, in which case they will be `NA`.}
-#'   \item{direction}{uses a local linear fit to estimate whether the signal in
-#'   this region is currently increasing or decreasing (reported as -1 for
-#'   decreasing, 1 for increasing, and 0 for neither).}
+#'   \item{stderr}{Associated standard error of the signal value, if available.}
+#'   \item{sample_size}{Integer indicating the sample size available in that
+#'   geography on that day; sample size may not be available for all signals,
+#'   due to privacy or other constraints, in which case it will be `NA`.}
 #'
 #'   Consult the signal documentation for more details on how values and
 #'   standard errors are calculated for specific signals.
@@ -536,11 +533,11 @@ covidcast_signals <- function(signals, start_day = NULL, end_day = NULL,
 #'   \item{num_locations}{Number of distinct geographic locations available for
 #'   this signal. For example, if `geo_type` is county, the number of counties
 #'   for which this signal has ever been reported.}
-#'   \item{min_value}{The smallest value that has ever been reported.}
-#'   \item{max_value}{The largest value that has ever been reported.}
-#'   \item{mean_value}{The arithmetic mean of all reported values.}
-#'   \item{stdev_value}{The sample standard deviation of all reported values.}
-#'   \item{max_issue}{The most recent issue date for this signal.}
+#'   \item{min_value}{Smallest value that has ever been reported.}
+#'   \item{max_value}{Largest value that has ever been reported.}
+#'   \item{mean_value}{Arithmetic mean of all reported values.}
+#'   \item{stdev_value}{Sample standard deviation of all reported values.}
+#'   \item{max_issue}{Most recent issue date for this signal.}
 #'   \item{min_lag}{Smallest lag from observation to issue, in `time_type` units}
 #'   \item{max_lag}{Largest lag from observation to issue, in `time_type` units}
 #'

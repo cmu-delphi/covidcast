@@ -1,14 +1,17 @@
+import warnings
 from datetime import date, datetime
 from unittest.mock import patch
 
 # Force tests to use a specific backend, so they reproduce across platforms
 import matplotlib
+
 matplotlib.use("AGG")
 
 import pandas as pd
 import numpy as np
 import pytest
 from covidcast import covidcast
+from covidcast.errors import NoDataWarning
 
 
 def sort_df(df):
@@ -69,6 +72,22 @@ def test_signal(mock_covidcast, mock_metadata):
     with pytest.raises(ValueError):
         covidcast.signal("source", "signal", geo_type="state",
                          start_day=date(2020, 4, 2), end_day=date(2020, 4, 1))
+
+    # test warnings
+    mock_covidcast.return_value = {"message": "fake"}
+    with warnings.catch_warnings(record=True) as w:
+        covidcast.signal("source", "signal", start_day=date(2020, 4, 1), end_day=date(2020, 4, 1))
+        assert len(w) == 1
+        assert str(w[0].message) == \
+               "Problem obtaining source signal data on 20200401 for geography 'county': fake"
+        assert w[0].category is UserWarning
+
+    mock_covidcast.return_value = {"message": "no results"}
+    with warnings.catch_warnings(record=True) as w:
+        covidcast.signal("source", "signal", start_day=date(2020, 4, 1), end_day=date(2020, 4, 1))
+        assert len(w) == 1
+        assert str(w[0].message) == "No source signal data found on 20200401 for geography 'county'"
+        assert w[0].category is NoDataWarning
 
 
 @patch("delphi_epidata.Epidata.covidcast_meta")

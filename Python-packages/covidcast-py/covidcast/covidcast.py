@@ -374,8 +374,6 @@ def _fetch_single_geo(data_source: str,
                                      issues=issues_strs, lag=lag)
 
         # Two possible error conditions: no data or too much data.
-        print(day_data)
-        print(data_source)
         if day_data["message"] == "no results":
             warnings.warn(f"No {data_source} {signal} data found on {day_str} "
                           f"for geography '{geo_type}'",

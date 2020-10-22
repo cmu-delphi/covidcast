@@ -14,13 +14,13 @@
 #' @importFrom stats median
 #' @export
 plot_width <- function(cards, alpha = 0.2) {
-  unique_attr(scorecards, "ahead")
-  unique_attr(scorecards, "geo_type")
-  unique_attr(scorecards, "incidence_period")
-  unique_attr(scorecards, "response")
-  scorecards <- intersect_locations(scorecards)
-  df <- scorecards %>%
-    set_names(all_attr(scorecards, "name_of_forecaster")) %>%
+  unique_attr(cards, "ahead")
+  unique_attr(cards, "geo_type")
+  unique_attr(cards, "incidence_period")
+  unique_attr(cards, "response")
+  cards <- intersect_locations(cards)
+  df <- cards %>%
+    set_names(all_attr(cards, "name_of_forecaster")) %>%
     bind_rows(.id = "forecaster")
   df$coverage <- df$forecast_distribution %>%
     map(compute_width_single_distribution)

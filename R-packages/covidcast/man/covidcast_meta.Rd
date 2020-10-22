@@ -2,7 +2,7 @@
 % Please edit documentation in R/covidcast.R
 \name{covidcast_meta}
 \alias{covidcast_meta}
-\title{Fetch Delphi's COVID-19 Surveillance Streams metadata.}
+\title{Obtain COVIDcast metadata}
 \usage{
 covidcast_meta()
 }

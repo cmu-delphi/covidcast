@@ -2,7 +2,7 @@
 % Please edit documentation in R/covidcast.R
 \name{covidcast_signal}
 \alias{covidcast_signal}
-\title{Produce a data frame for one signal.}
+\title{Obtain a data frame for one COVIDcast signal}
 \usage{
 covidcast_signal(
   data_source,

@@ -1,4 +1,4 @@
-#' Fetch only the latest issue for each observation in a data frame.
+#' Fetch only the latest issue for each observation in a data frame
 #'
 #' Since `covidcast_signal()` can, with the right options, return multiple
 #' issues for a single observation in a single geo, we may want only the most
@@ -23,7 +23,7 @@ latest_issue <- function(df) {
   return(df)
 }
 
-#' Fetch only the earliest issue for each observation in a data frame.
+#' Fetch only the earliest issue for each observation in a data frame
 #'
 #' Since `covidcast_signal()` can, with the right options, return multiple
 #' issues for a single observation in a single geo, we may want only the most

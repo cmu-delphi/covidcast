@@ -9,7 +9,7 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
   packageStartupMessage(paste(msg, collapse = "\n"))
 }
 
-#' Produce a data frame for one signal.
+#' Obtain a data frame for one COVIDcast signal
 #'
 #' Obtains data for selected date ranges for all geographic regions of the
 #' United States. Available data sources and signals are documented in the
@@ -462,7 +462,7 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
 
 ##########
 
-#' Obtain multiple signals in one data frame.
+#' Obtain multiple COVIDcast signals in one data frame
 #'
 #' This convenience function uses `covidcast_signal()` to obtain multiple
 #' signals, potentially from multiple data sources, in one data frame. See the
@@ -517,7 +517,7 @@ covidcast_signals <- function(signals, start_day = NULL, end_day = NULL,
 
 ##########
 
-#' Fetch Delphi's COVID-19 Surveillance Streams metadata.
+#' Obtain COVIDcast metadata
 #'
 #' Obtains a data frame of metadata describing all publicly available data
 #' streams from the COVIDcast API.
@@ -684,7 +684,7 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type,
   return(df)
 }
 
-# Fetch Delphi's COVID-19 Surveillance Streams
+# Fetch Delphi's COVID-19 indicators
 covidcast <- function(data_source, signal, time_type, geo_type, time_values,
                       geo_value, as_of, issues, lag) {
   # Check parameters

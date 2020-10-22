@@ -6,7 +6,7 @@
 \usage{
 abbr_to_fips(
   abbr,
-  ignore.case = FALSE,
+  ignore.case = TRUE,
   perl = FALSE,
   fixed = FALSE,
   ties_method = c("first", "all")
@@ -16,16 +16,16 @@ abbr_to_fips(
 \item{abbr}{Vector of state abbreviations to look up.}
 
 \item{ignore.case, perl, fixed}{Arguments to pass to \code{grep()}, with the same
-defaults as in the latter function. Hence, by default, regular expressions
-are used; to match against a fixed string (no regular expressions), set
-\code{fixed = TRUE}.}
+defaults as in the latter function, except for \code{ignore.case = TRUE}. Hence,
+by default, regular expressions are used; to match against a fixed string
+(no regular expressions), set \code{fixed = TRUE}.}
 
 \item{ties_method}{If "first", then only the first match for each name is
 returned. If "all", then all matches for each name are returned.}
 }
 \value{
 A vector of FIPS codes if \code{ties_method} equals "first", and a list of
-FIPS codes otherwise.
+FIPS codes otherwise. These FIPS codes have five digits (ending in "000").
 }
 \description{
 Look up FIPS codes by state abbreviations (including District of Columbia and

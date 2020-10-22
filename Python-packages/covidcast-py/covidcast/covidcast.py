@@ -7,6 +7,8 @@ from functools import reduce
 import pandas as pd
 from delphi_epidata import Epidata
 
+from .errors import NoDataWarning
+
 # Point API requests to the AWS endpoint
 Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
 
@@ -372,10 +374,14 @@ def _fetch_single_geo(data_source: str,
                                      issues=issues_strs, lag=lag)
 
         # Two possible error conditions: no data or too much data.
-        if day_data["message"] != "success":
-            warnings.warn("Problem obtaining data on {day}: {message}".format(
-                day=day_str,
-                message=day_data["message"]))
+        if day_data["message"] == "no results":
+            warnings.warn(f"No {data_source} {signal} data found on {day_str} "
+                          f"for geography '{geo_type}'",
+                          NoDataWarning)
+        if day_data["message"] not in {"success", "no results"}:
+            warnings.warn(f"Problem obtaining {data_source} {signal} data on {day_str} "
+                          f"for geography '{geo_type}': {day_data['message']}",
+                          RuntimeWarning)
 
         # In the too-much-data case, we continue to try putting the truncated
         # data in our results. In the no-data case, skip this day entirely,

@@ -57,7 +57,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   # For intensity, create a discrete color function, if we need to
   else if (!direction && !is.null(breaks)) {
     if (length(breaks) != length(col)) {
-      stop("'breaks' must have length equal to the number of colors.")
+      stop("`breaks` must have length equal to the number of colors.")
     }
     col_fun = function(val, alpha = 1) {
       alpha_str = substr(grDevices::rgb(0, 0, 0, alpha = alpha), 8, 9)
@@ -73,7 +73,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   # For direction, create a discrete color function
   else {
     if (length(dir_col) != 3) {
-      stop("'dir_col' must have length 3.")
+      stop("`dir_col` must have length 3.")
     }
     col_fun = function(val, alpha = 1) {
       alpha_str = substr(grDevices::rgb(0, 0, 0, alpha = alpha), 8, 9)

@@ -207,8 +207,7 @@ covidcast_signal <- function(data_source, signal,
   }
 
   if (start_day > end_day) {
-    stop("end_day must be on or after start_day, but start_day = '",
-         start_day, "' and end_day = '", end_day, "'")
+    stop("`end_day` must be on or after `start_day`.")
   }
 
   if (!is.null(as_of)) {
@@ -555,7 +554,7 @@ covidcast_meta <- function() {
   meta <- .request(list(source='covidcast_meta', cached="true"))
 
   if (meta$message != "success") {
-    stop("Failed to obtain metadata: ", meta$message)
+    stop("Failed to obtain metadata: ", meta$message, ".")
   }
 
   meta <- meta$epidata %>%
@@ -691,8 +690,8 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   # Check parameters
   if(missing(data_source) || missing(signal) || missing(time_type) ||
        missing(geo_type) || missing(time_values) || missing(geo_value)) {
-    stop('`data_source`, `signal`, `time_type`, `geo_type`, `time_values`, and ',
-         '`geo_value` are all required')
+    stop("`data_source`, `signal`, `time_type`, `geo_type`, `time_values`, and ",
+         "`geo_value` are all required.")
   }
 
   # Set up request
@@ -718,7 +717,7 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
     } else if (length(issues) == 1) {
       params$issues <- date_to_string(issues)
     } else {
-      stop('`issues` must be either a single date or a date interval')
+      stop("`issues` must be either a single date or a date interval.")
     }
   }
 

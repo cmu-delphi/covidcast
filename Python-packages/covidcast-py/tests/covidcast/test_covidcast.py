@@ -207,8 +207,8 @@ def test__fetch_single_geo(mock_covidcast):
                                    "epidata": [{"time_value": 20200821,
                                                 "issue": 20200925}],
                                    "message": "success"},
-                                  {"message": "failed"},  # unsuccessful API response
-                                  {"message": "no results"},  # unsuccessful API response
+                                  {"message": "failed"},  # unknown failed API response
+                                  {"message": "no results"},  # no data API response
                                   {"message": "success"},  # no epidata
                                   {"message": "success"}]
 
@@ -224,7 +224,7 @@ def test__fetch_single_geo(mock_covidcast):
                             index=[0, 0])
     assert sort_df(response).equals(sort_df(expected))
 
-    # test warnings
+    # test warning when an unknown bad response is received
     with warnings.catch_warnings(record=True) as w:
         covidcast._fetch_single_geo("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
                                     "*", None, None, None, None)
@@ -233,8 +233,9 @@ def test__fetch_single_geo(mock_covidcast):
                "Problem obtaining source signal data on 20200402 for geography '*': failed"
         assert w[0].category is RuntimeWarning
 
+    # test warning when a no data response is received
     with warnings.catch_warnings(record=True) as w:
-        covidcast._fetch_single_geo("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
+        covidcast._fetch_single_geo("source", "signal", date(2020, 4, 2), date(2020, 4, 4),
                                     "county", None, None, None, None)
         assert len(w) == 1
         assert str(w[0].message) == "No source signal data found on 20200402 for geography 'county'"

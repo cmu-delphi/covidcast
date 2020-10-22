@@ -66,27 +66,24 @@ signal on one day in one geographic location. Contains the following
 columns:
 
 \item{data_source}{Data source from which this observation was obtained.}
-\item{signal}{The signal from which this observation was obtained.}
-\item{geo_value}{identifies the location, such as a state name or county
-FIPS code}
-\item{time_value}{a \code{Date} object identifying the date of this observation}
-\item{issue}{a \code{Date} object identifying the date this estimate was issued.
+\item{signal}{Signal from which this observation was obtained.}
+\item{geo_value}{String identifying the location, such as a state name or
+county FIPS code.}
+\item{time_value}{Date object identifying the date of this observation.}
+\item{issue}{Date object identifying the date this estimate was issued.
 For example, an estimate with a \code{time_value} of June 3 might have been
 issued on June 5, after the data for June 3rd was collected and ingested
 into the API.}
-\item{lag}{an integer giving the difference between \code{issue} and
-\code{time_value}, in days.}
-\item{value}{the signal quantity requested. For example, in a query for the
-\code{confirmed_cumulative_num} signal from the \code{usa-facts} source, this would
-be the cumulative number of confirmed cases in the area, as of the
+\item{lag}{Integer giving the difference between \code{issue} and \code{time_value},
+in days.}
+\item{value}{Signal value being requested. For example, in a query for the
+"confirmed_cumulative_num" signal from the "usa-facts" source, this would
+be the cumulative number of confirmed cases in the area, as of the given
 \code{time_value}.}
-\item{stderr}{the value's standard error, if available}
-\item{sample_size}{indicates the sample size available in that geography on
-that day; sample size may not be available for all signals, due to privacy
-or other constraints, in which case they will be \code{NA}.}
-\item{direction}{uses a local linear fit to estimate whether the signal in
-this region is currently increasing or decreasing (reported as -1 for
-decreasing, 1 for increasing, and 0 for neither).}
+\item{stderr}{Associated standard error of the signal value, if available.}
+\item{sample_size}{Integer indicating the sample size available in that
+geography on that day; sample size may not be available for all signals,
+due to privacy or other constraints, in which case it will be \code{NA}.}
 
 Consult the signal documentation for more details on how values and
 standard errors are calculated for specific signals.

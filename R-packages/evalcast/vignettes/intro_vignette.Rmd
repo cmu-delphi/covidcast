@@ -33,7 +33,11 @@ The function `get_predictions` runs your forecaster on the dates you specify.  W
 
 ```{r, warning=FALSE}
 library(evalcast)
-forecast_dates <- get_forecast_dates("CMU-TimeSeries")[1:4]
+library(covidcast) # needed because covidcast make file does not run when only evalcast is libraried
+
+forecast_dates <- get_forecast_dates("CMU-TimeSeries")[1] # Reducing to 1 for testing
+
+#Seems very inefficient, retrieves from 2020-06-15 to each forecast date, so does ~4x the work
 predictions_cards <- get_predictions(baseline_forecaster,
                                      name_of_forecaster = "baseline",
                                      signals = signals,
@@ -104,9 +108,8 @@ scorecards[[1]]
 scorecards_list <- c(scorecards_yyg,scorecards_cmu,scorecards)
 plot_measure(scorecards_list, "wis")
 plot_measure(scorecards_list, "ae")
-# These next two lines broke because covidcast::county_census no longer exists:
-# plot_measure(c(scorecards_yyg,scorecards_cmu,scorecards), "wis", type = "dotplot") + scale_x_log10()
-# plot_measure(c(scorecards_yyg,scorecards_cmu,scorecards), "ae", type = "dotplot") + scale_x_log10()
+plot_measure(c(scorecards_yyg,scorecards_cmu,scorecards), "wis", type = "dotplot") + scale_x_log10()
+plot_measure(c(scorecards_yyg,scorecards_cmu,scorecards), "ae", type = "dotplot") + scale_x_log10()
 plot_calibration(scorecards_cmu[[1]], type = "wedge")
 plot_calibration(scorecards_yyg[[1]], type = "wedge")
 plot_calibration(scorecards[[1]], type = "wedge")

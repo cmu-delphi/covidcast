@@ -28,11 +28,11 @@ weighted_interval_score <- function(quantile_forecasts, actual_value) {
                   greater than or equal to 3.")
   num_intervals <- (num_prob - 1) / 2 # 11
   q <- quantile_forecasts$quantiles
+  assert_that(all(!is.na(q)), msg="Quantiles cannot be NA")
+  assert_that(all(diff(q) >= 0), msg="Quantiles must be in increasing order.")
   probs <- quantile_forecasts$probs
   assert_that(all(abs(probs + rev(probs) - 1) < 1e-8),
               msg="Quantile levels need to be symmetric around 0.5 (and include 0.5).")
-  assert_that(diff(q) >= 0 | is.na(diff(q)),
-              msg="Quantiles must be in increasing order.")
   # note: I will treat the median as a 0% predictive interval
   # (alpha = 1) of width 0.  This is equivalent to the expression above
   int <- tibble::tibble(lower = q[1:(num_intervals + 1)],

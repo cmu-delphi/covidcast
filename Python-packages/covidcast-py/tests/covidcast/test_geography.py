@@ -120,32 +120,6 @@ def test_name_to_abbr(test_key, test_kwargs, expected):
 
 @pytest.mark.parametrize("test_key, test_kwargs, expected", [
     (
-            "12",
-            {},
-            ["FL"]
-    ),
-    (
-            "7",
-            {"ties_method": "all"},
-            [{'17000': ['IL'],
-              '27000': ['MN'],
-              '37000': ['NC'],
-              '47000': ['TN'],
-              '72000': ['PR']}]
-
-    ),
-    (
-            ["ABC"],
-            {},
-            [None]
-    ),
-])
-def test_fips_to_abbr(test_key, test_kwargs, expected):
-    assert geography.fips_to_abbr(test_key, **test_kwargs) == expected
-
-
-@pytest.mark.parametrize("test_key, test_kwargs, expected", [
-    (
             "Pittsburgh",
             {},
             ["38300"]
@@ -163,27 +137,6 @@ def test_fips_to_abbr(test_key, test_kwargs, expected):
 ])
 def test_name_to_cbsa(test_key, test_kwargs, expected):
     assert geography.name_to_cbsa(test_key, **test_kwargs) == expected
-
-
-@pytest.mark.parametrize("test_key, test_kwargs, expected", [
-    (
-            "PA",
-            {},
-            ["42000"]
-    ),
-    (
-            "New",
-            {},
-            [None]
-    ),
-    (
-            ["PA", "ca"],
-            {"ignore_case": True},
-            ["42000", "06000"]
-    )
-])
-def test_abbr_to_fips(test_key, test_kwargs, expected):
-    assert geography.abbr_to_fips(test_key, **test_kwargs) == expected
 
 
 @pytest.mark.parametrize("test_key, test_kwargs, expected", [
@@ -364,7 +317,6 @@ def test__lookup(test_args, test_kwargs, expected):
             None
     )
 ])
-
 def test__get_first_tie(test_dict_list, expected_return, warn, expected_warning):
     if warn:
         with pytest.warns(UserWarning) as record:
@@ -372,3 +324,4 @@ def test__get_first_tie(test_dict_list, expected_return, warn, expected_warning)
             assert record[0].message.args[0] == expected_warning
     else:
         assert geography._get_first_tie(test_dict_list) == expected_return
+

@@ -61,7 +61,3 @@ States
 .. autofunction:: covidcast.abbr_to_name
 
 .. autofunction:: covidcast.name_to_abbr
-
-.. autofunction:: covidcast.abbr_to_fips
-
-.. autofunction:: covidcast.fips_to_abbr

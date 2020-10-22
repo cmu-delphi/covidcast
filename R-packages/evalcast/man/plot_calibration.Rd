@@ -2,20 +2,17 @@
 % Please edit documentation in R/plot_calibration.R
 \name{plot_calibration}
 \alias{plot_calibration}
-\title{Plot the calibration curves for a scorecard}
+\title{Plot calibration curves}
 \usage{
 plot_calibration(scorecard, type = c("wedgeplot", "traditional"), alpha = 0.1)
 }
 \arguments{
-\item{scorecard}{a scorecard tibble}
+\item{scorecard}{Single score card.}
 
-\item{type}{one of \code{"wedgeplot"} or \code{"traditional"}.}
+\item{type}{One of "wedgeplot" or "traditional".}
 
-\item{alpha}{the alpha value}
-}
-\value{
-a ggplot object
+\item{alpha}{Parameter defining nominal interval coverage.}
 }
 \description{
-Plot the calibration curves for a scorecard
+Plot calibration curves
 }

@@ -7,9 +7,9 @@
 absolute_error(quantile_forecasts, actual_value)
 }
 \arguments{
-\item{quantile_forecasts}{the quantile forecasts tibble}
+\item{quantile_forecasts}{Tibble of quantile forecasts.}
 
-\item{actual_value}{the actual value}
+\item{actual_value}{Actual value.}
 }
 \description{
 Computes absolute error between the actual value and the median of the

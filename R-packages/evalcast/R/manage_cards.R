@@ -20,8 +20,8 @@ get_and_check_pc_attributes <- function(predictions_cards) {
 #' Return unique value of attribute or throw error
 #'
 #' If TRUE, returns the unique value; if FALSE, throws an error.
-#' @param cards a list of predictions cards or a list of scorecards
-#' @param attribute name of attribute
+#' @param cards List of predictions cards or a list of score cards.
+#' @param attribute Name of attribute.
 #' @importFrom assertthat assert_that
 unique_attr <- function(cards, attribute) {
   attr_list <- all_attr(cards, attribute)
@@ -36,16 +36,15 @@ unique_attr <- function(cards, attribute) {
 #' Given a list of cards, returns a list of the same length giving the values
 #' of that attribute across all cards.
 #'
-#' @param cards a list of predictions cards or a list of scorecards
-#' @param attribute name of attribute
+#' @param cards List of predictions cards or a list of score cards.
+#' @param attribute Name of attribute.
 all_attr <- function(cards, attribute) {
   return(cards %>% map(~ attr(.x, attribute)))
 }
 
-
 #' Remove locations that are not in all cards
 #'
-#' @param cards a list of predictions cards or a list of scorecards
+#' @param cards List of predictions cards or a list of score cards.
 intersect_locations <- function(cards) {
   locations_list <- cards %>% map(~ unique(.x$location))
   intersected_locations <- Reduce(intersect, locations_list)

@@ -2,17 +2,20 @@
 % Please edit documentation in R/plot_width.R
 \name{plot_width}
 \alias{plot_width}
-\title{Plot the interval width}
+\title{Plot interval width}
 \usage{
 plot_width(cards, alpha = 0.2)
 }
 \arguments{
-\item{cards}{a list of different forecasters scorecards (or predictions
-cards), all on the same forecasting task (i.e., same ahead, etc.)}
+\item{cards}{List of different score cards (or predictions cards), all on the
+same forecasting task (i.e., same ahead, etc.).}
 
-\item{alpha}{location of vertical line}
+\item{alpha}{Location of vertical line is 1-alpha.}
 }
 \description{
-Interval width does not depend on the actual outcome, so this function can
-be called on predictions cards in addition to scorecards.
+Plot interval width
+}
+\details{
+Interval width does not depend on the actual outcome, so this
+function can be called on predictions cards in addition to score cards.
 }

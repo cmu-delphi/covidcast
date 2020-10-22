@@ -2,17 +2,18 @@
 % Please edit documentation in R/plot_measure.R
 \name{plot_measure}
 \alias{plot_measure}
-\title{Plot a measure}
+\title{Plot error measure}
 \usage{
 plot_measure(scorecards, err_name, type = "boxplot")
 }
 \arguments{
-\item{scorecards}{a list of scorecards}
+\item{scorecards}{List of different score cards, all on the same forecasting
+task (i.e., same ahead, etc.).}
 
-\item{err_name}{the name of a column appearing in all scorecards}
+\item{err_name}{Name of a column appearing in all score cards.}
 
-\item{type}{the plot type, default boxplot}
+\item{type}{One of "boxplot" or "dotplot".}
 }
 \description{
-Plot a measure
+Plot error measure
 }

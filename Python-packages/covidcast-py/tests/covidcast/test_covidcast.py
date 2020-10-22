@@ -242,7 +242,7 @@ def test__fetch_single_geo(mock_covidcast):
         assert w[0].category is NoDataWarning
 
     # test no epidata yields nothing
-    assert not covidcast._fetch_single_geo('a', None, date(2020, 4, 1), date(2020, 4, 1),
+    assert not covidcast._fetch_single_geo(None, None, date(2020, 4, 1), date(2020, 4, 1),
                                            None, None, None, None, None)
 
     # test end_day < start_day yields nothing

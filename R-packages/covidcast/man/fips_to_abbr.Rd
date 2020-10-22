@@ -6,7 +6,7 @@
 \usage{
 fips_to_abbr(
   code,
-  ignore.case = FALSE,
+  ignore.case = TRUE,
   perl = FALSE,
   fixed = FALSE,
   ties_method = c("first", "all")

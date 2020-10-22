@@ -245,14 +245,14 @@ abbr_to_name = function(abbr, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 #'
 #' @param abbr Vector of state abbreviations to look up.
 #' @param ignore.case,perl,fixed Arguments to pass to `grep()`, with the same
-#'   defaults as in the latter function. Hence, by default, regular expressions
-#'   are used; to match against a fixed string (no regular expressions), set
-#'   `fixed = TRUE`.
+#'   defaults as in the latter function, except for `ignore.case = TRUE`. Hence,
+#'   by default, regular expressions are used; to match against a fixed string
+#'   (no regular expressions), set `fixed = TRUE`.
 #' @param ties_method If "first", then only the first match for each name is
 #'   returned. If "all", then all matches for each name are returned.
 #'
 #' @return A vector of FIPS codes if `ties_method` equals "first", and a list of
-#'   FIPS codes otherwise. 
+#'   FIPS codes otherwise. These FIPS codes have five digits (ending in "000"). 
 #'
 #' @examples
 #' abbr_to_fips("PA")
@@ -263,12 +263,12 @@ abbr_to_name = function(abbr, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 #' 
 #' @seealso [abbr_to_name()]
 #' @export
-abbr_to_fips = function(abbr, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
+abbr_to_fips = function(abbr, ignore.case = TRUE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
   # First get rid of United States from state_census, then convert FIPS codes to
   # appropriate character format 
   df = state_census %>% dplyr::filter(STATE > 0) %>%
-    mutate(STATE = sprintf("%02d000", STATE))
+    dplyr::mutate(STATE = format_state_fips(STATE))
 
   # Now perform the grep-based look up
   grep_lookup(key = abbr, keys = df$ABBR, values = df$STATE,
@@ -284,6 +284,10 @@ abbr_to_fips = function(abbr, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 #'
 #' @param code Vector of FIPS codes to look up; codes can have either two digits
 #'   (as in "42") or five digits (as in "42000"), either is allowed.
+#' @param ignore.case,perl,fixed Arguments to pass to `grep()`, with the same
+#'   defaults as in the latter function, except for `ignore.case = TRUE`. Hence,
+#'   by default, regular expressions are used; to match against a fixed string
+#'   (no regular expressions), set `fixed = TRUE`.
 #' @param ignore.case,perl,fixed Arguments to pass to `grep()`, with the same
 #'   defaults as in the latter function. Hence, by default, regular expressions
 #'   are used; to match against a fixed string (no regular expressions), set
@@ -303,12 +307,12 @@ abbr_to_fips = function(abbr, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 #'
 #' @seealso [abbr_to_fips()]
 #' @export
-fips_to_abbr = function(code, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
+fips_to_abbr = function(code, ignore.case = TRUE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
   # First get rid of United States from state_census, then convert FIPS codes to
   # appropriate character format 
   df = state_census %>% dplyr::filter(STATE > 0) %>%
-    mutate(STATE = sprintf("%02d000", STATE))
+    dplyr::mutate(STATE = format_state_fips(STATE))
 
   # Now perform the grep-based look up
   grep_lookup(key = code, keys = df$STATE, values = df$ABBR,
@@ -338,3 +342,7 @@ grep_lookup = function(key, keys, values, ignore.case = FALSE, perl = FALSE,
   }
   return(sapply(res, `[`, 1))
 }
+
+# Simple convenience functions for FIPS formatting 
+format_fips = function(fips) { sprintf("%05d", fips) }
+format_state_fips = function(fips) { sprintf("%02d000", fips) }

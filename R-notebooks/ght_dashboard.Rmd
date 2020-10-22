@@ -31,9 +31,9 @@ twenty_eight_days_ago = Sys.Date() - 28
 
 # Sampling volume
 df_ght_states = covidcast_signal("ght",
-                                    "raw_search",
-                                    start_day = twenty_eight_days_ago,
-                                    geo_type = "state")
+                                 "raw_search",
+                                 start_day = twenty_eight_days_ago,
+                                 geo_type = "state")
 n_per_day = df_ght_states %>%
   group_by(time_value) %>%
   summarize(n = sum(value))
@@ -56,9 +56,9 @@ This measures how much state coverage we have in the samples (i.e., how many uni
 ```{r, fig.width = 7, fig.height = 5}
 # Sampling coverage
 df_ght_states = covidcast_signal("ght",
-                                    "raw_search",
-                                    start_day = twenty_eight_days_ago,
-                                    geo_type = "state")
+                                 "raw_search",
+                                 start_day = twenty_eight_days_ago,
+                                 geo_type = "state")
 states_per_day = df_ght_states %>%
   group_by(time_value) %>%
   summarize(n = n())
@@ -84,8 +84,8 @@ This visualizes the state coverage -- how frequently does each state show up in 
 ```{r, fig.width = 10, fig.height = 8}
 
 states_present = df_ght_states %>%
-  group_by(geo_value) %>%
-  summarize(value = n())
+group_by(geo_value) %>%
+summarize(value = n())
 
 # These are all required for rendering using covidcast.plot
 states_present$time_value = "2020-04-15"
@@ -93,5 +93,6 @@ states_present$issue = "2020-04-15"
 attributes(states_present)$geo_type = "state"
 class(states_present) = c("covidcast_signal", "data.frame")
 
-plot(states_present, title = "How frequently do states appear in last 28 days?", range=c(0, 28))
+plot(states_present, title = "How frequently do states appear in last 28 days?", range =
+c(0, 28))
 ```

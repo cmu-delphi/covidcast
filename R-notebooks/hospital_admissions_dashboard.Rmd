@@ -1,0 +1,77 @@
+---
+title: "Hospital Admissions dashboard"
+author: "Ben Smith"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(covidcast)
+library(dplyr)
+library(ggplot2)
+
+date_scale <-
+  scale_x_date(date_breaks = "1 week", date_labels = "%b %d")
+
+twenty_eight_days_ago = Sys.Date() - 28
+```
+
+
+### Coverage
+
+This measures how much county coverage we have in the samples (i.e., how many unique counties are present each day), and how it has recently changed over time.
+
+```{r, fig.width = 7, fig.height = 5}
+
+# Sampling coverage
+df_hospital_admissions_counties = covidcast_signal(
+  "hospital-admissions",
+  "smoothed_covid19_from_claims",
+  start_day = twenty_eight_days_ago,
+  geo_type = "county"
+)
+counties_per_day = df_hospital_admissions_counties %>%
+  group_by(time_value) %>%
+  summarize(n = n())
+
+ggplot(counties_per_day, aes(x = time_value, y = n)) +
+  geom_line() + geom_point() + theme_bw() +
+  labs(
+    x = "Date",
+    y = "Number of Counties",
+    title = sprintf(
+      "Unique Counties: %i, mean per day: %i",
+      length(unique(
+        df_hospital_admissions_counties$geo_value
+      )),
+      round(mean(counties_per_day$n))
+    )
+  ) + date_scale
+```
+
+## County Coverage Map
+
+This visualizes the county coverage -- how frequently does each county show up in the data over the last 28 days?
+
+```{r, fig.width = 10, fig.height = 8}
+
+counties_present = df_hospital_admissions_counties %>%
+  group_by(geo_value) %>%
+  summarize(value = n()) %>% ungroup() %>%
+  filter(substr(geo_value, 3, 5) != "000")
+
+# These are all required for rendering using covidcast.plot
+counties_present$time_value = "2020-04-15"
+counties_present$issue = "2020-04-15"
+attributes(counties_present)$geo_type = "county"
+class(counties_present) = c("covidcast_signal", "data.frame")
+
+plot(counties_present, title = "How frequently do counties appear in the last 28 days?", range =
+       c(0, 28))
+```

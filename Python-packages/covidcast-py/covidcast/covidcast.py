@@ -374,13 +374,16 @@ def _fetch_single_geo(data_source: str,
                                      issues=issues_strs, lag=lag)
 
         # Two possible error conditions: no data or too much data.
+        print(day_data)
+        print(data_source)
         if day_data["message"] == "no results":
             warnings.warn(f"No {data_source} {signal} data found on {day_str} "
                           f"for geography '{geo_type}'",
                           NoDataWarning)
         if day_data["message"] not in {"success", "no results"}:
             warnings.warn(f"Problem obtaining {data_source} {signal} data on {day_str} "
-                          f"for geography '{geo_type}': {day_data['message']}")
+                          f"for geography '{geo_type}': {day_data['message']}",
+                          RuntimeWarning)
 
         # In the too-much-data case, we continue to try putting the truncated
         # data in our results. In the no-data case, skip this day entirely,

@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v0.1.1, TODO
+- ``Direction`` is no longer supported and has been removed from the output
+  of :py:func:`covidcast.signal`
+
+
 v0.1.0, October 1, 2020
 -----------------------
 

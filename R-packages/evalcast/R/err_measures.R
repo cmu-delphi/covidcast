@@ -1,16 +1,19 @@
 #' Compute weighted interval score
 #'
-#' For more details, see https://arxiv.org/abs/2005.12881
-#'
-#' Bracher, J., Ray, E. L., Gneiting, T., & Reich, N. G. (2020). Evaluating
-#' epidemic forecasts in an interval format. arXiv preprint arXiv:2005.12881.
-#'
-#' @param quantile_forecasts the tibble of quantile forecasts (23 rows typically)
-#' @param actual_value the actual value for median
-#' @export
+#' Computes weighted interval score (WIS), a well-known quantile-based
+#' approximation of the commonly-used continuous ranked probability score
+#' (CRPS). WIS is a proper score, and can be thought of as a distributional
+#' generalization of absolute error. For example, see [Bracher et
+#' al. (2020)](https://arxiv.org/abs/2005.12881) for discussion in the context
+#' of COVID-19 forecasting.
+#' 
+#' @param quantile_forecasts Tibble of quantile forecasts.
+#' @param actual_value Actual value.
+#' 
 #' @importFrom rlang .data
 #' @importFrom tibble tibble
 #' @importFrom assertthat assert_that
+#' @export
 weighted_interval_score <- function(quantile_forecasts, actual_value) {
   # computes the weighted interval score
   #
@@ -29,7 +32,7 @@ weighted_interval_score <- function(quantile_forecasts, actual_value) {
   num_intervals <- (num_prob - 1) / 2 # 11
   q <- quantile_forecasts$quantiles
   probs <- quantile_forecasts$probs
-  assert_that(all(abs(probs + rev(probs) - 1) < 1e-8),
+  assert_that(all(abs(probs + rev(probs) - 1) < 1e-10),
               msg="Quantile levels must be symmetric around 0.5 (and include 0.5).")
   assert_that(all(diff(q) >= 0, na.rm = TRUE),
               msg="Quantiles must be in increasing order.")
@@ -50,8 +53,10 @@ weighted_interval_score <- function(quantile_forecasts, actual_value) {
 #'
 #' Computes absolute error between the actual value and the median of the
 #' forecast distribution.
-#' @param quantile_forecasts the quantile forecasts tibble
-#' @param actual_value the actual value
+#'
+#' @param quantile_forecasts Tibble of quantile forecasts.
+#' @param actual_value Actual value.
+#' 
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter transmute pull
 #' @importFrom rlang .data
@@ -65,16 +70,17 @@ absolute_error <- function(quantile_forecasts, actual_value) {
 
 #' Generate interval coverage error measure function
 #'
-#' This function returns an error measure function indicating
-#' whether a central interval covers the actual value.  The interval
-#' is defined as the (alpha / 2)-quantile to the (1 - alpha / 2)-quantile.
+#' Returns an error measure function indicating whether a central interval
+#' covers the actual value. The interval is defined as the (alpha/2)-quantile
+#' to the (1 - alpha/2)-quantile.
 #'
-#' @param alpha used to specify the nominal coverage of the interval
-#' @export
+#' @param alpha Parameter defining nominal interval coverage.
+#'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @importFrom dplyr filter pull
 #' @importFrom assertthat assert_that
+#' @export
 interval_coverage <- function(alpha) {
   function(quantile_forecasts, actual_value) {
     assert_that(any(abs(quantile_forecasts$probs - alpha / 2) < 1e-10) &&

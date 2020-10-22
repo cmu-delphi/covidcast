@@ -2,34 +2,39 @@
 #'
 #' For each of the provided forecast dates, runs a forecaster using the data
 #' that would have been available as of that given forecast date. Returns a list
-#' of "predictions cards."  A prediction card is a data frame giving the
-#' forecast distributions of a given forecaster for a given forecast task.  A
-#' forecast task is specified by the forecast date, ahead, response, incidence
-#' period, and geo_type (e.g., 1-epiweek ahead death forecasting at the state
-#' level with predictions made using the information as of Sept. 14).
+#' of "predictions cards", where each list element corresponds to a different
+#' forecast date. A predictions card is a data frame giving the forecast
+#' distributions of a given forecaster for a given forecast task. A forecast
+#' task is specified by the forecast date, ahead, response, incidence period,
+#' and geo type (e.g., 1-epiweek-ahead death forecasting at the state level with
+#' predictions made using the information as of September 14).
 #'
-#' A predictions card has two columns:
-#' \enumerate{
-#' \item location - the FIPS code of the location.  For counties, this is the
-#' same as the geo_value used in the API.  However, for states, the location
-#' and geo_value are different because the API uses state abbreviations instead
-#' of FIPS for geo_value.
-#' \item forecast_distribution - this is a list column... each element itself
-#' contains a tibble with the covidhub quantiles.}
-#' A predictions card has attributes that specify the exact forecasting
-#' task that was being carried out and the name of the forecaster.
-#'
-#' @param forecaster a function that outputs a tibble with columns...
-#' @param name_of_forecaster the name of forecaster
-#' @param forecast_dates a vector of class Date on which forecasts will be made.
-#'   e.g. \code{c(lubridate::ymd("2020-09-07"), lubridate::ymd("2020-09-14"))}
+#' @param forecaster Function that outputs a tibble with columns `ahead`,
+#'   `location`, `probs`, `quantiles`. The `quantiles` column gives the
+#'   predictive quantiles of the forecast distribution for that location and
+#'   ahead.
+#' @param name_of_forecaster String indicating name of the forecaster.
+#' @template forecast_dates-template
 #' @template signals-template
 #' @template incidence_period-template
 #' @template ahead-template
 #' @template geo_type-template
-#' @param geo_values see \link[covidcast]{covidcast_signal} for a description
-#'   of this parameter.
-#' @return a list of predictions cards
+#' @template geo_values-template
+#' 
+#' @return List of "predictions cards", with one element per forecast date. Each
+#'   predictions card is a data frame with two columns:
+#'
+#' \item{location}{FIPS code of the location. For counties, this is the same as
+#'   the `geo_value` used in the COVIDcast API.  However, for states, `location`
+#'   and `geo_value` are slightly different, in that the former is truncated to
+#'   two digits, as in "42" for Pennsylvania (whereas the latter is always five
+#'   digits, as in "42000").}
+#' \item{forecast_distribution}{Tibble containing the predicted quantiles for
+#'   that location.}
+#' 
+#' Each predictions card has attributes that specify the exact forecasting task
+#'   that was being carried out, along with the name of the forecaster.
+#' 
 #' @importFrom assertthat assert_that
 #' @export
 get_predictions <- function(forecaster,
@@ -40,7 +45,7 @@ get_predictions <- function(forecaster,
                             ahead,
                             geo_type,
                             geo_values = "*") {
-  assert_that(is_tibble(signals), msg="signals should be a tibble.")
+  assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
   forecast_dates %>%
     map(~ get_predictions_single_date(
       forecaster = forecaster,
@@ -57,14 +62,6 @@ get_predictions <- function(forecaster,
 
 #' Get predictions cards for a single date
 #'
-#' @template forecaster-template
-#' @template name_of_forecaster-template
-#' @template signals-template
-#' @template forecast_date-template
-#' @template incidence_period-template
-#' @template ahead-template
-#' @template geo_type-template
-#' @template geo_value-template
 #' @importFrom stringr str_glue
 get_predictions_single_date <- function(forecaster,
                                         name_of_forecaster,

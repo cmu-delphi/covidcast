@@ -2,21 +2,23 @@
 % Please edit documentation in R/plot_calibration.R
 \name{plot_coverage}
 \alias{plot_coverage}
-\title{Plot the interval coverage}
+\title{Plot interval coverage}
 \usage{
 plot_coverage(scorecards, alpha = 0.2, type = c("all", "one"))
 }
 \arguments{
-\item{scorecards}{a list of different forecasters scorecards, all on the
-same forecasting task (i.e., same ahead, etc.)}
+\item{scorecards}{List of different score cards, all on the same forecasting
+task (i.e., same ahead, etc.).}
 
-\item{alpha}{location of vertical line if type = "all" is 1-alpha; if
-type="one" then 1-alpha is the nominal coverage probability shown.}
+\item{alpha}{If \code{type = "all"}, then the location of the vertical line is
+1-alpha; if \code{type = "one"} then 1-alpha is the nominal interval coverage
+shown.}
 
-\item{type}{whether to show coverage across all nominal levels
-(in which case averaging is performed across forecast dates and locations)
-or whether to show it for one specific alpha value.}
+\item{type}{One of "all" or "none", indicating whether to show coverage
+across all nominal levels (in which case averaging is performed across
+forecast dates and locations) or whether to show it for one specific alpha
+value.}
 }
 \description{
-Plot the interval coverage
+Plot interval coverage
 }

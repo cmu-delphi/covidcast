@@ -1,11 +1,12 @@
-#' Plot the interval width
+#' Plot interval width
 #'
-#' Interval width does not depend on the actual outcome, so this function can
-#' be called on predictions cards in addition to scorecards.
-#'
-#' @param cards a list of different forecasters scorecards (or predictions
-#'  cards), all on the same forecasting task (i.e., same ahead, etc.)
-#' @param alpha location of vertical line
+#' @param cards List of different score cards (or predictions cards), all on the
+#'   same forecasting task (i.e., same ahead, etc.).
+#' @param alpha Location of vertical line is 1-alpha.
+#' 
+#' @details Interval width does not depend on the actual outcome, so this
+#'   function can be called on predictions cards in addition to score cards.
+#' 
 #' @importFrom rlang .data set_names
 #' @importFrom purrr map
 #' @importFrom dplyr group_by summarize select bind_rows

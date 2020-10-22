@@ -4,10 +4,10 @@
 #' @template incidence_period-template
 #' @template ahead-template
 #'
-#' @export
 #' @importFrom MMWRweek MMWRweek  MMWRweek2Date
 #' @importFrom lubridate wday
 #' @importFrom assertthat assert_that
+#' @export
 get_target_period <- function(forecast_date, incidence_period, ahead) {
   # This function gives the start and end dates of the target period,
   # based on the system described in the COVIDHub rules here:
@@ -21,7 +21,7 @@ get_target_period <- function(forecast_date, incidence_period, ahead) {
   if (incidence_period == "day")
     return(tibble(start = forecast_date + ahead, end = forecast_date + ahead))
   assert_that(incidence_period == "epiweek",
-              msg="Unsupported incidence_period")
+              msg="Unsupported `incidence_period`.")
   # incidence_period: epiweek
   ew_frcst_date <- MMWRweek(forecast_date) # get epiweek of forecast_dates
   sunday_of_ew_frcst_date <- MMWRweek2Date(MMWRyear = ew_frcst_date$MMWRyear,
@@ -40,8 +40,8 @@ get_target_period <- function(forecast_date, incidence_period, ahead) {
          end = sunday_of_ew_frcst_date + (week_ahead + 1) * 7 - 1)
 }
 
-#' Returns data frame with column names
-#' "forecast_date", "location", "target_start", "target_end", "actual"
+#' Get data frame with column names `forecast_date`, `location`, `target_start`,
+#' `target_end`, `actual`
 #'
 #' @template signals-template
 #' @template forecast_dates-template
@@ -51,7 +51,7 @@ get_target_period <- function(forecast_date, incidence_period, ahead) {
 #'
 #' @importFrom rlang .data
 #' @importFrom tibble enframe
-#' @importFrom dplyr mutate
+#' @importFrom dplyr mutate left_join
 #' @importFrom purrr pmap pmap_dfr
 #' @importFrom assertthat assert_that
 get_target_response <- function(signals,
@@ -73,9 +73,10 @@ get_target_response <- function(signals,
   problems <- target_periods %>%
     mutate(not_available = .data$end > Sys.Date())
   assert_that(!any(problems$not_available),
-              msg=paste0("For ahead = ", ahead, " it is too soon to evaluate forecasts on ",
-                  "these forecast dates: ",
-                  paste(forecast_dates[problems$not_available], collapse = ", ")))
+              msg=paste0("When `ahead` is ", ahead, ", it is too soon to evaluate ",
+                         "forecasts on these forecast dates: ",
+                         paste(forecast_dates[problems$not_available], collapse=", "),
+                         "."))
   out <- target_periods %>%
     rename(start_day = .data$start, end_day = .data$end) %>%
     mutate(data_source = response$data_source,
@@ -85,9 +86,10 @@ get_target_response <- function(signals,
 
   problem_date <- out %>% map_lgl(~ nrow(.x) == 0) %>% which()
   assert_that(length(problem_date) == 0,
-              msg=paste0("No data available for the target periods of these forecast
-                  dates: ",
-                  paste(forecast_dates[problem_date], collapse = ", ")))
+              msg=paste0("No data available for the target periods of these ",
+                         "forecast dates: ",
+                         paste(forecast_dates[problem_date], collapse = ", "),
+                         "."))
   names(out) <- forecast_dates
   out <- out %>%
     bind_rows(.id = "forecast_date") %>%

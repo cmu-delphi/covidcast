@@ -7,9 +7,9 @@
 unique_attr(cards, attribute)
 }
 \arguments{
-\item{cards}{a list of predictions cards or a list of scorecards}
+\item{cards}{List of predictions cards or a list of score cards.}
 
-\item{attribute}{name of attribute}
+\item{attribute}{Name of attribute.}
 }
 \description{
 If TRUE, returns the unique value; if FALSE, throws an error.

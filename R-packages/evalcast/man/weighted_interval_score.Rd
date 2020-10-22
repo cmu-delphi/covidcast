@@ -7,14 +7,14 @@
 weighted_interval_score(quantile_forecasts, actual_value)
 }
 \arguments{
-\item{quantile_forecasts}{the tibble of quantile forecasts (23 rows typically)}
+\item{quantile_forecasts}{Tibble of quantile forecasts.}
 
-\item{actual_value}{the actual value for median}
+\item{actual_value}{Actual value.}
 }
 \description{
-For more details, see https://arxiv.org/abs/2005.12881
-}
-\details{
-Bracher, J., Ray, E. L., Gneiting, T., & Reich, N. G. (2020). Evaluating
-epidemic forecasts in an interval format. arXiv preprint arXiv:2005.12881.
+Computes weighted interval score (WIS), a well-known quantile-based
+approximation of the commonly-used continuous ranked probability score
+(CRPS). WIS is a proper score, and can be thought of as a distributional
+generalization of absolute error. For example, see \href{https://arxiv.org/abs/2005.12881}{Bracher et al. (2020)} for discussion in the context
+of COVID-19 forecasting.
 }

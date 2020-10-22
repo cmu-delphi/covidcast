@@ -1,4 +1,3 @@
-#'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @importFrom purrr map_dfr map_dbl

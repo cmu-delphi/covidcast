@@ -1,8 +1,8 @@
 #' Download signal from covidcast
 #'
-#' This is a simple wrapper to \code{\link[covidcast]{covidcast_signal}} that is less verbose.
+#' This is a simple wrapper to [covidcast::covidcast_signal()] that is less verbose.
 #'
-#' @param ... the arguments that are passed to [covidcast::covidcast_signal()]
+#' @param ... Arguments that are passed to [covidcast::covidcast_signal()].
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @importFrom covidcast covidcast_signal

@@ -1,22 +1,21 @@
 #' Baseline forecaster
 #'
-#' This serves as a template for a forecaster.  It's not intended to be a great
-#' forecaster.
+#' The "flat-line" forecaster, which essentially mirrors the baseline in the
+#' [COVID Forecast Hub](https://github.com/reichlab/covid19-forecast-hub). It
+#' augments a flat-line point prediction with a forecast distribution around
+#' this point based on quantiles of symmetrized week-to-week residuals.
 #'
-#' @param df a data frame of the format that is outputted by
-#'   \code{\link[covidcast]{covidcast_signal}}.
-#' @param forecast_date date on which forecasts will be made about some period
-#'   (e.g., epiweek).  For example, if forecast_date is ymd("2020-05-11"),
-#'   incidence_period is "day",  and ahead = 3, then, we'd be making forecasts
-#'   for "2020-05-14".
+#' @param df Data frame of the format that is returned by
+#'   [covidcast::covidcast_signal()].  
+#' @template forecast_date-template
 #' @template signals-template
 #' @template incidence_period-template
 #' @template ahead-template
 #' @template geo_type-template
 #'
-#' @return A data frame with columns "ahead", "location", "probs", "quantiles".
-#'   The quantiles column gives the probs-quantile of the forecast distribution
-#'   for that location and ahead.
+#' @return Data frame with columns `ahead`, `location`, `probs`, `quantiles`.
+#'   The `quantiles` column gives the predictive quantiles of the forecast
+#'   distribution for that location and ahead.
 #'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data

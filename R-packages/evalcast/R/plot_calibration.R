@@ -1,14 +1,14 @@
-#' Plot the calibration curves for a scorecard
+#' Plot calibration curves
 #'
-#' @template scorecard-template
-#' @param type one of `"wedgeplot"` or `"traditional"`.
-#' @param alpha the alpha value
-#' @return a ggplot object
-#' @export
+#' @param scorecard Single score card.
+#' @param type One of "wedgeplot" or "traditional".
+#' @param alpha Parameter defining nominal interval coverage.
+#'
 #' @importFrom rlang .data
 #' @importFrom ggplot2 ggplot aes geom_point geom_abline geom_vline labs scale_colour_discrete scale_alpha_continuous scale_size_continuous guides facet_wrap xlim ylim theme_bw
 #' @importFrom dplyr filter mutate
 #' @importFrom tidyr pivot_longer
+#' @export
 plot_calibration <- function(scorecard,
                              type = c("wedgeplot", "traditional"),
                              alpha = 0.1) {
@@ -63,19 +63,22 @@ plot_calibration <- function(scorecard,
     theme_bw()
 }
 
-#' Plot the interval coverage
+#' Plot interval coverage
 #'
-#' @param scorecards a list of different forecasters scorecards, all on the
-#' same forecasting task (i.e., same ahead, etc.)
-#' @param alpha location of vertical line if type = "all" is 1-alpha; if
-#' type="one" then 1-alpha is the nominal coverage probability shown.
-#' @param type whether to show coverage across all nominal levels
-#' (in which case averaging is performed across forecast dates and locations)
-#' or whether to show it for one specific alpha value.
-#' @export
+#' @param scorecards List of different score cards, all on the same forecasting
+#'   task (i.e., same ahead, etc.).
+#' @param alpha If `type = "all"`, then the location of the vertical line is
+#'   1-alpha; if `type = "one"` then 1-alpha is the nominal interval coverage
+#'   shown.
+#' @param type One of "all" or "none", indicating whether to show coverage
+#'   across all nominal levels (in which case averaging is performed across
+#'   forecast dates and locations) or whether to show it for one specific alpha
+#'   value.
+#' 
 #' @importFrom rlang .data set_names
 #' @importFrom purrr map_dfr
 #' @importFrom ggplot2 ggplot geom_abline geom_vline labs facet_wrap xlim ylim theme_bw
+#' @export 
 plot_coverage <- function(scorecards, alpha = 0.2, type = c("all", "one")) {
   type <- match.arg(type)
   unique_attr(scorecards, "ahead")

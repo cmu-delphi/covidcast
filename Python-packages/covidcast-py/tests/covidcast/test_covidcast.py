@@ -235,7 +235,7 @@ def test__fetch_single_geo(mock_covidcast):
 
     # test warning when a no data response is received
     with warnings.catch_warnings(record=True) as w:
-        covidcast._fetch_single_geo("source", "signal", date(2020, 4, 2), date(2020, 4, 4),
+        covidcast._fetch_single_geo("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
                                     "county", None, None, None, None)
         assert len(w) == 1
         assert str(w[0].message) == "No source signal data found on 20200402 for geography 'county'"

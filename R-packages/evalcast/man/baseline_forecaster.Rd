@@ -10,7 +10,8 @@ baseline_forecaster(
   signals,
   incidence_period = c("epiweek", "day"),
   ahead,
-  geo_type
+  geo_type,
+  symmetrize = TRUE
 )
 }
 \arguments{
@@ -47,6 +48,11 @@ it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahea
 
 \item{geo_type}{String indicating geographical type, one of "county", "dma",
 "hrr", "msa", or "state".}
+
+\item{symmetrize}{Should symmetrized residuals be used, or unsymmetrized
+(raw) residuals? Default is \code{TRUE}, which results in the flat-line point
+prediction. If \code{FALSE}, then point predictions can be increasing or
+decreasing, depending on the historical trend.}
 }
 \value{
 Data frame with columns \code{ahead}, \code{location}, \code{probs}, \code{quantiles}.

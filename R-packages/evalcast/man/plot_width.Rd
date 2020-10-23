@@ -10,7 +10,7 @@ plot_width(cards, alpha = 0.2)
 \item{cards}{List of different score cards (or predictions cards), all on the
 same forecasting task (i.e., same ahead, etc.).}
 
-\item{alpha}{Location of vertical line is 1-alpha.}
+\item{legend.position}{Legend position, the default being "bottom".}
 }
 \description{
 Plot interval width

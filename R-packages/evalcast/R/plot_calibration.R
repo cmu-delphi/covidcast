@@ -2,8 +2,7 @@
 #'
 #' @param scorecard Single score card.
 #' @param type One of "wedgeplot" or "traditional".
-#' @param alpha Parameter defining nominal interval coverage.
-#' @param legend_position Legend position, the default being "bottom".
+#' @param legend.position Legend position, the default being "bottom".
 #'
 #' @importFrom rlang .data
 #' @importFrom ggplot2 ggplot aes geom_point geom_abline geom_vline labs scale_colour_discrete scale_alpha_continuous scale_size_continuous guides facet_wrap xlim ylim theme_bw
@@ -12,7 +11,7 @@
 #' @export
 plot_calibration <- function(scorecard,
                              type = c("wedgeplot", "traditional"),
-                             alpha = 0.1,
+                             alpha = 0.2,
                              legend.position = "bottom") {
   name <- attr(scorecard, "name_of_forecaster")
   ahead <- attr(scorecard, "ahead")
@@ -38,7 +37,6 @@ plot_calibration <- function(scorecard,
       labs(x = "Nominal quantile level",
            y = "Proportion",
            title = sprintf("%s (ahead = %s): Proportion above/below", name, ahead)) +
-      geom_vline(xintercept = c(alpha, 1 - alpha), lty = 2) +
       scale_colour_discrete(name = "") +
       scale_alpha_continuous(range = c(0.5, 1)) +
       scale_size_continuous(range = c(0.5, 1)) +
@@ -56,7 +54,6 @@ plot_calibration <- function(scorecard,
   }
   g +
     facet_wrap(~ forecast_date) +
-    geom_vline(xintercept = c(alpha, 1 - alpha), lty = 2) +
     xlim(0, 1) +
     ylim(0, 1) +
     theme_bw() + theme(legend.position = legend.position)
@@ -66,14 +63,13 @@ plot_calibration <- function(scorecard,
 #'
 #' @param scorecards List of different score cards, all on the same forecasting
 #'   task (i.e., same ahead, etc.).
-#' @param alpha If `type = "all"`, then the location of the vertical line is
-#'   1-alpha; if `type = "one"` then 1-alpha is the nominal interval coverage
+#' @param alpha If `type = "one"`, then 1-alpha is the nominal interval coverage
 #'   shown.
 #' @param type One of "all" or "none", indicating whether to show coverage
 #'   across all nominal levels (in which case averaging is performed across
 #'   forecast dates and locations) or whether to show it for one specific alpha
 #'   value.
-#' @param legend_position Legend position, the default being "bottom".
+#' @param legend.position Legend position, the default being "bottom".
 #' 
 #' @importFrom rlang .data set_names
 #' @importFrom purrr map_dfr
@@ -100,7 +96,6 @@ plot_coverage <- function(scorecards, alpha = 0.2, type = c("all", "one"),
                  color = .data$forecaster)) +
       geom_line() +
       geom_abline(slope = 1, intercept = 0) +
-      geom_vline(xintercept = 1 - alpha, lty = 2) +
       facet_wrap(~ forecast_date) +
       xlim(0, 1) +
       ylim(0, 1) +

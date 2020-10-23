@@ -44,7 +44,6 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-Roxygen: list(markdown = TRUE)
 Remotes: github::cmu-delphi/covidcast/R-packages/covidcast@main
 Imports: 
     assertthat,
@@ -62,7 +61,7 @@ Imports:
     rlang,
     memoise,
     rvest,
-    xml2
+    xml2,
     ggplot2
 Suggests: 
     testthat

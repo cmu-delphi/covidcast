@@ -66,7 +66,6 @@ get_predictions <- function(forecaster,
                             geo_type,
                             geo_values = "*",
                             apply_corrections = NULL) {
-                            geo_values = "*") {
   assert_that(is_tibble(signals), msg="signals should be a tibble.")
   forecast_dates %>%
     map(~ get_predictions_single_date(
@@ -117,10 +116,9 @@ get_predictions_single_date <- function(forecaster,
                       geo_type = geo_type,
                       geo_values = geo_values)
     })
-  if(!is.null(apply_corrections)){
-    corrected <- apply_corrections(df)
-    df$value = corrected$corrected
-  }
+
+  if(!is.null(apply_corrections)) df <- data_corrector(df, apply_corrections)
+
   out <- forecaster(df,
                     forecast_date,
                     signals,
@@ -150,3 +148,4 @@ get_predictions_single_date <- function(forecaster,
   }
   return(pcards)
 }
+

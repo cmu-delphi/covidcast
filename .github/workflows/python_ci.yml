@@ -11,8 +11,10 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Python-packages/covidcast-py/
     strategy:
       matrix:
         python-version: [3.6]
@@ -25,12 +27,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r Python-packages/covidcast-py/requirements.txt
+        pip install -r requirements_ci.txt
     - name: Lint with pylint and mypy
       run: |
-        pylint Python-packages/covidcast-py/covidcast/ --rcfile Python-packages/covidcast-py/.pylintrc
-        mypy Python-packages/covidcast-py/covidcast --config-file Python-packages/covidcast-py/mypy.ini
+        make lint
     - name: Test with pytest
       run: |
-        pytest Python-packages/covidcast-py/ -W ignore::UserWarning
-
+        make test

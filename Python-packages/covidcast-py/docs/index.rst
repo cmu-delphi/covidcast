@@ -23,6 +23,8 @@ all the data sources and signals available through this API.
 The package source code and bug tracker can be found `on GitHub
 <https://github.com/cmu-delphi/covidcast>`_.
 
+To get started, check out :ref:`<getting-started>`.
+
 
 .. note :: **You should consider subscribing** to the `API mailing list
    <https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api>`_ to be
@@ -39,23 +41,6 @@ The package source code and bug tracker can be found `on GitHub
    research product and not warranted for a particular purpose.
 
 
-Installation
-------------
-
-This package is available on PyPI as `covidcast
-<https://pypi.org/project/covidcast/>`_, and can be installed using ``pip`` or
-your favorite Python package manager:
-
-.. code-block:: sh
-
-   pip install covidcast
-
-The package requires `pandas <https://pandas.pydata.org/>`_ and `requests
-<https://requests.readthedocs.io/en/master/>`_; these should be installed
-automatically. It also uses the `delphi-epidata
-<https://pypi.org/project/delphi-epidata/>`_ package to access Delphi's Epidata
-API.
-
 Contents
 --------
 
@@ -64,6 +49,6 @@ Contents
 
    getting_started
    signals
-   plotting
    plot_examples
+   plotting
    changelog

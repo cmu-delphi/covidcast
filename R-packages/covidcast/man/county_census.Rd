@@ -9,7 +9,7 @@ A data frame with 3193 rows, one for each county (along with the 50
 states and DC). There are many columns. The most crucial are:
 
 \describe{
-\item{FIPS}{5-digit county FIPS codes. These are unique identifiers
+\item{FIPS}{Five-digit county FIPS codes. These are unique identifiers
 used, for example, as the \code{geo_values} argument to \code{covidcast_signal()} to
 request data from a specific county.}
 \item{CTYNAME}{County name, to help find counties by name.}

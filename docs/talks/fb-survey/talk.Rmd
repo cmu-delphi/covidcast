@@ -29,8 +29,8 @@ col = function(x, color = "#bb0000") {
 
 The COVIDcast project has many parts: 
     
-1. Unique relationships with partners in tech and healthcare granting us to access to data on pandemic activity
-2. Code and infrastructure to build `r col("COVID-19 indicators")`, continuously-updated and geographically comprehensive
+1. Unique relationships with partners in tech and healthcare granting us access to data on pandemic activity
+2. Code and infrastructure to build `r col("COVID-19 indicators")`, continuously-updated and geographically-comprehensive
 3. A historical database of all indicators, including `r col("revision tracking")`, with over 500 million observations
 4. A [public API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html) serving new indicators daily (and [R and Python packages](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_clients.html) for client support)
 5. [Interactive maps and graphics](https://covidcast.cmu.edu) to display our indicators

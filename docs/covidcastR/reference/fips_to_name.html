@@ -142,21 +142,21 @@ respectively; these functions are based on <code><a href='https://rdrr.io/r/base
 regular expressions.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>fips_to_name</span>(
-  <span class='no'>code</span>,
-  <span class='kw'>ignore.case</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>perl</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>fixed</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>ties_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first"</span>, <span class='st'>"all"</span>)
-)
+    <pre class="usage"><span class='fu'>fips_to_name</span><span class='op'>(</span>
+  <span class='va'>code</span>,
+  ignore.case <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  perl <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  fixed <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  ties_method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"first"</span>, <span class='st'>"all"</span><span class='op'>)</span>
+<span class='op'>)</span>
 
-<span class='fu'>cbsa_to_name</span>(
-  <span class='no'>code</span>,
-  <span class='kw'>ignore.case</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>perl</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>fixed</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>ties_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first"</span>, <span class='st'>"all"</span>)
-)</pre>
+<span class='fu'>cbsa_to_name</span><span class='op'>(</span>
+  <span class='va'>code</span>,
+  ignore.case <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  perl <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  fixed <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  ties_method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"first"</span>, <span class='st'>"all"</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -188,9 +188,12 @@ list of FIPS or CBSA codes otherwise.</p>
     <div class='dont-index'><p><code><a href='name_to_fips.html'>name_to_fips()</a></code>, <code><a href='name_to_fips.html'>name_to_cbsa()</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>fips_to_name</span>(<span class='st'>"42003"</span>)</div><div class='output co'>#&gt;              42003 
-#&gt; "Allegheny County" </div><div class='input'><span class='fu'>cbsa_to_name</span>(<span class='st'>"38300"</span>)</div><div class='output co'>#&gt;            38300 
-#&gt; "Pittsburgh, PA" </div><div class='input'><span class='fu'>fips_to_name</span>(<span class='st'>"4200"</span>, <span class='kw'>ties_method</span> <span class='kw'>=</span> <span class='st'>"all"</span>)</div><div class='output co'>#&gt; [[1]]
+    <pre class="examples"><div class='input'><span class='fu'>fips_to_name</span><span class='op'>(</span><span class='st'>"42003"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;              42003 
+#&gt; "Allegheny County" </div><div class='input'><span class='fu'>cbsa_to_name</span><span class='op'>(</span><span class='st'>"38300"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;            38300 
+#&gt; "Pittsburgh, PA" </div><div class='input'><span class='fu'>fips_to_name</span><span class='op'>(</span><span class='st'>"4200"</span>, ties_method <span class='op'>=</span> <span class='st'>"all"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [[1]]
 #&gt;              42000              42001              42003              42005 
 #&gt;     "Pennsylvania"     "Adams County" "Allegheny County" "Armstrong County" 
 #&gt;              42007              42009 
@@ -198,7 +201,8 @@ list of FIPS or CBSA codes otherwise.</p>
 #&gt; </div><div class='input'>
 <span class='co'># Count the number of counties, grouped by first two digits of FIPS code</span>
 <span class='co'># (which identify states):</span>
-<span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span>(<span class='fu'>fips_to_name</span>(<span class='fu'><a href='https://rdrr.io/r/base/sprintf.html'>sprintf</a></span>(<span class='st'>"%02d"</span>, <span class='fl'>1</span>:<span class='fl'>99</span>), <span class='kw'>ties</span> <span class='kw'>=</span> <span class='st'>"all"</span>), <span class='no'>length</span>))</div><div class='output co'>#&gt;  [1] 462 252 286 203 337 228 252 220 245 405 325 207 335  92 178 135 251 154 216
+<span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='fu'>fips_to_name</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/sprintf.html'>sprintf</a></span><span class='op'>(</span><span class='st'>"%02d"</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>99</span><span class='op'>)</span>, ties <span class='op'>=</span> <span class='st'>"all"</span><span class='op'>)</span>, <span class='va'>length</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  [1] 462 252 286 203 337 228 252 220 245 405 325 207 335  92 178 135 251 154 216
 #&gt; [20] 311 269  93 107  36  98  95 171  95 193 191 219  73  93  27 103  69 168  59
 #&gt; [39] 154 207 107  73  65  11 112  72 158 255  92 229 238   1  97  57 128  24  57
 #&gt; [58]   2  57 276 126   1  55   2  54   1  54   4  53 210 231   3  53   1  53   1
@@ -220,7 +224,7 @@ list of FIPS or CBSA codes otherwise.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

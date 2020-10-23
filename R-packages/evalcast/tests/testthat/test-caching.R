@@ -1,7 +1,7 @@
 if(memoise::is.memoised(download_signal)) memoise::forget(download_signal)
 
-t1 = system.time(
-  suppressMessages(
+t1 <- system.time(
+  out1 <- suppressMessages(
     get_predictions(
       baseline_forecaster, "baby",
       tibble::tibble(
@@ -13,9 +13,9 @@ t1 = system.time(
   )
 )
 
-t2 = system.time(
+t2 <- system.time(
   suppressMessages(
-    get_predictions(
+    out2 <- get_predictions(
       baseline_forecaster, "baby",
       tibble::tibble(
         data_source=c("jhu-csse", "usa-facts"),
@@ -26,6 +26,15 @@ t2 = system.time(
   )
 )
 
+test_that("original and subsequent predictions return prediction cards", {
+  # when prediction cards are given an S3 class, we can test those instead
+  expect_identical(attributes(out1[[1]]), attributes(out2[[2]]))
+})
+
+test_that("predictions are the same for original and cached versions", {
+  expect_equal(out1[[1]]$forecast_distribution[[1]],
+               out2[[1]]$forecast_distribution[[1]])
+})
 
 test_that("we are caching COVIDCAST calls", {
   expect_true(t1[1] > t2[1])

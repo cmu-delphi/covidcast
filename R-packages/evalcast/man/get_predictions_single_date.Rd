@@ -24,7 +24,7 @@ get_predictions_single_date(
 \item{signals}{a tibble with columns "data_source" and "signal" that
 specifies which variables from the covidcast API will be used by
 my_forecaster. The first row of signals is taken to be the response.   If
-using incidence_period "epiweek", thre response should be something for
+using incidence_period "epiweek", the response should be something for
 which summing daily values over an epiweek makes sense (e.g., counts or
 proportions but not log(counts) or log(proportions)).  Available data
 sources and signals are documented in the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{COVIDcast signal documentation}
@@ -47,6 +47,11 @@ api ("county", "dma", "hrr", "msa", "state")}
 
 \item{geo_values}{a vector or list of locations whose data will be passed to
 my_forecaster. The default, "*", fetches all that is available in API.}
+
+\item{apply_corrections}{an optional function that applies data corrections
+to the signals. Input is a data frame as returned by \code{download_signals()}.
+The returned object must be the same but with additional variables.
+Corrected values must exist in the column \code{corrected}.}
 }
 \description{
 Get predictions cards for a single date

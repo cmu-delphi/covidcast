@@ -2,7 +2,7 @@ data_corrector <- function(df, apply_corrections) {
   corrected <- apply_corrections(df)
   assertthat::assert_that(
     c("location","signal","time_value","issue", "data_source","corrected") %in%
-      names(df),
+      names(corrected),
     msg = "requested corrections drops some required columns"
   )
   corrected <- dplyr::select(corrected,

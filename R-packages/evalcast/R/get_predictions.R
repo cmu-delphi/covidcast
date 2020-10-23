@@ -29,10 +29,7 @@
 #' @template geo_type-template
 #' @param geo_values see \link[covidcast]{covidcast_signal} for a description
 #'   of this parameter.
-#' @param apply_corrections an optional function that applies data corrections
-#'   to the signals. Input is a data frame as returned by `download_signals()`.
-#'   The returned object must be the same but with additional variables.
-#'   Corrected values must exist in the column `corrected`.
+#' @template apply_corrections-template
 #' @return a list of predictions cards
 #'
 #' @examples
@@ -92,6 +89,7 @@ get_predictions <- function(forecaster,
 #' @template ahead-template
 #' @template geo_type-template
 #' @template geo_value-template
+#' @template apply_corrections-template
 #' @importFrom stringr str_glue
 get_predictions_single_date <- function(forecaster,
                                         name_of_forecaster,

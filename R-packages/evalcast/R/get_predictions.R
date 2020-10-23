@@ -20,6 +20,7 @@
 #' @template ahead-template
 #' @template geo_type-template
 #' @template geo_values-template
+#' @param ... Additional arguments to be passed to `forecaster()`.
 #' 
 #' @return List of "predictions cards", with one element per forecast date. Each
 #'   predictions card is a data frame with two columns:
@@ -44,19 +45,22 @@ get_predictions <- function(forecaster,
                             incidence_period,
                             ahead,
                             geo_type,
-                            geo_values = "*") {
+                            geo_values = "*",
+                            ...) {
   assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
+  params <- list(...)
   forecast_dates %>%
-    map(~ get_predictions_single_date(
-      forecaster = forecaster,
-      name_of_forecaster = name_of_forecaster,
-      signals = signals,
-      forecast_date = .x,
-      incidence_period = incidence_period,
-      ahead = ahead,
-      geo_type = geo_type,
-      geo_values = geo_values
-    )) %>%
+    map(~ do.call(
+          get_predictions_single_date,
+          c(list(forecaster = forecaster,
+                 name_of_forecaster = name_of_forecaster,
+                 signals = signals,
+                 forecast_date = .x,
+                 incidence_period = incidence_period,
+                 ahead = ahead,
+                 geo_type = geo_type,
+                 geo_values = geo_values),
+            params))) %>%
     flatten()
 }
 
@@ -70,7 +74,8 @@ get_predictions_single_date <- function(forecaster,
                                         incidence_period,
                                         ahead,
                                         geo_type,
-                                        geo_values) {
+                                        geo_values,
+                                        ...) {
   if (length(geo_values) > 1) geo_values <- list(geo_values)
   forecast_date <- lubridate::ymd(forecast_date)
   # get data that would have been available as of forecast_date
@@ -90,7 +95,8 @@ get_predictions_single_date <- function(forecaster,
                     signals,
                     incidence_period,
                     ahead,
-                    geo_type)
+                    geo_type,
+                    ...)
   # make a predictions card for each ahead
   pcards <- out %>%
     group_by(location, ahead) %>%
@@ -109,7 +115,8 @@ get_predictions_single_date <- function(forecaster,
            ahead = ahead[i],
            geo_type = geo_type,
            geo_values = geo_values,
-           from_covidhub = FALSE)
+           from_covidhub = FALSE,
+           ...)
     )
   }
   return(pcards)

@@ -12,7 +12,8 @@ get_predictions_single_date(
   incidence_period,
   ahead,
   geo_type,
-  geo_values
+  geo_values,
+  ...
 )
 }
 \description{

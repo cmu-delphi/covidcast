@@ -4,7 +4,7 @@ t1 = system.time(
   suppressMessages(
     get_predictions(
       baseline_forecaster, "baby",
-      tibble(
+      tibble::tibble(
         data_source=c("jhu-csse", "usa-facts"),
         signal = c("deaths_incidence_num","confirmed_incidence_num"),
         start_day=lubridate::ymd("2020-09-15")),
@@ -17,7 +17,7 @@ t2 = system.time(
   suppressMessages(
     get_predictions(
       baseline_forecaster, "baby",
-      tibble(
+      tibble::tibble(
         data_source=c("jhu-csse", "usa-facts"),
         signal = c("deaths_incidence_num","confirmed_incidence_num"),
         start_day=lubridate::ymd("2020-09-15")),

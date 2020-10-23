@@ -80,18 +80,18 @@ task that was being carried out and the name of the forecaster.
 }
 \examples{
 baby_predictions = get_predictions(
-  baseline, "baby",
-  tibble(
+  baseline_forecaster, "baby",
+  tibble::tibble(
     data_source=c("jhu-csse", "usa-facts"),
     signal = c("deaths_incidence_num","confirmed_incidence_num"),
     start_day=lubridate::ymd("2020-09-15")),
   lubridate::ymd("2020-10-01"),"epiweek", 1L, "state", "mi")
 
-baby_correct <- function(x) x \%>\% dplyr::mutate(corrected = 2*value)
+baby_correct <- function(x) dplyr::mutate(x, corrected = 2*value)
 
 baby_corrected = get_predictions(
-  baseline, "baby",
-  tibble(
+  baseline_forecaster, "baby",
+  tibble::tibble(
     data_source=c("jhu-csse", "usa-facts"),
     signal = c("deaths_incidence_num","confirmed_incidence_num"),
     start_day=lubridate::ymd("2020-09-15")),

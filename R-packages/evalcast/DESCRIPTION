@@ -57,7 +57,9 @@ Imports:
     DBI,
     RSQLite,
     rlang,
-    memoise
+    memoise,
+    rvest,
+    xml2
 Suggests: 
     testthat
 Depends: 

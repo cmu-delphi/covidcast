@@ -85,6 +85,9 @@ get_covidhub_predictions <- function(covid_hub_forecaster_name,
 #' the COVID Hub https://github.com/reichlab/covid19-forecast-hub/
 #'
 #' @param covid_hub_forecaster_name the name of a forecaster on the COVID Hub.
+#'
+#' @importFrom xml2 read_html
+#' @importFrom rvest html_text
 #' @export
 get_forecast_dates <- function(covid_hub_forecaster_name) {
   url <- "https://github.com/reichlab/covid19-forecast-hub/tree/master/data-processed/"

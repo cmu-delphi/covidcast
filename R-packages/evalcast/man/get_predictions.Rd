@@ -12,7 +12,8 @@ get_predictions(
   incidence_period,
   ahead,
   geo_type,
-  geo_values = "*"
+  geo_values = "*",
+  ...
 )
 }
 \arguments{
@@ -55,6 +56,8 @@ it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahea
 
 \item{geo_values}{Vector or list of locations whose data will be passed to
 \code{forecaster}. The default, "*", fetches all that is available in the API.}
+
+\item{...}{Additional arguments to be passed to \code{forecaster()}.}
 }
 \value{
 List of "predictions cards", with one element per forecast date. Each

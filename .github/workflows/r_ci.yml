@@ -39,5 +39,5 @@ jobs:
         shell: Rscript {0}
       - name: Check
         run: |
-          rcmdcheck::rcmdcheck(args = c("--no-manual, --no-vignettes"), error_on = "error")
+          rcmdcheck::rcmdcheck(args = c("--no-manual, --no-vignettes, --no-build-vignettes, --ignore-vignette"), error_on = "error")
         shell: Rscript {0}

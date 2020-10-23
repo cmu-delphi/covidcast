@@ -2,7 +2,7 @@
 #'
 #' @param cards List of different score cards (or predictions cards), all on the
 #'   same forecasting task (i.e., same ahead, etc.).
-#' @param alpha Location of vertical line is 1-alpha.
+#' @param legend.position Legend position, the default being "bottom".
 #' 
 #' @details Interval width does not depend on the actual outcome, so this
 #'   function can be called on predictions cards in addition to score cards.
@@ -40,9 +40,8 @@ plot_width <- function(cards, alpha = 0.2) {
                color = .data$forecaster,
                lty = summary)) +
     geom_line() +
-    geom_vline(xintercept = 1 - alpha, lty = 2) +
     facet_wrap(~ forecast_date) +
-    labs(x = "Nominal coverage", y = "Interval Width")
+    labs(x = "Nominal coverage", y = "Interval width")
 }
 
 #' @importFrom rlang .data

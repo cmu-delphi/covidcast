@@ -15,8 +15,7 @@ plot_coverage(
 \item{scorecards}{List of different score cards, all on the same forecasting
 task (i.e., same ahead, etc.).}
 
-\item{alpha}{If \code{type = "all"}, then the location of the vertical line is
-1-alpha; if \code{type = "one"} then 1-alpha is the nominal interval coverage
+\item{alpha}{If \code{type = "one"}, then 1-alpha is the nominal interval coverage
 shown.}
 
 \item{type}{One of "all" or "none", indicating whether to show coverage
@@ -24,7 +23,7 @@ across all nominal levels (in which case averaging is performed across
 forecast dates and locations) or whether to show it for one specific alpha
 value.}
 
-\item{legend_position}{Legend position, the default being "bottom".}
+\item{legend.position}{Legend position, the default being "bottom".}
 }
 \description{
 Plot interval coverage

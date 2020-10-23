@@ -13,6 +13,11 @@ t1 <- system.time(
   )
 )
 
+test_that("we memoised the download_signals function", {
+  expect_true(memoise::is.memoised(download_signals))
+})
+
+
 t2 <- system.time(
   suppressMessages(
     out2 <- get_predictions(

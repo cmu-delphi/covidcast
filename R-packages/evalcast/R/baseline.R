@@ -12,6 +12,10 @@
 #' @template incidence_period-template
 #' @template ahead-template
 #' @template geo_type-template
+#' @param symmetrize Should symmetrized residuals be used, or unsymmetrized
+#'   (raw) residuals? Default is `TRUE`, which results in the flat-line point
+#'   prediction. If `FALSE`, then point predictions can be increasing or
+#'   decreasing, depending on the historical trend.
 #'
 #' @return Data frame with columns `ahead`, `location`, `probs`, `quantiles`.
 #'   The `quantiles` column gives the predictive quantiles of the forecast
@@ -30,14 +34,15 @@ baseline_forecaster <- function(df,
                                 signals,
                                 incidence_period = c("epiweek", "day"),
                                 ahead,
-                                geo_type) {
+                                geo_type,
+                                symmetrize = TRUE) {
   incidence_period <- match.arg(incidence_period)
   forecast_date <- lubridate::ymd(forecast_date)
   target_period <- get_target_period(forecast_date, incidence_period, ahead)
   incidence_length <- ifelse(incidence_period == "epiweek", 7, 1)
-
   covidhub_probs <- c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99)
   dat <- list()
+  s <- ifelse(symmetrize, -1, 1)
   for (a in ahead) {
     # recall the first row of signals is the response
     dat[[a]] <- df %>%
@@ -54,7 +59,7 @@ baseline_forecaster <- function(df,
         dplyr::group_modify(~ {
             point <- .x$summed[.x$time_value == max(.x$time_value)]
             tibble::tibble(probs = covidhub_probs,
-                           quantiles = point + stats::quantile(.x$resid,
+                           quantiles = point + stats::quantile(c(.x$resid, s * .x$resid),
                                                                probs = covidhub_probs,
                                                                na.rm = TRUE))
         }, .keep = TRUE) %>%

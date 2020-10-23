@@ -1,7 +1,7 @@
 Package: evalcast
 Type: Package
-Title: Evaluating COVID-19 Forecasters Built on covidcast
-Version: 0.1.0
+Title: Evaluating COVID-19 Forecasters Built on Covidcast
+Version: 0.1.1
 Authors@R: 
   c(
     person(given = "Jacob",
@@ -14,6 +14,9 @@ Authors@R:
     person(given = "Balasubramanian",
            family = "Narasimhan",
            role = "aut"),
+    person(given = "Sarah",
+           family = "Colquhoun",
+           role = "ctb"),
     person(given = "Samyak",
            family = "Rajanala",
            role = "ctb"),
@@ -39,10 +42,12 @@ Description: This package is a tool for those developing probabilistic COVID-19
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 Remotes: github::cmu-delphi/covidcast/R-packages/covidcast@main
 Imports: 
+    assertthat,
     covidcast,
     dplyr,
     magrittr,
@@ -54,12 +59,11 @@ Imports:
     readr,
     MMWRweek,
     zoo,
-    DBI,
-    RSQLite,
     rlang,
     memoise,
     rvest,
     xml2
+    ggplot2
 Suggests: 
     testthat
 Depends: 

@@ -55,6 +55,7 @@
 #'   lubridate::ymd("2020-10-01"),"epiweek", 1L, "state", "mi",
 #'   apply_corrections = baby_correct)
 #'
+#' @importFrom assertthat assert_that
 #' @export
 get_predictions <- function(forecaster,
                             name_of_forecaster,
@@ -65,7 +66,8 @@ get_predictions <- function(forecaster,
                             geo_type,
                             geo_values = "*",
                             apply_corrections = NULL) {
-  if (!is_tibble(signals)) stop("signals should be a tibble.")
+                            geo_values = "*") {
+  assert_that(is_tibble(signals), msg="signals should be a tibble.")
   forecast_dates %>%
     map(~ get_predictions_single_date(
       forecaster = forecaster,
@@ -82,6 +84,15 @@ get_predictions <- function(forecaster,
 }
 
 #' Get predictions cards for a single date
+#'
+#' @template forecaster-template
+#' @template name_of_forecaster-template
+#' @template signals-template
+#' @template forecast_date-template
+#' @template incidence_period-template
+#' @template ahead-template
+#' @template geo_type-template
+#' @template geo_value-template
 #' @importFrom stringr str_glue
 get_predictions_single_date <- function(forecaster,
                                         name_of_forecaster,

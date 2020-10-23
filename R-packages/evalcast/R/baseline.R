@@ -18,14 +18,21 @@
 #'   The quantiles column gives the probs-quantile of the forecast distribution
 #'   for that location and ahead.
 #'
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#' @importFrom lubridate ymd
+#' @importFrom dplyr filter group_by arrange mutate select group_by group_modify ungroup bind_rows lag
+#' @importFrom tibble tibble
+#' @importFrom zoo rollsum
+#' @importFrom stats quantile
 #' @export
 baseline_forecaster <- function(df,
                                 forecast_date,
                                 signals,
-                                incidence_period,
+                                incidence_period = c("epiweek", "day"),
                                 ahead,
                                 geo_type) {
-  stopifnot(incidence_period %in% c("epiweek", "day"))
+  incidence_period <- match.arg(incidence_period)
   forecast_date <- lubridate::ymd(forecast_date)
   target_period <- get_target_period(forecast_date, incidence_period, ahead)
   incidence_length <- ifelse(incidence_period == "epiweek", 7, 1)
@@ -35,28 +42,28 @@ baseline_forecaster <- function(df,
   for (a in ahead) {
     # recall the first row of signals is the response
     dat[[a]] <- df %>%
-      filter(data_source == signals$data_source[1],
-             signal == signals$signal[1]) %>%
-      group_by(location) %>%
-      arrange(time_value) %>%
-      mutate(summed = zoo::rollsum(value,
-                                   k = incidence_length,
-                                   fill = NA,
-                                   align = "right"),
-             resid = summed - lag(summed, n = incidence_length * a)) %>%
-      select(location, time_value, value, summed, resid) %>%
-      group_modify(~ {
-        point <- .x$summed[.x$time_value == max(.x$time_value)]
-        tibble(probs = covidhub_probs,
-               quantiles = point + quantile(.x$resid,
-                                            probs = covidhub_probs,
-                                            na.rm = TRUE))
-      },
-      .keep = TRUE) %>%
-      ungroup() %>%
-      mutate(quantiles = pmax(quantiles, 0))
+        dplyr::filter(.data$data_source == signals$data_source[1],
+                      .data$signal == signals$signal[1]) %>%
+        dplyr::group_by(.data$location) %>%
+        dplyr::arrange(.data$time_value) %>%
+        dplyr::mutate(summed = zoo::rollsum(.data$value,
+                                            k = incidence_length,
+                                            fill = NA,
+                                            align = "right"),
+                      resid = .data$summed - dplyr::lag(.data$summed, n = incidence_length * a)) %>%
+        dplyr::select(.data$location, .data$time_value, .data$value, .data$summed, .data$resid) %>%
+        dplyr::group_modify(~ {
+            point <- .x$summed[.x$time_value == max(.x$time_value)]
+            tibble::tibble(probs = covidhub_probs,
+                           quantiles = point + stats::quantile(.x$resid,
+                                                               probs = covidhub_probs,
+                                                               na.rm = TRUE))
+        }, .keep = TRUE) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(quantiles = pmax(.data$quantiles, 0))
   }
   dat <- dat[ahead]
   names(dat) <- as.character(ahead)
-  bind_rows(dat, .id = "ahead") %>% mutate(ahead = as.numeric(ahead))
+  dplyr::bind_rows(dat, .id = "ahead") %>%
+      dplyr::mutate(ahead = as.integer(ahead))
 }

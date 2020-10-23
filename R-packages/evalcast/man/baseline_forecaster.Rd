@@ -8,7 +8,7 @@ baseline_forecaster(
   df,
   forecast_date,
   signals,
-  incidence_period,
+  incidence_period = c("epiweek", "day"),
   ahead,
   geo_type
 )

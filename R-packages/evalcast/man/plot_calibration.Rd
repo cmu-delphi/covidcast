@@ -4,7 +4,12 @@
 \alias{plot_calibration}
 \title{Plot calibration curves}
 \usage{
-plot_calibration(scorecard, type = c("wedgeplot", "traditional"), alpha = 0.1)
+plot_calibration(
+  scorecard,
+  type = c("wedgeplot", "traditional"),
+  alpha = 0.1,
+  legend.position = "bottom"
+)
 }
 \arguments{
 \item{scorecard}{Single score card.}
@@ -12,6 +17,8 @@ plot_calibration(scorecard, type = c("wedgeplot", "traditional"), alpha = 0.1)
 \item{type}{One of "wedgeplot" or "traditional".}
 
 \item{alpha}{Parameter defining nominal interval coverage.}
+
+\item{legend_position}{Legend position, the default being "bottom".}
 }
 \description{
 Plot calibration curves

@@ -32,7 +32,8 @@ plot_measure <- function(scorecards, err_name, type = "boxplot") {
       ggplot(aes(x = .data$forecaster, y = .data[[err_name]])) +
       geom_boxplot() +
       facet_wrap(~ forecast_date) +
-      scale_y_log10()
+      scale_y_log10() + 
+      theme_bw() 
   }
   else if (type == "dotplot") {
     if (geo_type == "state") {
@@ -59,6 +60,7 @@ plot_measure <- function(scorecards, err_name, type = "boxplot") {
                  y = .data$location,
                  color = .data$forecaster,
                  pch = .data$forecast_date)) +
-      geom_point()
+      geom_point() +
+      theme_bw()
   }
 }

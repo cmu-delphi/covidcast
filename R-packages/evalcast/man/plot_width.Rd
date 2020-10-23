@@ -4,11 +4,20 @@
 \alias{plot_width}
 \title{Plot interval width}
 \usage{
-plot_width(cards, alpha = 0.2)
+plot_width(
+  cards,
+  alpha = 0.2,
+  levels = c(0.5, 0.7, 0.9),
+  legend.position = "bottom"
+)
 }
 \arguments{
 \item{cards}{List of different score cards (or predictions cards), all on the
 same forecasting task (i.e., same ahead, etc.).}
+
+\item{levels}{Quantile levels for the summary of interval width, to be
+plotted. For example, \code{levels = c(0.5, 0.7, 0.9)}, the default, plots the
+median, 70\% and 90\% quantiles of interval widths.}
 
 \item{legend.position}{Legend position, the default being "bottom".}
 }

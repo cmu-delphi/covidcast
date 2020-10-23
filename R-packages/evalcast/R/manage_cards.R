@@ -25,6 +25,14 @@ get_and_check_pc_attributes <- function(predictions_cards) {
 #' @importFrom assertthat assert_that
 unique_attr <- function(cards, attribute) {
   attr_list <- all_attr(cards, attribute)
+  if (attribute == "signals")
+    attr_list <- attr_list %>%
+      map(~ .x[1, names(.x) != "start_day"]) # RJT: I added this part. I don't
+  # think start dates need to match here. Now that I'm allowing start_day to be 
+  # a function, it can depend on the forecast_date, so the next assertion would
+  # (unintentionally) fail in that case. Note: this if statement on "signals" is
+  # a bit of a hack and there might be a cleaner way to do it but it works for
+  # now.  
   assert_that(length(unique(attr_list)) <= 1,
               msg=sprintf("These cards do not all have the same %s.",
                           attribute))

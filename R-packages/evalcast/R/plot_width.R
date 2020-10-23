@@ -15,6 +15,7 @@
 #' @importFrom stats median
 #' @export
 plot_width <- function(cards, alpha = 0.2) {
+  # make sure scorecards are comparable:
   unique_attr(cards, "ahead")
   unique_attr(cards, "geo_type")
   unique_attr(cards, "incidence_period")

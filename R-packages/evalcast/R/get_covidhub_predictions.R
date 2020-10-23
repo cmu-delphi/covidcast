@@ -63,14 +63,14 @@ get_covidhub_predictions <- function(covid_hub_forecaster_name,
         attributes(.x) <- c(
           attributes(.x),
           list(forecaster = NA,
-                                 name_of_forecaster = covid_hub_forecaster_name,
-                                 signals = signals,
-                                 forecast_date = lubridate::ymd(forecast_date),
-                                 incidence_period = "epiweek",
-                                 ahead = as.numeric(.y$ahead),
-                                 geo_type = .y$geo_type,
-                                 geo_values = NA,
-                                 from_covidhub = TRUE)
+               name_of_forecaster = covid_hub_forecaster_name,
+               signals = signals,
+               forecast_date = lubridate::ymd(forecast_date),
+               incidence_period = "epiweek",
+               ahead = as.numeric(.y$ahead),
+               geo_type = .y$geo_type,
+               geo_values = NA,
+               from_covidhub = TRUE)
         )
 
         return(.x)

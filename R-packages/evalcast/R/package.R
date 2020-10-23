@@ -14,4 +14,9 @@
 #' @import tidyr
 #' @import readr
 #' @import stringr
+#' @importFrom memoise memoise
 NULL
+
+.onLoad <- function(libname, pkgname){
+  download_signal <<- memoise::memoise(download_signal)
+}

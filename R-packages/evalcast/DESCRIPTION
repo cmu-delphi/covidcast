@@ -56,7 +56,8 @@ Imports:
     zoo,
     DBI,
     RSQLite,
-    rlang
+    rlang,
+    memoise
 Suggests: 
     testthat
 Depends: 

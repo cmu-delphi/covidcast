@@ -29,7 +29,32 @@
 #' @template geo_type-template
 #' @param geo_values see \link[covidcast]{covidcast_signal} for a description
 #'   of this parameter.
+#' @param apply_corrections an optional function that applies data corrections
+#'   to the signals. Input is a data frame as returned by `download_signals()`.
+#'   The returned object must be the same but with additional variables.
+#'   Corrected values must exist in the column `corrected`.
 #' @return a list of predictions cards
+#'
+#' @examples
+#' baby_predictions = get_predictions(
+#'   baseline, "baby",
+#'   tibble(
+#'     data_source=c("jhu-csse", "usa-facts"),
+#'     signal = c("deaths_incidence_num","confirmed_incidence_num"),
+#'     start_day=lubridate::ymd("2020-09-15")),
+#'   lubridate::ymd("2020-10-01"),"epiweek", 1L, "state", "mi")
+#'
+#' baby_correct <- function(x) x %>% dplyr::mutate(corrected = 2*value)
+#'
+#' baby_corrected = get_predictions(
+#'   baseline, "baby",
+#'   tibble(
+#'     data_source=c("jhu-csse", "usa-facts"),
+#'     signal = c("deaths_incidence_num","confirmed_incidence_num"),
+#'     start_day=lubridate::ymd("2020-09-15")),
+#'   lubridate::ymd("2020-10-01"),"epiweek", 1L, "state", "mi",
+#'   apply_corrections = baby_correct)
+#'
 #' @export
 get_predictions <- function(forecaster,
                             name_of_forecaster,
@@ -38,7 +63,8 @@ get_predictions <- function(forecaster,
                             incidence_period,
                             ahead,
                             geo_type,
-                            geo_values = "*") {
+                            geo_values = "*",
+                            apply_corrections = NULL) {
   if (!is_tibble(signals)) stop("signals should be a tibble.")
   forecast_dates %>%
     map(~ get_predictions_single_date(
@@ -49,7 +75,8 @@ get_predictions <- function(forecaster,
       incidence_period = incidence_period,
       ahead = ahead,
       geo_type = geo_type,
-      geo_values = geo_values
+      geo_values = geo_values,
+      apply_corrections
     )) %>%
     flatten()
 }
@@ -63,7 +90,8 @@ get_predictions_single_date <- function(forecaster,
                                         incidence_period,
                                         ahead,
                                         geo_type,
-                                        geo_values) {
+                                        geo_values,
+                                        apply_corrections) {
   if (length(geo_values) > 1) geo_values <- list(geo_values)
   forecast_date <- lubridate::ymd(forecast_date)
   # get data that would have been available as of forecast_date
@@ -78,6 +106,10 @@ get_predictions_single_date <- function(forecaster,
                       geo_type = geo_type,
                       geo_values = geo_values)
     })
+  if(!is.null(apply_corrections)){
+    corrected <- apply_corrections(df)
+    df$value = corrected$corrected
+  }
   out <- forecaster(df,
                     forecast_date,
                     signals,

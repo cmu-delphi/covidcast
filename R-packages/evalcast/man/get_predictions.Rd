@@ -12,7 +12,8 @@ get_predictions(
   incidence_period,
   ahead,
   geo_type,
-  geo_values = "*"
+  geo_values = "*",
+  apply_corrections = NULL
 )
 }
 \arguments{
@@ -23,7 +24,7 @@ get_predictions(
 \item{signals}{a tibble with columns "data_source" and "signal" that
 specifies which variables from the covidcast API will be used by
 my_forecaster. The first row of signals is taken to be the response.   If
-using incidence_period "epiweek", thre response should be something for
+using incidence_period "epiweek", the response should be something for
 which summing daily values over an epiweek makes sense (e.g., counts or
 proportions but not log(counts) or log(proportions)).  Available data
 sources and signals are documented in the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{COVIDcast signal documentation}
@@ -47,6 +48,11 @@ api ("county", "dma", "hrr", "msa", "state")}
 
 \item{geo_values}{see \link[covidcast]{covidcast_signal} for a description
 of this parameter.}
+
+\item{apply_corrections}{an optional function that applies data corrections
+to the signals. Input is a data frame as returned by \code{download_signals()}.
+The returned object must be the same but with additional variables.
+Corrected values must exist in the column \code{corrected}.}
 }
 \value{
 a list of predictions cards
@@ -71,4 +77,25 @@ of FIPS for geo_value.
 contains a tibble with the covidhub quantiles.}
 A predictions card has attributes that specify the exact forecasting
 task that was being carried out and the name of the forecaster.
+}
+\examples{
+baby_predictions = get_predictions(
+  baseline, "baby",
+  tibble(
+    data_source=c("jhu-csse", "usa-facts"),
+    signal = c("deaths_incidence_num","confirmed_incidence_num"),
+    start_day=lubridate::ymd("2020-09-15")),
+  lubridate::ymd("2020-10-01"),"epiweek", 1L, "state", "mi")
+
+baby_correct <- function(x) x \%>\% dplyr::mutate(corrected = 2*value)
+
+baby_corrected = get_predictions(
+  baseline, "baby",
+  tibble(
+    data_source=c("jhu-csse", "usa-facts"),
+    signal = c("deaths_incidence_num","confirmed_incidence_num"),
+    start_day=lubridate::ymd("2020-09-15")),
+  lubridate::ymd("2020-10-01"),"epiweek", 1L, "state", "mi",
+  apply_corrections = baby_correct)
+
 }

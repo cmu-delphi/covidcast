@@ -62,7 +62,9 @@ get_target_response <- function(signals,
     mutate(data_source = response$data_source,
            signal = response$signal,
            geo_type = geo_type) %>%
-    pmap(download_signal)
+    pmap(download_signal) # apply_corrections would need to run here,
+                          # but can only use part of response
+                          # we don't allow this for now.
 
   problem_date <- out %>% map_lgl(~ nrow(.x) == 0) %>% which()
   if (length(problem_date) > 0)

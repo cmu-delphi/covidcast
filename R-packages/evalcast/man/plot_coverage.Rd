@@ -4,7 +4,12 @@
 \alias{plot_coverage}
 \title{Plot interval coverage}
 \usage{
-plot_coverage(scorecards, alpha = 0.2, type = c("all", "one"))
+plot_coverage(
+  scorecards,
+  alpha = 0.2,
+  type = c("all", "one"),
+  legend.position = "bottom"
+)
 }
 \arguments{
 \item{scorecards}{List of different score cards, all on the same forecasting
@@ -18,6 +23,8 @@ shown.}
 across all nominal levels (in which case averaging is performed across
 forecast dates and locations) or whether to show it for one specific alpha
 value.}
+
+\item{legend_position}{Legend position, the default being "bottom".}
 }
 \description{
 Plot interval coverage

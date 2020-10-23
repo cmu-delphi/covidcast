@@ -2,6 +2,9 @@
 #'
 #' @param cards List of different score cards (or predictions cards), all on the
 #'   same forecasting task (i.e., same ahead, etc.).
+#' @param levels Quantile levels for the summary of interval width, to be
+#'   plotted. For example, `levels = c(0.5, 0.7, 0.9)`, the default, plots the
+#'   median, 70% and 90% quantiles of interval widths.
 #' @param legend.position Legend position, the default being "bottom".
 #' 
 #' @details Interval width does not depend on the actual outcome, so this
@@ -14,7 +17,8 @@
 #' @importFrom ggplot2 ggplot aes geom_line geom_vline facet_wrap labs
 #' @importFrom stats median
 #' @export
-plot_width <- function(cards, alpha = 0.2) {
+plot_width <- function(cards, alpha = 0.2, levels = c(0.5, 0.7, 0.9),
+                       legend.position = "bottom") {
   # make sure scorecards are comparable:
   unique_attr(cards, "ahead")
   unique_attr(cards, "geo_type")
@@ -30,18 +34,16 @@ plot_width <- function(cards, alpha = 0.2) {
     select(.data$forecaster, .data$location, .data$forecast_date, .data$coverage) %>%
     unnest(.data$coverage) %>%
     group_by(.data$forecaster, .data$nominal, .data$forecast_date) %>%
-    summarize(median = stats::median(.data$width),
-              max = max(.data$width)) %>%
-    pivot_longer(cols = .data$median:.data$max,
-                 names_to = "summary",
-                 values_to = "width") %>%
+    summarize(level = as.factor(levels),
+              width = quantile(.data$width, probs = levels)) %>%
     ggplot(aes(x = .data$nominal,
                y = .data$width,
                color = .data$forecaster,
-               lty = summary)) +
+               lty = .data$level)) +
     geom_line() +
     facet_wrap(~ forecast_date) +
-    labs(x = "Nominal coverage", y = "Interval width")
+    labs(x = "Nominal coverage", y = "Interval width") + 
+    theme_bw() + theme(legend.position = legend.position)
 }
 
 #' @importFrom rlang .data

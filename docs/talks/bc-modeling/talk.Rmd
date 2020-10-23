@@ -1,0 +1,89 @@
+---
+title: "Delphi's COVIDcast Project: <br> Overview, Evaluation, and Forecasting"
+author: Daniel J. McDonald <br> Department of Statistics <br> University of British Columbia <br>
+date: "<br> ![](delphi.png) ![](cmu.png) <br><br> 26 October 2020"
+footer: "Get the slides at: cmu-delphi.github.io/covidcast/tree/bctalk/docs/talks/bc-modeling/talk.html"
+output:
+  slidy_presentation:
+    theme: cerulean
+    highlight: tango
+    font_adjustment: +1
+    css: style.css
+    includes:
+      after_body: script.html
+---
+
+```{r, include = FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, 
+                      cache=TRUE, autodep=TRUE,
+                      cache.comments=TRUE)
+library(tidyverse)
+library(ggplot2)
+library(gridExtra)
+library(cowplot)
+
+col = function(x, color = "#bb0000") {
+  sprintf("<span style='color: %s;'>%s</span>", color, x)
+}
+```
+
+# What is Delphi
+
+- Formed in 2012, [Delphi](https://delphi.cmu.edu) to "develop the theory and practice of epidemic forecasting, and its role in decision-making"
+- Led by Roni Rosenfeld and Ryan Tibshirani, with several participating faculty and graduate students 
+- Participated in annual CDC flu forecasting challenges starting in 2013, earned top place in several 
+- Awarded `r col("CDC Center of Excellence")` for flu forecasting in 2019 
+
+
+-  over 40, to support the COVID-19 response
+- Added many smart folks from CMU, but also Stanford, UC Davis, USC, Google
+- Beyond (before?) forecasting: we've been focusing, now more than ever, on `r col("data")`
+- *This problem is so hard that our best weapon is a diversity of data sources*
+
+# COVIDcast Ecosystem
+
+![](covidcast_overview.svg)
+
+# This Talk
+
+I can't cover all of this! I'll focus on our data sources, our API, and some `r col("basic demos")` ("real" modeling work will be skipped entirely ...)
+
+Outline:
+
+1. Data sources
+2. API and client support
+3. Dive into symptom surveys
+
+`r col("Reproducible talk:")` all code included
+
+# `r col("Part 1: Data Sources", "white")` {.bigger} 
+
+<div style='text-align: center; padding: 225px 0px'> 
+***Part 1: Data Sources*** </div>
+
+# Severity Pyramid
+
+![](severity_pyramid.svg)
+
+# What Is This Used For?
+
+- Forecasting, e.g.,
+    * Case incidence: for vaccine trial site selection
+    * Hospitalizations: for planning and preparedness 
+- Nowcasting, e.g.,
+    * Situational awareness: testing and resource allocation
+    * Decision-making: re-opening criteria, school closures
+ - General epidemiological research, e.g.,
+    * What behaviors are linked to spread?
+    * What symptoms are linked to cases?
+
+# COVIDcast Indicators
+
+![](covidcast_indicators.svg)
+
+# COVIDcast Indicators (Cont.)
+
+- Available through the [COVIDcast API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html), updated daily
+- Most (nearly all) available at the `r col("county level")`
+- For a full list see our [signal documentation site](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html) 
+- See also our [R](https://cmu-delphi.github.io/covidcast/covidcastR/) and [Python](https://cmu-delphi.github.io/covidcast/covidcast-py/html/) packages

@@ -81,6 +81,7 @@ plot_calibration <- function(scorecard,
 #' @export 
 plot_coverage <- function(scorecards, alpha = 0.2, type = c("all", "one")) {
   type <- match.arg(type)
+  # make sure scorecards are comparable:
   unique_attr(scorecards, "ahead")
   unique_attr(scorecards, "as_of")
   unique_attr(scorecards, "geo_type")

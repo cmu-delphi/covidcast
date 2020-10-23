@@ -25,13 +25,12 @@
 #' @return List of "predictions cards", with one element per forecast date. Each
 #'   predictions card is a data frame with two columns:
 #'
-#' \item{location}{FIPS code of the location. For counties, this is the same as
-#'   the `geo_value` used in the COVIDcast API.  However, for states, `location`
-#'   and `geo_value` are slightly different, in that the former is truncated to
-#'   two digits, as in "42" for Pennsylvania (whereas the latter is always five
-#'   digits, as in "42000").}
-#' \item{forecast_distribution}{Tibble containing the predicted quantiles for
-#'   that location.}
+#' \item{location}{FIPS codes of the locations. For counties, this matches the
+#'   `geo_value` used in the COVIDcast API.  However, for states, `location` and
+#'   `geo_value` are slightly different, in that the former is a two-digit FIPS
+#'   code, as in "42", whereas the latter is a state abbreviation, as in "pa".}
+#' \item{forecast_distribution}{List column of tibbles containing the predicted
+#'   quantiles for each location.}
 #' 
 #' Each predictions card has attributes that specify the exact forecasting task
 #'   that was being carried out, along with the name of the forecaster.
@@ -78,6 +77,11 @@ get_predictions_single_date <- function(forecaster,
                                         ...) {
   if (length(geo_values) > 1) geo_values <- list(geo_values)
   forecast_date <- lubridate::ymd(forecast_date)
+  # compute the start_day from the forecast_date, if we need to
+  if (!is.null(signals$start_day) && is.list(signals$start_day) &&
+      is.function(signals$start_day[[1]])) {
+    signals$start_day <- signals$start_day[[1]](forecast_date)
+  }
   # get data that would have been available as of forecast_date
   df <- signals %>%
     pmap_dfr(function(...) {

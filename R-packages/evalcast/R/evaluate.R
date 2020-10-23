@@ -54,7 +54,10 @@ evaluate_predictions <- function(
                       coverage_80 = interval_coverage(alpha = 0.2)),
   backfill_buffer = 10) {
   responses <- all_attr(predictions_cards, "signals") %>%
-    map(~ .x[1, ])
+    map(~ .x[1, names(.x) != "start_day"]) # RJT: I added this part. I don't
+  # think start dates need to match here. Now that I'm allowing start_day to be 
+  # a function, it can depend on the forecast_date, so the next assertion would
+  # (unintentionally) fail in that case.
   assert_that(length(unique(responses)) <= 1,
               msg="All predictions cards should have the same response.")
   unique_attr(predictions_cards, "incidence_period")

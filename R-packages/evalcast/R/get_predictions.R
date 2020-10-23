@@ -115,7 +115,11 @@ get_predictions_single_date <- function(forecaster,
                       geo_values = geo_values)
     })
 
-  if(!is.null(apply_corrections)) df <- data_corrector(df, apply_corrections)
+  if(!is.null(apply_corrections)){
+    df <- data_corrector(df, apply_corrections)
+  } else {
+    apply_corrections = NA
+  }
 
   out <- forecaster(df,
                     forecast_date,
@@ -141,6 +145,7 @@ get_predictions_single_date <- function(forecaster,
            ahead = ahead[i],
            geo_type = geo_type,
            geo_values = geo_values,
+           corrections_applied = apply_corrections,
            from_covidhub = FALSE)
     )
   }

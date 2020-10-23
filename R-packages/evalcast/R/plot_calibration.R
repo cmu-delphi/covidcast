@@ -73,12 +73,14 @@ plot_calibration <- function(scorecard,
 #'   across all nominal levels (in which case averaging is performed across
 #'   forecast dates and locations) or whether to show it for one specific alpha
 #'   value.
+#' @param legend_position Legend position, the default being "bottom".
 #' 
 #' @importFrom rlang .data set_names
 #' @importFrom purrr map_dfr
 #' @importFrom ggplot2 ggplot geom_abline geom_vline labs facet_wrap xlim ylim theme_bw
 #' @export 
-plot_coverage <- function(scorecards, alpha = 0.2, type = c("all", "one")) {
+plot_coverage <- function(scorecards, alpha = 0.2, type = c("all", "one"),
+                          legend.position = "bottom") {
   type <- match.arg(type)
   # make sure scorecards are comparable:
   unique_attr(scorecards, "ahead")
@@ -100,13 +102,21 @@ plot_coverage <- function(scorecards, alpha = 0.2, type = c("all", "one")) {
       geom_abline(slope = 1, intercept = 0) +
       geom_vline(xintercept = 1 - alpha, lty = 2) +
       facet_wrap(~ forecast_date) +
-      theme_bw() +
       xlim(0, 1) +
       ylim(0, 1) +
-      labs(x = "Nominal coverage", y = "Coverage proportion")
+      labs(x = "Nominal coverage", y = "Empirical coverage") +
+      theme_bw() + theme(legend.position = legend.position)
   } else {
-    stop("not yet implemented")
-    # plot of prop_covered vs. forecast_date.  Each forecaster is a line
-    # shows coverage only for 1 - alpha interval
+    cover %>%
+      filter(nominal_coverage_prob == 1 - alpha) %>%
+      group_by(forecast_date, forecaster) %>%
+      summarize(prop_covered = mean(.data$prop_covered, na.rm = TRUE)) %>%
+      ggplot(aes(x = .data$forecast_date,
+                 y = .data$prop_covered,
+                 color = .data$forecaster)) +
+      geom_point() + geom_line() +
+      geom_hline(yintercept = 1 - alpha, lty = 2) +
+      labs(x = "Forecast date", y = "Empirical coverage") +
+      theme_bw() + theme(legend.position = legend.position)
   }
 }

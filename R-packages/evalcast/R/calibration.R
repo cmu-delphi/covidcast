@@ -35,7 +35,7 @@ compute_coverage <- function(score_card) {
       score_card %>%
         mutate(is_below = .data$actual < map_dbl(.data$forecast_distribution, ~ .x$quantiles[i]),
                is_above = .data$actual > map_dbl(.data$forecast_distribution, ~ .x$quantiles[itop]),
-               is_covered = !.data$is_below && !.data$is_above) %>%
+               is_covered = !.data$is_below & !.data$is_above) %>%
         group_by(.data$forecast_date) %>%
         summarize(prop_below = mean(.data$is_below, na.rm = TRUE),
                   prop_above = mean(.data$is_above, na.rm = TRUE),
@@ -43,6 +43,7 @@ compute_coverage <- function(score_card) {
     }, .id = "nominal_id") %>%
     mutate(nominal_coverage_prob = nominal_coverage_probs[as.integer(.data$nominal_id)]) %>%
     select(-.data$nominal_id)
+
 }
 
 #' @importFrom magrittr %>%

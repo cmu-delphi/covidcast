@@ -1,9 +1,9 @@
 #' @importFrom rlang .data
 data_corrector <- function(df, apply_corrections) {
   corrected <- apply_corrections(df)
-  assertthat::assert_that(
+  assertthat::assert_that(all(
     c("location","signal","time_value","issue", "data_source","corrected") %in%
-      names(corrected),
+      names(corrected)),
     msg = "requested corrections drops some required columns"
   )
   corrected <- dplyr::select(corrected,
@@ -19,7 +19,7 @@ data_corrector <- function(df, apply_corrections) {
 
   assertthat::assert_that(nr == nrow(df),
                           msg="requested corrections generate duplicate rows.")
-  df <-  mutate(df, value = dplyr::if_else(!is.na(corrected),corrected,.data$value),
+  df <-  mutate(df, value = ifelse(!is.na(corrected),corrected,.data$value),
                 corrected = NULL)
   df
 }

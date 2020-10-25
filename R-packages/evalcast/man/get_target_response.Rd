@@ -11,10 +11,10 @@ get_target_response(signals, forecast_dates, incidence_period, ahead, geo_type)
 \item{signals}{Tibble with columns \code{data_source} and \code{signal} that specifies
 which variables from the COVIDcast API will be used by \code{forecaster}. Each
 row of \code{signals} represents a separate signal, and first row is taken to be
-the response. If using incidence_period "epiweek", the response should be
-something for which summing daily values over an epiweek makes sense (e.g.,
-counts or proportions but not log(counts) or log(proportions)). Available
-data sources and signals are documented in the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{COVIDcast signal documentation}.
+the response. If using \code{incidence_period = "epiweek"}, the response should
+be something for which summing daily values over an epiweek makes sense
+(e.g., counts or proportions but not log(counts) or log(proportions)).
+Available data sources and signals are documented in the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{COVIDcast signal documentation}.
 An optional column \code{start_day} can also be included. This can be a Date
 object or string in the form "YYYY-MM-DD", indicating the earliest date of
 data needed from that data source. Importantly, \code{start_day} can also be a
@@ -33,7 +33,7 @@ trains on the most recent 4 weeks of data).}
 \item{ahead}{Vector of (one or more) integers. How many epiweeks/days ahead
 are you forecasting? If \code{incidence_period = "epiweek"} and forecast_date is
 Sunday or Monday, then \code{ahead = 1} means the epiweek that includes the
-forecast date; if \code{forecast_date} fall on a Tuesday through Saturday, then
+forecast date; if \code{forecast_date} falls on a Tuesday through Saturday, then
 it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahead = 1} means the day after forecast date.}
 
 \item{geo_type}{String indicating geographical type, one of "county", "dma",

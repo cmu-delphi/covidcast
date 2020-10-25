@@ -8,7 +8,7 @@
 #' @importFrom covidcast fips_to_name
 #' @importFrom rlang .data
 #' @importFrom purrr map_chr
-#' @importFrom ggplot2 ggplot aes geom_boxplot facet_wrap scale_y_log10 geom_point
+#' @importFrom ggplot2 ggplot aes geom_boxplot facet_wrap scale_y_log10 geom_point theme
 #' @importFrom dplyr group_by mutate summarize arrange if_else
 #' @export
 plot_measure <- function(scorecards, err_name, type = "boxplot") {

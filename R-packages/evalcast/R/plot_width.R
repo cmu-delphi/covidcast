@@ -2,6 +2,7 @@
 #'
 #' @param cards List of different score cards (or predictions cards), all on the
 #'   same forecasting task (i.e., same ahead, etc.).
+#' @param alpha Deprecated parameter to be removed soon.
 #' @param levels Quantile levels for the summary of interval width, to be
 #'   plotted. For example, `levels = c(0.5, 0.7, 0.9)`, the default, plots the
 #'   median, 70% and 90% quantiles of interval widths.
@@ -14,7 +15,7 @@
 #' @importFrom purrr map
 #' @importFrom dplyr group_by summarize select bind_rows
 #' @importFrom tidyr pivot_longer unnest
-#' @importFrom ggplot2 ggplot aes geom_line geom_vline facet_wrap labs
+#' @importFrom ggplot2 ggplot aes geom_line geom_vline facet_wrap labs theme
 #' @importFrom stats median
 #' @export
 plot_width <- function(cards, alpha = 0.2, levels = c(0.5, 0.7, 0.9),
@@ -41,7 +42,7 @@ plot_width <- function(cards, alpha = 0.2, levels = c(0.5, 0.7, 0.9),
                color = .data$forecaster,
                lty = .data$level)) +
     geom_line() +
-    facet_wrap(~ forecast_date) +
+    facet_wrap(~ .data$forecast_date) +
     labs(x = "Nominal coverage", y = "Interval width") + 
     theme_bw() + theme(legend.position = legend.position)
 }

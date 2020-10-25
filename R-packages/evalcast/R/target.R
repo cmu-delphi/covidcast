@@ -51,8 +51,8 @@ get_target_period <- function(forecast_date, incidence_period, ahead) {
 #'
 #' @importFrom rlang .data
 #' @importFrom tibble enframe
-#' @importFrom dplyr mutate left_join
-#' @importFrom purrr pmap pmap_dfr
+#' @importFrom dplyr mutate left_join rename bind_rows group_by summarize
+#' @importFrom purrr pmap pmap_dfr pmap_lgl
 #' @importFrom assertthat assert_that
 get_target_response <- function(signals,
                                 forecast_dates,

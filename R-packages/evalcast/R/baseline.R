@@ -42,7 +42,7 @@ baseline_forecaster <- function(df,
   incidence_length <- ifelse(incidence_period == "epiweek", 7, 1)
   covidhub_probs <- c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99)
   dat <- list()
-  s <- ifelse(symmetrize, -1, 1)
+  s <- ifelse(symmetrize, -1, NA)
   for (a in ahead) {
     # recall the first row of signals is the response
     dat[[a]] <- df %>%

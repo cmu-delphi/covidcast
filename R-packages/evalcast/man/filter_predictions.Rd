@@ -34,7 +34,7 @@ epiweek). For example, if \code{forecast_date = "2020-05-11"}, \code{incidence_p
 \item{ahead}{Vector of (one or more) integers. How many epiweeks/days ahead
 are you forecasting? If \code{incidence_period = "epiweek"} and forecast_date is
 Sunday or Monday, then \code{ahead = 1} means the epiweek that includes the
-forecast date; if \code{forecast_date} fall on a Tuesday through Saturday, then
+forecast date; if \code{forecast_date} falls on a Tuesday through Saturday, then
 it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahead = 1} means the day after forecast date.}
 
 \item{geo_type}{String indicating geographical type, one of "county", "dma",

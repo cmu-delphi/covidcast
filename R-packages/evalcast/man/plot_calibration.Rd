@@ -16,6 +16,8 @@ plot_calibration(
 
 \item{type}{One of "wedgeplot" or "traditional".}
 
+\item{alpha}{Deprecated parameter to be removed soon.}
+
 \item{legend.position}{Legend position, the default being "bottom".}
 }
 \description{

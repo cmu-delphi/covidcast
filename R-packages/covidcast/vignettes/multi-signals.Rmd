@@ -14,11 +14,11 @@ start_day <- "2020-06-01"
 end_day <- "2020-10-01"
 
 signals <- suppressMessages(
-  covidcast_signals(data_source = "jhu-csse",
-                   signal = c("confirmed_incidence_num", 
-                              "deaths_incidence_num"),
-                   start_day = start_day, end_day = end_day,
-                   geo_type = "state")
+  covidcast_signals(data_source = "usa-facts",
+                    signal = c("confirmed_incidence_num", 
+                               "deaths_incidence_num"),
+                    start_day = start_day, end_day = end_day,
+                    geo_type = "state")
 )
 
 summary(signals[[1]])
@@ -31,17 +31,52 @@ summary(signals[[2]])
 library(dplyr)
 
 append_shifts(signals[[1]], dt = c(-1, 2)) %>% 
-  arrange(geo_value) %>% select(contains("value")) %>% head()
+  filter(geo_value == "tx") %>% select(contains("value")) %>% head()
+
+append_shifts(signals[[2]], dt = c(-1, 2)) %>% 
+  filter(geo_value == "tx") %>% select(contains("value")) %>% head()
 
 a = append_shifts(signals, dt = c(-1, 2)) 
-a[[1]] %>% arrange(geo_value) %>% select(contains("value")) %>% head()
-a[[2]] %>% arrange(geo_value) %>% select(contains("value")) %>% head()
+a[[1]] %>% filter(geo_value == "tx") %>% select(contains("value")) %>% head()
+a[[2]] %>% filter(geo_value == "tx") %>% select(contains("value")) %>% head()
 
 b = append_shifts(signals, dt = list(c(-1, 2), 1))
-b[[1]] %>% arrange(geo_value) %>% select(contains("value")) %>% head()
-b[[2]] %>% arrange(geo_value) %>% select(contains("value")) %>% head()
+b[[1]] %>% filter(geo_value == "tx") %>% select(contains("value")) %>% head()
+b[[2]] %>% filter(geo_value == "tx") %>% select(contains("value")) %>% head()
 ```
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(fig.width = 8, fig.height = 6)
+## Aggregating signals, wide format
+
+```{r}
+aggregate_signals(signals) %>% head()
+aggregate_signals(append_shifts(signals, dt = c(7, 14))) %>% head()
+```
+
+## Aggregating signals, long format
+
+```{r}
+aggregate_signals(signals, format = "long") %>% 
+  filter(geo_value == "tx", time_value <= "2020-06-03") 
+
+aggregate_signals(append_shifts(signals, dt = c(7, 14)), format = "long") %>% 
+  filter(geo_value == "tx", time_value == "2020-06-01") 
+```
+
+## Pivoting longer or wider
+
+Longer
+
+```{r}
+aggregate_signals(signals) %>% covidcast_longer() %>% 
+  filter(geo_value == "tx", time_value <= "2020-06-03") 
+
+aggregate_signals(append_shifts(signals, dt = list(7, 14))) %>% 
+  covidcast_longer() %>% 
+  filter(geo_value == "tx", time_value <= "2020-06-02") 
+```
+
+Wider (not working yet for time-shifts)
+
+```{r}
+aggregate_signals(signals, format = "long") %>% covidcast_wider() %>% head()
 ```

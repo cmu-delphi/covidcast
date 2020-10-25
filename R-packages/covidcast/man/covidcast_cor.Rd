@@ -38,7 +38,7 @@ A data frame with first column \code{geo_value} or \code{time_value} (depending
 on \code{by}), and second column \code{value}, which gives the correlation.
 }
 \description{
-Computes correlations between two \code{covidcast_signal()} data frames, allowing
+Computes correlations between two \code{covidcast_signal} data frames, allowing
 for slicing by geo location, or by time. (The latest issue from each data
 frame is used when computing correlations.) See
 \code{vignette("correlation-utils")} for examples.

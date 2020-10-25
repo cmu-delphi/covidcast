@@ -229,10 +229,10 @@ covidcast_signal <- function(data_source, signal,
   return(df)
 }
 
-#' Print `covidcast_signal` objects
+#' Print `covidcast_signal` object
 #'
 #' Prints a brief summary of the data source, signal, and geographic level, and
-#' then prints the underlying data frame, for objects returned by
+#' then prints the underlying data frame, for an object returned by
 #' `covidcast_signal()`. 
 #'
 #' @param x The `covidcast_signal` object.
@@ -259,11 +259,11 @@ head.covidcast_signal = function(x, ...) {
   head(as.data.frame(x), ...)
 }
 
-#' Summarize `covidcast_signal` objects
+#' Summarize `covidcast_signal` object
 #'
 #' Prints a variety of summary statistics about the underlying data, such as
-#' median values, the date range included, sample sizes, and so on, for objects
-#' returned by `covidcast_signal()`.
+#' median values, the date range included, sample sizes, and so on, for an
+#' object returned by `covidcast_signal()`.
 #'
 #' @param object The `covidcast_signal` object.
 #' @param ... Additional arguments, for compatibility with `summary()`.
@@ -403,7 +403,7 @@ covidcast_meta <- function() {
 #' Print `covidcast_meta` object
 #'
 #' Prints a brief summary of the metadata, and then prints the underlying data
-#' frame, for objects returned by `covidcast_meta()`.
+#' frame, for an object returned by `covidcast_meta()`.
 #'
 #' @param x The `covidcast_meta` object.
 #' @param ... Additional arguments passed to `print.data.frame()` to print the
@@ -432,7 +432,7 @@ head.covidcast_meta = function(x, ...) {
 
 #' Summarize `covidcast_meta` object
 #'
-#' Prints a summary of the metadata returned by `covidcast_meta()`.
+#' Prints a tabular summary of the object returned by `covidcast_meta()`.
 #'
 #' @param object The `covidcast_meta` object.
 #' @param ... Additional arguments, for compatibility with `summary()`.

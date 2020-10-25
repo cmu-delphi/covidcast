@@ -1,0 +1,47 @@
+---
+title: Manipulating multiple signals 
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{3. Manipulating multiple signals}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, message = FALSE}
+library(covidcast)
+
+start_day <- "2020-06-01"
+end_day <- "2020-10-01"
+
+signals <- suppressMessages(
+  covidcast_signals(data_source = "jhu-csse",
+                   signal = c("confirmed_incidence_num", 
+                              "deaths_incidence_num"),
+                   start_day = start_day, end_day = end_day,
+                   geo_type = "state")
+)
+
+summary(signals[[1]])
+summary(signals[[2]])
+```
+
+## Appending shifts
+
+```{r}
+library(dplyr)
+
+append_shifts(signals[[1]], dt = c(-1, 2)) %>% 
+  arrange(geo_value) %>% select(contains("value")) %>% head()
+
+a = append_shifts(signals, dt = c(-1, 2)) 
+a[[1]] %>% arrange(geo_value) %>% select(contains("value")) %>% head()
+a[[2]] %>% arrange(geo_value) %>% select(contains("value")) %>% head()
+
+b = append_shifts(signals, dt = list(c(-1, 2), 1))
+b[[1]] %>% arrange(geo_value) %>% select(contains("value")) %>% head()
+b[[2]] %>% arrange(geo_value) %>% select(contains("value")) %>% head()
+```
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(fig.width = 8, fig.height = 6)
+```

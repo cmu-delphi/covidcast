@@ -1,18 +1,23 @@
 #' Append time-shifted values to a `covidcast_signal` data frame
 #'
 #' Appends time-shifted values, lagging or leading, to a `covidcast_signal` data
-#' frame. (Only the latest issue from each data frame is preserved.)
+#' frame. (Only the latest issue from each data frame is retained.)
 #'
-#' @param x The `covidcast_signal` data frame.
-#' @param dt Vector of shifts to append for the values in `x`. Positive values
-#'   are taken to mean shifts forward in time, and negative values mean shifts
-#'   backward in time. For example, if `dt = 1`, then the values are shifted
-#'   forward 1 day in time (so, data on June 1 becomes data on June 2, and so 
-#'   on). Default is 0 for both.
+#' @param x The `covidcast_signal` data frame, or a list of such data frames.
+#' @param dt Vector of shifts to append for the values in the data frame `x`.
+#'   Positive values are interpreted as shifts forward in time, and negative
+#'   values are shifts backward in time. For example, if `dt = 1`, then the
+#'   values are shifted forward 1 day in time (so, data on June 1 becomes data
+#'   on June 2, and so on). When `x` is a list of data frames, `dt` can either
+#'   be a single vector of shifts or a list of shift vectors of the same length
+#'   as `x` (in order to apply, respectively, the same shifts or a different set
+#'   of shifts to each data frame in `x`).
 #' 
-#' @return A data frame one new column per value of `dt`. The new column names
-#'   reflect the values of `dt`, as in `value+1` and `value-1` for a time shift 
-#'   forward 1 day and backward 1 day, respectively.
+#' @return When `x` is a data frame, the return value is a column-augmented
+#'   version of `x` with one new column per value of `dt`. The new column names
+#'   reflect the values of `dt`, as in `value+1` and `value-1` for a time shift
+#'   forward 1 day and backward 1 day, respectively. When `x` is a list of data
+#'   frames, the return value is a list of column-augmented data frames.
 #'
 #' @export
 append_shifts = function(x, dt) {

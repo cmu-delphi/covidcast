@@ -1,9 +1,9 @@
 #' Compute correlations between two `covidcast_signal` data frames
 #'
 #' Computes correlations between two `covidcast_signal` data frames, allowing
-#' for slicing by geo location, or by time. (The latest issue from each data
-#' frame is used when computing correlations.) See
-#' `vignette("correlation-utils")` for examples.  
+#' for slicing by geo location, or by time. (Only the latest issue from each
+#' data frame are used for correlations.) See `vignette("correlation-utils")`
+#' for examples.
 #'
 #' @param x,y The `covidcast_signal` data frames to correlate.
 #' @param dt_x,dt_y Time shifts to consider for `x` and `y`, respectively,

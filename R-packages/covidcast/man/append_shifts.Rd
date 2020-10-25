@@ -7,20 +7,25 @@
 append_shifts(x, dt)
 }
 \arguments{
-\item{x}{The \code{covidcast_signal} data frame.}
+\item{x}{The \code{covidcast_signal} data frame, or a list of such data frames.}
 
-\item{dt}{Vector of shifts to append for the values in \code{x}. Positive values
-are taken to mean shifts forward in time, and negative values mean shifts
-backward in time. For example, if \code{dt = 1}, then the values are shifted
-forward 1 day in time (so, data on June 1 becomes data on June 2, and so
-on). Default is 0 for both.}
+\item{dt}{Vector of shifts to append for the values in the data frame \code{x}.
+Positive values are interpreted as shifts forward in time, and negative
+values are shifts backward in time. For example, if \code{dt = 1}, then the
+values are shifted forward 1 day in time (so, data on June 1 becomes data
+on June 2, and so on). When \code{x} is a list of data frames, \code{dt} can either
+be a single vector of shifts or a list of shift vectors of the same length
+as \code{x} (in order to apply, respectively, the same shifts or a different set
+of shifts to each data frame in \code{x}).}
 }
 \value{
-A data frame one new column per value of \code{dt}. The new column names
+When \code{x} is a data frame, the return value is a column-augmented
+version of \code{x} with one new column per value of \code{dt}. The new column names
 reflect the values of \code{dt}, as in \code{value+1} and \code{value-1} for a time shift
-forward 1 day and backward 1 day, respectively.
+forward 1 day and backward 1 day, respectively. When \code{x} is a list of data
+frames, the return value is a list of column-augmented data frames.
 }
 \description{
 Appends time-shifted values, lagging or leading, to a \code{covidcast_signal} data
-frame. (Only the latest issue from each data frame is preserved.)
+frame. (Only the latest issue from each data frame is retained.)
 }

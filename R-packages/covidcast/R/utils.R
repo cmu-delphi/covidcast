@@ -10,15 +10,16 @@
 #' @importFrom rlang .data
 #' @keywords internal
 latest_issue <- function(df) {
-  # Preserve the attributes, since grouping overwrites them
+  # Save the attributes, since grouping overwrites them
   attrs <- attributes(df)
+  attrs <- attrs[!(names(attrs) %in% c("row.names", "names"))]
 
   df <- df %>%
     dplyr::group_by(.data$geo_value, .data$time_value) %>%
     dplyr::filter(.data$issue == max(.data$issue)) %>%
     dplyr::ungroup()
 
-  attributes(df) <- attrs
+  attributes(df) <- c(attributes(df), attrs)
 
   return(df)
 }
@@ -35,15 +36,16 @@ latest_issue <- function(df) {
 #' @importFrom rlang .data
 #' @keywords internal
 earliest_issue <- function(df) {
-  # Preserve the attributes, since grouping overwrites them
+  # Save the attributes, since grouping overwrites them
   attrs <- attributes(df)
+  attrs <- attrs[!(names(attrs) %in% c("row.names", "names"))]
 
   df <- df %>%
     dplyr::group_by(.data$geo_value, .data$time_value) %>%
     dplyr::filter(.data$issue == min(.data$issue)) %>%
     dplyr::ungroup()
 
-  attributes(df) <- attrs
+  attributes(df) <- c(attributes(df), attrs)
 
   return(df)
 }

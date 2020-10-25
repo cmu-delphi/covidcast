@@ -6,7 +6,7 @@
 #' @param levels Quantile levels for the summary of interval width, to be
 #'   plotted. For example, `levels = c(0.5, 0.7, 0.9)`, the default, plots the
 #'   median, 70% and 90% quantiles of interval widths.
-#' @param legend.position Legend position, the default being "bottom".
+#' @param legend_position Legend position, the default being "bottom".
 #' 
 #' @details Interval width does not depend on the actual outcome, so this
 #'   function can be called on predictions cards in addition to score cards.
@@ -19,10 +19,10 @@
 #' @importFrom stats median
 #' @export
 plot_width <- function(cards, alpha = 0.2, levels = c(0.5, 0.7, 0.9),
-                       legend.position = "bottom") {
+                       legend_position = "bottom") {
   # make sure scorecards are comparable:
   unique_attr(cards, "ahead")
-  unique_attr(cards, "geo_type")
+  unique_attr(cards, "geo_type") 
   unique_attr(cards, "incidence_period")
   unique_attr(cards, "response")
   cards <- intersect_locations(cards)
@@ -44,7 +44,7 @@ plot_width <- function(cards, alpha = 0.2, levels = c(0.5, 0.7, 0.9),
     geom_line() +
     facet_wrap(~ .data$forecast_date) +
     labs(x = "Nominal coverage", y = "Interval width") + 
-    theme_bw() + theme(legend.position = legend.position)
+    theme_bw() + theme(legend.position = legend_position)
 }
 
 #' @importFrom rlang .data

@@ -1,3 +1,173 @@
+#' Plot `covidcast_signal` objects
+#'
+#' Several plot types are provided, including choropleth plots (maps), bubble
+#' plots, and time series plots showing the change of signals over time, for
+#' objects returned by `covidcast_signal()`.
+#'
+#' @param x The `covidcast_signal` object to map or plot. If the object contains
+#'   multiple issues of the same observation, only the most recent issue is
+#'   mapped or plotted. 
+#' @param plot_type One of "choro", "bubble", "line" indicating whether to plot
+#'   a choropleth map, bubble map, or line (time series) graph, respectively.
+#'   The default is "choro".
+#' @param time_value Date object (or string in the form "YYYY-MM-DD")
+#'   specifying the day to map, for choropleth and bubble maps. If `NULL`, the
+#'   default, then the last date in `x` is used for the maps. Time series plots
+#'   always include all available time values in `x`.
+#' @param include Vector of state abbreviations (case insensitive, so "pa" and
+#'   "PA" both denote Pennsylvania) indicating which states to include in the
+#'   choropleth and bubble maps. Default is `c()`, which is interpreted to mean
+#'   all states.
+#' @param range Vector of two values: min and max, in this order, to use when
+#'   defining the color scale for choropleth maps and the size scale for bubble
+#'   maps, or the range of the y-axis for the time series plot. If `NULL`, the
+#'   default, then for the maps, the min and max are set to be the mean +/- 3
+#'   standard deviations, where this mean and standard deviation are as provided
+#'   in the metadata for the given data source and signal; and for the time
+#'   series plot, they are set to be the observed min and max of the values over  
+#'   the given time period.
+#' @param choro_col Vector of colors, as specified in hex code, to use for the
+#'   choropleth color scale. Can be arbitrary in length. Default is similar to
+#'   that from covidcast.cmu.edu.
+#' @param alpha Number between 0 and 1, indicating the transparency level to be
+#'   used in the maps. For choropleth maps, this determines the transparency
+#'   level for the mega counties. For bubble maps, this determines the
+#'   transparency level for the bubbles. Default is 0.5.
+#' @param direction Should direction be visualized (instead of intensity) for
+#'   the choropleth map? Default is `FALSE`.
+#' @param dir_col Vector of colors, as specified in hex code, to use for the
+#'   direction color scale. Must be of length 3. Default is similar to that from
+#'   covidcast.cmu.edu.
+#' @param bubble_col Bubble color for the bubble map. Default is "purple".
+#' @param num_bins Number of bins for determining the bubble sizes for the
+#'   bubble map (here and throughout, to be precise, by bubble size we mean
+#'   bubble area). Default is 8. These bins are evenly-spaced in between the min
+#'   and max as specified through the `range` parameter. Each bin is assigned
+#'   the same bubble size. Also, values of zero special: it has its own separate
+#'   (small) bin, and values mapped to the zero bin are not drawn.
+#' @param title Title for the plot. If `NULL`, the default, then a simple title
+#'   is used based on the given data source, signal, and time values.
+#' @param choro_params,bubble_params,line_params Additional parameter lists for
+#'   the different plot types, for further customization. See details below.
+#' @param ... Additional arguments, for compatibility with `plot()`. Currently
+#'   unused.
+#'
+#' @details The following named arguments are supported through the lists 
+#'   `choro_params`, `bubble_params`, and `line_params`.
+#'
+#' For both choropleth and bubble maps:
+#' \describe{
+#' \item{`subtitle`}{Subtitle for the map.}
+#' \item{`missing_col`}{Color assigned to missing or NA geo locations.}
+#' \item{`border_col`}{Border color for geo locations.}
+#' \item{`border_size`}{Border size for geo locations.}
+#' \item{`legend_position`}{Position for legend; use "none" to hide legend.} 
+#' \item{`legend_height`, `legend_width`}{Height and width of the legend.} 
+#' \item{`breaks`}{Breaks for a custom (discrete) color or size scale.  Note
+#'   that we must set `breaks` to be a vector of the same length as `choro_col`
+#'   for choropleth maps. This works as follows: we assign the `i`th color for
+#'   choropleth maps, or the `i`th size for bubble maps, if and only if the
+#'   given value satisfies `breaks[i] <= value < breaks[i+1]`, where we take by 
+#'   convention `breaks[0] = -Inf` and `breaks[N+1] = Inf` for `N =
+#'   length(breaks)`.}   
+#' \item{`legend_digits`}{Number of decimal places to show for the legend
+#'   labels.}  
+#' }
+#'
+#' For choropleth maps only:
+#' \describe{
+#' \item{`legend_n`}{Number of values to label on the legend color bar. Ignored
+#'   for discrete color scales (when `breaks` is set manually) and for direction 
+#'   maps.} 
+#' }
+#'
+#' For bubble maps only:
+#' \describe{
+#' \item{`remove_zero`}{Should zeros be excluded from the size scale (hence
+#'   effectively drawn as bubbles of zero size)?}
+#' \item{`min_size`, `max_size`}{Min size for the size scale.}
+#' }
+#'
+#' For line graphs:
+#' \describe{
+#' \item{`xlab`, `ylab`}{Labels for the x-axis and y-axis.}
+#' \item{`stderr_bands`}{Should standard error bands be drawn?}
+#' \item{`stderr_alpha`}{Transparency level for the standard error bands.}
+#' }
+#'
+#' @method plot covidcast_signal
+#' @importFrom stats sd
+#' @importFrom rlang warn
+#' @export
+plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
+                                  time_value = NULL, include = c(),
+                                  range = NULL,
+                                  choro_col = c("#FFFFCC", "#FD893C", "#800026"),
+                                  alpha = 0.5, direction = FALSE,
+                                  dir_col = c("#6F9CC6", "#E4E4E4", "#C56B59"),
+                                  bubble_col = "purple", num_bins = 8,
+                                  title = NULL, choro_params = list(),
+                                  bubble_params = list(), line_params = list(),
+                                  ...) {
+  plot_type <- match.arg(plot_type)
+  x <- latest_issue(x)
+
+  # For the maps, set range, if we need to (to mean +/- 3 standard deviations,
+  # from metadata) 
+  if (is.null(range) && (plot_type == "choro" || plot_type == "bubble")) {
+    if (is.null(attributes(x)$metadata)) { 
+      warn(
+        paste0("Metadata for signal mean and standard deviation not ",
+               "available; defaulting to observed mean and standard ",
+               "deviation to set plot range."),
+        class = "covidcast_plot_meta_not_found")
+      mean_value <- mean(x$value)
+      stdev_value <- sd(x$value)
+    } else {
+      mean_value <- attributes(x)$metadata$mean_value
+      stdev_value <- attributes(x)$metadata$stdev_value
+    }
+    range <- c(mean_value - 3 * stdev_value, mean_value + 3 * stdev_value)
+    range <- pmax(0, range)
+    # TODO: figure out for which signals we need to clip the top of the range.
+    # For example, for percentages, we need to clip it at 100
+  }
+
+  # For the maps, take the most recent time value if more than one is passed,
+  # and check that the include arguments indeed contains state names
+  if (plot_type == "choro" || plot_type == "bubble") {
+    if (!is.null(include)) {
+      include <- toupper(include)
+      no_match <- which(!(include %in% c(state.abb, "DC")))
+
+      if (length(no_match) > 0) {
+        warning("'include' must only contain US state abbreviations or 'DC'.")
+        include <- include[-no_match]
+      }
+    }
+  }
+
+  # Choropleth map
+  if (plot_type == "choro") {
+    plot_choro(x, time_value = time_value, include = include, range = range,
+               col = choro_col, alpha = alpha, direction = direction,
+               dir_col = dir_col, title = title, params = choro_params)
+  }
+
+
+  # Bubble map
+  else if (plot_type == "bubble") {
+    plot_bubble(x, time_value = time_value, include = include, range = range,
+                col = bubble_col, alpha = alpha, num_bins = num_bins,
+                title = title, params = bubble_params)
+  }
+
+  # Line (time series) plot
+  else {
+    plot_line(x, range = range, title = title, params = line_params)
+  }
+}
+
 # Plot a choropleth map of a covidcast_signal object.
 
 #' @importFrom stats approx
@@ -438,5 +608,3 @@ plot_line = function(x, range = NULL, title = NULL, params = list()) {
   return(ggplot2::ggplot(aes(x = time_value), data = df) +
          line_layer + ribbon_layer + lim_layer + label_layer + theme_layer)
 }
-
-# TODO: plot functions for covidcast_signals objects (note the plural form)?

@@ -2,7 +2,8 @@
 #'
 #' Several plot types are provided, including choropleth plots (maps), bubble
 #' plots, and time series plots showing the change of signals over time, for
-#' objects returned by `covidcast_signal()`.
+#' objects returned by `covidcast_signal()`. See `vignette("plotting-signals")`
+#' for examples.  
 #'
 #' @param x The `covidcast_signal` object to map or plot. If the object contains
 #'   multiple issues of the same observation, only the most recent issue is

@@ -1,9 +1,9 @@
 #' Compute correlations between two `covidcast_signal` data frames
 #'
-#' Computes correlations between two `covidcast_signal()` data frames, allowing
+#' Computes correlations between two `covidcast_signal` data frames, allowing
 #' for slicing by geo location, or by time. (The latest issue from each data
 #' frame is used when computing correlations.) See
-#' `vignette("correlation-utils")` for examples.
+#' `vignette("correlation-utils")` for examples.  
 #'
 #' @param x,y The `covidcast_signal` data frames to correlate.
 #' @param dt_x,dt_y Time shifts to consider for `x` and `y`, respectively,
@@ -31,8 +31,12 @@ covidcast_cor = function(x, y, dt_x = 0, dt_y = 0,
                          method = c("pearson", "kendall", "spearman")) {
   x = latest_issue(x)
   y = latest_issue(y)
-  if (dt_x < 0 || dt_y < 0) stop("Both `dt_x` and `dt_y` must be nonnegative.")
-  if (dt_x > 0 && dt_y > 0) stop("Only one of `dt_x` and `dt_y` can be positive.")
+  if (dt_x < 0 || dt_y < 0) {
+    stop("Both `dt_x` and `dt_y` must be nonnegative.")
+  }
+  if (dt_x > 0 && dt_y > 0) {
+    stop("Only one of `dt_x` and `dt_y` can be positive.")
+  }
   by = match.arg(by)
   method = match.arg(method)
 

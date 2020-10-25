@@ -8,7 +8,7 @@ plot_width(
   cards,
   alpha = 0.2,
   levels = c(0.5, 0.7, 0.9),
-  legend.position = "bottom"
+  legend_position = "bottom"
 )
 }
 \arguments{
@@ -21,7 +21,7 @@ same forecasting task (i.e., same ahead, etc.).}
 plotted. For example, \code{levels = c(0.5, 0.7, 0.9)}, the default, plots the
 median, 70\% and 90\% quantiles of interval widths.}
 
-\item{legend.position}{Legend position, the default being "bottom".}
+\item{legend_position}{Legend position, the default being "bottom".}
 }
 \description{
 Plot interval width

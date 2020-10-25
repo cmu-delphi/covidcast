@@ -8,7 +8,7 @@ plot_coverage(
   scorecards,
   type = c("all", "one"),
   alpha = 0.2,
-  legend.position = "bottom"
+  legend_position = "bottom"
 )
 }
 \arguments{
@@ -23,7 +23,7 @@ value.}
 \item{alpha}{If \code{type = "one"}, then 1-alpha is the nominal interval coverage
 shown.}
 
-\item{legend.position}{Legend position, the default being "bottom".}
+\item{legend_position}{Legend position, the default being "bottom".}
 }
 \description{
 Plot interval coverage

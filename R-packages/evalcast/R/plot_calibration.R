@@ -3,7 +3,7 @@
 #' @param scorecard Single score card.
 #' @param type One of "wedgeplot" or "traditional".
 #' @param alpha Deprecated parameter to be removed soon.
-#' @param legend.position Legend position, the default being "bottom".
+#' @param legend_position Legend position, the default being "bottom".
 #'
 #' @importFrom rlang .data
 #' @importFrom ggplot2 ggplot aes geom_point geom_abline geom_vline geom_hline labs scale_colour_discrete scale_alpha_continuous scale_size_continuous guides facet_wrap xlim ylim theme_bw theme 
@@ -13,7 +13,7 @@
 plot_calibration <- function(scorecard,
                              type = c("wedgeplot", "traditional"),
                              alpha = 0.2,
-                             legend.position = "bottom") {
+                             legend_position = "bottom") {
   name <- attr(scorecard, "name_of_forecaster")
   ahead <- attr(scorecard, "ahead")
   type <- match.arg(type)
@@ -57,7 +57,7 @@ plot_calibration <- function(scorecard,
     facet_wrap(~ forecast_date) +
     xlim(0, 1) +
     ylim(0, 1) +
-    theme_bw() + theme(legend.position = legend.position)
+    theme_bw() + theme(legend.position = legend_position)
 }
 
 #' Plot interval coverage
@@ -70,14 +70,14 @@ plot_calibration <- function(scorecard,
 #'   value.
 #' @param alpha If `type = "one"`, then 1-alpha is the nominal interval coverage
 #'   shown.
-#' @param legend.position Legend position, the default being "bottom".
+#' @param legend_position Legend position, the default being "bottom".
 #' 
 #' @importFrom rlang .data set_names
 #' @importFrom purrr map_dfr
 #' @importFrom ggplot2 ggplot geom_abline geom_vline geom_hline labs facet_wrap xlim ylim theme_bw theme 
 #' @export 
 plot_coverage <- function(scorecards, type = c("all", "one"), alpha = 0.2, 
-                          legend.position = "bottom") {
+                          legend_position = "bottom") {
   type <- match.arg(type)
   # make sure scorecards are comparable:
   unique_attr(scorecards, "ahead")
@@ -101,7 +101,7 @@ plot_coverage <- function(scorecards, type = c("all", "one"), alpha = 0.2,
       xlim(0, 1) +
       ylim(0, 1) +
       labs(x = "Nominal coverage", y = "Empirical coverage") +
-      theme_bw() + theme(legend.position = legend.position)
+      theme_bw() + theme(legend.position = legend_position)
   } else {
     cover %>%
       filter(nominal_coverage_prob == 1 - alpha) %>%
@@ -113,6 +113,6 @@ plot_coverage <- function(scorecards, type = c("all", "one"), alpha = 0.2,
       geom_point() + geom_line() +
       geom_hline(yintercept = 1 - alpha, lty = 2) +
       labs(x = "Forecast date", y = "Empirical coverage") +
-      theme_bw() + theme(legend.position = legend.position)
+      theme_bw() + theme(legend.position = legend_position) 
   }
 }

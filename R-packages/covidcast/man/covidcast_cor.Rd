@@ -39,7 +39,7 @@ on \code{by}), and second column \code{value}, which gives the correlation.
 }
 \description{
 Computes correlations between two \code{covidcast_signal} data frames, allowing
-for slicing by geo location, or by time. (The latest issue from each data
-frame is used when computing correlations.) See
-\code{vignette("correlation-utils")} for examples.
+for slicing by geo location, or by time. (Only the latest issue from each
+data frame are used for correlations.) See \code{vignette("correlation-utils")}
+for examples.
 }

@@ -1,9 +1,10 @@
-#' Plot `covidcast_signal` objects
+#' Plot `covidcast_signal` object
 #'
 #' Several plot types are provided, including choropleth plots (maps), bubble
-#' plots, and time series plots showing the change of signals over time, for
-#' objects returned by `covidcast_signal()`. See `vignette("plotting-signals")`
-#' for examples.  
+#' plots, and time series plots showing the change of signals over time, for a 
+#' data frame returned by `covidcast_signal()`. (Only the latest issue from the
+#' data frame is used for plotting.) See `vignette("plotting-signals")` for
+#' examples.   
 #'
 #' @param x The `covidcast_signal` object to map or plot. If the object contains
 #'   multiple issues of the same observation, only the most recent issue is
@@ -100,18 +101,18 @@
 #' @importFrom stats sd
 #' @importFrom rlang warn
 #' @export
-plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
-                                  time_value = NULL, include = c(),
-                                  range = NULL,
-                                  choro_col = c("#FFFFCC", "#FD893C", "#800026"),
-                                  alpha = 0.5, direction = FALSE,
-                                  dir_col = c("#6F9CC6", "#E4E4E4", "#C56B59"),
-                                  bubble_col = "purple", num_bins = 8,
-                                  title = NULL, choro_params = list(),
-                                  bubble_params = list(), line_params = list(),
-                                  ...) {
-  plot_type <- match.arg(plot_type)
-  x <- latest_issue(x)
+plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
+                                 time_value = NULL, include = c(),
+                                 range = NULL,
+                                 choro_col = c("#FFFFCC", "#FD893C", "#800026"),
+                                 alpha = 0.5, direction = FALSE,
+                                 dir_col = c("#6F9CC6", "#E4E4E4", "#C56B59"),
+                                 bubble_col = "purple", num_bins = 8,
+                                 title = NULL, choro_params = list(),
+                                 bubble_params = list(), line_params = list(),
+                                 ...) {
+  plot_type = match.arg(plot_type)
+  x = latest_issue(x)
 
   # For the maps, set range, if we need to (to mean +/- 3 standard deviations,
   # from metadata) 
@@ -122,14 +123,14 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
                "available; defaulting to observed mean and standard ",
                "deviation to set plot range."),
         class = "covidcast_plot_meta_not_found")
-      mean_value <- mean(x$value)
-      stdev_value <- sd(x$value)
+      mean_value = mean(x$value)
+      stdev_value = sd(x$value)
     } else {
-      mean_value <- attributes(x)$metadata$mean_value
-      stdev_value <- attributes(x)$metadata$stdev_value
+      mean_value = attributes(x)$metadata$mean_value
+      stdev_value = attributes(x)$metadata$stdev_value
     }
-    range <- c(mean_value - 3 * stdev_value, mean_value + 3 * stdev_value)
-    range <- pmax(0, range)
+    range = c(mean_value - 3 * stdev_value, mean_value + 3 * stdev_value)
+    range = pmax(0, range)
     # TODO: figure out for which signals we need to clip the top of the range.
     # For example, for percentages, we need to clip it at 100
   }
@@ -138,12 +139,12 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
   # and check that the include arguments indeed contains state names
   if (plot_type == "choro" || plot_type == "bubble") {
     if (!is.null(include)) {
-      include <- toupper(include)
-      no_match <- which(!(include %in% c(state.abb, "DC")))
+      include = toupper(include)
+      no_match = which(!(include %in% c(state.abb, "DC")))
 
       if (length(no_match) > 0) {
         warning("'include' must only contain US state abbreviations or 'DC'.")
-        include <- include[-no_match]
+        include = include[-no_match]
       }
     }
   }

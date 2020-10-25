@@ -3,7 +3,7 @@
 #' Performs backtesting, through the following steps:
 #' \enumerate{
 #'   \item Takes a list of predictions cards (as created by
-#'   [get_predictions()]. These should be from a single forecaster, each card
+#'   [get_predictions()]). These should be from a single forecaster, each card 
 #'   corresponding to a different forecast date.
 #'   \item Downloads from the COVIDcast API the latest available data to compute
 #'   what actually occurred (summing the response over the incidence period).
@@ -29,7 +29,7 @@
 #' to the user to determine.  If backfill is not relevant for the particular
 #' signal you are predicting, then you can set `backfill_buffer` to 0.
 #'
-#' @param predictions_cards List of prediction cards from the same forecaster
+#' @param predictions_cards List of predictions cards from the same forecaster 
 #'   that are all for the same prediction task, meaning they are for the same
 #'   response, incidence period, ahead, and geo type. Each should be from a
 #'   different forecast date.  A predictions card is created by the function
@@ -107,7 +107,7 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
               "according to the provided `backfill_buffer` of ",
               "{backfill_buffer}.", forecast_date=.$forecast_date[1],
               end=.$end[1], backfill_buffer=backfill_buffer)))
-  # combine all prediction cards into a single data frame with an additional
+  # combine all predictions cards into a single data frame with an additional
   # column called forecast_date:
   predicted <- map2_dfr(predictions_cards, att$forecast_dates,
                         ~ mutate(.x, forecast_date = .y))

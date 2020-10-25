@@ -12,7 +12,7 @@ evaluate_predictions(
 )
 }
 \arguments{
-\item{predictions_cards}{List of prediction cards from the same forecaster
+\item{predictions_cards}{List of predictions cards from the same forecaster
 that are all for the same prediction task, meaning they are for the same
 response, incidence period, ahead, and geo type. Each should be from a
 different forecast date.  A predictions card is created by the function
@@ -33,7 +33,7 @@ List of "score cards", with one element per ahead value.
 Performs backtesting, through the following steps:
 \enumerate{
 \item Takes a list of predictions cards (as created by
-\code{\link[=get_predictions]{get_predictions()}}. These should be from a single forecaster, each card
+\code{\link[=get_predictions]{get_predictions()}}). These should be from a single forecaster, each card
 corresponding to a different forecast date.
 \item Downloads from the COVIDcast API the latest available data to compute
 what actually occurred (summing the response over the incidence period).

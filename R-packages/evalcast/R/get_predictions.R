@@ -14,8 +14,8 @@
 #'   predictive quantiles of the forecast distribution for that location and
 #'   ahead.
 #' @param name_of_forecaster String indicating name of the forecaster.
-#' @template forecast_dates-template
 #' @template signals-template
+#' @template forecast_dates-template
 #' @template incidence_period-template
 #' @template ahead-template
 #' @template geo_type-template
@@ -26,7 +26,7 @@
 #'   predictions card is a data frame with two columns:
 #'
 #' \item{location}{FIPS codes of the locations. For counties, this matches the
-#'   `geo_value` used in the COVIDcast API.  However, for states, `location` and
+#'   `geo_value` used in the COVIDcast API. However, for states, `location` and
 #'   `geo_value` are slightly different, in that the former is a two-digit FIPS
 #'   code, as in "42", whereas the latter is a state abbreviation, as in "pa".}
 #' \item{forecast_distribution}{List column of tibbles containing the predicted
@@ -65,6 +65,18 @@ get_predictions <- function(forecaster,
 
 #' Get predictions cards for a single date
 #'
+#' @param forecaster Function that outputs a tibble with columns `ahead`,
+#'   `location`, `probs`, `quantiles`. The `quantiles` column gives the
+#'   predictive quantiles of the forecast distribution for that location and
+#'   ahead.
+#' @param name_of_forecaster String indicating name of the forecaster.
+#' @template signals-template
+#' @template forecast_date-template
+#' @template incidence_period-template
+#' @template ahead-template
+#' @template geo_type-template
+#' @template geo_values-template
+#' 
 #' @importFrom stringr str_glue
 get_predictions_single_date <- function(forecaster,
                                         name_of_forecaster,
@@ -78,9 +90,12 @@ get_predictions_single_date <- function(forecaster,
   if (length(geo_values) > 1) geo_values <- list(geo_values)
   forecast_date <- lubridate::ymd(forecast_date)
   # compute the start_day from the forecast_date, if we need to
-  if (!is.null(signals$start_day) && is.list(signals$start_day) &&
-      is.function(signals$start_day[[1]])) {
-    signals$start_day <- signals$start_day[[1]](forecast_date)
+  if (!is.null(signals$start_day) && is.list(signals$start_day)) {
+    for (i in 1:length(signals$start_day)) {
+      if (is.function(signals$start_day[[i]])) {
+        signals$start_day <- signals$start_day[[i]](forecast_date)
+      }
+    }
   }
   # get data that would have been available as of forecast_date
   df <- signals %>%
@@ -120,7 +135,7 @@ get_predictions_single_date <- function(forecaster,
            geo_type = geo_type,
            geo_values = geo_values,
            from_covidhub = FALSE,
-           ...)
+           forecaster_params = list(...))
     )
   }
   return(pcards)

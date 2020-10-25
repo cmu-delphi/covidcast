@@ -25,7 +25,7 @@ Authors@R:
            role = "ctb"),
     person(given = "Ryan",
            family = "Tibshirani",
-           role = "ctb"))
+           role = "aut"))
 Description: Evaluation tools for probabilistic COVID-19 forecasters. This
     package provides functionality for accurately evaluating forecaster
     performance: crucially, evalcast leverages the covidcast R package's "as of"

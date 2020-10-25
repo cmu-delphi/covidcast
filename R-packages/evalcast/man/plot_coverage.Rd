@@ -6,8 +6,8 @@
 \usage{
 plot_coverage(
   scorecards,
-  alpha = 0.2,
   type = c("all", "one"),
+  alpha = 0.2,
   legend.position = "bottom"
 )
 }
@@ -15,13 +15,13 @@ plot_coverage(
 \item{scorecards}{List of different score cards, all on the same forecasting
 task (i.e., same ahead, etc.).}
 
-\item{alpha}{If \code{type = "one"}, then 1-alpha is the nominal interval coverage
-shown.}
-
 \item{type}{One of "all" or "none", indicating whether to show coverage
 across all nominal levels (in which case averaging is performed across
 forecast dates and locations) or whether to show it for one specific alpha
 value.}
+
+\item{alpha}{If \code{type = "one"}, then 1-alpha is the nominal interval coverage
+shown.}
 
 \item{legend.position}{Legend position, the default being "bottom".}
 }

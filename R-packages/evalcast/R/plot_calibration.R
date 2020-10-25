@@ -2,10 +2,11 @@
 #'
 #' @param scorecard Single score card.
 #' @param type One of "wedgeplot" or "traditional".
+#' @param alpha Deprecated parameter to be removed soon.
 #' @param legend.position Legend position, the default being "bottom".
 #'
 #' @importFrom rlang .data
-#' @importFrom ggplot2 ggplot aes geom_point geom_abline geom_vline labs scale_colour_discrete scale_alpha_continuous scale_size_continuous guides facet_wrap xlim ylim theme_bw
+#' @importFrom ggplot2 ggplot aes geom_point geom_abline geom_vline geom_hline labs scale_colour_discrete scale_alpha_continuous scale_size_continuous guides facet_wrap xlim ylim theme_bw theme 
 #' @importFrom dplyr filter mutate recode
 #' @importFrom tidyr pivot_longer
 #' @export
@@ -63,19 +64,19 @@ plot_calibration <- function(scorecard,
 #'
 #' @param scorecards List of different score cards, all on the same forecasting
 #'   task (i.e., same ahead, etc.).
-#' @param alpha If `type = "one"`, then 1-alpha is the nominal interval coverage
-#'   shown.
 #' @param type One of "all" or "none", indicating whether to show coverage
 #'   across all nominal levels (in which case averaging is performed across
 #'   forecast dates and locations) or whether to show it for one specific alpha
 #'   value.
+#' @param alpha If `type = "one"`, then 1-alpha is the nominal interval coverage
+#'   shown.
 #' @param legend.position Legend position, the default being "bottom".
 #' 
 #' @importFrom rlang .data set_names
 #' @importFrom purrr map_dfr
-#' @importFrom ggplot2 ggplot geom_abline geom_vline labs facet_wrap xlim ylim theme_bw
+#' @importFrom ggplot2 ggplot geom_abline geom_vline geom_hline labs facet_wrap xlim ylim theme_bw theme 
 #' @export 
-plot_coverage <- function(scorecards, alpha = 0.2, type = c("all", "one"),
+plot_coverage <- function(scorecards, type = c("all", "one"), alpha = 0.2, 
                           legend.position = "bottom") {
   type <- match.arg(type)
   # make sure scorecards are comparable:
@@ -96,7 +97,7 @@ plot_coverage <- function(scorecards, alpha = 0.2, type = c("all", "one"),
                  color = .data$forecaster)) +
       geom_line() +
       geom_abline(slope = 1, intercept = 0) +
-      facet_wrap(~ forecast_date) +
+      facet_wrap(~ .data$forecast_date) +
       xlim(0, 1) +
       ylim(0, 1) +
       labs(x = "Nominal coverage", y = "Empirical coverage") +
@@ -104,7 +105,7 @@ plot_coverage <- function(scorecards, alpha = 0.2, type = c("all", "one"),
   } else {
     cover %>%
       filter(nominal_coverage_prob == 1 - alpha) %>%
-      group_by(forecast_date, forecaster) %>%
+      group_by(.data$forecast_date, .data$forecaster) %>%
       summarize(prop_covered = mean(.data$prop_covered, na.rm = TRUE)) %>%
       ggplot(aes(x = .data$forecast_date,
                  y = .data$prop_covered,

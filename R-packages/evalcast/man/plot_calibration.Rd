@@ -8,7 +8,7 @@ plot_calibration(
   scorecard,
   type = c("wedgeplot", "traditional"),
   alpha = 0.2,
-  legend.position = "bottom"
+  legend_position = "bottom"
 )
 }
 \arguments{
@@ -18,7 +18,7 @@ plot_calibration(
 
 \item{alpha}{Deprecated parameter to be removed soon.}
 
-\item{legend.position}{Legend position, the default being "bottom".}
+\item{legend_position}{Legend position, the default being "bottom".}
 }
 \description{
 Plot calibration curves

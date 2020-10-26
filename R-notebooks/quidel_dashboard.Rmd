@@ -87,11 +87,6 @@ states_present = df_quidel_states %>%
   group_by(geo_value) %>%
   summarize(value = n())
 
-# These are all required for rendering using covidcast.plot
-states_present$time_value = "2020-04-15"
-states_present$issue = "2020-04-15"
-attributes(states_present)$geo_type = "state"
-class(states_present) = c("covidcast_signal", "data.frame")
-
-plot(states_present, title = "How frequently do states appear in last 28 days?")
+source("dashboard_functions.R")
+plot_28_day_frequency(states_present, "state")
 ```

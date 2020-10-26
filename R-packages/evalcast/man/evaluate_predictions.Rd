@@ -2,7 +2,7 @@
 % Please edit documentation in R/evaluate.R
 \name{evaluate_predictions}
 \alias{evaluate_predictions}
-\title{Create a list of scorecards}
+\title{Create a list of score cards}
 \usage{
 evaluate_predictions(
   predictions_cards,
@@ -12,51 +12,50 @@ evaluate_predictions(
 )
 }
 \arguments{
-\item{predictions_cards}{a list of prediction cards from the same forecaster
-that are all for the same prediction task, meaning they are for the same
-response, incidence_period, ahead, and geo_type. Each should be from a
-different forecast date.  A predictions card is created by the function
-\code{\link{get_predictions}}.}
+\item{predictions_cards}{List of predictions cards from the same forecaster
+that are all for the same response, incidence period, and geo type. Each
+should be from a different forecast date or for a different ahead.  A
+predictions card is created by the function \code{\link[=get_predictions]{get_predictions()}}.}
 
-\item{err_measures}{a named list of one or more functions, where each function
-takes a data frame with two columns "probs" and "quantiles" and an actual
-(i.e. observed) scalar value and returns some measure of error.  If empty,
+\item{err_measures}{Named list of one or more functions, where each function
+takes a data frame with two columns \code{probs} and \code{quantiles} and an actual
+(i.e., observed) scalar value and returns some measure of error.  If empty,
 returns the scorecard without any error measure columns.}
 
 \item{backfill_buffer}{How many days until response is deemed trustworthy
 enough to be taken as correct? See details for more.}
 }
 \value{
-a list of score cards (one for each ahead)
+List of "score cards", with one element per ahead value.
 }
 \description{
-This function performs backtesting.  It does the following:
+Performs backtesting, through the following steps:
 \enumerate{
 \item Takes a list of predictions cards (as created by
-\code{\link{get_predictions}}).  These should be from a single
-forecaster, each card corresponding to a different forecast date.
-\item Downloads from the covidcast API the latest available data to compute
+\code{\link[=get_predictions]{get_predictions()}}). These should be from a single forecaster, each card
+corresponding to a different forecast date.
+\item Downloads from the COVIDcast API the latest available data to compute
 what actually occurred (summing the response over the incidence period).
 \item Computes various user-specified error measures.
 }
-The result is a list of score cards, where each list element corresponds to a
-distinct value of ahead. A scorecard is a data frame in which each row
+The result is a list of "score cards", where each list element corresponds to
+a distinct ahead value. A score card is a data frame in which each row
 corresponds to a location-day pair, and the columns give the values of the
 error measures (along with other information including the forecast
 distributions and the actual response values).
 }
 \details{
 Backfill refers to the process by which some data sources go back in time
-updating previously reported values.  Suppose it is Sept. 14 and we are
+updating previously reported values. Suppose it is September 14 and we are
 evaluating our predictions for what happened in the previous epiweek
-(Sept. 6 - Sept. 12).  Although we may be able to calculate a value for
-"actual", we might not trust this value since on Sept. 16, backfill may
-occur changing what is known about the period Sept. 6 - Sept. 12.  There are
+(September 6 through 12). Although we may be able to calculate a value for
+"actual", we might not trust this value since on September 16, backfill may
+occur changing what is known about the period September 6 through 12.  There are
 two consequences of this phenomenon.  First, running this function on
 different dates may result in different estimates of the error. Second, we
 may not trust the evaluations we get that are too recent.  The parameter
 \code{backfill_buffer} specifies how long of a buffer period we should
 enforce.  This will be dependent on the data source and signal and is left
 to the user to determine.  If backfill is not relevant for the particular
-signal you are predicting, then you can set backfill_buffer to 0.
+signal you are predicting, then you can set \code{backfill_buffer} to 0.
 }

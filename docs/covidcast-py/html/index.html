@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COVIDcast API client &#8212; COVIDcast API client 0.0.9 documentation</title>
+    <title>COVIDcast API client &#8212; COVIDcast API client 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -65,8 +65,8 @@ your favorite Python package manager:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip install covidcast
 </pre></div>
 </div>
-<p>The package requires <a class="reference external" href="https://pandas.pydata.org/">pandas</a> and <a class="reference external" href="https://requests.readthedocs.io/en/master/">requests</a>; these should be installed
-automatically. It also uses the <a class="reference external" href="https://pypi.org/project/delphi-epidata/">delphi-epidata</a> package to access Delphi’s Epidata
+<p>The package requires <a class="reference external" href="https://pandas.pydata.org/">pandas</a>, <a class="reference external" href="https://requests.readthedocs.io/en/master/">requests</a>, and several other packages;
+these should be installed automatically. It also uses the <a class="reference external" href="https://pypi.org/project/delphi-epidata/">delphi-epidata</a> package to access Delphi’s Epidata
 API.</p>
 </div>
 <div class="section" id="contents">
@@ -76,24 +76,29 @@ API.</p>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#basic-examples">Basic examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#tracking-issues-and-updates">Tracking issues and updates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#dealing-with-geographies">Dealing with geographies</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="signals.html">Fetching Data</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="signals.html#signals">Signals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="signals.html#metadata">Metadata</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="plotting.html#choropleth-maps">Choropleth maps</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plotting.html#creating-a-geodataframe">Creating a GeoDataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="signals.html#working-with-geographic-identifiers">Working with geographic identifiers</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="plot_examples.html">Plotting Examples</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="plot_examples.html#built-in-functionality">Built-in functionality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_examples.html#animations">Animations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_examples.html#further-customization">Further customization</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plotting.html#choropleth-maps">Choropleth maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plotting.html#animate-a-signal-over-time">Animate a signal over time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plotting.html#creating-a-geodataframe">Creating a GeoDataFrame</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#v0-1-0-october-1-2020">v0.1.0, October 1, 2020</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#v0-0-9-august-30-2020">v0.0.9, August 30, 2020</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#v0-0-8-july-26-2020">v0.0.8, July 26, 2020</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#v0-0-7-june-29-2020">v0.0.7, June 29, 2020</a></li>
@@ -126,8 +131,8 @@ API.</p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="signals.html">Fetching Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_examples.html">Plotting Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 

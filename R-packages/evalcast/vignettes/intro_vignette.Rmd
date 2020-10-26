@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
 The `evalcast` package provides the infrastructure for developing and evaluating probabilistic forecasters that are based on data obtained with the [covidcast](https://cmu-delphi.github.io/covidcast/covidcastR/) R package.  A unique feature of the `covidcast` API is that it allows one to get the data that would have been available *as of* a certain date.  This accounts for a difficult property of working with certain COVID-19 data sources, which is that they are backfilled (in other words, the value of some variable on a certain day is updated as time passes).  Not properly accounting for backfill can lead to overly optimistic retrospective evaluations of forecasts and therefore poorly trained forecasters.  The `evalcast` package is designed so that forecasters avoid these pitfalls.
@@ -31,7 +31,7 @@ signals
 
 The function `get_predictions` runs your forecaster on the dates you specify.  Within the `evalcast` framework, forecasters do not internally download data.  Rather, data is managed by `get_predictions` so as to keep forecasters honest.  The function `get_predictions` will run the forecaster for you and ensure that the data you are providing it is *precisely the data that would have been available as of* the forecast date.
 
-```{r, warning=FALSE}
+```{r}
 library(evalcast)
 library(covidcast) # needed because covidcast make file does not run when only evalcast is libraried
 
@@ -59,14 +59,6 @@ Forecasts are probabilistic, meaning that rather than providing a single predict
 ```{r}
 pc <- predictions_cards_cmu[[1]]
 pc[pc$location == "06", ]$forecast_distribution[[1]]
-```
-
-### Look at some trajectory plots
-
-Not yet implemented:
-
-```{r, eval=FALSE}
-plot_trajectories(predictions_cards)
 ```
 
 ### Evaluate the performance of this forecaster
@@ -116,7 +108,7 @@ plot_calibration(scorecards[[1]], type = "wedge")
 plot_calibration(scorecards_cmu[[1]], type = "traditional")
 plot_coverage(list(scorecards_yyg[[1]],
                   scorecards_cmu[[1]]))
-# plot_width(scorecards_cmu[[1]]) # need to fix plot_width bug (see issue)
+plot_width(scorecards_cmu[[1]])
 ```
 
 ### Tables of these performance measures

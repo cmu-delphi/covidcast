@@ -38,7 +38,7 @@ get_covidhub_predictions <- function(covid_hub_forecaster_name,
                         covid_hub_forecaster_name,
                         forecast_date,
                         covid_hub_forecaster_name)
-    cat("Downloading", filename, fill = TRUE)
+    message("Downloading ", filename)
     pred <- read_csv(filename,
                      col_types = cols(
                        location = col_character(),

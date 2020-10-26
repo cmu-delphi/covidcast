@@ -1,5 +1,5 @@
 ---
-title: "Hospital Admissions dashboard"
+title: "Safegraph dashboard"
 author: "Ben Smith"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
@@ -30,13 +30,13 @@ This measures how much county coverage we have in the samples (i.e., how many un
 ```{r, fig.width = 7, fig.height = 5}
 
 # Sampling coverage
-df_hospital_admissions_counties = covidcast_signal(
-  "hospital-admissions",
-  "smoothed_covid19_from_claims",
+df_safegraph_counties = covidcast_signal(
+  "safegraph",
+  "median_home_dwell_time",
   start_day = twenty_eight_days_ago,
   geo_type = "county"
 )
-counties_per_day = df_hospital_admissions_counties %>%
+counties_per_day = df_safegraph_counties %>%
   group_by(time_value) %>%
   summarize(n = n())
 
@@ -48,7 +48,7 @@ ggplot(counties_per_day, aes(x = time_value, y = n)) +
     title = sprintf(
       "Unique Counties: %i, mean per day: %i",
       length(unique(
-        df_hospital_admissions_counties$geo_value
+        df_safegraph_counties$geo_value
       )),
       round(mean(counties_per_day$n))
     )
@@ -61,7 +61,7 @@ This visualizes the county coverage -- how frequently does each county show up i
 
 ```{r, fig.width = 10, fig.height = 8}
 
-counties_present = df_hospital_admissions_counties %>%
+counties_present = df_safegraph_counties %>%
   group_by(geo_value) %>%
   summarize(value = n()) %>% ungroup() %>%
   filter(substr(geo_value, 3, 5) != "000")

@@ -2,7 +2,7 @@
 title: "Delphi's COVIDcast Project: <br> An Ecosystem for Tracking and Forecasting the Pandemic"
 author: Daniel J. McDonald <br> Department of Statistics <br> University of British Columbia <br>
 date: "<br> ![](delphi.png) ![](cmu.png) <br><br> 26 October 2020"
-footer: "Get the slides at: cmu-delphi.github.io/covidcast/tree/bctalk/docs/talks/bc-modeling/talk.html"
+footer: "Get the slides at: github.com/cmu-delphi/covidcast/tree/djm/bctalk/docs/talks/bc-modeling/"
 output:
   slidy_presentation:
     theme: cerulean
@@ -31,7 +31,7 @@ col = function(x, color = "#bb0000") {
 
 # What is Delphi
 
-- Formed in 2012, [Delphi](https://delphi.cmu.edu) to "develop the theory and practice of epidemic forecasting, and its role in decision-making"
+- [Delphi](https://delphi.cmu.edu) formed in 2012 to "develop the theory and practice of epidemic forecasting, and its role in decision-making"
 - Led by Profs. Roni Rosenfeld and Ryan Tibshirani at CMU
 - Participated in annual CDC flu forecasting challenges starting in 2013, earned top place in several 
 - Awarded `r col("CDC Center of Excellence")` for flu forecasting in 2019
@@ -42,7 +42,7 @@ col = function(x, color = "#bb0000") {
 
 # COVIDcast Ecosystem
 
-![](covidcast_overview.svg)
+![](covidcast_overview.svg){ height=75% }
 
 
 # This Talk
@@ -113,23 +113,24 @@ Implemented with `{evalcast}` package + API
 
 How many people have died from COVID-19 per day, in my state, since March 1?
 
-```{r, fig.width=8, fig.height=6}
+```{r, fig.width=9, fig.height=5}
 library(covidcast)
-deaths = covidcast_signal(data_source = "usa-facts", 
+deaths = suppressMessages(covidcast_signal(data_source = "usa-facts", 
                           signal = "deaths_7dav_incidence_num", 
                           start_day = "2020-03-01", 
                           end_day = "2020-10-15",
-                          geo_type = "state", geo_values = "in")
+                          geo_type = "state", geo_values = "in"))
 
 plot(deaths, plot_type = "line", 
-     title = "COVID-19 deaths in IN (7-day trailing average)")
+     title = "COVID-19 deaths in IN (7-day trailing average)") +
+  theme(legend.position = "none")
 ```
 
 # Example: Hospitalizations
 
 What percentage of daily hospital admissions are due to COVID-19 in IN, NY, TX, CA?
 
-```{r, fig.width=8, fig.height=6}
+```{r, fig.width=9, fig.height=5}
 hosp = covidcast_signal(data_source = "hospital-admissions", 
                         signal = "smoothed_adj_covid19",
                         start_day = "2020-03-01", end_day = "2020-10-15",
@@ -283,32 +284,34 @@ dv_as_of %>%
 
 3. Evaluation relies on the "actual outcome", but this might not be reliably known until some time has passed.
 
-Note: `evalcast` has a `backfill_buffer` parameter that forces one to wait a certain amount of time before trying to evaluate.
+Note: `{evalcast}` has a `backfill_buffer` parameter that forces one to wait a certain amount of time before trying to evaluate.
 
 # Making corrections
 
 Some data has other obvious issues ...
 
-```{r}
+```{r, fig.width=9, fig.height=5}
 riga = suppressMessages(covidcast_signal(
   "usa-facts","deaths_incidence_num",geo_type = "state",
   geo_values = c("ri","ga")))
 plot(filter(riga, geo_value=="ga"), 
-     plot_type="line", title="usa-facts: deaths_incidence_num --- GA")
+     plot_type="line", title="usa-facts: deaths_incidence_num --- GA") +
+  theme(legend.position = "none")
 ```
 
 # Making corrections
 
 Some data has other obvious issues ...
 
-```{r}
+```{r, fig.width=9, fig.height=5}
 plot(filter(riga, geo_value=="ri"), 
-     plot_type="line", title="usa-facts: deaths_incidence_num --- RI")
+     plot_type="line", title="usa-facts: deaths_incidence_num --- RI") +
+  theme(legend.position = "none")
 ```
 
 # Making corrections
 
-```{r}
+```{r, fig.width=10, fig.height=5}
 source("correct-riga.R") # available in the Github repo, 
                          # removed due to length
 riga %>% filter(time_value > ymd("2020-04-01")) %>%

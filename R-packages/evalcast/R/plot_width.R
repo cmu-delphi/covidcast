@@ -1,26 +1,33 @@
-#' Plot the interval width
+#' Plot interval width
 #'
-#' Interval width does not depend on the actual outcome, so this function can
-#' be called on predictions cards in addition to scorecards.
-#'
-#' @param cards a list of different forecasters scorecards (or predictions
-#'  cards), all on the same forecasting task (i.e., same ahead, etc.)
-#' @param alpha location of vertical line
+#' @param cards List of different score cards (or predictions cards), all on the
+#'   same forecasting task (i.e., same ahead, etc.).
+#' @param alpha Deprecated parameter to be removed soon.
+#' @param levels Quantile levels for the summary of interval width, to be
+#'   plotted. For example, `levels = c(0.5, 0.7, 0.9)`, the default, plots the
+#'   median, 70% and 90% quantiles of interval widths.
+#' @param legend_position Legend position, the default being "bottom".
+#' 
+#' @details Interval width does not depend on the actual outcome, so this
+#'   function can be called on predictions cards in addition to score cards.
+#' 
 #' @importFrom rlang .data set_names
 #' @importFrom purrr map
 #' @importFrom dplyr group_by summarize select bind_rows
 #' @importFrom tidyr pivot_longer unnest
-#' @importFrom ggplot2 ggplot aes geom_line geom_vline facet_wrap labs
+#' @importFrom ggplot2 ggplot aes geom_line geom_vline facet_wrap labs theme
 #' @importFrom stats median
 #' @export
-plot_width <- function(cards, alpha = 0.2) {
-  unique_attr(scorecards, "ahead")
-  unique_attr(scorecards, "geo_type")
-  unique_attr(scorecards, "incidence_period")
-  unique_attr(scorecards, "response")
-  scorecards <- intersect_locations(scorecards)
-  df <- scorecards %>%
-    set_names(all_attr(scorecards, "name_of_forecaster")) %>%
+plot_width <- function(cards, alpha = 0.2, levels = c(0.5, 0.7, 0.9),
+                       legend_position = "bottom") {
+  # make sure scorecards are comparable:
+  unique_attr(cards, "ahead")
+  unique_attr(cards, "geo_type") 
+  unique_attr(cards, "incidence_period")
+  unique_attr(cards, "response")
+  cards <- intersect_locations(cards)
+  df <- cards %>%
+    set_names(all_attr(cards, "name_of_forecaster")) %>%
     bind_rows(.id = "forecaster")
   df$coverage <- df$forecast_distribution %>%
     map(compute_width_single_distribution)
@@ -28,19 +35,16 @@ plot_width <- function(cards, alpha = 0.2) {
     select(.data$forecaster, .data$location, .data$forecast_date, .data$coverage) %>%
     unnest(.data$coverage) %>%
     group_by(.data$forecaster, .data$nominal, .data$forecast_date) %>%
-    summarize(median = stats::median(.data$width),
-              max = max(.data$width)) %>%
-    pivot_longer(cols = .data$median:.data$max,
-                 names_to = "summary",
-                 values_to = "width") %>%
+    summarize(level = as.factor(levels),
+              width = quantile(.data$width, probs = levels)) %>%
     ggplot(aes(x = .data$nominal,
                y = .data$width,
                color = .data$forecaster,
-               lty = summary)) +
+               lty = .data$level)) +
     geom_line() +
-    geom_vline(xintercept = 1 - alpha, lty = 2) +
-    facet_wrap(~ forecast_date) +
-    labs(x = "Nominal coverage", y = "Interval Width")
+    facet_wrap(~ .data$forecast_date) +
+    labs(x = "Nominal coverage", y = "Interval width") + 
+    theme_bw() + theme(legend.position = legend_position)
 }
 
 #' @importFrom rlang .data

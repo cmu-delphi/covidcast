@@ -22,13 +22,19 @@ NON_GEOMETRY_COLS = ["geo_value", "time_value", "direction", "issue", "lag", "va
                      "sample_size", "geo_type", "data_source", "signal", "state_fips"]
 
 
+def _convert_to_array(fig: matplotlib.figure.Figure) -> np.array:
+    """Covert Matplotlib Figure into an numpy array for comparison."""
+    return np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)  # get np array representation
+
+
 @pytest.mark.skipif(platform.system() != "Linux", reason="Linux specific plot rendering expected.")
 @patch("covidcast.plotting._signal_metadata")
-def test_plot_choropleth(mock_metadata):
+def test_plot(mock_metadata):
     mock_metadata.side_effect = [
         {"mean_value": 0.5330011, "stdev_value": 0.4683431},
         {"mean_value": 0.5330011, "stdev_value": 0.4683431},
         {"mean_value": 0.5304083, "stdev_value": 0.235302},
+        {"mean_value": 0.5705364, "stdev_value": 0.4348706},
         {"mean_value": 0.5705364, "stdev_value": 0.4348706},
     ]
     matplotlib.use("agg")
@@ -41,32 +47,32 @@ def test_plot_choropleth(mock_metadata):
     test_county["time_value"] = test_county.time_value.astype("datetime64[D]")
     test_county["value"] = test_county.value.astype("float")
 
-    fig1 = plotting.plot_choropleth(test_county, time_value=date(2020, 8, 4))
-    data1 = np.frombuffer(fig1.canvas.tostring_rgb(), dtype=np.uint8)  # get np array representation
+    county_fig1 = plotting.plot(test_county, time_value=date(2020, 8, 4))
     # give margin of +-2 for floating point errors and weird variations (1 isn't consistent)
-    assert np.allclose(data1, expected["expected_1"], atol=2, rtol=0)
+    assert np.allclose(_convert_to_array(county_fig1), expected["county1"], atol=2, rtol=0)
 
-    fig2 = plotting.plot_choropleth(test_county, cmap="viridis", figsize=(5, 5), edgecolor="0.8")
-    data2 = np.frombuffer(fig2.canvas.tostring_rgb(), dtype=np.uint8)
-    assert np.allclose(data2, expected["expected_2"], atol=2, rtol=0)
+    county_fig2 = plotting.plot(test_county, cmap="viridis", figsize=(5, 5), edgecolor="0.8")
+    assert np.allclose(_convert_to_array(county_fig2), expected["county2"], atol=2, rtol=0)
 
     # test state
     test_state = pd.read_csv(
         os.path.join(CURRENT_PATH, "../reference_data/test_input_state_signal.csv"), dtype=str)
     test_state["time_value"] = test_state.time_value.astype("datetime64[D]")
     test_state["value"] = test_state.value.astype("float")
-    fig3 = plotting.plot_choropleth(test_state)
-    data3 = np.frombuffer(fig3.canvas.tostring_rgb(), dtype=np.uint8)
-    assert np.allclose(data3, expected["expected_3"], atol=2, rtol=0)
+    state_fig = plotting.plot(test_state)
+    assert np.allclose(_convert_to_array(state_fig), expected["state"], atol=2, rtol=0)
 
     # test MSA
     test_msa = pd.read_csv(
         os.path.join(CURRENT_PATH, "../reference_data/test_input_msa_signal.csv"), dtype=str)
     test_msa["time_value"] = test_msa.time_value.astype("datetime64[D]")
     test_msa["value"] = test_msa.value.astype("float")
-    fig4 = plotting.plot_choropleth(test_msa)
-    data4 = np.frombuffer(fig4.canvas.tostring_rgb(), dtype=np.uint8)
-    assert np.allclose(data4, expected["expected_4"], atol=2, rtol=0)
+    msa_fig = plotting.plot(test_msa)
+    assert np.allclose(_convert_to_array(msa_fig), expected["msa"], atol=2, rtol=0)
+
+    # test bubble
+    msa_bubble_fig = plotting.plot(test_msa, plot_type="bubble")
+    assert np.allclose(_convert_to_array(msa_bubble_fig), expected["msa_bubble"], atol=2, rtol=0)
 
 
 def test_get_geo_df():

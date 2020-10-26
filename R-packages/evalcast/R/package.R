@@ -1,6 +1,6 @@
 #' evalcast
 #'
-#' A package to evaluate forecasters using the \code{covidcast} R package.
+#' A package to evaluate forecasters using the `covidcast` R package.
 #'
 #' @name evalcast-package
 #' @docType package

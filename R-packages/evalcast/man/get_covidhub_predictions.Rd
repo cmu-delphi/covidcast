@@ -2,28 +2,32 @@
 % Please edit documentation in R/get_covidhub_predictions.R
 \name{get_covidhub_predictions}
 \alias{get_covidhub_predictions}
-\title{Get predictions from a forecaster on COVIDHub}
+\title{Get predictions from a forecaster on the COVID Hub}
 \usage{
 get_covidhub_predictions(covid_hub_forecaster_name, forecast_dates = NULL, ...)
 }
 \arguments{
-\item{covid_hub_forecaster_name}{the name of the forecaster matching what it is called on covid hub}
+\item{covid_hub_forecaster_name}{String indicating of the forecaster
+(matching what it is called on the COVID Hub).}
 
-\item{forecast_dates}{a vector of class Date on which forecasts will be made.
-e.g. \code{c(lubridate::ymd("2020-09-07"), lubridate::ymd("2020-09-14"))}}
+\item{forecast_dates}{Vector of Date objects (or strings of the form
+"YYYY-MM-DD") indicating dates on which forecasts will be made. If \code{NULL},
+the default, then all currently available forecast dates from the given
+forecaster in the COVID Hub will be used.}
 
-\item{...}{additional parameters to be passed to \code{\link{filter_predictions}}.}
+\item{...}{Additional parameters to be passed to \code{\link[=filter_predictions]{filter_predictions()}}.}
 }
 \value{
-a list of predictions cards
+List of predictions cards.
 }
 \description{
-This function simply converts the predictions of forecasters submitting to
-the COVID Hub https://github.com/reichlab/covid19-forecast-hub/
-to the format of a predictions card, so it can be easily evaluated and
-compared.
+Simply converts the predictions of forecasters submitting to the \href{https://github.com/reichlab/covid19-forecast-hub/}{COVID Hub} to the format of a
+predictions card, so it can be easily evaluated and compared.
 }
 \details{
 For now, this function only supports (i) incident not cumulative predictions
-and (ii) epiweek not daily incidence_period predictions.
+and (ii) epiweek not daily incidence period predictions.
+}
+\seealso{
+\code{\link[=get_predictions]{get_predictions()}}
 }

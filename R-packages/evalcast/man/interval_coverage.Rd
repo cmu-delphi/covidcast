@@ -7,10 +7,10 @@
 interval_coverage(alpha)
 }
 \arguments{
-\item{alpha}{used to specify the nominal coverage of the interval}
+\item{alpha}{Parameter defining nominal interval coverage.}
 }
 \description{
-This function returns an error measure function indicating
-whether a central interval covers the actual value.  The interval
-is defined as the (alpha / 2)-quantile to the (1 - alpha / 2)-quantile.
+Returns an error measure function indicating whether a central interval
+covers the actual value. The interval is defined as the (alpha/2)-quantile
+to the (1 - alpha/2)-quantile.
 }

@@ -7,7 +7,7 @@
 intersect_locations(cards)
 }
 \arguments{
-\item{cards}{a list of predictions cards or a list of scorecards}
+\item{cards}{List of predictions cards or a list of score cards.}
 }
 \description{
 Remove locations that are not in all cards

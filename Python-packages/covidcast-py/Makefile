@@ -1,8 +1,8 @@
 .PHONY = lint, test, install-requirements, build-and-install
 
 install-requirements:
-	pip install -r requirements_ci.txt
 	pip install -r requirements_dev.txt
+	pip install -r requirements_ci.txt
 
 build-and-install: install-requirements
 	python3 setup.py clean

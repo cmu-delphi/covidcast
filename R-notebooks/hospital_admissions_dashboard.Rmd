@@ -66,12 +66,6 @@ counties_present = df_hospital_admissions_counties %>%
   summarize(value = n()) %>% ungroup() %>%
   filter(substr(geo_value, 3, 5) != "000")
 
-# These are all required for rendering using covidcast.plot
-counties_present$time_value = "2020-04-15"
-counties_present$issue = "2020-04-15"
-attributes(counties_present)$geo_type = "county"
-class(counties_present) = c("covidcast_signal", "data.frame")
-
-plot(counties_present, title = "How frequently do counties appear in the last 28 days?", range =
-       c(0, 28))
+source("dashboard_functions.R")
+plot_28_day_frequency(counties_present, "county")
 ```

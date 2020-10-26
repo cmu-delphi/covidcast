@@ -58,6 +58,8 @@ it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahea
 
 \item{geo_values}{Vector or list of locations whose data will be passed to
 \code{forecaster}. The default, "*", fetches all that is available in the API.}
+
+\item{...}{Additional arguments to be passed to \code{forecaster()}.}
 }
 \description{
 Get predictions cards for a single date

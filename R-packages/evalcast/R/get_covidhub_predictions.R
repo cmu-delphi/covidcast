@@ -1,19 +1,22 @@
-#' Get predictions from a forecaster on COVIDHub
+#' Get predictions from a forecaster on the COVID Hub
 #'
-#' This function simply converts the predictions of forecasters submitting to
-#' the COVID Hub https://github.com/reichlab/covid19-forecast-hub/
-#' to the format of a predictions card, so it can be easily evaluated and
-#' compared.
+#' Simply converts the predictions of forecasters submitting to the [COVID
+#' Hub](https://github.com/reichlab/covid19-forecast-hub/) to the format of a
+#' predictions card, so it can be easily evaluated and compared.
 #'
 #' For now, this function only supports (i) incident not cumulative predictions
-#' and (ii) epiweek not daily incidence_period predictions.
+#' and (ii) epiweek not daily incidence period predictions.
 #'
-#' @param covid_hub_forecaster_name the name of the forecaster matching what it is called on covid hub
-#' @param forecast_dates a vector of class Date on which forecasts will be made.
-#'   e.g. \code{c(lubridate::ymd("2020-09-07"), lubridate::ymd("2020-09-14"))}
-#' @param ... additional parameters to be passed to \code{\link{filter_predictions}}.
-#' @return a list of predictions cards
-#' @export
+#' @param covid_hub_forecaster_name String indicating of the forecaster
+#'   (matching what it is called on the COVID Hub).
+#' @param forecast_dates Vector of Date objects (or strings of the form
+#'   "YYYY-MM-DD") indicating dates on which forecasts will be made. If `NULL`,
+#'   the default, then all currently available forecast dates from the given
+#'   forecaster in the COVID Hub will be used.
+#' @param ... Additional parameters to be passed to [filter_predictions()].
+#' @return List of predictions cards.
+#' 
+#' @seealso [get_predictions()]
 #' @importFrom readr read_csv
 #' @importFrom rlang .data
 #' @importFrom purrr flatten
@@ -21,6 +24,7 @@
 #' @importFrom tidyr separate
 #' @importFrom tibble tibble
 #' @importFrom stringr str_detect
+#' @export
 get_covidhub_predictions <- function(covid_hub_forecaster_name,
                                      forecast_dates = NULL, ...) {
   url <- "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed"
@@ -85,12 +89,14 @@ get_covidhub_predictions <- function(covid_hub_forecaster_name,
   flatten(pcards) %>% filter_predictions(...)
 }
 
-#' Get Available Forecast Dates for Forecaster on COVID Hub
+#' Get available forecast dates for a forecaster on the COVID Hub
 #'
 #' Retrieves the forecast dates that a forecaster submitted to
-#' the COVID Hub https://github.com/reichlab/covid19-forecast-hub/
+#' the [COVID Hub](https://github.com/reichlab/covid19-forecast-hub/).
 #'
-#' @param covid_hub_forecaster_name the name of a forecaster on the COVID Hub.
+#' @param covid_hub_forecaster_name String indicating of the forecaster
+#'   (matching what it is called on the COVID Hub).
+#' 
 #' @importFrom rvest html_nodes html_text
 #' @importFrom xml2 read_html
 #' @importFrom stringr str_remove_all str_match_all
@@ -110,7 +116,7 @@ get_forecast_dates <- function(covid_hub_forecaster_name) {
 #' @importFrom xml2 read_html
 #' @importFrom stringr str_subset
 get_covid_hub_forecaster_names <- function() {
-  warning("This should be done with the github API.")
+  warning("This should be reimplemented using the Zoltar API ... coming soon.")
   url <- "https://github.com/reichlab/covid19-forecast-hub/tree/master/data-processed/"
   xml2::read_html(url) %>%
     rvest::html_nodes(xpath="//*[@id=\"js-repo-pjax-container\"]/div[2]/div/div[3]//a[@class='js-navigation-open link-gray-dark']") %>%

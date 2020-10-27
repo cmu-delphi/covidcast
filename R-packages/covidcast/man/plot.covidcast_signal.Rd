@@ -12,8 +12,6 @@
   range = NULL,
   choro_col = c("#FFFFCC", "#FD893C", "#800026"),
   alpha = 0.5,
-  direction = FALSE,
-  dir_col = c("#6F9CC6", "#E4E4E4", "#C56B59"),
   bubble_col = "purple",
   num_bins = 8,
   title = NULL,
@@ -59,13 +57,6 @@ that from covidcast.cmu.edu.}
 used in the maps. For choropleth maps, this determines the transparency
 level for the mega counties. For bubble maps, this determines the
 transparency level for the bubbles. Default is 0.5.}
-
-\item{direction}{Should direction be visualized (instead of intensity) for
-the choropleth map? Default is \code{FALSE}.}
-
-\item{dir_col}{Vector of colors, as specified in hex code, to use for the
-direction color scale. Must be of length 3. Default is similar to that from
-covidcast.cmu.edu.}
 
 \item{bubble_col}{Bubble color for the bubble map. Default is "purple".}
 
@@ -117,8 +108,7 @@ labels.}
 For choropleth maps only:
 \describe{
 \item{\code{legend_n}}{Number of values to label on the legend color bar. Ignored
-for discrete color scales (when \code{breaks} is set manually) and for direction
-maps.}
+for discrete color scales (when \code{breaks} is set manually).}
 }
 
 For bubble maps only:

@@ -31,7 +31,7 @@ comb <- suppressMessages(
 summary(comb)
 
 inum <- suppressMessages(
-  covidcast_signal(data_source = "jhu-csse",
+  covidcast_signal(data_source = "usa-facts",
                    signal = "confirmed_7dav_incidence_num",
                    start_day = "2020-07-01", end_day = "2020-07-14")
 )
@@ -84,7 +84,7 @@ which counties have cumulative case rates of at least 1/100?
 
 ```{r}
 cprop <- suppressMessages(
-  covidcast_signal(data_source = "jhu-csse",
+  covidcast_signal(data_source = "usa-facts",
                    signal = "confirmed_cumulative_prop",
                    start_day = "2020-07-01", end_day = "2020-07-14")
 )
@@ -127,7 +127,7 @@ proportion signal:
 
 ```{r}
 iprop <- suppressMessages(
-  covidcast_signal(data_source = "jhu-csse",
+  covidcast_signal(data_source = "usa-facts",
                    signal = "confirmed_7dav_incidence_prop",
                    start_day = "2020-07-01", end_day = "2020-07-14")
 )
@@ -168,7 +168,7 @@ comb_st <- covidcast_signal(data_source = "indicator-combination",
                                signal = "nmf_day_doc_fbc_fbs_ght",
                                start_day = "2020-04-15", end_day = "2020-07-01",
                                geo_type = "state")
-inum_st <- covidcast_signal(data_source = "jhu-csse",
+inum_st <- covidcast_signal(data_source = "usa-facts",
                                signal = "confirmed_7dav_incidence_num",
                                start_day = "2020-04-15", end_day = "2020-07-01",
                                geo_type = "state")
@@ -208,7 +208,7 @@ comb_md <- covidcast_signal(data_source = "indicator-combination",
                                signal = "nmf_day_doc_fbc_fbs_ght",
                                start_day = "2020-06-01", end_day = "2020-07-15",
                                geo_values = name_to_fips("Miami-Dade"))
-inum_md <- covidcast_signal(data_source = "jhu-csse",
+inum_md <- covidcast_signal(data_source = "usa-facts",
                                signal = "confirmed_7dav_incidence_num",
                                start_day = "2020-06-01", end_day = "2020-07-15",
                                geo_values = name_to_fips("Miami-Dade"))

@@ -23,14 +23,14 @@ start_day <- "2020-03-01"
 end_day <- "2020-08-15"
 
 inum <- suppressMessages(
-  covidcast_signal(data_source = "jhu-csse",
+  covidcast_signal(data_source = "usa-facts",
                    signal = "confirmed_7dav_incidence_num", 
                    start_day = start_day, end_day = end_day)
 )
 summary(inum)
 
 dnum <- suppressMessages(
-  covidcast_signal(data_source = "jhu-csse",
+  covidcast_signal(data_source = "usa-facts",
                    signal = "deaths_7dav_incidence_num", 
                    start_day = start_day, end_day = end_day)
 )

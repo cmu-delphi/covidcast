@@ -27,7 +27,8 @@ compute_coverage <- function(score_card) {
               msg="Can't compute coverage for an empty score_card.")
   probs <- score_card$forecast_distribution[[1]]$probs
   assert_that(length(probs) %% 2 == 1 & all(abs(probs + rev(probs) - 1) < 1e-3),
-              msg="Quantile levels need to be symmetric around 0.5 (and include 0.5).")
+              msg="Quantile levels need to be symmetric around 0.5 (and include 0.5) to
+                   computer coverage.")
   num_intervals <- (length(probs) - 1) / 2
   nominal_coverage_probs <- 1 - 2 * probs[1:num_intervals]
   as.list(1:num_intervals) %>%
@@ -54,7 +55,8 @@ compute_coverage <- function(score_card) {
 compute_calibration <- function(score_card) {
   probs <- score_card$forecast_distribution[[1]]$probs
   assert_that(length(probs) %% 2 == 1 & all(abs(probs + rev(probs) - 1) < 1e-3),
-              msg="Quantile levels need to be symmetric around 0.5 (and include 0.5).")
+              msg="Quantile levels need to be symmetric around 0.5 (and include 0.5)
+                   to compute calibration.")
   as.list(1:length(probs)) %>%
     map_dfr(function(i) {
       # itop <- length(probs) - i + 1

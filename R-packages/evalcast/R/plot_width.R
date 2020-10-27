@@ -46,6 +46,10 @@ plot_width <- function(cards, alpha = 0.2) {
 #' @importFrom rlang .data
 #' @importFrom dplyr left_join filter transmute
 compute_width_single_distribution <- function(forecast_distribution) {
+  probs <- forecast_distribution$probs
+  assert_that(length(probs) %% 2 == 1 & all(abs(probs + rev(probs) - 1) < 1e-3),
+              msg="Quantile levels need to be symmetric around 0.5 (and include 0.5)
+                   to plot interval width.")
   lower <- forecast_distribution %>% mutate(probs = round(.data$probs, 4))
   upper <- forecast_distribution %>% mutate(probs = round(1 - .data$probs, 4))
   lower %>%

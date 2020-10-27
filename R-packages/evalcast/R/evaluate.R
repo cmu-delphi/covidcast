@@ -171,3 +171,5 @@ check_valid_forecaster_output <- function(pred_card) {
            bad_quantiles = bad_quantiles) %>%
     filter(null_forecasts | wrong_probs | bad_quantiles | wrong_format)
 }
+ 
+ TO DO 

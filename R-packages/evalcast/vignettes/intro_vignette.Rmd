@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-The `evalcast` package provides the infrastructure for developing and evaluating probabilistic forecasters that are based on data obtained with the [covidcast](https://cmu-delphi.github.io/covidcast/covidcastR/) R package.  A unique feature of the `covidcast` API is that it allows one to get the data that would have been available *as of* a certain date.  This accounts for a difficult property of working with certain COVID-19 data sources, which is that they are backfilled (in other words, the value of some variable on a certain day is updated as time passes).  Not properly accounting for backfill can lead to overly optimistic retrospective evaluations of forecasts and therefore poorly trained forecasters.  The `evalcast` package is designed so that forecasters avoid these pitfalls.
+The `evalcast` package provides the infrastructure for developing and evaluating probabilistic forecasters that are based on data obtained with the [covidcast](https://cmu-delphi.github.io/covidcast/covidcastR/) R package.  A unique feature of the `covidcast` API is that it can retrieve data that would have been available *as of* a certain date.  This accounts for a difficult property of working with certain COVID-19 data sources, which is that they may be backfilled (retrospectively updated).  Not properly accounting for backfill can lead to overly optimistic retrospective evaluations of forecasts and therefore poorly trained forecasters.  The `evalcast` package is designed so that forecasters avoid these pitfalls.
 
 ## A first look at `evalcast`
 
@@ -33,29 +33,33 @@ The function `get_predictions` runs your forecaster on the dates you specify.  W
 
 ```{r}
 library(evalcast)
-library(covidcast) # needed because covidcast make file does not run when only evalcast is libraried
+library(covidcast)
+library(lubridate)
 
-forecast_dates <- get_forecast_dates("CMU-TimeSeries")[1] # Reducing to 1 for testing
+forecast_dates <- as_date(get_forecast_dates("CMU-TimeSeries"))
+forecast_dates_july <- forecast_dates[forecast_dates >= "2020-07-01" & forecast_dates <= "2020-07-31"]
 
-#Seems very inefficient, retrieves from 2020-06-15 to each forecast date, so does ~4x the work
+# Retrieve past predictions from COVIDhub
+predictions_cards_yyg <- get_covidhub_predictions("YYG-ParamSearch", forecast_dates_july)
+predictions_cards_cmu <- get_covidhub_predictions("CMU-TimeSeries", forecast_dates_july)
+
+# Make new predictions using baseline_forecaster
 predictions_cards <- get_predictions(baseline_forecaster,
                                      name_of_forecaster = "baseline",
                                      signals = signals,
-                                     forecast_dates = forecast_dates,
+                                     forecast_dates = forecast_dates_july,
                                      incidence_period = "epiweek",
                                      ahead = 3,
                                      geo_type = "state")
-predictions_cards_yyg <- get_covidhub_predictions("YYG-ParamSearch", forecast_dates)
-predictions_cards_cmu <- get_covidhub_predictions("CMU-TimeSeries", forecast_dates)
 ```
 
-This creates a list of `r length(predictions_cards)` predictions cards, one for each (forecast date, ahead) pairs.  Let's look at a predictions card:
+This creates a list of `r length(predictions_cards_cmu)` predictions cards, one for each (forecast date, ahead) pairs.  Let's look at a predictions card:
 
 ```{r}
 predictions_cards_cmu[[1]]
 ```
 
-Forecasts are probabilistic, meaning that rather than providing a single predicted value, a distribution of values is provided. For example, the baseline forecaster predicts the following distribution in California on ...
+Forecasts are probabilistic, meaning that rather than providing a single predicted value, a distribution of values is provided. For example, the baseline forecaster would have predicted the following distribution in California for X weeks after `r forecast_dates_july[1]`
 ```{r}
 pc <- predictions_cards_cmu[[1]]
 pc[pc$location == "06", ]$forecast_distribution[[1]]
@@ -71,11 +75,9 @@ err_measures <- list(wis = weighted_interval_score,
                      coverage_80 = interval_coverage(alpha = 0.2))
 ```
 
+We may now create scorecards for each forecaster's predictions or for a filtered subset. 
 
 ```{r}
-scorecards <- evaluate_predictions(filter_predictions(predictions_cards, ahead = 3), 
-                                   err_measures, 
-                                   backfill_buffer = 10)
 scorecards_yyg <- evaluate_predictions(filter_predictions(predictions_cards_yyg, ahead = 3), 
                                    err_measures, 
                                    backfill_buffer = 10)
@@ -86,8 +88,14 @@ pcards_cmu_death3 <- filter_predictions(predictions_cards_cmu,
 scorecards_cmu <- evaluate_predictions(pcards_cmu_death3, 
                                    err_measures, 
                                    backfill_buffer = 10)
+
+scorecards <- evaluate_predictions(filter_predictions(predictions_cards, ahead = 3), 
+                                   err_measures, 
+                                   backfill_buffer = 10)
 ```
-Let's look at the scorecard for `ahead = 4`, i.e., for 4-epiweek ahead forecasts.
+
+Let's look at the `baseline_forecaster's` scorecard for 3-epiweek ahead forecasts.
+
 ```{r}
 scorecards[[1]]
 ```
@@ -109,16 +117,6 @@ plot_calibration(scorecards_cmu[[1]], type = "traditional")
 plot_coverage(list(scorecards_yyg[[1]],
                   scorecards_cmu[[1]]))
 plot_width(scorecards_cmu[[1]])
-```
-
-### Tables of these performance measures
-
-Not yet implemented:
-
-```{r, eval=FALSE}
-tabulate_by_location(list(scorecards[[1]],scorecards_othermethod[[1]]))
-tabulate_by_time(list(scorecards[[1]],scorecards_othermethod[[1]]))
-tabulate(list(scorecards[[1]],scorecards_othermethod[[1]]))
 ```
 
   

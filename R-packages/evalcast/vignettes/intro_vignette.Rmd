@@ -1,7 +1,7 @@
 ---
 title: "Introduction to evalcast"
 author: "Jacob Bien"
-date: "9/13/2020"
+date: "10/27/2020"
 output: html_document
 ---
 
@@ -9,11 +9,13 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-The `evalcast` package provides the infrastructure for developing and evaluating probabilistic forecasters that are based on data obtained with the [covidcast](https://cmu-delphi.github.io/covidcast/covidcastR/) R package.  A unique feature of the `covidcast` API is that it can retrieve data that would have been available *as of* a certain date.  This accounts for a difficult property of working with certain COVID-19 data sources, which is that they may be backfilled (retrospectively updated).  Not properly accounting for backfill can lead to overly optimistic retrospective evaluations of forecasts and therefore poorly trained forecasters.  The `evalcast` package is designed so that forecasters avoid these pitfalls.
+The `evalcast` package provides the infrastructure for developing and evaluating probabilistic forecasters that are based on data obtained with the [covidcast](https://cmu-delphi.github.io/covidcast/covidcastR/) R package.  A unique feature of the `covidcast` API is that it can retrieve data that would have been available *as of* a certain date.  This accounts for a difficult property of working with certain COVID-19 data sources, which is that they may be backfilled (retrospectively updated).  Failing to account for backfill can lead to poorly trained forecasters and overly optimistic retrospective evaluations.  The `evalcast` package is designed to help forecasters avoid these pitfalls.
 
-## A first look at `evalcast`
 
-Before getting into the details, let us start by showing a typical usage of `evalcast`.  Let's say you've written a forecaster based on data from the `covidcast` API, and you want to perform backtesting to see how well it would have performed in the past.  For this example, we'll use `baseline_forecaster`, a very simple forecaster that is provided in `evalcast` to use as a template.
+## Testing forecasters
+We will use the included `baseline_forecaster` to demonstrate how to backtest a forecaster and compare its predictions to contemporaneous forecasts submitted to CovidHub. While `baseline_forecaster` is very simple, it can be used as a template for creating more sophisticated forecasters.
+
+The format of a forecaster is aligned with the [CovidHub submission instructions](https://github.com/reichlab/covid19-forecast-hub/blob/master/data-processed/README.md) and with the [covidcast](https://cmu-delphi.github.io/covidcast/covidcastR/) R package.
 
 ### Specify the signals that will be used by forecaster
 
@@ -29,7 +31,7 @@ signals
 
 ### Run the forecaster on some dates
 
-The function `get_predictions` runs your forecaster on the dates you specify.  Within the `evalcast` framework, forecasters do not internally download data.  Rather, data is managed by `get_predictions` so as to keep forecasters honest.  The function `get_predictions` will run the forecaster for you and ensure that the data you are providing it is *precisely the data that would have been available as of* the forecast date.
+Within the `evalcast` framework, forecasters do not directly retrieve historic data. Instead, `get_predictions` provides *only the data that would have been available at the time* to the specified forecaster in order to generate retrospective predictions.
 
 ```{r}
 library(evalcast)
@@ -39,7 +41,7 @@ library(lubridate)
 forecast_dates <- as_date(get_forecast_dates("CMU-TimeSeries"))
 forecast_dates_july <- forecast_dates[forecast_dates >= "2020-07-01" & forecast_dates <= "2020-07-31"]
 
-# Retrieve past predictions from COVIDhub
+# Retrieve past predictions from CovidHub
 predictions_cards_yyg <- get_covidhub_predictions("YYG-ParamSearch", forecast_dates_july)
 predictions_cards_cmu <- get_covidhub_predictions("CMU-TimeSeries", forecast_dates_july)
 
@@ -53,19 +55,21 @@ predictions_cards <- get_predictions(baseline_forecaster,
                                      geo_type = "state")
 ```
 
-This creates a list of `r length(predictions_cards_cmu)` predictions cards, one for each (forecast date, ahead) pairs.  Let's look at a predictions card:
+`baseline_forecaster` created a list of `r length(predictions_cards)` predictions cards, (one for each `(forecast date, ahead)` pair).  Let's look at a predictions card:
 
 ```{r}
-predictions_cards_cmu[[1]]
+predictions_cards[[1]]
 ```
 
-Forecasts are probabilistic, meaning that rather than providing a single predicted value, a distribution of values is provided. For example, the baseline forecaster would have predicted the following distribution in California for X weeks after `r forecast_dates_july[1]`
+Forecasts are probabilistic, meaning that rather than predicting a single value, a distribution of values is generated. For example, the baseline forecaster would have predicted the following distribution in California for `r attributes(predictions_cards_cmu[[1]])$ahead` week(s) after `r attributes(predictions_cards_cmu[[1]])$forecast_date`
 ```{r}
 pc <- predictions_cards_cmu[[1]]
-pc[pc$location == "06", ]$forecast_distribution[[1]]
+ca_fips = covidcast::name_to_fips("California")
+ca_code = substr(ca_fips, 0, 2) # States are identified by a 2 character code
+pc[pc$location == ca_code, ]$forecast_distribution[[1]]
 ```
 
-### Evaluate the performance of this forecaster
+### Evaluate the performance of a forecaster
 
 Now that we've made these predictions, we'd like to know how well they perform.  By default, `evalcast` uses the following three performance measures, but these can be easily substituted:
 
@@ -88,19 +92,18 @@ pcards_cmu_death3 <- filter_predictions(predictions_cards_cmu,
 scorecards_cmu <- evaluate_predictions(pcards_cmu_death3, 
                                    err_measures, 
                                    backfill_buffer = 10)
-
 scorecards <- evaluate_predictions(filter_predictions(predictions_cards, ahead = 3), 
                                    err_measures, 
                                    backfill_buffer = 10)
 ```
 
-Let's look at the `baseline_forecaster's` scorecard for 3-epiweek ahead forecasts.
+Let's look at the `baseline_forecaster`'s scorecard for 3-epiweek ahead forecasts.
 
 ```{r}
 scorecards[[1]]
 ```
 
-**Technical note:** What does `backfill_buffer = 10` do?  When we evaluate, a forecaster in backtesting, we are assuming that we know what actually occurred.  However, in light of backfill, we may not trust the data for some period of time.  The argument `backfill_buffer` allows us to specify how many days until we believe that the data has "settled down" and is unlikely to be updated further.  The choice of this argument will depend on the particular signal you are forecasting.
+**Technical note:** What does `backfill_buffer = 10` do?  When we evaluate a forecaster in backtesting we are assuming that we know what actually occurred.  However, in light of backfill, we may not trust the data for some period of time.  The argument `backfill_buffer` allows us to specify how many days until we believe that the data has "settled down" and is unlikely to be updated further.  The choice of this argument will depend on the particular signal you are forecasting.
 
 ### Plots of these performance measures
 
@@ -108,8 +111,8 @@ scorecards[[1]]
 scorecards_list <- c(scorecards_yyg,scorecards_cmu,scorecards)
 plot_measure(scorecards_list, "wis")
 plot_measure(scorecards_list, "ae")
-plot_measure(c(scorecards_yyg,scorecards_cmu,scorecards), "wis", type = "dotplot") + scale_x_log10()
-plot_measure(c(scorecards_yyg,scorecards_cmu,scorecards), "ae", type = "dotplot") + scale_x_log10()
+plot_measure(scorecards_list, "wis", type = "dotplot") + scale_x_log10()
+plot_measure(scorecards_list, "ae", type = "dotplot") + scale_x_log10()
 plot_calibration(scorecards_cmu[[1]], type = "wedge")
 plot_calibration(scorecards_yyg[[1]], type = "wedge")
 plot_calibration(scorecards[[1]], type = "wedge")
@@ -119,14 +122,6 @@ plot_coverage(list(scorecards_yyg[[1]],
 plot_width(scorecards_cmu[[1]])
 ```
 
-  
-## Writing forecasters
-
-The starting point for using `evalcast` will be writing your own forecaster.
-
-The `evalcast` package defines a very simple forecaster called `baseline_forecaster`, which can serve as a template for writing more sophisticated forecasters.
-
-The format of a forecaster is aligned with the [CovidHub submission instructions](https://github.com/reichlab/covid19-forecast-hub/blob/master/data-processed/README.md) and with the [covidcast](https://cmu-delphi.github.io/covidcast/covidcastR/) R package.
 
 ## Cumulative forecasting
 

@@ -1,7 +1,5 @@
 ---
 title: "Introduction to evalcast"
-author: "Jacob Bien"
-date: "10/27/2020"
 output: html_document
 ---
 
@@ -105,17 +103,15 @@ scorecards[[1]]
 
 **Technical note:** What does `backfill_buffer = 10` do?  When we evaluate a forecaster in backtesting we are assuming that we know what actually occurred.  However, in light of backfill, we may not trust the data for some period of time.  The argument `backfill_buffer` allows us to specify how many days until we believe that the data has "settled down" and is unlikely to be updated further.  The choice of this argument will depend on the particular signal you are forecasting.
 
-### Plots of these performance measures
+### Plots of performance measures
+
+`evalcast` provides a number of tools to visually assess a forecaster (including comparisons with other forecasters):
 
 ```{r}
 scorecards_list <- c(scorecards_yyg,scorecards_cmu,scorecards)
 plot_measure(scorecards_list, "wis")
-plot_measure(scorecards_list, "ae")
-plot_measure(scorecards_list, "wis", type = "dotplot") + scale_x_log10()
 plot_measure(scorecards_list, "ae", type = "dotplot") + scale_x_log10()
 plot_calibration(scorecards_cmu[[1]], type = "wedge")
-plot_calibration(scorecards_yyg[[1]], type = "wedge")
-plot_calibration(scorecards[[1]], type = "wedge")
 plot_calibration(scorecards_cmu[[1]], type = "traditional")
 plot_coverage(list(scorecards_yyg[[1]],
                   scorecards_cmu[[1]]))

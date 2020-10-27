@@ -1,17 +1,19 @@
-#' Append time-shifted values to a `covidcast_signal` data frame
+#' Apply time-shifts to the values in a `covidcast_signal` data frame 
 #'
-#' Appends time-shifted values, lagging or leading, to a `covidcast_signal` data
-#' frame. (Only the latest issue from each data frame is retained.)
+#' Applies time-shifts to the values in a `covidcast_signal` data frame. (Only
+#' the latest issue from each data frame is retained.) 
 #'
-#' @param x The `covidcast_signal` data frame, or a list of such data frames.
-#' @param dt Vector of shifts to append for the values in the data frame `x`.
+#' @param x Single `covidcast_signal` data frame, or a list of such data
+#'   frames. 
+#' @param dt Vector of shifts to apply to the values in the data frame `x`.
 #'   Positive values are interpreted as shifts forward in time, and negative
 #'   values are shifts backward in time. For example, if `dt = 1`, then the
 #'   values are shifted forward 1 day in time (so, data on June 1 becomes data
-#'   on June 2, and so on). When `x` is a list of data frames, `dt` can either
-#'   be a single vector of shifts or a list of shift vectors of the same length
-#'   as `x` (in order to apply, respectively, the same shifts or a different set
-#'   of shifts to each data frame in `x`).
+#'   on June 2, and so on); if `dt = 0`, then the values are left as is. When
+#'   `x` is a list of data frames, `dt` can either be a single vector of shifts
+#'   or a list of vectors of shifts, this list having the same length as `x` (in
+#'   order to apply, respectively, the same shifts or a different set of shifts
+#'   to each data frame in `x`). 
 #' 
 #' @return When `x` is a data frame, the return value is a column-augmented
 #'   version of `x` with one new column per value of `dt`. The new column names
@@ -19,10 +21,10 @@
 #'   forward 1 day and backward 1 day, respectively. When `x` is a list of data
 #'   frames, the return value is a list of column-augmented data frames.
 #'
-#' @export
-append_shifts = function(x, dt) {
+#' @noRd
+apply_shifts = function(x, dt) {
   # If we're passed a single covidcast_signal data frame
-  if ("covidcast_signal" %in% class(x)) return(append_shifts_one(x, dt))
+  if ("covidcast_signal" %in% class(x)) return(apply_shifts_one(x, dt))
   
   # If we're passed a list of covidcast_signal data frames
   else if (is.list(x) && all(sapply(lapply(x, class), function(v) {
@@ -34,8 +36,8 @@ append_shifts = function(x, dt) {
     else if (length(dt) != length(x)) {
       stop("If `dt` is a list, it must have the same length as `x`.")
     }
-
-    return(mapply(append_shifts_one, x, dt, SIMPLIFY = FALSE))
+    
+    return(mapply(apply_shifts_one, x, dt, SIMPLIFY = FALSE))
   }
 
   # Else throw an error
@@ -45,74 +47,134 @@ append_shifts = function(x, dt) {
   }
 }
 
-# Function to append shifts for one covidcast_signal data frame
+# Function to apply shifts for one covidcast_signal data frame
 
-append_shifts_one = function(x, dt) {
+apply_shifts_one = function(x, dt) {
   x = latest_issue(x)
   attrs = attributes(x)
   attrs = attrs[!(names(attrs) %in% c("row.names", "names"))]
   
   # Make sure that we have a complete record of dates for each geo_value (fill
   # with NAs as necessary)
-  x_all = x %>% group_by(geo_value) %>%
-    summarize(time_value = seq.Date(as.Date(min(time_value)),
-                                    as.Date(max(time_value)),
-                                    by = "day")) %>% ungroup()
+  x_all = x %>% dplyr::group_by(geo_value) %>%
+    dplyr::summarize(time_value = seq.Date(as.Date(min(time_value)),
+                                           as.Date(max(time_value)),
+                                           by = "day")) %>%
+    dplyr::ungroup()
   x = dplyr::full_join(x, x_all, by = c("geo_value", "time_value"))
   
   # Group by geo value, sort rows by increasing time
   x = x %>% dplyr::group_by(geo_value) %>% dplyr::arrange(time_value) 
   
-  # Loop over dt, and append lag value or lead value
+  # Loop over dt, and apply lag or lead to the value column
   for (n in dt) {
     fun = ifelse(n < 0, lag, lead)
     varname = sprintf("value%+d", n)
     x = x %>% dplyr::mutate(!!varname := fun(value, n = abs(n)))
   }
   
-  # Ungroup, restore attributes, and return
-  x = ungroup(x)
+  # Remove value column, restore attributes, and return
+  x = dplyr::select(x, -value)
   attributes(x) = c(attributes(x), attrs)
   return(x)
 }
 
 ##########
 
-#' Aggregate list of `covidcast_signal` objects into one data frame
+#' Aggregate `covidcast_signal` objects into one data frame
 #'
-#' Aggregates a list of `covidcast_signal` objects into one data frame, in
-#' either "wide" or "long" format. (In "wide" aggregation, only the latest issue
-#' from each data frame is retained, and several columns are dropped.) 
+#' Aggregates `covidcast_signal` objects into one data frame, in either "wide"
+#' or "long" format. (In "wide" aggregation, only the latest issue from each
+#' data frame is retained, and several columns, including `data_source` and
+#' `signal` are dropped; see details below).   
 #' 
-#' @param x List of `covidcast_signal` data frames.
+#' @param x Single `covidcast_signal` data frame, or a list of such data
+#'   frames.
+#' @param dt Vector of shifts to apply to the values in the data frame `x`.
+#'   Positive values are interpreted as shifts forward in time, and negative
+#'   values are shifts backward in time. For example, if `dt = 1`, then the
+#'   values are shifted forward 1 day in time (so, data on June 1 becomes data
+#'   on June 2, and so on); if `dt = 0`, then the values are left as is. When
+#'   `x` is a list of data frames, `dt` can either be a single vector of shifts
+#'   or a list of vectors of shifts, this list having the same length as `x` (in
+#'   order to apply, respectively, the same shifts or a different set of shifts
+#'   to each data frame in `x`).
 #' @param format One of either "wide" or "long". The default is "wide".
 #'
-#' @return Data frame of aggregated signals in "wide" or "long" form, depending 
-#'   on `format`. Important: in "wide" aggregation, only the latest issue from
-#'   each data frame is retained, and the columns `data_source`, `signal`,
-#'   `issue`, `lag`, `stderr`, `sample_size` are all dropped from the returned
-#'   data frame.
+#' @details This function can be thought of having three use cases. In all three
+#'   cases, the result will be a new data frame in either "wide" or "tall"
+#'   format, depending on `format`.
 #'
-#'   For convenience, the function `aggregate_signals()` can operate on a list
-#'   of `covidcast_signal` data frames with time-shifted values (so one can
-#'   first call `append_shifts()`, and then `aggregate_signals()`). When there
-#'   are time-shifted values, and `format` is "tall", then a `dt` column gets
-#'   appended to the output data frame.
+#'   The first use case is to apply time-shifts to the values in a given
+#'   `covidcast_signal` object. In this use case, `x` is a `covidcast_signal`
+#'   data frame and `dt` is a vector of shifts. 
+#'
+#'   The second use case is to bind together, into one data frame, signals that
+#'   are returned by `covidcast_signals()`. In this use case, `x` is a list of
+#'   `covidcast_signal` data frames, and `dt` is `NULL`. 
+#'
+#'   The third use case is a combination of the first two: to bind together
+#'   signals returned by `covidcast_signals()`, and simultaneously, apply
+#'   time-shifts to their values. In this use case, `x` is a list of
+#'   `covidcast_signal` data frames, and `dt` is either a vector of shifts---to
+#'   apply the same shifts for each signal in `x`, or a list of vector of
+#'   shifts---to apply different shifts for each signal in `x`.
+#'
+#' @return Data frame of aggregated signals in "wide" or "long" form, depending 
+#'   on `format`. In "long" form, an extra column `dt` is appended to indicate
+#'   the value of the time-shift. In "wide" form, only the latest issue of data
+#'   is retained, and the columns `data_source`, `signal`, `issue`, `lag`,
+#'   `stderr`, `sample_size` are all dropped from the returned data frame. Each
+#'   unique signal---defined by a combination of data source name, signal name,
+#'   and time-shift---is given its own column, whose name indicates its defining 
+#'   quantities. For example, the column name
+#'   "value+2:usa-facts_confirmed_incidence_num" corresponds to a signal defined
+#'   by `data_source = "usa-facts"`, `signal = "confirmed_incidence_num"`, and
+#'   `dt = 2`. 
 #'
 #' @export
-aggregate_signals = function(x, format = c("wide", "long")) {
-  if (!(is.list(x) && all(sapply(lapply(x, class), function(v) {
-    "covidcast_signal" %in% v })))) {
-    stop("`x` must be a list of `covidcast_signal` data frames.")
+aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
+  # If we're passed a single covidcast_signal data frame
+  if ("covidcast_signal" %in% class(x)) {
+    # If dt is missing, then set it to 0
+    if (is.null(dt)) dt = 0
+    
+    # If dt is a list, then throw an error
+    if (is.list(dt)) {
+      stop("If `x` is a `covidcast_signal` data frame, then `dt` must be a ",
+           "vector.")
+    }
   }
+  
+  # If we're passed a list of covidcast_signal data frames
+  else if (is.list(x) && all(sapply(lapply(x, class), function(v) {
+    "covidcast_signal" %in% v }))) {
+    # If dt is missing, then set it to a list of 0s
+    if (is.null(dt)) dt = rep(list(0), length(x))
+   
+    # If dt is a vector, then recycle it into a list
+    if (!is.list(dt)) dt = rep(list(dt), length(x))
+
+    # If dt is a list, then check its length
+    if (!is.list(dt)) {
+      stop("If `dt` is a list, then it must have the same length as `x`.")
+    }
+  }
+
+  # If we have neither a covidcast_signal data frame or a list of them
+  else {
+    stop("`x` must be a `covidcast_data` frame or a list of them.")
+  }
+
   format = match.arg(format)
   N = length(x)
+  x = apply_shifts(x, dt) # Apply shifts and overwrite x with the result!
   meta_list = vector("list", length = N)
   for (i in 1:N) {
     meta_list[[i]] = attributes(x[[i]])$metadata
   }
   meta_all = do.call(rbind, meta_list)
-
+  
   # Issue a warning if there's more than one geo type present
   if (length(unique(meta_all$geo_type)) > 1) {
     warn(paste("More than one `geo_type` present. Are you sure you want to",
@@ -121,11 +183,10 @@ aggregate_signals = function(x, format = c("wide", "long")) {
 
   # Wide format
   if (format == "wide") {
-    x = lapply(x, latest_issue)
+    x = lapply(x, latest_issue) # Grab only the latest issue in wide form!
     
-    # Rename value columns according to data source and signal combos (note: 
-    # there could be time-shifted value columns present), and drop a bunch of
-    # columns 
+    # Rename value columns according to data source and signal combos, and drop
+    # a bunch of columns 
     for (i in 1:N) {
       src = x[[i]]$data_source[1]
       sig = x[[i]]$signal[1]
@@ -154,22 +215,16 @@ aggregate_signals = function(x, format = c("wide", "long")) {
 
   # Long format
   if (format == "long") {
-    # First check if there are time-shifted value columns present, and if so,
-    # then pivot them to long format, then add a column dt
+    # Pivot time-shifted value columns to long format, add column dt 
     for (i in 1:N) {
-      if (length(base::grep("^value", colnames(x[[i]]))) > 1) {
-        x[[i]] = x[[i]] %>%
-          tidyr::pivot_longer(dplyr::starts_with("value"),
-                              names_to = "dt", values_to = "value") %>%
-          dplyr::mutate(dt = as.numeric(sub("value", "", dt)))
-      }
+      x[[i]] = x[[i]] %>%
+        tidyr::pivot_longer(dplyr::starts_with("value"),
+                            names_to = "dt", values_to = "value") %>%
+        dplyr::mutate(dt = as.numeric(sub("value", "", dt)))
     }
 
-    # Now bind all rows together from the various data frames
+    # Bind all rows together from the various data frames
     y = do.call(dplyr::bind_rows, x)
-
-    # Replace NA values in dt column with 0s (if this column exists)
-    if ("dt" %in% colnames(y)) y = y %>% tidyr::replace_na(list(dt = 0))
 
     # Set covidcast_signal_wide class, attributes, and return
     class(y) = c("covidcast_signal_long", "data.frame")
@@ -178,6 +233,8 @@ aggregate_signals = function(x, format = c("wide", "long")) {
   }
 }
 
+# Pivot covidcast_signal_wide object to "long" format
+#
 #' @export
 covidcast_longer = function(x) {
   if (!("covidcast_signal_wide" %in% class(x))) {
@@ -196,21 +253,16 @@ covidcast_longer = function(x) {
                     into = c("data_source", "signal"),
                     sep = "_", extra = "merge")
 
-  # Now check dt; if there's no need, drop it, otherwise convert it
-  if (all(x$dt == "value")) {
-    x = x %>% select(-dt)
-  }
-  else {
-    x = x %>%
-      dplyr::mutate(dt = as.numeric(sub("value", "", dt))) %>%
-      tidyr::replace_na(list(dt = 0))
-  }
+  # Now add dt column
+  x = x %>% dplyr::mutate(dt = as.numeric(sub("value", "", dt)))
 
   # Change class and return
   class(x) = c("covicast_signal_long", "data.frame")
   return(x)
 }
 
+#' # Pivot covidcast_signal_long object to "wide" format
+#
 #' @export
 covidcast_wider = function(x) {
   if (!("covidcast_signal_long" %in% class(x))) {
@@ -220,25 +272,21 @@ covidcast_wider = function(x) {
   # First drop various columns
   x = x %>% dplyr::select(-c(direction, issue, lag, stderr, sample_size)) 
 
-  # No dt column is present
-  if (!("dt" %in% colnames(x))) {
-    x = x %>%
-      dplyr::group_by(geo_value, time_value) %>% 
-      tidyr::pivot_wider(names_from = c("data_source", "signal"),
-                         names_prefix = "value:",
-                         names_sep = "_",
-                         values_from = "value")
-  }
-
-  # Yes dt column is present
-  else {
-    x = x %>%
-      dplyr::group_by(geo_value, time_value) %>% 
-      tidyr::pivot_wider(names_from = c("dt", "data_source", "signal"),
-                         names_prefix = "value:",
-                         names_sep = "_",
-                         values_from = "value") 
-  }
+  # Renamer function (bit ugly)
+  renamer = Vectorize(function(name) {
+    k = regexpr("_", name)
+    n = as.numeric(strsplit(substr(name, 1, k-1), ":")[[1]][2])
+    return(sprintf("value%+d:%s", n, substr(name, k+1, nchar(name))))
+  })
+  
+  # Now deal with dt column
+  x = x %>%
+    dplyr::group_by(geo_value, time_value) %>% 
+    tidyr::pivot_wider(names_from = c("dt", "data_source", "signal"),
+                       names_prefix = "value:",
+                       names_sep = "_",
+                       values_from = "value") %>%
+    dplyr::rename_with(renamer, dplyr::starts_with("value"))
 
   # Change class and return
   class(x) = c("covicast_signal_wide", "data.frame")

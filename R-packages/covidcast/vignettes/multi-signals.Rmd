@@ -2,7 +2,6 @@
 title: Manipulating multiple signals 
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{3. Manipulating multiple signals}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -25,22 +24,22 @@ summary(signals[[1]])
 summary(signals[[2]])
 ```
 
-## Appending shifts
+## Applying shifts 
 
 ```{r}
 library(dplyr)
 
-append_shifts(signals[[1]], dt = c(-1, 2)) %>% 
+apply_shifts(signals[[1]], dt = c(-1, 0, 1)) %>% 
   filter(geo_value == "tx") %>% select(contains("value")) %>% head()
 
-append_shifts(signals[[2]], dt = c(-1, 2)) %>% 
+apply_shifts(signals[[2]], dt = c(-1, 0, 1)) %>% 
   filter(geo_value == "tx") %>% select(contains("value")) %>% head()
 
-a = append_shifts(signals, dt = c(-1, 2)) 
+a = apply_shifts(signals, dt = c(-1, 0, 1)) 
 a[[1]] %>% filter(geo_value == "tx") %>% select(contains("value")) %>% head()
 a[[2]] %>% filter(geo_value == "tx") %>% select(contains("value")) %>% head()
 
-b = append_shifts(signals, dt = list(c(-1, 2), 1))
+b = apply_shifts(signals, dt = list(c(-1, 0, 1), 1))
 b[[1]] %>% filter(geo_value == "tx") %>% select(contains("value")) %>% head()
 b[[2]] %>% filter(geo_value == "tx") %>% select(contains("value")) %>% head()
 ```
@@ -48,8 +47,9 @@ b[[2]] %>% filter(geo_value == "tx") %>% select(contains("value")) %>% head()
 ## Aggregating signals, wide format
 
 ```{r}
-aggregate_signals(signals) %>% head()
-aggregate_signals(append_shifts(signals, dt = c(7, 14))) %>% head()
+aggregate_signals(signals, format = "wide") %>% head()
+aggregate_signals(signals, dt = c(0, 7), format = "wide") %>% head()
+aggregate_signals(signals, dt = list(0, c(0, 7)), format = "wide") %>% head()
 ```
 
 ## Aggregating signals, long format
@@ -58,8 +58,11 @@ aggregate_signals(append_shifts(signals, dt = c(7, 14))) %>% head()
 aggregate_signals(signals, format = "long") %>% 
   filter(geo_value == "tx", time_value <= "2020-06-03") 
 
-aggregate_signals(append_shifts(signals, dt = c(7, 14)), format = "long") %>% 
-  filter(geo_value == "tx", time_value == "2020-06-01") 
+aggregate_signals(signals, dt = c(0, 7), format = "long") %>% 
+  filter(geo_value == "tx", time_value <= "2020-06-02") 
+
+aggregate_signals(signals, dt = list(0, 7), format = "long") %>% 
+  filter(geo_value == "tx", time_value <= "2020-06-02") 
 ```
 
 ## Pivoting longer or wider
@@ -67,16 +70,21 @@ aggregate_signals(append_shifts(signals, dt = c(7, 14)), format = "long") %>%
 Longer
 
 ```{r}
-aggregate_signals(signals) %>% covidcast_longer() %>% 
+aggregate_signals(signals, format = "wide") %>% 
+  covidcast_longer() %>% 
   filter(geo_value == "tx", time_value <= "2020-06-03") 
 
-aggregate_signals(append_shifts(signals, dt = list(7, 14))) %>% 
+aggregate_signals(signals, dt = list(0, 7), format = "wide") %>% 
   covidcast_longer() %>% 
   filter(geo_value == "tx", time_value <= "2020-06-02") 
 ```
 
-Wider (not working yet for time-shifts)
+Wider 
 
 ```{r}
-aggregate_signals(signals, format = "long") %>% covidcast_wider() %>% head()
+aggregate_signals(signals, format = "long") %>% 
+  covidcast_wider() %>% head()
+
+aggregate_signals(signals, dt = list(0, 7), format = "long") %>% 
+  covidcast_wider() %>% head()
 ```

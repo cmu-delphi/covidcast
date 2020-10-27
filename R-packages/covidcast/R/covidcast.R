@@ -162,7 +162,6 @@ covidcast_signal <- function(data_source, signal,
                              geo_values = "*",
                              as_of = NULL, issues = NULL, lag = NULL) {
   geo_type <- match.arg(geo_type)
-
   meta <- covidcast_meta()
   given_data_source <- data_source
   given_signal <- signal
@@ -222,10 +221,12 @@ covidcast_signal <- function(data_source, signal,
                as_of, issues, lag)
   })
 
+  # Drop direction column (if it still exists)
+  df$direction <- NULL
+
   # Assign covidcast_signal class and add some helpful attributes
   class(df) <- c("covidcast_signal", "data.frame")
   attributes(df)$metadata <- relevant_meta
-  attributes(df)$geo_type <- geo_type
   return(df)
 }
 
@@ -246,7 +247,7 @@ print.covidcast_signal = function(x, ...) {
               nrow(x), ncol(x)))
   cat(sprintf("%-12s: %s\n", "data_source", x$data_source[1]))
   cat(sprintf("%-12s: %s\n", "signal", x$signal[1]))
-  cat(sprintf("%-12s: %s\n\n", "geo_type", attributes(x)$geo_type))
+  cat(sprintf("%-12s: %s\n\n", "geo_type", attributes(x)$metadata$geo_type))
 
   # forward to print the data as well
   NextMethod("print")
@@ -278,7 +279,7 @@ summary.covidcast_signal = function(object, ...) {
               nrow(x), ncol(x)))
   cat(sprintf("%-12s: %s\n", "data_source", x$data_source[1]))
   cat(sprintf("%-12s: %s\n", "signal", x$signal[1]))
-  cat(sprintf("%-12s: %s\n\n", "geo_type", attributes(x)$geo_type))
+  cat(sprintf("%-12s: %s\n\n", "geo_type", attributes(x)$metadata$geo_type))
   cat(sprintf("%-36s: %s\n", "first date", min(x$time_value)))
   cat(sprintf("%-36s: %s\n", "last date", max(x$time_value)))
   cat(sprintf("%-36s: %i\n", "median number of geo_values per day",
@@ -394,7 +395,7 @@ covidcast_meta <- function() {
   meta <- meta$epidata %>%
     dplyr::mutate(min_time = as.Date(as.character(.data$min_time), format = "%Y%m%d"),
                   max_time = as.Date(as.character(.data$max_time), format = "%Y%m%d"),
-                  max_issue = as.Date(as.character(.data$max_issue), format = "%Y%m%d"))
+                  max_issue = as.Date(as.character(.data$max_issue), format = "%Y%m%d")) 
 
   class(meta) <- c("covidcast_meta", "data.frame")
   return(meta)
@@ -510,9 +511,14 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type,
     # If no data is found, there is no time_value column to report
     df$time_value <- as.Date(as.character(df$time_value), format = "%Y%m%d")
     df$issue <- as.Date(as.character(df$issue), format = "%Y%m%d")
-
     df$data_source <- data_source
     df$signal <- signal
+
+    # Reorder data_source, signal, geo_value, time_value, so that they appear in
+    # this order
+    df <- dplyr::relocate(df, .data$data_source, .data$signal, .data$geo_value,
+                          .data$time_value)
+                                                               
   }
 
   return(df)

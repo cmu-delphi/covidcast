@@ -193,8 +193,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
       x[[i]] = x[[i]] %>%
         dplyr::rename_with(~ paste0(.x, ":", src, "_", sig),
                            dplyr::starts_with("value")) %>%
-        dplyr::select(-c(data_source, signal, direction, issue, lag, stderr,
-                         sample_size)) 
+        dplyr::select(-c(data_source, signal, issue, lag, stderr, sample_size)) 
     }
     
     # This is the wide data frame that we will eventually return
@@ -251,26 +250,28 @@ covidcast_longer = function(x) {
                     sep = ":") %>%
     tidyr::separate(col = "data_source_signal",
                     into = c("data_source", "signal"),
-                    sep = "_", extra = "merge")
+                    sep = "_", extra = "merge") 
 
-  # Now add dt column
-  x = x %>% dplyr::mutate(dt = as.numeric(sub("value", "", dt)))
+  # Now add dt column, and reorder columns a bit
+  x = x %>% dplyr::mutate(dt = as.numeric(sub("value", "", dt))) %>%
+    dplyr::relocate(data_source, signal, geo_value, time_value) %>%
+    dplyr::relocate(dt, .before = value)
 
   # Change class and return
   class(x) = c("covicast_signal_long", "data.frame")
   return(x)
 }
 
-#' # Pivot covidcast_signal_long object to "wide" format
+#' Pivot covidcast_signal_long object to "wide" format
 #
 #' @export
 covidcast_wider = function(x) {
   if (!("covidcast_signal_long" %in% class(x))) {
     stop("`x` must be a `covidcast_signal_long` object.")
   }
-
+  
   # First drop various columns
-  x = x %>% dplyr::select(-c(direction, issue, lag, stderr, sample_size)) 
+  x = dplyr::select(x, -c(issue, lag, stderr, sample_size))  
 
   # Renamer function (bit ugly)
   renamer = Vectorize(function(name) {

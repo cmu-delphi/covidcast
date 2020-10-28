@@ -8,8 +8,11 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
                       title = NULL, params = list()) {
   # Check that we're looking at either counties or states
   if (!(attributes(x)$geo_type == "county" ||
-                     attributes(x)$geo_type == "state")) {
-    stop("Only 'county' and 'state' are supported for choropleth maps.")
+                     attributes(x)$geo_type == "state" ||
+                     attributes(x)$geo_type == "hrr" ||
+                     attributes(x)$geo_type == "msa")) {
+    stop("Only 'county', 'state', 'hrr' and 'msa' are supported 
+         for choropleth maps.")
   }
 
   # Set the time value, if we need to (last observed time value)
@@ -138,15 +141,52 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     map_col[map_geo %in% geo] = col_fun(val[map_obs])
   }
 
-  # Create the polygon layer
-  aes = ggplot2::aes
-  geom_args = list()
-  geom_args$color = border_col
-  geom_args$size = border_size
-  geom_args$fill = map_col
-  geom_args$mapping = aes(x = x, y = y, group = group)
-  geom_args$data = map_df
-  polygon_layer = do.call(ggplot2::geom_polygon, geom_args)
+  else if (attributes(x)$geo_type == "msa") {
+    map_df = st_read('../data/shapefiles/msa/cb_2019_us_cbsa_5m.shp')
+    map_df = map_df %>% filter(map_df$LSAD == 'M1') # only get metro and not micropolitan areas
+    if (length(include) > 0) {
+      map_df = map_df %>% filter(map_df$NAME %in% include)
+    }
+    map_geo = map_df$GEOID
+    map_col = rep(missing_col, length(map_geo))
+
+    map_obs = map_geo[map_geo %in% geo]
+    map_col[map_geo %in% geo] = col_fun(val[map_obs])
+
+    coord_crs = rep(st_crs(2163), length(map_geo))
+    map_df$NAME <- as.character(map_df$NAME)
+    coord_crs[substr(map_df$NAME, nchar(map_df$NAME) - 1, nchar(map_df$NAME)) == 'AK'] = st_crs(3467)
+  }
+
+  else if (attributes(x)$geo_type == "hrr") {}
+
+  # Create the polygon layer 
+  if (attributes(x)$geo_type == "county" || 
+      attributes(x)$geo_type == "state") {
+    aes = ggplot2::aes
+    geom_args = list()
+    geom_args$color = border_col
+    geom_args$size = border_size
+    geom_args$fill = map_col
+    geom_args$mapping = aes(x = x, y = y, group = group)
+    geom_args$data = map_df
+    polygon_layer = do.call(ggplot2::geom_polygon, geom_args)
+    coord_layer = ggplot2::coord_equal()
+    }
+  else if (attributes(x)$geo_type == "msa" || 
+          attributes(x)$geo_type == "hrr") {
+    aes = ggplot2::aes
+    geom_args = list()
+    geom_args$color = border_col
+    geom_args$size = border_size
+    geom_args$fill = map_col
+    geom_args$mapping = aes(geometry=geometry)
+    geom_args$data = map_df
+    coord_args = list()
+    coord_args$crs = coord_crs
+    polygon_layer = do.call(ggplot2::geom_sf, geom_args) 
+    coord_layer = do.call(ggplot2::coord_sf, coord_args)
+    }
   
   # For intensity and continuous color scale, create a legend layer
   if (!direction && is.null(breaks)) {
@@ -219,7 +259,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   }
 
   # Put it all together and return
-  return(ggplot2::ggplot() + polygon_layer + ggplot2::coord_equal() +
+  return(ggplot2::ggplot() + polygon_layer + coord_layer +
          title_layer + hidden_layer + scale_layer + theme_layer)
 }
 

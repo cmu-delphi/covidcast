@@ -1,11 +1,36 @@
-#' @importFrom ggplot2 ggplot aes geom_line geom_ribbon facet_wrap labs scale_colour_discrete theme_bw theme 
+
+#' Produce trajectory plots of forecasts and observed data
+#'
+#' @param list_of_predictions_cards collection of prediction cards as returned 
+#'   by `get_predictions()`. Supports collections of multiple forecast dates and
+#'   forecasters
+#' @param first_day the earliest date to display
+#' @param last_day the latest date to display. Defaults to the most recent data
+#'   available (plus future, if forecasts are past today)
+#' @param alpha Displayed ribbons are the 1-alpha coverage results
+#'
+#' @return Produces a ggplot object
+#' @export
+#' @importFrom rlang .data
+#'
+#' @examples
+#' sister_preds = get_predictions(
+#'   baseline_forecaster, "sister",
+#'   tibble::tibble(data_source="usa-facts", signal = "deaths_incidence_num",
+#'     start_day=lubridate::ymd("2020-07-01")),
+#'     lubridate::ymd("2020-09-01"),"epiweek", 1:4, "state", c("mi"))
+#' baby_preds = get_predictions(
+#'   baseline_forecaster, "baby",
+#'   tibble::tibble(data_source="usa-facts", signal = "deaths_incidence_num",
+#'     start_day=lubridate::ymd("2020-07-01")),
+#'     lubridate::ymd("2020-09-08"),"epiweek", 1:4, "state", c("mi"))
+#'  plot_trajectory(c(sister_preds, baby_preds), last_day="2020-10-01")
 plot_trajectory <- function(list_of_predictions_cards,
                             first_day = "2020-07-01",
-                            last_day = "2020-10-01",
+                            last_day = Sys.Date(),
                             alpha = .2)
 {
-  # make sure predictions cards are for the same forecasting task (except ahead)
-  forecast_date <- unique_attr(list_of_predictions_cards, "forecast_date")
+  # make sure predictions cards are for the same forecasting task (except ahead, and forecast_date)
   response <- unique_attr(list_of_predictions_cards,"signals")
   incidence_period <- unique_attr(list_of_predictions_cards,"incidence_period")
   geo_type <- unique_attr(list_of_predictions_cards, "geo_type")
@@ -15,20 +40,21 @@ plot_trajectory <- function(list_of_predictions_cards,
   # predicted quantiles to plot
   plot_probs <- c(.5 - (1 - alpha)/2,.5,.5 + (1 - alpha)/2 )
   preds_df <- list_of_predictions_cards %>% 
-    map_dfr(function(predictions_card){
+    purrr::map_dfr(function(predictions_card){
+      fcast_date = attributes(predictions_card)$forecast_date
       predictions_card %>%
-      unnest(forecast_distribution) %>%
-      mutate(forecaster_name = attributes(predictions_card)$name_of_forecaster,
+      tidyr::unnest(.data$forecast_distribution) %>%
+      dplyr::mutate(forecaster_name = attributes(predictions_card)$name_of_forecaster,
              ahead = attributes(predictions_card)$ahead,
-             prob_type = case_when(
+             prob_type = dplyr::case_when(
                abs(probs - plot_probs[1]) <= 1e-8 ~ "lower",
                abs(probs - plot_probs[2]) <= 1e-8 ~ "point",
                abs(probs - plot_probs[3]) <= 1e-8 ~ "upper"
              )) %>%
-      filter(!is.na(prob_type)) %>%
-      mutate(target_period = get_target_period_num(forecast_date,ahead,incidence_period)) %>%
-      select(location,quantiles,forecaster_name,prob_type,target_period) %>%
-      pivot_wider(values_from = quantiles,names_from = prob_type)
+      filter(!is.na(.data$prob_type)) %>%
+      dplyr::mutate(target_period = get_target_period_num(fcast_date,.data$ahead,incidence_period)) %>%
+      dplyr::select(.data$location,.data$quantiles,.data$forecaster_name,.data$prob_type,.data$target_period) %>%
+      tidyr::pivot_wider(values_from = .data$quantiles,names_from = .data$prob_type)
     })
   
   # ground truth to plot
@@ -39,14 +65,14 @@ plot_trajectory <- function(list_of_predictions_cards,
                                    start_day = first_day,
                                    end_day = last_day,
                                    geo_type = geo_type) %>%
-      select(location, time_value,value) %>%
-      rename(reference_period = time_value) %>%
-      filter(location %in% preds_df$location) 
-  } else{
+      dplyr::select(.data$location, .data$time_value, .data$value) %>%
+      dplyr::rename(reference_period = .data$time_value) %>%
+      dplyr::filter(location %in% preds_df$location) 
+  } else {
     # avoid summing over partial epiweeks
     date_range <- covidcast::covidcast_meta() %>% 
-      filter(data_source == response$data_source & signal == response$signal & geo_type == !!geo_type) %>%
-      select(min_time,max_time)
+      dplyr::filter(data_source == response$data_source & signal == response$signal & geo_type == !!geo_type) %>%
+      dplyr::select(min_time,max_time)
     sunday_following_first_day <- shift_day_to_following_xxxday(max(ymd(date_range$min_time,first_day)),xxx = 1)
     saturday_preceding_last_day <- shift_day_to_preceding_xxxday(min(ymd(date_range$max_time,last_day)),xxx = 7)
     assertthat::assert_that(sunday_following_first_day < saturday_preceding_last_day,
@@ -57,20 +83,21 @@ plot_trajectory <- function(list_of_predictions_cards,
                                    start_day = sunday_following_first_day,
                                    end_day = saturday_preceding_last_day,
                                    geo_type = geo_type) %>%
-      select(location, time_value,value) %>%
+      dplyr::select(location, .data$time_value,.data$value) %>%
       sum_to_epiweek() %>%
-      rename(reference_period = epiweek) %>%
-      filter(location %in% preds_df$location)
+      dplyr::rename(reference_period = epiweek) %>%
+      dplyr::filter(location %in% preds_df$location)
   }
   
   # plot
-  bind_rows(response_df,
-                  preds_df %>% rename(reference_period = target_period)) %>%
-    mutate(location_abbr = if(geo_type == "state") fips_to_abbr(paste0(location,"000")) else fips_to_name(location)) %>%
-    filter(!is.na(location_abbr)) %>%
-    ggplot(aes(x = .data$reference_period)) +
-    geom_line(aes(y = .data$value),
-              size = 1) +
+  preds_df <- dplyr::rename(preds_df, reference_period = target_period) %>%
+    dplyr::mutate(
+      location_abbr = if(geo_type == "state") covidcast::fips_to_abbr(paste0(location,"000")) else covidcast::fips_to_name(location)) %>%
+    dplyr::filter(!is.na(location_abbr))
+  response_df <- response_df %>% dplyr::mutate(
+    location_abbr = if(geo_type == "state") covidcast::fips_to_abbr(paste0(location,"000")) else covidcast::fips_to_name(location)) %>%
+    dplyr::filter(!is.na(location_abbr))
+  ggplot(preds_df, aes(x = .data$reference_period)) +
     geom_line(aes(y = .data$point,
                   col = .data$forecaster_name),
               size = 1) + 
@@ -79,11 +106,13 @@ plot_trajectory <- function(list_of_predictions_cards,
                     fill = .data$forecaster_name),
                 alpha = .1,
                 colour = NA,
-                show.legend = F) + 
+                show.legend = FALSE) + 
+    geom_line(data=response_df, aes(y = .data$value),
+              size = 1) +
     facet_wrap(~ .data$location_abbr, scales = "free") +
-    scale_color_discrete(na.translate = F) +
+    scale_color_discrete(na.translate = FALSE) +
     labs(x = incidence_period,
-         y = paste0(response$data_source,"-",response$signal),
+         y = paste0(response$data_source,": ",response$signal),
          colour = "forecaster_name") +
     theme_bw()
 }
@@ -92,9 +121,9 @@ sum_to_epiweek <- function(daily_df)
 {
   daily_df %>%
     mutate(epiweek = MMWRweek::MMWRweek(time_value)$MMWRweek) %>%
-    select(-time_value) %>%
-    group_by(location,epiweek) %>%
-    summarise(value = sum(value)) %>%
+    select(-.data$time_value) %>%
+    group_by(location,.data$epiweek) %>%
+    summarise(value = sum(.data$value)) %>%
     ungroup()
 }
 

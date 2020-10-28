@@ -11,14 +11,13 @@ aggregate_signals(x, dt = NULL, format = c("wide", "long"))
 frames.}
 
 \item{dt}{Vector of shifts to apply to the values in the data frame \code{x}.
-Positive values are interpreted as shifts forward in time, and negative
-values are shifts backward in time. For example, if \code{dt = 1}, then the
-values are shifted forward 1 day in time (so, data on June 1 becomes data
-on June 2, and so on); if \code{dt = 0}, then the values are left as is. When
-\code{x} is a list of data frames, \code{dt} can either be a single vector of shifts
-or a list of vectors of shifts, this list having the same length as \code{x} (in
-order to apply, respectively, the same shifts or a different set of shifts
-to each data frame in \code{x}).}
+Negative shifts translate into in a lag value and positive shifts into a
+lead value; for example, if \code{dt = -1}, then the value on June 2 that gets
+reported is the original value on June 1; if \code{dt = 0}, then the values are
+left as is. When \code{x} is a list of data frames, \code{dt} can either be a single
+vector of shifts or a list of vectors of shifts, this list having the same
+length as \code{x} (in order to apply, respectively, the same shifts or a
+different set of shifts to each data frame in \code{x}).}
 
 \item{format}{One of either "wide" or "long". The default is "wide".}
 }

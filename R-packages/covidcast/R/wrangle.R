@@ -6,14 +6,13 @@
 #' @param x Single `covidcast_signal` data frame, or a list of such data
 #'   frames. 
 #' @param dt Vector of shifts to apply to the values in the data frame `x`.
-#'   Positive values are interpreted as shifts forward in time, and negative
-#'   values are shifts backward in time. For example, if `dt = 1`, then the
-#'   values are shifted forward 1 day in time (so, data on June 1 becomes data
-#'   on June 2, and so on); if `dt = 0`, then the values are left as is. When
-#'   `x` is a list of data frames, `dt` can either be a single vector of shifts
-#'   or a list of vectors of shifts, this list having the same length as `x` (in
-#'   order to apply, respectively, the same shifts or a different set of shifts
-#'   to each data frame in `x`). 
+#'   Negative shifts translate into in a lag value and positive shifts into a
+#'   lead value; for example, if `dt = -1`, then the value on June 2 that gets
+#'   reported is the original value on June 1; if `dt = 0`, then the values are
+#'   left as is. When `x` is a list of data frames, `dt` can either be a single
+#'   vector of shifts or a list of vectors of shifts, this list having the same
+#'   length as `x` (in order to apply, respectively, the same shifts or a
+#'   different set of shifts to each data frame in `x`).
 #' 
 #' @return When `x` is a data frame, the return value is a column-augmented
 #'   version of `x` with one new column per value of `dt`. The new column names
@@ -66,11 +65,10 @@ apply_shifts_one = function(x, dt) {
   # Group by geo value, sort rows by increasing time
   x = x %>% dplyr::group_by(geo_value) %>% dplyr::arrange(time_value) 
   
-  # Loop over dt, and apply lag or lead to the value column
+  # Loop over dt, and time shift the value column
   for (n in dt) {
-    fun = ifelse(n < 0, lag, lead)
     varname = sprintf("value%+d", n)
-    x = x %>% dplyr::mutate(!!varname := fun(value, n = abs(n)))
+    x = x %>% dplyr::mutate(!!varname := shift(value, n))
   }
   
   # Remove value column, restore attributes, and return
@@ -91,14 +89,13 @@ apply_shifts_one = function(x, dt) {
 #' @param x Single `covidcast_signal` data frame, or a list of such data
 #'   frames.
 #' @param dt Vector of shifts to apply to the values in the data frame `x`.
-#'   Positive values are interpreted as shifts forward in time, and negative
-#'   values are shifts backward in time. For example, if `dt = 1`, then the
-#'   values are shifted forward 1 day in time (so, data on June 1 becomes data
-#'   on June 2, and so on); if `dt = 0`, then the values are left as is. When
-#'   `x` is a list of data frames, `dt` can either be a single vector of shifts
-#'   or a list of vectors of shifts, this list having the same length as `x` (in
-#'   order to apply, respectively, the same shifts or a different set of shifts
-#'   to each data frame in `x`).
+#'   Negative shifts translate into in a lag value and positive shifts into a
+#'   lead value; for example, if `dt = -1`, then the value on June 2 that gets
+#'   reported is the original value on June 1; if `dt = 0`, then the values are
+#'   left as is. When `x` is a list of data frames, `dt` can either be a single
+#'   vector of shifts or a list of vectors of shifts, this list having the same
+#'   length as `x` (in order to apply, respectively, the same shifts or a
+#'   different set of shifts to each data frame in `x`).
 #' @param format One of either "wide" or "long". The default is "wide".
 #'
 #' @details This function can be thought of having three use cases. In all three
@@ -144,6 +141,9 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
       stop("If `x` is a `covidcast_signal` data frame, then `dt` must be a ",
            "vector.")
     }
+
+    # Convert both x and dt to lists
+    x = list(x); dt = list(dt)
   }
   
   # If we're passed a list of covidcast_signal data frames

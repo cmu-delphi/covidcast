@@ -25,14 +25,14 @@ different set of shifts to each data frame in \code{x}).}
 Data frame of aggregated signals in "wide" or "long" form, depending
 on \code{format}. In "long" form, an extra column \code{dt} is appended to indicate
 the value of the time-shift. In "wide" form, only the latest issue of data
-is retained, and the columns \code{data_source}, \code{signal}, \code{issue}, \code{lag},
-\code{stderr}, \code{sample_size} are all dropped from the returned data frame. Each
-unique signal---defined by a combination of data source name, signal name,
-and time-shift---is given its own column, whose name indicates its defining
-quantities. For example, the column name
-"value+2:usa-facts_confirmed_incidence_num" corresponds to a signal defined
-by \code{data_source = "usa-facts"}, \code{signal = "confirmed_incidence_num"}, and
-\code{dt = 2}.
+is retained; the returned data frame is formed via full joins of the input
+data frames (on \code{geo_value} and \code{time_value} as the join key), and the
+columns \code{data_source}, \code{signal}, \code{issue}, \code{lag}, \code{stderr}, \code{sample_size}
+are all dropped from the output. Each unique signal---defined by a
+combination of data source name, signal name, and time-shift---is given its
+own column, whose name indicates its defining quantities. For example, the
+column name "value+2:usa-facts_confirmed_incidence_num" corresponds to a
+signal defined by \code{data_source = "usa-facts"}, \code{signal = "confirmed_incidence_num"}, and \code{dt = 2}.
 }
 \description{
 Aggregates \code{covidcast_signal} objects into one data frame, in either "wide"

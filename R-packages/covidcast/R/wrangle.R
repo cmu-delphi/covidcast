@@ -120,14 +120,15 @@ apply_shifts_one = function(x, dt) {
 #' @return Data frame of aggregated signals in "wide" or "long" form, depending 
 #'   on `format`. In "long" form, an extra column `dt` is appended to indicate
 #'   the value of the time-shift. In "wide" form, only the latest issue of data
-#'   is retained, and the columns `data_source`, `signal`, `issue`, `lag`,
-#'   `stderr`, `sample_size` are all dropped from the returned data frame. Each
-#'   unique signal---defined by a combination of data source name, signal name,
-#'   and time-shift---is given its own column, whose name indicates its defining 
-#'   quantities. For example, the column name
-#'   "value+2:usa-facts_confirmed_incidence_num" corresponds to a signal defined
-#'   by `data_source = "usa-facts"`, `signal = "confirmed_incidence_num"`, and
-#'   `dt = 2`. 
+#'   is retained; the returned data frame is formed via full joins of the input
+#'   data frames (on `geo_value` and `time_value` as the join key), and the
+#'   columns `data_source`, `signal`, `issue`, `lag`, `stderr`, `sample_size`
+#'   are all dropped from the output. Each unique signal---defined by a
+#'   combination of data source name, signal name, and time-shift---is given its
+#'   own column, whose name indicates its defining quantities. For example, the
+#'   column name "value+2:usa-facts_confirmed_incidence_num" corresponds to a
+#'   signal defined by `data_source = "usa-facts"`, `signal =
+#'   "confirmed_incidence_num"`, and `dt = 2`.
 #'
 #' @export
 aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {

@@ -1,7 +1,7 @@
-#' @importFrom ggplot2 ggplot aes geom_line geom_ribbon facet_wrap labs scale_colour_discrete theme_bw theme 
+#' @import ggplot2
 plot_trajectory <- function(list_of_predictions_cards,
                             first_day = "2020-07-01",
-                            last_day = "2020-10-01",
+                            last_day = NULL,
                             alpha = .2)
 {
   # make sure predictions cards are for the same forecasting task (except ahead)
@@ -11,6 +11,7 @@ plot_trajectory <- function(list_of_predictions_cards,
   geo_type <- unique_attr(list_of_predictions_cards, "geo_type")
   assertthat::assert_that(incidence_period %in% c("day","epiweek"))
   assertthat::assert_that(geo_type %in% c("county","state"))
+  
   
   # predicted quantiles to plot
   plot_probs <- c(.5 - (1 - alpha)/2,.5,.5 + (1 - alpha)/2 )

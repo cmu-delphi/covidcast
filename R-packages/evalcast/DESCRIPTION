@@ -58,7 +58,6 @@ Imports:
     MMWRweek,
     zoo,
     rlang,
-    memoise,
     rvest,
     xml2,
     ggplot2

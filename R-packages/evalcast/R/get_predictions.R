@@ -43,7 +43,7 @@
 #'     data_source=c("jhu-csse", "usa-facts"),
 #'     signal = c("deaths_incidence_num","confirmed_incidence_num"),
 #'     start_day=lubridate::ymd("2020-09-15")),
-#'   lubridate::ymd("2020-10-01"),"epiweek", 1L, "state", "mi")
+#'   lubridate::ymd("2020-10-01"),"epiweek", 1:4, "state", "mi")
 #'
 #' baby_correct <- function(x) dplyr::mutate(x, corrected = 2*value)
 #'

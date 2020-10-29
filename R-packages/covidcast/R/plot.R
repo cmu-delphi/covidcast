@@ -143,19 +143,28 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
 
   else if (attributes(x)$geo_type == "msa") {
     map_df = st_read('../data/shapefiles/msa/cb_2019_us_cbsa_5m.shp')
+    print(typeof(map_df))
     map_df = map_df %>% filter(map_df$LSAD == 'M1') # only get metro and not micropolitan areas
     if (length(include) > 0) {
       map_df = map_df %>% filter(map_df$NAME %in% include)
     }
+    map_df$NAME <- as.character(map_df$NAME)
+    map_df$is_alaska = substr(map_df$NAME, nchar(map_df$NAME) - 1, nchar(map_df$NAME)) == 'AK'
+    map_df$is_hawaii = substr(map_df$NAME, nchar(map_df$NAME) - 1, nchar(map_df$NAME)) == 'HI'
+    map_df$is_pr = substr(map_df$NAME, nchar(map_df$NAME) - 1, nchar(map_df$NAME)) == 'PR'
+    print(typeof(map_df))
+    pr_df = (map_df %>% filter(map_df$is_pr)) + c(-0.9e6, 1e6)
+    hawaii_df = map_df %>% filter(map_df$is_hawaii) + c(-1e6, -2e6)
+    alaska_df = map_df %>% filter(map_df$is_alaska)
+    map_df = map_df %>% filter(!map_df$is_alaska)
+    map_df = map_df %>% filter(!map_df$is_hawaii)
+    map_df = map_df %>% filter(!map_df$is_pr)
+
     map_geo = map_df$GEOID
     map_col = rep(missing_col, length(map_geo))
 
     map_obs = map_geo[map_geo %in% geo]
-    map_col[map_geo %in% geo] = col_fun(val[map_obs])
-
-    coord_crs = rep(st_crs(2163), length(map_geo))
-    map_df$NAME <- as.character(map_df$NAME)
-    coord_crs[substr(map_df$NAME, nchar(map_df$NAME) - 1, nchar(map_df$NAME)) == 'AK'] = st_crs(3467)
+    map_col[map_geo %in% geo] = col_fun(val[map_obs]) 
   }
 
   else if (attributes(x)$geo_type == "hrr") {}
@@ -183,7 +192,6 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     geom_args$mapping = aes(geometry=geometry)
     geom_args$data = map_df
     coord_args = list()
-    coord_args$crs = coord_crs
     polygon_layer = do.call(ggplot2::geom_sf, geom_args) 
     coord_layer = do.call(ggplot2::coord_sf, coord_args)
     }

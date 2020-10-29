@@ -5,7 +5,7 @@ library(lubridate)
 
 
 forecast_dates <- seq(lubridate::ymd("2020-08-10"),
-                      lubridate::ymd("2020-10-19"), by = 7)
+                      lubridate::ymd("2020-10-26"), by = 7)
 cmu <- get_covidhub_predictions("CMU-TimeSeries", 
                                 forecast_dates,
                                 ahead = 1:4,

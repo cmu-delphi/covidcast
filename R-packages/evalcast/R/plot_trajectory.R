@@ -46,6 +46,7 @@ plot_trajectory <- function(list_of_predictions_cards,
       tidyr::unnest(.data$forecast_distribution) %>%
       dplyr::mutate(forecaster_name = attributes(predictions_card)$name_of_forecaster,
              ahead = attributes(predictions_card)$ahead,
+             forecast_date = fcast_date,
              prob_type = dplyr::case_when(
                abs(probs - plot_probs[1]) <= 1e-8 ~ "lower",
                abs(probs - plot_probs[2]) <= 1e-8 ~ "point",
@@ -53,14 +54,16 @@ plot_trajectory <- function(list_of_predictions_cards,
              )) %>%
       filter(!is.na(.data$prob_type)) %>%
       dplyr::mutate(target_period = get_target_period_num(fcast_date,.data$ahead,incidence_period)) %>%
-      dplyr::select(.data$location,.data$quantiles,.data$forecaster_name,.data$prob_type,.data$target_period) %>%
+      dplyr::select(.data$location,.data$quantiles,.data$forecaster_name,
+                    .data$prob_type,.data$target_period,
+                    .data$forecast_date) %>%
       tidyr::pivot_wider(values_from = .data$quantiles,names_from = .data$prob_type)
     })
   
   # ground truth to plot
   if(incidence_period == "day")
   {
-    response_df <- download_signal(data_source = response$data_source,
+    response_df <- download_signal(data_source = "usa-facts",#response$data_source,
                                    signal = response$signal,
                                    start_day = first_day,
                                    end_day = last_day,
@@ -71,14 +74,15 @@ plot_trajectory <- function(list_of_predictions_cards,
   } else {
     # avoid summing over partial epiweeks
     date_range <- covidcast::covidcast_meta() %>% 
-      dplyr::filter(data_source == response$data_source & signal == response$signal & geo_type == !!geo_type) %>%
+      dplyr::filter(data_source == "usa-facts" & signal == response$signal & geo_type == !!geo_type) %>%
+      #dplyr::filter(data_source == response$data_source & signal == response$signal & geo_type == !!geo_type) %>%
       dplyr::select(min_time,max_time)
     sunday_following_first_day <- shift_day_to_following_xxxday(max(ymd(date_range$min_time,first_day)),xxx = 1)
     saturday_preceding_last_day <- shift_day_to_preceding_xxxday(min(ymd(date_range$max_time,last_day)),xxx = 7)
     assertthat::assert_that(sunday_following_first_day < saturday_preceding_last_day,
                             msg = "Pick first and last day to span at least one full epiweek.")
     
-    response_df <- download_signal(data_source = response$data_source,
+    response_df <- download_signal(data_source = "usa-facts",#response$data_source,
                                    signal = response$signal,
                                    start_day = sunday_following_first_day,
                                    end_day = saturday_preceding_last_day,
@@ -99,17 +103,22 @@ plot_trajectory <- function(list_of_predictions_cards,
     dplyr::filter(!is.na(location_abbr))
   ggplot(preds_df, aes(x = .data$reference_period)) +
     geom_line(aes(y = .data$point,
-                  col = .data$forecaster_name),
+                  col = .data$forecaster_name, 
+                  group=.data$forecast_date),
               size = 1) + 
+    geom_point(aes(y = .data$point,
+                   col = .data$forecaster_name, 
+                   group=.data$forecast_date)) +
     geom_ribbon(aes(ymin = .data$lower,
                     ymax = .data$upper,
-                    fill = .data$forecaster_name),
+                    fill = .data$forecaster_name,
+                    group=.data$forecast_date),
                 alpha = .1,
                 colour = NA,
                 show.legend = FALSE) + 
     geom_line(data=response_df, aes(y = .data$value),
               size = 1) +
-    facet_wrap(~ .data$location_abbr, scales = "free") +
+    facet_wrap(~ .data$location_abbr, scales = "free", ncol = 8) +
     scale_color_discrete(na.translate = FALSE) +
     labs(x = incidence_period,
          y = paste0(response$data_source,": ",response$signal),

@@ -60,7 +60,8 @@ Imports:
     rlang,
     rvest,
     xml2,
-    ggplot2
+    ggplot2,
+    memoise
 Suggests: 
     testthat
 Depends: 

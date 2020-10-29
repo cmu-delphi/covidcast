@@ -15,4 +15,9 @@
 #' @import readr
 #' @import stringr
 #' @import ggplot2
+#' @importFrom memoise memoise
 NULL
+
+.onLoad <- function(libname, pkgname){
+  download_signal <<- memoise::memoise(download_signal)
+}

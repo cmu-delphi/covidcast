@@ -31,8 +31,8 @@ covidcast_cor = function(x, y, dt_x = 0, dt_y = 0,
                          method = c("pearson", "kendall", "spearman")) {
   x = latest_issue(x)
   y = latest_issue(y)
-  if (dt_x < 0 || dt_y < 0) stop("Both dt_x and dt_y must be nonnegative")
-  if (dt_x > 0 && dt_y > 0) stop("Only one of dt_x and dt_y can be positive")
+  if (dt_x < 0 || dt_y < 0) stop("Both `dt_x` and `dt_y` must be nonnegative.")
+  if (dt_x > 0 && dt_y > 0) stop("Only one of `dt_x` and `dt_y` can be positive.")
   by = match.arg(by)
   method = match.arg(method)
 

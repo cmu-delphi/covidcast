@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{earliest_issue}
 \alias{earliest_issue}
-\title{Fetch only the earliest issue for each observation in a data frame.}
+\title{Fetch only the earliest issue for each observation in a data frame}
 \usage{
 earliest_issue(df)
 }

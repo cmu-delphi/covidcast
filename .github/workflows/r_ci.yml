@@ -37,6 +37,8 @@ jobs:
         with:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-r-1-
+      - name: Install linux dependencies  
+        run: sudo apt-get install libudunits2-dev
       - name: Install dependencies
         run: |
           install.packages(c("remotes", "rcmdcheck"))

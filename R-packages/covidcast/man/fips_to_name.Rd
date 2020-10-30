@@ -33,8 +33,8 @@ are used; to match against a fixed string (no regular expressions), set
 returned. If "all", then all matches for each code are returned.}
 }
 \value{
-A vector of FIPS or CBSA codes if \code{ties_method} equals "first", and a
-list of FIPS or CBSA codes otherwise.
+A vector of county or metro names if \code{ties_method} equals "first",
+and a list of county or names otherwise.
 }
 \description{
 Look up county or metropolitan area names by FIPS or CBSA codes,

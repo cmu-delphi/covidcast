@@ -150,17 +150,17 @@ hospital referral regions, or states, as desired, by using the <code>geo_type</c
 argument. View <code><a href='../articles/covidcast.html'>vignette("covidcast")</a></code> for detailed example usage.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>covidcast_signal</span>(
-  <span class='no'>data_source</span>,
-  <span class='no'>signal</span>,
-  <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>end_day</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"county"</span>, <span class='st'>"hrr"</span>, <span class='st'>"msa"</span>, <span class='st'>"dma"</span>, <span class='st'>"state"</span>),
-  <span class='kw'>geo_values</span> <span class='kw'>=</span> <span class='st'>"*"</span>,
-  <span class='kw'>as_of</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>issues</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>lag</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+    <pre class="usage"><span class='fu'>covidcast_signal</span><span class='op'>(</span>
+  <span class='va'>data_source</span>,
+  <span class='va'>signal</span>,
+  start_day <span class='op'>=</span> <span class='cn'>NULL</span>,
+  end_day <span class='op'>=</span> <span class='cn'>NULL</span>,
+  geo_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"county"</span>, <span class='st'>"hrr"</span>, <span class='st'>"msa"</span>, <span class='st'>"dma"</span>, <span class='st'>"state"</span><span class='op'>)</span>,
+  geo_values <span class='op'>=</span> <span class='st'>"*"</span>,
+  as_of <span class='op'>=</span> <span class='cn'>NULL</span>,
+  issues <span class='op'>=</span> <span class='cn'>NULL</span>,
+  lag <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -197,7 +197,7 @@ for details on which types are available.</p></td>
     </tr>
     <tr>
       <th>geo_values</th>
-      <td><p>Which geographies to return. The default, <code><a href='https://rdrr.io/r/base/Arithmetic.html'>"*"</a></code>, fetches
+      <td><p>Which geographies to return. The default, <code>"*"</code>, fetches
 all geographies. To fetch specific geographies, specify their IDs as a
 vector or list of strings. See the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>geographic coding documentation</a>
 for details on how to specify these IDs.</p></td>
@@ -306,22 +306,24 @@ messages for each day of data it downloads. To suppress these, use
 <code><a href='state_census.html'>state_census</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'>## Fetch all counties from 2020-05-10 to the most recent available data</span>
-<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='st'>"2020-05-10"</span>)
+<span class='fu'>covidcast_signal</span><span class='op'>(</span><span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, start_day <span class='op'>=</span> <span class='st'>"2020-05-10"</span><span class='op'>)</span>
 <span class='co'>## Fetch all counties on just 2020-05-10 and no other days</span>
-<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='st'>"2020-05-10"</span>,
-                 <span class='kw'>end_day</span> <span class='kw'>=</span> <span class='st'>"2020-05-10"</span>)
+<span class='fu'>covidcast_signal</span><span class='op'>(</span><span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, start_day <span class='op'>=</span> <span class='st'>"2020-05-10"</span>,
+                 end_day <span class='op'>=</span> <span class='st'>"2020-05-10"</span><span class='op'>)</span>
 <span class='co'>## Fetch all states on 2020-05-10, 2020-05-11, 2020-05-12</span>
-<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='st'>"2020-05-10"</span>,
-                 <span class='kw'>end_day</span> <span class='kw'>=</span> <span class='st'>"2020-05-12"</span>, <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='st'>"state"</span>)
+<span class='fu'>covidcast_signal</span><span class='op'>(</span><span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, start_day <span class='op'>=</span> <span class='st'>"2020-05-10"</span>,
+                 end_day <span class='op'>=</span> <span class='st'>"2020-05-12"</span>, geo_type <span class='op'>=</span> <span class='st'>"state"</span><span class='op'>)</span>
 <span class='co'>## Fetch all available data for just Pennsylvania and New Jersey</span>
-<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='st'>"state"</span>,
-                 <span class='kw'>geo_values</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pa"</span>, <span class='st'>"nj"</span>))
+<span class='fu'>covidcast_signal</span><span class='op'>(</span><span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, geo_type <span class='op'>=</span> <span class='st'>"state"</span>,
+                 geo_values <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"pa"</span>, <span class='st'>"nj"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='co'>## Fetch all available data in the Pittsburgh metropolitan area</span>
-<span class='fu'>covidcast_signal</span>(<span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='st'>"msa"</span>,
-                 <span class='kw'>geo_values</span> <span class='kw'>=</span> <span class='fu'><a href='name_to_fips.html'>name_to_cbsa</a></span>(<span class='st'>"Pittsburgh"</span>))
-}</div></pre>
+<span class='fu'>covidcast_signal</span><span class='op'>(</span><span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, geo_type <span class='op'>=</span> <span class='st'>"msa"</span>,
+                 geo_values <span class='op'>=</span> <span class='fu'><a href='name_to_fips.html'>name_to_cbsa</a></span><span class='op'>(</span><span class='st'>"Pittsburgh"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -337,7 +339,7 @@ messages for each day of data it downloads. To suppress these, use
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -7,6 +7,8 @@ from typing import Union, Iterable, Tuple, List
 import pandas as pd
 from delphi_epidata import Epidata
 
+from .errors import NoDataWarning
+
 # Point API requests to the AWS endpoint
 Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
 
@@ -101,45 +103,52 @@ def signal(data_source: str,
       columns:
 
       ``geo_value``
-        identifies the location, such as a state name or county FIPS code. The
+        Identifies the location, such as a state name or county FIPS code. The
         geographic coding used by COVIDcast is described in the `API
         documentation here
         <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html>`_.
 
+      ``signal``
+        Name of the signal, same as the value of the ``signal`` input argument. Used for
+        downstream functions to recognize where this signal is from.
+
       ``time_value``
-        contains a `pandas Timestamp object
+        Contains a `pandas Timestamp object
         <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_
         identifying the date this estimate is for.
 
       ``issue``
-        contains a `pandas Timestamp object
+        Contains a `pandas Timestamp object
         <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_
         identifying the date this estimate was issued. For example, an estimate
         with a ``time_value`` of June 3 might have been issued on June 5, after
         the data for June 3rd was collected and ingested into the API.
 
       ``lag``
-        an integer giving the difference between ``issue`` and ``time_value``,
+        Integer giving the difference between ``issue`` and ``time_value``,
         in days.
 
       ``value``
-        the signal quantity requested. For example, in a query for the
+        The signal quantity requested. For example, in a query for the
         ``confirmed_cumulative_num`` signal from the ``usa-facts`` source,
         this would be the cumulative number of confirmed cases in the area, as
         of the ``time_value``.
 
       ``stderr``
-        the value's standard error, if available.
+        The value's standard error, if available.
 
       ``sample_size``
-        indicates the sample size available in that geography on that day;
+        Indicates the sample size available in that geography on that day;
         sample size may not be available for all signals, due to privacy or
         other constraints.
 
-      ``direction``
-        uses a local linear fit to estimate whether the signal in this region is
-        currently increasing or decreasing (reported as -1 for decreasing, 1 for
-        increasing, and 0 for neither).
+      ``geo_type``
+        Geography type for the signal, same as the value of the ``geo_type`` input argument.
+        Used for downstream functions to parse ``geo_value`` correctly
+
+      ``data_source``
+        Name of the signal source, same as the value of the ``data_source`` input argument. Used for
+        downstream functions to recognize where this signal is from.
 
     Consult the `signal documentation
     <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html>`_
@@ -147,7 +156,6 @@ def signal(data_source: str,
     specific signals.
 
     """
-
     if geo_type not in VALID_GEO_TYPES:
         raise ValueError("geo_type must be one of " + ", ".join(VALID_GEO_TYPES))
 
@@ -250,7 +258,6 @@ def metadata() -> pd.DataFrame:
       ``max_lag``
         Largest lag from observation to issue, in days.
     """
-
     meta = Epidata.covidcast_meta()
 
     if meta["result"] != 1:
@@ -362,7 +369,6 @@ def _fetch_single_geo(data_source: str,
     entries.
 
     """
-
     as_of_str = _date_to_api_string(as_of) if as_of is not None else None
     issues_strs = _dates_to_api_strings(issues) if issues is not None else None
 
@@ -379,10 +385,14 @@ def _fetch_single_geo(data_source: str,
                                      issues=issues_strs, lag=lag)
 
         # Two possible error conditions: no data or too much data.
-        if day_data["message"] != "success":
-            warnings.warn("Problem obtaining data on {day}: {message}".format(
-                day=day_str,
-                message=day_data["message"]))
+        if day_data["message"] == "no results":
+            warnings.warn(f"No {data_source} {signal} data found on {day_str} "
+                          f"for geography '{geo_type}'",
+                          NoDataWarning)
+        if day_data["message"] not in {"success", "no results"}:
+            warnings.warn(f"Problem obtaining {data_source} {signal} data on {day_str} "
+                          f"for geography '{geo_type}': {day_data['message']}",
+                          RuntimeWarning)
 
         # In the too-much-data case, we continue to try putting the truncated
         # data in our results. In the no-data case, skip this day entirely,
@@ -394,7 +404,7 @@ def _fetch_single_geo(data_source: str,
 
     if len(dfs) > 0:
         out = pd.concat(dfs)
-
+        out.drop("direction", axis=1, inplace=True)
         out["time_value"] = pd.to_datetime(out["time_value"], format="%Y%m%d")
         out["issue"] = pd.to_datetime(out["issue"], format="%Y%m%d")
         out["geo_type"] = geo_type
@@ -409,7 +419,6 @@ def _signal_metadata(data_source: str,
                      signal: str,  # pylint: disable=W0621
                      geo_type: str) -> dict:
     """Fetch metadata for a single signal as a dict."""
-
     meta = metadata()
 
     mask = ((meta.data_source == data_source) &
@@ -434,13 +443,11 @@ def _signal_metadata(data_source: str,
 
 def _date_to_api_string(date: date) -> str:  # pylint: disable=W0621
     """Convert a date object to a YYYYMMDD string expected by the API."""
-
     return date.strftime("%Y%m%d")
 
 
 def _dates_to_api_strings(dates: Union[date, list, tuple]) -> str:
     """Convert a date object, or pair of (start, end) objects, to YYYYMMDD strings."""
-
     if not isinstance(dates, (list, tuple)):
         return _date_to_api_string(dates)
 

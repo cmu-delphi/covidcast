@@ -13,7 +13,9 @@ plot_28_day_frequency_state  <- function(df_to_plot) {
   
   covidcast_signal_to_plot = make_covidcast_signal(states_present, df_to_plot, "state")
   
-  plot(covidcast_signal_to_plot, range=c(0,28))
+  plot(covidcast_signal_to_plot,
+       title = "State frequency in last 28 days",
+       range = c(0, 28))
 }
 
 plot_28_day_frequency_county  <- function(df_to_plot) {
@@ -24,5 +26,7 @@ plot_28_day_frequency_county  <- function(df_to_plot) {
   
   covidcast_signal_to_plot = make_covidcast_signal(counties_present, df_to_plot, "county")
   
-  plot(covidcast_signal_to_plot, range=c(0,28))
+  plot(covidcast_signal_to_plot,
+       title = "County frequency in last 28 days",
+       range = c(0, 28))
 }

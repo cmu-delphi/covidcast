@@ -54,11 +54,6 @@ This visualizes the county coverage -- how frequently does each county show up i
 
 ```{r, fig.width = 10, fig.height = 8}
 
-counties_present = df_doctor_visits_counties %>%
-  group_by(geo_value) %>%
-  summarize(value = n()) %>% ungroup() %>%
-  filter(substr(geo_value, 3, 5) != "000")
-
 source("dashboard_functions.R")
-plot_28_day_frequency(counties_present, "county")
+plot_28_day_frequency_county(df_doctor_visits_counties)
 ```

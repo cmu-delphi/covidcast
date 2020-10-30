@@ -1,9 +1,28 @@
-plot_28_day_frequency <- function(df_to_plot, geo_type) {
-  # These are all required for rendering using covidcast.plot
-  df_to_plot$time_value = "2020-04-15"
-  df_to_plot$issue = "2020-04-15"
-  attributes(df_to_plot)$geo_type = geo_type
-  class(df_to_plot) = c("covidcast_signal", "data.frame")
+make_covidcast_signal <- function(destination, source, geo_type) {
+  destination$time_value = source$time_value[1]
+  destination$issue = source$issue[1]
+  attributes(destination)$geo_type = geo_type
+  class(destination) = c("covidcast_signal", "data.frame")
+  return(destination)
+}
+
+plot_28_day_frequency_state  <- function(df_to_plot) {
+  states_present = df_to_plot %>%
+    group_by(geo_value) %>%
+    summarize(value = n())
   
-  plot(df_to_plot, range=c(0,28))
+  covidcast_signal_to_plot = make_covidcast_signal(states_present, df_to_plot, "state")
+  
+  plot(covidcast_signal_to_plot, range=c(0,28))
+}
+
+plot_28_day_frequency_county  <- function(df_to_plot) {
+  counties_present = df_to_plot %>%
+    group_by(geo_value) %>%
+    summarize(value = n()) %>% ungroup() %>%
+    filter(substr(geo_value, 3, 5) != "000")
+  
+  covidcast_signal_to_plot = make_covidcast_signal(counties_present, df_to_plot, "county")
+  
+  plot(covidcast_signal_to_plot, range=c(0,28))
 }

@@ -83,10 +83,6 @@ This visualizes the state coverage -- how frequently does each state show up in 
 
 ```{r, fig.width = 10, fig.height = 8}
 
-states_present = df_ght_states %>%
-group_by(geo_value) %>%
-summarize(value = n())
-
 source("dashboard_functions.R")
-plot_28_day_frequency(states_present, "state")
+plot_28_day_frequency_state(df_ght_states)
 ```

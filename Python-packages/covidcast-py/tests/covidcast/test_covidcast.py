@@ -1,14 +1,17 @@
+import warnings
 from datetime import date, datetime
 from unittest.mock import patch
 
 # Force tests to use a specific backend, so they reproduce across platforms
 import matplotlib
+
 matplotlib.use("AGG")
 
 import pandas as pd
 import numpy as np
 import pytest
 from covidcast import covidcast
+from covidcast.errors import NoDataWarning
 
 
 def sort_df(df):
@@ -22,7 +25,9 @@ def sort_df(df):
 @patch("delphi_epidata.Epidata.covidcast")
 def test_signal(mock_covidcast, mock_metadata):
     mock_covidcast.return_value = {"result": 1,  # successful API response
-                                   "epidata": [{"time_value": 20200622, "issue": 20200724}],
+                                   "epidata": [{"time_value": 20200622,
+                                                "issue": 20200724,
+                                                "direction": None}],
                                    "message": "success"}
     mock_metadata.return_value = {"max_time": pd.Timestamp("2020-08-04 00:00:00"),
                                   "min_time": pd.Timestamp("2020-08-03 00:00:00")}
@@ -196,13 +201,18 @@ def test__detect_metadata():
 def test__fetch_single_geo(mock_covidcast):
     # not generating full DF since most attributes used
     mock_covidcast.side_effect = [{"result": 1,  # successful API response
-                                   "epidata": [{"time_value": 20200622, "issue": 20200724}],
+                                   "epidata": [{"time_value": 20200622,
+                                                "issue": 20200724,
+                                                "direction": None}],
                                    "message": "success"},
                                   {"result": 1,  # second successful API
-                                   "epidata": [{"time_value": 20200821, "issue": 20200925}],
+                                   "epidata": [{"time_value": 20200821,
+                                                "issue": 20200925}],
                                    "message": "success"},
-                                  {"message": "error: failed"},  # unsuccessful API response
-                                  {"message": "success"}]  # no epidata
+                                  {"message": "failed"},  # unknown failed API response
+                                  {"message": "no results"},  # no data API response
+                                  {"message": "success"},  # no epidata
+                                  {"message": "success"}]
 
     # test happy path with 2 day range
     response = covidcast._fetch_single_geo(
@@ -216,18 +226,31 @@ def test__fetch_single_geo(mock_covidcast):
                             index=[0, 0])
     assert sort_df(response).equals(sort_df(expected))
 
-    # test warning is raised if unsuccessful API response
-    with pytest.warns(UserWarning):
-        covidcast._fetch_single_geo(None, None, date(2020, 4, 2), date(2020, 4, 2),
-                                    None, None, None, None, None)
+    # test warning when an unknown bad response is received
+    with warnings.catch_warnings(record=True) as w:
+        covidcast._fetch_single_geo("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
+                                    "*", None, None, None, None)
+        assert len(w) == 1
+        assert str(w[0].message) == \
+               "Problem obtaining source signal data on 20200402 for geography '*': failed"
+        assert w[0].category is RuntimeWarning
+
+    # test warning when a no data response is received
+    with warnings.catch_warnings(record=True) as w:
+        covidcast._fetch_single_geo("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
+                                    "county", None, None, None, None)
+        assert len(w) == 1
+        assert str(w[0].message) == "No source signal data found on 20200402 for geography 'county'"
+        assert w[0].category is NoDataWarning
 
     # test no epidata yields nothing
-    assert not covidcast._fetch_single_geo(None, None, date(2020, 4, 2), date(2020, 4, 1),
+    assert not covidcast._fetch_single_geo(None, None, date(2020, 4, 1), date(2020, 4, 1),
                                            None, None, None, None, None)
 
     # test end_day < start_day yields nothing
-    assert not covidcast._fetch_single_geo(None, None, date(2020, 4, 2), date(2020, 4, 1),
+    assert not covidcast._fetch_single_geo(None, None, date(2020, 4, 1), date(2020, 4, 1),
                                            None, None, None, None, None)
+
 
 
 @patch("covidcast.covidcast.metadata")

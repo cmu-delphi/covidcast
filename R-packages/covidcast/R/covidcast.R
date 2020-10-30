@@ -9,7 +9,7 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
   packageStartupMessage(paste(msg, collapse = "\n"))
 }
 
-#' Produce a data frame for one signal.
+#' Obtain a data frame for one COVIDcast signal
 #'
 #' Obtains data for selected date ranges for all geographic regions of the
 #' United States. Available data sources and signals are documented in the
@@ -35,8 +35,8 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 #' returns the most recent issue available for every observation. The `as_of`,
 #' `issues`, and `lag` parameters allow the user to select specific issues
 #' instead, or to see all updates to observations. These options are mutually
-#' exclusive; if you specify more than one, `as_of` will take priority over
-#' `issues`, which will take priority over `lag`.
+#' exclusive, and you should only specify one; if you specify more than one, you
+#' may get an error or confusing results.
 #'
 #' Note that the API only tracks the initial value of an estimate and *changes*
 #' to that value. If a value was first issued on June 5th and never updated,
@@ -67,62 +67,61 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 #'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)
 #'   for a list of available signals.
 #' @param start_day Query data beginning on this date. Date object, or string in
-#'   the form `"YYYY-MM-DD"`. If `start_day` is `NULL`, defaults to first day
+#'   the form "YYYY-MM-DD". If `start_day` is `NULL`, defaults to first day
 #'   data is available for this signal.
 #' @param end_day Query data up to this date, inclusive. Date object or string
-#'   in the form `"YYYY-MM-DD"`. If `end_day` is `NULL`, defaults to the most
+#'   in the form "YYYY-MM-DD". If `end_day` is `NULL`, defaults to the most
 #'   recent day data is available for this signal.
 #' @param geo_type The geography type for which to request this data, such as
-#'   `"county"` or `"state"`. Defaults to `"county"`. See the [geographic coding
+#'   "county" or "state". Defaults to "county". See the [geographic coding
 #'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html)
 #'   for details on which types are available.
-#' @param geo_values Which geographies to return. The default, `"*"`, fetches
+#' @param geo_values Which geographies to return. The default, "*", fetches
 #'   all geographies. To fetch specific geographies, specify their IDs as a
 #'   vector or list of strings. See the [geographic coding
 #'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html)
 #'   for details on how to specify these IDs.
 #' @param as_of Fetch only data that was available on or before this date,
-#'   provided as a `Date` object or string in the form `"YYYY-MM-DD"`. If
-#'   `NULL`, the default, return the most recent available data.
+#'   provided as a `Date` object or string in the form "YYYY-MM-DD". If
+#'   `NULL`, the default, return the most recent available data. Note that only
+#'   one of `as_of`, `issues`, and `lag` should be provided; it does not make
+#'   sense to specify more than one.
 #' @param issues Fetch only data that was published or updated ("issued") on
 #'   these dates. Provided as either a single `Date` object (or string in the
-#'   form `"YYYY-MM-DD"`), indicating a single date to fetch data issued on, or
+#'   form "YYYY-MM-DD"), indicating a single date to fetch data issued on, or
 #'   a vector specifying two dates, start and end. In this case, return all data
 #'   issued in this range. There may be multiple rows for each observation,
 #'   indicating several updates to its value. If `NULL`, the default, return the
 #'   most recently issued data.
-#' @param lag Integer. If, for example, `lag=3`, fetch only data that was
-#'   published or updated exactly 3 days after the date. For example, a row with
-#'   `time_value` of June 3 will only be included in the results if its data was
-#'   issued or updated on June 6. If `NULL`, the default, return the most
-#'   recently issued data regardless of its lag.
-#' 
+#' @param lag Integer. If, for example, `lag = 3`, then we fetch only data that
+#'   was published or updated exactly 3 days after the date. For example, a row
+#'   with `time_value` of June 3 will only be included in the results if its
+#'   data was issued or updated on June 6. If `NULL`, the default, return the
+#'   most recently issued data regardless of its lag.
+#'
 #' @return Data frame with matching data. Each row is one observation of one
 #'   signal on one day in one geographic location. Contains the following
 #'   columns:
 #'
 #'   \item{data_source}{Data source from which this observation was obtained.}
-#'   \item{signal}{The signal from which this observation was obtained.}
-#'   \item{geo_value}{identifies the location, such as a state name or county
-#'   FIPS code}
-#'   \item{time_value}{a `Date` object identifying the date of this observation}
-#'   \item{issue}{a `Date` object identifying the date this estimate was issued.
+#'   \item{signal}{Signal from which this observation was obtained.}
+#'   \item{geo_value}{String identifying the location, such as a state name or
+#'   county FIPS code.}
+#'   \item{time_value}{Date object identifying the date of this observation.}
+#'   \item{issue}{Date object identifying the date this estimate was issued.
 #'   For example, an estimate with a `time_value` of June 3 might have been
 #'   issued on June 5, after the data for June 3rd was collected and ingested
 #'   into the API.}
-#'   \item{lag}{an integer giving the difference between ``issue`` and
-#'   ``time_value``, in days.}
-#'   \item{value}{the signal quantity requested. For example, in a query for the
-#'   `confirmed_cumulative_num` signal from the `usa-facts` source, this would
-#'   be the cumulative number of confirmed cases in the area, as of the
+#'   \item{lag}{Integer giving the difference between `issue` and `time_value`,
+#'   in days.}
+#'   \item{value}{Signal value being requested. For example, in a query for the
+#'   "confirmed_cumulative_num" signal from the "usa-facts" source, this would
+#'   be the cumulative number of confirmed cases in the area, as of the given
 #'   `time_value`.}
-#'   \item{stderr}{the value's standard error, if available}
-#'   \item{sample_size}{indicates the sample size available in that geography on
-#'   that day; sample size may not be available for all signals, due to privacy
-#'   or other constraints, in which case they will be `NA`.}
-#'   \item{direction}{uses a local linear fit to estimate whether the signal in
-#'   this region is currently increasing or decreasing (reported as -1 for
-#'   decreasing, 1 for increasing, and 0 for neither).}
+#'   \item{stderr}{Associated standard error of the signal value, if available.}
+#'   \item{sample_size}{Integer indicating the sample size available in that
+#'   geography on that day; sample size may not be available for all signals,
+#'   due to privacy or other constraints, in which case it will be `NA`.}
 #'
 #'   Consult the signal documentation for more details on how values and
 #'   standard errors are calculated for specific signals.
@@ -207,8 +206,7 @@ covidcast_signal <- function(data_source, signal,
   }
 
   if (start_day > end_day) {
-    stop("end_day must be on or after start_day, but start_day = '",
-         start_day, "' and end_day = '", end_day, "'")
+    stop("`end_day` must be on or after `start_day`.")
   }
 
   if (!is.null(as_of)) {
@@ -301,7 +299,7 @@ summary.covidcast_signal = function(object, ...) {
 #' @param plot_type One of "choro", "bubble", "line" indicating whether to plot
 #'   a choropleth map, bubble map, or line (time series) graph, respectively.
 #'   The default is "choro".
-#' @param time_value Date object (or string in the form `"YYYY-MM-DD"`)
+#' @param time_value Date object (or string in the form "YYYY-MM-DD")
 #'   specifying the day to map, for choropleth and bubble maps. If `NULL`, the
 #'   default, then the last date in `x` is used for the maps. Time series plots
 #'   always include all available time values in `x`.
@@ -463,7 +461,7 @@ plot.covidcast_signal <- function(x, plot_type = c("choro", "bubble", "line"),
 
 ##########
 
-#' Obtain multiple signals in one data frame.
+#' Obtain multiple COVIDcast signals in one data frame
 #'
 #' This convenience function uses `covidcast_signal()` to obtain multiple
 #' signals, potentially from multiple data sources, in one data frame. See the
@@ -518,7 +516,7 @@ covidcast_signals <- function(signals, start_day = NULL, end_day = NULL,
 
 ##########
 
-#' Fetch Delphi's COVID-19 Surveillance Streams metadata.
+#' Obtain COVIDcast metadata
 #'
 #' Obtains a data frame of metadata describing all publicly available data
 #' streams from the COVIDcast API.
@@ -537,11 +535,11 @@ covidcast_signals <- function(signals, start_day = NULL, end_day = NULL,
 #'   \item{num_locations}{Number of distinct geographic locations available for
 #'   this signal. For example, if `geo_type` is county, the number of counties
 #'   for which this signal has ever been reported.}
-#'   \item{min_value}{The smallest value that has ever been reported.}
-#'   \item{max_value}{The largest value that has ever been reported.}
-#'   \item{mean_value}{The arithmetic mean of all reported values.}
-#'   \item{stdev_value}{The sample standard deviation of all reported values.}
-#'   \item{max_issue}{The most recent issue date for this signal.}
+#'   \item{min_value}{Smallest value that has ever been reported.}
+#'   \item{max_value}{Largest value that has ever been reported.}
+#'   \item{mean_value}{Arithmetic mean of all reported values.}
+#'   \item{stdev_value}{Sample standard deviation of all reported values.}
+#'   \item{max_issue}{Most recent issue date for this signal.}
 #'   \item{min_lag}{Smallest lag from observation to issue, in `time_type` units}
 #'   \item{max_lag}{Largest lag from observation to issue, in `time_type` units}
 #'
@@ -555,7 +553,7 @@ covidcast_meta <- function() {
   meta <- .request(list(source='covidcast_meta', cached="true"))
 
   if (meta$message != "success") {
-    stop("Failed to obtain metadata: ", meta$message)
+    stop("Failed to obtain metadata: ", meta$message, ".")
   }
 
   meta <- meta$epidata %>%
@@ -685,14 +683,14 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type,
   return(df)
 }
 
-# Fetch Delphi's COVID-19 Surveillance Streams
+# Fetch Delphi's COVID-19 indicators
 covidcast <- function(data_source, signal, time_type, geo_type, time_values,
                       geo_value, as_of, issues, lag) {
   # Check parameters
   if(missing(data_source) || missing(signal) || missing(time_type) ||
        missing(geo_type) || missing(time_values) || missing(geo_value)) {
-    stop('`data_source`, `signal`, `time_type`, `geo_type`, `time_values`, and ',
-         '`geo_value` are all required')
+    stop("`data_source`, `signal`, `time_type`, `geo_type`, `time_values`, and ",
+         "`geo_value` are all required.")
   }
 
   # Set up request
@@ -718,7 +716,7 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
     } else if (length(issues) == 1) {
       params$issues <- date_to_string(issues)
     } else {
-      stop("`issues` must be either a single date or a date interval")
+      stop("`issues` must be either a single date or a date interval.")
     }
   }
 

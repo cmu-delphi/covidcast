@@ -28,7 +28,8 @@
 plot_trajectory <- function(list_of_predictions_cards,
                             first_day = "2020-07-01",
                             last_day = Sys.Date(),
-                            alpha = .2)
+                            alpha = .2,
+                           page_facet = 1)
 {
   # make sure predictions cards are for the same forecasting task (except ahead, and forecast_date)
   response <- unique_attr(list_of_predictions_cards,"signals")
@@ -97,7 +98,22 @@ plot_trajectory <- function(list_of_predictions_cards,
   response_df <- response_df %>% dplyr::mutate(
     location_abbr = if(geo_type == "state") covidcast::fips_to_abbr(paste0(location,"000")) else covidcast::fips_to_name(location)) %>%
     dplyr::filter(!is.na(location_abbr))
-  ggplot(preds_df, aes(x = .data$reference_period)) +
+    
+    #set the page number 
+  fc_round <- function(x){  #round to integer
+    idx = rep(c(FALSE,TRUE), length.out=length(x))
+    floor(x)*idx + ceiling(x)*(!idx)
+  }
+  
+  if (length(unique(preds_df$location_abbr))/45 < 1) {
+    page_facet = page_facet
+  } else 
+    page_facet = fc_round(length(unique(preds_df$location_abbr))/45)
+  
+#facetting
+  for (i in 1:page_facet){
+    
+  print(ggplot(preds_df, aes(x = .data$reference_period)) +
     geom_line(aes(y = .data$point,
                   col = .data$forecaster_name),
               size = 1) + 
@@ -109,13 +125,16 @@ plot_trajectory <- function(list_of_predictions_cards,
                 show.legend = FALSE) + 
     geom_line(data=response_df, aes(y = .data$value),
               size = 1) +
-    facet_wrap(~ .data$location_abbr, scales = "free") +
+    ggforce::facet_wrap_paginate(~.data$location_abbr,nrow = 9,ncol = 5,scales="free_y",page=i) + 
+    #facet_wrap(~ .data$location_abbr, scales = "free", ncol = 8) +
     scale_color_discrete(na.translate = FALSE) +
     labs(x = incidence_period,
          y = paste0(response$data_source,": ",response$signal),
          colour = "forecaster_name") +
-    theme_bw()
+    theme_bw() + #tune font size
+    theme(strip.text = element_text(size = 12,face = "bold")))
 }
+    }
 
 sum_to_epiweek <- function(daily_df)
 {

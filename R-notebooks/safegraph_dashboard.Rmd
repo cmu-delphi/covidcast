@@ -61,17 +61,7 @@ This visualizes the county coverage -- how frequently does each county show up i
 
 ```{r, fig.width = 10, fig.height = 8}
 
-counties_present = df_safegraph_counties %>%
-  group_by(geo_value) %>%
-  summarize(value = n()) %>% ungroup() %>%
-  filter(substr(geo_value, 3, 5) != "000")
+source("dashboard_functions.R")
+plot_28_day_frequency_county(df_safegraph_counties)
 
-# These are all required for rendering using covidcast.plot
-counties_present$time_value = "2020-04-15"
-counties_present$issue = "2020-04-15"
-attributes(counties_present)$geo_type = "county"
-class(counties_present) = c("covidcast_signal", "data.frame")
-
-plot(counties_present, title = "How frequently do counties appear in the last 28 days?", range =
-       c(0, 28))
 ```

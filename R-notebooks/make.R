@@ -1,7 +1,6 @@
 file_names = list.files(".", pattern="*.Rmd")
 file_names = substr(file_names, 1, nchar(file_names)-4)
 
-file_name = "fb_dashboard"
 for (file_name in file_names) {
   cat(sprintf("Rendering %s ... ", file_name))
   t0 = proc.time()

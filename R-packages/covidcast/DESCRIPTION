@@ -54,5 +54,7 @@ Suggests:
     rmarkdown,
     gridExtra,
     testthat,
-    tibble
+    tibble,
+    mockery,
+    vdiffr
 VignetteBuilder: knitr

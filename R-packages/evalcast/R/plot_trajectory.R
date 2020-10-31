@@ -29,6 +29,8 @@ plot_trajectory <- function(list_of_predictions_cards,
                             first_day = "2020-07-01",
                             last_day = Sys.Date(),
                             alpha = .2,
+                            nrow = 6,
+                            ncol = 6,  
                            page_facet = 1)
 {
   # make sure predictions cards are for the same forecasting task (except ahead, and forecast_date)
@@ -100,40 +102,46 @@ plot_trajectory <- function(list_of_predictions_cards,
     dplyr::filter(!is.na(location_abbr))
     
     #set the page number 
-  fc_round <- function(x){  #round to integer
-    idx = rep(c(FALSE,TRUE), length.out=length(x))
-    floor(x)*idx + ceiling(x)*(!idx)
-  }
+  nfacets = length(unique(preds_df$location_abbr)) 
+  if(ncol*nrow*page_facet < nfacets) page_facet = ceiling(nfacets / (ncol*nrow))
   
-  if (length(unique(preds_df$location_abbr))/45 < 1) {
-    page_facet = page_facet
-  } else 
-    page_facet = fc_round(length(unique(preds_df$location_abbr))/45)
+
   
 #facetting
-  for (i in 1:page_facet){
-    
-  print(ggplot(preds_df, aes(x = .data$reference_period)) +
-    geom_line(aes(y = .data$point,
-                  col = .data$forecaster_name),
-              size = 1) + 
-    geom_ribbon(aes(ymin = .data$lower,
-                    ymax = .data$upper,
-                    fill = .data$forecaster_name),
-                alpha = .1,
-                colour = NA,
-                show.legend = FALSE) + 
-    geom_line(data=response_df, aes(y = .data$value),
-              size = 1) +
-    ggforce::facet_wrap_paginate(~.data$location_abbr,nrow = 9,ncol = 5,scales="free_y",page=i) + 
-    #facet_wrap(~ .data$location_abbr, scales = "free", ncol = 8) +
-    scale_color_discrete(na.translate = FALSE) +
-    labs(x = incidence_period,
-         y = paste0(response$data_source,": ",response$signal),
-         colour = "forecaster_name") +
-    theme_bw() + #tune font size
-    theme(strip.text = element_text(size = 12,face = "bold")))
-}
+  p <- ggplot(preds_df, aes(x = .data$reference_period)) +
+            geom_line(aes(y = .data$point,
+                          col = .data$forecaster_name, 
+                          group=.data$forecast_date),
+                      size = 1) + 
+            geom_point(aes(y = .data$point,
+                           col = .data$forecaster_name, 
+                           group=.data$forecast_date)) +
+            geom_ribbon(aes(ymin = .data$lower,
+                            ymax = .data$upper,
+                            fill = .data$forecaster_name,
+                            group=.data$forecast_date),
+                        alpha = .1,
+                        colour = NA,
+                        show.legend = FALSE) + 
+            geom_line(data=response_df, aes(y = .data$value),
+                      size = 1) + scale_color_discrete(na.translate = FALSE) +
+            labs(x = incidence_period,
+                 y = paste0(response$data_source,": ",response$signal),
+                 colour = "forecaster_name") +
+           theme_bw() + #tune font size for axis and facet title
+           theme(axis.text = element_text(size = 8), 
+                 strip.text = element_text(size = 10,face = "bold"))
+ 
+ # The breakpoint is 52 so that all states can be rendered in one plot
+ if (nfacets <= 52 ) {
+   print(p + ggplot2::facet_wrap(~.data$location_abbr, scales = "free", ncol = 6,nrow=NULL))
+ } else { 
+   for (i in 1: page_facet) { 
+# if facet > 52, pagination will be implemented
+     print(p + ggforce::facet_wrap_paginate(~.data$location_abbr, scales = "free_y", ncol = ncol,nrow=nrow, page=i))
+   } 
+ }  
+
     }
 
 sum_to_epiweek <- function(daily_df)

@@ -235,17 +235,27 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
   }
 }
 
-#' Pivot covidcast_signal_wide object to "long" format
+#' Pivot multiple signals between "wide" and "long" formats
 #'
-#' Pivots a `covidcast_signal_wide` object, the output of `aggregate_signals()`
-#' with `format = "wide"`, into "long" format, i.e., as if `aggregate_signals()`
-#' had been called in the first place with `format = "long"`.
+#' These functions take signals returned from `aggregate_signals()` and convert
+#' between formats. `covidcast_longer()` takes the output of
+#' `aggregate_signals(..., format = "wide")` and converts it to "long" format,
+#' while `covidcast_wider()` takes the output of `aggregate_signals(..., format
+#' = "long")` and converts it to "wide" format.
+#'
+#' @param x A `covidcast_signal_wide` or `covidcast_signal_long` object, as
+#'   returned from `aggregate_signals()` with the respective `format` argument.
+#'
+#' @return The object pivoted into the opposite form, i.e. as if
+#'   `aggregate_signals()` had been called in the first place with that
+#'   `format` argument.
+#'
 #' @export
 covidcast_longer = function(x) {
   if (!("covidcast_signal_wide" %in% class(x))) {
     stop("`x` must be a `covidcast_signal_wide` object.")
   }
-  
+
   # First pivot into long format
   x = x %>%
     tidyr::pivot_longer(dplyr::starts_with("value"),
@@ -268,11 +278,7 @@ covidcast_longer = function(x) {
   return(x)
 }
 
-#' Pivot covidcast_signal_long object to "wide" format
-#' 
-#' Pivots a `covidcast_signal_long` object, the output of `aggregate_signals()`
-#' with `format = "long"`, into "wide" format, i.e., as if `aggregate_signals()`
-#' had been called in the first place with `format = "wide"`.
+#' @rdname covidcast_longer
 #' @export
 covidcast_wider = function(x) {
   if (!("covidcast_signal_long" %in% class(x))) {

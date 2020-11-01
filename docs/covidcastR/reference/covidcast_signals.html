@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Metro area population data — msa_census • covidcast</title>
+<title>Obtain multiple COVIDcast signals in one data frame — covidcast_signals • covidcast</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,9 @@
 
 
 
-<meta property="og:title" content="Metro area population data — msa_census" />
-<meta property="og:description" content="Data set on metropolitan area populations, from the 2019 US Census. This
-includes metropolitan and micropolitan statistical areas, although the
-COVIDcast API only supports fetching data from metropolitan statistical
-areas." />
+<meta property="og:title" content="Obtain multiple COVIDcast signals in one data frame — covidcast_signals" />
+<meta property="og:description" content="This convenience function uses covidcast_signal() to obtain multiple
+signals, potentially from multiple data sources." />
 
 
 
@@ -135,48 +133,49 @@ areas." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Metro area population data</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/data.R'><code>R/data.R</code></a></small>
-    <div class="hidden name"><code>msa_census.Rd</code></div>
+    <h1>Obtain multiple COVIDcast signals in one data frame</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/covidcast.R'><code>R/covidcast.R</code></a></small>
+    <div class="hidden name"><code>covidcast_signals.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Data set on metropolitan area populations, from the 2019 US Census. This
-includes metropolitan and micropolitan statistical areas, although the
-COVIDcast API only supports fetching data from metropolitan statistical
-areas.</p>
+    <p>This convenience function uses <code><a href='covidcast_signal.html'>covidcast_signal()</a></code> to obtain multiple
+signals, potentially from multiple data sources.</p>
     </div>
 
-    <pre class="usage"><span class='no'>msa_census</span></pre>
+    <pre class="usage"><span class='fu'>covidcast_signals</span>(
+  <span class='no'>data_source</span>,
+  <span class='no'>signal</span>,
+  <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>end_day</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"county"</span>, <span class='st'>"hrr"</span>, <span class='st'>"msa"</span>, <span class='st'>"dma"</span>, <span class='st'>"state"</span>),
+  <span class='kw'>geo_values</span> <span class='kw'>=</span> <span class='st'>"*"</span>,
+  <span class='kw'>as_of</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>issues</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>lag</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)</pre>
 
 
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>A data frame with 2797 rows, each representing one core-based
-statistical area (including metropolitan and micropolitan statistical
-areas, county or county equivalents, and metropolitan divisions). There are
-many columns. The most crucial are:</p>
-<dl'>
-<dt>CBSA</dt><dd><p>Core Based Statistical Area code. These are unique identifiers
-used, for example, as the <code>geo_values</code> argument to <code><a href='covidcast_signal.html'>covidcast_signal()</a></code>
-when requesting data from specific metro areas (with <code>geo_type = 'msa'</code>).</p></dd>
-<dt>NAME</dt><dd><p>Name or title of the area.</p></dd>
-<dt>LSAD</dt><dd><p>Legal/Statistical Area Description, identifying if this is a
-metropolitan or micropolitan area, a metropolitan division, or a county.</p></dd>
-<dt>POPESTIMATE2019</dt><dd><p>Estimate of the area's resident population as of
-July 1, 2019.</p></dd>
+    <p>The argument structure is just as in <code><a href='covidcast_signal.html'>covidcast_signal()</a></code>, except
+the first four arguments <code>data_source</code>, <code>signal</code>, <code>start_day</code>, <code>end_day</code>
+are permitted to be vectors. The returned object is a list of
+<code>covidcast_signal</code> data frames, of length <code>N = max(length(data_source), length(signal))</code>. The first two arguments <code>data_source</code>, <code>signal</code> are
+recycled appropriately, in the calls to <code><a href='covidcast_signal.html'>covidcast_signal()</a></code>; see example
+below. The next two arguments <code>start_day</code>, <code>end_day</code>, unless <code>NULL</code>, must
+be either length 1 or N.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-</dl>
+    <div class='dont-index'><p><code><a href='covidcast_signal.html'>covidcast_signal()</a></code></p></div>
 
-    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
-
-    <p>United States Census Bureau, at
-<a href='https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.csv'>https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.csv</a></p>
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
-
-    <p>Census Bureau documentation of all columns and their meaning:
-<a href='https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.pdf'>https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.pdf</a></p>
-
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='co'>## Fetch USAFacts confirmed cases and deaths over the same time period</span>
+<span class='fu'>covidcast_signals</span>(<span class='st'>"usa-facts"</span>, <span class='kw'>signal</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"confirmed_incidence_num"</span>,
+                                        <span class='st'>"deaths_incidence_num"</span>),
+                   <span class='kw'>start_day</span> <span class='kw'>=</span> <span class='st'>"2020-08-15"</span>, <span class='kw'>end_day</span> <span class='kw'>=</span> <span class='st'>"2020-10-01"</span>)
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

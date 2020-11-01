@@ -46,7 +46,8 @@ Imports:
   maptools,
   ggplot2,
   grDevices,
-  rlang
+  rlang,
+  tidyr
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,

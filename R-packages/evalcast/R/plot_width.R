@@ -22,7 +22,7 @@ plot_width <- function(cards, alpha = 0.2, levels = c(0.5, 0.7, 0.9),
                        legend_position = "bottom") {
   # make sure scorecards are comparable:
   unique_attr(cards, "ahead")
-  unique_attr(cards, "geo_type")
+  unique_attr(cards, "geo_type") 
   unique_attr(cards, "incidence_period")
   unique_attr(cards, "response")
   cards <- intersect_locations(cards)

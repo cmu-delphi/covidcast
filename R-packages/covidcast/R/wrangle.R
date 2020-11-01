@@ -252,7 +252,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
 #'
 #' @export
 covidcast_longer = function(x) {
-  if (!("covidcast_signal_wide" %in% class(x))) {
+  if (!inherits(x, "covidcast_signal_wide")) {
     stop("`x` must be a `covidcast_signal_wide` object.")
   }
 
@@ -281,7 +281,7 @@ covidcast_longer = function(x) {
 #' @rdname covidcast_longer
 #' @export
 covidcast_wider = function(x) {
-  if (!("covidcast_signal_long" %in% class(x))) {
+  if (!inherits(x, "covidcast_signal_long")) {
     stop("`x` must be a `covidcast_signal_long` object.")
   }
   

@@ -1,12 +1,13 @@
 library(testthat)
 library(vdiffr)
+library(dplyr)
 
 # Contexts are no longer required or recommended in testthat, but vdiffr still
 # wants one to place the figure files correctly. See
 # https://github.com/r-lib/vdiffr/issues/71
 context("plot")
 
-test_that("line graphs", {
+test_that("simple line graph", {
   fake_data <- structure(data.frame(
     value = 1:10,
     time_value = seq.Date(as.Date("2020-01-01"), as.Date("2020-01-10"),
@@ -29,4 +30,52 @@ test_that("line graphs", {
       stderr_alpha = 0.3
     )
   ))
+})
+
+test_that("state line graphs", {
+  fb_state <- readRDS(test_path("data/survey-data-state.rds"))
+
+  expect_doppelganger("default state line graph",
+                      plot(fb_state, plot_type = "line"))
+
+  expect_doppelganger("state line graph with stderrs",
+                      plot(filter(fb_state, geo_value %in% c("pa", "tx", "ny")),
+                           plot_type = "line",
+                           line_params = list(stderr_bands = TRUE)))
+
+  expect_doppelganger("state line graph with range",
+                      plot(fb_state, plot_type = "line",
+                           range = c(0, 10)))
+})
+
+test_that("simple state choropleths", {
+  fb_state <- readRDS(test_path("data/survey-data-state.rds"))
+
+  expect_doppelganger("default state choropleth",
+                      plot(fb_state, plot_type = "choro"))
+
+  expect_doppelganger("default state choropleth with include",
+                      plot(fb_state, plot_type = "choro",
+                           include = c("pa", "OH", "in", "KY")))
+
+  expect_doppelganger("default state choropleth with range",
+                      plot(fb_state, plot_type = "choro",
+                           range = c(0, 4)))
+
+  fb_county <- readRDS(test_path("data/survey-data-county.rds"))
+  expect_doppelganger("default county choropleth",
+                      plot(fb_county, plot_type = "choro"))
+
+  expect_doppelganger("default county choropleth with include",
+                      plot(fb_county, plot_type = "choro",
+                           include = c("pa", "OH", "in", "KY")))
+
+  # Work-in-progress signals may not have metadata, so we should preserve the
+  # ability to plot them by manually specifying range
+  attributes(fb_state)$metadata <- NULL
+  attributes(fb_state)$metadata$geo_type <- "state"
+  expect_doppelganger("state choropleth with no metadata",
+                      plot(fb_state, plot_type = "choro",
+                           range = c(0, 2)))
+
 })

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Pivot covidcast_signal_wide object to "long" format — covidcast_longer • covidcast</title>
+<title>Pivot aggregated signals between "wide" and "long" formats — covidcast_longer • covidcast</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,11 @@
 
 
 
-<meta property="og:title" content="Pivot covidcast_signal_wide object to "long" format — covidcast_longer" />
-<meta property="og:description" content="Pivots a covidcast_signal_wide object, the output of aggregate_signals()
-with format = &quot;wide&quot;, into &quot;long&quot; format, i.e., as if aggregate_signals()
-had been called in the first place with format = &quot;long&quot;." />
+<meta property="og:title" content="Pivot aggregated signals between "wide" and "long" formats — covidcast_longer" />
+<meta property="og:description" content="These functions take signals returned from aggregate_signals() and convert
+between formats. covidcast_longer() takes the output of
+aggregate_signals(..., format = &quot;wide&quot;) and converts it to &quot;long&quot; format,
+while covidcast_wider() takes the output of aggregate_signals(..., format = &quot;long&quot;) and converts it to &quot;wide&quot; format." />
 
 
 
@@ -134,20 +135,37 @@ had been called in the first place with format = &quot;long&quot;." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Pivot covidcast_signal_wide object to "long" format</h1>
+    <h1>Pivot aggregated signals between "wide" and "long" formats</h1>
     <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/wrangle.R'><code>R/wrangle.R</code></a></small>
     <div class="hidden name"><code>covidcast_longer.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Pivots a <code>covidcast_signal_wide</code> object, the output of <code><a href='aggregate_signals.html'>aggregate_signals()</a></code>
-with <code>format = "wide"</code>, into "long" format, i.e., as if <code><a href='aggregate_signals.html'>aggregate_signals()</a></code>
-had been called in the first place with <code>format = "long"</code>.</p>
+    <p>These functions take signals returned from <code><a href='aggregate_signals.html'>aggregate_signals()</a></code> and convert
+between formats. <code>covidcast_longer()</code> takes the output of
+<code><a href='aggregate_signals.html'>aggregate_signals(..., format = "wide")</a></code> and converts it to "long" format,
+while <code>covidcast_wider()</code> takes the output of <code><a href='aggregate_signals.html'>aggregate_signals(..., format = "long")</a></code> and converts it to "wide" format.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>covidcast_longer</span>(<span class='no'>x</span>)</pre>
+    <pre class="usage"><span class='fu'>covidcast_longer</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
+<span class='fu'>covidcast_wider</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p>A <code>covidcast_signal_wide</code> or <code>covidcast_signal_long</code> object, as
+returned from <code><a href='aggregate_signals.html'>aggregate_signals()</a></code> with the respective <code>format</code> argument.</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>The object pivoted into the opposite form, i.e. as if
+<code><a href='aggregate_signals.html'>aggregate_signals()</a></code> had been called in the first place with that
+<code>format</code> argument.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -164,7 +182,7 @@ had been called in the first place with <code>format = "long"</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

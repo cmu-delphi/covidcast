@@ -145,13 +145,13 @@ Puerto Rico); this function is based on <code><a href='https://rdrr.io/r/base/gr
 regular expressions.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>abbr_to_fips</span>(
-  <span class='no'>abbr</span>,
-  <span class='kw'>ignore.case</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>perl</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>fixed</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>ties_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first"</span>, <span class='st'>"all"</span>)
-)</pre>
+    <pre class="usage"><span class='fu'>abbr_to_fips</span><span class='op'>(</span>
+  <span class='va'>abbr</span>,
+  ignore.case <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  perl <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  fixed <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  ties_method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"first"</span>, <span class='st'>"all"</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -183,11 +183,14 @@ FIPS codes otherwise. These FIPS codes have five digits (ending in "000").</p>
     <div class='dont-index'><p><code><a href='abbr_to_name.html'>abbr_to_name()</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>abbr_to_fips</span>(<span class='st'>"PA"</span>)</div><div class='output co'>#&gt;      PA 
-#&gt; "42000" </div><div class='input'><span class='fu'>abbr_to_fips</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"PA"</span>, <span class='st'>"PR"</span>, <span class='st'>"DC"</span>))</div><div class='output co'>#&gt;      PA      PR      DC 
+    <pre class="examples"><div class='input'><span class='fu'>abbr_to_fips</span><span class='op'>(</span><span class='st'>"PA"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;      PA 
+#&gt; "42000" </div><div class='input'><span class='fu'>abbr_to_fips</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"PA"</span>, <span class='st'>"PR"</span>, <span class='st'>"DC"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;      PA      PR      DC 
 #&gt; "42000" "72000" "11000" </div><div class='input'>
 <span class='co'># Note that name_to_fips() works for state names too:</span>
-<span class='fu'><a href='name_to_fips.html'>name_to_fips</a></span>(<span class='st'>"^Pennsylvania$"</span>)</div><div class='output co'>#&gt; Pennsylvania 
+<span class='fu'><a href='name_to_fips.html'>name_to_fips</a></span><span class='op'>(</span><span class='st'>"^Pennsylvania$"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Pennsylvania 
 #&gt;      "42000" </div><div class='input'>
 </div></pre>
   </div>
@@ -205,7 +208,7 @@ FIPS codes otherwise. These FIPS codes have five digits (ending in "000").</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

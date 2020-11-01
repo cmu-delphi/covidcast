@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Aggregate <code>covidcast_signal</code> objects into one data frame — aggregate_signals • covidcast</title>
+<title>Aggregate covidcast_signal objects into one data frame — aggregate_signals • covidcast</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Aggregate <code>covidcast_signal</code> objects into one data frame — aggregate_signals" />
+<meta property="og:title" content="Aggregate covidcast_signal objects into one data frame — aggregate_signals" />
 <meta property="og:description" content="Aggregates covidcast_signal objects into one data frame, in either &quot;wide&quot;
 or &quot;long&quot; format. (In &quot;wide&quot; aggregation, only the latest issue from each
 data frame is retained, and several columns, including data_source and
@@ -149,7 +149,7 @@ data frame is retained, and several columns, including <code>data_source</code> 
 for examples.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>aggregate_signals</span>(<span class='no'>x</span>, <span class='kw'>dt</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>format</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"wide"</span>, <span class='st'>"long"</span>))</pre>
+    <pre class="usage"><span class='fu'>aggregate_signals</span><span class='op'>(</span><span class='va'>x</span>, dt <span class='op'>=</span> <span class='cn'>NULL</span>, format <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"wide"</span>, <span class='st'>"long"</span><span class='op'>)</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -157,7 +157,7 @@ for examples.</p>
     <tr>
       <th>x</th>
       <td><p>Single <code>covidcast_signal</code> data frame, or a list of such data
-frames.</p></td>
+frames, such as is returned by <code><a href='covidcast_signals.html'>covidcast_signals()</a></code>.</p></td>
     </tr>
     <tr>
       <th>dt</th>
@@ -192,7 +192,7 @@ signal defined by <code>data_source = "usa-facts"</code>, <code>signal = "confir
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>This function can be thought of having three use cases. In all three
-cases, the result will be a new data frame in either "wide" or "tall"
+cases, the result will be a new data frame in either "wide" or "long"
 format, depending on <code>format</code>.</p>
 <p>The first use case is to apply time-shifts to the values in a given
 <code>covidcast_signal</code> object. In this use case, <code>x</code> is a <code>covidcast_signal</code>
@@ -206,6 +206,9 @@ time-shifts to their values. In this use case, <code>x</code> is a list of
 <code>covidcast_signal</code> data frames, and <code>dt</code> is either a vector of shifts---to
 apply the same shifts for each signal in <code>x</code>, or a list of vector of
 shifts---to apply different shifts for each signal in <code>x</code>.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code><a href='covidcast_longer.html'>covidcast_wider()</a></code>, <code><a href='covidcast_longer.html'>covidcast_longer()</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -222,7 +225,7 @@ shifts---to apply different shifts for each signal in <code>x</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

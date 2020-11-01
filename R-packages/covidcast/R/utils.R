@@ -339,8 +339,9 @@ grep_lookup = function(key, keys, values, ignore.case = FALSE, perl = FALSE,
 
   # Otherwise, format into a vector, and warn if needed
   if (length(unlist(res)) > length(key)) {
-    warning("Some inputs were not uniquely matched; returning only the first ",
-            "match in each case.")
+    warn(paste("Some inputs were not uniquely matched; returning only the",
+               "first match in each case."),
+         res = res, key = key, class = "grep_lookup_nonunique_match")
   }
   return(sapply(res, `[`, 1))
 }

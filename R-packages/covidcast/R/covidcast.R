@@ -18,7 +18,9 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 #' Most (but not all) data sources are available at the county level, but the
 #' API can also return data aggregated to metropolitan statistical areas,
 #' hospital referral regions, or states, as desired, by using the `geo_type`
-#' argument. View `vignette("covidcast")` for detailed example usage.
+#' argument. View the [covidcast
+#' vignette](https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html)
+#' for detailed example usage.
 #'
 #' For data on counties, metropolitan statistical areas, and states, this
 #' package provides the [`county_census`], [`msa_census`], and [`state_census`]
@@ -41,8 +43,10 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 #' Note that the API only tracks the initial value of an estimate and *changes*
 #' to that value. If a value was first issued on June 5th and never updated,
 #' asking for data issued on June 6th (using `issues` or `lag`) would *not*
-#' return that value, though asking for data `as_of` June 6th would. See
-#' `vignette("covidcast")` for examples.
+#' return that value, though asking for data `as_of` June 6th would. See the 
+#' [covidcast
+#' vignette](https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html)
+#' for examples.
 #'
 #' Note also that the API enforces a maximum result row limit; results beyond
 #' the maximum limit are truncated. This limit is sufficient to fetch
@@ -485,19 +489,14 @@ single_geo <- function(data_source, signal, start_day, end_day, geo_type,
                           issues = issues,
                           lag = lag)
     message(sprintf("Fetched day %s: %s, %s, num_entries = %s",
-                    day,
-                    dat[[i]]$result,
-                    dat[[i]]$message,
+                    day, dat[[i]]$result, dat[[i]]$message,
                     nrow(dat[[i]]$epidata)))
 
     if (dat[[i]]$message != "success") {
       warn(paste0("Fetching ", signal, " from ", data_source, " for ", day,
-                  " in geography '", geo_value, "': ", dat[[i]]$message),
-           data_source = data_source,
-           signal = signal,
-           day = day,
-           geo_value = geo_value,
-           msg = dat[[i]]$message,
+                  " in geography '", geo_value, "': ", dat[[i]]$message, "."),
+           data_source = data_source, signal = signal, day = day,
+           geo_value = geo_value, msg = dat[[i]]$message,
            class = "covidcast_fetch_failed")
     }
   }
@@ -530,8 +529,8 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   # Check parameters
   if(missing(data_source) || missing(signal) || missing(time_type) ||
        missing(geo_type) || missing(time_values) || missing(geo_value)) {
-    stop("`data_source`, `signal`, `time_type`, `geo_type`, `time_values`, and ",
-         "`geo_value` are all required.")
+    stop("`data_source`, `signal`, `time_type`, `geo_type`, `time_values`, ",
+         "and `geo_value` are all required.")
   }
 
   # Set up request
@@ -598,8 +597,7 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
                                           encoding = "utf-8")))
 }
 
-# e.g. date_to_string(ymd("20200506")) gives "20200506"; this is the format
-# expected by the API
+# This is the date format expected by the API
 date_to_string <- function(mydate) {
   format(mydate, "%Y%m%d")
 }

@@ -2,7 +2,8 @@
 #'
 #' Computes correlations between two `covidcast_signal` data frames, allowing
 #' for slicing by geo location, or by time. (Only the latest issue from each
-#' data frame are used for correlations.) See `vignette("correlation-utils")`
+#' data frame are used for correlations.) See the [correlations
+#' vignette](https://cmu-delphi.github.io/covidcast/covidcastR/articles/correlation-utils.html)
 #' for examples.
 #'
 #' @param x,y The `covidcast_signal` data frames to correlate.

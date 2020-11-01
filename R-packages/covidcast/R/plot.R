@@ -3,8 +3,9 @@
 #' Several plot types are provided, including choropleth plots (maps), bubble
 #' plots, and time series plots showing the change of signals over time, for a 
 #' data frame returned by `covidcast_signal()`. (Only the latest issue from the
-#' data frame is used for plotting.) See `vignette("plotting-signals")` for
-#' examples.   
+#' data frame is used for plotting.) See the [plotting
+#' vignette](https://cmu-delphi.github.io/covidcast/covidcastR/articles/plotting-signals.html)
+#' for examples.
 #'
 #' @param x The `covidcast_signal` object to map or plot. If the object contains
 #'   multiple issues of the same observation, only the most recent issue is
@@ -110,11 +111,10 @@ plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
   # from metadata) 
   if (is.null(range) && (plot_type == "choro" || plot_type == "bubble")) {
     if (is.null(attributes(x)$metadata)) { 
-      warn(
-        paste0("Metadata for signal mean and standard deviation not ",
-               "available; defaulting to observed mean and standard ",
-               "deviation to set plot range."),
-        class = "covidcast_plot_meta_not_found")
+      warn(paste("Metadata for signal mean and standard deviation not",
+                 "available; defaulting to observed mean and standard",
+                 "deviation to set plot range."),
+           class = "covidcast_plot_meta_not_found")
       mean_value = mean(x$value)
       stdev_value = sd(x$value)
     } else {
@@ -135,7 +135,8 @@ plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
       no_match = which(!(include %in% c(state.abb, "DC")))
 
       if (length(no_match) > 0) {
-        warning("'include' must only contain US state abbreviations or 'DC'.")
+        warn("'include' must only contain US state abbreviations or 'DC'.",
+             not_match = include[no_match], class = "plot_include_no_match")
         include = include[-no_match]
       }
     }

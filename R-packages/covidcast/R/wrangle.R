@@ -235,7 +235,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
   }
 }
 
-#' Pivot multiple signals between "wide" and "long" formats
+#' Pivot aggregated signals between "wide" and "long" formats
 #'
 #' These functions take signals returned from `aggregate_signals()` and convert
 #' between formats. `covidcast_longer()` takes the output of

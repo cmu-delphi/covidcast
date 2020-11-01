@@ -104,7 +104,7 @@ plot_coverage <- function(scorecards, type = c("all", "one"), alpha = 0.2,
       theme_bw() + theme(legend.position = legend_position)
   } else {
     cover %>%
-      filter(nominal_coverage_prob == 1 - alpha) %>%
+      filter(.data$nominal_coverage_prob == 1 - alpha) %>%
       group_by(.data$forecast_date, .data$forecaster) %>%
       summarize(prop_covered = mean(.data$prop_covered, na.rm = TRUE)) %>%
       ggplot(aes(x = .data$forecast_date,

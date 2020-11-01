@@ -76,6 +76,7 @@ get_predictions <- function(forecaster,
 #' @template ahead-template
 #' @template geo_type-template
 #' @template geo_values-template
+#' @param ... Additional arguments to be passed to `forecaster()`.
 #' 
 #' @importFrom stringr str_glue
 get_predictions_single_date <- function(forecaster,

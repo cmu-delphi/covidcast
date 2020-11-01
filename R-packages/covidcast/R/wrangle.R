@@ -23,11 +23,13 @@
 #' @noRd
 apply_shifts = function(x, dt) {
   # If we're passed a single covidcast_signal data frame
-  if ("covidcast_signal" %in% class(x)) return(apply_shifts_one(x, dt))
+  if (inherits(x, "covidcast_signal")) return(apply_shifts_one(x, dt))
   
   # If we're passed a list of covidcast_signal data frames
-  else if (is.list(x) && all(sapply(lapply(x, class), function(v) {
-    "covidcast_signal" %in% v }))) {
+  else if (is.list(x) &&
+             all(sapply(x, function(v) {
+               inherits(v, "covidcast_signal")
+             }))) {
     # If dt is a vector 
     if (!is.list(dt)) dt = rep(list(dt), length(x))
 
@@ -135,7 +137,7 @@ apply_shifts_one = function(x, dt) {
 #' @export
 aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
   # If we're passed a single covidcast_signal data frame
-  if ("covidcast_signal" %in% class(x)) {
+  if (inherits(x, "covidcast_signal")) {
     # If dt is missing, then set it to 0
     if (is.null(dt)) dt = 0
     
@@ -150,8 +152,10 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
   }
   
   # If we're passed a list of covidcast_signal data frames
-  else if (is.list(x) && all(sapply(lapply(x, class), function(v) {
-    "covidcast_signal" %in% v }))) {
+  else if (is.list(x) &&
+             all(sapply(x, function(v) {
+               inherits(v, "covidcast_signal")
+             }))) {
     # If dt is missing, then set it to a list of 0s
     if (is.null(dt)) dt = rep(list(0), length(x))
    
@@ -235,17 +239,27 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
   }
 }
 
-#' Pivot covidcast_signal_wide object to "long" format
+#' Pivot aggregated signals between "wide" and "long" formats
 #'
-#' Pivots a `covidcast_signal_wide` object, the output of `aggregate_signals()`
-#' with `format = "wide"`, into "long" format, i.e., as if `aggregate_signals()`
-#' had been called in the first place with `format = "long"`.
+#' These functions take signals returned from `aggregate_signals()` and convert
+#' between formats. `covidcast_longer()` takes the output of
+#' `aggregate_signals(..., format = "wide")` and converts it to "long" format,
+#' while `covidcast_wider()` takes the output of `aggregate_signals(..., format
+#' = "long")` and converts it to "wide" format.
+#'
+#' @param x A `covidcast_signal_wide` or `covidcast_signal_long` object, as
+#'   returned from `aggregate_signals()` with the respective `format` argument.
+#'
+#' @return The object pivoted into the opposite form, i.e. as if
+#'   `aggregate_signals()` had been called in the first place with that
+#'   `format` argument.
+#'
 #' @export
 covidcast_longer = function(x) {
-  if (!("covidcast_signal_wide" %in% class(x))) {
+  if (!inherits(x, "covidcast_signal_wide")) {
     stop("`x` must be a `covidcast_signal_wide` object.")
   }
-  
+
   # First pivot into long format
   x = x %>%
     tidyr::pivot_longer(dplyr::starts_with("value"),
@@ -264,18 +278,14 @@ covidcast_longer = function(x) {
     dplyr::relocate(dt, .before = value)
 
   # Change class and return
-  class(x) = c("covicast_signal_long", "data.frame")
+  class(x) = c("covidcast_signal_long", "data.frame")
   return(x)
 }
 
-#' Pivot covidcast_signal_long object to "wide" format
-#' 
-#' Pivots a `covidcast_signal_long` object, the output of `aggregate_signals()`
-#' with `format = "long"`, into "wide" format, i.e., as if `aggregate_signals()`
-#' had been called in the first place with `format = "wide"`.
+#' @rdname covidcast_longer
 #' @export
 covidcast_wider = function(x) {
-  if (!("covidcast_signal_long" %in% class(x))) {
+  if (!inherits(x, "covidcast_signal_long")) {
     stop("`x` must be a `covidcast_signal_long` object.")
   }
   
@@ -299,6 +309,6 @@ covidcast_wider = function(x) {
     dplyr::rename_with(renamer, dplyr::starts_with("value"))
 
   # Change class and return
-  class(x) = c("covicast_signal_wide", "data.frame")
+  class(x) = c("covidcast_signal_wide", "data.frame")
   return(x)
 }

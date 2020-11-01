@@ -2,12 +2,25 @@
 % Please edit documentation in R/wrangle.R
 \name{covidcast_longer}
 \alias{covidcast_longer}
-\title{Pivot covidcast_signal_wide object to "long" format}
+\alias{covidcast_wider}
+\title{Pivot aggregated signals between "wide" and "long" formats}
 \usage{
 covidcast_longer(x)
+
+covidcast_wider(x)
+}
+\arguments{
+\item{x}{A \code{covidcast_signal_wide} or \code{covidcast_signal_long} object, as
+returned from \code{aggregate_signals()} with the respective \code{format} argument.}
+}
+\value{
+The object pivoted into the opposite form, i.e. as if
+\code{aggregate_signals()} had been called in the first place with that
+\code{format} argument.
 }
 \description{
-Pivots a \code{covidcast_signal_wide} object, the output of \code{aggregate_signals()}
-with \code{format = "wide"}, into "long" format, i.e., as if \code{aggregate_signals()}
-had been called in the first place with \code{format = "long"}.
+These functions take signals returned from \code{aggregate_signals()} and convert
+between formats. \code{covidcast_longer()} takes the output of
+\code{aggregate_signals(..., format = "wide")} and converts it to "long" format,
+while \code{covidcast_wider()} takes the output of \code{aggregate_signals(..., format = "long")} and converts it to "wide" format.
 }

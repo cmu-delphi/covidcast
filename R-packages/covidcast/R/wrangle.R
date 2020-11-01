@@ -23,11 +23,13 @@
 #' @noRd
 apply_shifts = function(x, dt) {
   # If we're passed a single covidcast_signal data frame
-  if ("covidcast_signal" %in% class(x)) return(apply_shifts_one(x, dt))
+  if (inherits(x, "covidcast_signal")) return(apply_shifts_one(x, dt))
   
   # If we're passed a list of covidcast_signal data frames
-  else if (is.list(x) && all(sapply(lapply(x, class), function(v) {
-    "covidcast_signal" %in% v }))) {
+  else if (is.list(x) &&
+             all(sapply(x, function(v) {
+               inherits(v, "covidcast_signal")
+             }))) {
     # If dt is a vector 
     if (!is.list(dt)) dt = rep(list(dt), length(x))
 
@@ -135,7 +137,7 @@ apply_shifts_one = function(x, dt) {
 #' @export
 aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
   # If we're passed a single covidcast_signal data frame
-  if ("covidcast_signal" %in% class(x)) {
+  if (inherits(x, "covidcast_signal")) {
     # If dt is missing, then set it to 0
     if (is.null(dt)) dt = 0
     
@@ -150,8 +152,10 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
   }
   
   # If we're passed a list of covidcast_signal data frames
-  else if (is.list(x) && all(sapply(lapply(x, class), function(v) {
-    "covidcast_signal" %in% v }))) {
+  else if (is.list(x) &&
+             all(sapply(x, function(v) {
+               inherits(v, "covidcast_signal")
+             }))) {
     # If dt is missing, then set it to a list of 0s
     if (is.null(dt)) dt = rep(list(0), length(x))
    

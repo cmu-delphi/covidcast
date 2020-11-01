@@ -2,7 +2,7 @@
 % Please edit documentation in R/covidcast.R
 \name{covidcast_signals}
 \alias{covidcast_signals}
-\title{Obtain multiple COVIDcast signals in one data frame}
+\title{Obtain multiple COVIDcast signals at once}
 \usage{
 covidcast_signals(
   data_source,
@@ -63,7 +63,9 @@ data was issued or updated on June 6. If \code{NULL}, the default, return the
 most recently issued data regardless of its lag.}
 }
 \value{
-A list of \code{covidcast_signal} data frames, of length \code{N = max(length(data_source), length(signal))}.
+A list of \code{covidcast_signal} data frames, of length \code{N = max(length(data_source), length(signal))}. This list can be aggregated
+into a single data frame of either "wide" or "long" format using
+\code{aggregate_signals()}.
 }
 \description{
 This convenience function uses \code{covidcast_signal()} to obtain multiple
@@ -86,5 +88,5 @@ covidcast_signals("usa-facts", signal=c("confirmed_incidence_num",
 }
 }
 \seealso{
-\code{\link[=covidcast_signal]{covidcast_signal()}}
+\code{\link[=covidcast_signal]{covidcast_signal()}}, \code{\link[=aggregate_signals]{aggregate_signals()}}
 }

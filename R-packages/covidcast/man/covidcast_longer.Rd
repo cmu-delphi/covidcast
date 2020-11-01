@@ -3,7 +3,7 @@
 \name{covidcast_longer}
 \alias{covidcast_longer}
 \alias{covidcast_wider}
-\title{Pivot multiple signals between "wide" and "long" formats}
+\title{Pivot aggregated signals between "wide" and "long" formats}
 \usage{
 covidcast_longer(x)
 

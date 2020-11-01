@@ -46,6 +46,23 @@ that the changes look correct, then press Validate.
 Once you've validated all changes, press Quit and you will be able to commit the
 changed images and run the tests successfully.
 
+### Using data files in tests
+
+Unit tests should not depend on being able to load data from the COVIDcast API,
+since that data is subject to change. It is preferable to either use toy
+examples or to store static datasets to be loaded and used.
+
+Small static datasets can be kept in `tests/testthat/data/` in RDS form (using
+`saveRDS` and `loadRDS`). The `testthat::test_path` function locates files
+relative to the `tests/testthat/` directory regardless of your current working
+directory, so for example you can use
+
+```r
+foo <- readRDS(test_path("data/foo.rds"))
+```
+
+to load `tests/testthat/data/foo.rds`.
+
 ## Documentation
 
 We use

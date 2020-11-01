@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Metro area population data — msa_census • covidcast</title>
+<title>Pivot covidcast_signal_wide object to "long" format — covidcast_longer • covidcast</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,10 @@
 
 
 
-<meta property="og:title" content="Metro area population data — msa_census" />
-<meta property="og:description" content="Data set on metropolitan area populations, from the 2019 US Census. This
-includes metropolitan and micropolitan statistical areas, although the
-COVIDcast API only supports fetching data from metropolitan statistical
-areas." />
+<meta property="og:title" content="Pivot covidcast_signal_wide object to "long" format — covidcast_longer" />
+<meta property="og:description" content="Pivots a covidcast_signal_wide object, the output of aggregate_signals()
+with format = &quot;wide&quot;, into &quot;long&quot; format, i.e., as if aggregate_signals()
+had been called in the first place with format = &quot;long&quot;." />
 
 
 
@@ -135,47 +134,20 @@ areas." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Metro area population data</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/data.R'><code>R/data.R</code></a></small>
-    <div class="hidden name"><code>msa_census.Rd</code></div>
+    <h1>Pivot covidcast_signal_wide object to "long" format</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/wrangle.R'><code>R/wrangle.R</code></a></small>
+    <div class="hidden name"><code>covidcast_longer.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Data set on metropolitan area populations, from the 2019 US Census. This
-includes metropolitan and micropolitan statistical areas, although the
-COVIDcast API only supports fetching data from metropolitan statistical
-areas.</p>
+    <p>Pivots a <code>covidcast_signal_wide</code> object, the output of <code><a href='aggregate_signals.html'>aggregate_signals()</a></code>
+with <code>format = "wide"</code>, into "long" format, i.e., as if <code><a href='aggregate_signals.html'>aggregate_signals()</a></code>
+had been called in the first place with <code>format = "long"</code>.</p>
     </div>
 
-    <pre class="usage"><span class='no'>msa_census</span></pre>
+    <pre class="usage"><span class='fu'>covidcast_longer</span>(<span class='no'>x</span>)</pre>
 
 
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
-
-    <p>A data frame with 2797 rows, each representing one core-based
-statistical area (including metropolitan and micropolitan statistical
-areas, county or county equivalents, and metropolitan divisions). There are
-many columns. The most crucial are:</p>
-<dl'>
-<dt>CBSA</dt><dd><p>Core Based Statistical Area code. These are unique identifiers
-used, for example, as the <code>geo_values</code> argument to <code><a href='covidcast_signal.html'>covidcast_signal()</a></code>
-when requesting data from specific metro areas (with <code>geo_type = 'msa'</code>).</p></dd>
-<dt>NAME</dt><dd><p>Name or title of the area.</p></dd>
-<dt>LSAD</dt><dd><p>Legal/Statistical Area Description, identifying if this is a
-metropolitan or micropolitan area, a metropolitan division, or a county.</p></dd>
-<dt>POPESTIMATE2019</dt><dd><p>Estimate of the area's resident population as of
-July 1, 2019.</p></dd>
-
-</dl>
-
-    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
-
-    <p>United States Census Bureau, at
-<a href='https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.csv'>https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.csv</a></p>
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
-
-    <p>Census Bureau documentation of all columns and their meaning:
-<a href='https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.pdf'>https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.pdf</a></p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

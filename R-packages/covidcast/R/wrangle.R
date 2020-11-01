@@ -274,7 +274,7 @@ covidcast_longer = function(x) {
     dplyr::relocate(dt, .before = value)
 
   # Change class and return
-  class(x) = c("covicast_signal_long", "data.frame")
+  class(x) = c("covidcast_signal_long", "data.frame")
   return(x)
 }
 
@@ -305,6 +305,6 @@ covidcast_wider = function(x) {
     dplyr::rename_with(renamer, dplyr::starts_with("value"))
 
   # Change class and return
-  class(x) = c("covicast_signal_wide", "data.frame")
+  class(x) = c("covidcast_signal_wide", "data.frame")
   return(x)
 }

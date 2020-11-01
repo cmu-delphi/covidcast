@@ -11,13 +11,13 @@ home:
 
 reference:
   - title: Fetch data
-    desc: Fetch data from the COVIDcast API
+    desc: Fetch signals and metadata from the COVIDcast API
   - contents:
       - covidcast_signal
       - covidcast_signals
       - covidcast_meta
-  - title: Analyze and plot data
-    desc: Plot and summarize signals
+  - title: Plot and summarize data
+    desc: Plot and summarize COVIDcast signals and metadata
   - contents:
       - plot.covidcast_signal
       - print.covidcast_signal
@@ -25,7 +25,7 @@ reference:
       - summary.covidcast_signal
       - summary.covidcast_meta
   - title: Wrangle and correlate multiple signals
-    desc: Calculate correlations and move signals between formats for analysis
+    desc: Calculate correlations, aggregate signals, and move between aggregated data formats
   - contents:
       - covidcast_cor
       - aggregate_signals
@@ -47,4 +47,4 @@ reference:
       - msa_census
       - state_census
       - state_geo
-  
+

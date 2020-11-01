@@ -24,13 +24,29 @@ test_that("get_predictions and evaluate_predictions on baseline_forecaster works
                               backfill_buffer = 10)
 })
 
+test_that("geo_values argument to get_predictions works", {
+  # if we run get_predictions on a subset of locations, the predictions
+  # of baseline_forecaster should not change on those locations
+  geo_values <- c("ca", "pa", "al")
+  pc2 <- get_predictions(baseline_forecaster,
+                         name_of_forecaster = "baseline",
+                         signals = signals,
+                         forecast_dates = forecast_dates,
+                         incidence_period = "epiweek",
+                         ahead = 3,
+                         geo_type = "state",
+                         geo_values = geo_values)
+  both <- pc2[[1]] %>% left_join(pc[[1]], by = "location")
+  expect_identical(both$forecast_distribution.x, both$forecast_distribution.y)
+})
+
 test_that("backfill_buffer works", {
   # how long has it been since the last target period ends in the scorecards?
   days_elapsed <- sc %>% map_dbl(~ today() - max(.x$end)) %>% unlist()
-  # too soon:
+  # too soon should give error:
   expect_error(evaluate_predictions(pc, backfill_buffer = days_elapsed),
                "backfill_buffer")
-  # waited long enough:
+  # waited long enough should have no error:
   evaluate_predictions(pc, backfill_buffer = days_elapsed - 1)
 })
 

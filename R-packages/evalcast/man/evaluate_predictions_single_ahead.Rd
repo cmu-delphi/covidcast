@@ -10,6 +10,21 @@ evaluate_predictions_single_ahead(
   backfill_buffer
 )
 }
+\arguments{
+\item{predictions_cards}{List of predictions cards from the same forecaster
+that are all for the same prediction task, meaning they are for the same
+response, incidence period, ahead, and geo type. Each should be from a
+different forecast date.  A predictions card is created by the function
+\code{\link[=get_predictions]{get_predictions()}}.}
+
+\item{err_measures}{Named list of one or more functions, where each function
+takes a data frame with two columns \code{probs} and \code{quantiles} and an actual
+(i.e., observed) scalar value and returns some measure of error.  If empty,
+returns the scorecard without any error measure columns.}
+
+\item{backfill_buffer}{How many days until response is deemed trustworthy
+enough to be taken as correct? See details for more.}
+}
 \description{
 Create score cards for one ahead
 }

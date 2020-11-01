@@ -10,13 +10,9 @@
 #' @param dt_x,dt_y Time shifts to consider for `x` and `y`, respectively,
 #'   before computing correlations. Negative shifts translate into in a lag
 #'   value and positive shifts into a lead value; for example, if `dt = -1`,
-#'   then the value on June 2 that gets reported is the original value on June
-#'   1; if `dt = 0`, then the values are left as is.
-#'
-#' These must both be nonnegative, and only one
-#'   can be positive. If `dt_x = 1`, for example, then data for `x` is shifted
-#'   forward 1 day in time (so, data on June 1 becomes data on June 2, and so
-#'   on). Default is 0 for both.
+#'   then the new value on June 2 is the original value on June 1; if `dt = 1`,
+#'   then the new value on June 2 is the original value on June 3; if `dt = 0`,
+#'   then the values are left as is. Default is 0 for both `dt_x` and `dt_y`. 
 #' @param by If "geo_value", then correlations are computed for each geo
 #'   location, over all time. Each correlation is measured between two time
 #'   series at the same location. If "time_value", then correlations are

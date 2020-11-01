@@ -4,7 +4,9 @@ A short checklist for submitting pull requests:
 
 1. Run the unit tests with `devtools::test()` and ensure they pass.
 2. If you have added any new features (new functions, new options, etc.), add a
-   brief description to `NEWS.md` to the next listed version number.
+   brief description to `NEWS.md` to the next listed version number. Also ensure
+   that new functions or datasets are listed in the reference in `_pkgdown.yml`
+   so they appear in a good place in the documentation website.
 3. If you changed any documentation, rebuild the documentation with
    `devtools::document()` and then `pkgdown::build_site()`. (This can be slow,
    because our vignettes take a long time to build.)

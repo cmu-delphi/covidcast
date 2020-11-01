@@ -8,7 +8,7 @@ aggregate_signals(x, dt = NULL, format = c("wide", "long"))
 }
 \arguments{
 \item{x}{Single \code{covidcast_signal} data frame, or a list of such data
-frames.}
+frames, such as is returned by \code{covidcast_signals()}.}
 
 \item{dt}{Vector of shifts to apply to the values in the data frame \code{x}.
 Negative shifts translate into in a lag value and positive shifts into a
@@ -43,7 +43,7 @@ for examples.
 }
 \details{
 This function can be thought of having three use cases. In all three
-cases, the result will be a new data frame in either "wide" or "tall"
+cases, the result will be a new data frame in either "wide" or "long"
 format, depending on \code{format}.
 
 The first use case is to apply time-shifts to the values in a given
@@ -60,4 +60,7 @@ time-shifts to their values. In this use case, \code{x} is a list of
 \code{covidcast_signal} data frames, and \code{dt} is either a vector of shifts---to
 apply the same shifts for each signal in \code{x}, or a list of vector of
 shifts---to apply different shifts for each signal in \code{x}.
+}
+\seealso{
+\code{\link[=covidcast_wider]{covidcast_wider()}}, \code{\link[=covidcast_longer]{covidcast_longer()}}
 }

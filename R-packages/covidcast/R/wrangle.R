@@ -4,7 +4,7 @@
 #' the latest issue from each data frame is retained.) 
 #'
 #' @param x Single `covidcast_signal` data frame, or a list of such data
-#'   frames. 
+#'   frames.
 #' @param dt Vector of shifts to apply to the values in the data frame `x`.
 #'   Negative shifts translate into in a lag value and positive shifts into a
 #'   lead value; for example, if `dt = -1`, then the value on June 2 that gets
@@ -91,7 +91,7 @@ apply_shifts_one = function(x, dt) {
 #' for examples.
 #' 
 #' @param x Single `covidcast_signal` data frame, or a list of such data
-#'   frames.
+#'   frames, such as is returned by `covidcast_signals()`.
 #' @param dt Vector of shifts to apply to the values in the data frame `x`.
 #'   Negative shifts translate into in a lag value and positive shifts into a
 #'   lead value; for example, if `dt = -1`, then the value on June 2 that gets
@@ -103,7 +103,7 @@ apply_shifts_one = function(x, dt) {
 #' @param format One of either "wide" or "long". The default is "wide".
 #'
 #' @details This function can be thought of having three use cases. In all three
-#'   cases, the result will be a new data frame in either "wide" or "tall"
+#'   cases, the result will be a new data frame in either "wide" or "long"
 #'   format, depending on `format`.
 #'
 #'   The first use case is to apply time-shifts to the values in a given
@@ -133,6 +133,8 @@ apply_shifts_one = function(x, dt) {
 #'   column name "value+2:usa-facts_confirmed_incidence_num" corresponds to a
 #'   signal defined by `data_source = "usa-facts"`, `signal =
 #'   "confirmed_incidence_num"`, and `dt = 2`.
+#'
+#' @seealso [covidcast_wider()], [covidcast_longer()]
 #'
 #' @export
 aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {

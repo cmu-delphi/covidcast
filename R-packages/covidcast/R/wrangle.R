@@ -235,8 +235,11 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
   }
 }
 
-# Pivot covidcast_signal_wide object to "long" format
-#
+#' Pivot covidcast_signal_wide object to "long" format
+#'
+#' Pivots a `covidcast_signal_wide` object, the output of `aggregate_signals()`
+#' with `format = "wide"`, into "long" format, i.e., as if `aggregate_signals()`
+#' had been called in the first place with `format = "long"`.
 #' @export
 covidcast_longer = function(x) {
   if (!("covidcast_signal_wide" %in% class(x))) {
@@ -266,7 +269,10 @@ covidcast_longer = function(x) {
 }
 
 #' Pivot covidcast_signal_long object to "wide" format
-#
+#' 
+#' Pivots a `covidcast_signal_long` object, the output of `aggregate_signals()`
+#' with `format = "long"`, into "wide" format, i.e., as if `aggregate_signals()`
+#' had been called in the first place with `format = "wide"`.
 #' @export
 covidcast_wider = function(x) {
   if (!("covidcast_signal_long" %in% class(x))) {

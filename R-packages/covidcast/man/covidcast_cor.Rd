@@ -20,13 +20,9 @@ covidcast_cor(
 \item{dt_x, dt_y}{Time shifts to consider for \code{x} and \code{y}, respectively,
 before computing correlations. Negative shifts translate into in a lag
 value and positive shifts into a lead value; for example, if \code{dt = -1},
-then the value on June 2 that gets reported is the original value on June
-1; if \code{dt = 0}, then the values are left as is.
-
-These must both be nonnegative, and only one
-can be positive. If \code{dt_x = 1}, for example, then data for \code{x} is shifted
-forward 1 day in time (so, data on June 1 becomes data on June 2, and so
-on). Default is 0 for both.}
+then the new value on June 2 is the original value on June 1; if \code{dt = 1},
+then the new value on June 2 is the original value on June 3; if \code{dt = 0},
+then the values are left as is. Default is 0 for both \code{dt_x} and \code{dt_y}.}
 
 \item{by}{If "geo_value", then correlations are computed for each geo
 location, over all time. Each correlation is measured between two time

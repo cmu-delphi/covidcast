@@ -7,5 +7,7 @@
 covidcast_wider(x)
 }
 \description{
-Pivot covidcast_signal_long object to "wide" format
+Pivots a \code{covidcast_signal_long} object, the output of \code{aggregate_signals()}
+with \code{format = "long"}, into "wide" format, i.e., as if \code{aggregate_signals()}
+had been called in the first place with \code{format = "wide"}.
 }

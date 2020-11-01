@@ -33,6 +33,7 @@ def test_plot(mock_metadata):
     mock_metadata.side_effect = [
         {"mean_value": 0.5330011, "stdev_value": 0.4683431},
         {"mean_value": 0.5330011, "stdev_value": 0.4683431},
+        {"mean_value": 0.5330011, "stdev_value": 0.4683431},
         {"mean_value": 0.5304083, "stdev_value": 0.235302},
         {"mean_value": 0.5705364, "stdev_value": 0.4348706},
         {"mean_value": 0.5705364, "stdev_value": 0.4348706},
@@ -47,12 +48,24 @@ def test_plot(mock_metadata):
     test_county["time_value"] = test_county.time_value.astype("datetime64[D]")
     test_county["value"] = test_county.value.astype("float")
 
-    county_fig1 = plotting.plot(test_county, time_value=date(2020, 8, 4))
+    # w/o megacounties
+    no_mega_fig1 = plotting.plot(test_county,
+                                 time_value=date(2020, 8, 4),
+                                 combine_megacounties=False)
     # give margin of +-2 for floating point errors and weird variations (1 isn't consistent)
-    assert np.allclose(_convert_to_array(county_fig1), expected["county1"], atol=2, rtol=0)
+    assert np.allclose(_convert_to_array(no_mega_fig1), expected["no_mega_1"], atol=2, rtol=0)
 
-    county_fig2 = plotting.plot(test_county, cmap="viridis", figsize=(5, 5), edgecolor="0.8")
-    assert np.allclose(_convert_to_array(county_fig2), expected["county2"], atol=2, rtol=0)
+    no_mega_fig2 = plotting.plot_choropleth(test_county,
+                                            cmap="viridis",
+                                            figsize=(5, 5),
+                                            edgecolor="0.8",
+                                            combine_megacounties=False)
+    assert np.allclose(_convert_to_array(no_mega_fig2), expected["no_mega_2"], atol=2, rtol=0)
+
+    # w/ megacounties
+    mega_fig = plotting.plot_choropleth(test_county, time_value=date(2020, 8, 4))
+    # give margin of +-2 for floating point errors and weird variations (1 isn't consistent)
+    assert np.allclose(_convert_to_array(mega_fig), expected["mega"], atol=2, rtol=0)
 
     # test state
     test_state = pd.read_csv(
@@ -72,6 +85,7 @@ def test_plot(mock_metadata):
 
     # test bubble
     msa_bubble_fig = plotting.plot(test_msa, plot_type="bubble")
+    from matplotlib import pyplot as plt
     assert np.allclose(_convert_to_array(msa_bubble_fig), expected["msa_bubble"], atol=2, rtol=0)
 
 
@@ -173,20 +187,31 @@ def test__join_county_geo_df():
                                "test_value": [1.5, 2.5, 3],
                                "test_value2": [21.5, 32.5, 34]})
     geo_info = gpd.read_file(os.path.join(CURRENT_PATH, SHAPEFILE_PATHS["county"]))
+    # test w/o megacounty combine
     # test right join
-    output1 = plotting._join_county_geo_df(test_input, "county_code", geo_info)
-    assert type(output1) is gpd.GeoDataFrame
-    expected1 = gpd.read_file(
-        os.path.join(CURRENT_PATH, "../reference_data/expected__join_county_geo_df_right.gpkg"),
+    no_mega_r = plotting._join_county_geo_df(test_input, "county_code", geo_info)
+    assert type(no_mega_r) is gpd.GeoDataFrame
+    expected_no_mega_r = gpd.read_file(
+        os.path.join(CURRENT_PATH,
+                     "../reference_data/expected__join_county_geo_df_no_mega_right.gpkg"),
         dtype={"geo_value": str})
-    pd.testing.assert_frame_equal(expected1, output1)
+    pd.testing.assert_frame_equal(expected_no_mega_r, no_mega_r)
 
     # test left join
-    output2 = plotting._join_county_geo_df(test_input, "county_code", geo_info, "left")
-    expected2 = gpd.read_file(
-        os.path.join(CURRENT_PATH, "../reference_data/expected__join_county_geo_df_left.gpkg"),
+    no_mega_l = plotting._join_county_geo_df(test_input, "county_code", geo_info, "left")
+    expected_no_mega_l = gpd.read_file(
+        os.path.join(CURRENT_PATH,
+                     "../reference_data/expected__join_county_geo_df_no_mega_left.gpkg"),
         dtype={"geo_value": str})
-    pd.testing.assert_frame_equal(expected2, output2)
+    pd.testing.assert_frame_equal(expected_no_mega_l, no_mega_l)
+
+    # test w/ megacounty combine
+    mega = plotting._join_county_geo_df(test_input, "county_code", geo_info, "left", True)
+    expected_mega = gpd.read_file(
+        os.path.join(CURRENT_PATH,
+                     "../reference_data/expected__join_county_geo_df_mega.gpkg"),
+        dtype={"geo_value": str})
+    pd.testing.assert_frame_equal(expected_mega, mega)
 
 
 def test__join_msa_geo_df():
@@ -233,3 +258,9 @@ def test__join_hrr_geo_df():
         os.path.join(CURRENT_PATH, "../reference_data/expected__join_hrr_geo_df_left.gpkg"),
         dtype={"geo_value": str})
     pd.testing.assert_frame_equal(expected2, output2)
+
+
+def test__is_megacounty():
+    assert plotting._is_megacounty("12000")
+    assert not plotting._is_megacounty("12001")
+    assert not plotting._is_megacounty("120000")

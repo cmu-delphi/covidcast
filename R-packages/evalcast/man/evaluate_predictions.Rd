@@ -13,10 +13,9 @@ evaluate_predictions(
 }
 \arguments{
 \item{predictions_cards}{List of predictions cards from the same forecaster
-that are all for the same prediction task, meaning they are for the same
-response, incidence period, ahead, and geo type. Each should be from a
-different forecast date.  A predictions card is created by the function
-\code{\link[=get_predictions]{get_predictions()}}.}
+that are all for the same response, incidence period, and geo type. Each
+should be from a different forecast date or for a different ahead.  A
+predictions card is created by the function \code{\link[=get_predictions]{get_predictions()}}.}
 
 \item{err_measures}{Named list of one or more functions, where each function
 takes a data frame with two columns \code{probs} and \code{quantiles} and an actual

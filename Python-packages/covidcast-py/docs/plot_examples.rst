@@ -9,8 +9,8 @@ The returned DataFrame from :py:func:`covidcast.signal` can be plotted using the
 :py:func:`covidcast.plot`. Currently, state, county, hospital referral regions
 (HRR), and metropolitan statistical area (MSA) geography types are supported.
 
-County-level maps show estimates for each county, and color each state by the
-megacounty estimates, if available. (Megacounties represent all counties with
+County-level maps show estimates for each county, and color each state as a single
+polygon with the megacounty estimates, if available. (Megacounties represent all counties with
 insufficient sample size to report in that state; see the `geographic coding
 documentation
 <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html>`_ for
@@ -179,7 +179,8 @@ The :py:func:`covidcast.get_geo_df` method can return different joins depending 
 default, it will try to compute the right join between the input data (left side of join) to the
 geometry data (right side of join), so that the returned GeoDataFrame will contain all the possible
 geometries with the signal values filled if present. When mapping counties, those that do not have values but have
-a corresponding megacounty will inherit the megacounty values.
+a corresponding megacounty will inherit the megacounty values. To have a singe polygon returned for each
+megacounty, use the ``combine_megacounties=True`` argument.
 
 This operation depends on having only one row of signal information per
 geographic region. If this is not the the case, you must specify another join

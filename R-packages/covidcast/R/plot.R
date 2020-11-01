@@ -388,7 +388,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   if (is.null(legend_width)) legend_width = 15
   if (is.null(legend_digits)) legend_digits = 2
   if (is.null(legend_pos)) legend_pos = "bottom"
-  
+
   # Create breaks, if we need to
   breaks = params$breaks
   if (!is.null(breaks)) num_bins = length(breaks)
@@ -422,7 +422,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     for (i in 1:length(breaks)) val_out[val >= breaks[i]] = breaks[i]
     return(val_out)
   }
-  
+
   # Set some basic layers
   element_text = ggplot2::element_text
   margin = ggplot2::margin
@@ -477,12 +477,12 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   # Retrieve coordinates for mapping
   # Reading from usmap files to ensure consistency with borders
   if (attributes(x)$metadata$geo_type == "county") {
-    centroids = county_geo[county_geo$fips %in% map_geo, ]
+    centroids = covidcast::county_geo[covidcast::county_geo$fips %in% map_geo, ]
     cur_geo = centroids$fips
     cur_val = rep(NA, length(cur_geo))
   }
   else if (attributes(x)$metadata$geo_type == "state") {
-    centroids = state_geo
+    centroids = covidcast::state_geo
     centroids$abbr = tolower(centroids$abbr)
     centroids = centroids[centroids$abbr %in% map_geo, ]
     cur_geo = centroids$abbr
@@ -501,7 +501,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     cur_val[cur_val == 0] = NA
     levels(cur_val)[levels(cur_val) == 0] = NA
   }
-  
+
   # Create the bubble layer
   bubble_df = data.frame(lat = centroids$x, lon = centroids$y, val = cur_val)
   bubble_layer = ggplot2::geom_point(aes(x = lat, y = lon, size = val),
@@ -514,7 +514,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   scale_layer = ggplot2::scale_size_manual(values = sizes, breaks = breaks,
                                            labels = labels, drop = FALSE,
                                            guide = guide)
-  
+
   # Put it all together and return
   return(ggplot2::ggplot() + polygon_layer + ggplot2::coord_equal() +
          title_layer + bubble_layer + scale_layer + theme_layer)
@@ -535,13 +535,13 @@ plot_line = function(x, range = NULL, title = NULL, params = list()) {
   if (is.null(ylab)) ylab = "Value"
   if (is.null(stderr_bands)) stderr_bands = FALSE
   if (is.null(stderr_alpha)) stderr_alpha = 0.5
-  
+
   # Grab the values
   df = x %>% dplyr::select(value, time_value, geo_value, stderr)
 
   # Set the range, if we need to
   if (is.null(range)) range = base::range(df$value, na.rm = TRUE)
-  
+
   # Create label and theme layers
   label_layer = ggplot2::labs(title = title, x = xlab, y = ylab)
   theme_layer = ggplot2::theme_bw() +

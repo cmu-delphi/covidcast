@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Metro area population data — msa_census • covidcast</title>
+<title>Get state abbreviations from FIPS codes — fips_to_abbr • covidcast</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,10 @@
 
 
 
-<meta property="og:title" content="Metro area population data — msa_census" />
-<meta property="og:description" content="Data set on metropolitan area populations, from the 2019 US Census. This
-includes metropolitan and micropolitan statistical areas, although the
-COVIDcast API only supports fetching data from metropolitan statistical
-areas." />
+<meta property="og:title" content="Get state abbreviations from FIPS codes — fips_to_abbr" />
+<meta property="og:description" content="Look up state abbreviations by FIPS codes (including District of Columbia and
+Puerto Rico); this function is based on grep(), and hence allows for
+regular expressions." />
 
 
 
@@ -135,48 +134,63 @@ areas." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Metro area population data</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/data.R'><code>R/data.R</code></a></small>
-    <div class="hidden name"><code>msa_census.Rd</code></div>
+    <h1>Get state abbreviations from FIPS codes</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
+    <div class="hidden name"><code>fips_to_abbr.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Data set on metropolitan area populations, from the 2019 US Census. This
-includes metropolitan and micropolitan statistical areas, although the
-COVIDcast API only supports fetching data from metropolitan statistical
-areas.</p>
+    <p>Look up state abbreviations by FIPS codes (including District of Columbia and
+Puerto Rico); this function is based on <code><a href='https://rdrr.io/r/base/grep.html'>grep()</a></code>, and hence allows for
+regular expressions.</p>
     </div>
 
-    <pre class="usage"><span class='no'>msa_census</span></pre>
+    <pre class="usage"><span class='fu'>fips_to_abbr</span>(
+  <span class='no'>code</span>,
+  <span class='kw'>ignore.case</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>perl</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>fixed</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>ties_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first"</span>, <span class='st'>"all"</span>)
+)</pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>code</th>
+      <td><p>Vector of FIPS codes to look up; codes can have either two digits
+(as in "42") or five digits (as in "42000"), either is allowed.</p></td>
+    </tr>
+    <tr>
+      <th>ignore.case, perl, fixed</th>
+      <td><p>Arguments to pass to <code><a href='https://rdrr.io/r/base/grep.html'>grep()</a></code>, with the same
+defaults as in the latter function. Hence, by default, regular expressions
+are used; to match against a fixed string (no regular expressions), set
+<code>fixed = TRUE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>ties_method</th>
+      <td><p>If "first", then only the first match for each code is
+returned. If "all", then all matches for each code are returned.</p></td>
+    </tr>
+    </table>
 
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data frame with 2797 rows, each representing one core-based
-statistical area (including metropolitan and micropolitan statistical
-areas, county or county equivalents, and metropolitan divisions). There are
-many columns. The most crucial are:</p>
-<dl'>
-<dt>CBSA</dt><dd><p>Core Based Statistical Area code. These are unique identifiers
-used, for example, as the <code>geo_values</code> argument to <code><a href='covidcast_signal.html'>covidcast_signal()</a></code>
-when requesting data from specific metro areas (with <code>geo_type = 'msa'</code>).</p></dd>
-<dt>NAME</dt><dd><p>Name or title of the area.</p></dd>
-<dt>LSAD</dt><dd><p>Legal/Statistical Area Description, identifying if this is a
-metropolitan or micropolitan area, a metropolitan division, or a county.</p></dd>
-<dt>POPESTIMATE2019</dt><dd><p>Estimate of the area's resident population as of
-July 1, 2019.</p></dd>
+    <p>A vector of state abbreviations if <code>ties_method</code> equals "first", and
+a list of state abbreviations otherwise.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-</dl>
+    <div class='dont-index'><p><code><a href='abbr_to_fips.html'>abbr_to_fips()</a></code></p></div>
 
-    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
-
-    <p>United States Census Bureau, at
-<a href='https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.csv'>https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.csv</a></p>
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
-
-    <p>Census Bureau documentation of all columns and their meaning:
-<a href='https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.pdf'>https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.pdf</a></p>
-
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>fips_to_abbr</span>(<span class='st'>"42000"</span>)</div><div class='output co'>#&gt; 42000 
+#&gt;  "PA" </div><div class='input'><span class='fu'>fips_to_abbr</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"42"</span>, <span class='st'>"72"</span>, <span class='st'>"11"</span>))</div><div class='output co'>#&gt; 42000 72000 11000 
+#&gt;  "PA"  "PR"  "DC" </div><div class='input'>
+<span class='co'># Note that fips_to_name() works for state names too:</span>
+<span class='fu'><a href='fips_to_name.html'>fips_to_name</a></span>(<span class='st'>"42000"</span>)</div><div class='output co'>#&gt;          42000 
+#&gt; "Pennsylvania" </div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

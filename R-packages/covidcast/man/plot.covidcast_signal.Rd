@@ -80,8 +80,8 @@ unused.}
 Several plot types are provided, including choropleth plots (maps), bubble
 plots, and time series plots showing the change of signals over time, for a
 data frame returned by \code{covidcast_signal()}. (Only the latest issue from the
-data frame is used for plotting.) See \code{vignette("plotting-signals")} for
-examples.
+data frame is used for plotting.) See the \href{https://cmu-delphi.github.io/covidcast/covidcastR/articles/plotting-signals.html}{plotting vignette}
+for examples.
 }
 \details{
 The following named arguments are supported through the lists

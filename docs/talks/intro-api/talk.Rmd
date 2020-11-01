@@ -295,7 +295,7 @@ ggplot(dv_as_of, aes(x = time_value, y = value)) +
 
 # Example: Correlations Between Cases and Deaths
 
-Now let's examine the correlations between COVID-19 cases and deaths, per day, across counties. We'll look at Spearman correlation, starting March 1. Then repeat but for cases and deaths 7 days ahead:
+Now let's examine the correlations between COVID-19 cases and deaths, per day, across counties. We'll look at Spearman correlation, starting March 1. Then repeat but for cases lagged back 7 days:
 
 ```{r, fig.width=8, fig.height=6}
 # Fetch confirmed cases and deaths, at the county level, since March 1
@@ -315,17 +315,17 @@ cases_act = cases %>% filter(geo_value %in% geo_values)
 deaths_act = deaths %>% filter(geo_value %in% geo_values)
 
 # Compute correlations, per time, over all counties. Both with original time
-# alignment, and with cases shifted forward in time by 7 days
+# alignment, and with cases lagged backwards in time by 7 days
 df_cor1 = covidcast_cor(cases_act, deaths_act, by = "time_value", 
                         method = "spearman")
 df_cor2 = covidcast_cor(cases_act, deaths_act, by = "time_value", 
-                        method = "spearman", dt_x = 7)
+                        method = "spearman", dt_x = -7)
 
 # Stack rowwise into one data frame, then plot time series
 df_cor = rbind(df_cor1, df_cor2)
-df_cor$Shift = factor(c(rep(0, nrow(df_cor1)), rep(7, nrow(df_cor2))))
+df_cor$dt = factor(c(rep(0, nrow(df_cor1)), rep(-7, nrow(df_cor2))))
 ggplot(df_cor, aes(x = time_value, y = value)) +
-  geom_line(aes(color = Shift)) +
+  geom_line(aes(color = dt)) +
   labs(title = "Correlation between cases and deaths",
        subtitle = sprintf("Over counties with at least %i cases", case_num),
        x = "Date", y = "Correlation") + 

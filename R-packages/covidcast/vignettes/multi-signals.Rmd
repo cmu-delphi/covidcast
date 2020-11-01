@@ -46,8 +46,8 @@ function, which acceps a list of `covidcast_signal` objects, as returned by
 `covidcast_signals()`. With all arguments set to their default values,
 `aggregate_signals()` returns a data frame in "wide" format: 
 
-```{r}
-library(dplyr) 
+```{r, message=FALSE}
+library(dplyr)
 
 aggregate_signals(signals) %>% head()
 ```
@@ -75,7 +75,7 @@ aggregate_signals(signals, dt = list(0, c(-1, 0, 1))) %>%
   filter(geo_value == "tx") %>% head()
 ```
 
-Finally, `covidcast_signals()` also accepts a single data frame (instead of a 
+Finally, `aggregate_signals()` also accepts a single data frame (instead of a
 list of data frames), intended to be convenient when applying shifts to a single
 `covidcast_signal` object:
 
@@ -115,7 +115,7 @@ aggregate_signals(signals[[1]], dt = c(-1, 0), format = "long") %>%
 
 The package also provides functions for pivoting an aggregated signal data frame
 longer or wider. These are essentially wrappers around `pivot_longer()` and 
-`pivot_wider()` from the `dplyr` package, that set the column structure and
+`pivot_wider()` from the `tidyr` package, that set the column structure and
 column names appropriately. For example, to pivot longer:
 
 ```{r}

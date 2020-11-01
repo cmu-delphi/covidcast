@@ -85,3 +85,65 @@ test_that("get_predictions works when forecaster has additional arguments", {
   with_args_pred <- pc2[[1]]$forecast_distribution[[1]]$quantiles
   expect_equal(baseline_pred + 10, with_args_pred)
 })
+
+test_that("start_day within signals works", {
+  # if signals does not have a start_day, does all still run?
+  signals_no_start_day <- tibble(data_source = "jhu-csse",
+                                 signal = c("deaths_incidence_num",
+                                            "confirmed_incidence_num"))
+  forecast_dates <- ymd(c("2020-07-20", "2020-07-27"))
+  pc_no_start_day <- get_predictions(baseline_forecaster,
+                                     name_of_forecaster = "baseline",
+                                     signals = signals_no_start_day,
+                                     forecast_dates = forecast_dates,
+                                     incidence_period = "epiweek",
+                                     ahead = 3,
+                                     geo_type = "state")
+  sc_no_start_day <- evaluate_predictions(pc_no_start_day)
+  
+  # if signals has a start_day, does all still run?
+  signals <- signals_no_start_day %>% mutate(start_day = "2020-06-15")
+  forecast_date <- ymd("2020-07-20")
+  pc1 <- get_predictions(baseline_forecaster,
+                         name_of_forecaster = "baseline",
+                         signals = signals,
+                         forecast_dates = forecast_date,
+                         incidence_period = "epiweek",
+                         ahead = 3,
+                         geo_type = "state")
+  # the median should be the same for both for the
+  # baseline_forecaster in the symmetrized case:
+  med_pred_no_start_day <- pc_no_start_day[[1]]$forecast_distribution %>%
+    map_dbl(~ .x %>% filter(probs == 0.5) %>% pull(quantiles))
+  med_pred1 <- pc1[[1]]$forecast_distribution %>%
+    map_dbl(~ .x %>% filter(probs == 0.5) %>% pull(quantiles))
+  expect_equal(med_pred1, med_pred_no_start_day)
+
+  # if signals has a start_day that is a function, does all still run?
+  signals_f <- signals_no_start_day %>% 
+    mutate(start_day = list(function(forecast_date) forecast_date - 40))
+  pc_f <- get_predictions(baseline_forecaster,
+                          name_of_forecaster = "baseline",
+                          signals = signals_f,
+                          forecast_dates = forecast_date,
+                          incidence_period = "epiweek",
+                          ahead = 3,
+                          geo_type = "state")
+  med_pred_f <- pc_f[[1]]$forecast_distribution %>%
+    map_dbl(~ .x %>% filter(probs == 0.5) %>% pull(quantiles))
+  expect_equal(med_pred1, med_pred_f)
+  
+  # what about a mix of start_day types? (currently fails)
+  signals_mix <- signals_f
+  signals_mix$start_day[[1]] <- "2020-06-15"
+  pc_mix <- get_predictions(baseline_forecaster,
+                            name_of_forecaster = "baseline",
+                            signals = signals_mix,
+                            forecast_dates = forecast_date,
+                            incidence_period = "epiweek",
+                            ahead = 3,
+                            geo_type = "state")
+  med_pred_mix <- pc_mix[[1]]$forecast_distribution %>%
+    map_dbl(~ .x %>% filter(probs == 0.5) %>% pull(quantiles))
+  expect_equal(med_pred1, med_pred_mix)
+})

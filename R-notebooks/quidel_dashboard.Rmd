@@ -1,0 +1,88 @@
+---
+title: "Quidel dashboard"
+author: "Delphi Lab"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+### Response Volume
+
+This is a check on overall volume of raw results. There may be weekly effects but we would not expect to see any big systematic changes.
+
+```{r, fig.width = 7, fig.height = 5}
+library(covidcast)
+library(dplyr)
+library(ggplot2)
+
+date_scale <-
+  scale_x_date(
+    date_breaks = "1 month",
+    date_minor_breaks = "1 week",
+    date_labels = "%b %Y"
+  )
+
+twenty_eight_days_ago = Sys.Date() - 28
+
+# Sampling volume
+df_quidel_states = covidcast_signal("quidel",
+                                    "covid_ag_raw_pct_positive",
+                                    start_day = twenty_eight_days_ago,
+                                    geo_type = "state")
+n_per_day = df_quidel_states %>%
+  group_by(time_value) %>%
+  summarize(n = sum(sample_size))
+
+ggplot(n_per_day, aes(x = time_value, y = n)) +
+  geom_line() + geom_point() + theme_bw() +
+  labs(
+    x = "Date",
+    y = "Number of Responses",
+    title = sprintf("Total responses: %i, mean per day: %i",
+                    round(sum(n_per_day$n)), round(mean(n_per_day$n)))
+  ) +
+  date_scale
+```
+
+### Coverage
+
+This measures how much state coverage we have in the samples (i.e., how many unique states are present each day), and how it has recently changed over time.
+
+```{r, fig.width = 7, fig.height = 5}
+# Sampling coverage
+df_quidel_states = covidcast_signal("quidel",
+                                    "covid_ag_raw_pct_positive",
+                                    start_day = twenty_eight_days_ago,
+                                    geo_type = "state")
+states_per_day = df_quidel_states %>%
+  group_by(time_value) %>%
+  summarize(n = n())
+
+ggplot(states_per_day, aes(x = time_value, y = n)) +
+  geom_line() + geom_point() + theme_bw() +
+  labs(
+    x = "Date",
+    y = "Number of States",
+    title = sprintf(
+      "Unique States: %i, mean per day: %i",
+      length(unique(df_quidel_states$geo_value)),
+      round(mean(states_per_day$n))
+    )
+  ) +
+  date_scale
+```
+
+## State Coverage Map
+
+This visualizes the state coverage -- how frequently does each state show up in the data over the last 28 days?
+
+```{r, fig.width = 10, fig.height = 8}
+
+source("dashboard_functions.R")
+plot_28_day_frequency_state(df_quidel_states)
+```

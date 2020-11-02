@@ -203,7 +203,7 @@ def abbr_to_fips(code: Union[str, Iterable],
 
     Given an individual or list of state abbreviations or regular expressions,
     look up the corresponding state FIPS codes. The returned codes are 5 digits: the
-    2 digit state fips and 000 appeneded to the end.
+    2 digit state FIPS with 000 appended to the end.
 
     :param code: Individual or list of abbreviations or regular expressions.
     :param ignore_case: Boolean for whether or not to be case insensitive in the regular expression.

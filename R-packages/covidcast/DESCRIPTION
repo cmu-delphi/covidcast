@@ -39,22 +39,22 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 Imports:
   dplyr,
-  httr,
-  purrr,
-  jsonlite,
-  usmap,
-  maptools,
   ggplot2,
   grDevices,
+  httr,
+  jsonlite,
+  maptools,
+  purrr,
   rlang,
-  tidyr
+  tidyr,
+  usmap
 RoxygenNote: 7.1.1
 Suggests: 
-    knitr,
-    rmarkdown,
     gridExtra,
+    knitr,
+    mockery,
+    rmarkdown,
     testthat,
     tibble,
-    mockery,
     vdiffr
 VignetteBuilder: knitr

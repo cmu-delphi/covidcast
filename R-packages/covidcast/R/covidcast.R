@@ -294,7 +294,7 @@ summary.covidcast_signal = function(object, ...) {
 
 ##########
 
-#' Obtain multiple COVIDcast signals in one data frame
+#' Obtain multiple COVIDcast signals at once
 #'
 #' This convenience function uses `covidcast_signal()` to obtain multiple
 #' signals, potentially from multiple data sources.
@@ -307,11 +307,13 @@ summary.covidcast_signal = function(object, ...) {
 #'   be either length 1 or N.
 #'
 #' @return A list of `covidcast_signal` data frames, of length `N =
-#'     max(length(data_source), length(signal))`.
+#'     max(length(data_source), length(signal))`. This list can be aggregated
+#'     into a single data frame of either "wide" or "long" format using
+#'     `aggregate_signals()`.
 #'
 #' @inheritParams covidcast_signal
 #'
-#' @seealso [covidcast_signal()]
+#' @seealso [covidcast_signal()], [aggregate_signals()]
 #' @examples
 #' \dontrun{
 #' ## Fetch USAFacts confirmed cases and deaths over the same time period

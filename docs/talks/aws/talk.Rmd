@@ -2,7 +2,7 @@
 title: "Delphi's COVIDcast Project: <br> An Ecosystem for Tracking and Forecasting the Pandemic"
 author: Ryan Tibshirani <br> Statistics and Machine Learning <br> Carnegie Mellon University <br> Amazon Scholar, AWS Labs
 date: "<br> ![](delphi.png) ![](cmu.png) <br><br> November 3, 2020"
-footer: "Get the slides at: cmu-delphi.github.io/covidcast/talks/rmls20/talk.html"
+footer: "Get the slides at: cmu-delphi.github.io/covidcast/talks/aws/talk.html"
 output: 
   slidy_presentation:
     theme: cerulean

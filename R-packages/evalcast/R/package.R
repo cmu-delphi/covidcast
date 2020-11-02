@@ -14,4 +14,10 @@
 #' @import tidyr
 #' @import readr
 #' @import stringr
+#' @importFrom memoise memoise
 NULL
+
+.onLoad <- function(libname, pkgname) {
+    download_signal <<- memoise::memoise(download_signal)
+    get_covidhub_predictions <<- memoise::memoise(get_covidhub_predictions)
+}

@@ -1,6 +1,6 @@
 ---
 title: "Doctor Visits dashboard"
-author: "Ben Smith"
+author: "Delphi Lab"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
   html_document:

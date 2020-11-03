@@ -30,8 +30,9 @@ plot_trajectory <- function(list_of_predictions_cards,
                             last_day = Sys.Date(),
                             alpha = .2,
                             nrow = 6,
-                            ncol = 6,  
-                           page_facet = 1)
+                            ncol = 4,  
+                           page_facet = 1，
+                           cutoff = 52)
 {
   # make sure predictions cards are for the same forecasting task (except ahead, and forecast_date)
   response <- unique_attr(list_of_predictions_cards,"signals")
@@ -132,8 +133,8 @@ plot_trajectory <- function(list_of_predictions_cards,
            theme(axis.text = element_text(size = 8), 
                  strip.text = element_text(size = 10,face = "bold"))
  
- # The breakpoint is 52 so that all states can be rendered in one plot
- if (nfacets <= 52 ) {
+ # The default cutoff is 52 so that all states can be rendered in one plot
+ if (nfacets <= cutoff) {
    print(p + ggplot2::facet_wrap(~.data$location_abbr, scales = "free", ncol = 6,nrow=NULL))
  } else { 
    for (i in 1: page_facet) { 

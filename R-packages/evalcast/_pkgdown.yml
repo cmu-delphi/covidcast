@@ -1,0 +1,35 @@
+# Deploy to central docs directory that's on GitHub Pages
+destination: ../../docs/evalcast/
+
+home:
+  links:
+    - text: Get the COVIDcast API client
+      href: https://cmu-delphi.github.io/covidcast/covidcastR/
+
+    - text: View the COVIDcast map
+      href: https://covidcast.cmu.edu/
+
+reference:
+- title: "Example forecasters"
+- contents:
+  - baseline_forecaster
+- title: "Creating or importing predictions"
+- contents:
+  - get_covidhub_predictions
+  - get_predictions
+- title: "Evaluating predictions"
+- contents:
+  - evaluate_predictions
+  - weighted_interval_score
+  - absolute_error
+  - interval_coverage
+- title: "Visualizing performance"
+- contents:
+  - starts_with("plot_")
+- title: "Utilities"
+- contents:
+  - check_valid_forecaster_output
+  - get_target_period
+  - get_forecast_dates
+  - filter_predictions
+  

@@ -1,9 +1,10 @@
 library(covidcast)
 library(tibble)
 
-test_that("simple correlations", {
+test_that("correlations when correlation is 1", {
   # Two data frames with perfect correlation, except on a day that does not
-  # match between the two of them
+  # match between the two of them. The non-matching day does not have perfect
+  # correlation, so this will detect if it is correctly excluded.
   foo <- data.frame(
     time_value = as.Date(c("2020-01-01", "2020-01-02",
                            "2020-01-03", "2020-01-05")),
@@ -30,7 +31,7 @@ test_that("simple correlations", {
                expected)
 })
 
-test_that("basic lagged correlations", {
+test_that("lags are applied before correlating", {
   foo <- data.frame(
     time_value = as.Date(c("2020-01-01", "2020-01-02",
                            "2020-01-03", "2020-01-04")),
@@ -57,7 +58,7 @@ test_that("basic lagged correlations", {
                expected)
 })
 
-test_that("lags are in correct direction", {
+test_that("lags are applied in correct temporal direction", {
   foo <- data.frame(
     time_value = seq.Date(as.Date("2020-01-01"), as.Date("2020-01-10"),
                           "day"),
@@ -74,6 +75,7 @@ test_that("lags are in correct direction", {
     value = c(rep(0, 5), 1:5)
   )
 
+  # These data frames have correlation 1 only if lagged exactly the right amount
   expected <- tibble(
     geo_value = "pa",
     value = 1

@@ -2,6 +2,13 @@ library(testthat)
 library(vdiffr)
 library(dplyr)
 
+## Plotting tests.
+# Since it is difficult to test specific output of plots, these tests instead
+# use vdiffr to ensure that plots match a saved reference version. The tests
+# below simple build simple graphs of each type, thus exercising the different
+# plotting options and ensuring they all function.
+
+
 # Contexts are no longer required or recommended in testthat, but vdiffr still
 # wants one to place the figure files correctly. See
 # https://github.com/r-lib/vdiffr/issues/71

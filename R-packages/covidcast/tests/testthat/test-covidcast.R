@@ -1,7 +1,7 @@
 library(covidcast)
 library(mockery)
 
-test_that("covidcast_meta", {
+test_that("covidcast_meta formats result correctly", {
   stub(covidcast_meta, ".request",
        list(message = "success",
             epidata = data.frame(
@@ -9,6 +9,7 @@ test_that("covidcast_meta", {
               max_time = c("20200102", "20201003"),
               max_issue = c("20200404", "20201101"))))
 
+  # ensure columns that should be converted to dates are indeed dates
   expect_equal(covidcast_meta(),
                structure(
                  data.frame(
@@ -19,6 +20,9 @@ test_that("covidcast_meta", {
                  class = c("covidcast_meta", "data.frame")
                ))
 
+})
+
+test_that("covidcast_meta raises error when API signals one", {
   stub(covidcast_meta, ".request",
        list(message = "argle-bargle"))
 

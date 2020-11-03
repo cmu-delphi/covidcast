@@ -29,10 +29,12 @@ __Environment__
     or rerun the above command with a new environment name in place of `env`.
 
 __Style__
+- Run `make lint` from `Python-packages/covidcast-py/` to run the lint commands.
 - `mypy`, `pylint`, and `pydocstyle` are used for linting, with associated configurations for 
 `pylint` in `.pylintrc` and for `mypy` in `mypy.ini`.
 
 __Testing__
+- Run `make test` from `Python-packages/covidcast-py/` to run the test commands.
 - `pytest` is the framework used in this package.
 - Each function should have corresponding unit tests. 
 - Tests should be deterministic.
@@ -53,33 +55,15 @@ When you develop a new package version, there are several steps to consider.
 These are written from the `Python-packages/covidcast-py/` directory:
 
 1. Increment the package version in `setup.py` and in Sphinx's `conf.py`.
-2. Install the requirements needed to build the package and documentation:
-
-    ```sh
-    pip3 install -r requirements_dev.txt
-    ```
-   
-3. Rebuild the package:
-
-    ```sh
-    python3 setup.py clean
-    python3 setup.py sdist bdist_wheel
-    ```
-
-    Verify the build worked without errors.
-4. Locally install the package:
-    
-    ```sh
-    pip3 install .
-    ```
-   
+2. Install the requirements needed to build the package and documentation with `make install-requirements`
+3. Rebuild and install the package locally with `make build-and-install`
 5. Rebuild the documentation. The documentation lives in `docs/` and is built by
    [Sphinx](https://www.sphinx-doc.org/en/master/), which automatically reads
    the function docstrings and formats them. `docs/index.rst` contains the main
    documentation and the `.. autofunction::` directives insert documentation of
    specified functions.
 
-   To rebuild the documentation, install the `sphinx` package and run
+   To rebuild the documentation, run
 
     ```sh
     cd docs/

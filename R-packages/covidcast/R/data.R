@@ -6,7 +6,7 @@
 #'   states and DC). There are many columns. The most crucial are:  
 #'
 #' \describe{
-#'   \item{FIPS}{5-digit county FIPS codes. These are unique identifiers
+#'   \item{FIPS}{Five-digit county FIPS codes. These are unique identifiers
 #'   used, for example, as the `geo_values` argument to `covidcast_signal()` to
 #'   request data from a specific county.}
 #'   \item{CTYNAME}{County name, to help find counties by name.}
@@ -18,8 +18,7 @@
 #' @references Census Bureau documentation of all columns and their meaning:
 #'   \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.pdf}
 #'
-#' @source
-#' United States Census Bureau, at
+#' @source United States Census Bureau, at
 #'   \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.csv}
 "county_census"
 
@@ -49,7 +48,7 @@
 #' @references Census Bureau documentation of all columns and their meaning:
 #'   \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.pdf}
 #'
-#' @source
+#' @source United States Census Bureau, at
 #'   \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.csv}
 "msa_census"
 
@@ -66,43 +65,44 @@
 #'   \item{POPESTIMATE2019}{Estimate of the state's resident population in 2019.}
 #' }
 #'
-#' @source
+#' @source United States Census Bureau, at
 #'   \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/state/detail/SCPRC-EST2019-18+POP-RES.csv}
 "state_census"
 
 #' County latitudes and longitudes
 #'
-#' Data set on latitudes and longitudes of county centroids, from the National
-#' Weather Service.
+#' Data set on latitudes and longitudes of county centroids, from the `usmap`
+#' package.
 #'
-#' @format Data frame with 3331 rows, each representing one county. Columns:
+#' @format Data frame with 3142 rows, each representing one county. Columns:
 #'
 #' \describe{
-#'   \item{COUNTYNAME}{Name of the county.}
-#'   \item{FIPS}{5-digit county FIPS code.}
-#'   \item{STATE}{Two-letter state abbreviation.}
-#'   \item{LON}{Longitude of county centroid.}
-#'   \item{LAT}{Latitude of county centroid.}
+#'   \item{x}{Longitude of county centroid.}
+#'   \item{y}{Latitude of county centroid.}
+#'   \item{fips}{Five-digit county FIPS code.}
+#'   \item{abbr}{Two-letter state abbreviation.}
+#'   \item{full}{State name.}
+#'   \item{county}{County name.}
 #' }
 #'
-#' @source
-#'   \url{https://www.weather.gov/gis/Counties}
+#' @source `usmap`
 "county_geo"
 
 #' State latitudes and longitudes
 #'
-#' Data set on latitudes and longitudes of state centroids, from Google's DSPL.
+#' Data set on latitudes and longitudes of state centroids, from the `usmap`
+#' package.
 #'
-#' @format Data frame with 52 rows, each representing one state (including
-#'   Puerto Rico and the District of Columbia). Columns:
+#' @format Data frame with 51 rows, each representing one state (including the
+#'   District of Columbia). Columns:
 #'
 #' \describe{
-#'   \item{STATE}{Two-letter state abbreviation.}
-#'   \item{LAT}{Latitude of state centroid.}
-#'   \item{LON}{Longitude of state centroid.}
-#'   \item{NAME}{Name of state.}
+#'   \item{x}{Longitude of state centroid.}
+#'   \item{y}{Latitude of state centroid.}
+#'   \item{fips}{Five-digit county FIPS code.}
+#'   \item{abbr}{Two-letter state abbreviation.}
+#'   \item{full}{State name.}
 #' }
 #'
-#' @source
-#'   \url{https://developers.google.com/public-data/docs/canonical/states_csv}
+#' @source `usmap`
 "state_geo"

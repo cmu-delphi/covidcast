@@ -5,24 +5,25 @@
 \alias{county_geo}
 \title{County latitudes and longitudes}
 \format{
-Data frame with 3331 rows, each representing one county. Columns:
+Data frame with 3142 rows, each representing one county. Columns:
 
 \describe{
-\item{COUNTYNAME}{Name of the county.}
-\item{FIPS}{5-digit county FIPS code.}
-\item{STATE}{Two-letter state abbreviation.}
-\item{LON}{Longitude of county centroid.}
-\item{LAT}{Latitude of county centroid.}
+\item{x}{Longitude of county centroid.}
+\item{y}{Latitude of county centroid.}
+\item{fips}{Five-digit county FIPS code.}
+\item{abbr}{Two-letter state abbreviation.}
+\item{full}{State name.}
+\item{county}{County name.}
 }
 }
 \source{
-\url{https://www.weather.gov/gis/Counties}
+\code{usmap}
 }
 \usage{
 county_geo
 }
 \description{
-Data set on latitudes and longitudes of county centroids, from the National
-Weather Service.
+Data set on latitudes and longitudes of county centroids, from the \code{usmap}
+package.
 }
 \keyword{datasets}

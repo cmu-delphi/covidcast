@@ -360,10 +360,10 @@ def _agg_long(processed_signals: list) -> pd.DataFrame:
     """
     first_columns = processed_signals[0][0].columns
     for df, *_ in processed_signals:
-        if df.columns() != first_columns:
+        if any(df.columns != first_columns):
             raise ValueError("Inconsistent columns detected. All columns must be the same to use"
                              "'long' output.")
-    return pd.concat([df for df, *_ in processed_signals])
+    return pd.concat([df for df, *_ in processed_signals]).reset_index(drop=True)
 
 
 def _detect_metadata(data: pd.DataFrame,

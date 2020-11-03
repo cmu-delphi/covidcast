@@ -75,8 +75,9 @@ test_that("aggregated data can be made longer", {
                  value = c(4, 6, 5, 1, 3, 2)),
                  class = c("covidcast_signal_long", "data.frame")))
 
-  # Now try it long in the first place. Currently fails because wide format does
-  # not preserve issue, stderr, sample_size, or lag.
+  # Now try it long in the first place. TODO Currently fails because wide format
+  # does not preserve issue, stderr, sample_size, or lag. Support should be
+  # added for these columns.
   ## agg_long <- aggregate_signals(list(foo, bar), format = "long")
   ## expect_equal(long, agg_long)
 })

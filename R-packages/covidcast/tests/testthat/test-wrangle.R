@@ -1,7 +1,7 @@
 library(covidcast)
 library(dplyr)
 
-test_that("aggregate and shift", {
+test_that("aggregated signals have times shifted correctly", {
   foo <- structure(data.frame(
     data_source = "foo",
     signal = "foo",
@@ -27,7 +27,7 @@ test_that("aggregate and shift", {
                  class = c("covidcast_signal_wide", "data.frame")))
 })
 
-test_that("widen and lengthen", {
+test_that("aggregated data can be made longer", {
   foo <- structure(data.frame(
     data_source = "foo",
     signal = "foo",

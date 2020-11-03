@@ -26,5 +26,6 @@ test_that("covidcast_meta raises error when API signals one", {
   stub(covidcast_meta, ".request",
        list(message = "argle-bargle"))
 
-  expect_error(covidcast_meta())
+  expect_error(covidcast_meta(),
+               class = "covidcast_meta_fetch_failed")
 })

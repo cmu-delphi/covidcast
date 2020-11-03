@@ -396,13 +396,15 @@ covidcast_meta <- function() {
   meta <- .request(list(source='covidcast_meta', cached="true"))
 
   if (meta$message != "success") {
-    stop("Failed to obtain metadata: ", meta$message, ".")
+    abort(paste0("Failed to obtain metadata: ", meta$message, "."),
+          err_msg = meta$message,
+          class = "covidcast_meta_fetch_failed")
   }
 
   meta <- meta$epidata %>%
     dplyr::mutate(min_time = as.Date(as.character(.data$min_time), format = "%Y%m%d"),
                   max_time = as.Date(as.character(.data$max_time), format = "%Y%m%d"),
-                  max_issue = as.Date(as.character(.data$max_issue), format = "%Y%m%d")) 
+                  max_issue = as.Date(as.character(.data$max_issue), format = "%Y%m%d"))
 
   class(meta) <- c("covidcast_meta", "data.frame")
   return(meta)

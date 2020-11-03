@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Produce a data frame for one signal. — covidcast_signal • covidcast</title>
+<title>Obtain a data frame for one COVIDcast signal — covidcast_signal • covidcast</title>
 
 
 <!-- jquery -->
@@ -39,14 +39,15 @@
 
 
 
-<meta property="og:title" content="Produce a data frame for one signal. — covidcast_signal" />
+<meta property="og:title" content="Obtain a data frame for one COVIDcast signal — covidcast_signal" />
 <meta property="og:description" content="Obtains data for selected date ranges for all geographic regions of the
 United States. Available data sources and signals are documented in the
 COVIDcast signal documentation.
 Most (but not all) data sources are available at the county level, but the
 API can also return data aggregated to metropolitan statistical areas,
 hospital referral regions, or states, as desired, by using the geo_type
-argument. View vignette(&quot;covidcast&quot;) for detailed example usage." />
+argument. View the covidcast vignette
+for detailed example usage." />
 
 
 
@@ -78,7 +79,7 @@ argument. View vignette(&quot;covidcast&quot;) for detailed example usage." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -105,6 +106,9 @@ argument. View vignette(&quot;covidcast&quot;) for detailed example usage." />
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/correlation-utils.html">Correlation utilities</a>
+    </li>
+    <li>
+      <a href="../articles/multi-signals.html">Manipulating multiple signals</a>
     </li>
     <li>
       <a href="../articles/plotting-signals.html">Plotting and mapping signals</a>
@@ -135,7 +139,7 @@ argument. View vignette(&quot;covidcast&quot;) for detailed example usage." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Produce a data frame for one signal.</h1>
+    <h1>Obtain a data frame for one COVIDcast signal</h1>
     <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/covidcast.R'><code>R/covidcast.R</code></a></small>
     <div class="hidden name"><code>covidcast_signal.Rd</code></div>
     </div>
@@ -147,7 +151,8 @@ United States. Available data sources and signals are documented in the
 Most (but not all) data sources are available at the county level, but the
 API can also return data aggregated to metropolitan statistical areas,
 hospital referral regions, or states, as desired, by using the <code>geo_type</code>
-argument. View <code><a href='../articles/covidcast.html'>vignette("covidcast")</a></code> for detailed example usage.</p>
+argument. View the <a href='https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html'>covidcast vignette</a>
+for detailed example usage.</p>
     </div>
 
     <pre class="usage"><span class='fu'>covidcast_signal</span><span class='op'>(</span>
@@ -180,24 +185,24 @@ for a list of available signals.</p></td>
     <tr>
       <th>start_day</th>
       <td><p>Query data beginning on this date. Date object, or string in
-the form <code>"YYYY-MM-DD"</code>. If <code>start_day</code> is <code>NULL</code>, defaults to first day
+the form "YYYY-MM-DD". If <code>start_day</code> is <code>NULL</code>, defaults to first day
 data is available for this signal.</p></td>
     </tr>
     <tr>
       <th>end_day</th>
       <td><p>Query data up to this date, inclusive. Date object or string
-in the form <code>"YYYY-MM-DD"</code>. If <code>end_day</code> is <code>NULL</code>, defaults to the most
+in the form "YYYY-MM-DD". If <code>end_day</code> is <code>NULL</code>, defaults to the most
 recent day data is available for this signal.</p></td>
     </tr>
     <tr>
       <th>geo_type</th>
       <td><p>The geography type for which to request this data, such as
-<code>"county"</code> or <code>"state"</code>. Defaults to <code>"county"</code>. See the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>geographic coding documentation</a>
+"county" or "state". Defaults to "county". See the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>geographic coding documentation</a>
 for details on which types are available.</p></td>
     </tr>
     <tr>
       <th>geo_values</th>
-      <td><p>Which geographies to return. The default, <code>"*"</code>, fetches
+      <td><p>Which geographies to return. The default, "*", fetches
 all geographies. To fetch specific geographies, specify their IDs as a
 vector or list of strings. See the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>geographic coding documentation</a>
 for details on how to specify these IDs.</p></td>
@@ -205,14 +210,16 @@ for details on how to specify these IDs.</p></td>
     <tr>
       <th>as_of</th>
       <td><p>Fetch only data that was available on or before this date,
-provided as a <code>Date</code> object or string in the form <code>"YYYY-MM-DD"</code>. If
-<code>NULL</code>, the default, return the most recent available data.</p></td>
+provided as a <code>Date</code> object or string in the form "YYYY-MM-DD". If
+<code>NULL</code>, the default, return the most recent available data. Note that only
+one of <code>as_of</code>, <code>issues</code>, and <code>lag</code> should be provided; it does not make
+sense to specify more than one.</p></td>
     </tr>
     <tr>
       <th>issues</th>
       <td><p>Fetch only data that was published or updated ("issued") on
 these dates. Provided as either a single <code>Date</code> object (or string in the
-form <code>"YYYY-MM-DD"</code>), indicating a single date to fetch data issued on, or
+form "YYYY-MM-DD"), indicating a single date to fetch data issued on, or
 a vector specifying two dates, start and end. In this case, return all data
 issued in this range. There may be multiple rows for each observation,
 indicating several updates to its value. If <code>NULL</code>, the default, return the
@@ -220,11 +227,11 @@ most recently issued data.</p></td>
     </tr>
     <tr>
       <th>lag</th>
-      <td><p>Integer. If, for example, <code>lag=3</code>, fetch only data that was
-published or updated exactly 3 days after the date. For example, a row with
-<code>time_value</code> of June 3 will only be included in the results if its data was
-issued or updated on June 6. If <code>NULL</code>, the default, return the most
-recently issued data regardless of its lag.</p></td>
+      <td><p>Integer. If, for example, <code>lag = 3</code>, then we fetch only data that
+was published or updated exactly 3 days after the date. For example, a row
+with <code>time_value</code> of June 3 will only be included in the results if its
+data was issued or updated on June 6. If <code>NULL</code>, the default, return the
+most recently issued data regardless of its lag.</p></td>
     </tr>
     </table>
 
@@ -234,27 +241,24 @@ recently issued data regardless of its lag.</p></td>
 signal on one day in one geographic location. Contains the following
 columns:</p>
 <dt>data_source</dt><dd><p>Data source from which this observation was obtained.</p></dd>
-<dt>signal</dt><dd><p>The signal from which this observation was obtained.</p></dd>
-<dt>geo_value</dt><dd><p>identifies the location, such as a state name or county
-FIPS code</p></dd>
-<dt>time_value</dt><dd><p>a <code>Date</code> object identifying the date of this observation</p></dd>
-<dt>issue</dt><dd><p>a <code>Date</code> object identifying the date this estimate was issued.
+<dt>signal</dt><dd><p>Signal from which this observation was obtained.</p></dd>
+<dt>geo_value</dt><dd><p>String identifying the location, such as a state name or
+county FIPS code.</p></dd>
+<dt>time_value</dt><dd><p>Date object identifying the date of this observation.</p></dd>
+<dt>issue</dt><dd><p>Date object identifying the date this estimate was issued.
 For example, an estimate with a <code>time_value</code> of June 3 might have been
 issued on June 5, after the data for June 3rd was collected and ingested
 into the API.</p></dd>
-<dt>lag</dt><dd><p>an integer giving the difference between <code>issue</code> and
-<code>time_value</code>, in days.</p></dd>
-<dt>value</dt><dd><p>the signal quantity requested. For example, in a query for the
-<code>confirmed_cumulative_num</code> signal from the <code>usa-facts</code> source, this would
-be the cumulative number of confirmed cases in the area, as of the
+<dt>lag</dt><dd><p>Integer giving the difference between <code>issue</code> and <code>time_value</code>,
+in days.</p></dd>
+<dt>value</dt><dd><p>Signal value being requested. For example, in a query for the
+"confirmed_cumulative_num" signal from the "usa-facts" source, this would
+be the cumulative number of confirmed cases in the area, as of the given
 <code>time_value</code>.</p></dd>
-<dt>stderr</dt><dd><p>the value's standard error, if available</p></dd>
-<dt>sample_size</dt><dd><p>indicates the sample size available in that geography on
-that day; sample size may not be available for all signals, due to privacy
-or other constraints, in which case they will be <code>NA</code>.</p></dd>
-<dt>direction</dt><dd><p>uses a local linear fit to estimate whether the signal in
-this region is currently increasing or decreasing (reported as -1 for
-decreasing, 1 for increasing, and 0 for neither).</p></dd>
+<dt>stderr</dt><dd><p>Associated standard error of the signal value, if available.</p></dd>
+<dt>sample_size</dt><dd><p>Integer indicating the sample size available in that
+geography on that day; sample size may not be available for all signals,
+due to privacy or other constraints, in which case it will be <code>NA</code>.</p></dd>
 
 Consult the signal documentation for more details on how values and
 standard errors are calculated for specific signals.
@@ -275,13 +279,14 @@ data, creating a new issue on June 8th. By default, <code>covidcast_signal()</co
 returns the most recent issue available for every observation. The <code>as_of</code>,
 <code>issues</code>, and <code>lag</code> parameters allow the user to select specific issues
 instead, or to see all updates to observations. These options are mutually
-exclusive; if you specify more than one, <code>as_of</code> will take priority over
-<code>issues</code>, which will take priority over <code>lag</code>.</p>
+exclusive, and you should only specify one; if you specify more than one, you
+may get an error or confusing results.</p>
 <p>Note that the API only tracks the initial value of an estimate and <em>changes</em>
 to that value. If a value was first issued on June 5th and never updated,
 asking for data issued on June 6th (using <code>issues</code> or <code>lag</code>) would <em>not</em>
-return that value, though asking for data <code>as_of</code> June 6th would. See
-<code><a href='../articles/covidcast.html'>vignette("covidcast")</a></code> for examples.</p>
+return that value, though asking for data <code>as_of</code> June 6th would. See the
+<a href='https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html'>covidcast vignette</a>
+for examples.</p>
 <p>Note also that the API enforces a maximum result row limit; results beyond
 the maximum limit are truncated. This limit is sufficient to fetch
 observations in all counties in the United States on one day. This client
@@ -292,7 +297,8 @@ issued in this case. To see all results, split your query across multiple
 calls with different <code>issues</code> arguments.</p>
 <p>Downloading large amounts of data may be slow, so this function prints
 messages for each day of data it downloads. To suppress these, use
-<code><a href='https://rdrr.io/r/base/message.html'>base::suppressMessages()</a></code>, as in <code><a href='https://rdrr.io/r/base/message.html'>suppressMessages(covidcast_signal("fb-survey", ...))</a></code>.</p>
+<code><a href='https://rdrr.io/r/base/message.html'>base::suppressMessages()</a></code>, as in
+<code><a href='https://rdrr.io/r/base/message.html'>suppressMessages(covidcast_signal("fb-survey", ...))</a></code>.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>COVIDcast API documentation:
@@ -308,18 +314,18 @@ messages for each day of data it downloads. To suppress these, use
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'>## Fetch all counties from 2020-05-10 to the most recent available data</span>
-<span class='fu'>covidcast_signal</span><span class='op'>(</span><span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, start_day <span class='op'>=</span> <span class='st'>"2020-05-10"</span><span class='op'>)</span>
+<span class='fu'>covidcast_signal</span><span class='op'>(</span><span class='st'>"fb-survey"</span>, <span class='st'>"smoothed_cli"</span>, start_day <span class='op'>=</span> <span class='st'>"2020-05-10"</span><span class='op'>)</span>
 <span class='co'>## Fetch all counties on just 2020-05-10 and no other days</span>
-<span class='fu'>covidcast_signal</span><span class='op'>(</span><span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, start_day <span class='op'>=</span> <span class='st'>"2020-05-10"</span>,
+<span class='fu'>covidcast_signal</span><span class='op'>(</span><span class='st'>"fb-survey"</span>, <span class='st'>"smoothed_cli"</span>, start_day <span class='op'>=</span> <span class='st'>"2020-05-10"</span>,
                  end_day <span class='op'>=</span> <span class='st'>"2020-05-10"</span><span class='op'>)</span>
 <span class='co'>## Fetch all states on 2020-05-10, 2020-05-11, 2020-05-12</span>
-<span class='fu'>covidcast_signal</span><span class='op'>(</span><span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, start_day <span class='op'>=</span> <span class='st'>"2020-05-10"</span>,
+<span class='fu'>covidcast_signal</span><span class='op'>(</span><span class='st'>"fb-survey"</span>, <span class='st'>"smoothed_cli"</span>, start_day <span class='op'>=</span> <span class='st'>"2020-05-10"</span>,
                  end_day <span class='op'>=</span> <span class='st'>"2020-05-12"</span>, geo_type <span class='op'>=</span> <span class='st'>"state"</span><span class='op'>)</span>
 <span class='co'>## Fetch all available data for just Pennsylvania and New Jersey</span>
-<span class='fu'>covidcast_signal</span><span class='op'>(</span><span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, geo_type <span class='op'>=</span> <span class='st'>"state"</span>,
+<span class='fu'>covidcast_signal</span><span class='op'>(</span><span class='st'>"fb-survey"</span>, <span class='st'>"smoothed_cli"</span>, geo_type <span class='op'>=</span> <span class='st'>"state"</span>,
                  geo_values <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"pa"</span>, <span class='st'>"nj"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='co'>## Fetch all available data in the Pittsburgh metropolitan area</span>
-<span class='fu'>covidcast_signal</span><span class='op'>(</span><span class='st'>"fb-survey"</span>, <span class='st'>"raw_cli"</span>, geo_type <span class='op'>=</span> <span class='st'>"msa"</span>,
+<span class='fu'>covidcast_signal</span><span class='op'>(</span><span class='st'>"fb-survey"</span>, <span class='st'>"smoothed_cli"</span>, geo_type <span class='op'>=</span> <span class='st'>"msa"</span>,
                  geo_values <span class='op'>=</span> <span class='fu'><a href='name_to_fips.html'>name_to_cbsa</a></span><span class='op'>(</span><span class='st'>"Pittsburgh"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span>
 
@@ -335,7 +341,7 @@ messages for each day of data it downloads. To suppress these, use
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Pedrito Maynard-Zhang, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

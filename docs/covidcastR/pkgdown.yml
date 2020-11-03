@@ -1,9 +1,10 @@
-pandoc: 1.19.2.1
+pandoc: '2.5'
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   correlation-utils: correlation-utils.html
   covidcast: covidcast.html
+  multi-signals: multi-signals.html
   plotting-signals: plotting-signals.html
-last_built: 2020-10-08T21:55Z
+last_built: 2020-11-01T21:46Z
 

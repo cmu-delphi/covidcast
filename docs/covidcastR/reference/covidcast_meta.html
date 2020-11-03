@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fetch Delphi's COVID-19 Surveillance Streams metadata. — covidcast_meta • covidcast</title>
+<title>Obtain COVIDcast metadata — covidcast_meta • covidcast</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Fetch Delphi's COVID-19 Surveillance Streams metadata. — covidcast_meta" />
+<meta property="og:title" content="Obtain COVIDcast metadata — covidcast_meta" />
 <meta property="og:description" content="Obtains a data frame of metadata describing all publicly available data
 streams from the COVIDcast API." />
 
@@ -73,7 +73,7 @@ streams from the COVIDcast API." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -100,6 +100,9 @@ streams from the COVIDcast API." />
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/correlation-utils.html">Correlation utilities</a>
+    </li>
+    <li>
+      <a href="../articles/multi-signals.html">Manipulating multiple signals</a>
     </li>
     <li>
       <a href="../articles/plotting-signals.html">Plotting and mapping signals</a>
@@ -130,7 +133,7 @@ streams from the COVIDcast API." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Fetch Delphi's COVID-19 Surveillance Streams metadata.</h1>
+    <h1>Obtain COVIDcast metadata</h1>
     <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/covidcast.R'><code>R/covidcast.R</code></a></small>
     <div class="hidden name"><code>covidcast_meta.Rd</code></div>
     </div>
@@ -159,11 +162,11 @@ own metadata.</p></dd>
 <dt>num_locations</dt><dd><p>Number of distinct geographic locations available for
 this signal. For example, if <code>geo_type</code> is county, the number of counties
 for which this signal has ever been reported.</p></dd>
-<dt>min_value</dt><dd><p>The smallest value that has ever been reported.</p></dd>
-<dt>max_value</dt><dd><p>The largest value that has ever been reported.</p></dd>
-<dt>mean_value</dt><dd><p>The arithmetic mean of all reported values.</p></dd>
-<dt>stdev_value</dt><dd><p>The sample standard deviation of all reported values.</p></dd>
-<dt>max_issue</dt><dd><p>The most recent issue date for this signal.</p></dd>
+<dt>min_value</dt><dd><p>Smallest value that has ever been reported.</p></dd>
+<dt>max_value</dt><dd><p>Largest value that has ever been reported.</p></dd>
+<dt>mean_value</dt><dd><p>Arithmetic mean of all reported values.</p></dd>
+<dt>stdev_value</dt><dd><p>Sample standard deviation of all reported values.</p></dd>
+<dt>max_issue</dt><dd><p>Most recent issue date for this signal.</p></dd>
 <dt>min_lag</dt><dd><p>Smallest lag from observation to issue, in <code>time_type</code> units</p></dd>
 <dt>max_lag</dt><dd><p>Largest lag from observation to issue, in <code>time_type</code> units</p></dd>
 
@@ -186,7 +189,7 @@ for which this signal has ever been reported.</p></dd>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Pedrito Maynard-Zhang, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

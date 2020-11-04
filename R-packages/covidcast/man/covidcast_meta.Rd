@@ -2,7 +2,7 @@
 % Please edit documentation in R/covidcast.R
 \name{covidcast_meta}
 \alias{covidcast_meta}
-\title{Fetch Delphi's COVID-19 Surveillance Streams metadata.}
+\title{Obtain COVIDcast metadata}
 \usage{
 covidcast_meta()
 }
@@ -21,11 +21,11 @@ own metadata.}
 \item{num_locations}{Number of distinct geographic locations available for
 this signal. For example, if \code{geo_type} is county, the number of counties
 for which this signal has ever been reported.}
-\item{min_value}{The smallest value that has ever been reported.}
-\item{max_value}{The largest value that has ever been reported.}
-\item{mean_value}{The arithmetic mean of all reported values.}
-\item{stdev_value}{The sample standard deviation of all reported values.}
-\item{max_issue}{The most recent issue date for this signal.}
+\item{min_value}{Smallest value that has ever been reported.}
+\item{max_value}{Largest value that has ever been reported.}
+\item{mean_value}{Arithmetic mean of all reported values.}
+\item{stdev_value}{Sample standard deviation of all reported values.}
+\item{max_issue}{Most recent issue date for this signal.}
 \item{min_lag}{Smallest lag from observation to issue, in \code{time_type} units}
 \item{max_lag}{Largest lag from observation to issue, in \code{time_type} units}
 }

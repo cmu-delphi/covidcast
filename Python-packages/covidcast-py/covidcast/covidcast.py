@@ -1,11 +1,13 @@
 """This is the client side library for accessing the COVIDcast API."""
 import warnings
 from datetime import timedelta, date
-from typing import Union, Iterable, Tuple, List
 from functools import reduce
+from typing import Union, Iterable, Tuple, List
 
 import pandas as pd
 from delphi_epidata import Epidata
+
+from .errors import NoDataWarning
 
 # Point API requests to the AWS endpoint
 Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
@@ -211,11 +213,9 @@ def metadata() -> pd.DataFrame:
       ``signal``
         Signal name.
 
-      ``min_time``
-        First day for which this signal is available.
-
-      ``max_time``
-        Most recent day for which this signal is available.
+      ``time_type``
+        Temporal resolution at which this signal is reported. "day", for
+        example, means the signal is reported daily.
 
       ``geo_type``
         Geographic level for which this signal is available, such as county,
@@ -223,9 +223,11 @@ def metadata() -> pd.DataFrame:
         levels and will hence be listed in multiple rows with their own
         metadata.
 
-      ``time_type``
-        Temporal resolution at which this signal is reported. "day", for
-        example, means the signal is reported daily.
+      ``min_time``
+        First day for which this signal is available.
+
+      ``max_time``
+        Most recent day for which this signal is available.
 
       ``num_locations``
         Number of distinct geographic locations available for this signal. For
@@ -244,6 +246,17 @@ def metadata() -> pd.DataFrame:
       ``stdev_value``
         The sample standard deviation of all reported values.
 
+      ``last_update``
+        The UTC datetime for when the signal value was last updated.
+
+      ``max_issue``
+        Most recent date data was issued.
+
+      ``min_lag``
+        Smallest lag from observation to issue, in days.
+
+      ``max_lag``
+        Largest lag from observation to issue, in days.
     """
     meta = Epidata.covidcast_meta()
 
@@ -255,7 +268,7 @@ def metadata() -> pd.DataFrame:
     meta_df = pd.DataFrame.from_dict(meta["epidata"])
     meta_df["min_time"] = pd.to_datetime(meta_df["min_time"], format="%Y%m%d")
     meta_df["max_time"] = pd.to_datetime(meta_df["max_time"], format="%Y%m%d")
-
+    meta_df["last_update"] = pd.to_datetime(meta_df["last_update"], unit="s")
     return meta_df
 
 
@@ -372,10 +385,14 @@ def _fetch_single_geo(data_source: str,
                                      issues=issues_strs, lag=lag)
 
         # Two possible error conditions: no data or too much data.
-        if day_data["message"] != "success":
-            warnings.warn("Problem obtaining data on {day}: {message}".format(
-                day=day_str,
-                message=day_data["message"]))
+        if day_data["message"] == "no results":
+            warnings.warn(f"No {data_source} {signal} data found on {day_str} "
+                          f"for geography '{geo_type}'",
+                          NoDataWarning)
+        if day_data["message"] not in {"success", "no results"}:
+            warnings.warn(f"Problem obtaining {data_source} {signal} data on {day_str} "
+                          f"for geography '{geo_type}': {day_data['message']}",
+                          RuntimeWarning)
 
         # In the too-much-data case, we continue to try putting the truncated
         # data in our results. In the no-data case, skip this day entirely,

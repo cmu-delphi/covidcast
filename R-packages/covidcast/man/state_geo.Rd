@@ -5,23 +5,25 @@
 \alias{state_geo}
 \title{State latitudes and longitudes}
 \format{
-Data frame with 52 rows, each representing one state (including
-Puerto Rico and the District of Columbia). Columns:
+Data frame with 51 rows, each representing one state (including the
+District of Columbia). Columns:
 
 \describe{
-\item{STATE}{Two-letter state abbreviation.}
-\item{LAT}{Latitude of state centroid.}
-\item{LON}{Longitude of state centroid.}
-\item{NAME}{Name of state.}
+\item{x}{Longitude of state centroid.}
+\item{y}{Latitude of state centroid.}
+\item{fips}{Five-digit county FIPS code.}
+\item{abbr}{Two-letter state abbreviation.}
+\item{full}{State name.}
 }
 }
 \source{
-\url{https://developers.google.com/public-data/docs/canonical/states_csv}
+\code{usmap}
 }
 \usage{
 state_geo
 }
 \description{
-Data set on latitudes and longitudes of state centroids, from Google's DSPL.
+Data set on latitudes and longitudes of state centroids, from the \code{usmap}
+package.
 }
 \keyword{datasets}

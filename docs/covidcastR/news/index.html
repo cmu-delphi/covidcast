@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -98,6 +98,9 @@
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/correlation-utils.html">Correlation utilities</a>
+    </li>
+    <li>
+      <a href="../articles/multi-signals.html">Manipulating multiple signals</a>
     </li>
     <li>
       <a href="../articles/plotting-signals.html">Plotting and mapping signals</a>
@@ -132,13 +135,32 @@
       <small>Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="covidcast-0-3-0" class="section level1">
-<h1 class="page-header" data-toc-text="0.3.0">
-<a href="#covidcast-0-3-0" class="anchor"></a>covidcast 0.3.0</h1>
-<p>Released August 22, 2020.</p>
+    <div id="covidcast-031" class="section level1">
+<h1 class="page-header" data-toc-text="0.3.1">
+<a href="#covidcast-031" class="anchor"></a>covidcast 0.3.1</h1>
+<p>Released October 31, 2020.</p>
+<div id="breaking-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#breaking-changes" class="anchor"></a>Breaking changes</h2>
+<ul>
+<li>The <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code> function now interprets its <code>dt_x</code> and <code>dt_y</code> arguments in the opposite way as before, i.e. what was once a positive lag is now a negative lag. See the documentation for details.</li>
+</ul>
+</div>
 <div id="major-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#major-changes" class="anchor"></a>Major changes</h2>
+<ul>
+<li>The new <code><a href="../reference/covidcast_signals.html">covidcast_signals()</a></code> function allows users to query multiple signals from the API at once, returning a list of data frames. The <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> function can convert this list into a “wide” or “long” format data frame for further analysis, while <code><a href="../reference/covidcast_longer.html">covidcast_wider()</a></code> and <code><a href="../reference/covidcast_longer.html">covidcast_longer()</a></code> can convert from “long” to “wide” format and vice versa.</li>
+</ul>
+</div>
+</div>
+    <div id="covidcast-030" class="section level1">
+<h1 class="page-header" data-toc-text="0.3.0">
+<a href="#covidcast-030" class="anchor"></a>covidcast 0.3.0</h1>
+<p>Released August 22, 2020.</p>
+<div id="major-changes-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#major-changes-1" class="anchor"></a>Major changes</h2>
 <ul>
 <li><p>New <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code> function for calculating correlations between COVIDcast signals. See <code><a href="../articles/correlation-utils.html">vignette("correlation-utils")</a></code> for examples.</p></li>
 <li><p>New utility functions <code><a href="../reference/name_to_fips.html">name_to_fips()</a></code> and <code><a href="../reference/name_to_fips.html">name_to_cbsa()</a></code> to look up FIPS codes (for counties) or CBSA codes (for metropolitan statistical areas) based on the names of the counties or MSAs.</p></li>
@@ -147,13 +169,13 @@
 </ul>
 </div>
 </div>
-    <div id="covidcast-0-2-0" class="section level1">
+    <div id="covidcast-020" class="section level1">
 <h1 class="page-header" data-toc-text="0.2.0">
-<a href="#covidcast-0-2-0" class="anchor"></a>covidcast 0.2.0</h1>
+<a href="#covidcast-020" class="anchor"></a>covidcast 0.2.0</h1>
 <p>Released July 26, 2020.</p>
-<div id="major-changes-1" class="section level2">
+<div id="major-changes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#major-changes-1" class="anchor"></a>Major changes</h2>
+<a href="#major-changes-2" class="anchor"></a>Major changes</h2>
 <ul>
 <li><p><strong>Name change:</strong> The package is now called covidcast, not covidcastR. If already installed, users should remove covidcastR using <code><a href="https://rdrr.io/r/utils/remove.packages.html">remove.packages()</a></code> and then install covidcast using the instructions in <code><a href="../articles/covidcast.html">vignette("covidcast")</a></code>.</p></li>
 <li><p><strong>Incompatible change:</strong> The <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> function now takes <code>start_day</code> and <code>end_day</code> arguments as strings in the form YYYY-MM-DD, rather than YYYYMMDD, for consistency with <code><a href="https://rdrr.io/r/base/as.Date.html">as.Date()</a></code> and other common R usage. The arguments can also be passed as <code>Date</code> objects directly.</p></li>
@@ -169,9 +191,9 @@
 </ul>
 </div>
 </div>
-    <div id="covidcast-0-1-0" class="section level1">
+    <div id="covidcast-010" class="section level1">
 <h1 class="page-header" data-toc-text="0.1.0">
-<a href="#covidcast-0-1-0" class="anchor"></a>covidcast 0.1.0</h1>
+<a href="#covidcast-010" class="anchor"></a>covidcast 0.1.0</h1>
 <ul>
 <li>First major release.</li>
 </ul>
@@ -189,7 +211,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Pedrito Maynard-Zhang, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

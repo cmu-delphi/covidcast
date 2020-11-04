@@ -7,10 +7,8 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
                       dir_col = c("#6F9CC6", "#E4E4E4", "#C56B59"),
                       title = NULL, params = list()) {
   # Check that we're looking at either counties or states
-  if (!(attributes(x)$geo_type == "county" ||
-                     attributes(x)$geo_type == "state" ||
-                     attributes(x)$geo_type == "hrr" ||
-                     attributes(x)$geo_type == "msa")) {
+  if (!(attributes(x)$metadata$geo_type %in%
+        c("county", "state", "hrr", "msa"))) {
     stop("Only 'county', 'state', 'hrr' and 'msa' are supported 
          for choropleth maps.")
   }
@@ -108,9 +106,12 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   names(val) = geo
 
   # Make background layer for MSA and HRR maps which are incomplete
-  if ((attributes(x)$geo_type == "msa") |
-      (attributes(x)$geo_type == "hrr")) {
-    map_df = sf::st_read('../data/shapefiles/state/cb_2019_us_state_5m.shp')
+  if ((attributes(x)$metadata$geo_type == "msa") ||
+      (attributes(x)$metadata$geo_type == "hrr")) {
+    map_df = sf::st_read(system.file(
+                         "shapefiles/state",
+                         "cb_2019_us_state_5m.shp",
+                         package = "covidcast"))
     background_crs = sf::st_crs(map_df)
     map_df$STATEFP <- as.character(map_df$STATEFP)
     map_df$is_alaska = map_df$STATEFP == '02'
@@ -138,14 +139,11 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     hawaii_df = sf::st_set_crs(hawaii_df, 102003)
 
     alaska_centroid = sf::st_centroid(sf::st_geometry(alaska_df))
-    print('hi')
     alaska_scale = (sf::st_geometry(alaska_df) - alaska_centroid) * 0.35 + alaska_centroid
     alaska_df = sf::st_set_geometry(alaska_df, alaska_scale)
     alaska_shift = sf::st_geometry(alaska_df) + c(-2e+6, -2.6e+6)
     alaska_df = sf::st_set_geometry(alaska_df, alaska_shift)
     alaska_df = sf::st_set_crs(alaska_df, 102003)
-
-    print('hi')
 
     pr_shift = sf::st_geometry(pr_df) + c(-0.9e+6, 1e+6)
     pr_df = sf::st_set_geometry(pr_df, pr_shift)
@@ -179,10 +177,10 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     geom_args$fill = alaska_col
     geom_args$data = alaska_df
     back_alaska_layer = do.call(ggplot2::geom_sf, geom_args)
-    }
+  }
 
   # Create the choropleth colors for counties
-  if (attributes(x)$geo_type == "county") {
+  if (attributes(x)$metadata$geo_type == "county") {
     map_df = usmap::us_map("county", include = include)
     map_geo = map_df$fips
     map_col = rep(missing_col, length(map_geo))
@@ -205,7 +203,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   }
 
   # Create the choropleth colors for states
-  else if (attributes(x)$geo_type == "state") {
+  else if (attributes(x)$metadata$geo_type == "state") {
     map_df = usmap::us_map("state", include = include)
     map_geo = tolower(map_df$abbr)
     map_col = rep(missing_col, length(map_geo))
@@ -215,8 +213,11 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     map_col[map_geo %in% geo] = col_fun(val[map_obs])
   }
 
-  else if (attributes(x)$geo_type == "msa") {
-    map_df = sf::st_read('../data/shapefiles/msa/cb_2019_us_cbsa_5m.shp')
+  else if (attributes(x)$metadata$geo_type == "msa") {
+    map_df = sf::st_read(system.file(
+                         "shapefiles/msa",
+                         "cb_2019_us_cbsa_5m.shp",
+                         package = "covidcast"))
     map_df = map_df %>% filter(map_df$LSAD == 'M1') # only get metro and not micropolitan areas
     if (length(include) > 0) {
       map_df = map_df %>% filter(map_df$GEOID %in% include)
@@ -267,8 +268,11 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     pr_geo = pr_df$color
   }
 
-  else if (attributes(x)$geo_type == "hrr") {
-    map_df = sf::st_read('../data/shapefiles/hrr/geo_export_ad86cff5-e5ed-432e-9ec2-2ce8732099ee.shp')
+  else if (attributes(x)$metadata$geo_type == "hrr") {
+    map_df = sf::st_read(system.file(
+                         "shapefiles/hrr",
+                         "geo_export_ad86cff5-e5ed-432e-9ec2-2ce8732099ee.shp",
+                         package = "covidcast"))
     if (length(include) > 0) {
       map_df = map_df %>% filter(map_df$hrr_num %in% include)
     }
@@ -324,8 +328,8 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   }
 
   # Create the polygon layer 
-  if (attributes(x)$geo_type == "county" || 
-      attributes(x)$geo_type == "state") {
+  if (attributes(x)$metadata$geo_type == "county" || 
+      attributes(x)$metadata$geo_type == "state") {
     aes = ggplot2::aes
     geom_args = list()
     geom_args$color = border_col
@@ -336,8 +340,8 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     polygon_layer = do.call(ggplot2::geom_polygon, geom_args)
     coord_layer = ggplot2::coord_equal()
     }
-  else if (attributes(x)$geo_type == "msa" || 
-          attributes(x)$geo_type == "hrr") {
+  else if (attributes(x)$metadata$geo_type == "msa" || 
+          attributes(x)$metadata$geo_type == "hrr") {
     aes = ggplot2::aes
     geom_args = list()
     geom_args$color = border_col
@@ -430,8 +434,8 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
                                              guide = guide)
   }
   # Put it all together and return
-  if ((attributes(x)$geo_type == "msa") |
-      (attributes(x)$geo_type == "hrr")) {
+  if ((attributes(x)$metadata$geo_type == "msa") |
+      (attributes(x)$metadata$geo_type == "hrr")) {
     return(ggplot2::ggplot() + 
           back_main_layer + back_pr_layer + back_hawaii_layer + back_alaska_layer + 
           main_layer + pr_layer + alaska_layer + hawaii_layer + coord_layer +
@@ -449,8 +453,8 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
                        col = "purple", alpha = 0.5, num_bins = 8,
                        title = NULL, params = list()) {
   # Check that we're looking at either counties or states
-  if (!(attributes(x)$geo_type == "county" ||
-                     attributes(x)$geo_type == "state")) {
+  if (!(attributes(x)$metadata$geo_type == "county" ||
+        attributes(x)$metadata$geo_type == "state")) {
     stop("Only 'county' and 'state' are supported for bubble maps.")
   }
 
@@ -498,9 +502,9 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   # Max and min bubble sizes
   min_size = params$min_size
   max_size = params$max_size
-  if (is.null(min_size)) min_size = ifelse(attributes(x)$geo_type == "county",
+  if (is.null(min_size)) min_size = ifelse(attributes(x)$metadata$geo_type == "county",
                                            0.1, 1)
-  if (is.null(max_size)) max_size = ifelse(attributes(x)$geo_type == "county",
+  if (is.null(max_size)) max_size = ifelse(attributes(x)$metadata$geo_type == "county",
                                            4, 12)
 
   # Bubble sizes. Important note the way we set sizes later, via
@@ -535,13 +539,13 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   names(val) = geo
 
   # Grap the map data frame for counties
-  if (attributes(x)$geo_type == "county") {
+  if (attributes(x)$metadata$geo_type == "county") {
     map_df = usmap::us_map("county", include = include)
     map_geo = map_df$fips
   }
 
   # Grap the map data frame for states
-  else if (attributes(x)$geo_type == "state") {
+  else if (attributes(x)$metadata$geo_type == "state") {
     map_df = usmap::us_map("state", include = include)
     map_geo = tolower(map_df$abbr)
   }
@@ -568,12 +572,12 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 
   # Retrieve coordinates for mapping
   # Reading from usmap files to ensure consistency with borders
-  if (attributes(x)$geo_type == "county") {
+  if (attributes(x)$metadata$geo_type == "county") {
     centroids = county_geo[county_geo$fips %in% map_geo, ]
     cur_geo = centroids$fips
     cur_val = rep(NA, length(cur_geo))
   }
-  else if (attributes(x)$geo_type == "state") {
+  else if (attributes(x)$metadata$geo_type == "state") {
     centroids = state_geo
     centroids$abbr = tolower(centroids$abbr)
     centroids = centroids[centroids$abbr %in% map_geo, ]

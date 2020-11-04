@@ -195,6 +195,30 @@ def signal(data_source: str,
     return out
 
 
+def signals(data_source: Union[str, List[str]],
+            signals: Union[str, List[str]],  # pylint: disable=W0621
+            start_day: Union[date, List[date]] = None,
+            end_day: Union[date, List[date]] = None,
+            geo_type: str = "county",
+            geo_values: Union[str, Iterable[str]] = "*",
+            as_of: date = None,
+            issues: Union[date, Tuple[date], List[date]] = None,
+            lag: int = None) -> List[pd.DataFrame]:
+    input_params = [i for i in [data_source, signals, start_day, end_day] if isinstance(i, list)]
+    len_args = 1 if not input_params else len(input_params[0])
+    if not all(len(i) == len_args for i in input_params):
+        raise ValueError("Input data_source, signal, start_day, and end_day must be single values "
+                         "or the same length.")
+    data_source = data_source if isinstance(data_source, list) else [data_source]*len_args
+    signals = signals if isinstance(signals, list) else [signals]*len_args
+    start_day = start_day if isinstance(start_day, list) else [start_day]*len_args
+    end_day = end_day if isinstance(end_day, list) else [end_day]*len_args
+    output = []
+    for source, sig, start, end in zip(data_source, signals, start_day, end_day):
+        output.append(signal(source, sig, start, end, geo_type, geo_values, as_of, issues, lag))
+    return output
+
+
 def metadata() -> pd.DataFrame:
     """Fetch COVIDcast surveillance stream metadata.
 

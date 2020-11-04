@@ -1,6 +1,6 @@
 import warnings
 from datetime import date, datetime
-from unittest.mock import patch
+from unittest.mock import patch, call
 
 # Force tests to use a specific backend, so they reproduce across platforms
 import matplotlib
@@ -72,6 +72,29 @@ def test_signal(mock_covidcast, mock_metadata):
     with pytest.raises(ValueError):
         covidcast.signal("source", "signal", geo_type="state",
                          start_day=date(2020, 4, 2), end_day=date(2020, 4, 1))
+
+
+@patch("covidcast.covidcast.signal")
+def test_signals(signal):
+    signal.return_value = None
+
+    # test two sources
+    output = covidcast.signals(["1", "2"], "signal")
+    calls = [call("1", "signal", None, None, "county", "*", None, None, None),
+             call("2", "signal", None, None, "county", "*", None, None, None)]
+    signal.assert_has_calls(calls)
+    assert output == [None]*2
+
+    # test two sources and two start days
+    output = covidcast.signals(["1", "2"], "signal", [date(2020, 1, 1), date(2020, 1, 2)])
+    calls = [call("1", "signal", date(2020, 1, 1), None, "county", "*", None, None, None),
+             call("2", "signal", date(2020, 1, 2), None, "county", "*", None, None, None)]
+    signal.assert_has_calls(calls)
+    assert output == [None]*2
+
+    # test error if improper input args
+    with pytest.raises(ValueError):
+        covidcast.signals(["1", "2"], ["a", "b", "c"])
 
 
 @patch("delphi_epidata.Epidata.covidcast_meta")

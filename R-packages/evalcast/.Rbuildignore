@@ -1,4 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^man-roxygen
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
 ^data-raw$

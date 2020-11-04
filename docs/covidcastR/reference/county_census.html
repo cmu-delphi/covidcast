@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -99,6 +99,9 @@
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/correlation-utils.html">Correlation utilities</a>
+    </li>
+    <li>
+      <a href="../articles/multi-signals.html">Manipulating multiple signals</a>
     </li>
     <li>
       <a href="../articles/plotting-signals.html">Plotting and mapping signals</a>
@@ -146,7 +149,7 @@
     <p>A data frame with 3193 rows, one for each county (along with the 50
 states and DC). There are many columns. The most crucial are:</p>
 <dl>
-<dt>FIPS</dt><dd><p>5-digit county FIPS codes. These are unique identifiers
+<dt>FIPS</dt><dd><p>Five-digit county FIPS codes. These are unique identifiers
 used, for example, as the <code>geo_values</code> argument to <code><a href='covidcast_signal.html'>covidcast_signal()</a></code> to
 request data from a specific county.</p></dd>
 <dt>CTYNAME</dt><dd><p>County name, to help find counties by name.</p></dd>
@@ -176,7 +179,7 @@ July 1, 2019.</p></dd>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Pedrito Maynard-Zhang, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

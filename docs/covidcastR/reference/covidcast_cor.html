@@ -40,10 +40,10 @@
 
 
 <meta property="og:title" content="Compute correlations between two covidcast_signal data frames — covidcast_cor" />
-<meta property="og:description" content="Computes correlations between two covidcast_signal() data frames, allowing
-for slicing by geo location, or by time. (The latest issue from each data
-frame is used when computing correlations.) See
-vignette(&quot;correlation-utils&quot;) for examples." />
+<meta property="og:description" content="Computes correlations between two covidcast_signal data frames, allowing
+for slicing by geo location, or by time. (Only the latest issue from each
+data frame are used for correlations.) See the correlations vignette
+for examples." />
 
 
 
@@ -75,7 +75,7 @@ vignette(&quot;correlation-utils&quot;) for examples." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -102,6 +102,9 @@ vignette(&quot;correlation-utils&quot;) for examples." />
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/correlation-utils.html">Correlation utilities</a>
+    </li>
+    <li>
+      <a href="../articles/multi-signals.html">Manipulating multiple signals</a>
     </li>
     <li>
       <a href="../articles/plotting-signals.html">Plotting and mapping signals</a>
@@ -138,10 +141,10 @@ vignette(&quot;correlation-utils&quot;) for examples." />
     </div>
 
     <div class="ref-description">
-    <p>Computes correlations between two <code><a href='covidcast_signal.html'>covidcast_signal()</a></code> data frames, allowing
-for slicing by geo location, or by time. (The latest issue from each data
-frame is used when computing correlations.) See
-<code><a href='../articles/correlation-utils.html'>vignette("correlation-utils")</a></code> for examples.</p>
+    <p>Computes correlations between two <code>covidcast_signal</code> data frames, allowing
+for slicing by geo location, or by time. (Only the latest issue from each
+data frame are used for correlations.) See the <a href='https://cmu-delphi.github.io/covidcast/covidcastR/articles/correlation-utils.html'>correlations vignette</a>
+for examples.</p>
     </div>
 
     <pre class="usage"><span class='fu'>covidcast_cor</span><span class='op'>(</span>
@@ -164,10 +167,11 @@ frame is used when computing correlations.) See
     <tr>
       <th>dt_x, dt_y</th>
       <td><p>Time shifts to consider for <code>x</code> and <code>y</code>, respectively,
-before computing correlations. These must both be nonnegative, and only one
-can be positive. If <code>dt_x = 1</code>, for example, then data for <code>x</code> is shifted
-forward 1 day in time (so, data on June 1 becomes data on June 2, and so
-on). Default is 0 for both.</p></td>
+before computing correlations. Negative shifts translate into in a lag
+value and positive shifts into a lead value; for example, if <code>dt = -1</code>,
+then the new value on June 2 is the original value on June 1; if <code>dt = 1</code>,
+then the new value on June 2 is the original value on June 3; if <code>dt = 0</code>,
+then the values are left as is. Default is 0 for both <code>dt_x</code> and <code>dt_y</code>.</p></td>
     </tr>
     <tr>
       <th>by</th>
@@ -201,7 +205,7 @@ on <code>by</code>), and second column <code>value</code>, which gives the corre
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Pedrito Maynard-Zhang, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

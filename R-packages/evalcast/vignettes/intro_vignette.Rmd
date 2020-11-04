@@ -115,7 +115,7 @@ plot_calibration(scorecards_cmu[[1]], type = "wedge")
 plot_calibration(scorecards_cmu[[1]], type = "traditional")
 plot_coverage(list(scorecards_yyg[[1]],
                   scorecards_cmu[[1]]))
-plot_width(scorecards_cmu[[1]])
+plot_width(scorecards_cmu)
 ```
 
 

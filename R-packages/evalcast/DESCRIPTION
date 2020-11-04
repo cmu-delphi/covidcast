@@ -57,9 +57,12 @@ Imports:
     readr,
     MMWRweek,
     zoo,
+    rlang,
     rvest,
     xml2,
-    rlang,
-    ggplot2
+    ggplot2,
+    memoise
 Suggests: 
     testthat
+Depends: 
+    R (>= 3.5.0)

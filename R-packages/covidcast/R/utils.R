@@ -10,15 +10,16 @@
 #' @importFrom rlang .data
 #' @keywords internal
 latest_issue <- function(df) {
-  # Preserve the attributes, since grouping overwrites them
+  # Save the attributes, since grouping overwrites them
   attrs <- attributes(df)
+  attrs <- attrs[!(names(attrs) %in% c("row.names", "names"))]
 
   df <- df %>%
     dplyr::group_by(.data$geo_value, .data$time_value) %>%
     dplyr::filter(.data$issue == max(.data$issue)) %>%
     dplyr::ungroup()
 
-  attributes(df) <- attrs
+  attributes(df) <- c(attributes(df), attrs)
 
   return(df)
 }
@@ -35,15 +36,16 @@ latest_issue <- function(df) {
 #' @importFrom rlang .data
 #' @keywords internal
 earliest_issue <- function(df) {
-  # Preserve the attributes, since grouping overwrites them
+  # Save the attributes, since grouping overwrites them
   attrs <- attributes(df)
+  attrs <- attrs[!(names(attrs) %in% c("row.names", "names"))]
 
   df <- df %>%
     dplyr::group_by(.data$geo_value, .data$time_value) %>%
     dplyr::filter(.data$issue == min(.data$issue)) %>%
     dplyr::ungroup()
 
-  attributes(df) <- attrs
+  attributes(df) <- c(attributes(df), attrs)
 
   return(df)
 }
@@ -337,8 +339,9 @@ grep_lookup = function(key, keys, values, ignore.case = FALSE, perl = FALSE,
 
   # Otherwise, format into a vector, and warn if needed
   if (length(unlist(res)) > length(key)) {
-    warning("Some inputs were not uniquely matched; returning only the first ",
-            "match in each case.")
+    warn(paste("Some inputs were not uniquely matched; returning only the",
+               "first match in each case."),
+         res = res, key = key, class = "grep_lookup_nonunique_match")
   }
   return(sapply(res, `[`, 1))
 }

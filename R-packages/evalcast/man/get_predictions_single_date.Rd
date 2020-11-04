@@ -13,6 +13,7 @@ get_predictions_single_date(
   ahead,
   geo_type,
   geo_values,
+  apply_corrections,
   ...
 )
 }
@@ -58,6 +59,11 @@ it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahea
 
 \item{geo_values}{Vector or list of locations whose data will be passed to
 \code{forecaster}. The default, "*", fetches all that is available in the API.}
+
+\item{apply_corrections}{an optional function that applies data corrections
+to the signals. Input is a data frame as returned by \code{download_signals()}.
+The returned object must be the same but with additional variables.
+Corrected values must exist in the column \code{corrected}.}
 
 \item{...}{Additional arguments to be passed to \code{forecaster()}.}
 }

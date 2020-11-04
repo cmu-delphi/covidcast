@@ -13,6 +13,7 @@ get_predictions(
   ahead,
   geo_type,
   geo_values = "*",
+  apply_corrections = NULL,
   ...
 )
 }
@@ -58,6 +59,11 @@ it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahea
 \item{geo_values}{Vector or list of locations whose data will be passed to
 \code{forecaster}. The default, "*", fetches all that is available in the API.}
 
+\item{apply_corrections}{an optional function that applies data corrections
+to the signals. Input is a data frame as returned by \code{download_signals()}.
+The returned object must be the same but with additional variables.
+Corrected values must exist in the column \code{corrected}.}
+
 \item{...}{Additional arguments to be passed to \code{forecaster()}.}
 }
 \value{
@@ -83,4 +89,24 @@ distributions of a given forecaster for a given forecast task. A forecast
 task is specified by the forecast date, ahead, response, incidence period,
 and geo type (e.g., 1-epiweek-ahead death forecasting at the state level with
 predictions made using the information as of September 14).
+}
+\examples{
+baby_predictions = get_predictions(
+  baseline_forecaster, "baby",
+  tibble::tibble(
+    data_source=c("jhu-csse", "usa-facts"),
+    signal = c("deaths_incidence_num","confirmed_incidence_num"),
+    start_day=lubridate::ymd("2020-09-15")),
+  lubridate::ymd("2020-10-01"),"epiweek", 1:4, "state", "mi")
+
+baby_correct <- function(x) dplyr::mutate(x, corrected = 2*value)
+
+baby_corrected = get_predictions(
+  baseline_forecaster, "baby",
+  tibble::tibble(
+    data_source=c("jhu-csse", "usa-facts"),
+    signal = c("deaths_incidence_num","confirmed_incidence_num"),
+    start_day=lubridate::ymd("2020-09-15")),
+  lubridate::ymd("2020-10-01"),"epiweek", 1L, "state", "mi",
+  apply_corrections = baby_correct)
 }

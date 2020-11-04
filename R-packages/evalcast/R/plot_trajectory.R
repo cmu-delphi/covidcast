@@ -1,4 +1,3 @@
-
 #' Produce trajectory plots of forecasts and observed data
 #'
 #' @param list_of_predictions_cards collection of prediction cards as returned 
@@ -32,8 +31,7 @@ plot_trajectory <- function(list_of_predictions_cards,
                             nrow = 6,
                             ncol = 4,  
                             page_facet = 1，
-                            cutoff = 52)
-{
+                            cutoff = 52){
   # make sure predictions cards are for the same forecasting task (except ahead, and forecast_date)
   response <- unique_attr(list_of_predictions_cards,"signals")
   incidence_period <- unique_attr(list_of_predictions_cards,"incidence_period")
@@ -41,26 +39,28 @@ plot_trajectory <- function(list_of_predictions_cards,
   assertthat::assert_that(incidence_period %in% c("day","epiweek"))
   assertthat::assert_that(geo_type %in% c("county","state"))
   
-  # predicted quantiles to plot
-  plot_probs <- c(.5 - (1 - alpha)/2,.5,.5 + (1 - alpha)/2 )
   
-  preds_df <- list_of_predictions_cards %>% purrr::map_dfr(function(predictions_card){
-      fcast_date = attributes(predictions_card)$forecast_date
+  # predicted quantiles to plot
+  plot_probs <- c(.5 - (1-alpha)/2, .5, .5 + (1-alpha)/2)
+  
+  preds_df <- list_of_predictions_cards %>% 
+                purrr::map_dfr(function(predictions_card) {
+                  fcast_date = attributes(predictions_card)$forecast_date
       
-      predictions_card %>%
-        tidyr::unnest(.data$forecast_distribution) %>%
-        dplyr::mutate(forecaster_name = attributes(predictions_card)$name_of_forecaster,
+                  predictions_card %>%
+                    tidyr::unnest(.data$forecast_distribution) %>%
+                    dplyr::mutate(
+                      forecaster_name = attributes(predictions_card)$name_of_forecaster,
                       ahead = attributes(predictions_card)$ahead,
                       prob_type = dplyr::case_when(
-                                                   abs(probs - plot_probs[1]) <= 1e-8 ~ "lower",
-                                                   abs(probs - plot_probs[2]) <= 1e-8 ~ "point",
-                                                   abs(probs - plot_probs[3]) <= 1e-8 ~ "upper")
-                      ) %>%
-        filter(!is.na(.data$prob_type)) %>%
-        dplyr::mutate(target_period = get_target_period_num(fcast_date,.data$ahead,incidence_period)) %>%
-        dplyr::select(.data$location,.data$quantiles,.data$forecaster_name,.data$prob_type,.data$target_period) %>%
-        tidyr::pivot_wider(values_from = .data$quantiles,names_from = .data$prob_type)
-    })
+                        abs(probs - plot_probs[1]) <= 1e-8 ~ "lower",
+                        abs(probs - plot_probs[2]) <= 1e-8 ~ "point",
+                        abs(probs - plot_probs[3]) <= 1e-8 ~ "upper")) %>%
+                    filter(!is.na(.data$prob_type)) %>%
+                    dplyr::mutate(target_period = get_target_period_num(fcast_date,.data$ahead,incidence_period)) %>%
+                    dplyr::select(.data$location,.data$quantiles,.data$forecaster_name,.data$prob_type,.data$target_period) %>%
+                    tidyr::pivot_wider(values_from = .data$quantiles,names_from = .data$prob_type)
+                })
   
   # ground truth to plot
   if(incidence_period == "day") {
@@ -71,12 +71,12 @@ plot_trajectory <- function(list_of_predictions_cards,
                                    geo_type = geo_type) %>%
       dplyr::select(.data$location, .data$time_value, .data$value) %>%
       dplyr::rename(reference_period = .data$time_value) %>%
-      dplyr::filter(location %in% preds_df$location) }
-    
-  else {
+      dplyr::filter(location %in% preds_df$location) 
+  } else {
     # avoid summing over partial epiweeks
     date_range <- covidcast::covidcast_meta() %>% 
-      dplyr::filter(data_source == response$data_source & signal == response$signal & geo_type == !!geo_type) %>%
+      dplyr::filter(data_source == "usa-facts" & signal == response$signal & geo_type == !!geo_type) %>%
+      #dplyr::filter(data_source == response$data_source & signal == response$signal & geo_type == !!geo_type) %>%
       dplyr::select(min_time,max_time)
     
     sunday_following_first_day <- shift_day_to_following_xxxday(max(ymd(date_range$min_time,first_day)),xxx = 1)
@@ -84,7 +84,7 @@ plot_trajectory <- function(list_of_predictions_cards,
     assertthat::assert_that(sunday_following_first_day < saturday_preceding_last_day,
                             msg = "Pick first and last day to span at least one full epiweek.")
     
-    response_df <- download_signal(data_source = response$data_source,
+    response_df <- download_signal(data_source = "usa-facts",#response$data_source,
                                    signal = response$signal,
                                    start_day = sunday_following_first_day,
                                    end_day = saturday_preceding_last_day,
@@ -101,8 +101,7 @@ plot_trajectory <- function(list_of_predictions_cards,
   preds_df <- dplyr::rename(preds_df, reference_period = target_period) %>% 
               dplyr::mutate(location_abbr = if(geo_type == "state") {
                                                  covidcast::fips_to_abbr(paste0(location,"000")) 
-                                              }
-                                            else {
+                                              } else {
                                                  covidcast::fips_to_name(location)
                                               } 
                              ) %>% 
@@ -112,8 +111,7 @@ plot_trajectory <- function(list_of_predictions_cards,
   response_df <- response_df %>% 
                  dplyr::mutate(location_abbr = if(geo_type == "state") {
                                                   covidcast::fips_to_abbr(paste0(location,"000")) 
-                                               }
-                                               else {
+                                               } else {
                                                   covidcast::fips_to_name(location) 
                                                }
                                ) %>% 
@@ -156,19 +154,20 @@ plot_trajectory <- function(list_of_predictions_cards,
   # Facetting. The default cutoff is 52, and plots that exceed 52 facets will be paginated.
   if (nfacets <= cutoff) {
     print(p + ggplot2::facet_wrap(~.data$location_abbr, scales = "free", ncol = 6, nrow=NULL))
-  } 
-  else { 
+  } else { 
     for (i in 1: page_facet){
-      print(p + ggforce::facet_wrap_paginate(~.data$location_abbr, scales = "free_y", 
-                                             ncol = ncol, nrow=nrow,page=i)) }
-  } 
-  
+      print(
+        p + ggforce::facet_wrap_paginate(
+          ~.data$location_abbr, scales = "free_y", ncol = ncol, nrow=nrow,page=i
+        )
+      ) 
+    }
+  }
 }
 
 
 
-sum_to_epiweek <- function(daily_df)
-{
+sum_to_epiweek <- function(daily_df){
   daily_df %>%
     mutate(epiweek = MMWRweek::MMWRweek(time_value)$MMWRweek) %>%
     select(-.data$time_value) %>%
@@ -177,30 +176,27 @@ sum_to_epiweek <- function(daily_df)
     ungroup()
 }
 
-shift_day_to_preceding_xxxday <- function(day,xxx)
-{
+shift_day_to_preceding_xxxday <- function(day,xxx){
   ew_day <- MMWRweek::MMWRweek(day)
   if(ew_day$MMWRday < xxx)
   {
     MMWRweek::MMWRweek2Date(MMWRyear = ew_day$MMWRyear, MMWRweek = ew_day$MMWRweek, MMWRday = xxx) - 7
-  } else{
+  } else {
     MMWRweek::MMWRweek2Date(MMWRyear = ew_day$MMWRyear, MMWRweek = ew_day$MMWRweek, MMWRday = xxx)
   }
 }
 
-shift_day_to_following_xxxday <- function(day,xxx)
-{
+shift_day_to_following_xxxday <- function(day,xxx){
   ew_day <- MMWRweek::MMWRweek(day)
   if(ew_day$MMWRday > xxx)
   {
     MMWRweek::MMWRweek2Date(MMWRyear = ew_day$MMWRyear, MMWRweek = ew_day$MMWRweek, MMWRday = xxx) + 7
-  } else{
+  } else {
     MMWRweek::MMWRweek2Date(MMWRyear = ew_day$MMWRyear, MMWRweek = ew_day$MMWRweek, MMWRday = xxx)
   }
 }
 
-get_target_period_num <- function(forecast_date,ahead,incidence_period)
-{
+get_target_period_num <- function(forecast_date,ahead,incidence_period){
   assertthat::assert_that(
     incidence_period %in% c("day","epiweek"), 
     msg = "Incidence period must be one of day or epiweek."

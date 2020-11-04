@@ -131,11 +131,11 @@ plot_trajectory <- function(list_of_predictions_cards,
                      size = 1) + 
        geom_point(aes(y = .data$point,
                       col = .data$forecaster_name, 
-                      group =. data$forecast_date)) +
+                      group = .data$forecast_date)) +
        geom_ribbon(aes(ymin = .data$lower,
                        ymax = .data$upper,
                        fill = .data$forecaster_name,
-                       group =. data$forecast_date),
+                       group = .data$forecast_date),
                        alpha = .1,
                        colour = NA,
                        show.legend = FALSE) + 

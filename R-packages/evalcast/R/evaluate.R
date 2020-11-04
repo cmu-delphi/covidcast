@@ -66,7 +66,7 @@ evaluate_predictions <- function(
   unique_ahead <- unique(ahead)
   scorecards <- list()
   for (i in seq_along(unique_ahead)) {
-    cat("ahead =", unique_ahead[i], fill = TRUE)
+    message("ahead = ", unique_ahead[i])
     scorecards[[i]] <- evaluate_predictions_single_ahead(
       predictions_cards = predictions_cards[ahead == unique_ahead[i]],
       err_measures = err_measures,

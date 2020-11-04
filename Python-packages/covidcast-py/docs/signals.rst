@@ -12,8 +12,11 @@ Pandas data frame. Detailed examples are provided in the :ref:`usage examples
 
 Sometimes you would like to work with multiple signals -- for example, to obtain
 several signals at every location, as part of building models of features at
-each location. For convenience, the package provides a function to produce a
+each location. For convenience, the package provides a function to retrieve multiple
+signals in a list and a function to take a list of signals and produce a
 single data frame containing multiple signals at each location.
+
+.. autofunction:: covidcast.signals
 
 .. autofunction:: covidcast.aggregate_signals
 

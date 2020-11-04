@@ -108,7 +108,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   names(val) = geo
 
   # Make background layer for MSA and HRR maps which are incomplete
-  if ((attributes(x)$geo_type == "msa") |
+  if ((attributes(x)$geo_type == "msa") ||
       (attributes(x)$geo_type == "hrr")) {
     map_df = sf::st_read('../data/shapefiles/state/cb_2019_us_state_5m.shp')
     background_crs = sf::st_crs(map_df)

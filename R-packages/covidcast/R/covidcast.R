@@ -159,7 +159,6 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 #'     [`state_census`]
 #' @export
 #' @importFrom rlang abort
-#' @importFrom rlang warn
 #' @importFrom dplyr %>%
 covidcast_signal <- function(data_source, signal,
                              start_day = NULL, end_day = NULL,

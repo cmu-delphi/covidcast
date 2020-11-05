@@ -501,17 +501,17 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
                     nrow(dat[[i]]$epidata)))
     if (dat[[i]]$message == "success") {
       returned_geo_values <- dat[[i]]$epidata$geo_value
-      missed_geos <- setdiff(tolower(geo_value), tolower(returned_geo_values))
+      missed_geos <- setdiff(tolower(geo_value), 
+                             c(tolower(returned_geo_values), "*"))
       if (length(missed_geos) > 0) {
         missed_geos_str <- paste0(missed_geos, collapse = ", ")
-        warn(message =
-               sprintf("Data not fetched for some geographies on %s: %s",
+        warn(sprintf("Data not fetched for some geographies on %s: %s",
                        query_day, missed_geos_str),
              data_source = data_source,
              signal = signal,
              day = query_day,
              geo_value = geo_value,
-             msg = dat[[i]]$message,
+             api_msg = dat[[i]]$message,
              class = "covidcast_missing_geo_values"
              )
       }
@@ -523,7 +523,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
            signal = signal,
            day = query_day,
            geo_value = geo_value,
-           msg = dat[[i]]$message,
+           api_msg = dat[[i]]$message,
            class = "covidcast_fetch_failed")
     }
   }

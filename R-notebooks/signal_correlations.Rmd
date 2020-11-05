@@ -118,7 +118,7 @@ distribution for each signal.
 for (i in 1:length(signals)) {
   df_cor[[i]]$time_value = start_day
   df_cor[[i]]$issue = start_day
-  attributes(df_cor[[i]])$geo_type = "county"
+  attributes(df_cor[[i]])$metadata$geo_type = "county"
   class(df_cor[[i]]) = c("covidcast_signal", "data.frame")
   
   print(plot(df_cor[[i]], range = c(-1, 1), choro_col = cm.colors(10),

@@ -501,7 +501,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
                     nrow(dat[[i]]$epidata)))
     if (dat[[i]]$message == "success") {
       returned_geo_values <- dat[[i]]$epidata$geo_value
-      if (!identical("*", geo_value)){
+      if (!identical("*", geo_value)) {
         missed_geos <- setdiff(tolower(geo_value), 
                                tolower(returned_geo_values))
         if (length(missed_geos) > 0) {

@@ -494,11 +494,16 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
                           as_of = as_of,
                           issues = issues,
                           lag = lag)
-    message(sprintf("Fetched day %s: %s, %s, num_entries = %s",
-                    query_day,
-                    dat[[i]]$result,
-                    dat[[i]]$message,
-                    nrow(dat[[i]]$epidata)))
+    summary <- sprintf(
+      "Fetched day %s: %s, %s, num_entries = %s",
+      query_day,
+      dat[[i]]$result,
+      dat[[i]]$message,
+      nrow(dat[[i]]$epidata)
+    )
+    if (length(summary) != 0) {
+      message(summary)
+    }
     if (dat[[i]]$message == "success") {
       returned_geo_values <- dat[[i]]$epidata$geo_value
       missed_geos <- setdiff(tolower(geo_value), tolower(returned_geo_values))

@@ -15,4 +15,5 @@ Functions:
 from .covidcast import signal, metadata, aggregate_signals
 from .plotting import plot, plot_choropleth, get_geo_df, animate
 from .geography import (fips_to_name, cbsa_to_name, abbr_to_name,
-                        name_to_abbr, name_to_cbsa, name_to_fips)
+                        name_to_abbr, name_to_cbsa, name_to_fips,
+                        fips_to_abbr, abbr_to_fips)

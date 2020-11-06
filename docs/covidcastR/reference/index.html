@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -98,6 +98,9 @@
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/correlation-utils.html">Correlation utilities</a>
+    </li>
+    <li>
+      <a href="../articles/multi-signals.html">Manipulating multiple signals</a>
     </li>
     <li>
       <a href="../articles/plotting-signals.html">Plotting and mapping signals</a>
@@ -142,8 +145,8 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
+          <h2 id="section-fetch-data" class="hasAnchor"><a href="#section-fetch-data" class="anchor"></a>Fetch data</h2>
+          <p class="section-desc"><p>Fetch signals and metadata from the COVIDcast API</p></p>
         </th>
       </tr>
       
@@ -154,10 +157,158 @@
       <tr>
         
         <td>
+          <p><code><a href="covidcast_signal.html">covidcast_signal()</a></code> </p>
+        </td>
+        <td><p>Obtain a data frame for one COVIDcast signal</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="covidcast_signals.html">covidcast_signals()</a></code> </p>
+        </td>
+        <td><p>Obtain multiple COVIDcast signals at once</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="covidcast_meta.html">covidcast_meta()</a></code> </p>
+        </td>
+        <td><p>Obtain COVIDcast metadata</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-plot-and-summarize-data" class="hasAnchor"><a href="#section-plot-and-summarize-data" class="anchor"></a>Plot and summarize data</h2>
+          <p class="section-desc"><p>Plot and summarize COVIDcast signals and metadata</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="plot.covidcast_signal.html">plot(<i>&lt;covidcast_signal&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Plot <code>covidcast_signal</code> object</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="print.covidcast_signal.html">print(<i>&lt;covidcast_signal&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Print <code>covidcast_signal</code> object</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="print.covidcast_meta.html">print(<i>&lt;covidcast_meta&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Print <code>covidcast_meta</code> object</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="summary.covidcast_signal.html">summary(<i>&lt;covidcast_signal&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Summarize <code>covidcast_signal</code> object</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="summary.covidcast_meta.html">summary(<i>&lt;covidcast_meta&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Summarize <code>covidcast_meta</code> object</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-wrangle-and-correlate-multiple-signals" class="hasAnchor"><a href="#section-wrangle-and-correlate-multiple-signals" class="anchor"></a>Wrangle and correlate multiple signals</h2>
+          <p class="section-desc"><p>Calculate correlations, aggregate signals, and move between aggregated data formats</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="covidcast_cor.html">covidcast_cor()</a></code> </p>
+        </td>
+        <td><p>Compute correlations between two <code>covidcast_signal</code> data frames</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="aggregate_signals.html">aggregate_signals()</a></code> </p>
+        </td>
+        <td><p>Aggregate <code>covidcast_signal</code> objects into one data frame</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="covidcast_longer.html">covidcast_longer()</a></code> <code><a href="covidcast_longer.html">covidcast_wider()</a></code> </p>
+        </td>
+        <td><p>Pivot aggregated signals between "wide" and "long" formats</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-geographic-utilities" class="hasAnchor"><a href="#section-geographic-utilities" class="anchor"></a>Geographic utilities</h2>
+          <p class="section-desc"><p>Manipulate geographic IDs like FIPS codes and CBSAs</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="fips_to_name.html">fips_to_name()</a></code> <code><a href="fips_to_name.html">cbsa_to_name()</a></code> </p>
+        </td>
+        <td><p>Get county or metropolitan area names from FIPS or CBSA codes</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="name_to_fips.html">name_to_fips()</a></code> <code><a href="name_to_fips.html">name_to_cbsa()</a></code> </p>
+        </td>
+        <td><p>Get FIPS or CBSA codes from county or metropolitan area names</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="abbr_to_fips.html">abbr_to_fips()</a></code> </p>
+        </td>
+        <td><p>Get FIPS codes from state abbreviations</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="abbr_to_name.html">abbr_to_name()</a></code> </p>
         </td>
         <td><p>Get state names from state abbreviations</p></td>
       </tr><tr>
+        
+        <td>
+          <p><code><a href="fips_to_abbr.html">fips_to_abbr()</a></code> </p>
+        </td>
+        <td><p>Get state abbreviations from FIPS codes</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="name_to_abbr.html">name_to_abbr()</a></code> </p>
+        </td>
+        <td><p>Get state abbreviations from state names</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-geographic-data" class="hasAnchor"><a href="#section-geographic-data" class="anchor"></a>Geographic data</h2>
+          <p class="section-desc"><p>Get Census reference and geographic data</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
         
         <td>
           <p><code><a href="county_census.html">county_census</a></code> </p>
@@ -172,63 +323,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="covidcast_cor.html">covidcast_cor()</a></code> </p>
-        </td>
-        <td><p>Compute correlations between two <code>covidcast_signal</code> data frames</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="covidcast_meta.html">covidcast_meta()</a></code> </p>
-        </td>
-        <td><p>Fetch Delphi's COVID-19 Surveillance Streams metadata.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="covidcast_signal.html">covidcast_signal()</a></code> </p>
-        </td>
-        <td><p>Produce a data frame for one signal.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="fips_to_name.html">fips_to_name()</a></code> <code><a href="fips_to_name.html">cbsa_to_name()</a></code> </p>
-        </td>
-        <td><p>Get county or metropolitan area names from FIPS or CBSA codes</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="msa_census.html">msa_census</a></code> </p>
         </td>
         <td><p>Metro area population data</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="name_to_abbr.html">name_to_abbr()</a></code> </p>
-        </td>
-        <td><p>Get state abbreviations from state names</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="name_to_fips.html">name_to_fips()</a></code> <code><a href="name_to_fips.html">name_to_cbsa()</a></code> </p>
-        </td>
-        <td><p>Get FIPS or CBSA codes from county or metropolitan area names</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plot.covidcast_signal.html">plot(<i>&lt;covidcast_signal&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Plot <code>covidcast_signal</code> objects</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="print.covidcast_meta.html">print(<i>&lt;covidcast_meta&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Print <code>covidcast_meta</code> object</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="print.covidcast_signal.html">print(<i>&lt;covidcast_signal&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Print <code>covidcast_signal</code> objects</p></td>
       </tr><tr>
         
         <td>
@@ -241,18 +338,6 @@
           <p><code><a href="state_geo.html">state_geo</a></code> </p>
         </td>
         <td><p>State latitudes and longitudes</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="summary.covidcast_meta.html">summary(<i>&lt;covidcast_meta&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Summarize <code>covidcast_meta</code> object</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="summary.covidcast_signal.html">summary(<i>&lt;covidcast_signal&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Summarize <code>covidcast_signal</code> objects</p></td>
       </tr>
     </tbody>
     </table>
@@ -268,7 +353,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Pedrito Maynard-Zhang, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

@@ -1,3 +1,3 @@
+wheel
 sphinx
 sphinx-autodoc-typehints
-wheel

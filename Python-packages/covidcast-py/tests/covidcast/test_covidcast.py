@@ -77,19 +77,21 @@ def test_signal(mock_covidcast, mock_metadata):
 @patch("delphi_epidata.Epidata.covidcast_meta")
 def test_metadata(mock_covidcast_meta):
     # not generating full DF since most attributes used
-    mock_covidcast_meta.side_effect = [{"result": 1,  # successful API response
-                                        "epidata": [{"max_time": 20200622, "min_time": 20200421},
-                                                    {"max_time": 20200724, "min_time": 20200512}],
-                                        "message": "success"},
-                                       {"result": 0,  # unsuccessful API response
-                                        "epidata": [{"max_time": 20200622, "min_time": 20200421},
-                                                    {"max_time": 20200724, "min_time": 20200512}],
-                                        "message": "error: failed"}]
-
+    mock_covidcast_meta.side_effect = [
+        {"result": 1,  # successful API response
+         "epidata": [{"max_time": 20200622, "min_time": 20200421, "last_update": 12345},
+                     {"max_time": 20200724, "min_time": 20200512, "last_update": 99999}],
+         "message": "success"},
+        {"result": 0,  # unsuccessful API response
+         "epidata": [{"max_time": 20200622, "min_time": 20200421},
+                     {"max_time": 20200724, "min_time": 20200512}],
+         "message": "error: failed"}]
     # test happy path
     response = covidcast.metadata()
-    expected = pd.DataFrame({"max_time": [datetime(2020, 6, 22), datetime(2020, 7, 24)],
-                             "min_time": [datetime(2020, 4, 21), datetime(2020, 5, 12)]})
+    expected = pd.DataFrame({
+        "max_time": [datetime(2020, 6, 22), datetime(2020, 7, 24)],
+        "min_time": [datetime(2020, 4, 21), datetime(2020, 5, 12)],
+        "last_update": [datetime(1970, 1, 1, 3, 25, 45), datetime(1970, 1, 2, 3, 46, 39)]})
     assert sort_df(response).equals(sort_df(expected))
 
     # test failed response raises RuntimeError

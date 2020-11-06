@@ -517,30 +517,70 @@ summary.covidcast_meta = function(object, ...) {
 
 ##########
 
+max_geo_values <- function(geo_type){ #TODO find max values
+  if (geo_type == "county") {
+    return(1400)
+  }
+  if (geo_type == "hrr") {
+    return(300)
+  }
+  if (geo_type == "msa") {
+    return(300)
+  }
+  if (geo_type == "dma") {
+    return(300)
+  }
+  if (geo_type == "state") {
+    return(52)
+  }
+  stop("\"%s\" is not a recognized geo_type")
+}
+
+
 # Helper function, not user-facing, to loop through a sequence of days, call
 # covidcast for each one and combine the results
 covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
                        geo_value, as_of, issues, lag) {
-  ndays <- as.numeric(end_day - start_day)
+  days = seq(start_day, end_day, by = 1)
+  ndays <- length(days)
+  if (identical(geo_value, "*")){
+    ngeos <- max_geo_values(geo_type)
+  } else {
+    ngeos <- length(geo_value)
+  }
+  if (length(issues) == 2){
+    nissues = as.numeric(issues[2] - issues[1]) + 1
+  } else {
+    nissues = 1
+  }
+  max_days_at_time = floor(3300 / (ngeos * nissues))
+  batch_days = ceiling(ndays / max_days_at_time)
+  
   dat <- list()
 
   # The API limits the number of rows that can be returned at once, so we query
   # each day separately.
-  for (i in seq(ndays + 1)) {
-    query_day <- start_day + i - 1
-    day_str <- date_to_string(query_day)
-    dat[[i]] <- covidcast(data_source = data_source,
+  for (i in seq(1, batch_days)) {
+    start_offset = (i - 1) * max_days_at_time
+    end_offset = (i * max_days_at_time) - 1
+    query_start_day <- start_day + start_offset
+    query_end_day <- min(start_day + end_offset, end_day)
+    
+    start_day_str <- date_to_string(query_start_day)
+    end_day_str <- date_to_string(query_end_day)
+    dat[[i]] <- covidcast:::covidcast(data_source = data_source,
                           signal = signal,
                           time_type = "day",
                           geo_type = geo_type,
-                          time_values = day_str,
+                          time_values = date_to_string(days[(start_offset + 1):(end_offset + 1)]),
                           geo_value = geo_value,
                           as_of = as_of,
                           issues = issues,
                           lag = lag)
     summary <- sprintf(
-      "Fetched day %s: %s, %s, num_entries = %s",
-      query_day,
+      "Fetched day %s to %s: %s, %s, num_entries = %s",
+      query_start_day,
+      query_end_day,
       dat[[i]]$result,
       dat[[i]]$message,
       nrow(dat[[i]]$epidata)
@@ -572,7 +612,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
                   dat[[i]]$message),
            data_source = data_source,
            signal = signal,
-           day = query_day,
+           day = query_start_day, #TODO check by day
            geo_value = geo_value,
            api_msg = dat[[i]]$message,
            class = "covidcast_fetch_failed")

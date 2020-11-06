@@ -519,16 +519,16 @@ summary.covidcast_meta = function(object, ...) {
 
 max_geo_values <- function(geo_type){ #TODO find max values
   if (geo_type == "county") {
-    return(1400)
-  }
-  if (geo_type == "hrr") {
-    return(300)
-  }
-  if (geo_type == "msa") {
-    return(300)
+    return(3193)
   }
   if (geo_type == "dma") {
-    return(300)
+    return(210)
+  }
+  if (geo_type == "hrr") {
+    return(306)
+  }
+  if (geo_type == "msa") {
+    return(381)
   }
   if (geo_type == "state") {
     return(52)
@@ -553,7 +553,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
   } else {
     nissues = 1
   }
-  max_days_at_time = floor(3300 / (ngeos * nissues))
+  max_days_at_time = floor(3649 / (ngeos * nissues))
   batch_days = ceiling(ndays / max_days_at_time)
   
   dat <- list()
@@ -608,7 +608,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
       }
     } else {
       warn(paste0("Fetching ", signal, " from ", data_source, " for ",
-                  query_day, " in geography '", geo_value, "': ",
+                  query_start_day, " in geography '", geo_value, "': ",
                   dat[[i]]$message),
            data_source = data_source,
            signal = signal,

@@ -29,8 +29,8 @@ plot_trajectory <- function(list_of_predictions_cards,
                             last_day = Sys.Date(),
                             alpha = .2,
                             nrow = 6,
-                            ncol = 4,  
-                            page_facet = 1，
+                            ncol = 4,
+                            page_facet = 1,
                             cutoff = 52){
   # make sure predictions cards are for the same forecasting task (except ahead, and forecast_date)
   response <- unique_attr(list_of_predictions_cards,"signals")

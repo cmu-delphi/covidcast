@@ -507,7 +507,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
     if (dat[[i]]$message == "success") {
       returned_geo_values <- dat[[i]]$epidata$geo_value
       if (!identical("*", geo_value)) {
-        missed_geos <- setdiff(tolower(geo_value), 
+        missed_geos <- setdiff(tolower(geo_value),
                                tolower(returned_geo_values))
         if (length(missed_geos) > 0) {
           missed_geos_str <- paste0(missed_geos, collapse = ", ")
@@ -551,7 +551,6 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
     # this order
     df <- dplyr::relocate(df, .data$data_source, .data$signal, .data$geo_value,
                           .data$time_value)
-                                                               
   }
 
   return(df)

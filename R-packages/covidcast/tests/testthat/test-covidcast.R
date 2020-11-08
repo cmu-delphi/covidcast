@@ -81,6 +81,29 @@ with_mock_api({
                  class = "covidcast_meta_not_found")
   })
 
+  test_that("covidcast_signal works for signals with no meta", {
+    # when no meta is available, we must provide start_day and end_day.
+    # api.php-cb89ad.json
+    expect_equal(
+      covidcast_signal("foo", "bar-not-found",
+                       "2020-01-01", "2020-01-01"),
+      structure(data.frame(
+        data_source = "foo",
+        signal = "bar-not-found",
+        geo_value = "01000",
+        time_value = as.Date("2020-01-01"),
+        issue = as.Date("2020-01-02"),
+        lag = 1L,
+        value = 1,
+        stderr = 0.1,
+        sample_size = 2
+      ),
+      class = c("covidcast_signal", "data.frame"),
+      metadata = list()
+      )
+    )
+  })
+
   test_that("covidcast_signal stops when end_day < start_day", {
     # reusing api.php-da6974.json
     expect_error(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-01"))

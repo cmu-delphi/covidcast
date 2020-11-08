@@ -99,7 +99,7 @@ with_mock_api({
         sample_size = 2
       ),
       class = c("covidcast_signal", "data.frame"),
-      metadata = list()
+      metadata = list(geo_type = "county")
       )
     )
   })

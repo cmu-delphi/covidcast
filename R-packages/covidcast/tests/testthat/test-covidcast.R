@@ -48,6 +48,8 @@ test_that("covidcast_meta raises error when API signals one", {
 })
 
 with_mock_api({
+  ## covidcast_signal() tests
+
   test_that("covidcast_signal warns when requested geo_values are unavailable", {
     # api.php-6a5814.json
     expect_warning(covidcast_signal("foo", "bar", "2020-01-01", "2020-01-01",
@@ -80,6 +82,16 @@ with_mock_api({
   })
 
   test_that("covidcast_signal stops when end_day < start_day", {
+    # reusing api.php-da6974.json
     expect_error(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-01"))
+  })
+
+  ## covidcast_signals()
+
+  test_that("covidcast_signals rejects incorrect start/end_day length", {
+    expect_error(covidcast_signals("foo", "bar",
+                                   start_day = c("2020-01-01", "2020-01-02")))
+    expect_error(covidcast_signals("foo", "bar",
+                                   end_day = c("2020-01-01", "2020-01-02")))
   })
 })

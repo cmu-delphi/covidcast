@@ -177,7 +177,9 @@ covidcast_signal <- function(data_source, signal,
                   .data$geo_type == given_geo_type)
 
   if (nrow(relevant_meta) == 0) {
-    relevant_meta <- list()
+    # even if no other metadata is available, we should set the geo_type so
+    # plotting functions can deal with this signal.
+    relevant_meta <- list(geo_type = geo_type)
   }
 
   if (is.null(start_day) || is.null(end_day)) {

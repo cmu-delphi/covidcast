@@ -16,6 +16,11 @@ STATE_CENSUS = pd.read_csv(
 # Filter undesired rows from CSVs.
 # They're not removed from the files to keep them identical to rda files.
 STATE_CENSUS = STATE_CENSUS.loc[STATE_CENSUS.STATE != "0"]
+# pad to 2 characters with leading 0s
+STATE_CENSUS["STATE"] = STATE_CENSUS["STATE"].str.zfill(2)
+# add 000 to the end to get a 5 digit code
+STATE_CENSUS["STATE"] = STATE_CENSUS["STATE"].str.pad(width=5, fillchar="0", side="right")
+# filter out micropolitan areas
 MSA_CENSUS = MSA_CENSUS.loc[MSA_CENSUS.LSAD == "Metropolitan Statistical Area"]
 
 
@@ -128,6 +133,34 @@ def name_to_abbr(name: Union[str, Iterable],
     return _lookup(name, STATE_CENSUS.NAME, STATE_CENSUS.ABBR, ignore_case, fixed, ties_method)
 
 
+def fips_to_abbr(code: Union[str, Iterable],
+                 ignore_case: bool = False,
+                 fixed: bool = False,
+                 ties_method: str = "first") -> list:
+    """Look up state abbreviation by FIPS codes with regular expression support.
+
+    Given an individual or list of FIPS codes or regular expressions, look up the corresponding
+    state abbreviation. FIPS codes can be the 2 digit code (``covidcast.fips_to_abbr("12")``) or
+    the 2 digit code with 000 appended to the end (``covidcast.fips_to_abbr("12000")``.
+
+    :param code: Individual or list of FIPS codes or regular expressions.
+    :param ignore_case: Boolean for whether or not to be case insensitive in the regular expression.
+      If ``fixed=True``, this argument is ignored. Defaults to ``False``.
+    :param fixed: Conduct an exact case sensitive match with the input string.
+      Defaults to ``False``.
+    :param ties_method: Method for determining how to deal with multiple outputs for a given input.
+      Must be one of ``"all"`` or ``"first"``. If ``"first"``, then only the first match for each
+      code is returned. If ``"all"``, then all matches for each code are returned.
+      Defaults to ``first``.
+    :return: If ``ties_method="first"``, returns a list of the first value found for each input key.
+      If ``ties_method="all"``, returns a list of dicts, one for each input, with keys
+      corresponding to all matched input keys and values corresponding to the list of county names.
+      The returned list will be the same length as the input, with ``None`` or ``{}`` if no values
+      are found for ``ties_method="first"`` and ``ties_method="all"``, respectively.
+    """
+    return _lookup(code, STATE_CENSUS.STATE, STATE_CENSUS.ABBR, ignore_case, fixed, ties_method)
+
+
 def name_to_cbsa(name: Union[str, Iterable],
                  ignore_case: bool = False,
                  fixed: bool = False,
@@ -160,6 +193,34 @@ def name_to_cbsa(name: Union[str, Iterable],
     else:
         df = MSA_CENSUS
     return _lookup(name, df.NAME, df.CBSA, ignore_case, fixed, ties_method)
+
+
+def abbr_to_fips(code: Union[str, Iterable],
+                 ignore_case: bool = False,
+                 fixed: bool = False,
+                 ties_method: str = "first") -> list:
+    """Look up state FIPS codes by abbreviation with regular expression support.
+
+    Given an individual or list of state abbreviations or regular expressions,
+    look up the corresponding state FIPS codes. The returned codes are 5 digits: the
+    2 digit state FIPS with 000 appended to the end.
+
+    :param code: Individual or list of abbreviations or regular expressions.
+    :param ignore_case: Boolean for whether or not to be case insensitive in the regular expression.
+      If ``fixed=True``, this argument is ignored. Defaults to ``False``.
+    :param fixed: Conduct an exact case sensitive match with the input string.
+      Defaults to ``False``.
+    :param ties_method: Method for determining how to deal with multiple outputs for a given input.
+      Must be one of ``"all"`` or ``"first"``. If ``"first"``, then only the first match for each
+      code is returned. If ``"all"``, then all matches for each code are returned.
+      Defaults to ``first``.
+    :return: If ``ties_method="first"``, returns a list of the first value found for each input key.
+      If ``ties_method="all"``, returns a list of dicts, one for each input, with keys
+      corresponding to all matched input keys and values corresponding to the list of county names.
+      The returned list will be the same length as the input, with ``None`` or ``{}`` if no values
+      are found for ``ties_method="first"`` and ``ties_method="all"``, respectively.
+    """
+    return _lookup(code, STATE_CENSUS.ABBR, STATE_CENSUS.STATE, ignore_case, fixed, ties_method)
 
 
 def name_to_fips(name: Union[str, Iterable],

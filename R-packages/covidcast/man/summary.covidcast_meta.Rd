@@ -13,5 +13,5 @@
 Currently unused.}
 }
 \description{
-Prints a summary of the metadata returned by \code{covidcast_meta()}.
+Prints a tabular summary of the object returned by \code{covidcast_meta()}.
 }

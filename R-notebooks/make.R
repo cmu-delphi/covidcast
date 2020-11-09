@@ -8,16 +8,21 @@ for (file_name in file_names) {
   t0 = proc.time()
   tryCatch(
     suppressWarnings(suppressMessages(
-      rmarkdown::render(paste0(file_name, ".Rmd"),  
-                        output_format="html_document",
-                        output_file=paste0(file_name, ".html"),
-                        envir=new.env(), quiet=TRUE))),
-    error = function(e) { 
-      cat(e$message) 
+      rmarkdown::render(
+        paste0(file_name, ".Rmd"),
+        output_format = "html_document",
+        output_file = paste0(file_name, ".html"),
+        envir = new.env(),
+        quiet = TRUE
+      )
+    )),
+    error = function(e) {
+      cat(e$message)
       has_failures <<- TRUE
-    })
+    }
+  )
   t1 = proc.time()
-  cat(sprintf("%0.2f s\n", (t1-t0)[3]))
+  cat(sprintf("%0.2f s\n", (t1 - t0)[3]))
 }
 
 # Failures do not prevent other dashboards from running, but should result in an

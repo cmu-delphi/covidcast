@@ -33,7 +33,7 @@ and Puerto Rico); this function is based on \code{grep()}, and hence allows for
 regular expressions.
 }
 \examples{
-name_to_abbr("Penn") 
+name_to_abbr("Penn")
 name_to_abbr(c("Penn", "New"), ties_method = "all")
 
 }

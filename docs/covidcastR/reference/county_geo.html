@@ -40,8 +40,8 @@
 
 
 <meta property="og:title" content="County latitudes and longitudes — county_geo" />
-<meta property="og:description" content="Data set on latitudes and longitudes of county centroids, from the National
-Weather Service." />
+<meta property="og:description" content="Data set on latitudes and longitudes of county centroids, from the usmap
+package." />
 
 
 
@@ -73,7 +73,7 @@ Weather Service." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -100,6 +100,9 @@ Weather Service." />
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/correlation-utils.html">Correlation utilities</a>
+    </li>
+    <li>
+      <a href="../articles/multi-signals.html">Manipulating multiple signals</a>
     </li>
     <li>
       <a href="../articles/plotting-signals.html">Plotting and mapping signals</a>
@@ -136,8 +139,8 @@ Weather Service." />
     </div>
 
     <div class="ref-description">
-    <p>Data set on latitudes and longitudes of county centroids, from the National
-Weather Service.</p>
+    <p>Data set on latitudes and longitudes of county centroids, from the <code>usmap</code>
+package.</p>
     </div>
 
     <pre class="usage"><span class='va'>county_geo</span></pre>
@@ -145,19 +148,20 @@ Weather Service.</p>
 
     <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>Data frame with 3331 rows, each representing one county. Columns:</p>
+    <p>Data frame with 3142 rows, each representing one county. Columns:</p>
 <dl>
-<dt>COUNTYNAME</dt><dd><p>Name of the county.</p></dd>
-<dt>FIPS</dt><dd><p>5-digit county FIPS code.</p></dd>
-<dt>STATE</dt><dd><p>Two-letter state abbreviation.</p></dd>
-<dt>LON</dt><dd><p>Longitude of county centroid.</p></dd>
-<dt>LAT</dt><dd><p>Latitude of county centroid.</p></dd>
+<dt>x</dt><dd><p>Longitude of county centroid.</p></dd>
+<dt>y</dt><dd><p>Latitude of county centroid.</p></dd>
+<dt>fips</dt><dd><p>Five-digit county FIPS code.</p></dd>
+<dt>abbr</dt><dd><p>Two-letter state abbreviation.</p></dd>
+<dt>full</dt><dd><p>State name.</p></dd>
+<dt>county</dt><dd><p>County name.</p></dd>
 
 </dl>
 
     <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
 
-    <p><a href='https://www.weather.gov/gis/Counties'>https://www.weather.gov/gis/Counties</a></p>
+    <p><code>usmap</code></p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -170,7 +174,7 @@ Weather Service.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Pedrito Maynard-Zhang, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

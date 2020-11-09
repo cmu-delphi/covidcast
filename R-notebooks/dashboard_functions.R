@@ -15,7 +15,7 @@ plot_28_day_frequency_state  <- function(df_to_plot) {
   
   plot(covidcast_signal_to_plot,
        title = sprintf(
-         "State frequency in last 28 days (start date: %s)",
+         "State frequency in last 28 days (start date: %s); grey = no data for state.",
          covidcast_signal_to_plot$time_value[1]
        ),
        range = c(0, 28))
@@ -32,7 +32,7 @@ plot_28_day_frequency_county  <- function(df_to_plot) {
   plot(
     covidcast_signal_to_plot,
     title = sprintf(
-      "County frequency in last 28 days (start date: %s)",
+      "County frequency in last 28 days (start date: %s); grey = no data for county.",
       covidcast_signal_to_plot$time_value[1]
     ),
     range = c(0, 28)

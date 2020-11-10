@@ -112,7 +112,7 @@ get_predictions_single_date <- function(forecaster,
                                         geo_values,
                                         apply_corrections,
                                         ...) {
-  if (length(geo_values) > 1) geo_values <- list(geo_values)
+  #if (length(geo_values) > 1) geo_values <- list(geo_values)
   forecast_date <- lubridate::ymd(forecast_date)
   # compute the start_day from the forecast_date, if we need to
   if (!is.null(signals$start_day) && is.list(signals$start_day)) {

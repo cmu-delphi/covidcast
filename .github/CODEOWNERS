@@ -6,7 +6,7 @@
 /R-packages/data-raw/ @capnrefsmmat @ryantibs @sgsmob
 
 # evalcast R package
-/R-packages/evalcast/  @ryantibs @jacobbien
+/R-packages/evalcast/  @ryantibs @jacobbien @dajmcdon
 
 # covidcast Python package
 /Python-packages/covidcast-py/ @chinandrew @capnrefsmmat

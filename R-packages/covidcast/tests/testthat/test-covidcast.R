@@ -52,7 +52,7 @@ with_mock_api({
                      max_value = 10,
                      num_locations = 100,
                      time_type = "day",
-                     geo_type = "county",
+                     geo_type = c("county", "state"),
                      max_issue = as.Date(c("2020-04-04", "2020-11-01"))
                    ),
                    class = c("covidcast_meta", "data.frame")

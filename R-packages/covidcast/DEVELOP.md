@@ -6,7 +6,7 @@ A short checklist for submitting pull requests:
 2. If you have added any new features (new functions, new options, etc.), add a
    brief description to `NEWS.md` to the next listed version number. Also ensure
    that new functions or datasets are listed in the reference in `_pkgdown.yml`
-   so they appear in a good place in the documentation website.
+   so they appear in a good place in the function reference page.
 3. If you changed any documentation, rebuild the documentation with
    `devtools::document()` and then `pkgdown::build_site()`. (This can be slow,
    because our vignettes take a long time to build.)
@@ -24,6 +24,17 @@ Our continuous integration (CI) on GitHub will automatically run the unit tests
 when you open a pull request, as part of running `R CMD check`. Failed tests and
 check errors will both result in the build failing and errors being visible in
 the pull request.
+
+### Testing API access
+
+Unit tests should *not* require Internet access. This poses a problem for
+testing of functions like `covidcast_signal()`. In testing, it is also helpful
+to be able to test different custom responses from the API server.
+
+The [httptest package](https://enpiar.com/r/httptest/index.html) solves these
+problems by hooking in to the `httr` package and replacing API requests with the
+contents of specially named files. See `tests/testthat/test-covidcast.R` for
+details and examples.
 
 ### Testing plots
 
@@ -78,3 +89,22 @@ After changing a vignette or documentation, you'll need to rebuild the
 documentation. Use `devtools::document()` to do this. Then
 `pkgdown::build_site(".")` (from within the package directory) will rebuild the
 HTML documentation site.
+
+### Vignettes
+
+Our vignettes can take quite a while to render; much of this time is spent in
+downloading data from the COVIDcast API. This can make the package inconvenient
+to install, take up time on our CI servers, and may cause issues when we
+eventually submit to CRAN.
+
+We hence use [httptest's vignette
+features](https://enpiar.com/r/httptest/articles/vignettes.html) to record API
+requests and serve them from static JSON files in the repository, instead of
+actual API queries. This cuts the time dramatically. See the httptest
+documentation for more details on how this works, and ensure that any new
+vignettes use this feature.
+
+To re-download all data for the vignettes, simply delete the corresponding
+folder in `vignettes/` and re-build the vignette. For example, delete
+`vignettes/plotting-signals/` and then rebuild `plotting-signals.Rmd` to have
+httptest re-download and save the data.

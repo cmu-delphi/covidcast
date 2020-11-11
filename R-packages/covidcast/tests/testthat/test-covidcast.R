@@ -13,8 +13,10 @@ library(dplyr)
 # types of errors.
 #
 # 2. Once you've written a test, it can be difficult to find the file storing
-# the JSON needed for that test. We hence store the filename in comments
-# adjacent to every call.
+# the JSON or CSV needed for that test. We hence store the filename in comments
+# adjacent to every call. (Note that we request CSVs from the API for
+# covidcast_signal, and httptest suggests filenames ending in .json by default.
+# You can use .csv instead and httptest will correctly locate those files.)
 #
 # 3. covidcast_signal() calls covidcast_meta() unconditionally. We hence need a
 # single meta file that suffices for all tests that call covidcast_signal().
@@ -38,7 +40,7 @@ library(dplyr)
 
 with_mock_api({
   test_that("covidcast_meta formats result correctly", {
-    # api.php-d2e163.json
+    # api.php-dd024f.csv
     expect_equal(covidcast_meta(),
                  structure(
                    data.frame(
@@ -46,12 +48,12 @@ with_mock_api({
                      signal = c("bar", "bar2"),
                      min_time = as.Date(c("2020-01-01", "2020-10-02")),
                      max_time = as.Date(c("2020-01-02", "2020-10-03")),
-                     max_issue = as.Date(c("2020-04-04", "2020-11-01")),
                      min_value = 0,
                      max_value = 10,
                      num_locations = 100,
                      time_type = "day",
-                     geo_type = "county"
+                     geo_type = "county",
+                     max_issue = as.Date(c("2020-04-04", "2020-11-01"))
                    ),
                    class = c("covidcast_meta", "data.frame")
                  ))
@@ -59,8 +61,7 @@ with_mock_api({
 })
 
 test_that("covidcast_meta raises error when API signals one", {
-  stub(covidcast_meta, ".request",
-       "{\"message\": \"argle-bargle\"}")
+  stub(covidcast_meta, ".request", "")
 
   expect_error(covidcast_meta(),
                class = "covidcast_meta_fetch_failed")

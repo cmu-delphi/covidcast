@@ -1,8 +1,8 @@
 ---
-title: Correlation utilities
+title: 2. Computing signal correlations
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{2. Correlation utilities}
+  %\VignetteIndexEntry{2. Computing signal correlations}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

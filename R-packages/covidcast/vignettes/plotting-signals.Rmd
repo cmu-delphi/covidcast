@@ -1,5 +1,5 @@
 ---
-title: Plotting and mapping signals
+title: 1. Plotting and mapping signals
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{1. Plotting and mapping signals}

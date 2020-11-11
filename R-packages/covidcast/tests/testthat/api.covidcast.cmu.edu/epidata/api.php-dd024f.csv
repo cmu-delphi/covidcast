@@ -1,0 +1,3 @@
+data_source,signal,time_type,geo_type,min_time,max_time,min_value,max_value,max_issue
+foo,bar,day,county,20200101,20200102,0,10,20200404
+foo,bar,day,county,20201002,20201003,0,10,20201101

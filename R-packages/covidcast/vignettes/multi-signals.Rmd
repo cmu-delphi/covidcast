@@ -1,5 +1,5 @@
 ---
-title: Manipulating multiple signals 
+title: 3. Manipulating multiple signals 
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{3. Manipulating multiple signals}

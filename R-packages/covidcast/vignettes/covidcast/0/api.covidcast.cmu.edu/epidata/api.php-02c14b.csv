@@ -1,0 +1,2 @@
+geo_value,signal,time_value,direction,issue,lag,value,stderr,sample_size
+42003,smoothed_cli,20200503,,20200903,123,0.3370994,0.1046873,2552.0112

@@ -1,0 +1,2 @@
+geo_value,signal,time_value,direction,issue,lag,value,stderr,sample_size
+pa,smoothed_cli,20200501,-1,20200704,64,5.075015,,

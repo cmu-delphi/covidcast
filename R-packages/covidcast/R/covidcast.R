@@ -437,20 +437,21 @@ covidcast_signals <- function(data_source, signal,
 #'
 #' @export
 covidcast_meta <- function() {
-  meta <- jsonlite::fromJSON(.request(
+  meta <- .request(
     list(source = "covidcast_meta",
-         cached = "true")))
+         format = "csv"))
 
-  if (meta$message != "success") {
-    abort(paste0("Failed to obtain metadata: ", meta$message, "."),
-          err_msg = meta$message,
-          class = "covidcast_meta_fetch_failed")
+  if (nchar(meta) == 0) {
+    abort("Failed to obtain metadata", class = "covidcast_meta_fetch_failed")
   }
 
-  meta <- meta$epidata %>%
-    dplyr::mutate(min_time = as.Date(as.character(.data$min_time), format = "%Y%m%d"),
-                  max_time = as.Date(as.character(.data$max_time), format = "%Y%m%d"),
-                  max_issue = as.Date(as.character(.data$max_issue), format = "%Y%m%d"))
+  meta <- read.csv(textConnection(meta), stringsAsFactors = FALSE) %>%
+    dplyr::mutate(min_time = as.Date(as.character(.data$min_time),
+                                     format = "%Y%m%d"),
+                  max_time = as.Date(as.character(.data$max_time),
+                                     format = "%Y%m%d"),
+                  max_issue = as.Date(as.character(.data$max_issue),
+                                      format = "%Y%m%d"))
 
   class(meta) <- c("covidcast_meta", "data.frame")
   return(meta)

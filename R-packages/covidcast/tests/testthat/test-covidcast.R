@@ -29,7 +29,7 @@ with_mock_api({
                      data_source = "foo",
                      signal = "bar",
                      time_type = "day",
-                     geo_type = "county",
+                     geo_type = c("county", "state"),
                      min_time = as.Date(c("2020-01-01", "2020-10-02")),
                      max_time = as.Date(c("2020-01-02", "2020-10-03")),
                      min_value = 0,

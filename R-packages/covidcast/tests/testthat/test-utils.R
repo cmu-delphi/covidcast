@@ -17,7 +17,7 @@ test_that("latest_issue gives only the latest issue", {
 })
 
 test_that("earliest_issue gives only the earliest issue", {
-    foo <- data.frame(
+  foo <- data.frame(
     geo_value = c(rep("pa", 3), rep("tx", 3)),
     issue = c(3, 2, 1, 1, 2, 3),
     time_value = 1,
@@ -25,9 +25,9 @@ test_that("earliest_issue gives only the earliest issue", {
 
   earliest <- data.frame(
     geo_value = c("pa", "tx"),
-    issue = 3,
+    issue = 1,
     time_value = 1,
     value = c(6, 7))
 
-  expect_equal(earliest_issue(foo), latest)
+  expect_equal(earliest_issue(foo), earliest)
 })

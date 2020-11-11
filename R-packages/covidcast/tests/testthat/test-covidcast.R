@@ -60,7 +60,7 @@ with_mock_api({
 
 test_that("covidcast_meta raises error when API signals one", {
   stub(covidcast_meta, ".request",
-       list(message = "argle-bargle"))
+       "{\"message\": \"argle-bargle\"}")
 
   expect_error(covidcast_meta(),
                class = "covidcast_meta_fetch_failed")
@@ -69,13 +69,13 @@ test_that("covidcast_meta raises error when API signals one", {
 with_mock_api({
   ## covidcast_signal() tests
   test_that("covidcast_signal warns when requested geo_values are unavailable", {
-    # api.php-6a5814.json
+    # api.php-3e1dc3.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-01", "2020-01-01",
                                     geo_values = c("pa", "tx", "DUCKS")),
                    class = "covidcast_missing_geo_values")
 
     # ...but not when they *are* available.
-    # api.php-64a69c.json
+    # api.php-f666a2.csv
     expect_silent(suppressMessages(
       covidcast_signal("foo", "bar", "2020-01-01", "2020-01-01",
                        geo_values = c("pa", "tx"))))
@@ -83,12 +83,12 @@ with_mock_api({
 
   test_that("covidcast_signal warns when requested dates are unavailable", {
     # with geo_values = "*".
-    # api.php-96f6a5.json
+    # api.php-b6e478.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-02"),
                    class = "covidcast_fetch_failed")
 
     # and with geo_values = "pa"
-    # api.php-da6974.json
+    # api.php-d707dc.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-02",
                                     geo_values = "pa"),
                    class = "covidcast_fetch_failed")
@@ -101,7 +101,7 @@ with_mock_api({
 
   test_that("covidcast_signal works for signals with no meta", {
     # when no meta is available, we must provide start_day and end_day.
-    # api.php-cb89ad.json
+    # api.php-1d9b5c.csv
     expect_equal(
       covidcast_signal("foo", "bar-not-found",
                        "2020-01-01", "2020-01-01"),
@@ -123,7 +123,7 @@ with_mock_api({
   })
 
   test_that("covidcast_signal stops when end_day < start_day", {
-    # reusing api.php-da6974.json
+    # reusing api.php-d2e163.json for metadata
     expect_error(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-01"))
   })
 

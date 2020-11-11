@@ -1,3 +1,45 @@
+#' covidcast: Client for Delphi's COVIDcast API
+#'
+#' The covidcast package provides access to numerous COVID-19 data streams,
+#' updated daily, covering the United States of America. These include publicly
+#' reported cases and deaths data, along with data the Delphi research group
+#' collects or obtains from partners.
+#'
+#' @section Finding data sources and documentation:
+#'
+#' The COVIDcast API includes:
+#'
+#' * publicly reported COVID case and death data
+#' * insurance claims data reporting on COVID-related doctor's visits and
+#'   hospitalizations, obtained from health partners
+#' * aggregate results from massive COVID symptom surveys conducted by Delphi
+#' * mobility data aggregated from SafeGraph
+#' * symptom search trends from Google
+#'
+#' and numerous other important signals, most available daily at the county
+#' level.
+#'
+#' Each data stream is identified by its data source and signal names. These are
+#' documented on the COVIDcast API website:
+#' <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html>
+#'
+#' Each data stream has a page giving detailed technical documentation on how
+#' the data is collected, how it is aggregated, and any limitations or known
+#' problems with the data.
+#'
+#' @section Getting started:
+#'
+#' We recommend the Getting Started vignette, which includes numerous examples
+#' and is provided online here:
+#' <https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html>
+#'
+#' See also `covidcast_signal()` for details on how to obtain COVIDcast data as
+#' a data frame.
+#'
+#' @docType package
+#' @name covidcast
+NULL
+
 # API base url
 COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 

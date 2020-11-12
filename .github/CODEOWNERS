@@ -1,12 +1,12 @@
 # default owners for anything not listed below, such as README and CI workflows
-* @krivard @capnrefsmmat @ryantibs
+* @krivard @capnrefsmmat
 
 # covidcast R package and data generation
-/R-packages/covidcast/ @capnrefsmmat @ryantibs @sgsmob
-/R-packages/data-raw/ @capnrefsmmat @ryantibs @sgsmob
+/R-packages/covidcast/ @capnrefsmmat @sgsmob
+/R-packages/data-raw/ @capnrefsmmat  @sgsmob
 
 # evalcast R package
-/R-packages/evalcast/  @ryantibs @jacobbien @dajmcdon
+/R-packages/evalcast/  @jacobbien @dajmcdon
 
 # covidcast Python package
 /Python-packages/covidcast-py/ @chinandrew @capnrefsmmat

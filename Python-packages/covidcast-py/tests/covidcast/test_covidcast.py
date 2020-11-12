@@ -161,6 +161,23 @@ def test_aggregate_signals():
 
     assert covidcast.aggregate_signals([test_input1, test_input1], dt=[0, 1]).equals(expected3)
 
+    # test long output
+    expected4 = pd.DataFrame(
+        {"geo_value": ["a", "b", "c", "a"]*2,
+         "time_value": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2),
+                        date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 3)],
+         "value": [2, 4, 6, 8]*2,
+         "signal": ["i", "i", "i", "i"]*2,
+         "geo_type": ["state", "state", "state", "state"]*2,
+         "data_source": ["x", "x", "x", "x"]*2})
+
+    assert covidcast.aggregate_signals([test_input1, test_input1],
+                                     dt=[0, 1],
+                                     output_format="long").equals(expected4)
+    # test long output with different column names
+    with pytest.raises(ValueError):
+        covidcast.aggregate_signals([test_input1, test_input2], output_format="long")
+
     # test invalid lag length
     with pytest.raises(ValueError):
         covidcast.aggregate_signals([test_input1, test_input1], dt=[0])

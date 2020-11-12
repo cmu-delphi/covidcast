@@ -1,6 +1,8 @@
 library(covidcast)
 library(httptest)
 library(mockery)
+library(lubridate)
+library(dplyr)
 
 # Many of these tests use mockery::with_mock_api. This replaces calls to the
 # live API server, instead returning static JSON files from disk. Three
@@ -116,5 +118,126 @@ with_mock_api({
                                    start_day = c("2020-01-01", "2020-01-02")))
     expect_error(covidcast_signals("foo", "bar",
                                    end_day = c("2020-01-01", "2020-01-02")))
+  })
+})
+
+test_that("max_geo_values raises error for non-existant signal", {
+  stub(max_geo_values, "covidcast_meta",
+    data.frame(
+      data_source = "data_source",
+      signal = "signal",
+      time_type = "day",
+      geo_type = "county",
+      min_time = "2020-02-01",
+      max_time = "2020-11-06",
+      num_locations = 10,
+      min_value = 1,
+      max_value = 100,
+      mean_value = 3,
+      stdev_value = 10,
+      last_update = 1604982935
+    )
+  )
+  expect_error(max_geo_values("bad_data", "bad_signal", "bad_geo_type"),
+               regexp = "bad_data.*bad_signal.*bad_geo_type")
+})
+
+test_that("covidcast_days does not treat \"*\" as a missing geo_value", {
+  stub(covidcast_days, "max_geo_values",
+       1
+  )
+  stub(covidcast_days, "covidcast",
+       list(message = "success", epidata = data.frame(
+         geo_value = c("geoa", "geob"),
+         signal = "signal",
+         time_value = c(20201030, 20201031),
+         direction = NA,
+         issue = ymd("2020-11-04"),
+         lag = 2,
+         value = 3,
+         stderr = NA,
+         sample_size = NA
+       ), result = 1))
+  # Expect no warning
+  expect_warning(
+    covidcast_days(
+      data_source = "fb-survey",
+      signal = "raw_cli",
+      start_day = ymd("2020-10-30"),
+      end_day = ymd("2020-10-31"),
+      geo_type = "county",
+      geo_value = c("*"),
+      as_of = NULL,
+      issues = NULL,
+      lag = NULL),
+    regexp = NA)
+})
+
+test_that("covidcast_days does not raise warnings for full response", {
+  stub(covidcast_days, "max_geo_values",
+       1
+  )
+  stub(covidcast_days, "covidcast",
+       list(message = "success", epidata = data.frame(
+         geo_value = c("geoa"),
+         signal = "signal",
+         time_value = c(20201030, 20201031),
+         direction = NA,
+         issue = ymd("2020-11-04"),
+         lag = 2,
+         value = 3,
+         stderr = NA,
+         sample_size = NA
+       ), result = 1))
+  # Expect no warning
+  expect_warning(
+    covidcast_days(
+      data_source = "fb-survey",
+      signal = "raw_cli",
+      start_day = ymd("2020-10-30"),
+      end_day = ymd("2020-10-31"),
+      geo_type = "county",
+      geo_value = c("geoa"),
+      as_of = NULL,
+      issues = NULL,
+      lag = NULL),
+    regexp = NA)
+})
+
+test_that("covidcast_days batches calls to covidcast", {
+  stub(covidcast_days, "max_geo_values",
+       1000
+  )
+  covidcast_returns = rep(list(list(message = "success", epidata = data.frame(
+    geo_value = c("geoa"),
+    signal = "signal",
+    time_value = rep(NA, 3),
+    direction = NA,
+    issue = ymd("2020-11-04"),
+    lag = 2,
+    value = 3,
+    stderr = NA,
+    sample_size = NA
+  ), result = 1)), 10)
+  for (i in 1:2){
+    covidcast_returns[[i]]$epidata$time_value = 20101000 + ((i - 1) * 3) + c(1:3)
+  }
+  
+  m = mock(covidcast_returns[[1]], covidcast_returns[[2]])
+  with_mock(covidcast = m, {
+    expect_warning(
+    covidcast_days(
+      data_source = "fb-survey",
+      signal = "raw_cli",
+      start_day = ymd("2020-10-01"),
+      end_day = ymd("2020-10-06"),
+      geo_type = "county",
+      geo_value = "*",
+      as_of = NULL,
+      issues = NULL,
+      lag = NULL
+    ),
+    regexp = NA)
+  expect_called(m, 2)
   })
 })

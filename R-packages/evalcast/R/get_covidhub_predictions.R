@@ -82,7 +82,7 @@ get_covidhub_predictions <- function(covid_hub_forecaster_name,
                geo_values = NA,
                from_covidhub = TRUE)
         )
-        class(.x) <- c("prediction_card", class(.x))
+
         return(.x)
       })
   }

@@ -195,6 +195,73 @@ def signal(data_source: str,
     return out
 
 
+def signals(data_source: Union[str, List[str]],
+            signals: Union[str, List[str]],  # pylint: disable=W0621
+            start_day: Union[date, List[date]] = None,
+            end_day: Union[date, List[date]] = None,
+            geo_type: str = "county",
+            geo_values: Union[str, Iterable[str]] = "*",
+            as_of: date = None,
+            issues: Union[date, Tuple[date], List[date]] = None,
+            lag: int = None) -> List[pd.DataFrame]:
+    """Download a list of multiple signals.
+
+    Given one or more data sources, signals, start days, and end days, this function will
+    return a list of the desired signals by calling ``covidcast.signal()`` multiple times.
+    The output will use the input parameters element-wise. Because of this, the parameters
+    must either be an individual value or lists of the same length. For example, you can
+    provide two data sources and one start day, two data sources and two start days, but not
+    two data sources with three start days.
+
+    :param data_source: String or list identifying the data source(s) to query, such as
+      ``"fb-survey"``.
+    :param signal_list: String or list identifying the signal(s) from that source to query,
+      such as ``"smoothed_cli"``.
+    :param start_day: Query data beginning on these dates. Provided as a single or list of
+      ``datetime.date`` objects. If ``start_day`` is ``None``, defaults to the
+      first day data is available for this signal.
+    :param end_day: Query data up to these dates, inclusive. Provided as a single or list of
+      ``datetime.date`` objects. If ``end_day`` is ``None``, defaults to the most
+      recent day data is available for this signal.
+    :param geo_type: The geography type for which to request this data, such as
+      ``"county"`` or ``"state"``. Available types are described in the
+      COVIDcast signal documentation. Defaults to ``"county"``.
+    :param geo_values: The geographies to fetch data for. The default, ``"*"``,
+      fetches all geographies. To fetch one geography, specify its ID as a
+      string; multiple geographies can be provided as an iterable (list, tuple,
+      ...) of strings.
+    :param as_of: Fetch only data that was available on or before this date,
+      provided as a ``datetime.date`` object. If ``None``, the default, return
+      the most recent available data.
+    :param issues: Fetch only data that was published or updated ("issued") on
+      these dates. Provided as either a single ``datetime.date`` object,
+      indicating a single date to fetch data issued on, or a tuple or list
+      specifying (start, end) dates. In this case, return all data issued in
+      this range. There may be multiple rows for each observation, indicating
+      several updates to its value. If ``None``, the default, return the most
+      recently issued data.
+    :param lag: Integer. If, for example, ``lag=3``, fetch only data that was
+      published or updated exactly 3 days after the date. For example, a row
+      with ``time_value`` of June 3 will only be included in the results if its
+      data was issued or updated on June 6. If ``None``, the default, return the
+      most recently issued data regardless of its lag.
+    :returns: A list of the signal DataFrames.
+    """
+    input_params = [i for i in [data_source, signals, start_day, end_day] if isinstance(i, list)]
+    len_args = 1 if not input_params else len(input_params[0])
+    if not all(len(i) == len_args for i in input_params):
+        raise ValueError("Input data_source, signal, start_day, and end_day must be single values "
+                         "or the same length.")
+    data_source = data_source if isinstance(data_source, list) else [data_source]*len_args
+    signals = signals if isinstance(signals, list) else [signals]*len_args
+    start_day = start_day if isinstance(start_day, list) else [start_day]*len_args
+    end_day = end_day if isinstance(end_day, list) else [end_day]*len_args
+    output = []
+    for source, sig, start, end in zip(data_source, signals, start_day, end_day):
+        output.append(signal(source, sig, start, end, geo_type, geo_values, as_of, issues, lag))
+    return output
+
+
 def metadata() -> pd.DataFrame:
     """Fetch COVIDcast surveillance stream metadata.
 
@@ -272,7 +339,9 @@ def metadata() -> pd.DataFrame:
     return meta_df
 
 
-def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") -> pd.DataFrame:
+def aggregate_signals(signals: list,  # pylint: disable=W0621
+                      dt: list = None,
+                      join_type: str = "outer") -> pd.DataFrame:
     """Given a list of DataFrames, [optionally] lag each one and join them into one DataFrame.
 
     This method takes a list of DataFrames containing signal information for

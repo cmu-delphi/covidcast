@@ -10,15 +10,17 @@
       "max_issue": 20200404,
       "min_value": 0,
       "max_value": 10,
+      "num_locations": 100,
       "time_type": "day",
       "geo_type": "county"
     },
     {
       "data_source": "foo",
-      "signal": "bar",
+      "signal": "bar2",
       "min_time": 20201002,
       "max_time": 20201003,
       "max_issue": 20201101,
+      "num_locations": 100,
       "min_value": 0,
       "max_value": 10,
       "time_type": "day",

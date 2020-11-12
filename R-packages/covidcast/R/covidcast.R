@@ -517,14 +517,14 @@ summary.covidcast_meta = function(object, ...) {
 
 ##########
 
-max_geo_values <- function(data_source, signal, geo_type){
-  
-  meta_info = covidcast_meta()
-  max_locations = meta_info[meta_info$data_source == data_source & 
-                              meta_info$signal == signal & 
-                              meta_info$geo_type == geo_type,]$num_locations
-  if (length(max_locations) == 0){
-    max_locations = max(meta_info[meta_info$geo_type == geo_type, ]$num_locations)
+max_geo_values <- function(data_source, signal, geo_type) {
+  meta_info <- covidcast_meta()
+  max_locations <- meta_info[meta_info$data_source == data_source &
+                              meta_info$signal == signal &
+                              meta_info$geo_type == geo_type, ]$num_locations
+  if (length(max_locations) == 0) {
+    geo_nums <- meta_info[meta_info$geo_type == geo_type, ]$num_locations
+    max_locations <- max(geo_nums)
   }
   return(max_locations)
 }
@@ -534,38 +534,35 @@ max_geo_values <- function(data_source, signal, geo_type){
 # covidcast for each one and combine the results
 covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
                        geo_value, as_of, issues, lag) {
-  days = seq(start_day, end_day, by = 1)
+  days <- seq(start_day, end_day, by = 1)
   ndays <- length(days)
-  if (identical(geo_value, "*")){
+  if (identical(geo_value, "*")) {
     ngeos <- max_geo_values(data_source, signal, geo_type)
   } else {
     ngeos <- length(geo_value)
   }
-  if (length(issues) == 2){
-    nissues = as.numeric(issues[2] - issues[1]) + 1
+  if (length(issues) == 2) {
+    nissues <- as.numeric(issues[2] - issues[1]) + 1
   } else {
-    nissues = 1
+    nissues <- 1
   }
-  max_days_at_time = floor(3649 / (ngeos * nissues))
+  max_days_at_time <- floor(3649 / (ngeos * nissues))
 
   # In theory, we could exceed max rows with 1 day, but try anyway
-  if (max_days_at_time == 0){
-    max_days_at_time = 1
+  if (max_days_at_time == 0) {
+    max_days_at_time <- 1
   }
-  batch_days = ceiling(ndays / max_days_at_time)
-  
+  batch_days <- ceiling(ndays / max_days_at_time)
   dat <- list()
 
   # The API limits the number of rows that can be returned at once, so we query
   # each day separately.
   for (i in seq(1, batch_days)) {
-    start_offset = (i - 1) * max_days_at_time
-    end_offset = min(i * max_days_at_time, ndays) - 1
+    start_offset <- (i - 1) * max_days_at_time
+    end_offset <- min(i * max_days_at_time, ndays) - 1
     query_start_day <- start_day + start_offset
     query_end_day <- start_day + end_offset
-    
-    start_day_str <- date_to_string(query_start_day)
-    end_day_str <- date_to_string(query_end_day)
+
     time_values <- date_to_string(days[(start_offset + 1):(end_offset + 1)])
     dat[[i]] <- covidcast(data_source = data_source,
                           signal = signal,
@@ -590,11 +587,14 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
     if (dat[[i]]$message == "success") {
       desired_geos <- tolower(unique(geo_value))
       returned_epidata <- dat[[i]]$epidata
-      returned_geo_array <- returned_epidata %>% select(geo_value, time_value) %>% group_by(time_value) %>% summarize(geo_value = list(geo_value))
+      returned_geo_array <- returned_epidata %>%
+        select(geo_value, time_value) %>%
+        group_by(time_value) %>%
+        summarize(geo_value = list(geo_value))
       returned_time_values <- returned_geo_array$time_value
-      if (length(returned_time_values) != length(time_values)){
-        missing_time_values = setdiff(time_values, returned_time_values)
-        missing_dates = ymd(missing_time_values)
+      if (length(returned_time_values) != length(time_values)) {
+        missing_time_values <- setdiff(time_values, returned_time_values)
+        missing_dates <- ymd(missing_time_values)
         warn(sprintf("Data not fetched for the following days: %s",
                      paste(missing_dates, collapse = ", ")),
              data_source = data_source,
@@ -606,9 +606,14 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
         )
       }
       if (!identical("*", geo_value)) {
-        missing_geo_array = returned_geo_array[lapply(returned_geo_array$geo_value, length) < length(desired_geos),]
-        if (nrow(missing_geo_array) > 0){
-          missing_geo_array$warning = unlist(apply(returned_geo_array, 1, FUN = function(row) geo_warning_message(row, desired_geos)))
+        missing_geo_array <- returned_geo_array[
+          lapply(returned_geo_array$geo_value, length) < length(desired_geos), ]
+        if (nrow(missing_geo_array) > 0) {
+          missing_geo_array$warning <-
+            unlist(apply(returned_geo_array,
+                         1,
+                         FUN = function(row) geo_warning_message(row,
+                                                                 desired_geos)))
           warn(missing_geo_array$warning,
                data_source = data_source,
                signal = signal,
@@ -620,8 +625,8 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
       }
     } else {
       warn(paste0("Fetching ", signal, " from ", data_source, " for ",
-                  query_start_day, " to ", query_end_day , " in geography '", geo_value, "': ",
-                  dat[[i]]$message),
+                  query_start_day, " to ", query_end_day, " in geography '",
+                  geo_value, "': ", dat[[i]]$message),
            data_source = data_source,
            signal = signal,
            start_day = query_start_day,
@@ -653,8 +658,8 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
   return(df)
 }
 
-geo_warning_message = function(row, desired_geos){
-  missing_geos = setdiff(desired_geos, unlist(row$geo_value))
+geo_warning_message <- function(row, desired_geos) {
+  missing_geos <- setdiff(desired_geos, unlist(row$geo_value))
   if (length(missing_geos) > 0) {
     missing_geos_str <- paste0(missing_geos, collapse = ", ")
     err_msg <- sprintf("Data not fetched for some geographies on %s: %s",

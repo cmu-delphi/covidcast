@@ -19,6 +19,21 @@ library(dplyr)
 #
 # 3. covidcast_signal() calls covidcast_meta() unconditionally. We hence need a
 # single meta file that suffices for all tests that call covidcast_signal().
+#
+# Other tests use mockery::stub and mockery::mock, which come with their own
+# pros and cons.
+#
+# with_mock_api:
+#   Replace all calls to a specified function that use specified arguments
+#   with the result in the corresponding file.
+# stub:
+#   Replaces all calls from a specified function to another specified function
+#   with the specified result (without regard for arguments).
+# mock:
+#   Replace all calls to a specified function with the arguments of the mock, in
+#   order (i.e. The n-th call to the function returns the n-th argument of the
+#   mock.
+
 
 with_mock_api({
   test_that("covidcast_meta formats result correctly", {
@@ -187,7 +202,7 @@ test_that("covidcast_days batches calls to covidcast", {
   stub(covidcast_days, "max_geo_values",
        1000
   )
-  covidcast_returns = rep(list(list(message = "success", epidata = data.frame(
+  covidcast_returns <- rep(list(list(message = "success", epidata = data.frame(
     geo_value = c("geoa"),
     signal = "signal",
     time_value = rep(NA, 3),
@@ -198,11 +213,10 @@ test_that("covidcast_days batches calls to covidcast", {
     stderr = NA,
     sample_size = NA
   ), result = 1)), 10)
-  for (i in 1:2){
-    covidcast_returns[[i]]$epidata$time_value = 20101000 + ((i - 1) * 3) + c(1:3)
-  }
-  
-  m = mock(covidcast_returns[[1]], covidcast_returns[[2]])
+  covidcast_returns[[1]]$epidata$time_value <- 20101001:20101003
+  covidcast_returns[[2]]$epidata$time_value <- 20101004:20101006
+
+  m <- mock(covidcast_returns[[1]], covidcast_returns[[2]])
   with_mock(covidcast = m, {
     expect_warning(
     covidcast_days(

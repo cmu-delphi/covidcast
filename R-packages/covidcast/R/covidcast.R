@@ -532,17 +532,17 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
   for (i in seq(ndays + 1)) {
     query_day <- start_day + i - 1
     day_str <- date_to_string(query_day)
-    res <- covidcast(data_source = data_source,
-                     signal = signal,
-                     time_type = "day",
-                     geo_type = geo_type,
-                     time_values = day_str,
-                     geo_value = geo_value,
-                     as_of = as_of,
-                     issues = issues,
-                     lag = lag)
+    response <- covidcast(data_source = data_source,
+                          signal = signal,
+                          time_type = "day",
+                          geo_type = geo_type,
+                          time_values = day_str,
+                          geo_value = geo_value,
+                          as_of = as_of,
+                          issues = issues,
+                          lag = lag)
 
-    if (is.null(res)) {
+    if (is.null(response)) {
       warn(paste0("Fetching ", signal, " from ", data_source, " for ",
                   query_day, " in geography '", geo_value, "': no results"),
            data_source = data_source,
@@ -554,7 +554,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
       next
     }
 
-    dat[[i]] <- res
+    dat[[i]] <- response
 
     summary <- sprintf(
       "Fetched day %s: num_entries = %s",
@@ -650,16 +650,18 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
     params$lag <- lag
   }
 
-  # Make the API call
-  res <- .request(params)
-  if (nchar(res) == 0) {
+  # Make the API call. If the API returns a non-200 status code, indicating e.g.
+  # a database error, .request() raises an error. It returns an empty string if
+  # there are no results for our query.
+  response <- .request(params)
+  if (nchar(response) == 0) {
     # empty if no results
     return(NULL)
   }
 
   # geo_value must be read as character so FIPS codes are returned as character,
   # not numbers (with leading 0s potentially removed)
-  return(read.csv(textConnection(res), stringsAsFactors = FALSE,
+  return(read.csv(textConnection(response), stringsAsFactors = FALSE,
                   colClasses = c("geo_value" = "character")))
 }
 

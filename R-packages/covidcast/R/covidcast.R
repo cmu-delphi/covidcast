@@ -515,8 +515,7 @@ summary.covidcast_meta = function(object, ...) {
   invisible(df)
 }
 
-##########
-
+# Find the maximum number of rows the API is expected to return per day of data
 max_geo_values <- function(data_source, signal, geo_type) {
   meta_info <- covidcast_meta()
   max_locations <- meta_info[meta_info$data_source == data_source &
@@ -530,8 +529,9 @@ max_geo_values <- function(data_source, signal, geo_type) {
 }
 
 
-# Helper function, not user-facing, to loop through a sequence of days, call
-# covidcast for each one and combine the results
+# Helper function, not user-facing, to loop through a sequence of days. Chooses
+# batches of days based on expected number of results, queries covidcast for
+# each batch and combines the resutls.
 covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
                        geo_value, as_of, issues, lag) {
   days <- seq(start_day, end_day, by = 1)
@@ -658,6 +658,8 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
   return(df)
 }
 
+# Helper function (not user facing) to create warning messages when geo_values
+# are missing.
 geo_warning_message <- function(row, desired_geos) {
   missing_geos <- setdiff(desired_geos, unlist(row$geo_value))
   if (length(missing_geos) > 0) {

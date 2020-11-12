@@ -518,16 +518,13 @@ summary.covidcast_meta = function(object, ...) {
 ##########
 
 max_geo_values <- function(data_source, signal, geo_type){
+  
   meta_info = covidcast_meta()
   max_locations = meta_info[meta_info$data_source == data_source & 
                               meta_info$signal == signal & 
                               meta_info$geo_type == geo_type,]$num_locations
   if (length(max_locations) == 0){
-    err_msg = sprintf("No data for data_source: \"%s\", signal: \"%s\", geo_type: \"%s\"",
-                      data_source,
-                      signal,
-                      geo_type)
-    stop(err_msg)
+    max_locations = max(meta_info[meta_info$geo_type == geo_type, ]$num_locations)
   }
   return(max_locations)
 }

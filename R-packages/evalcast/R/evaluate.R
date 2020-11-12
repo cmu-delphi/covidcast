@@ -159,7 +159,6 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
          backfill_buffer = backfill_buffer,
          as_of = as_of)
   )
-  class(score_card) <- c("score_card", class(score_card))
   return(score_card)
 }
 

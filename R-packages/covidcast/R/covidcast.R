@@ -523,10 +523,10 @@ max_geo_values <- function(data_source, signal, geo_type){
                               meta_info$signal == signal & 
                               meta_info$geo_type == geo_type,]$num_locations
   if (length(max_locations) == 0){
-    err_msg = sprintf("No data for data_source \"%s\", signal: \"%s\", geo_type: \"%s\"",
+    err_msg = sprintf("No data for data_source: \"%s\", signal: \"%s\", geo_type: \"%s\"",
                       data_source,
                       signal,
-                      geotype)
+                      geo_type)
     stop(err_msg)
   }
   return(max_locations)
@@ -609,7 +609,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
         )
       }
       if (!identical("*", geo_value)) {
-        missing_geo_array = returned_geo_array[lapply(returned_geo_array$geo_value, length) < 2,]
+        missing_geo_array = returned_geo_array[lapply(returned_geo_array$geo_value, length) < length(desired_geos),]
         if (nrow(missing_geo_array) > 0){
           missing_geo_array$warning = unlist(apply(returned_geo_array, 1, FUN = function(row) geo_warning_message(row, desired_geos)))
           warn(missing_geo_array$warning,

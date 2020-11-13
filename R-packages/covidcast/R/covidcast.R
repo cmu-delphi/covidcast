@@ -43,6 +43,9 @@ NULL
 # API base url
 COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 
+# Max rows returned by API
+MAX_RESULTS <- 3649
+
 .onAttach <- function(libname, pkgname) {
   msg <- c("We encourage COVIDcast API users to register on our mailing list:",
            "https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api",
@@ -521,6 +524,9 @@ max_geo_values <- function(data_source, signal, geo_type) {
   max_locations <- meta_info[meta_info$data_source == data_source &
                               meta_info$signal == signal &
                               meta_info$geo_type == geo_type, ]$num_locations
+
+  # If no metadata for source/signal/geo_type combo, use maximum observed values
+  # of desired geo_type as an upper bound.
   if (length(max_locations) == 0) {
     geo_nums <- meta_info[meta_info$geo_type == geo_type, ]$num_locations
     max_locations <- max(geo_nums)
@@ -541,23 +547,28 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
   } else {
     ngeos <- length(geo_value)
   }
+
+  # issues is either a single date, or a vector with a start and end date.
   if (length(issues) == 2) {
     nissues <- as.numeric(issues[2] - issues[1]) + 1
   } else {
     nissues <- 1
   }
-  max_days_at_time <- floor(3649 / (ngeos * nissues))
+
+  # Theoretically, each geo_value could have data issued each day. Likely
+  # overestimates when handling multiple issue dates, resulting in more batches.
+  max_days_at_time <- floor(MAX_RESULTS / (ngeos * nissues))
 
   # In theory, we could exceed max rows with 1 day, but try anyway
   if (max_days_at_time == 0) {
     max_days_at_time <- 1
   }
-  batch_days <- ceiling(ndays / max_days_at_time)
+  num_batches <- ceiling(ndays / max_days_at_time)
   dat <- list()
 
   # The API limits the number of rows that can be returned at once, so we query
   # each day separately.
-  for (i in seq(1, batch_days)) {
+  for (i in seq(1, num_batches)) {
     start_offset <- (i - 1) * max_days_at_time
     end_offset <- min(i * max_days_at_time, ndays) - 1
     query_start_day <- start_day + start_offset

@@ -32,7 +32,7 @@ library(dplyr)
 # mock:
 #   Replace all calls to a specified function with the arguments of the mock, in
 #   order (i.e. The n-th call to the function returns the n-th argument of the
-#   mock.
+#   mock).
 
 
 with_mock_api({
@@ -219,18 +219,18 @@ test_that("covidcast_days batches calls to covidcast", {
   m <- mock(covidcast_returns[[1]], covidcast_returns[[2]])
   with_mock(covidcast = m, {
     expect_warning(
-    covidcast_days(
-      data_source = "fb-survey",
-      signal = "raw_cli",
-      start_day = ymd("2020-10-01"),
-      end_day = ymd("2020-10-06"),
-      geo_type = "county",
-      geo_value = "*",
-      as_of = NULL,
-      issues = NULL,
-      lag = NULL
-    ),
-    regexp = NA)
-  expect_called(m, 2)
+      covidcast_days(
+        data_source = "fb-survey",
+        signal = "raw_cli",
+        start_day = ymd("2020-10-01"),
+        end_day = ymd("2020-10-06"),
+        geo_type = "county",
+        geo_value = "*",
+        as_of = NULL,
+        issues = NULL,
+        lag = NULL
+      ),
+      regexp = NA)
+    expect_called(m, 2)
   })
 })

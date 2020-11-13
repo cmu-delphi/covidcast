@@ -144,6 +144,8 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 #'   with `time_value` of June 3 will only be included in the results if its
 #'   data was issued or updated on June 6. If `NULL`, the default, return the
 #'   most recently issued data regardless of its lag.
+#' @param parallelize Integer Number of cores with which to fetch data from
+#'   API in parallel.  If NULL (as is default), fetch in serial.
 #'
 #' @return Data frame with matching data. Each row is one observation of one
 #'   signal on one day in one geographic location. Contains the following
@@ -206,7 +208,8 @@ covidcast_signal <- function(data_source, signal,
                              start_day = NULL, end_day = NULL,
                              geo_type = c("county", "hrr", "msa", "dma", "state"),
                              geo_values = "*",
-                             as_of = NULL, issues = NULL, lag = NULL) {
+                             as_of = NULL, issues = NULL, lag = NULL,
+                             parallelize = NULL) {
   geo_type <- match.arg(geo_type)
   meta <- covidcast_meta()
   given_data_source <- data_source
@@ -264,8 +267,14 @@ covidcast_signal <- function(data_source, signal,
     issues <- as.Date(issues)
   }
 
+  if (!is.null(parallelize)) {
+    if (!is.integer(parallelize) | parallelize < 1) {
+      parallelize = NULL
+    }
+  }
+
   df <- covidcast_days(data_source, signal, start_day, end_day, geo_type,
-                       geo_values, as_of, issues, lag)
+                       geo_values, as_of, issues, lag, parallelize)
 
   # Drop direction column (if it still exists)
   df$direction <- NULL
@@ -519,37 +528,37 @@ summary.covidcast_meta = function(object, ...) {
 
 # Helper function, not user-facing, to loop through a sequence of days, call
 # covidcast for each one and combine the results
+#'
+#' @importFrom parallelize mclapply
 covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
-                       geo_value, as_of, issues, lag) {
+                       geo_value, as_of, issues, lag, parallelize=NULL) {
   ndays <- as.numeric(end_day - start_day)
   dat <- list()
 
-  # The API limits the number of rows that can be returned at once, so we query
-  # each day separately.
-  for (i in seq(ndays + 1)) {
+  query_single_day = function(i) {
     query_day <- start_day + i - 1
     day_str <- date_to_string(query_day)
-    dat[[i]] <- covidcast(data_source = data_source,
-                          signal = signal,
-                          time_type = "day",
-                          geo_type = geo_type,
-                          time_values = day_str,
-                          geo_value = geo_value,
-                          as_of = as_of,
-                          issues = issues,
-                          lag = lag)
+    api_response <- covidcast(data_source = data_source,
+                              signal = signal,
+                              time_type = "day",
+                              geo_type = geo_type,
+                              time_values = day_str,
+                              geo_value = geo_value,
+                              as_of = as_of,
+                              issues = issues,
+                              lag = lag)
     summary <- sprintf(
       "Fetched day %s: %s, %s, num_entries = %s",
       query_day,
-      dat[[i]]$result,
-      dat[[i]]$message,
-      nrow(dat[[i]]$epidata)
+      api_response$result,
+      api_response$message,
+      nrow(api_response$epidata)
     )
     if (length(summary) != 0) {
       message(summary)
     }
-    if (dat[[i]]$message == "success") {
-      returned_geo_values <- dat[[i]]$epidata$geo_value
+    if (api_response$message == "success") {
+      returned_geo_values <- api_response$epidata$geo_value
       if (!identical("*", geo_value)) {
         missed_geos <- setdiff(tolower(geo_value),
                                tolower(returned_geo_values))
@@ -561,7 +570,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
                signal = signal,
                day = query_day,
                geo_value = geo_value,
-               api_msg = dat[[i]]$message,
+               api_msg = api_response$message,
                class = "covidcast_missing_geo_values"
                )
         }
@@ -569,14 +578,23 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
     } else {
       warn(paste0("Fetching ", signal, " from ", data_source, " for ",
                   query_day, " in geography '", geo_value, "': ",
-                  dat[[i]]$message),
+                  api_response$message),
            data_source = data_source,
            signal = signal,
            day = query_day,
            geo_value = geo_value,
-           api_msg = dat[[i]]$message,
+           api_msg = api_response$message,
            class = "covidcast_fetch_failed")
     }
+  }
+
+  # The API limits the number of rows that can be returned at once, so we query
+  # each day separately.
+  if (is.null(parallelize)) {
+    dat = lapply(seq(ndays+1), query_single_day)
+  } else {
+    dat = parallelize::mclapply(seq(ndays+1), query_single_day, mc.core=parallelize)
+
   }
 
   df <- dat %>%

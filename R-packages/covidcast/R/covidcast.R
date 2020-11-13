@@ -567,7 +567,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
   dat <- list()
 
   # The API limits the number of rows that can be returned at once, so we query
-  # each day separately.
+  # in batches.
   for (i in seq(1, num_batches)) {
     start_offset <- (i - 1) * max_days_at_time
     end_offset <- min(i * max_days_at_time, ndays) - 1

@@ -26,13 +26,15 @@ library(dplyr)
 # with_mock_api:
 #   Replace all calls to a specified function that use specified arguments
 #   with the result in the corresponding file.
-# stub:
-#   Replaces all calls from a specified function to another specified function
-#   with the specified result (without regard for arguments).
 # mock:
 #   Replace all calls to a specified function with the arguments of the mock, in
 #   order (i.e. The n-th call to the function returns the n-th argument of the
 #   mock).
+# stub:
+#   Replaces all calls from a specified function to another specified function
+#   with a specified result (without regard for arguments). The specified
+#   result can be a function, so using stub with a mock object allows you to
+#   return different values for each call.
 
 
 with_mock_api({

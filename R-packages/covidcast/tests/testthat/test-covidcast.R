@@ -217,7 +217,7 @@ test_that("covidcast_days batches calls to covidcast", {
   covidcast_returns[[2]]$epidata$time_value <- 20101004:20101006
 
   m <- mock(covidcast_returns[[1]], covidcast_returns[[2]])
-  with_mock(covidcast = m, {
+  with_mock(covidcast:::covidcast = m, {
     expect_warning(
       covidcast_days(
         data_source = "fb-survey",

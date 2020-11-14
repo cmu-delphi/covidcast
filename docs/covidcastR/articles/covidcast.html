@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Get started with covidcast">
-<meta property="og:description" content="covidcast">
+<meta property="og:description" content="An introductory tutorial with examples.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -57,13 +57,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/correlation-utils.html">Correlation utilities</a>
+      <a href="../articles/plotting-signals.html">1. Plotting and mapping signals</a>
     </li>
     <li>
-      <a href="../articles/multi-signals.html">Manipulating multiple signals</a>
+      <a href="../articles/correlation-utils.html">2. Computing signal correlations</a>
     </li>
     <li>
-      <a href="../articles/plotting-signals.html">Plotting and mapping signals</a>
+      <a href="../articles/multi-signals.html">3. Manipulating multiple signals</a>
     </li>
   </ul>
 </li>
@@ -73,7 +73,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/cmu-delphi/covidcast/">
+  <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -94,7 +94,7 @@
       <h1 data-toc-skip>Get started with covidcast</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cmu-delphi/covidcast/blob/master/vignettes/covidcast.Rmd"><code>vignettes/covidcast.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmu-delphi/covidcast/blob/main/R-packages/covidcast/vignettes/covidcast.Rmd"><code>vignettes/covidcast.Rmd</code></a></small>
       <div class="hidden name"><code>covidcast.Rmd</code></div>
 
     </div>
@@ -131,6 +131,17 @@
 <span class="op">)</span>
 <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">cli</span><span class="op">)</span><span class="op">)</span></pre></div>
 <table class="table">
+<colgroup>
+<col width="12%">
+<col width="13%">
+<col width="10%">
+<col width="11%">
+<col width="11%">
+<col width="4%">
+<col width="10%">
+<col width="10%">
+<col width="12%">
+</colgroup>
 <thead><tr class="header">
 <th align="left">data_source</th>
 <th align="left">signal</th>
@@ -234,6 +245,17 @@
 <span class="op">)</span>
 <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">cli</span><span class="op">)</span><span class="op">)</span></pre></div>
 <table class="table">
+<colgroup>
+<col width="12%">
+<col width="13%">
+<col width="10%">
+<col width="11%">
+<col width="11%">
+<col width="4%">
+<col width="10%">
+<col width="10%">
+<col width="12%">
+</colgroup>
 <thead><tr class="header">
 <th align="left">data_source</th>
 <th align="left">signal</th>
@@ -323,6 +345,17 @@
 <span class="op">)</span>
 <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">cli</span><span class="op">)</span><span class="op">)</span></pre></div>
 <table class="table">
+<colgroup>
+<col width="12%">
+<col width="13%">
+<col width="10%">
+<col width="11%">
+<col width="11%">
+<col width="4%">
+<col width="10%">
+<col width="10%">
+<col width="12%">
+</colgroup>
 <thead><tr class="header">
 <th align="left">data_source</th>
 <th align="left">signal</th>
@@ -403,7 +436,16 @@
 </tr>
 </tbody>
 </table>
-<p>This package provides convenient functions for plotting and mapping these signals. For more details and examples, see <code><a href="../articles/plotting-signals.html">vignette("plotting-signals")</a></code>.</p>
+<div id="plotting-and-mapping" class="section level3">
+<h3 class="hasAnchor">
+<a href="#plotting-and-mapping" class="anchor"></a>Plotting and mapping</h3>
+<p>This package provides convenient functions for plotting and mapping these signals. For example, simple line charts are easy to construct:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">cli</span>, plot_type <span class="op">=</span> <span class="st">"line"</span>,
+     title <span class="op">=</span> <span class="st">"Survey results in Allegheny County, PA"</span><span class="op">)</span></pre></div>
+<p><img src="covidcast_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<p>For more details and examples, including choropleth and bubble maps, see <code><a href="../articles/plotting-signals.html">vignette("plotting-signals")</a></code>.</p>
+</div>
 <div id="finding-signals-of-interest" class="section level3">
 <h3 class="hasAnchor">
 <a href="#finding-signals-of-interest" class="anchor"></a>Finding signals of interest</h3>
@@ -417,21 +459,21 @@
 <p>This package includes several utilities intended to make the process easier. For example, if we look at <code><a href="../reference/county_census.html">?county_census</a></code>, we find that the package provides census data (such as population) on every county in the United States, including its FIPS code. Similarly, by looking at <code><a href="../reference/msa_census.html">?msa_census</a></code> we can find data about metropolitan statistical areas, their corresponding CBSA IDs, and recent census data.</p>
 <p>(Note: the <code>msa_census</code> data includes types of area beyond metropolitan statistical areas, including micropolitan statistical areas. The <code>LSAD</code> column identifies the type of each area. The COVIDcast API only provides estimates for metropolitan statistical areas, not for their divisions or for micropolitan areas.)</p>
 <p>Building on these datasets, the convenience functions <code><a href="../reference/name_to_fips.html">name_to_fips()</a></code> and <code><a href="../reference/name_to_fips.html">name_to_cbsa()</a></code> conduct <code><a href="https://rdrr.io/r/base/grep.html">grep()</a></code>-based searching of county or metropolitan area names to find FIPS or CBSA codes, respectively:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit">
+<div class="sourceCode" id="cb9"><pre class="downlit">
 <span class="fu"><a href="../reference/name_to_fips.html">name_to_fips</a></span><span class="op">(</span><span class="st">"Allegheny"</span><span class="op">)</span></pre></div>
 <pre><code>## Allegheny County 
 ##          "42003"</code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit">
+<div class="sourceCode" id="cb11"><pre class="downlit">
 <span class="fu"><a href="../reference/name_to_fips.html">name_to_cbsa</a></span><span class="op">(</span><span class="st">"Pittsburgh"</span><span class="op">)</span></pre></div>
 <pre><code>## Pittsburgh, PA 
 ##        "38300"</code></pre>
 <p>Since these functions return vectors of IDs, we can use them to construct the <code>geo_values</code> argument to <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> to select specific regions to query.</p>
 <p>You may also want to convert FIPS codes or CBSA IDs back to well-known names, for instance to report in tables or graphics. The package provides inverse mappings <code><a href="../reference/fips_to_name.html">fips_to_name()</a></code> and <code><a href="../reference/fips_to_name.html">cbsa_to_name()</a></code> that work in the analogous way:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit">
+<div class="sourceCode" id="cb13"><pre class="downlit">
 <span class="fu"><a href="../reference/fips_to_name.html">fips_to_name</a></span><span class="op">(</span><span class="st">"42003"</span><span class="op">)</span></pre></div>
 <pre><code>##              42003 
 ## "Allegheny County"</code></pre>
-<div class="sourceCode" id="cb14"><pre class="downlit">
+<div class="sourceCode" id="cb15"><pre class="downlit">
 <span class="fu"><a href="../reference/fips_to_name.html">cbsa_to_name</a></span><span class="op">(</span><span class="st">"38300"</span><span class="op">)</span></pre></div>
 <pre><code>##            38300 
 ## "Pittsburgh, PA"</code></pre>
@@ -442,10 +484,27 @@
 <h2 class="hasAnchor">
 <a href="#signal-metadata" class="anchor"></a>Signal metadata</h2>
 <p>If we are interested in exploring the available signals and their metadata, we can use <code><a href="../reference/covidcast_meta.html">covidcast_meta()</a></code> to fetch a data frame of the available signals:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit">
+<div class="sourceCode" id="cb17"><pre class="downlit">
 <span class="va">meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_meta.html">covidcast_meta</a></span><span class="op">(</span><span class="op">)</span>
 <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">meta</span><span class="op">)</span><span class="op">)</span></pre></div>
 <table class="table">
+<colgroup>
+<col width="6%">
+<col width="16%">
+<col width="5%">
+<col width="5%">
+<col width="6%">
+<col width="6%">
+<col width="7%">
+<col width="5%">
+<col width="5%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="4%">
+<col width="4%">
+</colgroup>
 <thead><tr class="header">
 <th align="left">data_source</th>
 <th align="left">signal</th>
@@ -465,111 +524,111 @@
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">doctor-visits</td>
-<td align="left">smoothed_adj_cli</td>
+<td align="left">changehc</td>
+<td align="left">smoothed_adj_outpatient_covid</td>
 <td align="left">day</td>
 <td align="left">county</td>
 <td align="left">2020-02-01</td>
-<td align="left">2020-11-06</td>
-<td align="right">2517</td>
-<td align="right">0</td>
-<td align="right">87.67083</td>
-<td align="right">3.068926</td>
-<td align="right">3.544427</td>
-<td align="right">1604982935</td>
-<td align="left">2020-11-09</td>
-<td align="right">2</td>
-<td align="right">129</td>
+<td align="left">2020-11-08</td>
+<td align="right">2545</td>
+<td align="right">0.000868</td>
+<td align="right">34.931010</td>
+<td align="right">0.3505072</td>
+<td align="right">0.6384764</td>
+<td align="right">1605255860</td>
+<td align="left">2020-11-13</td>
+<td align="right">4</td>
+<td align="right">286</td>
 </tr>
 <tr class="even">
-<td align="left">doctor-visits</td>
-<td align="left">smoothed_adj_cli</td>
+<td align="left">changehc</td>
+<td align="left">smoothed_adj_outpatient_covid</td>
 <td align="left">day</td>
 <td align="left">hrr</td>
 <td align="left">2020-02-01</td>
-<td align="left">2020-11-06</td>
+<td align="left">2020-11-08</td>
 <td align="right">306</td>
-<td align="right">0</td>
-<td align="right">47.95543</td>
-<td align="right">3.511349</td>
-<td align="right">3.238851</td>
-<td align="right">1604982935</td>
-<td align="left">2020-11-09</td>
-<td align="right">3</td>
-<td align="right">129</td>
+<td align="right">0.000635</td>
+<td align="right">7.045493</td>
+<td align="right">0.2898596</td>
+<td align="right">0.3944807</td>
+<td align="right">1605255860</td>
+<td align="left">2020-11-13</td>
+<td align="right">5</td>
+<td align="right">286</td>
 </tr>
 <tr class="odd">
-<td align="left">doctor-visits</td>
-<td align="left">smoothed_adj_cli</td>
+<td align="left">changehc</td>
+<td align="left">smoothed_adj_outpatient_covid</td>
 <td align="left">day</td>
 <td align="left">msa</td>
 <td align="left">2020-02-01</td>
-<td align="left">2020-11-06</td>
-<td align="right">384</td>
-<td align="right">0</td>
-<td align="right">34.81049</td>
-<td align="right">3.184163</td>
-<td align="right">3.200040</td>
-<td align="right">1604982936</td>
-<td align="left">2020-11-09</td>
-<td align="right">3</td>
-<td align="right">129</td>
+<td align="left">2020-11-08</td>
+<td align="right">392</td>
+<td align="right">0.000506</td>
+<td align="right">12.866211</td>
+<td align="right">0.2540103</td>
+<td align="right">0.3769068</td>
+<td align="right">1605255861</td>
+<td align="left">2020-11-13</td>
+<td align="right">5</td>
+<td align="right">286</td>
 </tr>
 <tr class="even">
-<td align="left">doctor-visits</td>
-<td align="left">smoothed_adj_cli</td>
+<td align="left">changehc</td>
+<td align="left">smoothed_adj_outpatient_covid</td>
 <td align="left">day</td>
 <td align="left">state</td>
 <td align="left">2020-02-01</td>
-<td align="left">2020-11-06</td>
+<td align="left">2020-11-08</td>
 <td align="right">52</td>
-<td align="right">0</td>
-<td align="right">56.24371</td>
-<td align="right">3.595989</td>
-<td align="right">3.124654</td>
-<td align="right">1604982936</td>
-<td align="left">2020-11-09</td>
-<td align="right">3</td>
-<td align="right">129</td>
+<td align="right">0.000358</td>
+<td align="right">3.016247</td>
+<td align="right">0.2723865</td>
+<td align="right">0.3158401</td>
+<td align="right">1605255861</td>
+<td align="left">2020-11-13</td>
+<td align="right">5</td>
+<td align="right">286</td>
 </tr>
 <tr class="odd">
-<td align="left">doctor-visits</td>
-<td align="left">smoothed_cli</td>
+<td align="left">changehc</td>
+<td align="left">smoothed_outpatient_covid</td>
 <td align="left">day</td>
 <td align="left">county</td>
 <td align="left">2020-02-01</td>
-<td align="left">2020-11-06</td>
-<td align="right">2520</td>
-<td align="right">0</td>
-<td align="right">76.56961</td>
-<td align="right">2.586614</td>
-<td align="right">3.026507</td>
-<td align="right">1604982935</td>
-<td align="left">2020-11-09</td>
-<td align="right">2</td>
-<td align="right">129</td>
+<td align="left">2020-11-08</td>
+<td align="right">2545</td>
+<td align="right">0.000868</td>
+<td align="right">30.886603</td>
+<td align="right">0.3252638</td>
+<td align="right">0.5665026</td>
+<td align="right">1605255860</td>
+<td align="left">2020-11-13</td>
+<td align="right">4</td>
+<td align="right">286</td>
 </tr>
 <tr class="even">
-<td align="left">doctor-visits</td>
-<td align="left">smoothed_cli</td>
+<td align="left">changehc</td>
+<td align="left">smoothed_outpatient_covid</td>
 <td align="left">day</td>
 <td align="left">hrr</td>
 <td align="left">2020-02-01</td>
-<td align="left">2020-11-06</td>
+<td align="left">2020-11-08</td>
 <td align="right">306</td>
-<td align="right">0</td>
-<td align="right">44.29551</td>
-<td align="right">3.312260</td>
-<td align="right">3.183677</td>
-<td align="right">1604982935</td>
-<td align="left">2020-11-09</td>
-<td align="right">3</td>
-<td align="right">129</td>
+<td align="right">0.000635</td>
+<td align="right">5.998379</td>
+<td align="right">0.2656566</td>
+<td align="right">0.3597191</td>
+<td align="right">1605255860</td>
+<td align="left">2020-11-13</td>
+<td align="right">5</td>
+<td align="right">286</td>
 </tr>
 </tbody>
 </table>
 <p>The <code><a href="../reference/covidcast_meta.html">covidcast_meta()</a></code> documentation describes the columns and their meanings. The metadata data frame can be filtered and sliced as desired to obtain information about signals of interest. To get a basic summary of the metadata:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit">
+<div class="sourceCode" id="cb18"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">meta</span><span class="op">)</span></pre></div>
 <p>(We silenced the evaluation because the output of <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> here is still quite long.)</p>
 </div>
@@ -580,7 +639,7 @@
 <p>For example, consider using our <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html">doctor visits signal</a>, which estimates the percentage of outpatient doctor visits that are COVID-related, and consider a result row with <code>time_value</code> 2020-05-01 for <code>geo_values = "pa"</code>. This is an estimate for the percentage in Pennsylvania on May 1, 2020. That estimate was <em>issued</em> on May 5, 2020, the delay being due to the aggregation of data by our source and the time taken by the COVIDcast API to ingest the data provided. Later, the estimate for May 1st could be updated, perhaps because additional visit data from May 1st arrived at our source and was reported to us. This constitutes a new <em>issue</em> of the data.</p>
 <p>By default, <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> fetches the most recent issue available. This is the best option for users who simply want to graph the latest data or construct dashboards. But if we are interested in knowing <em>when</em> data was reported, we can request specific data versions.</p>
 <p>First, we can request the data that was available <em>as of</em> a specific date, using the <code>as_of</code> argument:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit">
+<div class="sourceCode" id="cb19"><pre class="downlit">
 <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"doctor-visits"</span>, signal <span class="op">=</span> <span class="st">"smoothed_cli"</span>,
                  start_day <span class="op">=</span> <span class="st">"2020-05-01"</span>, end_day <span class="op">=</span> <span class="st">"2020-05-01"</span>,
                  geo_type <span class="op">=</span> <span class="st">"state"</span>, geo_values <span class="op">=</span> <span class="st">"pa"</span>, as_of <span class="op">=</span> <span class="st">"2020-05-07"</span><span class="op">)</span></pre></div>
@@ -595,7 +654,7 @@
 ##   sample_size
 ## 1          NA</code></pre>
 <p>This shows that an estimate of about 2.3% was issued on May 7. If we don’t specify <code>as_of</code>, we get the most recent estimate available:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit">
+<div class="sourceCode" id="cb21"><pre class="downlit">
 <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"doctor-visits"</span>, signal <span class="op">=</span> <span class="st">"smoothed_cli"</span>,
                  start_day <span class="op">=</span> <span class="st">"2020-05-01"</span>, end_day <span class="op">=</span> <span class="st">"2020-05-01"</span>,
                  geo_type <span class="op">=</span> <span class="st">"state"</span>, geo_values <span class="op">=</span> <span class="st">"pa"</span><span class="op">)</span></pre></div>
@@ -611,12 +670,12 @@
 ## 1     NA          NA</code></pre>
 <p>Note the substantial change in the estimate, to over 5%, reflecting new data that became available <em>after</em> May 7 about visits occurring on May 1. This illustrates the importance of issue date tracking, particularly for forecasting tasks. To backtest a forecasting model on past data, it is important to use the data that would have been available <em>at the time</em>, not data that arrived much later.</p>
 <p>By using the <code>issues</code> argument, we can request all issues in a certain time period:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit">
+<div class="sourceCode" id="cb23"><pre class="downlit">
 <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"doctor-visits"</span>, signal <span class="op">=</span> <span class="st">"smoothed_cli"</span>,
                  start_day <span class="op">=</span> <span class="st">"2020-05-01"</span>, end_day <span class="op">=</span> <span class="st">"2020-05-01"</span>,
                  geo_type <span class="op">=</span> <span class="st">"state"</span>, geo_values <span class="op">=</span> <span class="st">"pa"</span>,
                  issues <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"2020-05-01"</span>, <span class="st">"2020-05-15"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></pre></div>
+  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">data_source</th>
@@ -711,11 +770,11 @@
 </table>
 <p>This estimate was clearly updated many times as new data for May 1st arrived. Note that these results include only data issued or updated between 2020-05-01 and 2020-05-15. If a value was first reported on 2020-04-15, and never updated, a query for issues between 2020-05-01 and 2020-05-15 will not include that value among its results.</p>
 <p>Finally, we can use the <code>lag</code> argument to request only data reported with a certain lag. For example, requesting a lag of 7 days means to request only issues 7 days after the corresponding <code>time_value</code>:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit">
+<div class="sourceCode" id="cb24"><pre class="downlit">
 <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"doctor-visits"</span>, signal <span class="op">=</span> <span class="st">"smoothed_cli"</span>,
                  start_day <span class="op">=</span> <span class="st">"2020-05-01"</span>, end_day <span class="op">=</span> <span class="st">"2020-05-07"</span>,
                  geo_type <span class="op">=</span> <span class="st">"state"</span>, geo_values <span class="op">=</span> <span class="st">"pa"</span>, lag <span class="op">=</span> <span class="fl">7</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></pre></div>
+  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <pre><code>## Warning: Fetching smoothed_cli from doctor-visits for 2020-05-03 in geography
 ## 'pa': no results</code></pre>
 <pre><code>## Warning: Fetching smoothed_cli from doctor-visits for 2020-05-04 in geography
@@ -791,12 +850,12 @@
 </tbody>
 </table>
 <p>Note that though this query requested all values between 2020-05-01 and 2020-05-07, May 3rd and May 4th were <em>not</em> included in the results set. This is because the query will only include a result for May 3rd if a value were issued on May 10th (a 7-day lag), but in fact the value was not updated on that day:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit">
+<div class="sourceCode" id="cb27"><pre class="downlit">
 <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"doctor-visits"</span>, signal <span class="op">=</span> <span class="st">"smoothed_cli"</span>,
                  start_day <span class="op">=</span> <span class="st">"2020-05-03"</span>, end_day <span class="op">=</span> <span class="st">"2020-05-03"</span>,
                  geo_type <span class="op">=</span> <span class="st">"state"</span>, geo_values <span class="op">=</span> <span class="st">"pa"</span>,
                  issues <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"2020-05-09"</span>, <span class="st">"2020-05-15"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></pre></div>
+  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">data_source</th>

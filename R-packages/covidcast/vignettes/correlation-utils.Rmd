@@ -1,5 +1,6 @@
 ---
 title: 2. Computing signal correlations
+description: Calculate correlations over space and time between multiple signals.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{2. Computing signal correlations}

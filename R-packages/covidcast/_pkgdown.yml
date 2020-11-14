@@ -9,6 +9,16 @@ home:
     - text: View the COVIDcast map
       href: https://covidcast.cmu.edu/
 
+articles:
+  - title: Using the package
+    desc: Basic usage and examples.
+    navbar: ~
+    contents:
+      - covidcast
+      - plotting-signals
+      - correlation-utils
+      - multi-signals
+
 reference:
   - title: Fetch data
     desc: Fetch signals and metadata from the COVIDcast API

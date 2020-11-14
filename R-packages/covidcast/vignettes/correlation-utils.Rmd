@@ -37,9 +37,12 @@ summary(dprop)
 
 # Restrict attention to "active" counties with at least 500 total cases 
 case_num <- 500
-geo_values <- iprop %>% group_by(geo_value) %>% 
-  summarize(total = sum(value)) %>% 
-  filter(total >= case_num) %>% pull(geo_value)
+geo_values <- suppressMessages(
+  covidcast_signal(data_source = "jhu-csse",
+                   signal = "confirmed_cumulative_num", 
+                   start_day = end_day, end_day = end_day) %>%
+  filter(value >= case_num) %>% pull(geo_value)
+)
 iprop_act <- iprop %>% filter(geo_value %in% geo_values)
 dprop_act <- dprop %>% filter(geo_value %in% geo_values)
 ```

@@ -7,6 +7,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r, include = FALSE}
+library(httptest)
+start_vignette("covidcast")
+```
+
 This package provides access to data frames of values from the [COVIDcast
 API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html). Using the
 `covidcast_signal()` function, you can fetch any data you may be interested in
@@ -283,4 +288,8 @@ covidcast_signal(data_source = "doctor-visits", signal = "smoothed_cli",
                  geo_type = "state", geo_values = "pa",
                  issues = c("2020-05-09", "2020-05-15")) %>%
   knitr::kable()
+```
+
+```{r, include = FALSE}
+end_vignette()
 ```

@@ -7,6 +7,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r, include = FALSE}
+library(httptest)
+start_vignette("multi-signals")
+```
+
 Various analyses involve working with multiple signals at once. The covidcast 
 package provides some helper functions for fetching multiple signals from the 
 API, and aggregating them into one data frame for various downstream uses.
@@ -19,7 +24,7 @@ call, we can use `covidcast_signals()` (note the plural form of "signals"):
 ```{r, message = FALSE}
 library(covidcast)
 
-start_day <- "2020-06-01"
+start_day <- "2020-09-01"
 end_day <- "2020-10-01"
 
 signals <- suppressMessages(
@@ -146,4 +151,8 @@ df_cor1 = covidcast_cor(x = aggregate_signals(signals[[1]], dt = -7,
 
 df_cor2 = covidcast_cor(x = signals[[1]], y = signals[[2]], dt_x = -7)
 identical(df_cor1, df_cor2)
+```
+
+```{r, include = FALSE}
+end_vignette()
 ```

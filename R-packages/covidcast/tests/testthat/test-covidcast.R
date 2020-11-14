@@ -12,27 +12,29 @@ library(mockery)
 # types of errors.
 #
 # 2. Once you've written a test, it can be difficult to find the file storing
-# the JSON needed for that test. We hence store the filename in comments
-# adjacent to every call.
+# the JSON or CSV needed for that test. We hence store the filename in comments
+# adjacent to every call. (Note that we request CSVs from the API for
+# covidcast_signal, and httptest suggests filenames ending in .json by default.
+# You can use .csv instead and httptest will correctly locate those files.)
 #
 # 3. covidcast_signal() calls covidcast_meta() unconditionally. We hence need a
 # single meta file that suffices for all tests that call covidcast_signal().
 
 with_mock_api({
   test_that("covidcast_meta formats result correctly", {
-    # api.php-d2e163.json
+    # api.php-dd024f.csv
     expect_equal(covidcast_meta(),
                  structure(
                    data.frame(
                      data_source = "foo",
                      signal = "bar",
+                     time_type = "day",
+                     geo_type = c("county", "state"),
                      min_time = as.Date(c("2020-01-01", "2020-10-02")),
                      max_time = as.Date(c("2020-01-02", "2020-10-03")),
-                     max_issue = as.Date(c("2020-04-04", "2020-11-01")),
                      min_value = 0,
                      max_value = 10,
-                     time_type = "day",
-                     geo_type = "county"
+                     max_issue = as.Date(c("2020-04-04", "2020-11-01"))
                    ),
                    class = c("covidcast_meta", "data.frame")
                  ))
@@ -40,8 +42,7 @@ with_mock_api({
 })
 
 test_that("covidcast_meta raises error when API signals one", {
-  stub(covidcast_meta, ".request",
-       list(message = "argle-bargle"))
+  stub(covidcast_meta, ".request", "")
 
   expect_error(covidcast_meta(),
                class = "covidcast_meta_fetch_failed")
@@ -51,13 +52,13 @@ with_mock_api({
   ## covidcast_signal() tests
 
   test_that("covidcast_signal warns when requested geo_values are unavailable", {
-    # api.php-6a5814.json
+    # api.php-3e1dc3.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-01", "2020-01-01",
                                     geo_values = c("pa", "tx", "DUCKS")),
                    class = "covidcast_missing_geo_values")
 
     # ...but not when they *are* available.
-    # api.php-64a69c.json
+    # api.php-f666a2.csv
     expect_silent(suppressMessages(
       covidcast_signal("foo", "bar", "2020-01-01", "2020-01-01",
                        geo_values = c("pa", "tx"))))
@@ -65,12 +66,12 @@ with_mock_api({
 
   test_that("covidcast_signal warns when requested dates are unavailable", {
     # with geo_values = "*".
-    # api.php-96f6a5.json
+    # api.php-b6e478.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-02"),
                    class = "covidcast_fetch_failed")
 
     # and with geo_values = "pa"
-    # api.php-da6974.json
+    # api.php-d707dc.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-02",
                                     geo_values = "pa"),
                    class = "covidcast_fetch_failed")
@@ -83,7 +84,7 @@ with_mock_api({
 
   test_that("covidcast_signal works for signals with no meta", {
     # when no meta is available, we must provide start_day and end_day.
-    # api.php-cb89ad.json
+    # api.php-1d9b5c.csv
     expect_equal(
       covidcast_signal("foo", "bar-not-found",
                        "2020-01-01", "2020-01-01"),
@@ -104,8 +105,51 @@ with_mock_api({
     )
   })
 
+  test_that("covidcast_signal works across multiple days with gaps", {
+    # If we request 3 days, we'll get 3 API queries. If the middle day is
+    # missing, we should get an appropriate warning, but still get the right
+    # data frame.
+
+    # day 1: api.php-32641f.csv
+    # day 2: api.php-b85d44.csv (empty)
+    # day 3: api.php-f49e8f.csv
+    expect_warning(covidcast_signal("foo", "bar", "2020-01-10", "2020-01-12",
+                                    geo_type = "county"),
+                   class = "covidcast_fetch_failed")
+
+    res <- suppressWarnings(
+      covidcast_signal("foo", "bar", "2020-01-10", "2020-01-12",
+                       geo_type = "county"))
+    expect_equal(
+      res,
+      structure(data.frame(
+        data_source = "foo",
+        signal = "bar",
+        geo_value = c("01001", "01002", "31001", "31002"),
+        time_value = as.Date(c("2020-01-10", "2020-01-10",
+                               "2020-01-12", "2020-01-12")),
+        issue = as.Date(c("2020-01-11", "2020-01-11",
+                          "2020-01-13", "2020-01-13")),
+        lag = 1,
+        value = c(91.2, 99.1, 81.2, 89.1),
+        stderr = c(0.8, 0.2, 0.8, 0.2),
+        sample_size = c(114.2, 217.8, 314.2, 417.8)),
+        class = c("covidcast_signal", "data.frame"),
+        metadata = structure(data.frame(
+          data_source = "foo",
+          signal = "bar",
+          time_type = "day",
+          geo_type = "county",
+          min_time = as.Date("2020-01-01"),
+          max_time = as.Date("2020-01-02"),
+          min_value = 0,
+          max_value = 10,
+          max_issue = as.Date("2020-04-04")),
+          class = c("covidcast_meta", "data.frame"))))
+  })
+
   test_that("covidcast_signal stops when end_day < start_day", {
-    # reusing api.php-da6974.json
+    # reusing api.php-dd024f.csv for metadata
     expect_error(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-01"))
   })
 

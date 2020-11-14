@@ -7,6 +7,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r, include = FALSE}
+library(httptest)
+start_vignette("plotting-signals")
+```
+
 Once you've fetched some COVIDcast signals using `covidcast_signal()`, the
 returned `covidcast` objects can be plotted and mapped in various ways. The data
 structure is designed to be tidy and easily wrangled using your favorite
@@ -33,7 +38,7 @@ summary(comb)
 inum <- suppressMessages(
   covidcast_signal(data_source = "usa-facts",
                    signal = "confirmed_7dav_incidence_num",
-                   start_day = "2020-07-01", end_day = "2020-07-14")
+                   start_day = "2020-07-14", end_day = "2020-07-14")
 )
 summary(inum)
 ```
@@ -86,7 +91,7 @@ which counties have cumulative case rates of at least 1/100?
 cprop <- suppressMessages(
   covidcast_signal(data_source = "usa-facts",
                    signal = "confirmed_cumulative_prop",
-                   start_day = "2020-07-01", end_day = "2020-07-14")
+                   start_day = "2020-07-14", end_day = "2020-07-14")
 )
 
 breaks <- c(0, 1000)
@@ -129,7 +134,7 @@ proportion signal:
 iprop <- suppressMessages(
   covidcast_signal(data_source = "usa-facts",
                    signal = "confirmed_7dav_incidence_prop",
-                   start_day = "2020-07-01", end_day = "2020-07-14")
+                   start_day = "2020-07-14", end_day = "2020-07-14")
 )
 ```
 
@@ -249,3 +254,7 @@ ggplot(df, aes(x = time_value, y = value)) +
 
 Again, we see that the combined indicator starts rising several days before the
 new COVID-19 cases do, an exciting phenomenon that Delphi is studying now.
+
+```{r, include = FALSE}
+end_vignette()
+```

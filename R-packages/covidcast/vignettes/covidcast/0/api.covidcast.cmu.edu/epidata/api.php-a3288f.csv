@@ -1,0 +1,6 @@
+geo_value,signal,time_value,direction,issue,lag,value,stderr,sample_size
+pa,smoothed_cli,20200503,-1,20200509,6,2.749537,,
+pa,smoothed_cli,20200503,-1,20200512,9,2.989626,,
+pa,smoothed_cli,20200503,-1,20200513,10,3.00686,,
+pa,smoothed_cli,20200503,-1,20200514,11,2.970561,,
+pa,smoothed_cli,20200503,-1,20200515,12,3.038054,,

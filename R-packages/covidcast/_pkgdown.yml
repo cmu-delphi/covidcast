@@ -9,6 +9,13 @@ home:
     - text: View the COVIDcast map
       href: https://covidcast.cmu.edu/
 
+repo:
+  url:
+    home: https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast
+    source: https://github.com/cmu-delphi/covidcast/blob/main/R-packages/covidcast/
+    issue: https://github.com/cmu-delphi/covidcast/issues
+    user: https://github.com/
+
 reference:
   - title: Fetch data
     desc: Fetch signals and metadata from the COVIDcast API

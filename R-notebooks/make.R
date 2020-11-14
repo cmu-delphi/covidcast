@@ -18,7 +18,7 @@ for (file_name in file_names[is_dashboard]) {
     )),
     error = function(e) {
       cat(e$message)
-      has_failures = TRUE
+      has_failures <<- TRUE
     }
   )
   t1 = proc.time()
@@ -30,4 +30,3 @@ for (file_name in file_names[is_dashboard]) {
 if (has_failures) {
   quit(status = 1)
 }
-

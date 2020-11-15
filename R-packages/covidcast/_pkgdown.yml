@@ -41,10 +41,12 @@ reference:
       - print.covidcast_meta
       - summary.covidcast_signal
       - summary.covidcast_meta
-  - title: Wrangle and correlate multiple signals
-    desc: Calculate correlations, aggregate signals, and move between aggregated data formats
+  - title: Wrangle and correlate signals
+    desc: Calculate correlations, aggregate multiple signals, and move between aggregated data formats
   - contents:
       - covidcast_cor
+      - latest_issue
+      - earliest_issue
       - aggregate_signals
       - covidcast_longer
   - title: Geographic utilities

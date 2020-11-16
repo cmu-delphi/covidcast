@@ -211,21 +211,9 @@ covidcast_signal <- function(data_source, signal,
                              geo_values = "*",
                              as_of = NULL, issues = NULL, lag = NULL) {
   geo_type <- match.arg(geo_type)
-  meta <- covidcast_meta()
-  given_data_source <- data_source
-  given_signal <- signal
-  given_geo_type <- geo_type
-  relevant_meta <- meta %>%
-    dplyr::filter(.data$data_source == given_data_source,
-                  .data$signal == given_signal,
-                  .data$time_type == "day",
-                  .data$geo_type == given_geo_type)
-
-  if (nrow(relevant_meta) == 0) {
-    # even if no other metadata is available, we should set the geo_type so
-    # plotting functions can deal with this signal.
-    relevant_meta <- list(geo_type = geo_type)
-  }
+  relevant_meta <- specific_meta(data_source, 
+                                 signal, 
+                                 geo_type)
 
   if (is.null(start_day) || is.null(end_day)) {
     if (is.null(relevant_meta$max_time) || is.null(relevant_meta$min_time)) {
@@ -518,20 +506,23 @@ summary.covidcast_meta = function(object, ...) {
   invisible(df)
 }
 
-# Find the maximum number of rows the API is expected to return per day of data
-max_geo_values <- function(data_source, signal, geo_type) {
+# Retrieve only the metadata that is specific to the values of interest (signal,
+# geo_type, etc.)
+specific_meta <- function(data_source, signal, geo_type, time_type = "day") {
   meta_info <- covidcast_meta()
-  max_locations <- meta_info[meta_info$data_source == data_source &
+  relevant_meta <- meta_info[meta_info$data_source == data_source &
                               meta_info$signal == signal &
-                              meta_info$geo_type == geo_type, ]$num_locations
+                              meta_info$geo_type == geo_type &
+                              meta_info$time_type == time_type, ]
 
-  # If no metadata for source/signal/geo_type combo, use maximum observed values
-  # of desired geo_type as an upper bound.
-  if (length(max_locations) == 0) {
-    geo_nums <- meta_info[meta_info$geo_type == geo_type, ]$num_locations
-    max_locations <- max(geo_nums)
+  # If no metadata for source/signal/geo_type combo, still return minimal data.
+  # Use maximum observed values of desired geo_type as an upper bound for
+  # num_locations.
+  if (nrow(relevant_meta) == 0) {
+    geo_nums <- max(meta_info[meta_info$geo_type == geo_type, ]$num_locations)
+    relevant_meta <- list(geo_type = geo_type, num_locations = geo_nums)
   }
-  return(max_locations)
+  return(relevant_meta)
 }
 
 
@@ -539,14 +530,9 @@ max_geo_values <- function(data_source, signal, geo_type) {
 # batches of days based on expected number of results, queries covidcast for
 # each batch and combines the resutls.
 covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
-                       geo_value, as_of, issues, lag) {
+                       geo_value, as_of, issues, lag, max_geos = NA) {
   days <- seq(start_day, end_day, by = 1)
   ndays <- length(days)
-  if (identical(geo_value, "*")) {
-    ngeos <- max_geo_values(data_source, signal, geo_type)
-  } else {
-    ngeos <- length(geo_value)
-  }
 
   # issues is either a single date, or a vector with a start and end date.
   if (length(issues) == 2) {
@@ -555,9 +541,14 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
     nissues <- 1
   }
 
+  # if not provided, assume worst case
+  if(is.na(max_geos)){
+    max_geos <- MAX_RESULTS
+  }
+
   # Theoretically, each geo_value could have data issued each day. Likely
   # overestimates when handling multiple issue dates, resulting in more batches.
-  max_days_at_time <- floor(MAX_RESULTS / (ngeos * nissues))
+  max_days_at_time <- floor(MAX_RESULTS / (max_geos * nissues))
 
   # In theory, we could exceed max rows with 1 day, but try anyway
   if (max_days_at_time == 0) {

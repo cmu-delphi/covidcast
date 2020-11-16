@@ -1,3 +1,14 @@
+# covidcast 0.4.0
+
+Released TODO DATE.
+
+## Major changes
+
+- The new `latest_issue()` and `earliest_issue()` functions make it easy to
+  filter data frames with multiple issues of each observation, obtaining only
+  the latest or earliest issue of each.
+
+
 # covidcast 0.3.1
 
 Released October 31, 2020.

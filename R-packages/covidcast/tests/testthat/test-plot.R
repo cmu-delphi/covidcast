@@ -16,6 +16,8 @@ context("plot")
 
 test_that("simple line graph", {
   fake_data <- structure(data.frame(
+    data_source = "foo",
+    signal = "bar",
     value = 1:10,
     time_value = seq.Date(as.Date("2020-01-01"), as.Date("2020-01-10"),
                           by = "day"),
@@ -89,6 +91,8 @@ test_that("simple state choropleths", {
 
 test_that("state bubble plot with both missing and 0 values", {
   fake_data <- structure(data.frame(
+    data_source = "foo",
+    signal = "bar",
     value = c(1, 2, 0, 3),
     geo_value = c("pa", "in", "tx", "wy"),
     time_value = as.Date("2020-01-01"),

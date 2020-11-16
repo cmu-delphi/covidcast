@@ -215,10 +215,14 @@ ingest the data provided. Later, the estimate for May 1st could be updated,
 perhaps because additional visit data from May 1st arrived at our source and was
 reported to us. This constitutes a new *issue* of the data.
 
+### Data known "as of" a specific date
+
 By default, `covidcast_signal()` fetches the most recent issue available. This
 is the best option for users who simply want to graph the latest data or
 construct dashboards. But if we are interested in knowing *when* data was
-reported, we can request specific data versions.
+reported, we can request specific data versions using the `as_of`, `issues`, or
+`lag` arguments. (Note these are mutually exclusive; only one can be specified
+at a time.)
 
 First, we can request the data that was available *as of* a specific date, using
 the `as_of` argument:
@@ -245,6 +249,8 @@ tasks. To backtest a forecasting model on past data, it is important to use the
 data that would have been available *at the time*, not data that arrived much
 later.
 
+### Multiple issues of observations
+
 By using the `issues` argument, we can request all issues in a certain time
 period:
 
@@ -261,6 +267,12 @@ Note that these results include only data issued or updated between 2020-05-01
 and 2020-05-15. If a value was first reported on 2020-04-15, and never updated,
 a query for issues between 2020-05-01 and 2020-05-15 will not include that value
 among its results.
+
+After fetching multiple issues of data, we can use the `latest_issue()` or
+`earliest_issue()` functions to subset the data frame to view only the latest or
+earliest issue of each observation.
+
+### Observations issued with a specific lag
 
 Finally, we can use the `lag` argument to request only data reported with a
 certain lag. For example, requesting a lag of 7 days means to request only

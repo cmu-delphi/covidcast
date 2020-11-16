@@ -118,7 +118,7 @@ with_mock_api({
         sample_size = 2
       ),
       class = c("covidcast_signal", "data.frame"),
-      metadata = list(geo_type = "county")
+      metadata = list(geo_type = "county", num_locations = 100)
       )
     )
   })
@@ -139,9 +139,6 @@ with_mock_api({
 })
 
 test_that("covidcast_days does not treat \"*\" as a missing geo_value", {
-  stub(covidcast_days, "max_geo_values",
-       1
-  )
   stub(covidcast_days, "covidcast",
        list(message = "success", epidata = data.frame(
          geo_value = c("geoa", "geob"),
@@ -165,14 +162,12 @@ test_that("covidcast_days does not treat \"*\" as a missing geo_value", {
       geo_value = c("*"),
       as_of = NULL,
       issues = NULL,
-      lag = NULL),
+      lag = NULL,
+      max_geos = 1),
     regexp = NA)
 })
 
 test_that("covidcast_days does not raise warnings for full response", {
-  stub(covidcast_days, "max_geo_values",
-       1
-  )
   stub(covidcast_days, "covidcast",
        list(message = "success", epidata = data.frame(
          geo_value = c("geoa"),
@@ -196,14 +191,12 @@ test_that("covidcast_days does not raise warnings for full response", {
       geo_value = c("geoa"),
       as_of = NULL,
       issues = NULL,
-      lag = NULL),
+      lag = NULL,
+      max_geos = 1),
     regexp = NA)
 })
 
 test_that("covidcast_days batches calls to covidcast", {
-  stub(covidcast_days, "max_geo_values",
-       1000
-  )
   covidcast_returns <- rep(list(list(message = "success", epidata = data.frame(
     geo_value = c("geoa"),
     signal = "signal",
@@ -230,7 +223,8 @@ test_that("covidcast_days batches calls to covidcast", {
         geo_value = "*",
         as_of = NULL,
         issues = NULL,
-        lag = NULL
+        lag = NULL,
+        max_geos = 1000
       ),
       regexp = NA)
   expect_called(m, 2)

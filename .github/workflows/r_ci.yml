@@ -10,9 +10,9 @@ name: R
 
 on:
   push:
-    branches: [ main, r-pkg-devel ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, r-pkg-devel ]
+    branches: [ main ]
 
 jobs:
   build:

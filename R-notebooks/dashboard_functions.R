@@ -1,7 +1,7 @@
 make_covidcast_signal <- function(destination, source, geo_type) {
   destination$time_value = source$time_value[1]
   destination$issue = source$issue[1]
-  attributes(destination)$geo_type = geo_type
+  attributes(destination)$metadata$geo_type = geo_type
   class(destination) = c("covidcast_signal", "data.frame")
   return(destination)
 }

@@ -1,0 +1,508 @@
+---
+title: "Evaluating State-Level COVID-19 Death Forecasts"
+author: "Delphi Group"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_document
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(cache = TRUE, autodep = TRUE, cache.comments = TRUE)
+
+library(covidcast)
+library(evalcast)
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(ggplot2)
+library(RColorBrewer)
+```
+# {.tabset}
+
+## Get forecasts from COVID Hub
+
+First fetch forecast dates for a bunch of forecasters. **TODO** (this is more of 
+a general one to make this notebook better, and not specific to evalcast dev): 
+we should do this more comprehensively. Pull all forecasters that have enough 
+submissions to make useful comparisons. To do this, we can expose the function 
+`get_covidhub_forecaster_names()`.
+
+```{r, eval = FALSE}
+forecasters = c("CMU-TimeSeries", 
+                "YYG-ParamSearch", 
+                "UMass-MechBayes", 
+                "GT-DeepCOVID", 
+                "IHME-CurveFit", 
+                "LANL-GrowthRate", 
+                "UCLA-SuEIR", 
+                "MOBS-GLEAM_COVID", 
+                "UT-Mobility", 
+                "OliverWyman-Navigator", 
+                "JHU_IDD-CovidSP", 
+                "CovidAnalytics-DELPHI", 
+                "Google_Harvard-CPF", 
+                "Yu_Group-CLEP", 
+                "COVIDhub-ensemble", 
+                "COVIDhub-baseline")
+
+# Get all forecast dates for these forecasters from COVID Hub
+forecast_dates = vector("list", length = length(forecasters))
+for (i in 1:length(forecasters)) {
+  forecast_dates[[i]] = tryCatch({
+    get_forecast_dates(forecasters[i])
+  },
+  error = function(e) cat(sprintf("%i. %s\n", i, e$message))
+  )
+}
+```
+
+Now figure out "comparable" forecast dates: making a forecast on a Sunday or a 
+Monday of the same epiweek should be comparable. **TODO**: we should switch over 
+to using the Zoltar API, and soon it should have an "as of" parameter, so then 
+we shouldn't need to do this. 
+
+```{r, eval = FALSE}
+forecast_dates_comparable = vector("list", length = length(forecasters)) 
+forecast_dates_cmu = forecast_dates[[1]]
+for (i in 1:length(forecasters)) {
+  given_dates = forecast_dates[[i]]
+  for (j in 1:length(forecast_dates_cmu)) {
+    # Find the last forecast date before the current CMU one
+    given_date = given_dates[max(which(given_dates <= forecast_dates_cmu[j]))]
+    
+    # If the dates match exactly, or the given date falls on a Sunday and the
+    # CMU date falls on a Monday of the same epiweek, the call it comparable
+    if (!is.na(given_date) &&
+        (given_date == forecast_dates_cmu[j] ||
+        (as.Date(forecast_dates_cmu[j]) - as.Date(given_date) == 1 &&
+         wday(forecast_dates_cmu[j]) == 2 && wday(given_date) == 1))) {
+      forecast_dates_comparable[[i]][j] = given_date
+    }
+    
+    # Otherwise call it NA
+    else forecast_dates_comparable[[i]][j] = NA
+  }
+}
+```
+
+Now get predictions for each forecaster, looping over forecast dates from the
+CMU-TimeSeries model. **TODO**: this part is very very slow. Maybe (hopefully) 
+by changing to use the Zoltar API, this will be much faster.
+
+```{r, eval = FALSE}
+predictions_cards = vector("list", length = length(forecasters))
+for (i in 1:length(forecasters)) {
+  cat(forecasters[i], "...\n")
+  predictions_cards[[i]] = tryCatch({
+    get_covidhub_predictions(forecasters[i], 
+                             na.omit(forecast_dates_comparable[[i]]), 
+                             geo_type = "state")
+  },
+  error = function(e) cat(e$message))
+}
+
+# Looks like we had errors for both Google-Harvard and Yu Group, who didn't set
+# anything for the response ...  
+inds_missing = which(sapply(predictions_cards, length) == 0)
+predictions_cards = predictions_cards[-inds_missing]
+forecasters = forecasters[-inds_missing]
+```
+
+On reflection: part of the problem here is that `get_covidhub_predictions()` 
+downloads *all* predictions from COVID Hub and *then* filters them as needed. 
+This makes the above extra slow because we end up downloading state and county 
+forecasts, when we just want state forecasts. **TODO**: even before switching 
+over to use the Zoltar API, we should redesign `get_covidhub_predictions()` so 
+that it fetches from GitHub only the forecasts we specify, if possible.
+
+## Evaluate predictions
+
+Hack: must change the response data source to be USAFacts, as JHU-CSSE data is
+currently unstable. **TODO**: we shouldn't require `evaluate_predictions()` to 
+have the response match what's in the forecaster. If I train my forecaster on
+(say) JHU-CSSE data, then I should be able to evaluate it on USAFacts data. 
+
+```{r, eval = FALSE}
+for (i in 1:length(predictions_cards)) {
+  for (j in 1:length(predictions_cards[[i]])) {
+    attributes(predictions_cards[[i]][[j]])$signals$data_source = "usa-facts"
+  }
+}
+```
+
+Evaluate the predictions based on weighted interval score (WIS), absolute error
+(AE), and coverage of the central 80% prediction interval. **TODO**: we need to
+make sure evalcast "fails gracefully" in as many places as possible, and doesn't
+throw an error (which would halt all execution) when it should be instead just
+throwing a warning and moving on. Basically I needed to artifically trim the
+forecast dates to have the latest one by "2020-09-28" so that I wouldn't get
+errors with the aheads here. This is undesirable obviously ...
+
+Also, another **TODO**: just want to note that this is again very slow. Caching
+would help but I don't think it's the right solution. We're fetching the exact 
+same data something like 15 times in a row. If we simply changed the order of 
+operations then we wouldn't even need caching at all.
+
+```{r, eval = FALSE}
+ahead = 1:4
+last_date = as.Date("2020-09-28")
+response_dat = "usa-facts"
+response_sig = "deaths_incidence_num"
+err_measures = list(wis = weighted_interval_score, ae = absolute_error,
+                    cov_80 = interval_coverage(alpha = 0.2))
+
+score_cards = vector("list", length = length(predictions_cards))
+for (i in 1:length(predictions_cards)) {
+  given_dates = do.call("c", lapply(predictions_cards[[i]], function(x) {
+    attributes(x)$forecast_date }))
+  given_dates_trimmed = given_dates[given_dates <= last_date]
+  given_predictions = filter_predictions(predictions_cards[[i]], ahead = ahead,
+                                         response_data_source = response_dat,
+                                         response_signal = response_sig,
+                                         forecast_date = given_dates_trimmed)
+  score_cards[[i]] = evaluate_predictions(given_predictions, err_measures,
+                                          backfill_buffer = 0)
+}
+```
+
+As the above contained some pretty expensive steps, we save the results in an
+RData file (and we set `eval = FALSE` on this and all the above code chunks). 
+
+```{r, eval = FALSE}
+save(list = ls(), file = "covidhub_evaluation.rda", compress = "xz")
+```
+
+Wrangle the score cards into a single data frame (more convenient). **TODO**:
+define some convenience functions to do this. I have it in "long" format here.
+
+```{r}
+load(file = "covidhub_evaluation.rda")
+
+score_cards_df = score_cards
+for (i in 1:length(score_cards_df)) {
+  for (j in 1:length(score_cards_df[[i]])) {
+    score_cards_df[[i]][[j]]$ahead = attributes(score_cards_df[[i]][[j]])$ahead
+    score_cards_df[[i]][[j]]$forecaster = forecasters[i]
+  }
+}
+
+for (i in 1:length(score_cards_df)) {
+  score_cards_df[[i]] = do.call(rbind, score_cards_df[[i]])
+}
+score_cards_df = do.call(rbind, score_cards_df)
+```
+
+Compute summary statistics.
+
+```{r}
+score_cards_df %>% group_by(forecaster, ahead) %>% 
+  summarize(num = sum(!is.na(wis))) %>%
+  pivot_wider(names_from = ahead, names_prefix = "num_", 
+              values_from = num) %>%
+  print(n = Inf)
+
+# CovidAnalytics-DELPHI and IHME-CurveFit didn't submit that many forecasts ...
+score_cards_df = score_cards_df %>% 
+  filter(forecaster != "CovidAnalytics-DELPHI",
+         forecaster != "IHME-CurveFit")
+```
+
+## Dot plots
+
+First we make dot plots (not the same as that in evalcast): one dot per ahead, 
+forecaster, and forecast date. The red plus marks the score computed over all 
+dates. Here we use the mean as the aggregator function, and we study WIS, AE,
+and coverage-80. 
+
+```{r, fig.width = 10, fig.height = 10}
+# Define mean and median functions that deal with missingness well
+Mean = function(x) mean(x, na.rm = TRUE)
+Median = function(x) median(x, na.rm = TRUE)
+
+summarize_var = function(df, var, aggr = Mean) {
+  df_by_date = df %>% 
+    group_by(forecaster, ahead, start) %>%
+    summarize(var = aggr(!!as.symbol(var))) %>%
+    ungroup()
+  df_overall = df %>%
+    group_by(forecaster, ahead) %>%
+    summarize(var_overall = aggr(!!as.symbol(var))) %>%
+    ungroup() %>% group_by(ahead) %>%
+    arrange(var_overall, .by_group = TRUE) %>%
+    ungroup() %>%
+    mutate(order = row_number())
+  df_sum = full_join(df_by_date, df_overall, by = c("forecaster", "ahead"))
+}
+
+dot_plot = function(df, var = "wis", ylab = var, ylim = NULL, aggr = Mean) {
+  df_sum = summarize_var(df, var, aggr)
+  df_sum$ahead = factor(paste("ahead =", df_sum$ahead))
+  
+  ggplot(df_sum, aes(x = order, y = var)) +
+    geom_point(aes(color = start)) + 
+    geom_point(aes(x = order, y = var_overall), color = "red", shape = 3) +
+    facet_wrap(vars(ahead), scales = "free") + 
+    labs(x = "Forecaster", y = ylab) +
+    scale_x_continuous(breaks = df_sum$order, labels = df_sum$forecaster) + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
+    coord_cartesian(ylim = ylim)
+}
+
+dot_plot(score_cards_df, var = "wis", ylab = "Mean WIS") + scale_y_log10()
+dot_plot(score_cards_df, var = "ae", ylab = "Mean AE") + scale_y_log10()
+dot_plot(score_cards_df, var = "cov_80", ylab = "Coverage-80", ylim = c(0,1)) +
+  geom_hline(yintercept = 0.8)
+```
+
+## Dot plots: median and 90th percentile
+
+Same as before, but change the aggregator function to the median. Omitting AE
+for brevity, hencforth.
+
+```{r, fig.width = 10, fig.height = 10}
+dot_plot(score_cards_df, var = "wis", ylab = "Median WIS", aggr = Median) +
+  scale_y_log10()
+```
+
+And now we change the aggregator function to be the 90th percentile.
+
+```{r, fig.width = 10, fig.height = 10}
+dot_plot(score_cards_df, var = "wis", ylab = "90th percentile WIS", 
+         aggr = function(x) quantile(x, prob = 0.9, na.rm = TRUE)) +
+  scale_y_log10()
+```
+
+## Line plots
+
+Now we make line plots: one line per ahead and forecaster, as a function of f
+orecast date. Here we use the mean as the aggregator function, and we look at
+WIS and coverage-80. 
+
+```{r, fig.width = 10, fig.height = 8}
+# From https://stackoverflow.com/questions/15282580/
+color_picker = function(n) {
+  qual_col_pals = brewer.pal.info[brewer.pal.info$category == 'qual',]
+  unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
+}
+
+line_plot = function(df, var = "wis", ylab = var, ylim = NULL, aggr = Mean) {
+  df_sum = summarize_var(df, var, aggr)
+  df_sum$ahead = factor(paste("ahead =", df_sum$ahead))
+  
+  ggplot(df_sum, aes(x = start, y = var)) +
+    geom_line(aes(color = forecaster, linetype = forecaster)) +
+    geom_point(aes(color = forecaster)) +
+    facet_wrap(vars(ahead), scales = "free") + 
+    labs(x = "Date", y = ylab) +
+    coord_cartesian(ylim = ylim) +
+    scale_color_manual(values = color_picker(length(unique(forecaster))))
+}
+
+line_plot(score_cards_df, var = "wis", ylab = "Mean WIS") + scale_y_log10() 
+line_plot(score_cards_df, var = "cov_80", ylab = "Coverage-80", ylim = c(0,1)) +
+  geom_hline(yintercept = 0.8)
+```
+
+## Scaling by baseline
+
+We scale each score, per location and forecast date, by the COVIDhub-baseline 
+score; then we take the mean or median. 
+
+Important note on the order of operations here: scale then aggregate. The other
+way around: aggregate then scale, would be a simple post-adjustment applied to
+the metrics we computed earlier. This way: scale then aggregate, results in a 
+different final metric altogether. It is potentially interesting as it provides
+a nonparametric spatiotemporal adjustment; assuming that space and time effects 
+are *multiplicative*, we're directly "canceling them out" by taking ratios. 
+
+Here are dot plots for scaled WIS, with mean as the aggregator. Omitting median
+for brevity.
+
+```{r, fig.width = 10, fig.height = 10}
+# Note to self: mutate_at() gave me a weird bug below! From now on, better use
+# mutate() with across() instead ...
+scale_df = function(df, var, base_forecaster = "COVIDhub-baseline") {
+  df %>% select(-c(forecast_distribution, forecast_date)) %>%
+    pivot_wider(id_cols = c(location, start, end, ahead),
+                names_from = "forecaster", names_prefix = var, 
+                values_from = var) %>% 
+    mutate(across(starts_with(var), ~ .x /
+                !!as.symbol(paste0(var, base_forecaster)))) %>%
+    pivot_longer(cols = starts_with(var), names_to = "forecaster",
+                 values_to = "scaled") %>%
+    mutate(forecaster = substring(forecaster, nchar(var) + 1)) %>%
+    filter(forecaster != base_forecaster)
+}
+
+dot_plot(scale_df(score_cards_df, var = "wis"), var = "scaled", 
+         ylab = "Mean scaled WIS") + geom_hline(yintercept = 1) 
+```
+
+Here are now line plots for mean scaled WIS. 
+
+```{r, fig.width = 10, fig.height = 8}
+line_plot(scale_df(score_cards_df, var = "wis"), var = "scaled", 
+          ylab = "Mean scaled WIS") + geom_hline(yintercept = 1) 
+```
+
+## Centering by baseline
+
+Similar to what we did previously but just with centering instead of scaling.
+
+Note on order of operations: center then aggregate versus aggregate then center
+are still in general different strategies. As before we're adhering to the first
+way, with a similar movitation: if space and time effects were now *additive*, 
+then this way would "cancel them out" directly. However, when the aggregator 
+is a linear operation (e.g., mean), the two strategies essentially reduce to the 
+same thing ("essentially", not exactl, because setting `na.rm = TRUE` generally
+turns any linear operator into a nonlinear one). 
+
+Here are the dot plots for mean centered WIS. Omitting median for brevity.
+
+```{r, fig.width = 10, fig.height = 10}
+center_df = function(df, var, base_forecaster = "COVIDhub-baseline") {
+  scale_df(df %>% mutate(y = exp(!!as.symbol(var))), "y", base_forecaster) %>%
+    mutate(centered = log(scaled)) %>% select(-scaled)
+}
+ 
+dot_plot(center_df(score_cards_df, var = "wis"), var = "centered", 
+         ylab = "Mean centered WIS") + geom_hline(yintercept = 0) 
+```
+
+Here are now the line plots for mean centered WIS.
+
+```{r, fig.width = 10, fig.height = 8}
+line_plot(center_df(score_cards_df, var = "wis"), var = "centered", 
+          ylab = "Mean centered WIS") + geom_hline(yintercept = 0) 
+```
+
+## Pairwise tournament
+
+We run a pairwise tournament. This is inspired by Johannes Bracher's analysis
+(and similar ideas in the literature). Except, the order of operations here is
+different: scale then aggregate (whereas Johannes did: aggregate then scale).
+The motivation for this was explained above (thinking of it as providing a 
+nonparametric spatiotemporal adjustment), as was the fact that the order of
+operations really makes a difference.
+
+For each pair of forecasters $f$ and $g$, we compute:
+
+$$
+\theta_{fg} = A\bigg\{ \frac{S(f;\ell,d,a)}{S(g;\ell,d,a)} \;:\; \text{common 
+locations $\ell$, forecast dates $d$, and ahead values $a$} \bigg\}
+$$
+
+where $S$ is a score of interest, say WIS, and $A$ is an aggregator of interest,
+say the mean. Important note: we aggregate over *all common locations, dates, 
+and ahead values*, which may differ for each pair $f,g$. To compute an overall
+metric for forecaster $f$, we use:
+
+$$
+\theta_f = \bigg( \prod_g \theta_{fg} \bigg)^{1/F}.
+$$
+
+the geometric mean of all pairwise comparisons of $f$ to other forecasters (here
+$F$ is the total number of forecasters). Another interesting option would be to 
+define $(\theta_f)_{f \in F}$ as the top left singular vector of the matrix 
+$(\theta_{fg})_{f,g \in F}$, which we'll also investigate.
+
+```{r, fig.width = 10, fig.height = 10}
+pairwise_tournament = function(df, var, aggr = Mean) {
+  forecasters = unique(df$forecaster)
+  theta_mat = matrix(NA, length(forecasters), length(forecasters))
+  rownames(theta_mat) = colnames(theta_mat) = forecasters
+  for (f in forecasters) {
+    result =  scale_df(df, var, base_forecaster = f) %>% 
+      group_by(forecaster) %>%
+      summarize(v = aggr(scaled))
+    theta_mat[result$forecaster, f] = result$v
+  }
+  
+  # Convert to data frame for convenience with ggplot
+  theta_df = as.data.frame(theta_mat) %>%
+    mutate(Forecaster1 = forecasters) %>%
+    pivot_longer(cols = -Forecaster1, names_to = "Forecaster2",
+                 values_to = "value")
+  
+  # Compute overall metrics two ways: geometric mean, SVD
+  theta_vec1 = exp(rowMeans(log(theta_mat), na.rm = TRUE))
+  diag(theta_mat) = 1 # so the SVD won't fail; undo it later
+  theta_vec2 = as.numeric(svd(theta_mat, nu = 1)$u)
+  names(theta_vec2) = names(theta_vec1)
+  diag(theta_mat) = NA
+  
+  return(list(mat = theta_mat, df = theta_df, vec1 = theta_vec1, 
+              vec2 = theta_vec2))
+}
+
+theta = pairwise_tournament(score_cards_df, var = "wis", aggr = 
+                              function(x) mean(x, trim = 0.01, na.rm = TRUE))
+
+ranked_list = rownames(theta$mat)[order(theta$vec1)]
+colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
+ggplot(theta$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
+                     y = factor(Forecaster1, levels = rev(ranked_list)))) +
+  geom_tile(aes(fill = value)) +
+  geom_text(aes(label = round(value, 3))) +
+  scale_fill_gradientn(colours = colors) +
+  labs(x = NULL, y = NULL) +
+  theme_bw() + theme(legend.position = "none", 
+                     axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Overall metric (computed via GM of pairwise metrics):
+knitr::kable(data.frame(rank = 1:length(theta$vec1), forecaster = ranked_list,
+                        theta = sort(theta$vec1), row.names = NULL))
+```
+
+For curiosity, we can plot the agreement the overall metric computed via GM and
+SVD. The agreement is basically perfect!
+
+```{r}
+ggplot() + geom_point(aes(x = theta$vec1, y = theta$vec2)) +
+  labs(x = "Geometric mean", y = "Top left singular vector")
+```
+
+## Pairwise tournament: median and 90th percentile
+
+Repeat the same pairwise tournament but with the median as the aggregator.
+
+```{r, fig.width = 10, fig.height = 10}
+theta = pairwise_tournament(score_cards_df, var = "wis", aggr = Median)
+
+ranked_list = rownames(theta$mat)[order(theta$vec1)]
+colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
+ggplot(theta$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
+                     y = factor(Forecaster1, levels = rev(ranked_list)))) +
+  geom_tile(aes(fill = value)) +
+  geom_text(aes(label = round(value, 3))) +
+  scale_fill_gradientn(colours = colors) +
+  labs(x = NULL, y = NULL) +
+  theme_bw() + theme(legend.position = "none", 
+                     axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Overall metric (computed via GM of pairwise metrics):
+knitr::kable(data.frame(rank = 1:length(theta$vec1), forecaster = ranked_list,
+                        theta = sort(theta$vec1), row.names = NULL))
+```
+
+And now with the 90th percentile as the aggregator. 
+
+```{r, fig.width = 10, fig.height = 10}
+theta = pairwise_tournament(score_cards_df, var = "wis", aggr =
+                              function(x) quantile(x, prob = 0.9, na.rm = TRUE))
+
+ranked_list = rownames(theta$mat)[order(theta$vec1)]
+colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
+ggplot(theta$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
+                     y = factor(Forecaster1, levels = rev(ranked_list)))) +
+  geom_tile(aes(fill = value)) +
+  geom_text(aes(label = round(value, 3))) +
+  scale_fill_gradientn(colours = colors) +
+  labs(x = NULL, y = NULL) +
+  theme_bw() + theme(legend.position = "none", 
+                     axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Overall metric (computed via GM of pairwise metrics):
+knitr::kable(data.frame(rank = 1:length(theta$vec1), forecaster = ranked_list,
+                        theta = sort(theta$vec1), row.names = NULL))
+```

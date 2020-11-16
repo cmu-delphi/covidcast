@@ -1,0 +1,17 @@
+{
+  "message": "success",
+  "result": 1,
+  "epidata": [
+    {
+      "geo_value": "01000",
+      "signal": "bar-not-found",
+      "time_value": 20200101,
+      "direction": null,
+      "issue": 20200102,
+      "lag": 1,
+      "value": 1.0,
+      "stderr": 0.1,
+      "sample_size": 2.0
+    }
+  ]
+}

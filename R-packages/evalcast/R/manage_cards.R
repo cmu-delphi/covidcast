@@ -66,11 +66,25 @@ intersect_locations <- function(cards) {
   cards %>% map(~ .x %>% filter(location %in% intersected_locations))
 }
 
+unpack_single_card <- function(card){
+  UseMethod("unpack_single_card", card)
+}
 
+unpack_single_card.prediction_card <- function(card) {
+  card_attr = attributes(card)
+  card %>%
+  tidyr::unnest(.data$forecast_distribution) %>%
+  dplyr::mutate(
+    ahead = card_attr$ahead,
+    data_source = card_attr$signals$data_source,
+    geo_type = card_attr$geo_type,
+    geo_values = card_attr$geo_values,
+    incidence_period = card_attr$incidence_period,
+    name_of_forecaster = card_attr$name_of_forecaster,
+    signal = card_attr$signals$signal
+  )
+}
 
-
-
-
-
-
-
+aggregate_cards <- function(list_of_cards) {
+  list_of_cards %>% purrr::map_dfr(unpack_single_card)
+}

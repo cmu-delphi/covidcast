@@ -86,3 +86,29 @@ test_that("simple state choropleths", {
                            range = c(0, 2)))
 
 })
+
+test_that("state bubble plot with both missing and 0 values", {
+  fake_data <- structure(data.frame(
+    value = c(1, 2, 0, 3),
+    geo_value = c("pa", "in", "tx", "wy"),
+    time_value = as.Date("2020-01-01"),
+    issue = as.Date("2020-02-01"),
+    stderr = 0.5),
+    class = c("covidcast_signal", "data.frame"),
+    metadata = list(geo_type = "state")
+  )
+
+  # we suppress the warning about missing data
+  expect_doppelganger("bubble plot with 0 and missing",
+                      suppressWarnings(
+                        plot(fake_data, plot_type = "bubble",
+                           range = c(0, 3))))
+})
+
+test_that("simple county bubble plot", {
+  fb_county <- readRDS(test_path("data/survey-data-county.rds"))
+
+  expect_doppelganger("simple county bubble plot",
+                      suppressWarnings(
+                        plot(fb_county, plot_type = "bubble")))
+})

@@ -53,6 +53,7 @@ Imports:
 RoxygenNote: 7.1.1
 Suggests: 
     gridExtra,
+    httptest,
     knitr,
     mockery,
     rmarkdown,

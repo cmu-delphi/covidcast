@@ -256,7 +256,8 @@ covidcast_signal <- function(data_source, signal,
   }
 
   df <- covidcast_days(data_source, signal, start_day, end_day, geo_type,
-                       geo_values, as_of, issues, lag)
+                       geo_values, as_of, issues, lag, 
+                       relevant_meta$num_locations)
 
   # Drop direction column (if it still exists)
   df$direction <- NULL

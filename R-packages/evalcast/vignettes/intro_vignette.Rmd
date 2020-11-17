@@ -36,7 +36,7 @@ library(evalcast)
 library(covidcast)
 library(lubridate)
 
-forecast_dates <- as_date(get_forecast_dates("CMU-TimeSeries"))
+forecast_dates <- get_forecast_dates("CMU-TimeSeries")
 forecast_dates_july <- forecast_dates[forecast_dates >= "2020-07-01" & forecast_dates <= "2020-07-31"]
 
 # Retrieve past predictions from CovidHub

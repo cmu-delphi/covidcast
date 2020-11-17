@@ -110,7 +110,7 @@ get_forecast_dates <- function(covid_hub_forecaster_name) {
     stringr::str_remove_all("\\n") %>%
     stringr::str_match_all(sprintf("(20\\d{2}-\\d{2}-\\d{2})-%s.csv",
                                    covid_hub_forecaster_name))
-  return(as_date(out[[1]][, 2]))
+  return(lubridate::as_date(out[[1]][, 2]))
 }
 
 #' @importFrom rvest html_nodes html_text

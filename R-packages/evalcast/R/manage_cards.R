@@ -86,6 +86,22 @@ unpack_single_card.prediction_card <- function(card) {
   )
 }
 
+unpack_single_card.evaluation_card <- function(card) {
+  card_attr = attributes(card)
+  card %>%
+  tidyr::unnest(.data$forecast_distribution) %>%
+  dplyr::mutate(
+    ahead = card_attr$ahead,
+    as_of = card_attr$as_of,
+    backfill_buffer = card_attr$backfill_buffer,
+    data_source = card_attr$response$data_source,
+    geo_type = card_attr$geo_type,
+    incidence_period = card_attr$incidence_period,
+    name_of_forecaster = card_attr$name_of_forecaster,
+    signal = card_attr$response$signal
+  )
+}
+
 aggregate_cards <- function(list_of_cards) {
   list_of_cards %>% purrr::map_dfr(unpack_single_card)
 }

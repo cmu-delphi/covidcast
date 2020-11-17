@@ -543,7 +543,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
   }
 
   # if not provided, assume worst case
-  if(is.na(max_geos)){
+  if (is.na(max_geos)) {
     max_geos <- MAX_RESULTS
   }
 

@@ -77,6 +77,7 @@ unpack_single_card.prediction_card <- function(card) {
   dplyr::mutate(
     ahead = card_attr$ahead,
     data_source = card_attr$signals$data_source,
+    forecast_date = card_attr$forecast_date,
     geo_type = card_attr$geo_type,
     geo_values = card_attr$geo_values,
     incidence_period = card_attr$incidence_period,

@@ -66,10 +66,36 @@ intersect_locations <- function(cards) {
   cards %>% map(~ .x %>% filter(location %in% intersected_locations))
 }
 
+#' Aggregate cards from a list into a single unnested data frame
+#'
+#' @param list_of_cards List of prediction or evaluation cards.  See documentation for the outputs
+#'   of `evalcast::get_predictions()` and `evalcast::evaluate_predictions()` for the required
+#'   format.
+#' @return Data frame such that:
+#'   \item There is a one-to-one correspondence between rows of the output and the rows of
+#'     `card$forecast_distribution` across each `card` in `list_of_cards`.  That is to say, if each
+#'     card has 7 rows in its `forecast_distribution` and there are 3 such cards in
+#'     `list_of_cards`, the output will have 21 rows.
+#'   \item The columns of the output correspond to:
+#'     \itemize{
+#'       \item Columns of `card$forecast_distribution`
+#'       \item Columns of `card`
+#'       \item Attributes of `card`
+#'     }
+aggregate_cards <- function(list_of_cards) {
+  list_of_cards %>% purrr::map_dfr(unpack_single_card)
+}
+
+#' Unpack a single prediction or evaluation card into an unnested tibble
+#'
+#' This is a generic method for dispatching to specific calls for evaluation and prediction cards.
+#' @param card Evaluation or prediction card.
+#' @return See `aggregate_cards`.
 unpack_single_card <- function(card){
   UseMethod("unpack_single_card", card)
 }
 
+#' Unpack a single prediction card into an unnested tibble
 unpack_single_card.prediction_card <- function(card) {
   card_attr = attributes(card)
   card %>%
@@ -86,6 +112,7 @@ unpack_single_card.prediction_card <- function(card) {
   )
 }
 
+#' Unpack a single evaluation card into an unnested tibble
 unpack_single_card.evaluation_card <- function(card) {
   card_attr = attributes(card)
   card %>%
@@ -100,8 +127,4 @@ unpack_single_card.evaluation_card <- function(card) {
     name_of_forecaster = card_attr$name_of_forecaster,
     signal = card_attr$response$signal
   )
-}
-
-aggregate_cards <- function(list_of_cards) {
-  list_of_cards %>% purrr::map_dfr(unpack_single_card)
 }

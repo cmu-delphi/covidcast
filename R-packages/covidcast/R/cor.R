@@ -1,16 +1,18 @@
 #' Compute correlations between two `covidcast_signal` data frames
 #'
-#' Computes correlations between two `covidcast_signal()` data frames, allowing
-#' for slicing by geo location, or by time. (The latest issue from each data
-#' frame is used when computing correlations.) See
-#' `vignette("correlation-utils")` for examples.
+#' Computes correlations between two `covidcast_signal` data frames, allowing
+#' for slicing by geo location, or by time. (Only the latest issue from each
+#' data frame are used for correlations.) See the [correlations
+#' vignette](https://cmu-delphi.github.io/covidcast/covidcastR/articles/correlation-utils.html)
+#' for examples.
 #'
 #' @param x,y The `covidcast_signal` data frames to correlate.
 #' @param dt_x,dt_y Time shifts to consider for `x` and `y`, respectively,
-#'   before computing correlations. These must both be nonnegative, and only one
-#'   can be positive. If `dt_x = 1`, for example, then data for `x` is shifted
-#'   forward 1 day in time (so, data on June 1 becomes data on June 2, and so
-#'   on). Default is 0 for both.
+#'   before computing correlations. Negative shifts translate into in a lag
+#'   value and positive shifts into a lead value; for example, if `dt = -1`,
+#'   then the new value on June 2 is the original value on June 1; if `dt = 1`,
+#'   then the new value on June 2 is the original value on June 3; if `dt = 0`,
+#'   then the values are left as is. Default is 0 for both `dt_x` and `dt_y`. 
 #' @param by If "geo_value", then correlations are computed for each geo
 #'   location, over all time. Each correlation is measured between two time
 #'   series at the same location. If "time_value", then correlations are
@@ -31,8 +33,6 @@ covidcast_cor = function(x, y, dt_x = 0, dt_y = 0,
                          method = c("pearson", "kendall", "spearman")) {
   x = latest_issue(x)
   y = latest_issue(y)
-  if (dt_x < 0 || dt_y < 0) stop("Both `dt_x` and `dt_y` must be nonnegative.")
-  if (dt_x > 0 && dt_y > 0) stop("Only one of `dt_x` and `dt_y` can be positive.")
   by = match.arg(by)
   method = match.arg(method)
 
@@ -51,10 +51,16 @@ covidcast_cor = function(x, y, dt_x = 0, dt_y = 0,
   # Perform time shifts, then compute appropriate correlations and return
   return(z %>% dplyr::group_by(geo_value) %>% # group by geo value
          dplyr::arrange(time_value) %>%  # sort rows by increasing time
-         dplyr::mutate(value.x = dplyr::lag(value.x, n = dt_x), # shift values
-                       value.y = dplyr::lag(value.y, n = dt_y)) %>%
+         dplyr::mutate(value.x = shift(value.x, n = dt_x), # shift values
+                       value.y = shift(value.y, n = dt_y)) %>%
          dplyr::ungroup() %>% # get rid of grouping by geo value
          dplyr::group_by(.dots = as.symbol(by)) %>% # group by what's specified
          dplyr::summarize(value = cor(x = value.x, y = value.y, # compute cor
                                       use = use, method = method)))
+}
+
+# Function to perform time shifts, lag or lead
+shift = function(value, n) {
+  if (n < 0) return(dplyr::lag(value, -n))
+  else return(dplyr::lead(value, n))
 }

@@ -1,8 +1,9 @@
 ---
-title: Correlation utilities
+title: 2. Computing signal correlations
+description: Calculate correlations over space and time between multiple signals.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{2. Correlation utilities}
+  %\VignetteIndexEntry{2. Computing signal correlations}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -11,38 +12,40 @@ The covidcast package provides some simple utilities for exploring the
 correlations between two signals, over space or time, which may be helpful for
 simple analyses and explorations of data.
 
-For these examples, we'll load confirmed cases and deaths to compare against,
-and restrict our analysis to counties with at least 500 total cases by August
-15th.
+For these examples, we'll load confirmed case and death rates. and restrict our
+analysis to counties with at least 500 total cases by August 15th.
 
 ```{r, message = FALSE}
 library(covidcast)
 library(dplyr)
 
-start_day = "2020-03-01"
-end_day = "2020-08-15"
+start_day <- "2020-03-01"
+end_day <- "2020-08-15"
 
-df_inum = suppressMessages(
+iprop <- suppressMessages(
   covidcast_signal(data_source = "jhu-csse",
-                   signal = "confirmed_7dav_incidence_num", 
+                   signal = "confirmed_7dav_incidence_prop", 
                    start_day = start_day, end_day = end_day)
 )
-summary(df_inum)
+summary(iprop)
 
-df_dnum = suppressMessages(
+dprop <- suppressMessages(
   covidcast_signal(data_source = "jhu-csse",
-                   signal = "deaths_7dav_incidence_num", 
+                   signal = "deaths_7dav_incidence_prop", 
                    start_day = start_day, end_day = end_day)
 )
-summary(df_dnum)
+summary(dprop)
 
 # Restrict attention to "active" counties with at least 500 total cases 
-case_num = 500
-geo_values = df_inum %>% group_by(geo_value) %>% 
-  summarize(total = sum(value)) %>% 
-  filter(total >= case_num) %>% pull(geo_value)
-df_inum_act = df_inum %>% filter(geo_value %in% geo_values)
-df_dnum_act = df_dnum %>% filter(geo_value %in% geo_values)
+case_num <- 500
+geo_values <- suppressMessages(
+  covidcast_signal(data_source = "jhu-csse",
+                   signal = "confirmed_cumulative_num", 
+                   start_day = end_day, end_day = end_day) %>%
+  filter(value >= case_num) %>% pull(geo_value)
+)
+iprop_act <- iprop %>% filter(geo_value %in% geo_values)
+dprop_act <- dprop %>% filter(geo_value %in% geo_values)
 ```
 
 ## Correlations sliced by time
@@ -60,90 +63,72 @@ by setting `by = "time_value"`:
 library(ggplot2)
 
 # Compute correlation per time, over all counties
-df_cor1 = covidcast_cor(df_inum_act, df_dnum_act, by = "time_value")
+df_cor <- covidcast_cor(iprop_act, dprop_act, by = "time_value")
 
 # Plot the correlation time series
-ggplot(df_cor1, aes(x = time_value, y = value)) + geom_line() + 
-  labs(title = "Correlation between cases and deaths",
+ggplot(df_cor, aes(x = time_value, y = value)) + geom_line() + 
+  labs(title = "Correlation between case and death rates",
        subtitle = sprintf("Per day, over counties with at least %i cases", 
                           case_num),
        x = "Date", y = "Correlation") 
 ```
+ 
+The above plot addresses the question: "on any given day, are case and death
+rates linearly associated, over US counties?". We might be interested in 
+broadening this question, instead asking: "on any given day, do higher case 
+rates tend to associate with higher death rates?", removing the dependence on a 
+linear relationship. The latter can be addressed using Spearman correlation, 
+accomplished by setting `method = "spearman"` in the call to `covidcast_cor()`.
+Spearman correlation is highly robust and invariant to monotone transformations
+(it doesn't rely on any particular functional form for the dependence between 
+two variables). 
 
-(The sudden drop on July 25th is due to a [sudden change in how New Jersey
-reported deaths](https://github.com/CSSEGISandData/COVID-19/issues/2763) being
-reflected in our data source as large outliers; since the signal is a 7-day
-average, these outliers last until the beginning of July and affect the reported
-correlation.)
-
-We might also be interested in how cases now correlate with deaths in the
-*future*. Using the `dt_x` parameter, we can shift the signal by 10 days forward
-in time, before calculating correlations:
+We might also interested in interested in how case rates associate with death
+rates in the *future*. Using the `dt_x` parameter in `covidcast_cor()`, we can 
+lag case rates back any number of days we want, before calculating correlations.
 
 ```{r, warning = FALSE}
-# Same, but now shift incident cases numbers by 10 days forward in time
-df_cor2 = covidcast_cor(df_inum_act, df_dnum_act, by = "time_value", dt_x = 10)
+# Use Spearman correlation, with case rates and 10-day lagged case rates
+df_cor1 <- covidcast_cor(iprop_act, dprop_act, by = "time_value", 
+                        method = "spearman")
+df_cor2 <- covidcast_cor(iprop_act, dprop_act, by = "time_value", dt_x = -10,
+                        method = "spearman")
 
 # Stack rowwise into one data frame, then plot time series
-df_cor = rbind(df_cor1, df_cor2)
-df_cor$Shift = as.factor(c(rep(0, nrow(df_cor1)), rep(10, nrow(df_cor2))))
+df_cor <- rbind(df_cor1, df_cor2)
+df_cor$dt <- as.factor(c(rep(0, nrow(df_cor1)), rep(-10, nrow(df_cor2))))
 ggplot(df_cor, aes(x = time_value, y = value)) + 
-  geom_line(aes(color = Shift)) + 
-  labs(title = "Correlation between cases and deaths",
+  geom_line(aes(color = dt)) + 
+  labs(title = "Correlation between case and death rates",
        subtitle = sprintf("Per day, over counties with at least %i cases", 
-                          case_num),
-       x = "Date", y = "Correlation") + 
-  theme(legend.position = "bottom")
-```
-
-We can see that, for the most part, shifting the cases time series forward by 10
-days improves correlations, showing that cases are better correlated with deaths
-10 days from now.
-
-We can also look at Spearman (rank) correlation, which is a more robust measure 
-of correlation: it's invariant to monotone transformations, and doesn't rely on
-any particular functional form for the dependence between two variables.
-
-```{r, warning = FALSE}
-# Repeat this comparison, but now using Spearman (rank) correlation
-df_cor1 = covidcast_cor(df_inum_act, df_dnum_act, by = "time_value", 
-                        method = "spearman")
-df_cor2 = covidcast_cor(df_inum_act, df_dnum_act, by = "time_value", dt_x = 10,
-                        method = "spearman")
-
-# Stack rowwise into one data frame, then plot time series
-df_cor = rbind(df_cor1, df_cor2)
-df_cor$Shift = as.factor(c(rep(0, nrow(df_cor1)), rep(10, nrow(df_cor2))))
-ggplot(df_cor, aes(x = time_value, y = value)) + 
-  geom_line(aes(color = Shift)) + 
-  labs(title = "Correlation between cases and deaths",
-       subtitle = sprintf("Per day, over counties with at least %i cases", case_num),
+                          case_num), 
        x = "Date", y = "Correlation") +
   theme(legend.position = "bottom")
 ```
 
-The "big dip" is gone (since the Spearman correlation uses ranks and not the
-actual values, and hence is less sensitive to outliers), and we can again see
-that the shift helps correlations.
+We can see that, for the most part, the Spearman measure has bolstered the 
+correlations; and generally, lagging the case rates time series back by 10 days 
+improves correlations, confirming case rates are better correlated with death 
+rates 10 days from now.
 
 ## Correlations sliced by county
 
 The second option we have is to "slice by location": this calculates, for each 
 geographic location, correlation between the time series of two signals. This
 is obtained by setting `by = "geo_value"`. We'll again look at correlations 
-both for observations at the same time and for a 10-day shift:
+both for observations at the same time and for 10-day lagged case rates:
 
 ```{r, warning = FALSE}
 # Compute correlation per county, over all times
-df_cor1 = covidcast_cor(df_inum_act, df_dnum_act, by = "geo_value")
-df_cor2 = covidcast_cor(df_inum_act, df_dnum_act, by = "geo_value", dt_x = 10)
+df_cor1 <- covidcast_cor(iprop_act, dprop_act, by = "geo_value")
+df_cor2 <- covidcast_cor(iprop_act, dprop_act, by = "geo_value", dt_x = -10)
 
 # Stack rowwise into one data frame, then plot densities
-df_cor = rbind(df_cor1, df_cor2)
-df_cor$Shift = as.factor(c(rep(0, nrow(df_cor1)), rep(10, nrow(df_cor2))))
+df_cor <- rbind(df_cor1, df_cor2)
+df_cor$dt <- as.factor(c(rep(0, nrow(df_cor1)), rep(-10, nrow(df_cor2))))
 ggplot(df_cor, aes(value)) + 
-  geom_density(aes(color = Shift, fill = Shift), alpha = 0.5) + 
-  labs(title = "Correlation between cases and deaths",
+  geom_density(aes(color = dt, fill = dt), alpha = 0.5) + 
+  labs(title = "Correlation between case and death rates",
        subtitle = "Computed separately for each county, over all times",
        x = "Date", y = "Density") +
   theme(legend.position = "bottom")
@@ -153,16 +138,16 @@ Using some tricks, we can attach the necessary properties to the data frame so
 we can plot these correlations in space as a choropleth map, using
 `plot.covidcast_signal()`:
 
-```{r, fig.width=10, fig.height=8}
+```{r, fig.width = 10, fig.height = 8}
 # Set a bunch of fields so that the data frame knows how to plot itself
-df_cor2$time_value = start_day
-df_cor2$issue = start_day
-attributes(df_cor2)$geo_type = "county"
-class(df_cor2) = c("covidcast_signal", "data.frame")
+df_cor2$time_value <- start_day
+df_cor2$issue <- start_day
+attributes(df_cor2)$metadata$geo_type <- "county"
+class(df_cor2) <- c("covidcast_signal", "data.frame")
 
 # Plot choropleth maps, using the covidcast plotting functionality
-plot(df_cor2, title = "Correlations between 10-day shifted cases and deaths",
-     range = c(-1, 1), choro_col = c("orange","lightblue", "purple"))
+plot(df_cor2, title = "Correlations between 10-day lagged case and death rates",
+     range = c(-1, 1), choro_col = c("orange", "lightblue", "purple"))
 ```
 
 ## More systematic lag analysis
@@ -171,27 +156,27 @@ You could also imagine trying to move the signals with various lags to see at
 what lag one signal is most correlated with the other. A simple way to achieve
 this:
 
-```{r, message = TRUE, warning = FALSE, fig.width=6, fig.height=4}
-# Loop over values for the time shift, and compute correlations per county
-dt_vec = 0:15
-df_list = vector("list", length(dt_vec))
+```{r, message = TRUE, warning = FALSE, fig.width = 6, fig.height = 4}
+# Loop over values for dt, and compute correlations per county
+dt_vec <- -(0:15)
+df_list <- vector("list", length(dt_vec))
 for (i in 1:length(dt_vec)) {
-  df_list[[i]] = covidcast_cor(df_inum_act, df_dnum_act, dt_x = dt_vec[i],
+  df_list[[i]] <- covidcast_cor(iprop_act, dprop_act, dt_x = dt_vec[i],
                                by = "geo_value")
-  df_list[[i]]$dt = dt_vec[i]
+  df_list[[i]]$dt <- dt_vec[i]
 }
 
-# Stack into one big data frame, and then plot the median correlation by shift
-df = do.call(rbind, df_list)
+# Stack into one big data frame, and then plot the median correlation by dt
+df <- do.call(rbind, df_list)
 df %>%
   group_by(dt) %>%
   summarize(median = median(value, na.rm = TRUE), .groups = "drop_last") %>%
   ggplot(aes(x = dt, y = median)) + geom_line() + geom_point() +
-  labs(title = "Median correlation between cases and deaths",
-       x = "Shift", y = "Correlation") +
+  labs(title = "Median correlation between case and death rates",
+       x = "dt", y = "Correlation") +
   theme(legend.position = "bottom", legend.title = element_blank())
 ```
 
-We can see that the median correlation between cases and deaths (where the
-correlations come from slicing by location) is maximized when we shift the case
-incidence numbers 8 days forward in time.
+We can see that the median correlation between case and death rates (where the
+correlations come from slicing by location) is maximized when we lag the case
+incidence rates back 8 days in time.

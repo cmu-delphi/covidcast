@@ -1,7 +1,7 @@
 Package: covidcast
 Type: Package
 Title: Client for Delphi's COVIDcast API
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: 
   c(
     person(given = "Jacob",
@@ -29,8 +29,9 @@ Authors@R:
 URL: https://cmu-delphi.github.io/covidcast/covidcastR/,
   https://github.com/cmu-delphi/covidcast 
 BugReports: https://github.com/cmu-delphi/covidcast/issues
-Description: Tools for Delphi's COVIDcast API: data access (for our COVID-19  
-  indicators), maps and time series plotting, and basic signal processing.     
+Description: Tools for Delphi's COVIDcast API: data access (for Delphi's
+  COVID-19 indicators), maps and time series plotting, and basic signal
+  processing.    
 Depends: R (>= 3.5.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -38,17 +39,23 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 Imports:
   dplyr,
-  httr,
-  purrr,
-  jsonlite,
-  usmap,
-  maptools,
   ggplot2,
   grDevices,
-  rlang
+  httr,
+  jsonlite,
+  maptools,
+  purrr,
+  rlang,
+  tidyr,
+  usmap
 RoxygenNote: 7.1.1
 Suggests: 
+    gridExtra,
+    httptest,
     knitr,
+    mockery,
     rmarkdown,
-    gridExtra
+    testthat,
+    tibble,
+    vdiffr
 VignetteBuilder: knitr

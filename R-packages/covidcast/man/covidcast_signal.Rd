@@ -48,7 +48,6 @@ provided as a \code{Date} object or string in the form "YYYY-MM-DD". If
 one of \code{as_of}, \code{issues}, and \code{lag} should be provided; it does not make
 sense to specify more than one.}
 
-
 \item{issues}{Fetch only data that was published or updated ("issued") on
 these dates. Provided as either a single \code{Date} object (or string in the
 form "YYYY-MM-DD"), indicating a single date to fetch data issued on, or
@@ -98,7 +97,8 @@ United States. Available data sources and signals are documented in the
 Most (but not all) data sources are available at the county level, but the
 API can also return data aggregated to metropolitan statistical areas,
 hospital referral regions, or states, as desired, by using the \code{geo_type}
-argument. View \code{vignette("covidcast")} for detailed example usage.
+argument. View the \href{https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html}{covidcast vignette}
+for detailed example usage.
 }
 \details{
 For data on counties, metropolitan statistical areas, and states, this
@@ -122,8 +122,9 @@ may get an error or confusing results.
 Note that the API only tracks the initial value of an estimate and \emph{changes}
 to that value. If a value was first issued on June 5th and never updated,
 asking for data issued on June 6th (using \code{issues} or \code{lag}) would \emph{not}
-return that value, though asking for data \code{as_of} June 6th would. See
-\code{vignette("covidcast")} for examples.
+return that value, though asking for data \code{as_of} June 6th would. See the
+\href{https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html}{covidcast vignette}
+for examples.
 
 Note also that the API enforces a maximum result row limit; results beyond
 the maximum limit are truncated. This limit is sufficient to fetch
@@ -136,23 +137,24 @@ calls with different \code{issues} arguments.
 
 Downloading large amounts of data may be slow, so this function prints
 messages for each day of data it downloads. To suppress these, use
-\code{\link[base:message]{base::suppressMessages()}}, as in \code{suppressMessages(covidcast_signal("fb-survey", ...))}.
+\code{\link[base:message]{base::suppressMessages()}}, as in
+\code{suppressMessages(covidcast_signal("fb-survey", ...))}.
 }
 \examples{
 \dontrun{
 ## Fetch all counties from 2020-05-10 to the most recent available data
-covidcast_signal("fb-survey", "raw_cli", start_day = "2020-05-10")
+covidcast_signal("fb-survey", "smoothed_cli", start_day = "2020-05-10")
 ## Fetch all counties on just 2020-05-10 and no other days
-covidcast_signal("fb-survey", "raw_cli", start_day = "2020-05-10",
+covidcast_signal("fb-survey", "smoothed_cli", start_day = "2020-05-10",
                  end_day = "2020-05-10")
 ## Fetch all states on 2020-05-10, 2020-05-11, 2020-05-12
-covidcast_signal("fb-survey", "raw_cli", start_day = "2020-05-10",
+covidcast_signal("fb-survey", "smoothed_cli", start_day = "2020-05-10",
                  end_day = "2020-05-12", geo_type = "state")
 ## Fetch all available data for just Pennsylvania and New Jersey
-covidcast_signal("fb-survey", "raw_cli", geo_type = "state",
+covidcast_signal("fb-survey", "smoothed_cli", geo_type = "state",
                  geo_values = c("pa", "nj"))
 ## Fetch all available data in the Pittsburgh metropolitan area
-covidcast_signal("fb-survey", "raw_cli", geo_type = "msa",
+covidcast_signal("fb-survey", "smoothed_cli", geo_type = "msa",
                  geo_values = name_to_cbsa("Pittsburgh"))
 }
 

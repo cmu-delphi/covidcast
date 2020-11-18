@@ -57,7 +57,7 @@ county_totals = df_fb1 %>%
 
 county_totals$time_value = "2020-04-15"
 county_totals$issue = "2020-04-15"
-attributes(county_totals)$geo_type = "county"
+attributes(county_totals)$metadata$geo_type = "county"
 class(county_totals) = c("covidcast_signal", "data.frame")
 
 plot(county_totals, title = "Which counties ever appear in our CLI signals?",

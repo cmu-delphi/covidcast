@@ -1,0 +1,150 @@
+---
+title: 3. Manipulating multiple signals 
+description: Download multiple signals at once, and aggregate and manipulate them in various ways.
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{3. Manipulating multiple signals}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Various analyses involve working with multiple signals at once. The covidcast 
+package provides some helper functions for fetching multiple signals from the 
+API, and aggregating them into one data frame for various downstream uses.
+
+## Fetching multiple signals
+
+To load confirmed cases and deaths at the state level, in a single function 
+call, we can use `covidcast_signals()` (note the plural form of "signals"):
+
+```{r, message = FALSE}
+library(covidcast)
+
+start_day <- "2020-06-01"
+end_day <- "2020-10-01"
+
+signals <- suppressMessages(
+  covidcast_signals(data_source = "usa-facts",
+                    signal = c("confirmed_incidence_num", 
+                               "deaths_incidence_num"),
+                    start_day = start_day, end_day = end_day,
+                    geo_type = "state")
+)
+
+summary(signals[[1]])
+summary(signals[[2]])
+```
+
+This returns a list of `covidcast_signal` objects. The argument structure for
+`covidcast_signals()` matches that of `covidcast_signal()`, except the first 
+four arguments (`data_source`, `signal`, `start_day`, `end_day`) are allowed to
+be vectors. See the `covidcast_signals()` documentation for details. 
+
+## Aggregating signals, wide format
+
+To aggregate multiple signals together, we can use the `aggregate_signals()`
+function, which acceps a list of `covidcast_signal` objects, as returned by
+`covidcast_signals()`. With all arguments set to their default values,
+`aggregate_signals()` returns a data frame in "wide" format: 
+
+```{r, message=FALSE}
+library(dplyr)
+
+aggregate_signals(signals) %>% head()
+```
+
+In "wide" format, only the latest issue of data is retained, and the columns 
+`data_source`, `signal`, `issue`, `lag`, `stderr`, `sample_size` are all dropped
+from the returned data frame. Each unique signal---defined by a combination of 
+data source name, signal name, and time-shift---is given its own column, whose 
+name indicates its defining quantities.
+
+As hinted above, `aggregate_signals()` can also apply time-shifts to the given
+signals, through the optional `dt` argument. This can be either be a single 
+vector of shifts or a list of vectors of shifts, this list having the same 
+length as the list of `covidcast_signal` objects (to apply, respectively, the 
+same shifts or a different set of shifts to each `covidcast_signal` object).
+Negative shifts translate into in a *lag* value and positive shifts into a 
+*lead* value; for example, if `dt = -1`, then the value on June 2 that gets 
+reported is the original value on June 1; if `dt = 0`, then the values are left
+as is.
+
+```{r}
+aggregate_signals(signals, dt = c(-1, 0)) %>% 
+  filter(geo_value == "tx") %>% head()
+aggregate_signals(signals, dt = list(0, c(-1, 0, 1))) %>% 
+  filter(geo_value == "tx") %>% head()
+```
+
+Finally, `aggregate_signals()` also accepts a single data frame (instead of a
+list of data frames), intended to be convenient when applying shifts to a single
+`covidcast_signal` object:
+
+```{r}
+aggregate_signals(signals[[1]], dt = c(-1, 0, 1)) %>%
+  filter(geo_value == "tx") %>% head()
+```
+
+## Aggregating signals, long format
+
+We can also use `aggregate_signals()` in "long" format: 
+
+```{r}
+aggregate_signals(signals, format = "long") %>% 
+  filter(geo_value == "tx") %>% head()
+
+aggregate_signals(signals, dt = c(-1, 0), format = "long") %>% 
+  filter(geo_value == "tx") %>% head()
+
+aggregate_signals(signals, dt = list(-1, 0), format = "long") %>% 
+  filter(geo_value == "tx") %>% head()
+```
+
+As we can see, time-shifts work just as before, in "wide" format. However, in
+"long" format, all columns are retained, and an additional `dt` column is added 
+to record the time-shift being used. 
+
+Just as before, `covidcast_signals()` can also operate on a single data frame, 
+to conveniently apply shifts, in "long" format:
+
+```{r}
+aggregate_signals(signals[[1]], dt = c(-1, 0), format = "long") %>% 
+  filter(geo_value == "tx") %>% head()
+```
+
+## Pivoting longer or wider
+
+The package also provides functions for pivoting an aggregated signal data frame
+longer or wider. These are essentially wrappers around `pivot_longer()` and 
+`pivot_wider()` from the `tidyr` package, that set the column structure and
+column names appropriately. For example, to pivot longer:
+
+```{r}
+aggregate_signals(signals, dt = list(-1, 0)) %>% 
+  covidcast_longer() %>% 
+  filter(geo_value == "tx") %>% head()
+```
+
+And to pivot wider:
+
+```{r}
+aggregate_signals(signals, dt = list(-1, 0), format = "long") %>% 
+  covidcast_wider() %>% 
+  filter(geo_value == "tx") %>% head()
+```
+
+## A sanity check
+
+Lastly, here's a small sanity check, that lagging cases by 7 days using 
+`aggregate_signals()` and correlating this with deaths using `covidcast_cor()` 
+yields the same result as telling `covidcast_cor()` to do the time-shifting 
+itself:
+
+```{r}
+df_cor1 = covidcast_cor(x = aggregate_signals(signals[[1]], dt = -7, 
+                                              format = "long"),
+                        y = signals[[2]])
+
+df_cor2 = covidcast_cor(x = signals[[1]], y = signals[[2]], dt_x = -7)
+identical(df_cor1, df_cor2)
+```

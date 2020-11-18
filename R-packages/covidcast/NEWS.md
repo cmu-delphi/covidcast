@@ -1,3 +1,21 @@
+# covidcast 0.3.1
+
+Released October 31, 2020.
+
+## Breaking changes
+
+- The `covidcast_cor()` function now interprets its `dt_x` and `dt_y` arguments
+  in the opposite way as before, i.e. what was once a positive lag is now a
+  negative lag. See the documentation for details.
+
+## Major changes
+
+- The new `covidcast_signals()` function allows users to query multiple signals
+  from the API at once, returning a list of data frames. The
+  `aggregate_signals()` function can convert this list into a "wide" or "long"
+  format data frame for further analysis, while `covidcast_wider()` and
+  `covidcast_longer()` can convert from "long" to "wide" format and vice versa.
+
 # covidcast 0.3.0
 
 Released August 22, 2020.

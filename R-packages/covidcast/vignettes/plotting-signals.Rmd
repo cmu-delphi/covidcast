@@ -1,5 +1,6 @@
 ---
-title: Plotting and mapping signals
+title: 1. Plotting and mapping signals
+description: Make custom time series plots, choropleth maps, and bubble plots of signals.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{1. Plotting and mapping signals}
@@ -23,19 +24,19 @@ the data is simple:
 ```{r, message=FALSE}
 library(covidcast)
 
-df_comb <- suppressMessages(
+comb <- suppressMessages(
   covidcast_signal(data_source = "indicator-combination", 
                    signal = "nmf_day_doc_fbc_fbs_ght",
                    start_day = "2020-07-01", end_day = "2020-07-14")
 )
-summary(df_comb)
+summary(comb)
 
-df_inum <- suppressMessages(
-  covidcast_signal(data_source = "jhu-csse",
+inum <- suppressMessages(
+  covidcast_signal(data_source = "usa-facts",
                    signal = "confirmed_7dav_incidence_num",
                    start_day = "2020-07-01", end_day = "2020-07-14")
 )
-summary(df_inum)
+summary(inum)
 ```
 
 ## Choropleth maps
@@ -49,7 +50,7 @@ The default `plot` method for `covidcast_signal` objects,
 `usmap` package:
 
 ```{r}
-plot(df_comb)
+plot(comb)
 ```
 
 The color scheme is automatically chosen to be similar to that used on the
@@ -59,7 +60,7 @@ choose the day and also choose the color scales, transparency level for mega
 counties, and title:
 
 ```{r}
-plot(df_comb, time_value = "2020-07-04", choro_col = cm.colors(10), alpha = 0.4,
+plot(comb, time_value = "2020-07-04", choro_col = cm.colors(10), alpha = 0.4,
      title = "Combination of COVID-19 indicators on 2020-07-04")
 ```
 
@@ -75,7 +76,7 @@ colors <- c("#D3D3D3", "#FFFFCC", "#FEDDA2", "#FDBB79", "#FD9950", "#EB7538",
 # we assign colors[i] iff the value satisfies breaks[i] <= value < breaks[i+1], 
 # where we take breaks[0] = -Inf and breaks[N+1] = Inf, for N = length(breaks)
 
-plot(df_inum, choro_col = colors, choro_params = list(breaks = breaks),
+plot(inum, choro_col = colors, choro_params = list(breaks = breaks),
      title = "New COVID cases (7-day trailing average) on 2020-07-14")
 ```
 
@@ -83,8 +84,8 @@ Lastly, we show how we can use custom breaks to (visually) answer the question:
 which counties have cumulative case rates of at least 1/100?
 
 ```{r}
-df_cprop <- suppressMessages(
-  covidcast_signal(data_source = "jhu-csse",
+cprop <- suppressMessages(
+  covidcast_signal(data_source = "usa-facts",
                    signal = "confirmed_cumulative_prop",
                    start_day = "2020-07-01", end_day = "2020-07-14")
 )
@@ -92,7 +93,7 @@ df_cprop <- suppressMessages(
 breaks <- c(0, 1000)
 colors <- c("#D3D3D3", "#FFC0CB")
 
-plot(df_cprop, choro_col = colors, 
+plot(cprop, choro_col = colors, 
      choro_params = list(breaks = breaks, legend_width = 3), 
      title = "Cumulative COVID cases per 100k people on 2020-07-14")
 ```
@@ -105,7 +106,7 @@ zero always means zero bubble size. The legend shows all bins, interpreted as
 each bubble size meaning *at least* the corresponding value.
 
 ```{r}
-plot(df_inum, plot_type = "bubble")
+plot(inum, plot_type = "bubble")
 ```
 
 As before, we can of course set customized breaks. As values to the left of the
@@ -113,7 +114,7 @@ first bin do not get drawn, this map is much sparser, and highlights areas with
 larger case counts.
 
 ```{r}
-plot(df_inum, plot_type = "bubble", 
+plot(inum, plot_type = "bubble", 
      bubble_params = list(breaks = seq(20, 200, len = 6)))
 ```
 
@@ -126,8 +127,8 @@ We'd like to compare counts per 100,000 against absolute counts, so we fetch the
 proportion signal:
 
 ```{r}
-df_iprop <- suppressMessages(
-  covidcast_signal(data_source = "jhu-csse",
+iprop <- suppressMessages(
+  covidcast_signal(data_source = "usa-facts",
                    signal = "confirmed_7dav_incidence_prop",
                    start_day = "2020-07-01", end_day = "2020-07-14")
 )
@@ -141,14 +142,14 @@ library(gridExtra)
 breaks1 <- c(1, 10, 100, 1000)
 breaks2 <- c(10, 50, 100, 500)
 
-p1 <- plot(df_inum, plot_type = "bubble", 
+p1 <- plot(inum, plot_type = "bubble", 
            bubble_params = list(breaks = breaks1, max_size = 6),
            include = "TX", bubble_col = "red",
-           title = paste("Incidence number on", max(df_inum$time_value)))
-p2 <- plot(df_iprop, plot_type = "bubble", 
+           title = paste("Incidence number on", max(inum$time_value)))
+p2 <- plot(iprop, plot_type = "bubble", 
            bubble_params = list(breaks = breaks2, max_size = 6),
            include = "TX", bubble_col = "red",
-           title = paste("Incidence rate on", max(df_iprop$time_value)))
+           title = paste("Incidence rate on", max(iprop$time_value)))
 
 grid.arrange(p1, p2, nrow = 1)
 ```
@@ -164,11 +165,11 @@ than for all counties. This will make the time series plots more manageable.
 
 ```{r}
 suppressMessages({
-df_comb_st <- covidcast_signal(data_source = "indicator-combination",
+comb_st <- covidcast_signal(data_source = "indicator-combination",
                                signal = "nmf_day_doc_fbc_fbs_ght",
                                start_day = "2020-04-15", end_day = "2020-07-01",
                                geo_type = "state")
-df_inum_st <- covidcast_signal(data_source = "jhu-csse",
+inum_st <- covidcast_signal(data_source = "usa-facts",
                                signal = "confirmed_7dav_incidence_num",
                                start_day = "2020-04-15", end_day = "2020-07-01",
                                geo_type = "state")
@@ -183,8 +184,8 @@ states and plot all data for them:
 library(dplyr)
 
 states <- c("ca", "pa", "tx", "ny")
-plot(df_comb_st %>% filter(geo_value %in% states), plot_type = "line") 
-plot(df_inum_st %>% filter(geo_value %in% states), plot_type = "line")
+plot(comb_st %>% filter(geo_value %in% states), plot_type = "line") 
+plot(inum_st %>% filter(geo_value %in% states), plot_type = "line")
 ```
 
 Notice how in Texas, the combined indicator rose several weeks in advance of
@@ -204,19 +205,19 @@ For example:
 library(ggplot2)
 
 suppressMessages({
-df_comb_md <- covidcast_signal(data_source = "indicator-combination",
+comb_md <- covidcast_signal(data_source = "indicator-combination",
                                signal = "nmf_day_doc_fbc_fbs_ght",
                                start_day = "2020-06-01", end_day = "2020-07-15",
                                geo_values = name_to_fips("Miami-Dade"))
-df_inum_md <- covidcast_signal(data_source = "jhu-csse",
+inum_md <- covidcast_signal(data_source = "usa-facts",
                                signal = "confirmed_7dav_incidence_num",
                                start_day = "2020-06-01", end_day = "2020-07-15",
                                geo_values = name_to_fips("Miami-Dade"))
 })
 
 # Compute the ranges of the two signals
-range1 <- df_inum_md %>% select("value") %>% range
-range2 <- df_comb_md %>% select("value") %>% range
+range1 <- inum_md %>% select("value") %>% range
+range2 <- comb_md %>% select("value") %>% range
 
 # Function to transform from one range to another
 trans <- function(x, from_range, to_range) {
@@ -230,10 +231,10 @@ trans21 <- function(x) trans(x, range2, range1)
 
 # Transform the combined signal to the incidence range, then stack
 # these rowwise into one data frame
-df <- select(rbind(df_comb_md %>% mutate_at("value", trans21),
-                   df_inum_md), c("time_value", "value"))
-df$signal <- c(rep("Combined indicator", nrow(df_comb_md)),
-               rep("New COVID-19 cases", nrow(df_inum_md)))   
+df <- select(rbind(comb_md %>% mutate_at("value", trans21),
+                   inum_md), c("time_value", "value"))
+df$signal <- c(rep("Combined indicator", nrow(comb_md)),
+               rep("New COVID-19 cases", nrow(inum_md)))   
 
 # Finally, plot both signals
 ggplot(df, aes(x = time_value, y = value)) +

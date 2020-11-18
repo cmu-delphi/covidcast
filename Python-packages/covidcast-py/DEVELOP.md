@@ -16,17 +16,11 @@ These are general recommendations for developing. They do not have to be strictl
 but are encouraged. 
 
 __Environment__
-- A virtual environment is recommended, which can be started with the following commands:
-
-    ```sh
-    python3 -m venv env
-    source env/bin/activate
-    ```
-    this will create an `env/` folder containing files required in the environment, which
-    is gitignored. The environment can be deactived by running `deactivate`, and reactived by
-    rerunning `source env/bin/activate`. To create a new environment, you can delete the 
-    `env/` folder and rerun the above commands if you do not require the old one anymore, 
-    or rerun the above command with a new environment name in place of `env`.
+- A virtual environment is recommended to install and develop this package. Run `make install` to generate a 
+virtual environment and install the package in editable mode (code changes will automatically propagate).
+- If you want to enter the virtual environment in your shell, you can run source env/bin/activate. Run deactivate 
+to leave the virtual environment.
+- To remove the virtual environment, you can run `make clean` or remove the `env/` folder.
 
 __Style__
 - Run `make lint` from `Python-packages/covidcast-py/` to run the lint commands.

@@ -1,8 +1,14 @@
-.PHONY = venv, install, build, lint, test, clean
+.PHONY = venv, install-ci, install, build, lint, test, clean
 
 
 venv:
 	python3 -m venv env
+
+install-ci: venv
+	. env/bin/activate; \
+	python -m pip install --upgrade pip; \
+	pip install -r requirements_dev.txt; \
+	pip install .
 
 install:  venv
 	. env/bin/activate; \
@@ -11,8 +17,8 @@ install:  venv
 	pip install -e .
 
 build:
-	python setup.py clean
-	python setup.py sdist bdist_wheel
+	python3 setup.py clean
+	python3 setup.py sdist bdist_wheel
 
 lint:
 	. env/bin/activate; \

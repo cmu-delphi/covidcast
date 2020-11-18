@@ -17,7 +17,9 @@ but are encouraged.
 
 __Environment__
 - A virtual environment is recommended to install and develop this package. Run `make install` to generate a 
-virtual environment and install the package in editable mode (code changes will automatically propagate).
+virtual environment and install the package in editable mode (code changes will automatically propagate). Note that 
+editable mode may not reveal errors when packaging files, so if the CI (which does not use editable mode) is failing 
+for reasons related to accessing data files, try debugging by installing without editable mode (`make install-ci`)
 - If you want to enter the virtual environment in your shell, you can run source env/bin/activate. Run deactivate 
 to leave the virtual environment.
 - To remove the virtual environment, you can run `make clean` or remove the `env/` folder.

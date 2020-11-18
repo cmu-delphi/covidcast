@@ -1,9 +1,12 @@
 Changelog
 =========
 
-v0.1.1, TODO
-- ``Direction`` is no longer supported and has been removed from the output
+v0.1.1
+- Bug fix: Shapefile packaging issue is now resolved.
+- Update: ``Direction`` is no longer supported and has been removed from the output
   of :py:func:`covidcast.signal`
+- New feature: Functions :py:func:`covidcast.fips_to_abbr` and :py:func:`covidcast.abbr_to_fips` to
+  convert between state FIPS codes and their abbreviations.
 
 
 v0.1.0, October 1, 2020

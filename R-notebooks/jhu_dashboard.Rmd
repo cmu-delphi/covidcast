@@ -1,0 +1,67 @@
+---
+title: "JHU dashboard"
+author: "Delphi Lab"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(covidcast)
+library(dplyr)
+library(ggplot2)
+
+date_scale <-
+  scale_x_date(date_breaks = "1 week", date_labels = "%b %d")
+
+twenty_eight_days_ago = Sys.Date() - 28
+```
+
+
+### Coverage
+
+This measures how much county coverage we have in the samples (i.e., how many unique counties are present each day), and how it has recently changed over time.
+
+```{r, fig.width = 7, fig.height = 5}
+
+# Sampling coverage
+df_jhu_counties = covidcast_signal(
+  "jhu-csse",
+  "confirmed_7dav_cumulative_num",
+  start_day = twenty_eight_days_ago,
+  geo_type = "county"
+)
+counties_per_day = df_jhu_counties %>%
+  group_by(time_value) %>%
+  summarize(n = n())
+
+ggplot(counties_per_day, aes(x = time_value, y = n)) +
+  geom_line() + geom_point() + theme_bw() +
+  labs(
+    x = "Date",
+    y = "Number of Counties",
+    title = sprintf(
+      "Unique Counties: %i, mean per day: %i",
+      length(unique(
+        df_jhu_counties$geo_value
+      )),
+      round(mean(counties_per_day$n))
+    )
+  ) + date_scale
+```
+
+## County Coverage Map
+
+This visualizes the county coverage -- how frequently does each county show up in the data over the last 28 days?
+
+```{r, fig.width = 10, fig.height = 8}
+
+source("dashboard_functions.R")
+plot_28_day_frequency_county(df_jhu_counties)
+
+```

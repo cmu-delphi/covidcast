@@ -8,3 +8,60 @@ home:
 
     - text: View the COVIDcast map
       href: https://covidcast.cmu.edu/
+
+articles:
+  - title: Using the package
+    desc: Basic usage and examples.
+    navbar: ~
+    contents:
+      - covidcast
+      - plotting-signals
+      - correlation-utils
+      - multi-signals
+
+repo:
+  url:
+    home: https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast
+    source: https://github.com/cmu-delphi/covidcast/blob/main/R-packages/covidcast/
+    issue: https://github.com/cmu-delphi/covidcast/issues
+    user: https://github.com/
+
+reference:
+  - title: Fetch data
+    desc: Fetch signals and metadata from the COVIDcast API
+  - contents:
+      - covidcast_signal
+      - covidcast_signals
+      - covidcast_meta
+  - title: Plot and summarize data
+    desc: Plot and summarize COVIDcast signals and metadata
+  - contents:
+      - plot.covidcast_signal
+      - print.covidcast_signal
+      - print.covidcast_meta
+      - summary.covidcast_signal
+      - summary.covidcast_meta
+  - title: Wrangle and correlate multiple signals
+    desc: Calculate correlations, aggregate signals, and move between aggregated data formats
+  - contents:
+      - covidcast_cor
+      - aggregate_signals
+      - covidcast_longer
+  - title: Geographic utilities
+    desc: Manipulate geographic IDs like FIPS codes and CBSAs
+  - contents:
+      - fips_to_name
+      - name_to_fips
+      - abbr_to_fips
+      - abbr_to_name
+      - fips_to_abbr
+      - name_to_abbr
+  - title: Geographic data
+    desc: Get Census reference and geographic data
+  - contents:
+      - county_census
+      - county_geo
+      - msa_census
+      - state_census
+      - state_geo
+

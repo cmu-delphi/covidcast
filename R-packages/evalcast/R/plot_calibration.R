@@ -113,6 +113,6 @@ plot_coverage <- function(scorecards, type = c("all", "one"), alpha = 0.2,
       geom_point() + geom_line() +
       geom_hline(yintercept = 1 - alpha, lty = 2) +
       labs(x = "Forecast date", y = "Empirical coverage") +
-      theme_bw() + theme(legend.position = legend_position) 
+      theme_bw() + theme(legend.position = legend_position)
   }
 }

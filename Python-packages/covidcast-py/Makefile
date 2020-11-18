@@ -1,8 +1,8 @@
-.PHONY = lint, test, requirements, build-and-install
+.PHONY = venv, install, build, lint, test, clean
 
 
 venv:
-	python3.8 -m venv env
+	python3 -m venv env
 
 install:  venv
 	. env/bin/activate; \

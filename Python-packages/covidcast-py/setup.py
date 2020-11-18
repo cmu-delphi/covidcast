@@ -31,5 +31,5 @@ setuptools.setup(
         "imageio",
         "tqdm"
     ],
-    package_data={"covidcast": ["shapefiles/*", "geo_mappings/*"]}
+    package_data={"covidcast": ["shapefiles/*/*", "geo_mappings/*"]}
 )

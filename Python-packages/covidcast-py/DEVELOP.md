@@ -23,12 +23,12 @@ to leave the virtual environment.
 - To remove the virtual environment, you can run `make clean` or remove the `env/` folder.
 
 __Style__
-- Run `make lint` from `Python-packages/covidcast-py/` to run the lint commands.
+- Once your environment is set up, run `make lint` from `Python-packages/covidcast-py/` to run the lint commands.
 - `mypy`, `pylint`, and `pydocstyle` are used for linting, with associated configurations for 
 `pylint` in `.pylintrc` and for `mypy` in `mypy.ini`.
 
 __Testing__
-- Run `make test` from `Python-packages/covidcast-py/` to run the test commands.
+- Once your environment is set up, run `make test` from `Python-packages/covidcast-py/` to run the test commands.
 - `pytest` is the framework used in this package.
 - Each function should have corresponding unit tests. 
 - Tests should be deterministic.

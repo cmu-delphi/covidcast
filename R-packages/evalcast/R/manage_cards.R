@@ -82,6 +82,7 @@ intersect_locations <- function(cards) {
 #'       \item Columns of `card`
 #'       \item Attributes of `card`
 #'     }
+#' @export
 aggregate_cards <- function(list_of_cards) {
   list_of_cards %>% purrr::map_dfr(unpack_single_card)
 }
@@ -97,7 +98,7 @@ unpack_single_card <- function(card){
 
 #' Unpack a single prediction card into an unnested tibble
 unpack_single_card.prediction_card <- function(card) {
-  card_attr = attributes(card)
+  card_attr <- attributes(card)
   card %>%
   tidyr::unnest(.data$forecast_distribution) %>%
   dplyr::mutate(
@@ -114,7 +115,7 @@ unpack_single_card.prediction_card <- function(card) {
 
 #' Unpack a single evaluation card into an unnested tibble
 unpack_single_card.evaluation_card <- function(card) {
-  card_attr = attributes(card)
+  card_attr <- attributes(card)
   card %>%
   tidyr::unnest(.data$forecast_distribution) %>%
   dplyr::mutate(

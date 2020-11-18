@@ -252,60 +252,38 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   val = df$val
   geo = df$geo
   names(val) = geo
-
+  
   # Make background layer for MSA and HRR maps which are incomplete
   if ((attributes(x)$metadata$geo_type == "msa") ||
       (attributes(x)$metadata$geo_type == "hrr")) {
     map_df = sf::st_read(system.file(
-                         "shapefiles/state",
-                         "cb_2019_us_state_5m.shp",
-                         package = "covidcast"))
+      "shapefiles/state/cb_2019_us_state_5m.shp",
+      package = "covidcast"))
     background_crs = sf::st_crs(map_df)
     map_df$STATEFP <- as.character(map_df$STATEFP)
-    map_df$is_alaska = map_df$STATEFP == '02'
-    map_df$is_hawaii = map_df$STATEFP == '15'
-    map_df$is_pr = map_df$STATEFP == '72'
-    map_df$STATEFP <- as.numeric(map_df$STATEFP)
-    map_df$is_state = map_df$STATEFP < 57
-    map_df$color = missing_col
+    map_df = map_df %>% dplyr::mutate(
+      is_alaska = STATEFP == '02',
+      is_hawaii = STATEFP == '15',
+      is_pr = STATEFP == '72',
+      is_state = as.numeric(STATEFP) < 57,
+      color = missing_col)
 
-    pr_df = map_df %>% filter(.$is_pr)
-    hawaii_df = map_df %>% filter(.$is_hawaii)
-    alaska_df = map_df %>% filter(.$is_alaska)
+    # For alaska and pr, set centroids here so same centroid is
+    # used for every map layer.
+    alaska_centroid = get_alaska_centroid(map_df)
+    pr_centroid = get_pr_centroid(map_df)
 
-    main_df = map_df %>% filter(!map_df$is_alaska)
-    main_df = main_df %>% filter(!main_df$is_hawaii)
-    main_df = main_df %>% filter(main_df$is_state)
+    # Need to filter out territories such as Guam, American Samoa, etc.
+    main_df = map_df %>% dplyr::filter(.$is_state) %>% shift_main(.)
 
-    main_df = sf::st_transform(main_df, 102003)
-    hawaii_df = sf::st_transform(hawaii_df, 102007)
-    alaska_df = sf::st_transform(alaska_df, 102006)
-    pr_df = sf::st_transform(pr_df, 102003)
-
-    hawaii_shift = sf::st_geometry(hawaii_df) + c(-1e+6, -2e+6)
-    hawaii_df = sf::st_set_geometry(hawaii_df, hawaii_shift)
-    hawaii_df = sf::st_set_crs(hawaii_df, 102003)
-
-    alaska_centroid = sf::st_centroid(sf::st_geometry(alaska_df))
-    alaska_scale = (sf::st_geometry(alaska_df) - alaska_centroid) * 0.35 + alaska_centroid
-    alaska_df = sf::st_set_geometry(alaska_df, alaska_scale)
-    alaska_shift = sf::st_geometry(alaska_df) + c(-2e+6, -2.6e+6)
-    alaska_df = sf::st_set_geometry(alaska_df, alaska_shift)
-    alaska_df = sf::st_set_crs(alaska_df, 102003)
-
-    pr_shift = sf::st_geometry(pr_df) + c(-0.9e+6, 1e+6)
-    pr_df = sf::st_set_geometry(pr_df, pr_shift)
-    r = -16 * pi / 180
-    rotation = matrix(c(cos(r), sin(r), -sin(r), cos(r)), nrow = 2, ncol = 2)
-    pr_centroid = sf::st_centroid(sf::st_geometry(pr_df))
-    pr_rotate = (sf::st_geometry(pr_df) - pr_centroid) * rotation + pr_centroid
-    pr_df = sf::st_set_geometry(pr_df, pr_rotate)
-    pr_df = sf::st_set_crs(pr_df, 102003)
+    hawaii_df = shift_hawaii(map_df)
+    alaska_df = shift_alaska(map_df, alaska_centroid)
+    pr_df = shift_pr(map_df, pr_centroid)
 
     main_col = main_df$color
     hawaii_col = hawaii_df$color
     alaska_col = alaska_df$color
-    pr_col = pr_df$color
+    pr_col = pr_df$color  
 
     aes = ggplot2::aes
     geom_args = list()
@@ -363,52 +341,23 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
 
   else if (attributes(x)$metadata$geo_type == "msa") {
     map_df = sf::st_read(system.file(
-                         "shapefiles/msa",
-                         "cb_2019_us_cbsa_5m.shp",
-                         package = "covidcast"))
-    map_df = map_df %>% filter(map_df$LSAD == 'M1') # only get metro and not micropolitan areas
+      "shapefiles/msa/cb_2019_us_cbsa_5m.shp",
+      package = "covidcast"))
+    map_df = map_df %>% dplyr::filter(map_df$LSAD == 'M1') # only get metro and not micropolitan areas
     if (length(include) > 0) {
-      map_df = map_df %>% filter(map_df$GEOID %in% include)
+      map_df = map_df %>% dplyr::filter(map_df$GEOID %in% include)
     }
     map_df$NAME <- as.character(map_df$NAME)
-    map_df$is_alaska = substr(map_df$NAME, nchar(map_df$NAME) - 1, nchar(map_df$NAME)) == 'AK'
-    map_df$is_hawaii = substr(map_df$NAME, nchar(map_df$NAME) - 1, nchar(map_df$NAME)) == 'HI'
-    map_df$is_pr = substr(map_df$NAME, nchar(map_df$NAME) - 1, nchar(map_df$NAME)) == 'PR'
-    map_df$color = ifelse(map_df$GEOID %in% geo,
-                          col_fun(val[map_df$GEOID]),
-                          missing_col)
+    map_df = map_df %>% dplyr::mutate(
+      is_alaska = substr(NAME, nchar(NAME) - 1, nchar(NAME)) == 'AK',
+      is_hawaii = substr(NAME, nchar(NAME) - 1, nchar(NAME)) == 'HI',
+      is_pr = substr(NAME, nchar(NAME) - 1, nchar(NAME)) == 'PR',
+      color = ifelse(GEOID %in% geo, col_fun(val[GEOID]), missing_col))
 
-    pr_df = map_df %>% filter(map_df$is_pr)
-    hawaii_df = map_df %>% filter(map_df$is_hawaii)
-    alaska_df = map_df %>% filter(map_df$is_alaska)
-    main_df = map_df %>% filter(!map_df$is_alaska)
-    main_df = main_df %>% filter(!main_df$is_hawaii)
-    main_df = main_df %>% filter(!main_df$is_pr)
-
-    main_df = sf::st_transform(main_df, 102003)
-    hawaii_df = sf::st_transform(hawaii_df, 102007)
-    alaska_df = sf::st_transform(alaska_df, 102006)
-    pr_df = sf::st_transform(pr_df, 102003)
-
-    hawaii_shift = sf::st_geometry(hawaii_df) + c(-1e+6, -2e+6)
-    hawaii_df = sf::st_set_geometry(hawaii_df, hawaii_shift)
-    hawaii_df = sf::st_set_crs(hawaii_df, 102003)
-
-    # Note centroid is centroid for entire state (defined for background)
-    alaska_scale = (sf::st_geometry(alaska_df) - alaska_centroid) * 0.35 + alaska_centroid
-    alaska_df = sf::st_set_geometry(alaska_df, alaska_scale)
-    alaska_shift = sf::st_geometry(alaska_df) + c(-2e+6, -2.6e+6)
-    alaska_df = sf::st_set_geometry(alaska_df, alaska_shift)
-    alaska_df = sf::st_set_crs(alaska_df, 102003)
-
-    pr_shift = sf::st_geometry(pr_df) + c(-0.9e+6, 1e+6)
-    pr_df = sf::st_set_geometry(pr_df, pr_shift)
-    r = -16 * pi / 180
-    rotation = matrix(c(cos(r), sin(r), -sin(r), cos(r)), nrow = 2, ncol = 2)
-    # Note centroid is same as for entire territory (defined for background)
-    pr_rotate = (sf::st_geometry(pr_df) - pr_centroid) * rotation + pr_centroid
-    pr_df = sf::st_set_geometry(pr_df, pr_rotate)
-    pr_df = sf::st_set_crs(pr_df, 102003)
+    main_df = shift_main(map_df)
+    hawaii_df = shift_hawaii(map_df)
+    alaska_df = shift_alaska(map_df, alaska_centroid)
+    pr_df = shift_pr(map_df, pr_centroid)
 
     main_col = main_df$color
     hawaii_col = hawaii_df$color
@@ -418,56 +367,26 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
 
   else if (attributes(x)$metadata$geo_type == "hrr") {
     map_df = sf::st_read(system.file(
-                         "shapefiles/hrr",
-                         "geo_export_ad86cff5-e5ed-432e-9ec2-2ce8732099ee.shp",
-                         package = "covidcast"))
+      "shapefiles/hrr/geo_export_ad86cff5-e5ed-432e-9ec2-2ce8732099ee.shp",
+      package = "covidcast"))
     if (length(include) > 0) {
-      map_df = map_df %>% filter(map_df$hrr_num %in% include)
+      map_df = map_df %>% filter(.$hrr_num %in% include)
     }
     map_df = sf::st_transform(map_df, background_crs)
     hrr_shift = sf::st_geometry(map_df) + c(0, -0.185)
     map_df = sf::st_set_geometry(map_df, hrr_shift)
     map_df = sf::st_set_crs(map_df, background_crs)
     map_df$hrr_name <- as.character(map_df$hrr_name)
-    map_df$is_alaska = substr(map_df$hrr_name, 1, 2) == 'AK'
-    map_df$is_hawaii = substr(map_df$hrr_name, 1, 2) == 'HI'
-    map_df$is_pr = substr(map_df$hrr_name, 1, 2) == 'PR'
-    map_df$color = ifelse(map_df$hrr_num %in% geo,
-                          col_fun(val[map_df$hrr_num]),
-                          missing_col)
+    map_df = map_df %>% dplyr::mutate(
+      is_alaska = substr(hrr_name, 1, 2) == 'AK',
+      is_hawaii = substr(hrr_name, 1, 2) == 'HI',
+      is_pr = substr(hrr_name, 1, 2) == 'PR',
+      color = ifelse(hrr_num %in% geo, col_fun(val[hrr_num]), missing_col))
 
-    pr_df = map_df %>% filter(map_df$is_pr)
-    hawaii_df = map_df %>% filter(map_df$is_hawaii)
-    alaska_df = map_df %>% filter(map_df$is_alaska)
-
-    main_df = map_df %>% filter(!map_df$is_alaska)
-    main_df = main_df %>% filter(!main_df$is_hawaii)
-    main_df = main_df %>% filter(!main_df$is_pr)
-
-    main_df = sf::st_transform(main_df, 102003)
-    hawaii_df = sf::st_transform(hawaii_df, 102007)
-    alaska_df = sf::st_transform(alaska_df, 102006)
-    pr_df = sf::st_transform(pr_df, 102003)
-
-    hawaii_shift = sf::st_geometry(hawaii_df) + c(-1e+6, -2e+6)
-    hawaii_df = sf::st_set_geometry(hawaii_df, hawaii_shift)
-    hawaii_df = sf::st_set_crs(hawaii_df, 102003)
-
-    # Note centroid is centroid for entire state (defined for background)
-    alaska_scale = (sf::st_geometry(alaska_df) - alaska_centroid) * 0.35 + alaska_centroid
-    alaska_df = sf::st_set_geometry(alaska_df, alaska_scale)
-    alaska_shift = sf::st_geometry(alaska_df) + c(-2e+6, -2.6e+6)
-    alaska_df = sf::st_set_geometry(alaska_df, alaska_shift)
-    alaska_df = sf::st_set_crs(alaska_df, 102003)
-
-    pr_shift = sf::st_geometry(pr_df) + c(-0.9e+6, 1e+6)
-    pr_df = sf::st_set_geometry(pr_df, pr_shift)
-    r = -16 * pi / 180
-    rotation = matrix(c(cos(r), sin(r), -sin(r), cos(r)), nrow = 2, ncol = 2)
-    # Note centroid is same as for entire territory (defined for background)
-    pr_rotate = (sf::st_geometry(pr_df) - pr_centroid) * rotation + pr_centroid
-    pr_df = sf::st_set_geometry(pr_df, pr_rotate)
-    pr_df = sf::st_set_crs(pr_df, 102003)
+    main_df = shift_main(map_df)
+    hawaii_df = shift_hawaii(map_df)
+    alaska_df = shift_alaska(map_df, alaska_centroid)
+    pr_df = shift_pr(map_df, pr_centroid)
 
     main_col = main_df$color
     hawaii_col = hawaii_df$color
@@ -487,7 +406,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     geom_args$data = map_df
     polygon_layer = do.call(ggplot2::geom_polygon, geom_args)
     coord_layer = ggplot2::coord_equal()
-    }
+  }
   else if (attributes(x)$metadata$geo_type == "msa" || 
           attributes(x)$metadata$geo_type == "hrr") {
     aes = ggplot2::aes
@@ -510,7 +429,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     geom_args$data = alaska_df
     alaska_layer = do.call(ggplot2::geom_sf, geom_args)
     coord_layer = do.call(ggplot2::coord_sf, coord_args)
-    }
+  }
   
   # For continuous color scale, create a legend layer
   if (is.null(breaks)) {
@@ -567,7 +486,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
           back_main_layer + back_pr_layer + back_hawaii_layer + back_alaska_layer + 
           main_layer + pr_layer + alaska_layer + hawaii_layer + coord_layer +
           title_layer + hidden_layer + scale_layer + theme_layer)
-      }
+  }
   else {
     return(ggplot2::ggplot() + polygon_layer + coord_layer +
           title_layer + hidden_layer + scale_layer + theme_layer)
@@ -791,3 +710,63 @@ plot_line = function(x, range = NULL, title = NULL, params = list()) {
   return(ggplot2::ggplot(aes(x = time_value), data = df) +
          line_layer + ribbon_layer + lim_layer + label_layer + theme_layer)
 }
+
+
+get_pr_centroid = function(map_df){
+  pr_df = map_df %>% dplyr::filter(.$is_pr) %>% sf::st_transform(., 102003)
+  pr_centroid = sf::st_centroid(sf::st_geometry(pr_df))
+  return(pr_centroid)
+}
+
+
+shift_pr = function(map_df, pr_centroid){
+  pr_df = map_df %>% dplyr::filter(.$is_pr)
+  pr_df = sf::st_transform(pr_df, 102003)
+  pr_shift = sf::st_geometry(pr_df) + c(-0.9e+6, 1e+6)
+  pr_df = sf::st_set_geometry(pr_df, pr_shift)
+  r = -16 * pi / 180
+  rotation = matrix(c(cos(r), sin(r), -sin(r), cos(r)), nrow = 2, ncol = 2)
+  pr_rotate = (sf::st_geometry(pr_df) - pr_centroid) * rotation + pr_centroid
+  pr_df = sf::st_set_geometry(pr_df, pr_rotate)
+  pr_df = sf::st_set_crs(pr_df, 102003)
+  return(pr_df)
+}
+
+
+get_alaska_centroid = function(map_df){
+  alaska_df = map_df %>% dplyr::filter(.$is_alaska) %>% sf::st_transform(., 102006)
+  alaska_centroid = sf::st_centroid(sf::st_geometry(alaska_df))
+  return(alaska_centroid)
+}
+
+
+shift_alaska = function(map_df, alaska_centroid){
+  alaska_df = map_df %>% dplyr::filter(.$is_alaska)
+  alaska_df = sf::st_transform(alaska_df, 102006)
+  alaska_scale = (sf::st_geometry(alaska_df) - alaska_centroid) * 0.35 + alaska_centroid
+  alaska_df = sf::st_set_geometry(alaska_df, alaska_scale)
+  alaska_shift = sf::st_geometry(alaska_df) + c(-2e+6, -2.6e+6)
+  alaska_df = sf::st_set_geometry(alaska_df, alaska_shift)
+  alaska_df = sf::st_set_crs(alaska_df, 102003)
+  return(alaska_df)
+}
+
+
+shift_hawaii = function(map_df){
+  hawaii_df = map_df %>% dplyr::filter(.$is_hawaii)
+  hawaii_df = sf::st_transform(hawaii_df, 102007)
+  hawaii_shift = sf::st_geometry(hawaii_df) + c(-1e+6, -2e+6)
+  hawaii_df = sf::st_set_geometry(hawaii_df, hawaii_shift)
+  hawaii_df = sf::st_set_crs(hawaii_df, 102003)
+  return(hawaii_df)
+}
+
+
+shift_main = function(map_df){
+  main_df = map_df %>% dplyr::filter(
+      !.$is_alaska) %>% dplyr::filter(
+        !.$is_hawaii) %>% dplyr::filter(!.$is_pr)
+  main_df = sf::st_transform(main_df, 102003)
+  return(main_df)
+}
+    

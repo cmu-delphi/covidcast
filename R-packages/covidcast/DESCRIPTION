@@ -46,6 +46,7 @@ Imports:
   maptools,
   purrr,
   rlang,
+  sf,
   tidyr,
   usmap
 RoxygenNote: 7.1.1

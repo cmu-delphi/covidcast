@@ -132,3 +132,38 @@ unpack_single_card.score_card <- function(card) {
     signal = card_attr$response$signal
   )
 }
+
+#' Print a single prediction card.
+#' @param card Prediction card.
+#' @export
+print.prediction_card <- function(card, ...) {
+  card_attr <- attributes(card)
+  cat("Attributes:\n")
+  cat("  Ahead:", card_attr$ahead, "\n")
+  cat("  Data source:", card_attr$signals$data_source, "\n")
+  cat("  Forecast date:", as.character(card_attr$forecast_date), "\n")
+  cat("  Geo type:", card_attr$geo_type, "\n")
+  cat("  Geo values:", card_attr$geo_values, "\n")
+  cat("  Incidence period:", card_attr$incidence_period, "\n")
+  cat("  Name of forecaster:", card_attr$name_of_forecaster, "\n")
+  cat("  Signal:", card_attr$signals$signal, "\n")
+  print(as_tibble(card), ...)
+}
+
+
+#' Print a single score card.
+#' @param card Score card.
+#' @export
+print.score_card <- function(card, ...) {
+  card_attr <- attributes(card)
+  cat("Attributes:\n")
+  cat("  Ahead:", card_attr$ahead, "\n")
+  cat("  As of:", as.character(card_attr$as_of), "\n")
+  cat("  Backfill buffer:", card_attr$backfill_buffer, "\n")
+  cat("  Data source:", card_attr$response$data_source, "\n")
+  cat("  Geo type:", card_attr$geo_type, "\n")
+  cat("  Incidence period:", card_attr$incidence_period, "\n")
+  cat("  Name of forecaster:", card_attr$name_of_forecaster, "\n")
+  cat("  Signal:", card_attr$response$signal, "\n")
+  print(as_tibble(card), ...)
+}

@@ -7,7 +7,7 @@
 aggregate_cards(list_of_cards)
 }
 \arguments{
-\item{list_of_cards}{List of prediction or evaluation cards.  See documentation for the outputs
+\item{list_of_cards}{List of prediction or score cards.  See documentation for the outputs
 of \code{evalcast::get_predictions()} and \code{evalcast::evaluate_predictions()} for the required
 format.}
 }

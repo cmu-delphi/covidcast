@@ -27,7 +27,8 @@ we should do this more comprehensively. Pull all forecasters that have enough
 submissions to make useful comparisons. To do this, we can expose the function 
 `get_covidhub_forecaster_names()`.
 
-```{r, eval = FALSE}
+```{r}
+load(file = "covidhub_evaluation.rda")
 forecasters = c("CMU-TimeSeries", 
                 "YYG-ParamSearch", 
                 "UMass-MechBayes", 
@@ -49,7 +50,7 @@ forecasters = c("CMU-TimeSeries",
 forecast_dates = vector("list", length = length(forecasters))
 for (i in 1:length(forecasters)) {
   forecast_dates[[i]] = tryCatch({
-    get_forecast_dates(forecasters[i])
+    as.Date(get_forecast_dates(forecasters[i]))
   },
   error = function(e) cat(sprintf("%i. %s\n", i, e$message))
   )
@@ -61,45 +62,68 @@ Monday of the same epiweek should be comparable. **TODO**: we should switch over
 to using the Zoltar API, and soon it should have an "as of" parameter, so then 
 we shouldn't need to do this. 
 
-```{r, eval = FALSE}
-forecast_dates_comparable = vector("list", length = length(forecasters)) 
+```{r}
+if (exists("predictions_cards")){
+  seen_dates = list()
+  for (i in 1:length(predictions_cards)){
+    forecaster_predictions_cards = predictions_cards[[i]]
+    pred_dates = lapply(forecaster_predictions_cards, FUN = function(x) attributes(x)$forecast_date)
+    seen_dates[[i]] = unique(do.call("c", pred_dates))
+    name_of_forecaster = attributes(forecaster_predictions_cards[[1]])$name_of_forecaster
+    names(seen_dates)[[i]] = name_of_forecaster
+  }
+} else {
+  for (i in 1:length(forecasters)){
+    seen_dates[[i]] = list()
+  }
+  names(seen_dates) = forecasters
+}
+
 forecast_dates_cmu = forecast_dates[[1]]
+new_dates = list()
 for (i in 1:length(forecasters)) {
   given_dates = forecast_dates[[i]]
-  for (j in 1:length(forecast_dates_cmu)) {
-    # Find the last forecast date before the current CMU one
-    given_date = given_dates[max(which(given_dates <= forecast_dates_cmu[j]))]
-    
-    # If the dates match exactly, or the given date falls on a Sunday and the
-    # CMU date falls on a Monday of the same epiweek, the call it comparable
-    if (!is.na(given_date) &&
-        (given_date == forecast_dates_cmu[j] ||
-        (as.Date(forecast_dates_cmu[j]) - as.Date(given_date) == 1 &&
-         wday(forecast_dates_cmu[j]) == 2 && wday(given_date) == 1))) {
-      forecast_dates_comparable[[i]][j] = given_date
-    }
-    
-    # Otherwise call it NA
-    else forecast_dates_comparable[[i]][j] = NA
+  dates_comp = given_dates[(given_dates %in% forecast_dates_cmu | 
+                            ((given_dates + 1) %in% forecast_dates_cmu) &
+                            wday(given_dates) == 1)]
+  extra_dates = dates_comp[(dates_comp + 1) %in% dates_comp]
+  dates_comp = as_date(setdiff(dates_comp, extra_dates))
+  if(forecasters[[i]] %in% names(seen_dates)){
+    forecaster_idx = which(names(seen_dates) == forecasters[[i]])
+    dates_comp = dates_comp[!(dates_comp %in% seen_dates[[forecaster_idx]])]
   }
+  new_dates[[i]] = dates_comp
 }
+names(new_dates) = forecasters
 ```
 
 Now get predictions for each forecaster, looping over forecast dates from the
 CMU-TimeSeries model. **TODO**: this part is very very slow. Maybe (hopefully) 
 by changing to use the Zoltar API, this will be much faster.
 
-```{r, eval = FALSE}
-predictions_cards = vector("list", length = length(forecasters))
+```{r}
+predictions_cards_new = vector("list", length = length(forecasters))
 for (i in 1:length(forecasters)) {
   cat(forecasters[i], "...\n")
-  predictions_cards[[i]] = tryCatch({
+  predictions_cards_new[[i]] = tryCatch({
     get_covidhub_predictions(forecasters[i], 
-                             na.omit(forecast_dates_comparable[[i]]), 
+                             new_dates[[i]], 
                              geo_type = "state")
   },
   error = function(e) cat(e$message))
 }
+old_forecaster_idxs = match(forecasters, names(seen_dates))
+
+predictions_cards_comb = vector("list", length = length(forecasters))
+for (i in 1:length(forecasters)){
+  if (is.na(old_forecaster_idxs[i])){
+    predictions_cards_comb[[i]] = as.list(predictions_cards_new[[i]])
+  } else {
+    predictions_cards_comb[[i]] = as.list(c(predictions_cards_new[[i]], 
+                                    predictions_cards[[old_forecaster_idxs[i]]]))
+  }
+}
+predictions_cards = predictions_cards_comb
 
 # Looks like we had errors for both Google-Harvard and Yu Group, who didn't set
 # anything for the response ...  
@@ -122,7 +146,7 @@ currently unstable. **TODO**: we shouldn't require `evaluate_predictions()` to
 have the response match what's in the forecaster. If I train my forecaster on
 (say) JHU-CSSE data, then I should be able to evaluate it on USAFacts data. 
 
-```{r, eval = FALSE}
+```{r}
 for (i in 1:length(predictions_cards)) {
   for (j in 1:length(predictions_cards[[i]])) {
     attributes(predictions_cards[[i]][[j]])$signals$data_source = "usa-facts"
@@ -143,41 +167,66 @@ would help but I don't think it's the right solution. We're fetching the exact
 same data something like 15 times in a row. If we simply changed the order of 
 operations then we wouldn't even need caching at all.
 
-```{r, eval = FALSE}
+```{r}
+scored_forecasters = unlist(lapply(score_cards, FUN = function(card) attributes(card[[1]])$name_of_forecaster))
+
 ahead = 1:4
-last_date = as.Date("2020-09-28")
+last_date = as.Date("2020-10-19")
 response_dat = "usa-facts"
 response_sig = "deaths_incidence_num"
 err_measures = list(wis = weighted_interval_score, ae = absolute_error,
                     cov_80 = interval_coverage(alpha = 0.2))
 
-score_cards = vector("list", length = length(predictions_cards))
+score_cards_new = vector("list", length = length(forecasters))
 for (i in 1:length(predictions_cards)) {
+  name_of_forecaster = forecasters[i]
+  cat(name_of_forecaster)
   given_dates = do.call("c", lapply(predictions_cards[[i]], function(x) {
     attributes(x)$forecast_date }))
-  given_dates_trimmed = given_dates[given_dates <= last_date]
+  given_dates_trimmed = unique(given_dates[given_dates <= last_date])
+  if (name_of_forecaster %in% scored_forecasters){
+    forecaster_idx = which(scored_forecasters == name_of_forecaster)
+    score_dates = attributes(score_cards[[forecaster_idx]][[1]])$forecast_date
+    given_dates_trimmed = as_date(setdiff(given_dates_trimmed, score_dates))
+  }
   given_predictions = filter_predictions(predictions_cards[[i]], ahead = ahead,
                                          response_data_source = response_dat,
                                          response_signal = response_sig,
                                          forecast_date = given_dates_trimmed)
-  score_cards[[i]] = evaluate_predictions(given_predictions, err_measures,
-                                          backfill_buffer = 0)
+  if(length(given_predictions) > 0){
+    score_cards_new[[i]] = evaluate_predictions(given_predictions, err_measures,
+                                                backfill_buffer = 0)
+  } else {
+    score_cards_new[[i]] = list()
+  }
 }
+
+score_cards_comb = list()
+for (i in 1:length(forecasters)){
+  name_of_forecaster = forecasters[i]
+  if (name_of_forecaster %in% scored_forecasters){
+    forecaster_idx = which(scored_forecasters == name_of_forecaster)
+    score_cards_comb[[i]] = c(score_cards[[forecaster_idx]], score_cards_new[[i]])
+  } else {
+    score_cards_comb[[i]] = score_cards_new[[i]]
+  }
+}
+score_cards = score_cards_comb
 ```
 
 As the above contained some pretty expensive steps, we save the results in an
 RData file (and we set `eval = FALSE` on this and all the above code chunks). 
 
-```{r, eval = FALSE}
-save(list = ls(), file = "covidhub_evaluation.rda", compress = "xz")
+```{r}
+save(list = c("predictions_cards", "score_cards"), 
+     file = "covidhub_evaluation.rda", 
+     compress = "xz")
 ```
 
 Wrangle the score cards into a single data frame (more convenient). **TODO**:
 define some convenience functions to do this. I have it in "long" format here.
 
 ```{r}
-load(file = "covidhub_evaluation.rda")
-
 score_cards_df = score_cards
 for (i in 1:length(score_cards_df)) {
   for (j in 1:length(score_cards_df[[i]])) {

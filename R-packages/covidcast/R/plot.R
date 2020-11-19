@@ -254,8 +254,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   names(val) = geo
   
   # Make background layer for MSA and HRR maps which are incomplete
-  if ((attributes(x)$metadata$geo_type == "msa") ||
-      (attributes(x)$metadata$geo_type == "hrr")) {
+  if (attributes(x)$metadata$geo_type %in% c("msa", "hrr", "state")) {
     map_df = sf::st_read(system.file(
       "shapefiles/state/cb_2019_us_state_5m.shp",
       package = "covidcast"))
@@ -267,6 +266,9 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
       is_pr = STATEFP == '72',
       is_state = as.numeric(STATEFP) < 57,
       color = missing_col)
+    if (length(include) > 0) {
+      map_df = map_df %>% dplyr::filter(.$STUSPS %in% include)
+    }
 
     # For alaska and pr, set centroids here so same centroid is
     # used for every map layer.
@@ -330,13 +332,33 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
 
   # Create the choropleth colors for states
   else if (attributes(x)$metadata$geo_type == "state") {
-    map_df = usmap::us_map("state", include = include)
-    map_geo = tolower(map_df$abbr)
-    map_col = rep(missing_col, length(map_geo))
+    map_df = sf::st_read(system.file(
+      "shapefiles/state/cb_2019_us_state_5m.shp",
+      package = "covidcast"))
+    background_crs = sf::st_crs(map_df)
+    map_df$STATEFP <- as.character(map_df$STATEFP)
+    map_df = map_df %>% dplyr::mutate(
+      is_alaska = STATEFP == '02',
+      is_hawaii = STATEFP == '15',
+      is_pr = STATEFP == '72',
+      is_state = as.numeric(STATEFP) < 57,
+      color = ifelse(tolower(STUSPS) %in% geo,
+                     col_fun(val[tolower(STUSPS)]),
+                     missing_col))
+    if (length(include) > 0) {
+      map_df = map_df %>% dplyr::filter(.$STUSPS %in% include)
+    }
 
-    # Overwrite the colors for observed states
-    map_obs = map_geo[map_geo %in% geo]
-    map_col[map_geo %in% geo] = col_fun(val[map_obs])
+    # Need to filter out territories such as Guam, American Samoa, etc.
+    main_df = map_df %>% dplyr::filter(.$is_state) %>% shift_main(.)
+    hawaii_df = shift_hawaii(map_df)
+    alaska_df = shift_alaska(map_df, alaska_centroid)
+    pr_df = shift_pr(map_df, pr_centroid)
+
+    main_col = main_df$color
+    hawaii_col = hawaii_df$color
+    alaska_col = alaska_df$color
+    pr_col = pr_df$color
   }
 
   else if (attributes(x)$metadata$geo_type == "msa") {
@@ -345,7 +367,8 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
       package = "covidcast"))
     map_df = map_df %>% dplyr::filter(map_df$LSAD == 'M1') # only get metro and not micropolitan areas
     if (length(include) > 0) {
-      map_df = map_df %>% dplyr::filter(map_df$GEOID %in% include)
+      map_df = map_df %>% dplyr::filter(
+        substr(.$NAME, nchar(.$NAME) - 1, nchar(.$NAME)) %in% include)
     }
     map_df$NAME <- as.character(map_df$NAME)
     map_df = map_df %>% dplyr::mutate(
@@ -362,7 +385,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     main_col = main_df$color
     hawaii_col = hawaii_df$color
     alaska_col = alaska_df$color
-    pr_geo = pr_df$color
+    pr_col = pr_df$color
   }
 
   else if (attributes(x)$metadata$geo_type == "hrr") {
@@ -370,7 +393,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
       "shapefiles/hrr/geo_export_ad86cff5-e5ed-432e-9ec2-2ce8732099ee.shp",
       package = "covidcast"))
     if (length(include) > 0) {
-      map_df = map_df %>% filter(.$hrr_num %in% include)
+      map_df = map_df %>% filter(substr(.$hrr_name, 1, 2) %in% include)
     }
     map_df = sf::st_transform(map_df, background_crs)
     hrr_shift = sf::st_geometry(map_df) + c(0, -0.185)
@@ -395,8 +418,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   }
 
   # Create the polygon layer 
-  if (attributes(x)$metadata$geo_type == "county" || 
-      attributes(x)$metadata$geo_type == "state") {
+  if (attributes(x)$metadata$geo_type == "county") {
     aes = ggplot2::aes
     geom_args = list()
     geom_args$color = border_col
@@ -407,8 +429,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     polygon_layer = do.call(ggplot2::geom_polygon, geom_args)
     coord_layer = ggplot2::coord_equal()
   }
-  else if (attributes(x)$metadata$geo_type == "msa" || 
-          attributes(x)$metadata$geo_type == "hrr") {
+  else if (attributes(x)$metadata$geo_type %in% c("msa", "hrr", "state")) {
     aes = ggplot2::aes
     geom_args = list()
     geom_args$color = border_col
@@ -480,10 +501,9 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   }
 
   # Put it all together and return
-  if ((attributes(x)$metadata$geo_type == "msa") |
-      (attributes(x)$metadata$geo_type == "hrr")) {
+  if (attributes(x)$metadata$geo_type %in% c("msa", "hrr", "state")) {
     return(ggplot2::ggplot() + 
-          back_main_layer + back_pr_layer + back_hawaii_layer + back_alaska_layer + 
+          #back_main_layer + back_pr_layer + back_hawaii_layer + back_alaska_layer + 
           main_layer + pr_layer + alaska_layer + hawaii_layer + coord_layer +
           title_layer + hidden_layer + scale_layer + theme_layer)
   }

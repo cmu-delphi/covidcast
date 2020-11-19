@@ -92,11 +92,13 @@ aggregate_cards <- function(list_of_cards) {
 #' This is a generic method for dispatching to specific calls for evaluation and prediction cards.
 #' @param card Evaluation or prediction card.
 #' @return See `aggregate_cards`.
+#' @export
 unpack_single_card <- function(card){
   UseMethod("unpack_single_card", card)
 }
 
 #' Unpack a single prediction card into an unnested tibble
+#' @export
 unpack_single_card.prediction_card <- function(card) {
   card_attr <- attributes(card)
   card %>%
@@ -114,6 +116,7 @@ unpack_single_card.prediction_card <- function(card) {
 }
 
 #' Unpack a single evaluation card into an unnested tibble
+#' @export
 unpack_single_card.evaluation_card <- function(card) {
   card_attr <- attributes(card)
   card %>%

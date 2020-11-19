@@ -8,7 +8,11 @@ plot_trajectory(
   list_of_predictions_cards,
   first_day = "2020-07-01",
   last_day = Sys.Date(),
-  alpha = 0.2
+  alpha = 0.2,
+  nrow = 6,
+  ncol = 4,
+  page_facet = 1,
+  cutoff = 52
 )
 }
 \arguments{

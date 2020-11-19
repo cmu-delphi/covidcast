@@ -134,6 +134,7 @@ unpack_single_card.evaluation_card <- function(card) {
 }
 
 #' Print a single prediction card.
+#' @param card Prediction card.
 #' @export
 print.prediction_card <- function(card, ...) {
   card_attr <- attributes(card)
@@ -151,6 +152,7 @@ print.prediction_card <- function(card, ...) {
 
 
 #' Print a single score card.
+#' @param card Score card.
 #' @export
 print.score_card <- function(card, ...) {
   card_attr <- attributes(card)

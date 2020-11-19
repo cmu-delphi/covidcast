@@ -68,7 +68,7 @@ intersect_locations <- function(cards) {
 
 #' Aggregate cards from a list into a single unnested data frame
 #'
-#' @param list_of_cards List of prediction or evaluation cards.  See documentation for the outputs
+#' @param list_of_cards List of prediction or score cards.  See documentation for the outputs
 #'   of `evalcast::get_predictions()` and `evalcast::evaluate_predictions()` for the required
 #'   format.
 #' @return Data frame such that:
@@ -87,10 +87,10 @@ aggregate_cards <- function(list_of_cards) {
   list_of_cards %>% purrr::map_dfr(unpack_single_card)
 }
 
-#' Unpack a single prediction or evaluation card into an unnested tibble
+#' Unpack a single prediction or score card into an unnested tibble
 #'
-#' This is a generic method for dispatching to specific calls for evaluation and prediction cards.
-#' @param card Evaluation or prediction card.
+#' This is a generic method for dispatching to specific calls for score and prediction cards.
+#' @param card score or prediction card.
 #' @return See `aggregate_cards`.
 #' @export
 unpack_single_card <- function(card){
@@ -115,9 +115,9 @@ unpack_single_card.prediction_card <- function(card) {
   )
 }
 
-#' Unpack a single evaluation card into an unnested tibble
+#' Unpack a single score card into an unnested tibble
 #' @export
-unpack_single_card.evaluation_card <- function(card) {
+unpack_single_card.score_card <- function(card) {
   card_attr <- attributes(card)
   card %>%
   tidyr::unnest(.data$forecast_distribution) %>%

@@ -2,16 +2,16 @@
 % Please edit documentation in R/manage_cards.R
 \name{unpack_single_card}
 \alias{unpack_single_card}
-\title{Unpack a single prediction or evaluation card into an unnested tibble}
+\title{Unpack a single prediction or score card into an unnested tibble}
 \usage{
 unpack_single_card(card)
 }
 \arguments{
-\item{card}{Evaluation or prediction card.}
+\item{card}{score or prediction card.}
 }
 \value{
 See \code{aggregate_cards}.
 }
 \description{
-This is a generic method for dispatching to specific calls for evaluation and prediction cards.
+This is a generic method for dispatching to specific calls for score and prediction cards.
 }

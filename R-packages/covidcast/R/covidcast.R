@@ -622,7 +622,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
                signal = signal,
                day = ymd(missing_geo_array$time_value),
                geo_value = geo_value,
-               msg = dat[[i]]$message,
+               api_msg = dat[[i]]$message,
                class = "covidcast_missing_geo_values")
         }
       }

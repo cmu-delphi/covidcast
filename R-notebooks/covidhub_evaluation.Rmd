@@ -237,7 +237,7 @@ score_cards = score_cards_comb
 ```
 
 As the above contained some pretty expensive steps, we save the results in an
-RData file (and we set `eval = FALSE` on this and all the above code chunks). 
+RData file. 
 
 ```{r}
 save(list = c("predictions_cards", "score_cards"), 

@@ -28,7 +28,6 @@ submissions to make useful comparisons. To do this, we can expose the function
 `get_covidhub_forecaster_names()`.
 
 ```{r}
-load(file = "covidhub_evaluation.rda")
 forecasters = c("CMU-TimeSeries", 
                 "YYG-ParamSearch", 
                 "UMass-MechBayes", 
@@ -57,19 +56,21 @@ for (i in 1:length(forecasters)) {
 }
 ```
 
-Now figure out "comparable" forecast dates: making a forecast on a Sunday or a 
-Monday of the same epiweek should be comparable. **TODO**: we should switch over 
-to using the Zoltar API, and soon it should have an "as of" parameter, so then 
-we shouldn't need to do this. 
-
+Load data from previous run so we don't have to reingest / process it. This
+data could end up out of date if a forecast is retrospectively updated, but in
+that case it's no longer a true prediction. We can always restart from scratch
+by deleting covidhub_evaluation.rda.
 ```{r}
+load(file = "covidhub_evaluation.rda")
 if (exists("predictions_cards")){
   seen_dates = list()
   for (i in 1:length(predictions_cards)){
     forecaster_predictions_cards = predictions_cards[[i]]
-    pred_dates = lapply(forecaster_predictions_cards, FUN = function(x) attributes(x)$forecast_date)
+    pred_dates = lapply(forecaster_predictions_cards, 
+                        FUN = function(x) attributes(x)$forecast_date)
     seen_dates[[i]] = unique(do.call("c", pred_dates))
-    name_of_forecaster = attributes(forecaster_predictions_cards[[1]])$name_of_forecaster
+    name_of_forecaster = attributes(
+                          forecaster_predictions_cards[[1]])$name_of_forecaster
     names(seen_dates)[[i]] = name_of_forecaster
   }
 } else {
@@ -78,14 +79,27 @@ if (exists("predictions_cards")){
   }
   names(seen_dates) = forecasters
 }
+```
+
+Now figure out "comparable" forecast dates: making a forecast on a Sunday or a 
+Monday of the same epiweek should be comparable. **TODO**: we should switch over 
+to using the Zoltar API, and soon it should have an "as of" parameter, so then 
+we shouldn't need to do this. 
+
+```{r}
 
 forecast_dates_cmu = forecast_dates[[1]]
 new_dates = list()
 for (i in 1:length(forecasters)) {
   given_dates = forecast_dates[[i]]
+  # If the dates match exactly, or the given date falls on a Sunday and the
+  # CMU date falls on a Monday of the same epiweek, then call it comparable...
   dates_comp = given_dates[(given_dates %in% forecast_dates_cmu | 
                             ((given_dates + 1) %in% forecast_dates_cmu) &
                             wday(given_dates) == 1)]
+  
+  # ...but if there is an exact match on dates, ignore predictions made on the
+  # previous day
   extra_dates = dates_comp[(dates_comp + 1) %in% dates_comp]
   dates_comp = as_date(setdiff(dates_comp, extra_dates))
   if(forecasters[[i]] %in% names(seen_dates)){
@@ -114,9 +128,11 @@ for (i in 1:length(forecasters)) {
 }
 old_forecaster_idxs = match(forecasters, names(seen_dates))
 
+# Combine old and new predictions cards
 predictions_cards_comb = vector("list", length = length(forecasters))
 for (i in 1:length(forecasters)){
   if (is.na(old_forecaster_idxs[i])){
+    #as.list needed to handle possible NULL values
     predictions_cards_comb[[i]] = as.list(predictions_cards_new[[i]])
   } else {
     predictions_cards_comb[[i]] = as.list(c(predictions_cards_new[[i]], 
@@ -159,7 +175,7 @@ Evaluate the predictions based on weighted interval score (WIS), absolute error
 make sure evalcast "fails gracefully" in as many places as possible, and doesn't
 throw an error (which would halt all execution) when it should be instead just
 throwing a warning and moving on. Basically I needed to artifically trim the
-forecast dates to have the latest one by "2020-09-28" so that I wouldn't get
+forecast dates to have the latest one by "2020-10-19" so that I wouldn't get
 errors with the aheads here. This is undesirable obviously ...
 
 Also, another **TODO**: just want to note that this is again very slow. Caching
@@ -168,7 +184,11 @@ same data something like 15 times in a row. If we simply changed the order of
 operations then we wouldn't even need caching at all.
 
 ```{r}
-scored_forecasters = unlist(lapply(score_cards, FUN = function(card) attributes(card[[1]])$name_of_forecaster))
+scored_forecasters = lapply(score_cards, 
+                            FUN = function(card) {
+                              attributes(card[[1]])$name_of_forecaster
+                              })
+scored_forecasters = unlist(scored_forecasters)
 
 ahead = 1:4
 last_date = as.Date("2020-10-19")
@@ -177,6 +197,7 @@ response_sig = "deaths_incidence_num"
 err_measures = list(wis = weighted_interval_score, ae = absolute_error,
                     cov_80 = interval_coverage(alpha = 0.2))
 
+# Create new score cards
 score_cards_new = vector("list", length = length(forecasters))
 for (i in 1:length(predictions_cards)) {
   name_of_forecaster = forecasters[i]
@@ -201,6 +222,7 @@ for (i in 1:length(predictions_cards)) {
   }
 }
 
+# And combine them with previous ones
 score_cards_comb = list()
 for (i in 1:length(forecasters)){
   name_of_forecaster = forecasters[i]

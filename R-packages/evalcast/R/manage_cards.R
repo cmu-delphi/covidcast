@@ -68,7 +68,7 @@ intersect_locations <- function(cards) {
 
 #' Aggregate cards from a list into a single unnested data frame
 #'
-#' @param list_of_cards List of prediction or evaluation cards.  See documentation for the outputs
+#' @param list_of_cards List of prediction or score cards.  See documentation for the outputs
 #'   of `evalcast::get_predictions()` and `evalcast::evaluate_predictions()` for the required
 #'   format.
 #' @return Data frame such that:
@@ -87,16 +87,18 @@ aggregate_cards <- function(list_of_cards) {
   list_of_cards %>% purrr::map_dfr(unpack_single_card)
 }
 
-#' Unpack a single prediction or evaluation card into an unnested tibble
+#' Unpack a single prediction or score card into an unnested tibble
 #'
-#' This is a generic method for dispatching to specific calls for evaluation and prediction cards.
-#' @param card Evaluation or prediction card.
+#' This is a generic method for dispatching to specific calls for score and prediction cards.
+#' @param card score or prediction card.
 #' @return See `aggregate_cards`.
+#' @export
 unpack_single_card <- function(card){
   UseMethod("unpack_single_card", card)
 }
 
 #' Unpack a single prediction card into an unnested tibble
+#' @export
 unpack_single_card.prediction_card <- function(card) {
   card_attr <- attributes(card)
   card %>%
@@ -113,8 +115,9 @@ unpack_single_card.prediction_card <- function(card) {
   )
 }
 
-#' Unpack a single evaluation card into an unnested tibble
-unpack_single_card.evaluation_card <- function(card) {
+#' Unpack a single score card into an unnested tibble
+#' @export
+unpack_single_card.score_card <- function(card) {
   card_attr <- attributes(card)
   card %>%
   tidyr::unnest(.data$forecast_distribution) %>%
@@ -128,4 +131,39 @@ unpack_single_card.evaluation_card <- function(card) {
     name_of_forecaster = card_attr$name_of_forecaster,
     signal = card_attr$response$signal
   )
+}
+
+#' Print a single prediction card.
+#' @param card Prediction card.
+#' @export
+print.prediction_card <- function(card, ...) {
+  card_attr <- attributes(card)
+  cat("Attributes:\n")
+  cat("  Ahead:", card_attr$ahead, "\n")
+  cat("  Data source:", card_attr$signals$data_source, "\n")
+  cat("  Forecast date:", as.character(card_attr$forecast_date), "\n")
+  cat("  Geo type:", card_attr$geo_type, "\n")
+  cat("  Geo values:", card_attr$geo_values, "\n")
+  cat("  Incidence period:", card_attr$incidence_period, "\n")
+  cat("  Name of forecaster:", card_attr$name_of_forecaster, "\n")
+  cat("  Signal:", card_attr$signals$signal, "\n")
+  print(as_tibble(card), ...)
+}
+
+
+#' Print a single score card.
+#' @param card Score card.
+#' @export
+print.score_card <- function(card, ...) {
+  card_attr <- attributes(card)
+  cat("Attributes:\n")
+  cat("  Ahead:", card_attr$ahead, "\n")
+  cat("  As of:", as.character(card_attr$as_of), "\n")
+  cat("  Backfill buffer:", card_attr$backfill_buffer, "\n")
+  cat("  Data source:", card_attr$response$data_source, "\n")
+  cat("  Geo type:", card_attr$geo_type, "\n")
+  cat("  Incidence period:", card_attr$incidence_period, "\n")
+  cat("  Name of forecaster:", card_attr$name_of_forecaster, "\n")
+  cat("  Signal:", card_attr$response$signal, "\n")
+  print(as_tibble(card), ...)
 }

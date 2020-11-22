@@ -84,7 +84,7 @@ test_that("aggregate_cards aggregates prediction cards", {
 
 test_that("aggregate_cards aggregates evaluation cards", {
     # Base data for evaluation cards
-    evaluation_cards <- list(
+    score_cards <- list(
         tibble(
             location = c("01", "02"),
             forecast_date = "2020-02-14",
@@ -127,7 +127,7 @@ test_that("aggregate_cards aggregates evaluation cards", {
         )   
     )
 
-    # Attributes for each card in `prediction_cards`.
+    # Attributes for each card in `score_cards`.
     card_attributes <- list(
         list(
             ahead = 1,
@@ -156,9 +156,9 @@ test_that("aggregate_cards aggregates evaluation cards", {
     )
 
     # Assign attributes to the evaluation cards.
-    for (i in seq_along(evaluation_cards)) {
-        class(evaluation_cards[[i]]) <- c("evaluation_card", class(evaluation_cards[[i]]))
-        attributes(evaluation_cards[[i]]) <- c(attributes(evaluation_cards[[i]]),
+    for (i in seq_along(score_cards)) {
+        class(score_cards[[i]]) <- c("evaluation_card", class(score_cards[[i]]))
+        attributes(score_cards[[i]]) <- c(attributes(score_cards[[i]]),
                                                card_attributes[[i]])
     }
 
@@ -182,6 +182,6 @@ test_that("aggregate_cards aggregates evaluation cards", {
         name_of_forecaster = c(rep("f1", 20), rep("f2", 20)),
         signal = c(rep("sig 1", 20), rep("sig 2", 20))
     )
-    actual <- aggregate_cards(evaluation_cards)
+    actual <- aggregate_cards(score_cards)
     expect_identical(actual, expected)
 })

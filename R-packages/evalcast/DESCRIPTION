@@ -1,6 +1,6 @@
 Package: evalcast
 Type: Package
-Title: Evaluation Tools For COVID Forecasters
+Title: Tools For Evaluating COVID Forecasters
 Version: 0.1.1
 Authors@R: 
   c(
@@ -8,15 +8,18 @@ Authors@R:
            family = "Bien",
            role = c("aut", "cre"),
            email = "jbien@usc.edu"),
-    person(given = "Alden",
-           family = "Green",
-           role = "aut"),
-    person(given = "Balasubramanian",
-           family = "Narasimhan",
-           role = "aut"),
     person(given = "Sarah",
            family = "Colquhoun",
            role = "ctb"),
+    person(given = "Alden",
+           family = "Green",
+           role = "aut"),
+		person(given = "Daniel",
+					 family = "McDonald",
+					 role = "aut"),
+    person(given = "Balasubramanian",
+           family = "Narasimhan",
+           role = "aut"),
     person(given = "Samyak",
            family = "Rajanala",
            role = "ctb"),
@@ -26,7 +29,7 @@ Authors@R:
     person(given = "Ryan",
            family = "Tibshirani",
            role = "aut"))
-Description: Evaluation tools for probabilistic COVID-19 forecasters. This
+Description: Tools for evaluating probabilistic COVID-19 forecasters. This
     package provides functionality for accurately evaluating forecaster
     performance: crucially, evalcast leverages the covidcast R package's "as of"
     capability, which allows one to get the data that would have been known as

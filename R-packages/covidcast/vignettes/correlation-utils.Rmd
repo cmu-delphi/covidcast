@@ -12,7 +12,7 @@ The covidcast package provides some simple utilities for exploring the
 correlations between two signals, over space or time, which may be helpful for
 simple analyses and explorations of data.
 
-For these examples, we'll load confirmed case and death rates. and restrict our
+For these examples, we'll load confirmed case and death rates, and restrict our
 analysis to counties with at least 500 total cases by August 15th.
 
 ```{r, message = FALSE}
@@ -81,18 +81,25 @@ linear relationship. The latter can be addressed using Spearman correlation,
 accomplished by setting `method = "spearman"` in the call to `covidcast_cor()`.
 Spearman correlation is highly robust and invariant to monotone transformations
 (it doesn't rely on any particular functional form for the dependence between 
-two variables). 
+two variables).
 
-We might also interested in interested in how case rates associate with death
-rates in the *future*. Using the `dt_x` parameter in `covidcast_cor()`, we can 
-lag case rates back any number of days we want, before calculating correlations.
+### Lagged correlations
+
+We might also be interested in how case rates associate with death rates in the
+*future*. Using the `dt_x` parameter in `covidcast_cor()`, we can lag case rates
+back any number of days we want, before calculating correlations.
+
+Here we set `dt_x = -10`. This means that `iprop_act` will be lagged by 10 days,
+meaning that cases on June 1st will be correlated with deaths on June 11th. (It
+might help to think of it this way: deaths on a certain day will be correlated
+with cases with an offset of -10 days.)
 
 ```{r, warning = FALSE}
 # Use Spearman correlation, with case rates and 10-day lagged case rates
 df_cor1 <- covidcast_cor(iprop_act, dprop_act, by = "time_value", 
-                        method = "spearman")
+                         method = "spearman")
 df_cor2 <- covidcast_cor(iprop_act, dprop_act, by = "time_value", dt_x = -10,
-                        method = "spearman")
+                         method = "spearman")
 
 # Stack rowwise into one data frame, then plot time series
 df_cor <- rbind(df_cor1, df_cor2)
@@ -106,10 +113,10 @@ ggplot(df_cor, aes(x = time_value, y = value)) +
   theme(legend.position = "bottom")
 ```
 
-We can see that, for the most part, the Spearman measure has bolstered the 
-correlations; and generally, lagging the case rates time series back by 10 days 
-improves correlations, confirming case rates are better correlated with death 
-rates 10 days from now.
+We can see that, for the most part, the Spearman measure has bolstered the
+correlations; and generally, lagging the case rates back by 10 days improves
+correlations, confirming case rates are better correlated with death rates 10
+days from now.
 
 ## Correlations sliced by county
 

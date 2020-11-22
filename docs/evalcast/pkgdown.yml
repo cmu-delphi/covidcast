@@ -1,7 +1,0 @@
-pandoc: 2.7.3
-pkgdown: 1.5.1
-pkgdown_sha: ~
-articles:
-  intro_vignette: intro_vignette.html
-last_built: 2020-11-04T19:06Z
-

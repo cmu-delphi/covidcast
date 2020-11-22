@@ -1,10 +1,18 @@
 ---
 title: "Introduction to evalcast"
-output: html_document
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to evalcast}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE, message = FALSE, warning = FALSE,
+  collapse = TRUE,
+  comment = "#>"
+)
 ```
 
 The `evalcast` package provides the infrastructure for developing and evaluating probabilistic forecasters that are based on data obtained with the [covidcast](https://cmu-delphi.github.io/covidcast/covidcastR/) R package.  A unique feature of the `covidcast` API is that it can retrieve data that would have been available *as of* a certain date.  This accounts for a difficult property of working with certain COVID-19 data sources, which is that they may be backfilled (retrospectively updated).  Failing to account for backfill can lead to poorly trained forecasters and overly optimistic retrospective evaluations.  The `evalcast` package is designed to help forecasters avoid these pitfalls.
@@ -20,7 +28,7 @@ The format of a forecaster is aligned with the [CovidHub submission instructions
 We start by specifying which signals the forecaster will be using.  See [here](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html) for a full list of signals available through the `covidcast` API.  Each signal is specified by two strings: `data_source` and `signal`.  Optionally, we can specify how far back in time we will want data.
 
 ```{r}
-library(tidyverse)
+library(tibble)
 signals <- tibble(data_source = "jhu-csse", 
                   signal = c("deaths_incidence_num", "confirmed_incidence_num"), 
                   start_day = "2020-06-15")
@@ -110,7 +118,8 @@ scorecards[[1]]
 ```{r}
 scorecards_list <- c(scorecards_yyg,scorecards_cmu,scorecards)
 plot_measure(scorecards_list, "wis")
-plot_measure(scorecards_list, "ae", type = "dotplot") + scale_x_log10()
+plot_measure(scorecards_list, "ae", type = "dotplot") +
+  ggplot2::scale_x_log10()
 plot_calibration(scorecards_cmu[[1]], type = "wedge")
 plot_calibration(scorecards_cmu[[1]], type = "traditional")
 plot_coverage(list(scorecards_yyg[[1]],

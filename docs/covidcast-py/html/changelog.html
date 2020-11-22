@@ -34,14 +34,19 @@
             
   <div class="section" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="v0-1-1-november-18-2020">
-<h2>v0.1.1, November 18, 2020<a class="headerlink" href="#v0-1-1-november-18-2020" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="v0-1-1-november-22-2020">
+<h2>v0.1.1, November 22, 2020<a class="headerlink" href="#v0-1-1-november-22-2020" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Bug fix: Shapefile packaging issue is now resolved.</p></li>
-<li><p>Update: <code class="docutils literal notranslate"><span class="pre">Direction</span></code> is no longer supported and has been removed from the output
-of <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a></p></li>
-<li><p>New feature: Functions <a class="reference internal" href="signals.html#covidcast.fips_to_abbr" title="covidcast.fips_to_abbr"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.fips_to_abbr()</span></code></a> and <a class="reference internal" href="signals.html#covidcast.abbr_to_fips" title="covidcast.abbr_to_fips"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.abbr_to_fips()</span></code></a> to
-convert between state FIPS codes and their abbreviations.</p></li>
+<li><p>Bug fix: A shapefile packaging issue, which broke
+<code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot_choropleth()</span></code> for metropolitan statistical areas and
+hospital referral regions, is now resolved.</p></li>
+<li><p>Update: <code class="docutils literal notranslate"><span class="pre">Direction</span></code> is no longer supported and has been removed from the
+output of <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a>. To measure increasing or decreasing
+trends in signals, we recommend implementing your own method based on your
+application’s specific needs.</p></li>
+<li><p>New feature: Functions <a class="reference internal" href="signals.html#covidcast.fips_to_abbr" title="covidcast.fips_to_abbr"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.fips_to_abbr()</span></code></a> and
+<a class="reference internal" href="signals.html#covidcast.abbr_to_fips" title="covidcast.abbr_to_fips"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.abbr_to_fips()</span></code></a> to convert between state FIPS codes and
+their abbreviations.</p></li>
 </ul>
 </div>
 <div class="section" id="v0-1-0-october-1-2020">
@@ -136,7 +141,7 @@ argument that can include multiple geographies, rather than a single
 <li class="toctree-l1"><a class="reference internal" href="plot_examples.html">Plotting Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#v0-1-1-november-18-2020">v0.1.1, November 18, 2020</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-1-1-november-22-2020">v0.1.1, November 22, 2020</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-1-0-october-1-2020">v0.1.0, October 1, 2020</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-9-august-30-2020">v0.0.9, August 30, 2020</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-8-july-26-2020">v0.0.8, July 26, 2020</a></li>

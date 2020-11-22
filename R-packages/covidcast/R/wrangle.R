@@ -256,6 +256,8 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
 #'   `aggregate_signals()` had been called in the first place with that
 #'   `format` argument.
 #'
+#' @seealso [covidcast_signals()]
+#'
 #' @export
 covidcast_longer = function(x) {
   if (!inherits(x, "covidcast_signal_wide")) {

@@ -4,10 +4,10 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COVIDcast API client &#8212; COVIDcast API client 0.1.0 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>COVIDcast API client &#8212; COVIDcast API client 0.1.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -34,15 +34,16 @@
             
   <div class="section" id="covidcast-api-client">
 <h1>COVIDcast API client<a class="headerlink" href="#covidcast-api-client" title="Permalink to this headline">¶</a></h1>
-<p>This package provides Python access to the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a> published by
+<p>This package provides Python access to the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast Epidata API</a> published by
 the <a class="reference external" href="https://delphi.cmu.edu">Delphi group</a> at <a class="reference external" href="https://www.cmu.edu">Carnegie Mellon University</a>. This API provides daily access to a range of
 COVID-related signals Delphi collects from a variety of sources, including
 cases, deaths, symptom surveys, healthcare data, and other information.</p>
-<p>Consult the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API documentation</a> for details
+<p>Consult the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast Epidata API documentation</a> for details
 on the data included in the API, licensing, and how to cite this data in your
 work. The <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">signals documentation</a> lists
 all the data sources and signals available through this API.</p>
 <p>The package source code and bug tracker can be found <a class="reference external" href="https://github.com/cmu-delphi/covidcast">on GitHub</a>.</p>
+<p>To get started, check out <a class="reference internal" href="getting_started.html#getting-started"><span class="std std-ref">getting started</span></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><strong>You should consider subscribing</strong> to the <a class="reference external" href="https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api">API mailing list</a> to be
@@ -51,29 +52,21 @@ updates.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>If you use data from the COVIDcast API to power a public product,
-dashboard, app, or other service, please download the data you need and store
-it centrally rather than making API requests for every user. Our server
-resources are limited and cannot support high-volume interactive use.</p>
+<p>If you use data from the COVIDcast Epidata API to power a public
+product, dashboard, app, or other service, please download the data you need
+and store it centrally rather than making API requests for every user. Our
+server resources are limited and cannot support high-volume interactive use.</p>
 <p>See also the <a class="reference external" href="https://covidcast.cmu.edu/terms-of-use.html">COVIDcast Terms of Use</a>, noting that the data is a
 research product and not warranted for a particular purpose.</p>
-</div>
-<div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>This package is available on PyPI as <a class="reference external" href="https://pypi.org/project/covidcast/">covidcast</a>, and can be installed using <code class="docutils literal notranslate"><span class="pre">pip</span></code> or
-your favorite Python package manager:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip install covidcast
-</pre></div>
-</div>
-<p>The package requires <a class="reference external" href="https://pandas.pydata.org/">pandas</a>, <a class="reference external" href="https://requests.readthedocs.io/en/master/">requests</a>, and several other packages;
-these should be installed automatically. It also uses the <a class="reference external" href="https://pypi.org/project/delphi-epidata/">delphi-epidata</a> package to access Delphi’s Epidata
-API.</p>
 </div>
 <div class="section" id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#signal-overview">Signal Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#basic-examples">Basic examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#tracking-issues-and-updates">Tracking issues and updates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#dealing-with-geographies">Dealing with geographies</a></li>
@@ -98,6 +91,7 @@ API.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#v0-1-1-november-22-2020">v0.1.1, November 22, 2020</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#v0-1-0-october-1-2020">v0.1.0, October 1, 2020</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#v0-0-9-august-30-2020">v0.0.9, August 30, 2020</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#v0-0-8-july-26-2020">v0.0.8, July 26, 2020</a></li>
@@ -181,7 +175,7 @@ API.</p>
       &copy;2020, Delphi research group.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

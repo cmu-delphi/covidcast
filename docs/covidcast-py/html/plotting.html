@@ -4,10 +4,10 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plotting Reference &#8212; COVIDcast API client 0.1.0 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plotting Reference &#8212; COVIDcast API client 0.1.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -41,9 +41,9 @@
 signal and generates a choropleth map, using <a class="reference external" href="https://matplotlib.org/">matplotlib</a> underneath. Detailed examples are provided in the
 <a class="reference internal" href="plot_examples.html#plotting-examples"><span class="std std-ref">usage examples</span></a>.</p>
 <dl class="py function">
-<dt id="covidcast.plot_choropleth">
-<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">plot_choropleth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">time_value</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.plot_choropleth" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given the output data frame of <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a>, plot a choropleth map.</p>
+<dt id="covidcast.plot">
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">time_value</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">plot_type</span><span class="o">=</span><span class="default_value">'choropleth'</span></em>, <em class="sig-param"><span class="n">combine_megacounties</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given the output data frame of <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a>, plot a choropleth or bubble map.</p>
 <p>Projections used for plotting:</p>
 <ul class="simple">
 <li><p>ESRI:102003 (USA Contiguous Albers Equal Area Conic) for the contiguous US
@@ -60,13 +60,21 @@ standard deviations. Custom arguments can be passed in as <code class="docutils 
 customizability. These arguments will be passed to the GeoPandas <code class="docutils literal notranslate"><span class="pre">plot</span></code>
 method; more information on these arguments can be found in <a class="reference external" href="https://geopandas.org/reference.html#geopandas.GeoDataFrame.plot">the GeoPandas
 documentation</a>.</p>
+<p>Bubble maps use a purple bubble by default, with all values discretized into 8 bins between 0.1
+and the signal’s historical mean value + 3 standard deviations. Values below 0 have no
+bubble but have the region displayed in white, and values above the mean + 3 std dev are binned
+into the highest bubble. Bubbles are scaled by area.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – Data frame of signal values, as returned from <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a>.</p></li>
 <li><p><strong>time_value</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code>]) – If multiple days of data are present in <code class="docutils literal notranslate"><span class="pre">data</span></code>, map only values from this
 day. Defaults to plotting the most recent day of data in <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p></li>
+<li><p><strong>combine_megacounties</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – For each state, display all counties without a signal value as a
+single polygon with the megacounty value, as opposed to plotting all the county boundaries.
+Defaults to <cite>True</cite>.</p></li>
 <li><p><strong>kwargs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – Optional keyword arguments passed to <code class="docutils literal notranslate"><span class="pre">GeoDataFrame.plot()</span></code>.</p></li>
+<li><p><strong>plot_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Type of plot to create. Either choropleth (default) or bubble map.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -97,11 +105,11 @@ Supported output formats are listed in the
 <li><p><strong>filepath</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Path where video will be saved. Filename must contain supported extension.</p></li>
 <li><p><strong>fps</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Frame rate in frames per second for animation. Defaults to 3.</p></li>
 <li><p><strong>dpi</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Dots per inch for output video. Defaults to 150 on a 12.8x9.6 figure (1920x1440).</p></li>
-<li><p><strong>kwargs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – Optional keyword arguments passed to <a class="reference internal" href="#covidcast.plot_choropleth" title="covidcast.plot_choropleth"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot_choropleth()</span></code></a>.</p></li>
+<li><p><strong>kwargs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – Optional keyword arguments passed to <a class="reference internal" href="#covidcast.plot" title="covidcast.plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot()</span></code></a>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>None</p>
@@ -117,7 +125,7 @@ Supported output formats are listed in the
 provided if the user desires more control over their plotting.</p>
 <dl class="py function">
 <dt id="covidcast.get_geo_df">
-<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">get_geo_df</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">geo_value_col</span><span class="o">=</span><span class="default_value">'geo_value'</span></em>, <em class="sig-param"><span class="n">geo_type_col</span><span class="o">=</span><span class="default_value">'geo_type'</span></em>, <em class="sig-param"><span class="n">join_type</span><span class="o">=</span><span class="default_value">'right'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.get_geo_df" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">get_geo_df</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">geo_value_col</span><span class="o">=</span><span class="default_value">'geo_value'</span></em>, <em class="sig-param"><span class="n">geo_type_col</span><span class="o">=</span><span class="default_value">'geo_type'</span></em>, <em class="sig-param"><span class="n">join_type</span><span class="o">=</span><span class="default_value">'right'</span></em>, <em class="sig-param"><span class="n">combine_megacounties</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.get_geo_df" title="Permalink to this definition">¶</a></dt>
 <dd><p>Augment a <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a> data frame with the shape of each geography.</p>
 <p>This method takes in a pandas DataFrame object and returns a GeoDataFrame
 object from the <a class="reference external" href="https://geopandas.org/">GeoPandas package</a>. The
@@ -132,9 +140,11 @@ and right join them, so all states/counties will always be present
 regardless of whether <code class="docutils literal notranslate"><span class="pre">data</span></code> contains values for those locations. <code class="docutils literal notranslate"><span class="pre">left</span></code>,
 <code class="docutils literal notranslate"><span class="pre">outer</span></code>, and <code class="docutils literal notranslate"><span class="pre">inner</span></code> joins are also supported and can be selected with
 the <code class="docutils literal notranslate"><span class="pre">join_type</span></code> argument.</p>
-<p>For right joins on counties, all counties without a signal value will be
-given the value of the megacounty (if present). Other joins will not use
-megacounties. See the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">geographic coding documentation</a>
+<p>If <code class="docutils literal notranslate"><span class="pre">combine_megacounties=False</span></code> (default) all counties without a signal value will be
+given the value of the megacounty if present. If <code class="docutils literal notranslate"><span class="pre">combine_megacounties=True</span></code>, a left join
+will be conducted and the megacounty rows will be given a polygon of the union of all
+constituent counties without a value. Other joins will not use megacounties.
+See the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">geographic coding documentation</a>
 for information about megacounties.</p>
 <p>By default, this function identifies the geography for each row of the input
 data frame using its <code class="docutils literal notranslate"><span class="pre">geo_value</span></code> column, matching data frames returned by
@@ -152,6 +162,8 @@ and the <a class="reference external" href="https://data.cms.gov/widgets/ia25-mr
 <li><p><strong>geo_type_col</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of column containing geography type.</p></li>
 <li><p><strong>join_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Type of join to do between input data (left side) and geo data (right side).
 Must be one of <cite>right</cite> (default), <cite>left</cite>, <cite>outer</cite>, or <cite>inner</cite>.</p></li>
+<li><p><strong>combine_megacounties</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – For each state, return all counties without a signal value as a
+single row and polygon with the megacounty value. Defaults to <cite>False</cite>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -247,7 +259,7 @@ WGS84 for HRRs.</p>
       &copy;2020, Delphi research group.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

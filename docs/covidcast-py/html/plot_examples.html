@@ -4,10 +4,10 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plotting Examples &#8212; COVIDcast API client 0.1.0 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plotting Examples &#8212; COVIDcast API client 0.1.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -38,10 +38,10 @@
 <div class="section" id="built-in-functionality">
 <h2>Built-in functionality<a class="headerlink" href="#built-in-functionality" title="Permalink to this headline">¶</a></h2>
 <p>The returned DataFrame from <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a> can be plotted using the built-in
-<a class="reference internal" href="plotting.html#covidcast.plot_choropleth" title="covidcast.plot_choropleth"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot_choropleth()</span></code></a>. Currently, state, county, hospital referral regions
+<a class="reference internal" href="plotting.html#covidcast.plot" title="covidcast.plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot()</span></code></a>. Currently, state, county, hospital referral regions
 (HRR), and metropolitan statistical area (MSA) geography types are supported.</p>
-<p>County-level maps show estimates for each county, and color each state by the
-megacounty estimates, if available. (Megacounties represent all counties with
+<p>County-level maps show estimates for each county, and color each state as a single
+polygon with the megacounty estimates, if available. (Megacounties represent all counties with
 insufficient sample size to report in that state; see the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">geographic coding
 documentation</a> for
 details.)</p>
@@ -53,7 +53,7 @@ details.)</p>
 <span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
 <span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
 <span class="gp">... </span>                        <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;county&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">plot_choropleth</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -67,7 +67,7 @@ details.)</p>
 <span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
 <span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
 <span class="gp">... </span>                        <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;state&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">plot_choropleth</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -82,7 +82,7 @@ and HRR plots.</p>
 <span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
 <span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
 <span class="gp">... </span>                        <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;msa&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">plot_choropleth</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -93,7 +93,7 @@ and HRR plots.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span> <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
 <span class="gp">... </span>                        <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;hrr&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">plot_choropleth</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -101,12 +101,9 @@ and HRR plots.</p>
 <div class="figure align-default">
 <img alt="_images/plot_examples-4.png" src="_images/plot_examples-4.png" />
 </div>
-<p>Additional keyword arguments can also be provided. These correspond to most of the arguments
-available for the
-<a class="reference external" href="https://geopandas.org/reference.html#geopandas.GeoSeries.plot">GeoPandas plot() function</a>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">plot_choropleth</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
-<span class="gp">... </span>                          <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                          <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;0.8&quot;</span><span class="p">)</span>
+<p>As an alternative to choropleths, bubble plots can be created with the <code class="docutils literal notranslate"><span class="pre">plot_type=&quot;bubble&quot;</span></code>
+argument.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">plot_type</span><span class="o">=</span><span class="s2">&quot;bubble&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -114,10 +111,23 @@ available for the
 <div class="figure align-default">
 <img alt="_images/plot_examples-5.png" src="_images/plot_examples-5.png" />
 </div>
+<p>Additional keyword arguments can also be provided. These correspond to most of the arguments
+available for the
+<a class="reference external" href="https://geopandas.org/reference.html#geopandas.GeoSeries.plot">GeoPandas plot() function</a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;0.8&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href=".//plot_examples-6.py">Source code</a>, <a class="reference external" href=".//plot_examples-6.png">png</a>, <a class="reference external" href=".//plot_examples-6.hires.png">hires.png</a>, <a class="reference external" href=".//plot_examples-6.pdf">pdf</a>)</p>
+<div class="figure align-default">
+<img alt="_images/plot_examples-6.png" src="_images/plot_examples-6.png" />
+</div>
 <p>The function returns a
 <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure">Matplotlib Figure object</a>
 which can be stored and altered further.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plotting</span><span class="o">.</span><span class="n">plot_choropleth</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plotting</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">set_dpi</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -139,7 +149,7 @@ the month of August.</p>
   <source src="_static/example_default_animation.mp4" type="video/mp4">
     Your browser does not support the HTML5 Video element
 </video><p>Video format, frame rate, and resolution are adjustable. Like the static maps, additional plotting
-keyword arguments can be provided and are passed to <a class="reference internal" href="plotting.html#covidcast.plot_choropleth" title="covidcast.plot_choropleth"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot_choropleth()</span></code></a>.</p>
+keyword arguments can be provided and are passed to <a class="reference internal" href="plotting.html#covidcast.plot" title="covidcast.plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot()</span></code></a>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">df</span><span class="p">,</span>
 <span class="gp">... </span>                  <span class="s2">&quot;test_plot2.mp4&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                  <span class="n">fps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
@@ -162,7 +172,8 @@ provided by that package. The geometry information is sourced from the
 default, it will try to compute the right join between the input data (left side of join) to the
 geometry data (right side of join), so that the returned GeoDataFrame will contain all the possible
 geometries with the signal values filled if present. When mapping counties, those that do not have values but have
-a corresponding megacounty will inherit the megacounty values.</p>
+a corresponding megacounty will inherit the megacounty values. To have a singe polygon returned for each
+megacounty, use the <code class="docutils literal notranslate"><span class="pre">combine_megacounties=True</span></code> argument.</p>
 <p>This operation depends on having only one row of signal information per
 geographic region. If this is not the the case, you must specify another join
 with the <code class="docutils literal notranslate"><span class="pre">join_type</span></code> argument.</p>
@@ -172,35 +183,35 @@ with the <code class="docutils literal notranslate"><span class="pre">join_type<
 <span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
 <span class="gp">... </span>                        <span class="n">geo_type</span> <span class="o">=</span> <span class="s2">&quot;county&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">get_geo_df</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="go">     geo_value time_value  direction      issue  lag     value    stderr  sample_size geo_type data_source        signal                                           geometry state_fips</span>
-<span class="go">0        24510 2020-08-04        NaN 2020-08-06  2.0  0.375601  0.193356     587.6289   county   fb-survey  smoothed_cli  POLYGON ((-76.71131 39.37193, -76.62619 39.372...         24</span>
-<span class="go">1        31169 2020-08-04        NaN 2020-08-06  2.0  0.928208  0.168783    1059.8130   county   fb-survey  smoothed_cli  POLYGON ((-97.82082 40.35054, -97.36869 40.350...         31</span>
-<span class="go">2        37077 2020-08-04        NaN 2020-08-06  2.0  0.627742  0.081884    3146.0176   county   fb-survey  smoothed_cli  POLYGON ((-78.80252 36.21349, -78.80235 36.220...         37</span>
-<span class="go">3        46091 2020-08-04        NaN 2020-08-06  2.0  0.589745  0.161989     778.7429   county   fb-survey  smoothed_cli  POLYGON ((-97.97924 45.76257, -97.97878 45.935...         46</span>
-<span class="go">4        39075 2020-08-04        NaN 2020-08-06  2.0  0.785641  0.099959    2767.5054   county   fb-survey  smoothed_cli  POLYGON ((-82.22066 40.66758, -82.12620 40.668...         39</span>
-<span class="gp">... </span>       <span class="o">...</span>        <span class="o">...</span>        <span class="o">...</span>        <span class="o">...</span>  <span class="o">...</span>       <span class="o">...</span>       <span class="o">...</span>          <span class="o">...</span>      <span class="o">...</span>         <span class="o">...</span>           <span class="o">...</span>                                                <span class="o">...</span>        <span class="o">...</span>
-<span class="go">3228     53055 2020-08-04        NaN 2020-08-06  2.0  0.440817  0.143404     944.1731   county   fb-survey  smoothed_cli  MULTIPOLYGON (((-122.97714 48.79345, -122.9379...         53</span>
-<span class="go">3229     39133 2020-08-04        NaN 2020-08-06  2.0  0.040082  0.089324     310.8495   county   fb-survey  smoothed_cli  POLYGON ((-81.39328 41.02544, -81.39322 41.040...         39</span>
-<span class="go">3230     08025 2020-08-04        NaN 2020-08-06  2.0  0.440306  0.123763    1171.5823   county   fb-survey  smoothed_cli  POLYGON ((-104.05840 38.26084, -104.05392 38.5...         08</span>
-<span class="go">3231     13227 2020-08-04        NaN 2020-08-06  2.0  1.009511  0.092993    3605.8731   county   fb-survey  smoothed_cli  POLYGON ((-84.65437 34.54895, -84.52139 34.550...         13</span>
-<span class="go">3232     21145 2020-08-04        NaN 2020-08-06  2.0  1.257862  0.915558     150.4266   county   fb-survey  smoothed_cli  POLYGON ((-88.93308 37.22775, -88.93174 37.227...         21</span>
+<span class="go">     geo_value time_value      issue  lag     value    stderr  sample_size geo_type data_source        signal                                           geometry state_fips</span>
+<span class="go">0        24510 2020-08-04 2020-08-06  2.0  0.375601  0.193356     587.6289   county   fb-survey  smoothed_cli  POLYGON ((-76.71131 39.37193, -76.62619 39.372...         24</span>
+<span class="go">1        31169 2020-08-04 2020-08-06  2.0  0.928208  0.168783    1059.8130   county   fb-survey  smoothed_cli  POLYGON ((-97.82082 40.35054, -97.36869 40.350...         31</span>
+<span class="go">2        37077 2020-08-04 2020-08-06  2.0  0.627742  0.081884    3146.0176   county   fb-survey  smoothed_cli  POLYGON ((-78.80252 36.21349, -78.80235 36.220...         37</span>
+<span class="go">3        46091 2020-08-04 2020-08-06  2.0  0.589745  0.161989     778.7429   county   fb-survey  smoothed_cli  POLYGON ((-97.97924 45.76257, -97.97878 45.935...         46</span>
+<span class="go">4        39075 2020-08-04 2020-08-06  2.0  0.785641  0.099959    2767.5054   county   fb-survey  smoothed_cli  POLYGON ((-82.22066 40.66758, -82.12620 40.668...         39</span>
+<span class="gp">... </span>       <span class="o">...</span>        <span class="o">...</span>       <span class="o">...</span>        <span class="o">...</span>  <span class="o">...</span>       <span class="o">...</span>       <span class="o">...</span>          <span class="o">...</span>      <span class="o">...</span>         <span class="o">...</span>           <span class="o">...</span>                                                <span class="o">...</span>        <span class="o">...</span>
+<span class="go">3228     53055 2020-08-04 2020-08-06  2.0  0.440817  0.143404     944.1731   county   fb-survey  smoothed_cli  MULTIPOLYGON (((-122.97714 48.79345, -122.9379...         53</span>
+<span class="go">3229     39133 2020-08-04 2020-08-06  2.0  0.040082  0.089324     310.8495   county   fb-survey  smoothed_cli  POLYGON ((-81.39328 41.02544, -81.39322 41.040...         39</span>
+<span class="go">3230     08025 2020-08-04 2020-08-06  2.0  0.440306  0.123763    1171.5823   county   fb-survey  smoothed_cli  POLYGON ((-104.05840 38.26084, -104.05392 38.5...         08</span>
+<span class="go">3231     13227 2020-08-04 2020-08-06  2.0  1.009511  0.092993    3605.8731   county   fb-survey  smoothed_cli  POLYGON ((-84.65437 34.54895, -84.52139 34.550...         13</span>
+<span class="go">3232     21145 2020-08-04 2020-08-06  2.0  1.257862  0.915558     150.4266   county   fb-survey  smoothed_cli  POLYGON ((-88.93308 37.22775, -88.93174 37.227...         21</span>
 <span class="go">[3233 rows x 13 columns]</span>
 </pre></div>
 </div>
 <p>Note that there are 3233 output rows for the 3233 counties present in the Census shapefiles.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">get_geo_df</span><span class="p">(</span><span class="n">covid</span><span class="p">,</span> <span class="n">join_type</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
-<span class="go">    geo_value time_value direction      issue  lag     value    stderr  sample_size geo_type data_source        signal                                           geometry state_fips</span>
-<span class="go">0       01000 2020-08-04      None 2020-08-06    2  1.153447  0.136070    1759.8539   county   fb-survey  smoothed_cli                                               None        NaN</span>
-<span class="go">1       01001 2020-08-04      None 2020-08-06    2  0.539568  0.450588     107.9345   county   fb-survey  smoothed_cli  POLYGON ((-86.91759 32.66417, -86.81657 32.660...         01</span>
-<span class="go">2       01003 2020-08-04      None 2020-08-06    2  1.625496  0.522036     455.2964   county   fb-survey  smoothed_cli  POLYGON ((-88.02927 30.22271, -88.02399 30.230...         01</span>
-<span class="go">3       01015 2020-08-04      None 2020-08-06    2  0.000000  0.378788     115.2302   county   fb-survey  smoothed_cli  POLYGON ((-86.14371 33.70913, -86.12388 33.710...         01</span>
-<span class="go">4       01051 2020-08-04      None 2020-08-06    2  0.786565  0.435877     112.5569   county   fb-survey  smoothed_cli  POLYGON ((-86.41333 32.75059, -86.37497 32.753...         01</span>
-<span class="go">..        ...        ...       ...        ...  ...       ...       ...          ...      ...         ...           ...                                                ...        ...</span>
-<span class="go">840     55141 2020-08-04      None 2020-08-06    2  1.190476  0.867751     144.3682   county   fb-survey  smoothed_cli  POLYGON ((-90.31605 44.42450, -90.31596 44.424...         55</span>
-<span class="go">841     56000 2020-08-04      None 2020-08-06    2  0.822092  0.254670     628.9937   county   fb-survey  smoothed_cli                                               None        NaN</span>
-<span class="go">842     56021 2020-08-04      None 2020-08-06    2  0.269360  0.315094     197.9646   county   fb-survey  smoothed_cli  POLYGON ((-105.28064 41.33100, -105.27824 41.6...         56</span>
-<span class="go">843     56025 2020-08-04      None 2020-08-06    2  0.170940  0.304654     192.0237   county   fb-survey  smoothed_cli  POLYGON ((-107.54353 42.78156, -107.50142 42.7...         56</span>
-<span class="go">844     72000 2020-08-04      None 2020-08-06    2  0.000000  0.228310     100.9990   county   fb-survey  smoothed_cli                                               None        NaN</span>
+<span class="go">    geo_value time_value      issue  lag     value    stderr  sample_size geo_type data_source        signal                                           geometry state_fips</span>
+<span class="go">0       01000 2020-08-04 2020-08-06    2  1.153447  0.136070    1759.8539   county   fb-survey  smoothed_cli                                               None        NaN</span>
+<span class="go">1       01001 2020-08-04 2020-08-06    2  0.539568  0.450588     107.9345   county   fb-survey  smoothed_cli  POLYGON ((-86.91759 32.66417, -86.81657 32.660...         01</span>
+<span class="go">2       01003 2020-08-04 2020-08-06    2  1.625496  0.522036     455.2964   county   fb-survey  smoothed_cli  POLYGON ((-88.02927 30.22271, -88.02399 30.230...         01</span>
+<span class="go">3       01015 2020-08-04 2020-08-06    2  0.000000  0.378788     115.2302   county   fb-survey  smoothed_cli  POLYGON ((-86.14371 33.70913, -86.12388 33.710...         01</span>
+<span class="go">4       01051 2020-08-04 2020-08-06    2  0.786565  0.435877     112.5569   county   fb-survey  smoothed_cli  POLYGON ((-86.41333 32.75059, -86.37497 32.753...         01</span>
+<span class="go">..        ...        ...        ...  ...       ...       ...          ...      ...         ...           ...                                                ...        ...</span>
+<span class="go">840     55141 2020-08-04 2020-08-06    2  1.190476  0.867751     144.3682   county   fb-survey  smoothed_cli  POLYGON ((-90.31605 44.42450, -90.31596 44.424...         55</span>
+<span class="go">841     56000 2020-08-04 2020-08-06    2  0.822092  0.254670     628.9937   county   fb-survey  smoothed_cli                                               None        NaN</span>
+<span class="go">842     56021 2020-08-04 2020-08-06    2  0.269360  0.315094     197.9646   county   fb-survey  smoothed_cli  POLYGON ((-105.28064 41.33100, -105.27824 41.6...         56</span>
+<span class="go">843     56025 2020-08-04 2020-08-06    2  0.170940  0.304654     192.0237   county   fb-survey  smoothed_cli  POLYGON ((-107.54353 42.78156, -107.50142 42.7...         56</span>
+<span class="go">844     72000 2020-08-04 2020-08-06    2  0.000000  0.228310     100.9990   county   fb-survey  smoothed_cli                                               None        NaN</span>
 <span class="go">[845 rows x 13 columns]</span>
 </pre></div>
 </div>
@@ -216,9 +227,9 @@ projection</a>:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>(<a class="reference external" href=".//plot_examples-6.py">Source code</a>, <a class="reference external" href=".//plot_examples-6.png">png</a>, <a class="reference external" href=".//plot_examples-6.hires.png">hires.png</a>, <a class="reference external" href=".//plot_examples-6.pdf">pdf</a>)</p>
+<p>(<a class="reference external" href=".//plot_examples-7.py">Source code</a>, <a class="reference external" href=".//plot_examples-7.png">png</a>, <a class="reference external" href=".//plot_examples-7.hires.png">hires.png</a>, <a class="reference external" href=".//plot_examples-7.pdf">pdf</a>)</p>
 <div class="figure align-default">
-<img alt="_images/plot_examples-6.png" src="_images/plot_examples-6.png" />
+<img alt="_images/plot_examples-7.png" src="_images/plot_examples-7.png" />
 </div>
 </div>
 </div>
@@ -299,7 +310,7 @@ projection</a>:</p>
       &copy;2020, Delphi research group.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

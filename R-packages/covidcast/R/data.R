@@ -20,6 +20,8 @@
 #'
 #' @source United States Census Bureau, at
 #'   \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.csv}
+#'
+#' @seealso [fips_to_name()], [name_to_fips()]
 "county_census"
 
 #' Metro area population data
@@ -50,6 +52,8 @@
 #'
 #' @source United States Census Bureau, at
 #'   \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.csv}
+#'
+#' @seealso [cbsa_to_name()], [name_to_cbsa()]
 "msa_census"
 
 #' State population data
@@ -67,6 +71,8 @@
 #'
 #' @source United States Census Bureau, at
 #'   \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/state/detail/SCPRC-EST2019-18+POP-RES.csv}
+#'
+#' @seealso [abbr_to_name()], [name_to_abbr()], [abbr_to_fips()], [fips_to_abbr()]
 "state_census"
 
 #' County latitudes and longitudes

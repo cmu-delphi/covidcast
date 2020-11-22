@@ -11,6 +11,9 @@ Authors@R:
     person(given = "Sarah",
            family = "Colquhoun",
            role = "ctb"),
+    person(given = "Jed",
+           family = "Grabman",
+           role = "aut"),
     person(given = "Alden",
            family = "Green",
            role = "aut"),
@@ -19,6 +22,9 @@ Authors@R:
 					 role = "aut"),
     person(given = "Balasubramanian",
            family = "Narasimhan",
+           role = "aut"),
+    person(given = "Mike",
+           family = "O'Brien",
            role = "aut"),
     person(given = "Samyak",
            family = "Rajanala",
@@ -29,6 +35,9 @@ Authors@R:
     person(given = "Ryan",
            family = "Tibshirani",
            role = "aut"))
+URL: https://cmu-delphi.github.io/covidcast/evalcastR/,
+  https://github.com/cmu-delphi/covidcast 
+BugReports: https://github.com/cmu-delphi/covidcast/issues
 Description: Tools for evaluating probabilistic COVID-19 forecasters. This
     package provides functionality for accurately evaluating forecaster
     performance: crucially, evalcast leverages the covidcast R package's "as of"

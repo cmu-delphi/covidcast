@@ -4,10 +4,10 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fetching Data &#8212; COVIDcast API client 0.1.0 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fetching Data &#8212; COVIDcast API client 0.1.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -99,7 +99,7 @@ string; multiple geographies can be provided as an iterable (list, tuple,
 <li><p><strong>as_of</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code>]) – Fetch only data that was available on or before this date,
 provided as a <code class="docutils literal notranslate"><span class="pre">datetime.date</span></code> object. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the default, return
 the most recent available data.</p></li>
-<li><p><strong>issues</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code>], <code class="docutils literal notranslate"><span class="pre">None</span></code>]) – Fetch only data that was published or updated (“issued”) on
+<li><p><strong>issues</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code>], <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – Fetch only data that was published or updated (“issued”) on
 these dates. Provided as either a single <code class="docutils literal notranslate"><span class="pre">datetime.date</span></code> object,
 indicating a single date to fetch data issued on, or a tuple or list
 specifying (start, end) dates. In this case, return all data issued in
@@ -121,35 +121,40 @@ most recently issued data regardless of its lag.</p></li>
 observation on one day in one geographic location. Contains the following
 columns:</p>
 <dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">geo_value</span></code></dt><dd><p>identifies the location, such as a state name or county FIPS code. The
+<dt><code class="docutils literal notranslate"><span class="pre">geo_value</span></code></dt><dd><p>Identifies the location, such as a state name or county FIPS code. The
 geographic coding used by COVIDcast is described in the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">API
 documentation here</a>.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">time_value</span></code></dt><dd><p>contains a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html">pandas Timestamp object</a>
+<dt><code class="docutils literal notranslate"><span class="pre">signal</span></code></dt><dd><p>Name of the signal, same as the value of the <code class="docutils literal notranslate"><span class="pre">signal</span></code> input argument. Used for
+downstream functions to recognize where this signal is from.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">time_value</span></code></dt><dd><p>Contains a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html">pandas Timestamp object</a>
 identifying the date this estimate is for.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">issue</span></code></dt><dd><p>contains a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html">pandas Timestamp object</a>
+<dt><code class="docutils literal notranslate"><span class="pre">issue</span></code></dt><dd><p>Contains a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html">pandas Timestamp object</a>
 identifying the date this estimate was issued. For example, an estimate
 with a <code class="docutils literal notranslate"><span class="pre">time_value</span></code> of June 3 might have been issued on June 5, after
 the data for June 3rd was collected and ingested into the API.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">lag</span></code></dt><dd><p>an integer giving the difference between <code class="docutils literal notranslate"><span class="pre">issue</span></code> and <code class="docutils literal notranslate"><span class="pre">time_value</span></code>,
+<dt><code class="docutils literal notranslate"><span class="pre">lag</span></code></dt><dd><p>Integer giving the difference between <code class="docutils literal notranslate"><span class="pre">issue</span></code> and <code class="docutils literal notranslate"><span class="pre">time_value</span></code>,
 in days.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">value</span></code></dt><dd><p>the signal quantity requested. For example, in a query for the
+<dt><code class="docutils literal notranslate"><span class="pre">value</span></code></dt><dd><p>The signal quantity requested. For example, in a query for the
 <code class="docutils literal notranslate"><span class="pre">confirmed_cumulative_num</span></code> signal from the <code class="docutils literal notranslate"><span class="pre">usa-facts</span></code> source,
 this would be the cumulative number of confirmed cases in the area, as
 of the <code class="docutils literal notranslate"><span class="pre">time_value</span></code>.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">stderr</span></code></dt><dd><p>the value’s standard error, if available.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">stderr</span></code></dt><dd><p>The value’s standard error, if available.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">sample_size</span></code></dt><dd><p>indicates the sample size available in that geography on that day;
+<dt><code class="docutils literal notranslate"><span class="pre">sample_size</span></code></dt><dd><p>Indicates the sample size available in that geography on that day;
 sample size may not be available for all signals, due to privacy or
 other constraints.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">direction</span></code></dt><dd><p>uses a local linear fit to estimate whether the signal in this region is
-currently increasing or decreasing (reported as -1 for decreasing, 1 for
-increasing, and 0 for neither).</p>
+<dt><code class="docutils literal notranslate"><span class="pre">geo_type</span></code></dt><dd><p>Geography type for the signal, same as the value of the <code class="docutils literal notranslate"><span class="pre">geo_type</span></code> input argument.
+Used for downstream functions to parse <code class="docutils literal notranslate"><span class="pre">geo_value</span></code> correctly</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">data_source</span></code></dt><dd><p>Name of the signal source, same as the value of the <code class="docutils literal notranslate"><span class="pre">data_source</span></code> input argument. Used for
+downstream functions to recognize where this signal is from.</p>
 </dd>
 </dl>
 </p>
@@ -225,17 +230,17 @@ following columns:</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">signal</span></code></dt><dd><p>Signal name.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">min_time</span></code></dt><dd><p>First day for which this signal is available.</p>
-</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">max_time</span></code></dt><dd><p>Most recent day for which this signal is available.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">time_type</span></code></dt><dd><p>Temporal resolution at which this signal is reported. “day”, for
+example, means the signal is reported daily.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">geo_type</span></code></dt><dd><p>Geographic level for which this signal is available, such as county,
 state, msa, or hrr. Most signals are available at multiple geographic
 levels and will hence be listed in multiple rows with their own
 metadata.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">time_type</span></code></dt><dd><p>Temporal resolution at which this signal is reported. “day”, for
-example, means the signal is reported daily.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">min_time</span></code></dt><dd><p>First day for which this signal is available.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">max_time</span></code></dt><dd><p>Most recent day for which this signal is available.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">num_locations</span></code></dt><dd><p>Number of distinct geographic locations available for this signal. For
 example, if <cite>geo_type</cite> is county, the number of counties for which this
@@ -248,6 +253,14 @@ signal has ever been reported.</p>
 <dt><code class="docutils literal notranslate"><span class="pre">mean_value</span></code></dt><dd><p>The arithmetic mean of all reported values.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">stdev_value</span></code></dt><dd><p>The sample standard deviation of all reported values.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">last_update</span></code></dt><dd><p>The UTC datetime for when the signal value was last updated.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">max_issue</span></code></dt><dd><p>Most recent date data was issued.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">min_lag</span></code></dt><dd><p>Smallest lag from observation to issue, in days.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">max_lag</span></code></dt><dd><p>Largest lag from observation to issue, in days.</p>
 </dd>
 </dl>
 </p>
@@ -276,7 +289,7 @@ county names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>code</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>) – Individual or list of FIPS codes or regular expressions.</p></li>
+<li><p><strong>code</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Individual or list of FIPS codes or regular expressions.</p></li>
 <li><p><strong>ignore_case</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Boolean for whether or not to be case insensitive in the regular expression.
 If <code class="docutils literal notranslate"><span class="pre">fixed=True</span></code>, this argument is ignored. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>fixed</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Conduct an exact case sensitive match with the input string.
@@ -309,7 +322,7 @@ FIPS codes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>) – Individual or list of county names or regular expressions.</p></li>
+<li><p><strong>name</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Individual or list of county names or regular expressions.</p></li>
 <li><p><strong>ignore_case</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Boolean for whether or not to be case insensitive in the regular expression.
 If <code class="docutils literal notranslate"><span class="pre">fixed=True</span></code>, this argument is ignored. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>fixed</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Conduct an exact case sensitive match with the input string.
@@ -346,7 +359,7 @@ MSA names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>code</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>) – Individual or list of FIPS codes or regular expressions.</p></li>
+<li><p><strong>code</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Individual or list of FIPS codes or regular expressions.</p></li>
 <li><p><strong>ignore_case</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Boolean for whether or not to be case insensitive in the regular expression.
 If <code class="docutils literal notranslate"><span class="pre">fixed=True</span></code>, this argument is ignored. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>fixed</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Conduct an exact case sensitive match with the input string.
@@ -379,7 +392,7 @@ MSA codes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>) – Individual or list of MSA names or regular expressions.</p></li>
+<li><p><strong>name</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Individual or list of MSA names or regular expressions.</p></li>
 <li><p><strong>ignore_case</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Boolean for whether or not to be case insensitive in the regular expression.
 If <code class="docutils literal notranslate"><span class="pre">fixed=True</span></code>, this argument is ignored. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>fixed</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Conduct an exact case sensitive match with the input string.
@@ -416,7 +429,7 @@ corresponding state names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>abbr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>) – Individual or list of state abbreviations or regular expressions.</p></li>
+<li><p><strong>abbr</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Individual or list of state abbreviations or regular expressions.</p></li>
 <li><p><strong>ignore_case</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Boolean for whether or not to be case insensitive in the regular expression.
 If <code class="docutils literal notranslate"><span class="pre">fixed=True</span></code>, this argument is ignored. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>fixed</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Conduct an exact case sensitive match with the input string.
@@ -449,7 +462,7 @@ corresponding state abbreviations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>) – Individual or list of state names or regular expressions.</p></li>
+<li><p><strong>name</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Individual or list of state names or regular expressions.</p></li>
 <li><p><strong>ignore_case</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Boolean for whether or not to be case insensitive in the regular expression.
 If <code class="docutils literal notranslate"><span class="pre">fixed=True</span></code>, this argument is ignored. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>fixed</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Conduct an exact case sensitive match with the input string.
@@ -470,6 +483,74 @@ corresponding to all matched input keys and values corresponding to the list of
 state abbreviations. The returned list will be the same length as the input, with <code class="docutils literal notranslate"><span class="pre">None</span></code> or
 <code class="docutils literal notranslate"><span class="pre">{}</span></code> if no values are found for <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>,
 respectively.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="covidcast.abbr_to_fips">
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">abbr_to_fips</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">code</span></em>, <em class="sig-param"><span class="n">ignore_case</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fixed</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ties_method</span><span class="o">=</span><span class="default_value">'first'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.abbr_to_fips" title="Permalink to this definition">¶</a></dt>
+<dd><p>Look up state FIPS codes by abbreviation with regular expression support.</p>
+<p>Given an individual or list of state abbreviations or regular expressions,
+look up the corresponding state FIPS codes. The returned codes are 5 digits: the
+2 digit state FIPS with 000 appended to the end.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>code</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Individual or list of abbreviations or regular expressions.</p></li>
+<li><p><strong>ignore_case</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Boolean for whether or not to be case insensitive in the regular expression.
+If <code class="docutils literal notranslate"><span class="pre">fixed=True</span></code>, this argument is ignored. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>fixed</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Conduct an exact case sensitive match with the input string.
+Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>ties_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Method for determining how to deal with multiple outputs for a given input.
+Must be one of <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code>. If <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code>, then only the first match for each
+code is returned. If <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>, then all matches for each code are returned.
+Defaults to <code class="docutils literal notranslate"><span class="pre">first</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>If <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code>, returns a list of the first value found for each input key.
+If <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>, returns a list of dicts, one for each input, with keys
+corresponding to all matched input keys and values corresponding to the list of county names.
+The returned list will be the same length as the input, with <code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">{}</span></code> if no values
+are found for <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>, respectively.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="covidcast.fips_to_abbr">
+<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">fips_to_abbr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">code</span></em>, <em class="sig-param"><span class="n">ignore_case</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fixed</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ties_method</span><span class="o">=</span><span class="default_value">'first'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.fips_to_abbr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Look up state abbreviation by FIPS codes with regular expression support.</p>
+<p>Given an individual or list of FIPS codes or regular expressions, look up the corresponding
+state abbreviation. FIPS codes can be the 2 digit code (<code class="docutils literal notranslate"><span class="pre">covidcast.fips_to_abbr(&quot;12&quot;)</span></code>) or
+the 2 digit code with 000 appended to the end (<code class="docutils literal notranslate"><span class="pre">covidcast.fips_to_abbr(&quot;12000&quot;)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>code</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Individual or list of FIPS codes or regular expressions.</p></li>
+<li><p><strong>ignore_case</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Boolean for whether or not to be case insensitive in the regular expression.
+If <code class="docutils literal notranslate"><span class="pre">fixed=True</span></code>, this argument is ignored. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>fixed</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Conduct an exact case sensitive match with the input string.
+Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>ties_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Method for determining how to deal with multiple outputs for a given input.
+Must be one of <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code>. If <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code>, then only the first match for each
+code is returned. If <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>, then all matches for each code are returned.
+Defaults to <code class="docutils literal notranslate"><span class="pre">first</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>If <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code>, returns a list of the first value found for each input key.
+If <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>, returns a list of dicts, one for each input, with keys
+corresponding to all matched input keys and values corresponding to the list of county names.
+The returned list will be the same length as the input, with <code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">{}</span></code> if no values
+are found for <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;first&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">ties_method=&quot;all&quot;</span></code>, respectively.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -554,7 +635,7 @@ respectively.</p>
       &copy;2020, Delphi research group.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

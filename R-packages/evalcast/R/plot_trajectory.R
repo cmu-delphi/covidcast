@@ -34,36 +34,37 @@ plot_trajectory <- function(list_of_predictions_cards,
                             cutoff = 52){
   # make sure predictions cards are for the same forecasting task (except ahead, and forecast_date)
   response <- unique_attr(list_of_predictions_cards,"signals")
-  incidence_period <- unique_attr(list_of_predictions_cards,"incidence_period")
+  single_incidence_period <- unique_attr(list_of_predictions_cards,"incidence_period")
   geo_type <- unique_attr(list_of_predictions_cards, "geo_type")
-  assertthat::assert_that(incidence_period %in% c("day","epiweek"))
+  assertthat::assert_that(single_incidence_period %in% c("day","epiweek"))
   assertthat::assert_that(geo_type %in% c("county","state"))
   
   
   # predicted quantiles to plot
   plot_probs <- c(.5 - (1-alpha)/2, .5, .5 + (1-alpha)/2)
-  
-  preds_df <- list_of_predictions_cards %>% 
-                purrr::map_dfr(function(predictions_card) {
-                  fcast_date = attributes(predictions_card)$forecast_date
-      
-                  predictions_card %>%
-                    tidyr::unnest(.data$forecast_distribution) %>%
-                    dplyr::mutate(
-                      forecaster_name = attributes(predictions_card)$name_of_forecaster,
-                      ahead = attributes(predictions_card)$ahead,
-                      prob_type = dplyr::case_when(
-                        abs(probs - plot_probs[1]) <= 1e-8 ~ "lower",
-                        abs(probs - plot_probs[2]) <= 1e-8 ~ "point",
-                        abs(probs - plot_probs[3]) <= 1e-8 ~ "upper")) %>%
-                    filter(!is.na(.data$prob_type)) %>%
-                    dplyr::mutate(target_period = get_target_period_num(fcast_date,.data$ahead,incidence_period)) %>%
-                    dplyr::select(.data$location,.data$quantiles,.data$forecaster_name,.data$prob_type,.data$target_period) %>%
-                    tidyr::pivot_wider(values_from = .data$quantiles,names_from = .data$prob_type)
-                })
+
+  preds_df <- list_of_predictions_cards %>%
+    evalcast::aggregate_cards() %>%
+    dplyr::mutate(
+      prob_type = dplyr::case_when(
+        abs(probs - plot_probs[1]) <= 1e-8 ~ "lower",
+        abs(probs - plot_probs[2]) <= 1e-8 ~ "point",
+        abs(probs - plot_probs[3]) <= 1e-8 ~ "upper")) %>%
+    filter(!is.na(.data$prob_type)) %>%
+    dplyr::mutate(target_period = get_target_period_num(.data$forecast_date,
+                                                        .data$ahead,
+                                                        single_incidence_period),
+                  forecaster_name = .data$name_of_forecaster) %>%
+    dplyr::select(.data$location,
+                  .data$quantiles,
+                  .data$forecaster_name,
+                  .data$prob_type,
+                  .data$target_period,
+                  .data$forecast_date) %>%
+    tidyr::pivot_wider(values_from = .data$quantiles, names_from = .data$prob_type)
   
   # ground truth to plot
-  if(incidence_period == "day") {
+  if(single_incidence_period == "day") {
     response_df <- download_signal(data_source = response$data_source,
                                    signal = response$signal,
                                    start_day = first_day,
@@ -143,7 +144,7 @@ plot_trajectory <- function(list_of_predictions_cards,
                  aes(y = .data$value),
                  size = 1) + 
        scale_color_discrete(na.translate = FALSE) +
-       labs(x = incidence_period,
+       labs(x = single_incidence_period,
             y = paste0(response$data_source,": ",response$signal),
             colour = "forecaster_name") +
        theme_bw() + 
@@ -203,11 +204,12 @@ get_target_period_num <- function(forecast_date,ahead,incidence_period){
   )
   if(incidence_period == "day")
   {
-    forecast_date + ahead
+    return(forecast_date + ahead)
   } else {
-    ifelse(wday(forecast_date) <= 2, 
+    x = ifelse(wday(forecast_date) <= 2, 
            MMWRweek::MMWRweek(forecast_date)$MMWRweek + ahead - 1,
            MMWRweek::MMWRweek(forecast_date)$MMWRweek + ahead)
+    return(x)
   }
 }
 

@@ -591,9 +591,9 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
       desired_geos <- tolower(unique(geo_value))
       returned_epidata <- dat[[i]]$epidata
       returned_geo_array <- returned_epidata %>%
-        select(geo_value, time_value) %>%
-        group_by(time_value) %>%
-        summarize(geo_value = list(geo_value))
+        dplyr::select(geo_value, time_value) %>%
+        dplyr::group_by(time_value) %>%
+        dplyr::summarize(geo_value = list(geo_value))
       returned_time_values <- returned_geo_array$time_value
       if (length(returned_time_values) != length(time_values)) {
         missing_time_values <- setdiff(time_values, returned_time_values)

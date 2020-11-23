@@ -7,7 +7,6 @@ Authors@R:
     person(given = "Jacob",
            family = "Bien",
            role = "aut"),
-           email = "jbien@usc.edu"),
     person(given = "Sarah",
            family = "Colquhoun",
            role = "ctb"),

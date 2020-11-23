@@ -1,5 +1,6 @@
 ---
-title: Manipulating multiple signals 
+title: 3. Manipulating multiple signals 
+description: Download multiple signals at once, and aggregate and manipulate them in various ways.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{3. Manipulating multiple signals}

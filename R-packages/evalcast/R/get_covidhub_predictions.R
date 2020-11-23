@@ -73,16 +73,16 @@ get_covidhub_predictions <- function(covid_hub_forecaster_name,
         attributes(.x) <- c(
           attributes(.x),
           list(forecaster = NA,
-                                 name_of_forecaster = covid_hub_forecaster_name,
-                                 signals = signals,
-                                 forecast_date = lubridate::ymd(forecast_date),
-                                 incidence_period = "epiweek",
-                                 ahead = as.numeric(.y$ahead),
-                                 geo_type = .y$geo_type,
-                                 geo_values = NA,
-                                 from_covidhub = TRUE)
+               name_of_forecaster = covid_hub_forecaster_name,
+               signals = signals,
+               forecast_date = lubridate::ymd(forecast_date),
+               incidence_period = "epiweek",
+               ahead = as.numeric(.y$ahead),
+               geo_type = .y$geo_type,
+               geo_values = NA,
+               from_covidhub = TRUE)
         )
-
+        class(.x) <- c("prediction_card", class(.x))
         return(.x)
       })
   }
@@ -100,6 +100,7 @@ get_covidhub_predictions <- function(covid_hub_forecaster_name,
 #' @importFrom rvest html_nodes html_text
 #' @importFrom xml2 read_html
 #' @importFrom stringr str_remove_all str_match_all
+#' @importFrom lubridate as_date
 #' @export
 get_forecast_dates <- function(covid_hub_forecaster_name) {
   url <- "https://github.com/reichlab/covid19-forecast-hub/tree/master/data-processed/"
@@ -109,7 +110,7 @@ get_forecast_dates <- function(covid_hub_forecaster_name) {
     stringr::str_remove_all("\\n") %>%
     stringr::str_match_all(sprintf("(20\\d{2}-\\d{2}-\\d{2})-%s.csv",
                                    covid_hub_forecaster_name))
-  out[[1]][, 2]
+  return(lubridate::as_date(out[[1]][, 2]))
 }
 
 #' @importFrom rvest html_nodes html_text

@@ -1,0 +1,224 @@
+---
+title: "Correlation Analyses for COVID-19 Indicators"
+author: "Delphi Group"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, fig.width = 8, 
+                      fig.height = 7)
+```
+
+## County analysis
+
+First, we'll look at counties. 
+
+### Getting data 
+
+We fetch various signals from our API, from April 15 through to the current day.
+
+```{r}
+library(covidcast)
+library(dplyr)
+library(ggplot2)
+
+# Fetch the following sources and signals from the API 
+sources = c("doctor-visits", "fb-survey", "fb-survey", "hospital-admissions", 
+            "indicator-combination")
+signals = c("smoothed_adj_cli", "smoothed_cli", "smoothed_hh_cmnty_cli", 
+            "smoothed_adj_covid19", "nmf_day_doc_fbc_fbs_ght")
+names = c("Doctor visits", "Facebook CLI", "Facebook CLI-in-community", 
+          "Hospitalizations", "Combo indicator")
+
+start_day = "2020-04-15"
+end_day = NULL
+
+df_signals = vector("list", length(signals))
+for (i in 1:length(signals)) {
+  df_signals[[i]] = covidcast_signal(sources[i], signals[i], start_day, end_day)
+}
+
+# Fetch USAFacts confirmed case incidence proportion (smoothed with 7-day 
+# trailing average)
+df_cases = covidcast_signal("usa-facts", "confirmed_7dav_incidence_prop",
+                            start_day, end_day)
+```
+
+### Correlations sliced by time
+
+Here we look at Spearman (rank) correlations between our signals and COVID-19
+case incidence rates, sliced by time. That is, for each day, we compute the 
+correlation between each signal and COVID-19 case incidence rates, over all  
+counties (with at least 500 cumulative cases). 
+
+```{r}
+# Consider only counties with at least 500 cumulative cases
+case_num = 500
+geo_values = covidcast_signal("usa-facts", "confirmed_cumulative_num",
+                              max(df_cases$time_value), 
+                              max(df_cases$time_value)) %>%
+  filter(value >= case_num) %>% pull(geo_value)
+
+df_cor = vector("list", length(signals))
+for (i in 1:length(signals)) {
+  df_cor[[i]] = covidcast_cor(df_signals[[i]] %>% 
+                                filter(geo_value %in% geo_values), 
+                              df_cases %>% 
+                                filter(geo_value %in% geo_values), 
+                              by = "time_value", method = "spearman")
+  df_cor[[i]]$signal = names[i]
+}
+df = do.call(rbind, df_cor)
+
+ggplot(df, aes(x = time_value, y = value)) +
+  geom_line(aes(color = signal)) +
+  guides(color = guide_legend(nrow = 2)) +
+  labs(title = "Correlation between signals and case rates",
+       subtitle = sprintf("Over all counties with at least %i cumulative cases",
+                          case_num), x = "Date", y = "Correlation") +
+  theme(legend.position = "bottom", legend.title = element_blank())
+```
+
+### Correlations sliced by county
+
+Now we look at Spearman (rank) correlations between our signals and COVID-19
+case incidence rates, sliced by county. That is, for each county (with at least
+500 cumulative cases), we compute the correlation between each signal and 
+COVID-19 case incidence rates, over all time.
+
+```{r}
+df_cor = vector("list", length(signals))
+for (i in 1:length(signals)) {
+  df_cor[[i]] = covidcast_cor(df_signals[[i]] %>% 
+                                filter(geo_value %in% geo_values), 
+                              df_cases %>% 
+                                filter(geo_value %in% geo_values), 
+                              by = "geo_value", method = "spearman")
+  df_cor[[i]]$signal = names[i]
+}
+df = do.call(rbind, df_cor)
+
+ggplot(df, aes(value)) +
+  geom_density(aes(color = signal, fill = signal), alpha = 0.4) +
+  guides(color = guide_legend(nrow = 2)) +
+  labs(title = "Correlation between signals and case rates",
+       subtitle = sprintf("Over all counties with at least %i cumulative cases",
+                          case_num), x = "Date", y = "Correlation") +
+  theme(legend.position = "bottom", legend.title = element_blank())
+```
+
+We can also look at choropleth maps to get a geographic sense of the correlation
+distribution for each signal.
+
+```{r}
+# Set some fields, then plot choropleth maps using covidcast functionality
+for (i in 1:length(signals)) {
+  df_cor[[i]]$time_value = start_day
+  df_cor[[i]]$issue = start_day
+  attributes(df_cor[[i]])$metadata$geo_type = "county"
+  class(df_cor[[i]]) = c("covidcast_signal", "data.frame")
+  
+  print(plot(df_cor[[i]], range = c(-1, 1), choro_col = cm.colors(10),
+             title = sprintf("Correlations for %s", names[i])))
+}
+```
+
+## Metro area analysis
+
+Next, we'll look at metro areas. 
+
+### Getting data 
+
+We fetch various signals from our API, from April 15 through to the current day.
+
+```{r}
+# Fetch the following sources and signals from the API 
+sources = c("doctor-visits", "fb-survey", "fb-survey", "ght",
+            "hospital-admissions", "indicator-combination")
+signals = c("smoothed_adj_cli", "smoothed_cli", "smoothed_hh_cmnty_cli", 
+            "smoothed_search", "smoothed_adj_covid19", 
+            "nmf_day_doc_fbc_fbs_ght")
+names = c("Doctor visits", "Facebook CLI", "Facebook CLI-in-community", 
+          "Google trends", "Hospitalizations", "Combo indicator")
+
+start_day = "2020-04-15"
+end_day = NULL
+
+df_signals = vector("list", length(signals))
+for (i in 1:length(signals)) {
+  df_signals[[i]] = covidcast_signal(sources[i], signals[i], start_day, end_day,
+                                     geo_type = "msa")
+}
+
+# Fetch USAFacts confirmed case incidence proportion (smoothed with 7-day
+# trailing average)
+df_cases = covidcast_signal("usa-facts", "confirmed_7dav_incidence_prop",
+                            start_day, end_day, geo_type = "msa")
+```
+
+### Correlations sliced by time
+
+Here we look at Spearman (rank) correlations between our signals and COVID-19
+case incidence rates, sliced by time. That is, for each day, we compute the 
+correlation between each signal and COVID-19 case incidence rates, over all 
+metro areas (with at least 500 cumulative cases). 
+
+```{r}
+# Consider only metro areas with at least 500 cumulative cases
+case_num = 500
+geo_values = covidcast_signal("usa-facts", "confirmed_cumulative_num",
+                              max(df_cases$time_value), 
+                              max(df_cases$time_value), 
+                              geo_type = "msa") %>%
+  filter(value >= case_num) %>% pull(geo_value)
+
+df_cor = vector("list", length(signals))
+for (i in 1:length(signals)) {
+  df_cor[[i]] = covidcast_cor(df_signals[[i]] %>% 
+                                filter(geo_value %in% geo_values), 
+                              df_cases %>% 
+                                filter(geo_value %in% geo_values), 
+                              by = "time_value", method = "spearman")
+  df_cor[[i]]$signal = names[i]
+}
+df = do.call(rbind, df_cor)
+
+ggplot(df, aes(x = time_value, y = value)) +
+  geom_line(aes(color = signal)) +
+  guides(color = guide_legend(nrow = 2)) +
+  labs(title = "Correlation between signals and case rates",
+       subtitle = sprintf("Over metro areas with at least %i cumulative cases",
+                          case_num), x = "Date", y = "Correlation") +
+  theme(legend.position = "bottom", legend.title = element_blank())
+```
+
+### Correlations sliced by metro area
+
+Now we look at Spearman (rank) correlations between our signals and COVID-19
+case incidence rates, sliced by metro area. That is, for each metro area (with 
+at least 500 cumulative cases), we compute the correlation between each signal 
+and COVID-19 case incidence rates, over all time.
+
+```{r}
+df_cor = vector("list", length(signals))
+for (i in 1:length(signals)) {
+  df_cor[[i]] = covidcast_cor(df_signals[[i]] %>% 
+                                filter(geo_value %in% geo_values), 
+                              df_cases %>% 
+                                filter(geo_value %in% geo_values), 
+                              by = "geo_value", method = "spearman")
+  df_cor[[i]]$signal = names[i]
+}
+df = do.call(rbind, df_cor)
+
+ggplot(df, aes(value)) +
+  geom_density(aes(color = signal, fill = signal), alpha = 0.4) +
+  guides(color = guide_legend(nrow = 2)) +
+  labs(title = "Correlation between signals and case rates",
+       subtitle = sprintf("Over metro areas with at least %i cumulative cases",
+                          case_num), x = "Date", y = "Correlation") +
+  theme(legend.position = "bottom", legend.title = element_blank())
+```

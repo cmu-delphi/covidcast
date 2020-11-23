@@ -20,8 +20,8 @@
 #' @template ahead-template
 #' @template geo_type-template
 #' @template geo_values-template
+#' @template apply_corrections-template
 #' @param ... Additional arguments to be passed to `forecaster()`.
-#' 
 #' @return List of "predictions cards", with one element per forecast date. Each
 #'   predictions card is a data frame with two columns:
 #'
@@ -35,6 +35,26 @@
 #' Each predictions card has attributes that specify the exact forecasting task
 #'   that was being carried out, along with the name of the forecaster.
 #' 
+#'
+#' @examples
+#' baby_predictions = get_predictions(
+#'   baseline_forecaster, "baby",
+#'   tibble::tibble(
+#'     data_source=c("jhu-csse", "usa-facts"),
+#'     signal = c("deaths_incidence_num","confirmed_incidence_num"),
+#'     start_day=lubridate::ymd("2020-09-15")),
+#'   lubridate::ymd("2020-10-01"),"epiweek", 1:4, "state", "mi")
+#'
+#' baby_correct <- function(x) dplyr::mutate(x, corrected = 2*value)
+#'
+#' baby_corrected = get_predictions(
+#'   baseline_forecaster, "baby",
+#'   tibble::tibble(
+#'     data_source=c("jhu-csse", "usa-facts"),
+#'     signal = c("deaths_incidence_num","confirmed_incidence_num"),
+#'     start_day=lubridate::ymd("2020-09-15")),
+#'   lubridate::ymd("2020-10-01"),"epiweek", 1L, "state", "mi",
+#'   apply_corrections = baby_correct)
 #' @importFrom assertthat assert_that
 #' @export
 get_predictions <- function(forecaster,
@@ -45,6 +65,7 @@ get_predictions <- function(forecaster,
                             ahead,
                             geo_type,
                             geo_values = "*",
+                            apply_corrections = NULL,
                             ...) {
   assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
   params <- list(...)
@@ -58,7 +79,8 @@ get_predictions <- function(forecaster,
                  incidence_period = incidence_period,
                  ahead = ahead,
                  geo_type = geo_type,
-                 geo_values = geo_values),
+                 geo_values = geo_values,
+                 apply_corrections = apply_corrections),
             params))) %>%
     flatten()
 }
@@ -76,6 +98,7 @@ get_predictions <- function(forecaster,
 #' @template ahead-template
 #' @template geo_type-template
 #' @template geo_values-template
+#' @template apply_corrections-template
 #' @param ... Additional arguments to be passed to `forecaster()`.
 #' 
 #' @importFrom stringr str_glue
@@ -87,8 +110,9 @@ get_predictions_single_date <- function(forecaster,
                                         ahead,
                                         geo_type,
                                         geo_values,
+                                        apply_corrections,
                                         ...) {
-  if (length(geo_values) > 1) geo_values <- list(geo_values)
+  #if (length(geo_values) > 1) geo_values <- list(geo_values)
   forecast_date <- lubridate::ymd(forecast_date)
   # compute the start_day from the forecast_date, if we need to
   if (!is.null(signals$start_day) && is.list(signals$start_day)) {
@@ -110,6 +134,13 @@ get_predictions_single_date <- function(forecaster,
                       geo_type = geo_type,
                       geo_values = geo_values)
     })
+
+  if(!is.null(apply_corrections)){
+    df <- data_corrector(df, apply_corrections)
+  } else {
+    apply_corrections <- NA
+  }
+
   out <- forecaster(df,
                     forecast_date,
                     signals,
@@ -135,9 +166,12 @@ get_predictions_single_date <- function(forecaster,
            ahead = ahead[i],
            geo_type = geo_type,
            geo_values = geo_values,
+           corrections_applied = apply_corrections,
            from_covidhub = FALSE,
            forecaster_params = list(...))
     )
+    class(pcards[[i]]) <- c("prediction_card", class(pcards[[i]]))
   }
   return(pcards)
 }
+

@@ -14,6 +14,7 @@
 #' @import tidyr
 #' @import readr
 #' @import stringr
+#' @import ggplot2
 #' @importFrom memoise memoise
 NULL
 

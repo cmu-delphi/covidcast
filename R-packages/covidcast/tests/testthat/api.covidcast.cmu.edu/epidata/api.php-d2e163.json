@@ -1,0 +1,28 @@
+{
+  "message": "success",
+  "result": 1,
+  "epidata": [
+    {
+      "data_source": "foo",
+      "signal": "bar",
+      "min_time": 20200101,
+      "max_time": 20200102,
+      "max_issue": 20200404,
+      "min_value": 0,
+      "max_value": 10,
+      "time_type": "day",
+      "geo_type": "county"
+    },
+    {
+      "data_source": "foo",
+      "signal": "bar",
+      "min_time": 20201002,
+      "max_time": 20201003,
+      "max_issue": 20201101,
+      "min_value": 0,
+      "max_value": 10,
+      "time_type": "day",
+      "geo_type": "county"
+    }
+  ]
+}

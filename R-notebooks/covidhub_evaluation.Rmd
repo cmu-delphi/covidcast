@@ -94,19 +94,19 @@ for (i in 1:length(forecasters)) {
   given_dates = forecast_dates[[i]]
   # If the dates match exactly, or the given date falls on a Sunday and the
   # CMU date falls on a Monday of the same epiweek, then call it comparable...
-  dates_comp = given_dates[(given_dates %in% forecast_dates_cmu | 
+  comparable_forecast_dates = given_dates[(given_dates %in% forecast_dates_cmu | 
                             ((given_dates + 1) %in% forecast_dates_cmu) &
                             wday(given_dates) == 1)]
   
   # ...but if there is an exact match on dates, ignore predictions made on the
   # previous day
-  extra_dates = dates_comp[(dates_comp + 1) %in% dates_comp]
-  dates_comp = as_date(setdiff(dates_comp, extra_dates))
+  extra_dates = comparable_forecast_dates[(comparable_forecast_dates + 1) %in% comparable_forecast_dates]
+  comparable_forecast_dates = as_date(setdiff(comparable_forecast_dates, extra_dates))
   if(forecasters[[i]] %in% names(seen_dates)){
     forecaster_idx = which(names(seen_dates) == forecasters[[i]])
-    dates_comp = dates_comp[!(dates_comp %in% seen_dates[[forecaster_idx]])]
+    comparable_forecast_dates = comparable_forecast_dates[!(comparable_forecast_dates %in% seen_dates[[forecaster_idx]])]
   }
-  new_dates[[i]] = dates_comp
+  new_dates[[i]] = comparable_forecast_dates
 }
 names(new_dates) = forecasters
 ```

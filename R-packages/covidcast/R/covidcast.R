@@ -197,8 +197,8 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 #'                  geo_values = name_to_cbsa("Pittsburgh"))
 #' }
 #'
-#' @seealso [plot.covidcast_signal()], [`county_census`], [`msa_census`],
-#'     [`state_census`]
+#' @seealso [plot.covidcast_signal()], [covidcast_signals()], [`county_census`],
+#'   [`msa_census`], [`state_census`]
 #' @export
 #' @importFrom rlang abort
 #' @importFrom dplyr %>%
@@ -359,8 +359,8 @@ summary.covidcast_signal = function(object, ...) {
 #' @examples
 #' \dontrun{
 #' ## Fetch USAFacts confirmed cases and deaths over the same time period
-#' covidcast_signals("usa-facts", signal=c("confirmed_incidence_num",
-#'                                         "deaths_incidence_num"),
+#' covidcast_signals("usa-facts", signal = c("confirmed_incidence_num",
+#'                                           "deaths_incidence_num"),
 #'                    start_day = "2020-08-15", end_day = "2020-10-01")
 #' }
 #' @export

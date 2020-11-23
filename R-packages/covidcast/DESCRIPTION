@@ -43,6 +43,7 @@ Imports:
   grDevices,
   httr,
   jsonlite,
+  lubridate,
   maptools,
   purrr,
   rlang,

@@ -50,18 +50,18 @@ plot_trajectory <- function(list_of_predictions_cards,
         abs(probs - plot_probs[1]) <= 1e-8 ~ "lower",
         abs(probs - plot_probs[2]) <= 1e-8 ~ "point",
         abs(probs - plot_probs[3]) <= 1e-8 ~ "upper")) %>%
-    filter(!is.na(.data$prob_type)) %>%
-    dplyr::mutate(target_period = get_target_period_num(.data$forecast_date,
-                                                        .data$ahead,
+    filter(!is.na(prob_type)) %>%
+    dplyr::mutate(target_period = get_target_period_num(forecast_date,
+                                                        ahead,
                                                         single_incidence_period),
-                  forecaster_name = .data$name_of_forecaster) %>%
-    dplyr::select(.data$location,
-                  .data$quantiles,
-                  .data$forecaster_name,
-                  .data$prob_type,
-                  .data$target_period,
-                  .data$forecast_date) %>%
-    tidyr::pivot_wider(values_from = .data$quantiles, names_from = .data$prob_type)
+                  forecaster_name = name_of_forecaster) %>%
+    dplyr::select(location,
+                  quantiles,
+                  forecaster_name,
+                  prob_type,
+                  target_period,
+                  forecast_date) %>%
+    tidyr::pivot_wider(values_from = quantiles, names_from = prob_type)
   
   # ground truth to plot
   if(single_incidence_period == "day") {
@@ -70,8 +70,8 @@ plot_trajectory <- function(list_of_predictions_cards,
                                    start_day = first_day,
                                    end_day = last_day,
                                    geo_type = geo_type) %>%
-      dplyr::select(.data$location, .data$time_value, .data$value) %>%
-      dplyr::rename(reference_period = .data$time_value) %>%
+      dplyr::select(ocation, time_value, value) %>%
+      dplyr::rename(reference_period = time_value) %>%
       dplyr::filter(location %in% preds_df$location) 
   } else {
     # avoid summing over partial epiweeks
@@ -90,7 +90,7 @@ plot_trajectory <- function(list_of_predictions_cards,
                                    start_day = sunday_following_first_day,
                                    end_day = saturday_preceding_last_day,
                                    geo_type = geo_type) %>%
-                   dplyr::select(location, .data$time_value,.data$value) %>%
+                   dplyr::select(location, time_value, value) %>%
                    sum_to_epiweek() %>%
                    dplyr::rename(reference_period = epiweek) %>%
                    dplyr::filter(location %in% preds_df$location)
@@ -125,18 +125,18 @@ plot_trajectory <- function(list_of_predictions_cards,
   
 
   # Framework of the trajectory plot
-  p <- ggplot(preds_df, aes(x = .data$reference_period)) +
-       geom_line(aes(y = .data$point,
-                     col = .data$forecaster_name, 
-                     group = .data$forecast_date),
+  p <- ggplot(preds_df, aes(x = reference_period)) +
+       geom_line(aes(y = point,
+                     col = forecaster_name, 
+                     group = forecast_date),
                      size = 1) + 
-       geom_point(aes(y = .data$point,
-                      col = .data$forecaster_name, 
-                      group = .data$forecast_date)) +
-       geom_ribbon(aes(ymin = .data$lower,
-                       ymax = .data$upper,
-                       fill = .data$forecaster_name,
-                       group = .data$forecast_date),
+       geom_point(aes(y = point,
+                      col = forecaster_name, 
+                      group = forecast_date)) +
+       geom_ribbon(aes(ymin = lower,
+                       ymax = upper,
+                       fill = forecaster_name,
+                       group = forecast_date),
                        alpha = .1,
                        colour = NA,
                        show.legend = FALSE) + 

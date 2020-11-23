@@ -204,12 +204,11 @@ get_target_period_num <- function(forecast_date,ahead,incidence_period){
   )
   if(incidence_period == "day")
   {
-    return(forecast_date + ahead)
+    forecast_date + ahead
   } else {
-    x = ifelse(wday(forecast_date) <= 2, 
+    ifelse(wday(forecast_date) <= 2, 
            MMWRweek::MMWRweek(forecast_date)$MMWRweek + ahead - 1,
            MMWRweek::MMWRweek(forecast_date)$MMWRweek + ahead)
-    return(x)
   }
 }
 

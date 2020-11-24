@@ -128,8 +128,11 @@ test_that("test incomplete metadata", {
     issue = as.Date("2020-02-01"),
     stderr = 0.5),
     class = c("covidcast_signal", "data.frame"),
-    metadata = list(geo_type = "state")
+    metadata = list(geo_type = "state", mean_value = 0, stdev_value = 1)
   )
+  
+  expect_warning(plot(fake_data), NA) 
+  attributes(fake_data)$metadata = list(geo_type = "state", mean_value = 0)
   
   expect_warning(plot(fake_data),
                  "Metadata for signal mean and standard deviation not",

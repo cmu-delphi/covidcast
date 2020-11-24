@@ -1,7 +1,6 @@
 library(covidcast)
 library(httptest)
 library(mockery)
-library(lubridate)
 library(dplyr)
 
 # Many of these tests use mockery::with_mock_api. This replaces calls to the
@@ -145,7 +144,7 @@ test_that("covidcast_days does not treat \"*\" as a missing geo_value", {
          signal = "signal",
          time_value = c(20201030, 20201031),
          direction = NA,
-         issue = ymd("2020-11-04"),
+         issue = as.Date("2020-11-04"),
          lag = 2,
          value = 3,
          stderr = NA,
@@ -156,8 +155,8 @@ test_that("covidcast_days does not treat \"*\" as a missing geo_value", {
     covidcast_days(
       data_source = "fb-survey",
       signal = "raw_cli",
-      start_day = ymd("2020-10-30"),
-      end_day = ymd("2020-10-31"),
+      start_day = as.Date("2020-10-30"),
+      end_day = as.Date("2020-10-31"),
       geo_type = "county",
       geo_value = c("*"),
       as_of = NULL,
@@ -174,7 +173,7 @@ test_that("covidcast_days does not raise warnings for full response", {
          signal = "signal",
          time_value = c(20201030, 20201031),
          direction = NA,
-         issue = ymd("2020-11-04"),
+         issue = as.Date("2020-11-04"),
          lag = 2,
          value = 3,
          stderr = NA,
@@ -185,8 +184,8 @@ test_that("covidcast_days does not raise warnings for full response", {
     covidcast_days(
       data_source = "fb-survey",
       signal = "raw_cli",
-      start_day = ymd("2020-10-30"),
-      end_day = ymd("2020-10-31"),
+      start_day = as.Date("2020-10-30"),
+      end_day = as.Date("2020-10-31"),
       geo_type = "county",
       geo_value = c("geoa"),
       as_of = NULL,
@@ -202,7 +201,7 @@ test_that("covidcast_days batches calls to covidcast", {
     signal = "signal",
     time_value = rep(NA, 3),
     direction = NA,
-    issue = ymd("2020-11-04"),
+    issue = as.Date("2020-11-04"),
     lag = 2,
     value = 3,
     stderr = NA,
@@ -217,8 +216,8 @@ test_that("covidcast_days batches calls to covidcast", {
       covidcast_days(
         data_source = "fb-survey",
         signal = "raw_cli",
-        start_day = ymd("2020-10-01"),
-        end_day = ymd("2020-10-06"),
+        start_day = as.Date("2020-10-01"),
+        end_day = as.Date("2020-10-06"),
         geo_type = "county",
         geo_value = "*",
         as_of = NULL,

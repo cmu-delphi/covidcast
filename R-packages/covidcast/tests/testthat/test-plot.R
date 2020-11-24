@@ -116,3 +116,23 @@ test_that("simple county bubble plot", {
                       suppressWarnings(
                         plot(fb_county, plot_type = "bubble")))
 })
+
+
+test_that("test incomplete metadata", {
+  fake_data <- structure(data.frame(
+    data_source = "foo",
+    signal = "bar",
+    value = c(1, 2, 0, 3),
+    geo_value = c("pa", "in", "tx", "wy"),
+    time_value = as.Date("2020-01-01"),
+    issue = as.Date("2020-02-01"),
+    stderr = 0.5),
+    class = c("covidcast_signal", "data.frame"),
+    metadata = list(geo_type = "state")
+  )
+  
+  expect_warning(plot(fake_data),
+                 "Metadata for signal mean and standard deviation not",
+                 "available; defaulting to observed mean and standard",
+                 "deviation to set plot range.")
+})

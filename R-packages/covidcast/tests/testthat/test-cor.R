@@ -5,20 +5,30 @@ test_that("correlations when correlation is 1", {
   # Two data frames with perfect correlation, except on a day that does not
   # match between the two of them. The non-matching day does not have perfect
   # correlation, so this will detect if it is correctly excluded.
-  foo <- data.frame(
-    time_value = as.Date(c("2020-01-01", "2020-01-02",
-                           "2020-01-03", "2020-01-05")),
-    geo_value = "pa",
-    issue = 1,
-    value = c(1, 2, 3, 5)
+  foo <- structure(
+    data.frame(
+      data_source = "foo",
+      signal = "bar",
+      time_value = as.Date(c("2020-01-01", "2020-01-02",
+                             "2020-01-03", "2020-01-05")),
+      geo_value = "pa",
+      issue = 1,
+      value = c(1, 2, 3, 5)
+    ),
+    class = c("covidcast_signal", "data.frame")
   )
 
-  bar <- data.frame(
-    time_value = as.Date(c("2020-01-01", "2020-01-02",
-                           "2020-01-03", "2020-01-04")),
-    geo_value = "pa",
-    issue = 1,
-    value = c(1, 2, 3, -5)
+  bar <- structure(
+    data.frame(
+      data_source = "foo",
+      signal = "bar",
+      time_value = as.Date(c("2020-01-01", "2020-01-02",
+                             "2020-01-03", "2020-01-04")),
+      geo_value = "pa",
+      issue = 1,
+      value = c(1, 2, 3, -5)
+    ),
+    class = c("covidcast_signal", "data.frame")
   )
 
   expected <- tibble(geo_value = "pa", value = 1)
@@ -32,20 +42,30 @@ test_that("correlations when correlation is 1", {
 })
 
 test_that("lags are applied before correlating", {
-  foo <- data.frame(
-    time_value = as.Date(c("2020-01-01", "2020-01-02",
-                           "2020-01-03", "2020-01-04")),
-    geo_value = "pa",
-    issue = 1,
-    value = c(1, 2, 1, 2)
+  foo <- structure(
+    data.frame(
+      data_source = "foo",
+      signal = "bar",
+      time_value = as.Date(c("2020-01-01", "2020-01-02",
+                             "2020-01-03", "2020-01-04")),
+      geo_value = "pa",
+      issue = 1,
+      value = c(1, 2, 1, 2)
+    ),
+    class = c("covidcast_signal", "data.frame")
   )
 
-  bar <- data.frame(
-    time_value = as.Date(c("2020-01-01", "2020-01-02",
-                           "2020-01-03", "2020-01-04")),
-    geo_value = "pa",
-    issue = 1,
-    value = c(2, 1, 2, 1)
+  bar <- structure(
+    data.frame(
+      data_source = "foo",
+      signal = "bar",
+      time_value = as.Date(c("2020-01-01", "2020-01-02",
+                             "2020-01-03", "2020-01-04")),
+      geo_value = "pa",
+      issue = 1,
+      value = c(2, 1, 2, 1)
+    ),
+    class = c("covidcast_signal", "data.frame")
   )
 
   expected <- tibble(
@@ -59,20 +79,30 @@ test_that("lags are applied before correlating", {
 })
 
 test_that("lags are applied in correct temporal direction", {
-  foo <- data.frame(
-    time_value = seq.Date(as.Date("2020-01-01"), as.Date("2020-01-10"),
-                          "day"),
-    geo_value = "pa",
-    issue = 1,
-    value = 1:10
+  foo <- structure(
+    data.frame(
+      data_source = "foo",
+      signal = "bar",
+      time_value = seq.Date(as.Date("2020-01-01"), as.Date("2020-01-10"),
+                            "day"),
+      geo_value = "pa",
+      issue = 1,
+      value = 1:10
+    ),
+    class = c("covidcast_signal", "data.frame")
   )
 
-  bar <- data.frame(
-    time_value = seq.Date(as.Date("2020-01-01"), as.Date("2020-01-10"),
-                          "day"),
-    geo_value = "pa",
-    issue = 1,
-    value = c(rep(0, 5), 1:5)
+  bar <- structure(
+    data.frame(
+      data_source = "foo",
+      signal = "bar",
+      time_value = seq.Date(as.Date("2020-01-01"), as.Date("2020-01-10"),
+                            "day"),
+      geo_value = "pa",
+      issue = 1,
+      value = c(rep(0, 5), 1:5)
+    ),
+    class = c("covidcast_signal", "data.frame")
   )
 
   # These data frames have correlation 1 only if lagged exactly the right amount

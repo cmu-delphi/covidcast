@@ -1,2 +1,2 @@
 # see setup-options.R
-options(stringsAsFactors = .defaultStringsAsFactors)
+options(.defaultStringsAsFactors)

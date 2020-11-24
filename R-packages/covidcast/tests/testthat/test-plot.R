@@ -118,7 +118,7 @@ test_that("simple county bubble plot", {
 })
 
 
-test_that("test incomplete metadata", {
+test_that("warn on incomplete metadata", {
   fake_data <- structure(data.frame(
     data_source = "foo",
     signal = "bar",

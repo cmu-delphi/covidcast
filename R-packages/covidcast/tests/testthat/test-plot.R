@@ -116,3 +116,24 @@ test_that("simple county bubble plot", {
                       suppressWarnings(
                         plot(fb_county, plot_type = "bubble")))
 })
+
+
+test_that("warn on incomplete metadata", {
+  fake_data <- structure(data.frame(
+    data_source = "foo",
+    signal = "bar",
+    value = c(1, 2, 0, 3),
+    geo_value = c("pa", "in", "tx", "wy"),
+    time_value = as.Date("2020-01-01"),
+    issue = as.Date("2020-02-01"),
+    stderr = 0.5),
+    class = c("covidcast_signal", "data.frame"),
+    metadata = list(geo_type = "state", mean_value = 0, stdev_value = 1)
+  )
+  
+  expect_warning(plot(fake_data), NA) 
+  attributes(fake_data)$metadata = list(geo_type = "state", mean_value = 0)
+
+  expect_warning(plot(fake_data),
+                 class="covidcast_plot_meta_not_found")
+})

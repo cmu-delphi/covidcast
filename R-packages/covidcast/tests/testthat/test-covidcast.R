@@ -46,13 +46,13 @@ with_mock_api({
                    data.frame(
                      data_source = "foo",
                      signal = c("bar", "bar2"),
+                     time_type = "day",
+                     geo_type = "county",
                      min_time = as.Date(c("2020-01-01", "2020-10-02")),
                      max_time = as.Date(c("2020-01-02", "2020-10-03")),
                      min_value = 0,
                      max_value = 10,
                      num_locations = 100,
-                     time_type = "day",
-                     geo_type = c("county", "state"),
                      max_issue = as.Date(c("2020-04-04", "2020-11-01"))
                    ),
                    class = c("covidcast_meta", "data.frame")
@@ -123,49 +123,6 @@ with_mock_api({
     )
   })
 
-  test_that("covidcast_signal works across multiple days with gaps", {
-    # If we request 3 days, we'll get 3 API queries. If the middle day is
-    # missing, we should get an appropriate warning, but still get the right
-    # data frame.
-
-    # day 1: api.php-32641f.csv
-    # day 2: api.php-b85d44.csv (empty)
-    # day 3: api.php-f49e8f.csv
-    expect_warning(covidcast_signal("foo", "bar", "2020-01-10", "2020-01-12",
-                                    geo_type = "county"),
-                   class = "covidcast_fetch_failed")
-
-    res <- suppressWarnings(
-      covidcast_signal("foo", "bar", "2020-01-10", "2020-01-12",
-                       geo_type = "county"))
-    expect_equal(
-      res,
-      structure(data.frame(
-        data_source = "foo",
-        signal = "bar",
-        geo_value = c("01001", "01002", "31001", "31002"),
-        time_value = as.Date(c("2020-01-10", "2020-01-10",
-                               "2020-01-12", "2020-01-12")),
-        issue = as.Date(c("2020-01-11", "2020-01-11",
-                          "2020-01-13", "2020-01-13")),
-        lag = 1,
-        value = c(91.2, 99.1, 81.2, 89.1),
-        stderr = c(0.8, 0.2, 0.8, 0.2),
-        sample_size = c(114.2, 217.8, 314.2, 417.8)),
-        class = c("covidcast_signal", "data.frame"),
-        metadata = structure(data.frame(
-          data_source = "foo",
-          signal = "bar",
-          time_type = "day",
-          geo_type = "county",
-          min_time = as.Date("2020-01-01"),
-          max_time = as.Date("2020-01-02"),
-          min_value = 0,
-          max_value = 10,
-          max_issue = as.Date("2020-04-04")),
-          class = c("covidcast_meta", "data.frame"))))
-  })
-
   test_that("covidcast_signal stops when end_day < start_day", {
     # reusing api.php-dd024f.csv for metadata
     expect_error(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-01"))
@@ -183,7 +140,7 @@ with_mock_api({
 
 test_that("covidcast_days does not treat \"*\" as a missing geo_value", {
   stub(covidcast_days, "covidcast",
-       list(message = "success", epidata = data.frame(
+       data.frame(
          geo_value = c("geoa", "geob"),
          signal = "signal",
          time_value = c(20201030, 20201031),
@@ -193,7 +150,8 @@ test_that("covidcast_days does not treat \"*\" as a missing geo_value", {
          value = 3,
          stderr = NA,
          sample_size = NA
-       ), result = 1))
+       ))
+
   # Expect no warning
   expect_warning(
     covidcast_days(
@@ -212,7 +170,7 @@ test_that("covidcast_days does not treat \"*\" as a missing geo_value", {
 
 test_that("covidcast_days does not raise warnings for full response", {
   stub(covidcast_days, "covidcast",
-       list(message = "success", epidata = data.frame(
+       data.frame(
          geo_value = c("geoa"),
          signal = "signal",
          time_value = c(20201030, 20201031),
@@ -222,7 +180,8 @@ test_that("covidcast_days does not raise warnings for full response", {
          value = 3,
          stderr = NA,
          sample_size = NA
-       ), result = 1))
+       ))
+
   # Expect no warning
   expect_warning(
     covidcast_days(
@@ -240,19 +199,22 @@ test_that("covidcast_days does not raise warnings for full response", {
 })
 
 test_that("covidcast_days batches calls to covidcast", {
-  covidcast_returns <- rep(list(list(message = "success", epidata = data.frame(
-    geo_value = c("geoa"),
-    signal = "signal",
-    time_value = rep(NA, 3),
-    direction = NA,
-    issue = as.Date("2020-11-04"),
-    lag = 2,
-    value = 3,
-    stderr = NA,
-    sample_size = NA
-  ), result = 1)), 10)
-  covidcast_returns[[1]]$epidata$time_value <- 20101001:20101003
-  covidcast_returns[[2]]$epidata$time_value <- 20101004:20101006
+  covidcast_returns <- rep(
+    list(
+      data.frame(
+        geo_value = c("geoa"),
+        signal = "signal",
+        time_value = rep(NA, 3),
+        direction = NA,
+        issue = as.Date("2020-11-04"),
+        lag = 2,
+        value = 3,
+        stderr = NA,
+        sample_size = NA
+      )),
+    10)
+  covidcast_returns[[1]]$time_value <- 20101001:20101003
+  covidcast_returns[[2]]$time_value <- 20101004:20101006
 
   m <- mock(covidcast_returns[[1]], covidcast_returns[[2]])
   stub(covidcast_days, "covidcast", m)

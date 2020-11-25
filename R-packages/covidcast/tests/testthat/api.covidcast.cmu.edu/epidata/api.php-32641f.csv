@@ -1,3 +1,0 @@
-geo_value,signal,time_value,direction,issue,lag,value,stderr,sample_size
-01001,bar,20200110,,20200111,1,91.2,0.8,114.2
-01002,bar,20200110,,20200111,1,99.1,0.2,217.8

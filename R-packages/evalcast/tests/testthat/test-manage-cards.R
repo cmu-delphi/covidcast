@@ -157,7 +157,7 @@ test_that("aggregate_cards aggregates evaluation cards", {
 
     # Assign attributes to the evaluation cards.
     for (i in seq_along(score_cards)) {
-        class(score_cards[[i]]) <- c("evaluation_card", class(score_cards[[i]]))
+        class(score_cards[[i]]) <- c("score_card", class(score_cards[[i]]))
         attributes(score_cards[[i]]) <- c(attributes(score_cards[[i]]),
                                                card_attributes[[i]])
     }

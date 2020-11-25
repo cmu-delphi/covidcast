@@ -13,6 +13,7 @@ format.}
 }
 \value{
 Data frame such that:
+\itemize{
 \item There is a one-to-one correspondence between rows of the output and the rows of
 \code{card$forecast_distribution} across each \code{card} in \code{list_of_cards}.  That is to say, if each
 card has 7 rows in its \code{forecast_distribution} and there are 3 such cards in
@@ -22,6 +23,7 @@ card has 7 rows in its \code{forecast_distribution} and there are 3 such cards i
 \item Columns of \code{card$forecast_distribution}
 \item Columns of \code{card}
 \item Attributes of \code{card}
+}
 }
 }
 \description{

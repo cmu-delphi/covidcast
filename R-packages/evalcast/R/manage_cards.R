@@ -72,16 +72,14 @@ intersect_locations <- function(cards) {
 #'   of `evalcast::get_predictions()` and `evalcast::evaluate_predictions()` for the required
 #'   format.
 #' @return Data frame such that:
-#'   \item There is a one-to-one correspondence between rows of the output and the rows of
+#'   * There is a one-to-one correspondence between rows of the output and the rows of
 #'     `card$forecast_distribution` across each `card` in `list_of_cards`.  That is to say, if each
 #'     card has 7 rows in its `forecast_distribution` and there are 3 such cards in
 #'     `list_of_cards`, the output will have 21 rows.
-#'   \item The columns of the output correspond to:
-#'     \itemize{
-#'       \item Columns of `card$forecast_distribution`
-#'       \item Columns of `card`
-#'       \item Attributes of `card`
-#'     }
+#'   * The columns of the output correspond to:
+#'       - Columns of `card$forecast_distribution`
+#'       - Columns of `card`
+#'       - Attributes of `card`
 #' @export
 aggregate_cards <- function(list_of_cards) {
   list_of_cards %>% purrr::map_dfr(unpack_single_card)

@@ -1,6 +1,23 @@
 Changelog
 =========
 
+v0.1.1, November 22, 2020
+-------------------------
+
+- Bug fix: A shapefile packaging issue, which broke
+  :py:func:`covidcast.plot_choropleth` for metropolitan statistical areas and
+  hospital referral regions, is now resolved.
+
+- Update: ``Direction`` is no longer supported and has been removed from the
+  output of :py:func:`covidcast.signal`. To measure increasing or decreasing
+  trends in signals, we recommend implementing your own method based on your
+  application's specific needs.
+
+- New feature: Functions :py:func:`covidcast.fips_to_abbr` and
+  :py:func:`covidcast.abbr_to_fips` to convert between state FIPS codes and
+  their abbreviations.
+
+
 v0.1.0, October 1, 2020
 -----------------------
 

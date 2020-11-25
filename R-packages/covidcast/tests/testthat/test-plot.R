@@ -133,9 +133,7 @@ test_that("warn on incomplete metadata", {
   
   expect_warning(plot(fake_data), NA) 
   attributes(fake_data)$metadata = list(geo_type = "state", mean_value = 0)
-  
+
   expect_warning(plot(fake_data),
-                 "Metadata for signal mean and standard deviation not",
-                 "available; defaulting to observed mean and standard",
-                 "deviation to set plot range.")
+                 class="covidcast_plot_meta_not_found")
 })

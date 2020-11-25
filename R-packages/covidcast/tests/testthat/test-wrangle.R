@@ -27,6 +27,101 @@ test_that("aggregated signals have times shifted correctly", {
                  class = c("covidcast_signal_wide", "data.frame")))
 })
 
+test_that("list of aggregated signals have times shifted correctly", {
+  foo <- structure(data.frame(
+    data_source = "foo",
+    signal = "foo",
+    geo_value = "a",
+    value = 1:5,
+    time_value = seq.Date(as.Date("2020-01-01"), as.Date("2020-01-05"), "day"),
+    issue = as.Date("2020-01-06"),
+    stderr = 0.1,
+    sample_size = 10,
+    lag = 1),
+    class = c("covidcast_signal", "data.frame"))
+  
+  bar <- structure(data.frame(
+    data_source = "bar",
+    signal = "bar",
+    geo_value = "a",
+    value = 6:10,
+    time_value = seq.Date(as.Date("2020-01-01"), as.Date("2020-01-05"), "day"),
+    issue = as.Date("2020-01-06"),
+    stderr = 0.1,
+    sample_size = 10,
+    lag = 1),
+    class = c("covidcast_signal", "data.frame"))
+  
+  # list of lags for each input signal
+  agg <- aggregate_signals(list(foo, bar), dt = list(0, c(-1, 1, 2)))
+  
+  expect_equal(arrange(agg, time_value),
+               structure(data.frame(
+                 geo_value = "a",
+                 time_value = foo$time_value,
+                 "value+0:foo_foo" = c(1:5),
+                 "value-1:bar_bar" = c(NA, 6:9),
+                 "value+1:bar_bar" = c(7:10, NA),
+                 "value+2:bar_bar" = c(8:10, NA, NA),
+                 check.names = FALSE),
+                 class = c("covidcast_signal_wide", "data.frame")))
+  
+  # single vector of lags for all input signals
+  agg <- aggregate_signals(list(foo, bar), dt = c(-1, 1, 2))
+  
+  expect_equal(arrange(agg, time_value),
+               structure(data.frame(
+                 geo_value = "a",
+                 time_value = foo$time_value,
+                 "value-1:foo_foo" = c(NA, 1:4),
+                 "value+1:foo_foo" = c(2:5, NA),
+                 "value+2:foo_foo" = c(3:5, NA, NA),
+                 "value-1:bar_bar" = c(NA, 6:9),
+                 "value+1:bar_bar" = c(7:10, NA),
+                 "value+2:bar_bar" = c(8:10, NA, NA),
+                 check.names = FALSE),
+                 class = c("covidcast_signal_wide", "data.frame")))
+})
+
+test_that("signals are joined with full join", {
+  foo <- structure(data.frame(
+    data_source = "foo",
+    signal = "foo",
+    geo_value = "a",
+    value = 1:5,
+    time_value = seq.Date(as.Date("2020-01-01"), as.Date("2020-01-05"), "day"),
+    issue = as.Date("2020-01-06"),
+    stderr = 0.1,
+    sample_size = 10,
+    lag = 1),
+    class = c("covidcast_signal", "data.frame"))
+  
+  bar <- structure(data.frame(
+    data_source = "bar",
+    signal = "bar",
+    geo_value = "a",
+    value = 6:10,
+    time_value = seq.Date(as.Date("2020-01-03"), as.Date("2020-01-07"), "day"),
+    issue = as.Date("2020-01-06"),
+    stderr = 0.1,
+    sample_size = 10,
+    lag = 1),
+    class = c("covidcast_signal", "data.frame"))
+  
+
+  agg <- aggregate_signals(list(foo, bar))
+  
+  expect_equal(arrange(agg, time_value),
+               structure(data.frame(
+                 geo_value = "a",
+                 time_value =  seq.Date(as.Date("2020-01-01"), 
+                                        as.Date("2020-01-07"), "day"),
+                 "value+0:foo_foo" = c(1:5, NA, NA),
+                 "value+0:bar_bar" = c(NA, NA, 6:10),
+                 check.names = FALSE),
+                 class = c("covidcast_signal_wide", "data.frame")))
+})
+
 test_that("aggregated data can be made longer", {
   foo <- structure(data.frame(
     data_source = "foo",

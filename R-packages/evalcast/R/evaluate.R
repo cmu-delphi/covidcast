@@ -173,9 +173,9 @@ check_valid_forecaster_output <- function(pred_card) {
   wrong_format <- pred_card$forecast_distribution %>%
     map_lgl(~ any(names(.x) != c("probs", "quantiles")))
   wrong_probs <- pred_card$forecast_distribution %>%
-    map_lgl(~ all(abs(.x$probs - covidhub_probs) > 1e-8))
+    map_lgl(~ any(abs(.x$probs - covidhub_probs) > 1e-8))
   bad_quantiles <- pred_card$forecast_distribution %>%
-    map_lgl(~ all(diff(.x$quantiles) < -1e-8))
+    map_lgl(~ any(diff(.x$quantiles) < -1e-8))
   pred_card %>%
     mutate(null_forecasts = null_forecasts,
            wrong_probs = wrong_probs,

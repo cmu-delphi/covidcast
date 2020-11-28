@@ -6,8 +6,11 @@ Authors@R:
 	c(
     person(given = "Ryan",
            family = "Tibshirani",
+           role = "aut"),
+    person(given = "Not Ryan",
+           family = "Tibshirani",
            role = c("aut", "cre"),
-					 email = "ryantibs@cmu.edu"))
+					 email = "not_ryantibs@cmu.edu"))
 Description: Tools for building COVID-19 models, mainly forecasting and hotspot
     prediction models. This package is meant to be used in conjuction with the
     covidcast and evalcast packages.

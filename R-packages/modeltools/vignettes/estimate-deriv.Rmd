@@ -13,8 +13,6 @@ knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 knitr::opts_chunk$set(cache = TRUE, autodep = TRUE, cache.comments = TRUE)
 ```
 
-## Estimating derivatives of signals
-
 TODO, blah load data
 
 ```{r}
@@ -31,6 +29,8 @@ case_rates <- suppressMessages(
 
 summary(case_rates)
 ```
+
+## Estimating derivatives via linear regression
 
 TODO, blah try linear regression
 
@@ -56,53 +56,76 @@ case_rates_fl = case_rates %>% filter(geo_value == "fl")
 threshold = 0.25
 
 p1 = ggplot(case_rates_fl, aes(x = time_value, y = value)) +
-  geom_line(color = "black") + 
+  geom_line() + 
   geom_point(data = case_rates_fl %>% filter(deriv >= threshold),
-             aes(x = time_value, y = value), color = "blue") + 
+             aes(x = time_value, y = value), color = "red") + 
   labs(x = "Date", y = "Cases per 100,00 people") 
 p2 = ggplot(case_rates_fl, aes(x = time_value, y = deriv)) +
-  geom_line(color = "red") + 
-  labs(x = "Date", y = "Derivative (linear regression)") +
-  geom_hline(yintercept = threshold, color = "blue", linetype = 2)
+  geom_line() + 
+  geom_hline(yintercept = threshold, linetype = 2)
+  labs(x = "Date", y = "Derivative (linear regression)") 
 grid.arrange(p1, p2, nrow = 1)
 ```
+
+## Estimating derivatives via smoothing spline
 
 TODO, blah try smoothing splines two ways, plot them
 
 ```{r, fig.width = 8, fig.height = 4}
 case_rates <- estimate_deriv(case_rates, method = "smooth-spline", n = 28,
-                             new_col = "deriv_ss_df", params = list(df = 8))
+                             new_col = "deriv_ss1", params = list(df = 8))
 
 case_rates <- estimate_deriv(case_rates, method = "smooth-spline", n = 28,
-                             new_col = "deriv_ss_cv", params = list(cv = TRUE))
+                             new_col = "deriv_ss2", params = list(cv = TRUE))
 
 case_rates %>% 
   arrange(geo_value) %>% 
   filter(time_value <= "2020-06-14") %>%
-  select(geo_value, time_value, value, deriv, deriv_ss_df, deriv_ss_cv) 
+  select(geo_value, time_value, value, deriv, deriv_ss1, deriv_ss2) 
 
 case_rates_fl = case_rates %>% filter(geo_value == "fl")
 threshold = 0.25
 
 p1 = ggplot(case_rates_fl, aes(x = time_value, y = value)) +
-  geom_line(color = "black") + 
-  geom_point(data = case_rates_fl %>% filter(deriv_ss_df >= threshold),
-             aes(x = time_value, y = value), color = "purple") + 
+  geom_line() + 
+  geom_point(data = case_rates_fl %>% filter(deriv_ss1 >= threshold),
+             aes(x = time_value, y = value), color = "red") + 
+  geom_point(data = case_rates_fl %>% filter(deriv_ss2 >= threshold),
+             aes(x = time_value, y = value), color = "blue", shape = 21) +
   labs(x = "Date", y = "Cases per 100,00 people") 
-p2 = ggplot(case_rates_fl, aes(x = time_value, y = deriv_ss_df)) +
-  geom_line(color = "red") + 
-  labs(x = "Date", y = "Derivative (smoothing spline, CV-tuned)") +
-  geom_hline(yintercept = threshold, color = "purple", linetype = 2)
+p2 = ggplot(case_rates_fl, aes(x = time_value)) +
+  geom_line(aes(y = deriv_ss1), color = "red") + 
+  geom_line(aes(y = deriv_ss2), color = "blue") + 
+  geom_hline(yintercept = threshold, linetype = 2) +
+  labs(x = "Date", y = "Derivative (smoothing spline)") 
 grid.arrange(p1, p2, nrow = 1)
+```
+
+## Estimating derivatives via trend filtering spline
+
+TODO, blah try trend filtering two ways, plot them. As it takes a while (here 
+using solution path algorithm from `genlasso` package), just compute for Florida
+
+```{r, fig.width = 8, fig.height = 4}
+case_rates_fl <- estimate_deriv(case_rates_fl, method = "trend-filter", n = 28,
+                                new_col = "deriv_tf1", params = list(df = 8))
+
+case_rates_fl <- estimate_deriv(case_rates_fl, method = "trend-filter", n = 28,
+                                new_col = "deriv_tf2", params = list(cv = TRUE))
+
+threshold = 0.25
 
 p1 = ggplot(case_rates_fl, aes(x = time_value, y = value)) +
-  geom_line(color = "black") + 
-  geom_point(data = case_rates_fl %>% filter(deriv_ss_cv >= threshold),
-             aes(x = time_value, y = value), color = "green") + 
+  geom_line() + 
+  geom_point(data = case_rates_fl %>% filter(deriv_tf1 >= threshold),
+             aes(x = time_value, y = value), color = "red") + 
+  geom_point(data = case_rates_fl %>% filter(deriv_tf2 >= threshold),
+             aes(x = time_value, y = value), color = "blue", shape = 21) +
   labs(x = "Date", y = "Cases per 100,00 people") 
-p2 = ggplot(case_rates_fl, aes(x = time_value, y = deriv_ss_cv)) +
-  geom_line(color = "red") + 
-  labs(x = "Date", y = "Derivative (smoothing spline, df = 10)") +
-  geom_hline(yintercept = threshold, color = "green", linetype = 2)
+p2 = ggplot(case_rates_fl, aes(x = time_value)) +
+  geom_line(aes(y = deriv_tf1), color = "red") + 
+  geom_line(aes(y = deriv_tf2), color = "blue") + 
+  geom_hline(yintercept = threshold, linetype = 2) +
+  labs(x = "Date", y = "Derivative (trend filtering)") 
 grid.arrange(p1, p2, nrow = 1)
 ```

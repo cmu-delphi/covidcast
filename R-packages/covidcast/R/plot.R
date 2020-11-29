@@ -765,5 +765,6 @@ shift_main = function(map_df){
     )
   }
   main_df = sf::st_transform(main_df, 102003)
+  main_df = sf::st_set_crs(main_df, 102003)
   return(main_df)
 }

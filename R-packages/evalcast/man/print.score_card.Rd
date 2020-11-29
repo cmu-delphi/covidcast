@@ -4,10 +4,12 @@
 \alias{print.score_card}
 \title{Print a single score card.}
 \usage{
-\method{print}{score_card}(card, ...)
+\method{print}{score_card}(x, ...)
 }
 \arguments{
-\item{card}{Score card.}
+\item{x}{Score card.}
+
+\item{...}{Additional arguments to be passed to \code{print.tbl_df}}
 }
 \description{
 Print a single score card.

@@ -132,10 +132,11 @@ unpack_single_card.score_card <- function(card) {
 }
 
 #' Print a single prediction card.
-#' @param card Prediction card.
+#' @param x Prediction card.
+#' @param ... Additional arguments to be passed to `print.tbl_df`
 #' @export
-print.prediction_card <- function(card, ...) {
-  card_attr <- attributes(card)
+print.prediction_card <- function(x, ...) {
+  card_attr <- attributes(x)
   cat("Attributes:\n")
   cat("  Ahead:", card_attr$ahead, "\n")
   cat("  Data source:", card_attr$signals$data_source, "\n")
@@ -145,15 +146,16 @@ print.prediction_card <- function(card, ...) {
   cat("  Incidence period:", card_attr$incidence_period, "\n")
   cat("  Name of forecaster:", card_attr$name_of_forecaster, "\n")
   cat("  Signal:", card_attr$signals$signal, "\n")
-  print(as_tibble(card), ...)
+  print(as_tibble(x), ...)
 }
 
 
 #' Print a single score card.
-#' @param card Score card.
+#' @param x Score card.
+#' @param ... Additional arguments to be passed to `print.tbl_df`
 #' @export
-print.score_card <- function(card, ...) {
-  card_attr <- attributes(card)
+print.score_card <- function(x, ...) {
+  card_attr <- attributes(x)
   cat("Attributes:\n")
   cat("  Ahead:", card_attr$ahead, "\n")
   cat("  As of:", as.character(card_attr$as_of), "\n")
@@ -163,5 +165,5 @@ print.score_card <- function(card, ...) {
   cat("  Incidence period:", card_attr$incidence_period, "\n")
   cat("  Name of forecaster:", card_attr$name_of_forecaster, "\n")
   cat("  Signal:", card_attr$response$signal, "\n")
-  print(as_tibble(card), ...)
+  print(as_tibble(x), ...)
 }

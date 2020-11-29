@@ -5,33 +5,33 @@
 #' dates are present, only the latest issue is considered.)  See the
 #' [derivatives vignette]() for examples.
 #'
-#' @param df The `covidcast_signal` data frame under consideration. 
-#' @param method One of "linear-reg", "smooth-spline", or "trend-filter"
-#'   indicating the method to use for the derivative calculation. To estimate
-#'   the derivative at any time point, we run the given method on the last `n`
-#'   days of data, and use the corresponding predicted derivative (that is, the
-#'   derivative of the underlying estimated function, linear or spline) at the
-#'   current time point. See details below. 
+#' @param x The `covidcast_signal` data frame under consideration. 
+#' @param method One of "lin", "ss", or "tf" indicating the method to use for
+#'   the derivative calculation. To estimate the derivative at any time point,
+#'   we run the given method on the last `n` days of data, and use the
+#'   corresponding predicted derivative (that is, the derivative of the
+#'   underlying estimated function, linear or spline) at the current time
+#'   point. See details below.
 #' @param n Size of the local window (in days) to use. For example, if `n = 5`,
 #'   then to estimate the derivative on November 5, we train the given method on
 #'   data in between November 1 and November 5. Default is 14.
 #' @param new_col String indicating the name of the new column that will contain
 #'   the derivative values. Default is "deriv"; note that setting `new_col =
 #'   "value"` will overwrite the existing "value" column.  
-#' @param deriv Order of derivative to estimate. Only orders 1 or 2 are allowed, 
+#' @param deriv Order of derivative to estimate. Only orders 1 or 2 are allowed,
 #'   with the default being 1. (In some cases, a second-order derivative will
-#'   return a trivial result: for example: when `method = "linear-reg"`, this
-#'   will always be zero.)
-#' @param params List of additional arguments to pass to the function that
-#'   estimates derivatives. See details below.   
+#'   return a trivial result: for example: when `method = "lin"`, this will
+#'   always be zero.)
+#' @param ... Additional arguments to pass to the function that estimates
+#'   derivatives. See details below.    
 #'
 #' @details Derivatives are estimated using:
 #'
 #' \itemize{
-#' \item Linear regression, when `method = "linear-reg"`, via `stats::lsfit()`. 
-#' \item Cubic smoothing spline, when `method = "smooth-spline"`, via
+#' \item Linear regression, when `method = "lin"`, via `stats::lsfit()`. 
+#' \item Cubic smoothing spline, when `method = "ss"`, via
 #'   `stats::smooth.spline()`.
-#' \item Polynomial trend filtering, when `method = "trend-filter"`, via 
+#' \item Polynomial trend filtering, when `method = "tf"`, via
 #'   `genlasso::trendfilter()`.
 #' }
 #'
@@ -42,8 +42,8 @@
 #'   of the underlying values.
 #' 
 #' In the first and second cases (linear regression and smoothing spline), the
-#'   list of arguments `params` is passed directly to the underlying estimation
-#'   function (`stats::lsfit()` and `stats::smooth.spline()`). 
+#'   additional arguments in `...` are directly passed to the underlying 
+#'   estimation function (`stats::lsfit()` and `stats::smooth.spline()`).   
 #'
 #' The third case (trend filtering) works a little differently. Here, a custom 
 #'   set of arguments is allowed (and are internally distributed as appropriate
@@ -66,55 +66,59 @@
 #'   TRUE`.} 
 #' }
 #' 
-#' @return A data frame given by appending a new column to `df` named according
+#' @return A data frame given by appending a new column to `x` named according
 #'   to the `new_col` argument, containing the estimated derivative values.
 #'
 #' @export
-estimate_deriv = function(df, method = c("linear-reg", "smooth-spline",
-                                         "trend-filter"),
-                          n = 14, new_col = "deriv", deriv = 1,
-                          params = list()) {
+estimate_deriv = function(x, method = c("lin", "ss", "tf"), n = 14,
+                          new_col = "deriv", deriv = 1, ...) { 
   # Define the slider function
   method = match.arg(method)
   slide_fun = switch(method,
-                     "linear-reg" = linear_reg_deriv,
-                     "smooth-spline" = smooth_spline_deriv,
-                     "trend-filter" = trend_filter_deriv)
-
+                     "lin" = linear_reg_deriv,
+                     "ss" = smooth_spline_deriv,
+                     "tf" = trend_filter_deriv)
+  
   # Check the derivative order
   if (!(deriv == 1 || deriv == 2)) {
     stop("`deriv` must be either 1 or 2.")
   }
   
   # Slide the slider function and return
-  params = c(params, deriv = deriv)
-  return(slide_by_geo(df, slide_fun, n, new_col, params))
+  return(slide_by_geo(x, slide_fun, n, new_col, deriv = deriv, ...))
 }
 
-#' Compute derivatives via linear regression
+#' Compute derivatives function via linear regression
 #' @importFrom stats lsfit
+#' @importFrom tidyr drop_na
 #' @noRd
-linear_reg_deriv = function(data, params) {
+linear_reg_deriv = function(x, ...) {
+  params = list(...)
+  params[[1]] = NULL # dplyr::group_modify() includes the group here
+  
   if (params$deriv == 2) return(0)
   params$deriv = NULL
-  data = na.omit(data) 
-  params$x = data$x
-  params$y = data$y
+  x = x %>% select(time_value, value) %>% drop_na()
+  params$x = as.numeric(x$time_value)
+  params$y = x$value
   
   return(tryCatch(suppressWarnings(suppressMessages(
     End(coef(do.call(lsfit, params))))), 
     error = function(e) return(NA)))
 }
 
-#' Compute derivatives via smoothing spline
+#' Compute derivatives function via smoothing spline
 #' @importFrom stats smooth.spline predict
 #' @noRd
-smooth_spline_deriv = function(data, params) {
+smooth_spline_deriv = function(x, ...) {
+  params = list(...)
+  params[[1]] = NULL # dplyr::group_modify() includes the group here
+  
   deriv = params$deriv
   params$deriv = NULL
-  data = na.omit(data) 
-  params$x = data$x
-  params$y = data$y
+  x = x %>% select(time_value, value) %>% drop_na()
+  params$x = as.numeric(x$time_value)
+  params$y = x$value
   
   return(tryCatch(suppressWarnings(suppressMessages(
     predict(
@@ -123,10 +127,12 @@ smooth_spline_deriv = function(data, params) {
     error = function(e) return(NA)))
 }
 
-#' Compute derivatives via trend filtering
+#' Compute derivatives function via trend filtering
 #' @importFrom genlasso trendfilter cv.trendfilter coef.genlasso
 #' @noRd
-trend_filter_deriv = function(data, params) {
+trend_filter_deriv = function(data, ...) {
+  params = list(...)
+  
   deriv = params$deriv
   ord = params$ord
   maxsteps = params$maxsteps
@@ -140,9 +146,9 @@ trend_filter_deriv = function(data, params) {
   if (is.null(k)) k = 5
   if (is.null(df)) df = ifelse(cv, "1se", 8)
   
-  data = na.omit(data) 
-  x = data$x
-  y = data$y
+  data = data %>% select(time_value, value) %>% drop_na()
+  x = as.numeric(data$time_value)
+  y = data$value
 
   return(tryCatch(suppressWarnings(suppressMessages({
     obj = trendfilter(y = y, pos = x, ord = ord, max = maxsteps)

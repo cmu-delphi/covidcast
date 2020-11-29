@@ -5,23 +5,23 @@
 \title{Estimate derivatives of values in `covidcast_signal` data frame}
 \usage{
 estimate_deriv(
-  df,
-  method = c("linear-reg", "smooth-spline", "trend-filter"),
+  x,
+  method = c("lin", "ss", "tf"),
   n = 14,
   new_col = "deriv",
   deriv = 1,
-  params = list()
+  ...
 )
 }
 \arguments{
-\item{df}{The `covidcast_signal` data frame under consideration.}
+\item{x}{The `covidcast_signal` data frame under consideration.}
 
-\item{method}{One of "linear-reg", "smooth-spline", or "trend-filter"
-indicating the method to use for the derivative calculation. To estimate
-the derivative at any time point, we run the given method on the last `n`
-days of data, and use the corresponding predicted derivative (that is, the
-derivative of the underlying estimated function, linear or spline) at the
-current time point. See details below.}
+\item{method}{One of "lin", "ss", or "tf" indicating the method to use for
+the derivative calculation. To estimate the derivative at any time point,
+we run the given method on the last `n` days of data, and use the
+corresponding predicted derivative (that is, the derivative of the
+underlying estimated function, linear or spline) at the current time
+point. See details below.}
 
 \item{n}{Size of the local window (in days) to use. For example, if `n = 5`,
 then to estimate the derivative on November 5, we train the given method on
@@ -31,16 +31,16 @@ data in between November 1 and November 5. Default is 14.}
 the derivative values. Default is "deriv"; note that setting `new_col =
 "value"` will overwrite the existing "value" column.}
 
-\item{deriv}{Order of derivative to estimate. Only orders 1 or 2 are allowed, 
+\item{deriv}{Order of derivative to estimate. Only orders 1 or 2 are allowed,
 with the default being 1. (In some cases, a second-order derivative will
-return a trivial result: for example: when `method = "linear-reg"`, this
-will always be zero.)}
+return a trivial result: for example: when `method = "lin"`, this will
+always be zero.)}
 
-\item{params}{List of additional arguments to pass to the function that
-estimates derivatives. See details below.}
+\item{...}{Additional arguments to pass to the function that estimates
+derivatives. See details below.}
 }
 \value{
-A data frame given by appending a new column to `df` named according
+A data frame given by appending a new column to `x` named according
   to the `new_col` argument, containing the estimated derivative values.
 }
 \description{
@@ -53,10 +53,10 @@ dates are present, only the latest issue is considered.)  See the
 Derivatives are estimated using:
 
 \itemize{
-\item Linear regression, when `method = "linear-reg"`, via `stats::lsfit()`. 
-\item Cubic smoothing spline, when `method = "smooth-spline"`, via
+\item Linear regression, when `method = "lin"`, via `stats::lsfit()`. 
+\item Cubic smoothing spline, when `method = "ss"`, via
   `stats::smooth.spline()`.
-\item Polynomial trend filtering, when `method = "trend-filter"`, via 
+\item Polynomial trend filtering, when `method = "tf"`, via
   `genlasso::trendfilter()`.
 }
 
@@ -67,8 +67,8 @@ The second and third cases base the derivative calculation on a nonparametric
   of the underlying values.
 
 In the first and second cases (linear regression and smoothing spline), the
-  list of arguments `params` is passed directly to the underlying estimation
-  function (`stats::lsfit()` and `stats::smooth.spline()`). 
+  additional arguments in `...` are directly passed to the underlying 
+  estimation function (`stats::lsfit()` and `stats::smooth.spline()`).   
 
 The third case (trend filtering) works a little differently. Here, a custom 
   set of arguments is allowed (and are internally distributed as appropriate

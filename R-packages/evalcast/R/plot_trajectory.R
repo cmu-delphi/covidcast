@@ -7,10 +7,15 @@
 #' @param last_day the latest date to display. Defaults to the most recent data
 #'   available (plus future, if forecasts are past today)
 #' @param alpha Displayed ribbons are the 1-alpha coverage results
+#' @param nrow maximum number of rows for faceting
+#' @param ncol maximum number of cols for faceting
+#' @param page_facet force facets to fit on a fixed number of pages 
+#'   (overriding the above)
+#' @param cutoff maximum number of facets to force to a page (52 for all states)
 #'
 #' @return Produces a ggplot object
 #' @export
-#' @importFrom rlang .data
+#' 
 #'
 #' @examples
 #' sister_preds = get_predictions(
@@ -70,7 +75,7 @@ plot_trajectory <- function(list_of_predictions_cards,
                                    start_day = first_day,
                                    end_day = last_day,
                                    geo_type = geo_type) %>%
-      dplyr::select(ocation, time_value, value) %>%
+      dplyr::select(location, time_value, value) %>%
       dplyr::rename(reference_period = time_value) %>%
       dplyr::filter(location %in% preds_df$location) 
   } else {

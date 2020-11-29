@@ -4,10 +4,12 @@
 \alias{print.prediction_card}
 \title{Print a single prediction card.}
 \usage{
-\method{print}{prediction_card}(card, ...)
+\method{print}{prediction_card}(x, ...)
 }
 \arguments{
-\item{card}{Prediction card.}
+\item{x}{Prediction card.}
+
+\item{...}{Additional arguments to be passed to \code{print.tbl_df}}
 }
 \description{
 Print a single prediction card.

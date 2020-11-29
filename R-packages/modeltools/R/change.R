@@ -10,20 +10,20 @@
 #'   percentage change on November 10, we use 100 * (B - A) / A, where A is the
 #'   sum of the values between November 6 and November 10, and A is the sum of
 #'   the values between November 1 and November 5. Default is 14.
-#' @param new_col String indicating the name of the new column that will contain
-#'   the percentage change values. Default is "pct_change"; note that we can set
-#'   `new_col = "value"` to overwrite the existing "value" column.  
+#' @param col_name String indicating the name of the new column that will
+#'   contain the percentage change values. Default is "pct_change"; note that we
+#'   can set `col_name = "value"` to overwrite the existing "value" column.  
 #' 
 #' @return A data frame given by appending a new column to `x` named according
-#'   to the `new_col` argument, containing the percentage change values. 
+#'   to the `col_name` argument, containing the percentage change values. 
 #'
 #' @export
-pct_change = function(x, n = 14, new_col = "pct_change") {
+pct_change = function(x, n = 14, col_name = "pct_change") {
   # Check if n is odd and if so bump it up one
   if (n %% 2 == 1) n = n + 1
 
   # Slide the percentage change function and return
-  return(slide_by_geo(x, pct_change_fun, n, new_col, N = n))
+  return(slide_by_geo(x, pct_change_fun, n, col_name, N = n))
 }
 
 #' Compute percentage change function

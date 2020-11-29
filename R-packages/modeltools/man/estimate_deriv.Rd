@@ -8,7 +8,8 @@ estimate_deriv(
   x,
   method = c("lin", "ss", "tf"),
   n = 14,
-  new_col = "deriv",
+  col_name = "deriv",
+  keep_obj = FALSE,
   deriv = 1,
   ...
 )
@@ -21,15 +22,20 @@ the derivative calculation. To estimate the derivative at any time point,
 we run the given method on the last `n` days of data, and use the
 corresponding predicted derivative (that is, the derivative of the
 underlying estimated function, linear or spline) at the current time
-point. See details below.}
+point. Default is "lin". See details below.}
 
 \item{n}{Size of the local window (in days) to use. For example, if `n = 5`,
 then to estimate the derivative on November 5, we train the given method on
 data in between November 1 and November 5. Default is 14.}
 
-\item{new_col}{String indicating the name of the new column that will contain
-the derivative values. Default is "deriv"; note that setting `new_col =
-"value"` will overwrite the existing "value" column.}
+\item{col_name}{String indicating the name of the new column that will
+contain the derivative values. Default is "deriv"; note that setting
+`col_name = "value"` will overwrite the existing "value" column.}
+
+\item{keep_obj}{Should the fitted object (from linear regression, smoothing 
+spline, or trend filtering) be kept as a separate column? If `TRUE`, then
+this column name is given by  appending "_obj" to `col_name`. Default is
+`FALSE`.}
 
 \item{deriv}{Order of derivative to estimate. Only orders 1 or 2 are allowed,
 with the default being 1. (In some cases, a second-order derivative will
@@ -41,7 +47,7 @@ derivatives. See details below.}
 }
 \value{
 A data frame given by appending a new column to `x` named according
-  to the `new_col` argument, containing the estimated derivative values.
+  to the `col_name` argument, containing the estimated derivative values.
 }
 \description{
 Estimates derivatives of the values in a `covidcast_signal` data frame, using

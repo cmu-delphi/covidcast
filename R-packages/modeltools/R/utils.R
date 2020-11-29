@@ -20,9 +20,16 @@ Median = function(x) median(x, na.rm = TRUE)
 
 ##########
 
+#' @export
+#' @noRd
 Start = function(x) head(x, 1)
+
+#' @export
+#' @noRd
 End = function(x) tail(x, 1)
 
+#' @export
+#' @noRd
 quiet = function(x) { 
   sink(tempfile()) 
   on.exit(sink()) 

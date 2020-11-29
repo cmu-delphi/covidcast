@@ -26,6 +26,15 @@ forecasters}
 available (plus future, if forecasts are past today)}
 
 \item{alpha}{Displayed ribbons are the 1-alpha coverage results}
+
+\item{nrow}{maximum number of rows for faceting}
+
+\item{ncol}{maximum number of cols for faceting}
+
+\item{page_facet}{force facets to fit on a fixed number of pages
+(overriding the above)}
+
+\item{cutoff}{maximum number of facets to force to a page (52 for all states)}
 }
 \value{
 Produces a ggplot object

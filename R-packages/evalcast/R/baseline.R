@@ -55,16 +55,16 @@ baseline_forecaster <- function(df,
                                             fill = NA,
                                             align = "right"),
                       resid = .data$summed - dplyr::lag(.data$summed, n = incidence_length * a)) %>%
-        dplyr::select(.data$location, .data$time_value, .data$value, .data$summed, .data$resid) %>%
+        dplyr::select(.data$location, .data$time_value, .data$summed, .data$resid) %>%
         dplyr::group_modify(~ {
             point <- .x$summed[.x$time_value == max(.x$time_value)]
-            tibble::tibble(probs = covidhub_probs,
-                           quantiles = point + stats::quantile(c(.x$resid, s * .x$resid),
+            tibble::tibble(quantile = covidhub_probs,
+                           value = point + stats::quantile(c(.x$resid, s * .x$resid),
                                                                probs = covidhub_probs,
                                                                na.rm = TRUE))
         }, .keep = TRUE) %>%
         dplyr::ungroup() %>%
-        dplyr::mutate(quantiles = pmax(.data$quantiles, 0))
+        dplyr::mutate(value = pmax(.data$value, 0))
   }
   dat <- dat[ahead]
   names(dat) <- as.character(ahead)

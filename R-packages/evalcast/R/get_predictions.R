@@ -70,7 +70,7 @@ get_predictions <- function(forecaster,
   assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
   params <- list(...)
   forecast_dates %>%
-    map(~ do.call(
+    map_dfr(~ do.call(
           get_predictions_single_date,
           c(list(forecaster = forecaster,
                  name_of_forecaster = name_of_forecaster,
@@ -81,8 +81,7 @@ get_predictions <- function(forecaster,
                  geo_type = geo_type,
                  geo_values = geo_values,
                  apply_corrections = apply_corrections),
-            params))) %>%
-    flatten()
+            params)))
 }
 
 #' Get predictions cards for a single date
@@ -149,29 +148,18 @@ get_predictions_single_date <- function(forecaster,
                     geo_type,
                     ...)
   # make a predictions card for each ahead
-  pcards <- out %>%
-    group_by(location, ahead) %>%
-    group_modify(~ tibble(forecast_distribution = list(.))) %>%
-    ungroup() %>%
-    group_by(ahead) %>%
-    group_map(~ .x) # break into a separate data frame for each ahead
-  for (i in seq_along(ahead)) {
-    attributes(pcards[[i]]) <- c(
-      attributes(pcards[[i]]),
-      list(forecaster = forecaster,
-           name_of_forecaster = name_of_forecaster,
-           signals = signals,
-           forecast_date = forecast_date,
-           incidence_period = incidence_period,
-           ahead = ahead[i],
-           geo_type = geo_type,
-           geo_values = geo_values,
-           corrections_applied = apply_corrections,
-           from_covidhub = FALSE,
-           forecaster_params = list(...))
-    )
-    class(pcards[[i]]) <- c("prediction_card", class(pcards[[i]]))
-  }
-  return(pcards)
+  out %>% 
+    mutate(
+      forecaster = name_of_forecaster,
+      forecast_date = forecast_date,
+      data_source = signals$data_source[1],
+      signal = signals$signal[1],
+      target_end_date = get_target_period(forecast_date, 
+                                          incidence_period, ahead)$end,
+      incidence_period = incidence_period
+      ) 
+      ## dropped attributes: forecaster, other signals, geo_type,
+      ##   geo_values, corrections_applied, from_covidhub,
+      ##   forecaster_params
 }
 

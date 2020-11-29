@@ -39,6 +39,16 @@ unique_attr <- function(cards, attribute) {
   return(attr_list[[1]])
 }
 
+unique_for_ahead <- function(cards, attribute) {
+  att <- select(cards, !!attribute) %>% distinct()
+  ahead <- cards$ahead[1]
+  assert_that(nrow(att) == 1,
+              msg=sprintf("These cards do not all have the same %s for ahead %i.",
+                          attribute, ahead))
+  invisible(pull(att))
+}
+
+
 #' Return list of attributes
 #'
 #' Given a list of cards, returns a list of the same length giving the values

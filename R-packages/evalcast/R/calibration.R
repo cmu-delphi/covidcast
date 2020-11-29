@@ -3,17 +3,15 @@
 #' @importFrom purrr map_dfr map_dbl
 #' @importFrom dplyr group_by summarize mutate select
 compute_actual_vs_nominal_prob <- function(score_card) {
-  nominal_probs <- score_card$forecast_distribution[[1]]$probs
-  as.list(1:length(nominal_probs)) %>%
-    map_dfr(function(i) {
-      score_card %>%
-        group_by(.data$forecast_date) %>%
-        summarize(prop_below = mean(.data$actual < map_dbl(.data$forecast_distribution,
-                                                           ~ .x$quantiles[i]),
-                                    na.rm = TRUE))
-    }, .id = "nominal_id") %>%
-    mutate(nominal_prob = nominal_probs[as.integer(.data$nominal_id)]) %>%
-    select(-.data$nominal_id)
+  score_card <- filter(score_card, !is.na(.data$quantile)) %>%
+    select(.data$forecaster, .data$location, .data$forecast_date, .data$ahead,
+           .data$actual, .data$quantile, .data$value)
+  score_card <- score_card %>% mutate(below = .data$actual < .data$value) %>%
+    group_by(.data$forecaster, .data$forecast_date, .data$ahead, 
+             .data$quantile) %>%
+    summarise(prop_below = mean(.data$below, na.rm = TRUE)) %>%
+    rename(nominal_prob = .data$quantile)
+  score_card
 }
 
 #' @importFrom magrittr %>%

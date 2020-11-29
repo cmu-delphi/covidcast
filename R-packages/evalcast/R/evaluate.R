@@ -29,18 +29,20 @@
 #' to the user to determine.  If backfill is not relevant for the particular
 #' signal you are predicting, then you can set `backfill_buffer` to 0.
 #'
-#' @param predictions_cards List of predictions cards from the same forecaster 
-#'   that are all for the same response, incidence period, and geo type. Each 
-#'   should be from a different forecast date or for a different ahead.  A 
-#'   predictions card is created by the function [get_predictions()].
+#' @param predictions_cards tibble of predictions 
+#'   that are all for the same prediction task, meaning they are for the same
+#'   response, incidence period, ahead, and geo type. Forecasts may be for a
+#'   different forecast date or forecaster.  
+#'   A predictions card may be created by the function
+#'   [get_predictions()], downloaded with [get_covidhub_predictions()] or
+#'   possibly created manually.
 #' @param err_measures Named list of one or more functions, where each function
-#'   takes a data frame with two columns `probs` and `quantiles` and an actual
-#'   (i.e., observed) scalar value and returns some measure of error.  If empty,
-#'   returns the scorecard without any error measure columns.
+#'   takes a data frame with three columns `quantile`, `value` and `actual`
+#'   (i.e., observed) returns a scalar measure of error.
 #' @param backfill_buffer How many days until response is deemed trustworthy
 #'   enough to be taken as correct? See details for more.
 #' 
-#' @return List of "score cards", with one element per ahead value. 
+#' @return tibble of "score cards" with additional columns for each err_measure
 #'
 #' @importFrom purrr map
 #' @importFrom magrittr %>%
@@ -52,40 +54,34 @@ evaluate_predictions <- function(
                       ae = absolute_error,
                       coverage_80 = interval_coverage(alpha = 0.2)),
   backfill_buffer = 10) {
-  responses <- all_attr(predictions_cards, "signals") %>%
-    map(~ .x[1, names(.x) != "start_day"]) # RJT: I added this part. I don't
-  # think start dates need to match here. Now that I'm allowing start_day to be 
-  # a function, it can depend on the forecast_date, so the next assertion would
-  # (unintentionally) fail in that case.
-  assert_that(length(unique(responses)) <= 1,
-              msg="All predictions cards should have the same response.")
-  unique_attr(predictions_cards, "incidence_period")
-  unique_attr(predictions_cards, "geo_type")
-
-  ahead <- unlist(all_attr(predictions_cards, "ahead"))
-  unique_ahead <- unique(ahead)
+  assert_that(all(c("quantile","value") %in% names(predictions_cards)),
+              msg = paste("Predictions cards must have at least quantile",
+                          "and value columns."))
+  unique_ahead <- select(predictions_cards, .data$ahead) %>% 
+    distinct() %>% pull()
   scorecards <- list()
-  for (i in seq_along(unique_ahead)) {
-    message("ahead = ", unique_ahead[i])
-    scorecards[[i]] <- evaluate_predictions_single_ahead(
-      predictions_cards = predictions_cards[ahead == unique_ahead[i]],
+  for (iter in seq_along(unique_ahead)) {
+    message("ahead = ", unique_ahead[iter])
+    scorecards[[iter]] <- evaluate_predictions_single_ahead(
+      filter(predictions_cards, ahead == !!iter) ,
       err_measures = err_measures,
       backfill_buffer = backfill_buffer)
   }
-  return(scorecards)
+  bind_rows(scorecards)
 }
 
 #' Create score cards for one ahead
 #' 
-#' @param predictions_cards List of predictions cards from the same forecaster 
+#' @param predictions_cards tibble of predictions 
 #'   that are all for the same prediction task, meaning they are for the same
-#'   response, incidence period, ahead, and geo type. Each should be from a
-#'   different forecast date.  A predictions card is created by the function
-#'   [get_predictions()].
+#'   response, incidence period, ahead, and geo type. Forecasts may be for a
+#'   different forecast date or forecaster.  
+#'   A predictions card may be created by the function
+#'   [get_predictions()], downloaded with [get_covidhub_predictions()] or
+#'   possibly created manually.
 #' @param err_measures Named list of one or more functions, where each function
-#'   takes a data frame with two columns `probs` and `quantiles` and an actual
-#'   (i.e., observed) scalar value and returns some measure of error.  If empty,
-#'   returns the scorecard without any error measure columns.
+#'   takes a data frame with three columns `quantile`, `value` and `actual`
+#'   (i.e., observed) returns a scalar measure of error.
 #' @param backfill_buffer How many days until response is deemed trustworthy
 #'   enough to be taken as correct? See details for more.
 #'   
@@ -99,66 +95,82 @@ evaluate_predictions <- function(
 evaluate_predictions_single_ahead <- function(predictions_cards,
                                               err_measures,
                                               backfill_buffer) {
+  
+  response <- predictions_cards %>% 
+    select(.data$data_source, .data$signal) %>% distinct()
+  assert_that(nrow(response) == 1,
+              msg="All predictions cards should have the same response.")
+  incidence_period <- unique_for_ahead(predictions_cards, "incidence_period")
+  geo_type <- unique_for_ahead(
+    select(predictions_cards, .data$location, .data$ahead) %>%
+      mutate(geo_type = nchar(.data$location)), 
+    "geo_type")
+  geo_type <- ifelse(geo_type == 2L, "state", "county")
+  forecast_dates <- select(predictions_cards, forecast_date) %>%
+    distinct() %>% pull()
+  ahead <- predictions_cards$ahead[1]
+  locations <- select(predictions_cards, location) %>%
+    distinct() %>% pull()
+  
   # get information from predictions cards' attributes and check:
-  att <- get_and_check_pc_attributes(predictions_cards)
+  # att <- get_and_check_pc_attributes(predictions_cards)
   # calculate the actual value we're trying to predict:
-  target_response <- get_target_response(att$signals,
-                                         att$forecast_dates,
-                                         att$incidence_period,
-                                         att$ahead,
-                                         att$geo_type)
+  target_response <- get_target_response(response,
+                                         forecast_dates,
+                                         incidence_period,
+                                         ahead,
+                                         geo_type,
+                                         locations)
   as_of <- attr(target_response, "as_of")
   . <- "got this idea from https://github.com/tidyverse/magrittr/issues/29"
-  assert_that(as_of > max(target_response$end) + backfill_buffer,
-              msg=(target_response %>% filter(.data$end == max(.data$end)) %>%
+  if (as_of < max(target_response$end) + backfill_buffer) {
+    warning(target_response %>% filter(.data$end == max(.data$end)) %>%
               stringr::str_glue_data(
               "Reliable data for evaluation is not yet available for ",
               "`forecast_date` of {forecast_date} because target period ",
               "extends to {end} which is too recent to be reliable ",
               "according to the provided `backfill_buffer` of ",
               "{backfill_buffer}.", forecast_date=.$forecast_date[1],
-              end=.$end[1], backfill_buffer=backfill_buffer)))
+              end=.$end[1], backfill_buffer=backfill_buffer))
+  }
   # combine all predictions cards into a single data frame with an additional
   # column called forecast_date:
-  predicted <- map2_dfr(predictions_cards, att$forecast_dates,
-                        ~ mutate(.x, forecast_date = .y))
-  invalid <- check_valid_forecaster_output(predicted)
-  assert_that(nrow(invalid) == 0,
-              msg=paste0("The following `forecast_date`, `location` pairs have invalid ",
-                         "forecasts:\n", invalid %>%
-                                         stringr::str_glue_data("({forecast_date}, {location})") %>%
-                                         paste(collapse = "\n"), "."))
+  
   # join together the data frames target_response and predicted:
   score_card <- target_response %>%
-    inner_join(predicted, by = c("location", "forecast_date")) %>%
+    inner_join(predictions_cards, by = c("location", "forecast_date")) %>%
     select(.data$location,
            .data$forecast_date,
-           .data$start,
-           .data$end,
            .data$actual,
-           .data$forecast_distribution)
+           .data$quantile,
+           .data$value,
+           .data$forecaster)
   # compute the error
-  for (err in names(err_measures)) {
-    score_card <- score_card %>%
-      rowwise() %>%
-      mutate(!!err := err_measures[[err]](.data$forecast_distribution, .data$actual)) %>%
-      ungroup()
+  erm <- function(x){
+    out <- double(length(err_measures))
+    for (i in seq_along(err_measures)) {
+      out[i] <- err_measures[[i]](x$quantile, x$value, x$actual)
+    }
+    names(out) <- names(err_measures)
+    bind_rows(out)
   }
-  pc_attributes_list <- predictions_cards %>%
-    map(~ attributes(.x)[-(1:3)])
-  attributes(score_card) <- c(
-    attributes(score_card),
-    list(pc_attributes_list = pc_attributes_list,
-         name_of_forecaster = att$name_of_forecaster,
-         response = att$signals[1, 1:2],
-         forecast_dates = att$forecast_dates,
-         incidence_period = att$incidence_period,
-         ahead = att$ahead,
-         geo_type = att$geo_type,
-         err_measures = err_measures,
-         backfill_buffer = backfill_buffer,
-         as_of = as_of)
-  )
+  score_card <- score_card %>%
+    group_by(.data$forecaster, .data$location, .data$forecast_date)
+  sc_keys <- score_card %>% group_keys()
+  score_card <- score_card %>% group_split() %>% lapply(erm) %>% bind_rows()
+  score_card <- bind_cols(score_card, sc_keys)
+  
+  score_card <- left_join(score_card, target_response, 
+                          by=c("location", "forecast_date")) %>%
+    select(-start, -end)
+  score_card <- inner_join(score_card, predictions_cards,
+                           by=c("forecaster", "location", "forecast_date"))
+  score_card <- score_card %>% relocate(
+    .data$ahead, .data$location, .data$quantile, .data$value, .data$forecaster,
+    .data$forecast_date, .data$data_source, .data$signal, .data$target_end_date,
+    .data$incidence_period, .data$actual)
+    
+  attributes(score_card) <- c(attributes(score_card), as_of = as_of)
   class(score_card) <- c("score_card", class(score_card))
   return(score_card)
 }

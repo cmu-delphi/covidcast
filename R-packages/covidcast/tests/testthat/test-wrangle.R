@@ -39,7 +39,7 @@ test_that("list of aggregated signals have times shifted correctly", {
     sample_size = 10,
     lag = 1),
     class = c("covidcast_signal", "data.frame"))
-  
+
   bar <- structure(data.frame(
     data_source = "bar",
     signal = "bar",
@@ -51,10 +51,10 @@ test_that("list of aggregated signals have times shifted correctly", {
     sample_size = 10,
     lag = 1),
     class = c("covidcast_signal", "data.frame"))
-  
+
   # list of lags for each input signal
   agg <- aggregate_signals(list(foo, bar), dt = list(0, c(-1, 1, 2)))
-  
+
   expect_equal(arrange(agg, time_value),
                structure(data.frame(
                  geo_value = "a",
@@ -65,10 +65,10 @@ test_that("list of aggregated signals have times shifted correctly", {
                  "value+2:bar_bar" = c(8:10, NA, NA),
                  check.names = FALSE),
                  class = c("covidcast_signal_wide", "data.frame")))
-  
+
   # single vector of lags for all input signals
   agg <- aggregate_signals(list(foo, bar), dt = c(-1, 1, 2))
-  
+
   expect_equal(arrange(agg, time_value),
                structure(data.frame(
                  geo_value = "a",
@@ -95,7 +95,7 @@ test_that("signals are joined with full join", {
     sample_size = 10,
     lag = 1),
     class = c("covidcast_signal", "data.frame"))
-  
+
   bar <- structure(data.frame(
     data_source = "bar",
     signal = "bar",
@@ -107,15 +107,14 @@ test_that("signals are joined with full join", {
     sample_size = 10,
     lag = 1),
     class = c("covidcast_signal", "data.frame"))
-  
-  
+
   agg <- aggregate_signals(list(foo, bar))
-  
+
   expect_equal(arrange(agg, time_value),
                structure(data.frame(
                  geo_value = "a",
-                 time_value =  seq.Date(as.Date("2020-01-01"), 
-                                        as.Date("2020-01-07"), "day"),
+                 time_value = seq.Date(as.Date("2020-01-01"),
+                                       as.Date("2020-01-07"), "day"),
                  "value+0:foo_foo" = c(1:5, NA, NA),
                  "value+0:bar_bar" = c(NA, NA, 6:10),
                  check.names = FALSE),
@@ -131,7 +130,6 @@ test_that("aggregated data can be made longer", {
     time_value = as.Date("2020-01-01"),
     issue = as.Date("2020-01-02"),
     stderr = 0.5,
-    sample_size = 10,
     lag = 1),
     class = c("covidcast_signal", "data.frame"))
 
@@ -142,7 +140,6 @@ test_that("aggregated data can be made longer", {
     value = 4:6,
     time_value = as.Date("2020-01-01"),
     issue = as.Date("2020-01-02"),
-    stderr = 0.5,
     sample_size = 10,
     lag = 1),
     class = c("covidcast_signal", "data.frame"))
@@ -175,4 +172,23 @@ test_that("aggregated data can be made longer", {
   # added for these columns.
   ## agg_long <- aggregate_signals(list(foo, bar), format = "long")
   ## expect_equal(long, agg_long)
+})
+
+test_that("can aggregate signals with different metadata", {
+  # signals from as.covidcast_signal() may have less metadata available than
+  # those from covidcast_signal()
+
+  foo <- as.covidcast_signal(
+    data.frame(
+      geo_value = "01000",
+      time_value = as.Date("2020-01-01"),
+      value = 1
+    ),
+    signal = "foo"
+  )
+
+  baz <- foo
+  attributes(baz)$metadata$num_locations <- 100
+
+  expect_silent(aggregate_signals(list(foo, baz)))
 })

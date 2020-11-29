@@ -150,7 +150,8 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
     }
 
     # Convert both x and dt to lists
-    x = list(x); dt = list(dt)
+    x = list(x)
+    dt = list(dt)
   }
   
   # If we're passed a list of covidcast_signal data frames
@@ -202,7 +203,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
       x[[i]] = x[[i]] %>%
         dplyr::rename_with(~ paste0(.x, ":", src, "_", sig),
                            dplyr::starts_with("value")) %>%
-        dplyr::select(-c(data_source, signal, issue, lag, stderr, sample_size)) 
+        dplyr::select(.data$geo_value, .data$time_value, dplyr::starts_with("value"))
     }
     
     # This is the wide data frame that we will eventually return
@@ -274,7 +275,7 @@ covidcast_longer = function(x) {
                     sep = ":") %>%
     tidyr::separate(col = "data_source_signal",
                     into = c("data_source", "signal"),
-                    sep = "_", extra = "merge") 
+                    sep = "_", extra = "merge")
 
   # Now add dt column, and reorder columns a bit
   x = x %>% dplyr::mutate(dt = as.numeric(sub("value", "", dt))) %>%
@@ -292,9 +293,9 @@ covidcast_wider = function(x) {
   if (!inherits(x, "covidcast_signal_long")) {
     stop("`x` must be a `covidcast_signal_long` object.")
   }
-  
-  # First drop various columns
-  x = dplyr::select(x, -c(issue, lag, stderr, sample_size))  
+
+  # Select only essential columns
+  x <- dplyr::select(x, .data$data_source, .data$signal, .data$dt, .data$value)
 
   # Renamer function (bit ugly)
   renamer = Vectorize(function(name) {
@@ -302,10 +303,10 @@ covidcast_wider = function(x) {
     n = as.numeric(strsplit(substr(name, 1, k-1), ":")[[1]][2])
     return(sprintf("value%+d:%s", n, substr(name, k+1, nchar(name))))
   })
-  
+
   # Now deal with dt column
   x = x %>%
-    dplyr::group_by(geo_value, time_value) %>% 
+    dplyr::group_by(geo_value, time_value) %>%
     tidyr::pivot_wider(names_from = c("dt", "data_source", "signal"),
                        names_prefix = "value:",
                        names_sep = "_",

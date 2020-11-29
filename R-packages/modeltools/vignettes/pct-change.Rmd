@@ -1,0 +1,100 @@
+---
+title: 2. Compute percentage change over time
+description: Compute percentage change of values over time.
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{2. Compute percentage change over time}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(cache = TRUE, autodep = TRUE, cache.comments = TRUE)
+```
+
+TODO, blah load data
+
+```{r}
+library(covidcast)
+
+start_day <- "2020-06-01"
+end_day <- "2020-11-15"
+geo_values <- c("ca", "fl", "ny", "tx")
+
+case_rates <- suppressMessages(
+  covidcast_signal(data_source = "usa-facts", 
+                   signal = "confirmed_7dav_incidence_prop",
+                   start_day = start_day, end_day = end_day, 
+                   geo_type = "state", geo_values = geo_values))
+
+summary(case_rates)
+```
+
+## Percentage change
+
+TODO, blah try trailing average
+
+```{r}
+library(modeltools)
+library(dplyr)
+
+case_rates <- pct_change(case_rates, n = 14, new_col = "pct_change")
+
+case_rates %>% 
+  arrange(geo_value) %>% 
+  select(geo_value, time_value, value, pct_change) %>%
+  head(n = 21)
+```
+
+TODO, blah plot it
+
+```{r, fig.width = 8, fig.height = 4}
+library(ggplot2)
+library(gridExtra)
+
+state = "fl"
+
+p1 <- ggplot(case_rates %>% filter(geo_value == state),
+             aes(x = time_value, y = value)) +
+  geom_line() + 
+  labs(x = "Date", y = "Cases per 100,00 people") 
+
+p2 <- ggplot(case_rates %>% filter(geo_value == state),
+             aes(x = time_value, y = pct_change)) +
+  geom_line() + 
+  labs(x = "Date", y = "Weekly percent change") 
+
+grid.arrange(p1, p2, nrow = 1)
+```
+
+## Smoothing via 7-day averaging
+
+TODO blah we can compute daily percentage change values and smooth via 7-day
+averaging
+
+```{r, fig.width = 8, fig.height = 4}
+case_rates <- case_rates %>%
+  pct_change(n = 2, new_col = "pct_change_daily") %>%
+  slide_by_geo(~ Mean(.x$pct_change_daily), n = 7, 
+               new_col = "pct_change_daily_7dav")
+
+case_rates %>% 
+  arrange(geo_value) %>% 
+  select(geo_value, time_value, value, pct_change_daily, 
+         pct_change_daily_7dav) %>%
+  head(n = 7)
+
+p1 <- ggplot(case_rates %>% filter(geo_value == state),
+             aes(x = time_value, y = value)) +
+  geom_line() + 
+  labs(x = "Date", y = "Cases per 100,00 people") 
+
+p2 <- ggplot(case_rates %>% filter(geo_value == state),
+             aes(x = time_value)) +
+  geom_line(aes(y = pct_change_daily), col = "red") + 
+  geom_line(aes(y = pct_change_daily_7dav), col = "blue") + 
+  labs(x = "Date", y = "Daily percent change") 
+
+grid.arrange(p1, p2, nrow = 1)
+```

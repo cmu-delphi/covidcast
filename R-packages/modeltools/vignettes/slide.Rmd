@@ -1,0 +1,64 @@
+---
+title: 1. Slide a function over time
+description: Apply a function to values over sliding time windows.
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{1. Slide a function over time}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(cache = TRUE, autodep = TRUE, cache.comments = TRUE)
+```
+
+TODO, blah load data
+
+```{r}
+library(covidcast)
+
+start_day <- "2020-06-01"
+end_day <- "2020-11-15"
+geo_values <- c("ca", "fl", "ny", "tx")
+
+signals <- suppressMessages(
+  covidcast_signals(data_source = "usa-facts", 
+                    signal = c("confirmed_incidence_prop",
+                               "confirmed_7dav_incidence_prop"),
+                    start_day = start_day, end_day = end_day, 
+                    geo_type = "state", geo_values = geo_values))
+
+summary(signals[[1]])
+summary(signals[[2]])
+```
+
+## Trailing average
+
+TODO, blah try trailing average
+
+```{r}
+library(modeltools)
+library(dplyr)
+
+signals[[1]] <- slide_by_geo(signals[[1]], slide_fun = ~ Mean(.x$value), n = 7, 
+                             new_col = "7dav")
+
+signals[[1]] %>% 
+  arrange(geo_value) %>% 
+  select(geo_value, time_value, value, `7dav`)
+```
+
+TODO, blah sanity check. Fails before June 7 because API has data before June 1 
+but slide function (7-day trailing average) doesn't have access to that. Passes 
+beyond that
+
+```{r, fig.width = 6, fig.height = 6}
+signals[[1]] %>% 
+  full_join(signals[[2]], by = c("geo_value", "time_value")) %>%
+  mutate(difference = `7dav` - value.y) %>%
+  filter(time_value >= "2020-06-07") %>%
+  summarize(max(abs(difference)))
+```
+
+## Custom function 

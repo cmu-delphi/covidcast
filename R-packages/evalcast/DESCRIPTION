@@ -61,7 +61,8 @@ Imports:
     rvest,
     xml2,
     ggplot2,
-    memoise
+    memoise,
+    ggforce
 Suggests: 
     testthat
 Depends: 

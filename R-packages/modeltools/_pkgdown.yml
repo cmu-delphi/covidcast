@@ -1,0 +1,9 @@
+articles:
+  - title: Using the package
+    desc: Basic usage and examples.
+    navbar: ~
+    contents:
+      - modeltools
+      - slide
+      - pct-change
+      - estimate-deriv

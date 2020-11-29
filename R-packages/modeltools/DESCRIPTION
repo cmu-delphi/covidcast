@@ -18,5 +18,9 @@ Encoding: UTF-8
 License: MIT
 Imports: 
     covidcast,
-		evalcast
+    dplyr,
+		evalcast,
+    genlasso,
+    slider,
+    tidyr
 RoxygenNote: 7.1.1

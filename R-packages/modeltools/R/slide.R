@@ -16,33 +16,44 @@
 #' @param n Size of the local window (in days) to use. For example, if `n = 5`,
 #'   then to estimate the derivative on November 5, we train the given method on
 #'   data in between November 1 and November 5. Default is 14.
-#' @param new_col String indicating the name of the new column that will contain
-#'   the derivative values. Default is "slide_value"; note that setting `new_col
-#'   = "value"` will overwrite the existing "value" column.  
+#' @param col_name String indicating the name of the new column that will
+#'   contain the derivative values. Default is "slide_value"; note that setting
+#'   `col_name = "value"` will overwrite the existing "value" column. 
+#' @param col_type One of "dbl", "int", "lgl", "chr", or "list", indicating the
+#'   data type (as tibble abbreviation) for the new column. Default is "dbl".  
 #' @param ... Additional arguments to pass to the function or formula specified
 #'   via `slide_fun`.  
 #' 
 #' @return A data frame given by appending a new column to `x` named according
-#'   to the `new_col` argument, containing the function values.
+#'   to the `col_name` argument, containing the function values.
 #'
-#' @importFrom dplyr %>% group_by
+#' @importFrom dplyr %>% arrange group_by group_modify mutate ungroup
 #' @importFrom lubridate days
-#' @importFrom slider slide_index_dbl
 #' @export
-slide_by_geo = function(x, slide_fun, n = 14, new_col = "slide_value", ...) {
+slide_by_geo = function(x, slide_fun, n = 14, col_name = "slide_value",
+                        col_type = c("dbl", "int", "lgl", "chr", "list"), ...) {
   # Check we have the minimal columns we need
-  if (!all(c("geo_value", "time_value", "value") %in% colnames(x))) {
-    stop("`x` must have columns 'geo_value', 'time_value', and 'value'.")
+  if (!all(c("geo_value", "time_value") %in% colnames(x))) {
+    stop("`x` must have columns 'geo_value' and 'time_value'.")
   }
   x = covidcast:::latest_issue(x) # TODO shouldn't require issue col
 
+  # Which slide_index function?
+  col_type = match.arg(col_type)
+  slide_index_zzz = switch(col_type,
+                           "dbl" = slider::slide_index_dbl,
+                           "int" = slider::slide_index_int,
+                           "lgl" = slider::slide_index_lgl,
+                           "chr" = slider::slide_index_chr,
+                           "list" = slider::slide_index)
+
   # Slide over a single geo value
-  slide_one_geo = function(.data_group, slide_fun, n, new_col, ...) {
-    slide_values = slide_index_dbl(.x = .data_group,
+  slide_one_geo = function(.data_group, slide_fun, n, col_name, ...) {
+    slide_values = slide_index_zzz(.x = .data_group,
                                    .i = .data_group$time_value,
                                    .f = slide_fun, ..., 
                                    .before = days(n-1))
-    return(mutate(.data_group, !!new_col := slide_values))
+    return(mutate(.data_group, !!col_name := slide_values))
   }
   
   # Apply slide function per group and return
@@ -50,6 +61,6 @@ slide_by_geo = function(x, slide_fun, n = 14, new_col = "slide_value", ...) {
          group_by(geo_value) %>%
          arrange(time_value) %>%
          group_modify(slide_one_geo, slide_fun = slide_fun,
-                      n = n, new_col = new_col, ...) %>%
+                      n = n, col_name = col_name, ...) %>%
          ungroup())
 }

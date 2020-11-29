@@ -5,7 +5,14 @@
 \title{Slide a function over values in `covidcast_signal` data frame, grouped by
 `geo_value`}
 \usage{
-slide_by_geo(x, slide_fun, n = 14, new_col = "slide_value", ...)
+slide_by_geo(
+  x,
+  slide_fun,
+  n = 14,
+  col_name = "slide_value",
+  col_type = c("dbl", "int", "lgl", "chr", "list"),
+  ...
+)
 }
 \arguments{
 \item{x}{The `covidcast_signal` data frame under consideration.}
@@ -22,16 +29,19 @@ mean(.x$value)` to compute a trailing mean over the last `n` days of data.}
 then to estimate the derivative on November 5, we train the given method on
 data in between November 1 and November 5. Default is 14.}
 
-\item{new_col}{String indicating the name of the new column that will contain
-the derivative values. Default is "slide_value"; note that setting `new_col
-= "value"` will overwrite the existing "value" column.}
+\item{col_name}{String indicating the name of the new column that will
+contain the derivative values. Default is "slide_value"; note that setting
+`col_name = "value"` will overwrite the existing "value" column.}
+
+\item{col_type}{One of "dbl", "int", "lgl", "chr", or "list", indicating the
+data type (as tibble abbreviation) for the new column. Default is "dbl".}
 
 \item{...}{Additional arguments to pass to the function or formula specified
 via `slide_fun`.}
 }
 \value{
 A data frame given by appending a new column to `x` named according
-  to the `new_col` argument, containing the function values.
+  to the `col_name` argument, containing the function values.
 }
 \description{
 Slides a given function over the values in a  `covidcast_signal` data frame,

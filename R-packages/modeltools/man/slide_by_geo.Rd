@@ -5,15 +5,18 @@
 \title{Slide a function over values in `covidcast_signal` data frame, grouped by
 `geo_value`}
 \usage{
-slide_by_geo(df, slide_fun, n = 14, new_col = "slide_value", params = list())
+slide_by_geo(x, slide_fun, n = 14, new_col = "slide_value", ...)
 }
 \arguments{
-\item{df}{The `covidcast_signal` data frame under consideration.}
+\item{x}{The `covidcast_signal` data frame under consideration.}
 
-\item{slide_fun}{Function to slide over the values in `df`, grouped by
-`geo_value`. To "slide" means to apply the function over a trailing window
-of `n` days (at any time point, we run the function over the last `n` days
-of data).}
+\item{slide_fun}{Function or formula to slide over the values in `x`, grouped
+by `geo_value`. To "slide" means to apply the function or formula over a
+trailing window of `n` days of data. If a function, `slide_fun` must take
+two arguments: `x`, a data frame the same column names as the original
+passed `x`, and `...`, for additional arguments. If a formula, `slide_fun`
+can operate directly on `.x$value`, `.x$time_value`, etc., as in `~
+mean(.x$value)` to compute a trailing mean over the last `n` days of data.}
 
 \item{n}{Size of the local window (in days) to use. For example, if `n = 5`,
 then to estimate the derivative on November 5, we train the given method on
@@ -23,11 +26,11 @@ data in between November 1 and November 5. Default is 14.}
 the derivative values. Default is "slide_value"; note that setting `new_col
 = "value"` will overwrite the existing "value" column.}
 
-\item{params}{List of additional arguments to pass to the function specified
+\item{...}{Additional arguments to pass to the function or formula specified
 via `slide_fun`.}
 }
 \value{
-A data frame given by appending a new column to `df` named according
+A data frame given by appending a new column to `x` named according
   to the `new_col` argument, containing the function values.
 }
 \description{

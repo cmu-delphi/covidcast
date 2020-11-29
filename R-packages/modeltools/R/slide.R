@@ -9,10 +9,11 @@
 #' @param slide_fun Function or formula to slide over the values in `x`, grouped
 #'   by `geo_value`. To "slide" means to apply the function or formula over a
 #'   trailing window of `n` days of data. If a function, `slide_fun` must take
-#'   two arguments: `x`, a data frame the same column names as the original
-#'   passed `x`, and `...`, for additional arguments. If a formula, `slide_fun`
+#'   `x`, a data frame the same column names as the original data frame;
+#'   followed by any number of named additional arguments; and ending with
+#'   `...`, to capture general additional arguments. If a formula, `slide_fun`
 #'   can operate directly on `.x$value`, `.x$time_value`, etc., as in `~
-#'   mean(.x$value)` to compute a trailing mean over the last `n` days of data. 
+#'   mean(.x$value)` to compute a trailing mean over the last `n` days of data.
 #' @param n Size of the local window (in days) to use. For example, if `n = 5`,
 #'   then to estimate the derivative on November 5, we train the given method on
 #'   data in between November 1 and November 5. Default is 14.
@@ -36,7 +37,7 @@ slide_by_geo = function(x, slide_fun, n = 14, col_name = "slide_value",
   if (!all(c("geo_value", "time_value") %in% colnames(x))) {
     stop("`x` must have columns 'geo_value' and 'time_value'.")
   }
-  x = covidcast:::latest_issue(x) # TODO shouldn't require issue col
+  x = covidcast:::latest_issue(x) # TODO is this needed?
 
   # Which slide_index function?
   col_type = match.arg(col_type)

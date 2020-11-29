@@ -20,8 +20,9 @@ slide_by_geo(
 \item{slide_fun}{Function or formula to slide over the values in `x`, grouped
 by `geo_value`. To "slide" means to apply the function or formula over a
 trailing window of `n` days of data. If a function, `slide_fun` must take
-two arguments: `x`, a data frame the same column names as the original
-passed `x`, and `...`, for additional arguments. If a formula, `slide_fun`
+`x`, a data frame the same column names as the original data frame;
+followed by any number of named additional arguments; and ending with
+`...`, to capture general additional arguments. If a formula, `slide_fun`
 can operate directly on `.x$value`, `.x$time_value`, etc., as in `~
 mean(.x$value)` to compute a trailing mean over the last `n` days of data.}
 

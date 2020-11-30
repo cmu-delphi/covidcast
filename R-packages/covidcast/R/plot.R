@@ -705,6 +705,7 @@ plot_line = function(x, range = NULL, title = NULL, params = list()) {
 
 
 get_pr_centroid = function(map_df){
+  sf::st_crs(map_df) <- 4269
   pr_df = map_df %>% dplyr::filter(.$is_pr) %>% sf::st_transform(., 102003)
   pr_centroid = sf::st_centroid(sf::st_geometry(pr_df))
   return(pr_centroid)
@@ -712,6 +713,7 @@ get_pr_centroid = function(map_df){
 
 
 shift_pr = function(map_df, pr_centroid){
+  sf::st_crs(map_df) <- 4269
   pr_df = map_df %>% dplyr::filter(.$is_pr)
   pr_df = sf::st_transform(pr_df, 102003)
   pr_shift = sf::st_geometry(pr_df) + c(-0.9e+6, 1e+6)
@@ -726,6 +728,7 @@ shift_pr = function(map_df, pr_centroid){
 
 
 get_alaska_centroid = function(map_df){
+  sf::st_crs(map_df) <- 4269
   alaska_df = map_df %>% dplyr::filter(.$is_alaska) %>% sf::st_transform(., 102006)
   alaska_centroid = sf::st_centroid(sf::st_geometry(alaska_df))
   return(alaska_centroid)
@@ -733,6 +736,7 @@ get_alaska_centroid = function(map_df){
 
 
 shift_alaska = function(map_df, alaska_centroid){
+  sf::st_crs(map_df) <- 4269
   alaska_df = map_df %>% dplyr::filter(.$is_alaska)
   alaska_df = sf::st_transform(alaska_df, 102006)
   alaska_scale = (sf::st_geometry(alaska_df) - alaska_centroid) * 0.35 + alaska_centroid
@@ -745,6 +749,7 @@ shift_alaska = function(map_df, alaska_centroid){
 
 
 shift_hawaii = function(map_df){
+  sf::st_crs(map_df) <- 4269
   hawaii_df = map_df %>% dplyr::filter(.$is_hawaii)
   hawaii_df = sf::st_transform(hawaii_df, 102007)
   hawaii_shift = sf::st_geometry(hawaii_df) + c(-1e+6, -2e+6)
@@ -755,6 +760,7 @@ shift_hawaii = function(map_df){
 
 
 shift_main = function(map_df){
+  sf::st_crs(map_df) <- 4269
   main_df = map_df %>% dplyr::filter(
       !.$is_alaska) %>% dplyr::filter(
         !.$is_hawaii) %>% dplyr::filter(!.$is_pr)

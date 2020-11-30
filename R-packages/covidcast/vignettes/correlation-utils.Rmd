@@ -147,6 +147,8 @@ we can plot these correlations in space as a choropleth map, using
 
 ```{r, fig.width = 10, fig.height = 8}
 # Set a bunch of fields so that the data frame knows how to plot itself
+df_cor2$data_source <- "cor"
+df_cor2$signal <- "cor"
 df_cor2$time_value <- start_day
 df_cor2$issue <- start_day
 attributes(df_cor2)$metadata$geo_type <- "county"

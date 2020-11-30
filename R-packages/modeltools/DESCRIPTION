@@ -16,10 +16,13 @@ Description: Tools for building COVID-19 models, mainly forecasting and hotspot
     covidcast and evalcast packages.
 Encoding: UTF-8
 License: MIT
+Remotes:
+    github::cmu-delphi/covidcast/R-packages/covidcast@main,
+    github::cmu-delphi/covidcast/R-packages/evalcast@main
 Imports: 
     covidcast,
     dplyr,
-		evalcast,
+    evalcast,
     genlasso,
     slider,
     tidyr

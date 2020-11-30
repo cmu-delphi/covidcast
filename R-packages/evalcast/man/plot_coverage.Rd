@@ -7,6 +7,8 @@
 plot_coverage(
   scorecards,
   type = c("all", "one"),
+  grp_vars = c("forecaster", "forecast_date", "ahead"),
+  avg_vars = c("location"),
   alpha = 0.2,
   legend_position = "bottom"
 )
@@ -19,6 +21,12 @@ task (i.e., same ahead, etc.).}
 across all nominal levels (in which case averaging is performed across
 forecast dates and locations) or whether to show it for one specific alpha
 value.}
+
+\item{grp_vars}{variables over which to compare coverage. The first
+determines the color of the lines while the rest will be faceted over}
+
+\item{avg_vars}{variables over which we average to determine the proportion
+of coverage. If \code{type = "one"},}
 
 \item{alpha}{If \code{type = "one"}, then 1-alpha is the nominal interval coverage
 shown.}

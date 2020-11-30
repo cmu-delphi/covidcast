@@ -4,10 +4,12 @@
 \alias{weighted_interval_score}
 \title{Compute weighted interval score}
 \usage{
-weighted_interval_score(quantile_forecasts, actual_value)
+weighted_interval_score(quantile, value, actual_value)
 }
 \arguments{
-\item{quantile_forecasts}{Tibble of quantile forecasts.}
+\item{quantile}{vector of forecasted quantiles}
+
+\item{value}{vector of forecasted values}
 
 \item{actual_value}{Actual value.}
 }

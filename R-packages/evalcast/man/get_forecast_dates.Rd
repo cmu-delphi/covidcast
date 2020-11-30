@@ -4,10 +4,10 @@
 \alias{get_forecast_dates}
 \title{Get available forecast dates for a forecaster on the COVID Hub}
 \usage{
-get_forecast_dates(covid_hub_forecaster_name)
+get_forecast_dates(covidhub_forecaster_name)
 }
 \arguments{
-\item{covid_hub_forecaster_name}{String indicating of the forecaster
+\item{covidhub_forecaster_name}{String indicating of the forecaster
 (matching what it is called on the COVID Hub).}
 }
 \description{

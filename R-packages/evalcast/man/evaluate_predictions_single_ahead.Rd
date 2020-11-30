@@ -11,16 +11,17 @@ evaluate_predictions_single_ahead(
 )
 }
 \arguments{
-\item{predictions_cards}{List of predictions cards from the same forecaster
+\item{predictions_cards}{tibble of predictions
 that are all for the same prediction task, meaning they are for the same
-response, incidence period, ahead, and geo type. Each should be from a
-different forecast date.  A predictions card is created by the function
-\code{\link[=get_predictions]{get_predictions()}}.}
+response, incidence period, ahead, and geo type. Forecasts may be for a
+different forecast date or forecaster.
+A predictions card may be created by the function
+\code{\link[=get_predictions]{get_predictions()}}, downloaded with \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}} or
+possibly created manually.}
 
 \item{err_measures}{Named list of one or more functions, where each function
-takes a data frame with two columns \code{probs} and \code{quantiles} and an actual
-(i.e., observed) scalar value and returns some measure of error.  If empty,
-returns the scorecard without any error measure columns.}
+takes a data frame with three columns \code{quantile}, \code{value} and \code{actual}
+(i.e., observed) returns a scalar measure of error.}
 
 \item{backfill_buffer}{How many days until response is deemed trustworthy
 enough to be taken as correct? See details for more.}

@@ -7,7 +7,8 @@
 plot_calibration(
   scorecard,
   type = c("wedgeplot", "traditional"),
-  alpha = 0.2,
+  grp_vars = c("forecaster", "forecast_date", "ahead"),
+  avg_vars = c("location"),
   legend_position = "bottom"
 )
 }
@@ -16,9 +17,9 @@ plot_calibration(
 
 \item{type}{One of "wedgeplot" or "traditional".}
 
-\item{alpha}{Deprecated parameter to be removed soon.}
-
 \item{legend_position}{Legend position, the default being "bottom".}
+
+\item{alpha}{Deprecated parameter to be removed soon.}
 }
 \description{
 Plot calibration curves

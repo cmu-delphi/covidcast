@@ -5,32 +5,28 @@
 #' @param alpha Deprecated parameter to be removed soon.
 #' @param legend_position Legend position, the default being "bottom".
 #'
-#' @importFrom rlang .data
-#' @importFrom ggplot2 ggplot aes geom_point geom_abline geom_vline geom_hline labs scale_colour_discrete scale_alpha_continuous scale_size_continuous guides facet_wrap xlim ylim theme_bw theme 
-#' @importFrom dplyr filter mutate recode
-#' @importFrom tidyr pivot_longer
 #' @export
 plot_calibration <- function(scorecard,
                              type = c("wedgeplot", "traditional"),
-                             alpha = 0.2,
+                             grp_vars = c("forecaster", "forecast_date", "ahead"),
+                             avg_vars = c("location"),
                              legend_position = "bottom") {
-  name <- attr(scorecard, "name_of_forecaster")
-  ahead <- attr(scorecard, "ahead")
   type <- match.arg(type)
   if (type == "wedgeplot") {
-    g <- compute_calibration(scorecard) %>%
+    calib <- compute_calibration(scorecard, grp_vars, avg_vars) %>%
       pivot_longer(contains("prop"),
                    names_to = "coverage_type",
                    values_to = "proportion") %>%
-      filter(.data$coverage_type != "prop_covered") %>%
-      mutate(emph = ifelse((.data$coverage_type == "prop_above" & .data$nominal_quantile < 0.5) |
-                              (.data$coverage_type == "prop_below" & .data$nominal_quantile >= 0.5), 0.5, 1)) %>%
+      mutate(emph = ifelse(
+        (.data$coverage_type == "prop_above" & .data$nominal_quantile < 0.5) |
+          (.data$coverage_type == "prop_below" & .data$nominal_quantile >= 0.5), 
+        0.5, 1)) %>%
       mutate(coverage_type = recode(.data$coverage_type,
                                     prop_above = "Proportion above",
-                                    prop_below = "Proportion below")) %>%
-      ggplot(aes(x = .data$nominal_quantile,
-                 y = .data$proportion,
-                 colour = .data$coverage_type)) +
+                                    prop_below = "Proportion below"))
+    g <- ggplot(aes(x = .data$nominal_prob,
+                    y = .data$proportion,
+                    colour = .data$coverage_type)) +
       geom_line(aes(alpha = .data$emph, size = .data$emph)) +
       geom_point(aes(alpha = .data$emph, size = .data$emph)) +
       geom_abline(intercept = 0, slope = 1) +
@@ -43,7 +39,7 @@ plot_calibration <- function(scorecard,
       scale_size_continuous(range = c(0.5, 1)) +
       guides(alpha = FALSE, size = FALSE)
   } else if (type == "traditional") {
-    calib <- compute_actual_vs_nominal_prob(scorecard)
+    calib <- compute_actual_vs_nominal_prob(scorecard, grp_vars, avg_vars)
     g <- calib %>%
       ggplot(aes(x = .data$nominal_prob, y = .data$prop_below)) +
       geom_line(color = "red") +
@@ -68,15 +64,19 @@ plot_calibration <- function(scorecard,
 #'   across all nominal levels (in which case averaging is performed across
 #'   forecast dates and locations) or whether to show it for one specific alpha
 #'   value.
+#' @param grp_vars variables over which to compare coverage. The first 
+#'   determines the color of the lines while the rest will be faceted over
+#' @param avg_vars variables over which we average to determine the proportion
+#'   of coverage. If `type = "one"`, 
 #' @param alpha If `type = "one"`, then 1-alpha is the nominal interval coverage
 #'   shown.
 #' @param legend_position Legend position, the default being "bottom".
 #' 
-#' @importFrom rlang .data set_names
-#' @importFrom purrr map_dfr
-#' @importFrom ggplot2 ggplot geom_abline geom_vline geom_hline labs facet_wrap xlim ylim theme_bw theme 
 #' @export 
-plot_coverage <- function(scorecards, type = c("all", "one"), alpha = 0.2, 
+plot_coverage <- function(scorecards, type = c("all", "one"), 
+                          grp_vars = c("forecaster", "forecast_date", "ahead"),
+                          avg_vars = c("location"),
+                          alpha = 0.2, 
                           legend_position = "bottom") {
   type <- match.arg(type)
   # make sure scorecards are comparable:

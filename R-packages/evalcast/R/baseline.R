@@ -21,13 +21,6 @@
 #'   The `quantiles` column gives the predictive quantiles of the forecast
 #'   distribution for that location and ahead.
 #'
-#' @importFrom magrittr %>%
-#' @importFrom rlang .data
-#' @importFrom lubridate ymd
-#' @importFrom dplyr filter group_by arrange mutate select group_by group_modify ungroup bind_rows lag
-#' @importFrom tibble tibble
-#' @importFrom zoo rollsum
-#' @importFrom stats quantile
 #' @export
 baseline_forecaster <- function(df,
                                 forecast_date,
@@ -50,18 +43,20 @@ baseline_forecaster <- function(df,
                       .data$signal == signals$signal[1]) %>%
         dplyr::group_by(.data$location) %>%
         dplyr::arrange(.data$time_value) %>%
-        dplyr::mutate(summed = zoo::rollsum(.data$value,
-                                            k = incidence_length,
-                                            fill = NA,
-                                            align = "right"),
-                      resid = .data$summed - dplyr::lag(.data$summed, n = incidence_length * a)) %>%
-        dplyr::select(.data$location, .data$time_value, .data$summed, .data$resid) %>%
+        dplyr::mutate(
+          summed = zoo::rollsum(.data$value, k = incidence_length, fill = NA, 
+                                align = "right"),
+          resid = .data$summed - 
+            dplyr::lag(.data$summed, n = incidence_length * a)) %>%
+        dplyr::select(.data$location, .data$time_value, 
+                      .data$summed, .data$resid) %>%
         dplyr::group_modify(~ {
             point <- .x$summed[.x$time_value == max(.x$time_value)]
             tibble::tibble(quantile = covidhub_probs,
-                           value = point + stats::quantile(c(.x$resid, s * .x$resid),
-                                                               probs = covidhub_probs,
-                                                               na.rm = TRUE))
+                           value = point + 
+                             stats::quantile(c(.x$resid, s * .x$resid),
+                                             probs = covidhub_probs,
+                                             na.rm = TRUE))
         }, .keep = TRUE) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(value = pmax(.data$value, 0))

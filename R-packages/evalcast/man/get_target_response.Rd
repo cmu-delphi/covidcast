@@ -5,7 +5,14 @@
 \title{Get data frame with column names \code{forecast_date}, \code{location}, \code{target_start},
 \code{target_end}, \code{actual}}
 \usage{
-get_target_response(signals, forecast_dates, incidence_period, ahead, geo_type)
+get_target_response(
+  signals,
+  forecast_dates,
+  incidence_period,
+  ahead,
+  geo_type,
+  locations
+)
 }
 \arguments{
 \item{signals}{Tibble with columns \code{data_source} and \code{signal} that specifies

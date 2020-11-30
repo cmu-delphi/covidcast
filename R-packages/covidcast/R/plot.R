@@ -716,12 +716,14 @@ shift_pr = function(map_df, pr_centroid){
   sf::st_crs(map_df) <- 4269
   pr_df = map_df %>% dplyr::filter(.$is_pr)
   pr_df = sf::st_transform(pr_df, 102003)
-  pr_shift = sf::st_geometry(pr_df) + c(-0.9e+6, 1e+6)
-  pr_df = sf::st_set_geometry(pr_df, pr_shift)
-  r = -16 * pi / 180
+  r = 16 * pi / 180
   rotation = matrix(c(cos(r), sin(r), -sin(r), cos(r)), nrow = 2, ncol = 2)
-  pr_rotate = (sf::st_geometry(pr_df) - pr_centroid) * rotation + pr_centroid
+  #pr_rotate = (sf::st_geometry(pr_df) - pr_centroid) * rotation + pr_centroid
+  pr_rotate = (sf::st_geometry(pr_df) - c(0,0)) * rotation + c(0,0)
   pr_df = sf::st_set_geometry(pr_df, pr_rotate)
+  pr_shift = sf::st_geometry(pr_df) + c(-0.7e+6, 1.25e+6)
+  pr_df = sf::st_set_geometry(pr_df, pr_shift)
+  
   sf::st_crs(pr_df) <- 102003
   return(pr_df)
 }

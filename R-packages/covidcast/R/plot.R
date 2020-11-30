@@ -721,7 +721,6 @@ shift_pr = function(map_df, pr_centroid){
   pr_rotate = (sf::st_geometry(pr_df) - pr_centroid) * rotation + pr_centroid
   pr_df = sf::st_set_geometry(pr_df, pr_rotate)
   sf::st_crs(pr_df) <- 102003
-  pr_df = sf::st_transform(pr_df, 2163)
   return(pr_df)
 }
 
@@ -741,7 +740,6 @@ shift_alaska = function(map_df, alaska_centroid){
   alaska_shift = sf::st_geometry(alaska_df) + c(-2e+6, -2.6e+6)
   alaska_df = sf::st_set_geometry(alaska_df, alaska_shift)
   sf::st_crs(alaska_df) <- 102003
-  alaska_df = sf::st_transform(alaska_df, 2163)
   return(alaska_df)
 }
 
@@ -752,7 +750,6 @@ shift_hawaii = function(map_df){
   hawaii_shift = sf::st_geometry(hawaii_df) + c(-1e+6, -2e+6)
   hawaii_df = sf::st_set_geometry(hawaii_df, hawaii_shift)
   sf::st_crs(hawaii_df) <- 102003
-  hawaii_df = sf::st_transform(hawaii_df, 2163)
   return(hawaii_df)
 }
 
@@ -769,7 +766,5 @@ shift_main = function(map_df){
   }
   main_df = sf::st_transform(main_df, 102003)
   sf::st_crs(main_df) <- 102003
-  print(usmap::usmap_crs())
-  main_df = sf::st_transform(main_df, 2163)
   return(main_df)
 }

@@ -283,15 +283,10 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     map_df = map_df %>% dplyr::filter(.$STUSPS %in% include)
   }
 
-  # For alaska and pr, set centroids here so same centroid is
-  # used for every map layer.
-  alaska_centroid = get_alaska_centroid(map_df)
-  pr_centroid = get_pr_centroid(map_df)
-
   main_df = shift_main(map_df)
   hawaii_df = shift_hawaii(map_df)
-  alaska_df = shift_alaska(map_df, alaska_centroid)
-  pr_df = shift_pr(map_df, pr_centroid)
+  alaska_df = shift_alaska(map_df)
+  pr_df = shift_pr(map_df)
 
   main_col = main_df$color
   hawaii_col = hawaii_df$color
@@ -360,8 +355,6 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     if (length(include) > 0) {
       map_df = map_df %>% dplyr::filter(.$STUSPS %in% include)
     }
-    alaska_centroid = get_alaska_centroid(map_df)
-    pr_centroid = get_pr_centroid(map_df)
   }
 
   else if (attributes(x)$metadata$geo_type == "msa") {
@@ -402,8 +395,8 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
 
   main_df = shift_main(map_df)
   hawaii_df = shift_hawaii(map_df)
-  alaska_df = shift_alaska(map_df, alaska_centroid)
-  pr_df = shift_pr(map_df, pr_centroid)
+  alaska_df = shift_alaska(map_df)
+  pr_df = shift_pr(map_df)
 
   main_col = main_df$color
   hawaii_col = hawaii_df$color
@@ -705,46 +698,28 @@ plot_line = function(x, range = NULL, title = NULL, params = list()) {
 }
 
 
-get_pr_centroid = function(map_df){
-  sf::st_crs(map_df) <- 4269
-  pr_df = map_df %>% dplyr::filter(.$is_pr) %>% sf::st_transform(., 102003)
-  pr_centroid = sf::st_centroid(sf::st_geometry(pr_df))
-  return(pr_centroid)
-}
-
-
-shift_pr = function(map_df, pr_centroid){
+shift_pr = function(map_df){
   sf::st_crs(map_df) <- 4269
   pr_df = map_df %>% dplyr::filter(.$is_pr)
   pr_df = sf::st_transform(pr_df, 102003)
+  pr_shift = sf::st_geometry(pr_df) + c(-0.9e+6, 1e+6)
+  pr_df = sf::st_set_geometry(pr_df, pr_shift)
   r = 16 * pi / 180
   rotation = matrix(c(cos(r), sin(r), -sin(r), cos(r)), nrow = 2, ncol = 2)
-  #pr_rotate = (sf::st_geometry(pr_df) - pr_centroid) * rotation + pr_centroid
   pr_rotate = (sf::st_geometry(pr_df) - c(0,0)) * rotation + c(0,0)
   pr_df = sf::st_set_geometry(pr_df, pr_rotate)
-  pr_shift = sf::st_geometry(pr_df) + c(-0.7e+6, 1.25e+6)
-  pr_df = sf::st_set_geometry(pr_df, pr_shift)
-  
   sf::st_crs(pr_df) <- 102003
   return(pr_df)
 }
 
 
-get_alaska_centroid = function(map_df){
-  sf::st_crs(map_df) <- 4269
-  alaska_df = map_df %>% dplyr::filter(.$is_alaska) %>% sf::st_transform(., 102006)
-  alaska_centroid = sf::st_centroid(sf::st_geometry(alaska_df))
-  return(alaska_centroid)
-}
-
-
-shift_alaska = function(map_df, alaska_centroid){
+shift_alaska = function(map_df){
   sf::st_crs(map_df) <- 4269
   alaska_df = map_df %>% dplyr::filter(.$is_alaska)
   alaska_df = sf::st_transform(alaska_df, 102006)
-  alaska_scale = (sf::st_geometry(alaska_df) - alaska_centroid) * 0.35 + alaska_centroid
+  alaska_scale = (sf::st_geometry(alaska_df) - c(0,0)) * 0.35 + c(0,0)
   alaska_df = sf::st_set_geometry(alaska_df, alaska_scale)
-  alaska_shift = sf::st_geometry(alaska_df) + c(-2e+6, -2.6e+6)
+  alaska_shift = sf::st_geometry(alaska_df) + c(-1.8e+6, -1.6e+6)
   alaska_df = sf::st_set_geometry(alaska_df, alaska_shift)
   sf::st_crs(alaska_df) <- 102003
   return(alaska_df)

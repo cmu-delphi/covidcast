@@ -733,7 +733,7 @@ shift_alaska = function(map_df){
 
 shift_hawaii = function(map_df){
   hawaii_df = map_df %>% dplyr::filter(.$is_hawaii)
-  hawaii_df = sf::st_transform(hawaii_df, 102007)
+  hawaii_df = sf::st_transform(hawaii_df, hawaii_crs)
   hawaii_shift = sf::st_geometry(hawaii_df) + c(-1e+6, -2e+6)
   hawaii_df = sf::st_set_geometry(hawaii_df, hawaii_shift)
   sf::st_crs(hawaii_df) <- final_crs

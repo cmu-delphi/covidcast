@@ -4,6 +4,5 @@ articles:
     navbar: ~
     contents:
       - modeltools
-      - slide
       - pct-change
       - estimate-deriv

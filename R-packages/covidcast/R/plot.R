@@ -165,7 +165,6 @@ plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
 }
 
 # Plot a choropleth map of a covidcast_signal object.
-
 #' @importFrom stats approx
 plot_choro = function(x, time_value = NULL, include = c(), range,
                       col = c("#FFFFCC", "#FD893C", "#800026"),
@@ -698,47 +697,50 @@ plot_line = function(x, range = NULL, title = NULL, params = list()) {
 }
 
 
+
+# Use the following CRS values
+
+final_crs = '+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 
+             +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs'
+alaska_crs = '+proj=aea +lat_1=55 +lat_2=65 +lat_0=50 +lon_0=-154 +x_0=0 
+              +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs'
+hawaii_crs = '+proj=aea +lat_1=8 +lat_2=18 +lat_0=13 +lon_0=-157 +x_0=0 
+              +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs'
+
 shift_pr = function(map_df){
-  sf::st_crs(map_df) <- 4269
   pr_df = map_df %>% dplyr::filter(.$is_pr)
-  pr_df = sf::st_transform(pr_df, 102003)
+  pr_df = sf::st_transform(pr_df, final_crs)
   pr_shift = sf::st_geometry(pr_df) + c(-0.9e+6, 1e+6)
   pr_df = sf::st_set_geometry(pr_df, pr_shift)
   r = 16 * pi / 180
   rotation = matrix(c(cos(r), sin(r), -sin(r), cos(r)), nrow = 2, ncol = 2)
   pr_rotate = (sf::st_geometry(pr_df) - c(0,0)) * rotation + c(0,0)
   pr_df = sf::st_set_geometry(pr_df, pr_rotate)
-  sf::st_crs(pr_df) <- 102003
+  sf::st_crs(pr_df) <- final_crs
   return(pr_df)
 }
 
-
 shift_alaska = function(map_df){
-  sf::st_crs(map_df) <- 4269
   alaska_df = map_df %>% dplyr::filter(.$is_alaska)
-  alaska_df = sf::st_transform(alaska_df, 102006)
+  alaska_df = sf::st_transform(alaska_df, alaska_crs)
   alaska_scale = (sf::st_geometry(alaska_df) - c(0,0)) * 0.35 + c(0,0)
   alaska_df = sf::st_set_geometry(alaska_df, alaska_scale)
   alaska_shift = sf::st_geometry(alaska_df) + c(-1.8e+6, -1.6e+6)
   alaska_df = sf::st_set_geometry(alaska_df, alaska_shift)
-  sf::st_crs(alaska_df) <- 102003
+  sf::st_crs(alaska_df) <- final_crs
   return(alaska_df)
 }
 
-
 shift_hawaii = function(map_df){
-  sf::st_crs(map_df) <- 4269
   hawaii_df = map_df %>% dplyr::filter(.$is_hawaii)
   hawaii_df = sf::st_transform(hawaii_df, 102007)
   hawaii_shift = sf::st_geometry(hawaii_df) + c(-1e+6, -2e+6)
   hawaii_df = sf::st_set_geometry(hawaii_df, hawaii_shift)
-  sf::st_crs(hawaii_df) <- 102003
+  sf::st_crs(hawaii_df) <- final_crs
   return(hawaii_df)
 }
 
-
 shift_main = function(map_df){
-  sf::st_crs(map_df) <- 4269
   main_df = map_df %>% dplyr::filter(
       !.$is_alaska) %>% dplyr::filter(
         !.$is_hawaii) %>% dplyr::filter(!.$is_pr)
@@ -748,7 +750,7 @@ shift_main = function(map_df){
       .$is_state
     )
   }
-  main_df = sf::st_transform(main_df, 102003)
-  sf::st_crs(main_df) <- 102003
+  main_df = sf::st_transform(main_df, final_crs)
+  sf::st_crs(main_df) <- final_crs
   return(main_df)
 }

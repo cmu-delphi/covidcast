@@ -8,6 +8,15 @@ Released TODO DATE.
   filter data frames with multiple issues of each observation, obtaining only
   the latest or earliest issue of each.
 
+- `covidcast_signal()` now batches requests, so that many days of data can be
+  fetched in one API call. This dramatically improves the speed of fetching
+  state-, MSA-, and HRR-level data, since many days of data can be fetched in
+  one API call. County-level signals, such as cases and deaths, may still
+  require one API call per day, since the API's row limit is only slightly
+  larger than the number of counties in the United States.
+
+- `covidcast_signal()` now fetches data from the API server in CSV format,
+  rather than JSON, which requires less bandwidth and parsing.
 
 # covidcast 0.3.1
 

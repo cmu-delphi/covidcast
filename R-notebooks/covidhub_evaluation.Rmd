@@ -229,7 +229,16 @@ for (i in 1:length(forecasters)){
   name_of_forecaster = forecasters[i]
   if (name_of_forecaster %in% scored_forecasters){
     forecaster_idx = which(scored_forecasters == name_of_forecaster)
-    score_cards_comb[[i]] = c(score_cards[[forecaster_idx]], score_cards_new[[i]])
+    forecaster_score_cards = list()
+    if (length(score_cards_new[[i]]) > 0){
+      for (weeks_ahead in ahead){
+        forecaster_score_cards[[weeks_ahead]] = 
+          rbind(score_cards[[forecaster_idx]][[weeks_ahead]], score_cards_new[[i]][[weeks_ahead]])
+      }
+      score_cards_comb[[i]] = forecaster_score_cards
+    } else {
+      score_cards_comb[[i]] = score_cards[[forecaster_idx]]
+    }
   } else {
     score_cards_comb[[i]] = score_cards_new[[i]]
   }

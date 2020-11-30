@@ -37,7 +37,7 @@ slide_by_geo = function(x, slide_fun, n = 14, col_name = "slide_value",
   if (!all(c("geo_value", "time_value") %in% colnames(x))) {
     stop("`x` must have columns 'geo_value' and 'time_value'.")
   }
-  x = covidcast:::latest_issue(x) # TODO is this needed?
+  # x = covidcast:::latest_issue(x) # TODO is this needed?
 
   # Which slide_index function?
   col_type = match.arg(col_type)

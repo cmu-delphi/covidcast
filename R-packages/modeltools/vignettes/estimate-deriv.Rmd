@@ -1,17 +1,12 @@
 ---
-title: 3. Estimate derivatives of signals 
+title: 2. Estimate derivatives of signals 
 description: Estimate derivatives of signal values, using various methodologies.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{3. Estimate derivatives of signals}
+  %\VignetteIndexEntry{2. Estimate derivatives of signals}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(message = FALSE, warning = FALSE)
-knitr::opts_chunk$set(cache = TRUE, autodep = TRUE, cache.comments = TRUE)
-```
 
 TODO, blah load data
 
@@ -78,10 +73,10 @@ TODO, blah try smoothing splines two ways, plot them
 
 ```{r, fig.width = 8, fig.height = 4}
 case_rates <- estimate_deriv(case_rates, method = "ss", n = 28,
-                             new_col = "deriv_ss1", df = 8)
+                             col_name = "deriv_ss1", df = 8)
 
 case_rates <- estimate_deriv(case_rates, method = "ss", n = 28,
-                             new_col = "deriv_ss2", cv = TRUE)
+                             col_name = "deriv_ss2", cv = TRUE)
 
 p1 <- ggplot(case_rates %>% filter(geo_value == state), 
              aes(x = time_value, y = value)) +
@@ -114,12 +109,10 @@ for Florida
 case_rates_state <- case_rates %>% filter(geo_value == state)
 
 case_rates_state <- estimate_deriv(case_rates_state, method = "tf", n = 28, 
-                                   new_col = "deriv_tf1", df = 8)
+                                   col_name = "deriv_tf1", df = 8)
 
 case_rates_state <- estimate_deriv(case_rates_state, method = "tf", n = 28, 
-                                   new_col = "deriv_tf2", cv = TRUE)
-
-
+                                   col_name = "deriv_tf2", cv = TRUE)
 
 p1 <- ggplot(case_rates_state, aes(x = time_value, y = value)) +
   geom_line() + 
@@ -136,4 +129,28 @@ p2 <- ggplot(case_rates_state, aes(x = time_value)) +
   labs(x = "Date", y = "Derivative (smoothing spline)") 
 
 grid.arrange(p1, p2, nrow = 1)
+```
+
+## Post-hoc inspection
+
+TODO blah we can set `keep_obj = TRUE` to keep around a second column with the
+fitted model objects. For example, here, we can look at the p-values associated
+with the estimated slopes from `lsfit()`
+
+```{r}
+case_rates <- estimate_deriv(case_rates, method = "lin", n = 14, 
+                             keep_obj = TRUE)
+
+class(case_rates$deriv_obj)
+ls.print(case_rates$deriv_obj[[7]])
+         
+case_rates <- case_rates %>%
+  rowwise() %>%
+  mutate(p_value = quiet(
+    tryCatch(ls.print(deriv_obj)$coef.table[[1]][2,"Pr(>|t|)"], 
+             error = function(e) NA))) 
+
+case_rates %>% 
+  arrange(geo_value) %>% 
+  select(geo_value, time_value, value, deriv, deriv_obj, p_value)
 ```

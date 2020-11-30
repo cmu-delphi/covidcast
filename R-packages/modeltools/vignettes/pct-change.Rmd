@@ -1,17 +1,12 @@
 ---
-title: 2. Compute percentage change over time
-description: Compute percentage change of values over time.
+title: 1. Compute percentage change over time
+description: Compute percentage change of signal values over time.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{2. Compute percentage change over time}
+  %\VignetteIndexEntry{1. Compute percentage change over time}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(message = FALSE, warning = FALSE)
-knitr::opts_chunk$set(cache = TRUE, autodep = TRUE, cache.comments = TRUE)
-```
 
 TODO, blah load data
 
@@ -39,7 +34,7 @@ TODO, blah try trailing average
 library(modeltools)
 library(dplyr)
 
-case_rates <- pct_change(case_rates, n = 14, new_col = "pct_change")
+case_rates <- pct_change(case_rates, n = 14, col_name = "pct_change")
 
 case_rates %>% 
   arrange(geo_value) %>% 
@@ -75,9 +70,9 @@ averaging
 
 ```{r, fig.width = 8, fig.height = 4}
 case_rates <- case_rates %>%
-  pct_change(n = 2, new_col = "pct_change_daily") %>%
+  pct_change(n = 2, col_name = "pct_change_daily") %>%
   slide_by_geo(~ Mean(.x$pct_change_daily), n = 7, 
-               new_col = "pct_change_daily_7dav")
+               col_name = "pct_change_daily_7dav")
 
 case_rates %>% 
   arrange(geo_value) %>% 

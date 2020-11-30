@@ -13,8 +13,10 @@ library(dplyr)
 # types of errors.
 #
 # 2. Once you've written a test, it can be difficult to find the file storing
-# the JSON needed for that test. We hence store the filename in comments
-# adjacent to every call.
+# the JSON or CSV needed for that test. We hence store the filename in comments
+# adjacent to every call. (Note that we request CSVs from the API for
+# covidcast_signal, and httptest suggests filenames ending in .json by default.
+# You can use .csv instead and httptest will correctly locate those files.)
 #
 # 3. covidcast_signal() calls covidcast_meta() unconditionally. We hence need a
 # single meta file that suffices for all tests that call covidcast_signal().
@@ -38,20 +40,20 @@ library(dplyr)
 
 with_mock_api({
   test_that("covidcast_meta formats result correctly", {
-    # api.php-d2e163.json
+    # api.php-dd024f.csv
     expect_equal(covidcast_meta(),
                  structure(
                    data.frame(
                      data_source = "foo",
                      signal = c("bar", "bar2"),
+                     time_type = "day",
+                     geo_type = "county",
                      min_time = as.Date(c("2020-01-01", "2020-10-02")),
                      max_time = as.Date(c("2020-01-02", "2020-10-03")),
-                     max_issue = as.Date(c("2020-04-04", "2020-11-01")),
                      min_value = 0,
                      max_value = 10,
                      num_locations = 100,
-                     time_type = "day",
-                     geo_type = "county"
+                     max_issue = as.Date(c("2020-04-04", "2020-11-01"))
                    ),
                    class = c("covidcast_meta", "data.frame")
                  ))
@@ -59,8 +61,7 @@ with_mock_api({
 })
 
 test_that("covidcast_meta raises error when API signals one", {
-  stub(covidcast_meta, ".request",
-       list(message = "argle-bargle"))
+  stub(covidcast_meta, ".request", "")
 
   expect_error(covidcast_meta(),
                class = "covidcast_meta_fetch_failed")
@@ -69,13 +70,13 @@ test_that("covidcast_meta raises error when API signals one", {
 with_mock_api({
   ## covidcast_signal() tests
   test_that("covidcast_signal warns when requested geo_values are unavailable", {
-    # api.php-6a5814.json
+    # api.php-3e1dc3.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-01", "2020-01-01",
                                     geo_values = c("pa", "tx", "DUCKS")),
                    class = "covidcast_missing_geo_values")
 
     # ...but not when they *are* available.
-    # api.php-64a69c.json
+    # api.php-f666a2.csv
     expect_silent(suppressMessages(
       covidcast_signal("foo", "bar", "2020-01-01", "2020-01-01",
                        geo_values = c("pa", "tx"))))
@@ -83,12 +84,12 @@ with_mock_api({
 
   test_that("covidcast_signal warns when requested dates are unavailable", {
     # with geo_values = "*".
-    # api.php-96f6a5.json
+    # api.php-b6e478.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-02"),
                    class = "covidcast_fetch_failed")
 
     # and with geo_values = "pa"
-    # api.php-da6974.json
+    # api.php-d707dc.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-02",
                                     geo_values = "pa"),
                    class = "covidcast_fetch_failed")
@@ -101,7 +102,7 @@ with_mock_api({
 
   test_that("covidcast_signal works for signals with no meta", {
     # when no meta is available, we must provide start_day and end_day.
-    # api.php-cb89ad.json
+    # api.php-1d9b5c.csv
     expect_equal(
       covidcast_signal("foo", "bar-not-found",
                        "2020-01-01", "2020-01-01"),
@@ -123,7 +124,7 @@ with_mock_api({
   })
 
   test_that("covidcast_signal stops when end_day < start_day", {
-    # reusing api.php-da6974.json
+    # reusing api.php-dd024f.csv for metadata
     expect_error(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-01"))
   })
 
@@ -139,7 +140,7 @@ with_mock_api({
 
 test_that("covidcast_days does not treat \"*\" as a missing geo_value", {
   stub(covidcast_days, "covidcast",
-       list(message = "success", epidata = data.frame(
+       data.frame(
          geo_value = c("geoa", "geob"),
          signal = "signal",
          time_value = c(20201030, 20201031),
@@ -149,7 +150,8 @@ test_that("covidcast_days does not treat \"*\" as a missing geo_value", {
          value = 3,
          stderr = NA,
          sample_size = NA
-       ), result = 1))
+       ))
+
   # Expect no warning
   expect_warning(
     covidcast_days(
@@ -168,7 +170,7 @@ test_that("covidcast_days does not treat \"*\" as a missing geo_value", {
 
 test_that("covidcast_days does not raise warnings for full response", {
   stub(covidcast_days, "covidcast",
-       list(message = "success", epidata = data.frame(
+       data.frame(
          geo_value = c("geoa"),
          signal = "signal",
          time_value = c(20201030, 20201031),
@@ -178,7 +180,8 @@ test_that("covidcast_days does not raise warnings for full response", {
          value = 3,
          stderr = NA,
          sample_size = NA
-       ), result = 1))
+       ))
+
   # Expect no warning
   expect_warning(
     covidcast_days(
@@ -196,19 +199,22 @@ test_that("covidcast_days does not raise warnings for full response", {
 })
 
 test_that("covidcast_days batches calls to covidcast", {
-  covidcast_returns <- rep(list(list(message = "success", epidata = data.frame(
-    geo_value = c("geoa"),
-    signal = "signal",
-    time_value = rep(NA, 3),
-    direction = NA,
-    issue = as.Date("2020-11-04"),
-    lag = 2,
-    value = 3,
-    stderr = NA,
-    sample_size = NA
-  ), result = 1)), 10)
-  covidcast_returns[[1]]$epidata$time_value <- 20101001:20101003
-  covidcast_returns[[2]]$epidata$time_value <- 20101004:20101006
+  covidcast_returns <- rep(
+    list(
+      data.frame(
+        geo_value = c("geoa"),
+        signal = "signal",
+        time_value = rep(NA, 3),
+        direction = NA,
+        issue = as.Date("2020-11-04"),
+        lag = 2,
+        value = 3,
+        stderr = NA,
+        sample_size = NA
+      )),
+    10)
+  covidcast_returns[[1]]$time_value <- 20101001:20101003
+  covidcast_returns[[2]]$time_value <- 20101004:20101006
 
   m <- mock(covidcast_returns[[1]], covidcast_returns[[2]])
   stub(covidcast_days, "covidcast", m)

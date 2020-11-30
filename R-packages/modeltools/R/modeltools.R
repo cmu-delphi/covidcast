@@ -5,5 +5,5 @@
 #' in conjuction with the `covidcast` and `evalcast` packages.
 #'
 #' @docType package
-#' @name modetools
+#' @name modeltools
 NULL

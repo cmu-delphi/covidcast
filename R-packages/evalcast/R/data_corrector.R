@@ -1,4 +1,4 @@
-#' @importFrom rlang .data
+
 data_corrector <- function(df, apply_corrections) {
   corrected <- apply_corrections(df)
   assertthat::assert_that(all(

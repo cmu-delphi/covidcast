@@ -18,12 +18,6 @@
 #' 
 #' @seealso [get_predictions()]
 #' @importFrom readr read_csv
-#' @importFrom rlang .data
-#' @importFrom purrr flatten
-#' @importFrom dplyr rename filter select mutate group_by group_modify group_map summarize case_when
-#' @importFrom tidyr separate
-#' @importFrom tibble tibble
-#' @importFrom stringr str_detect
 #' @export
 get_covidhub_predictions <- function(covidhub_forecaster_name,
                                      forecast_dates = NULL) {

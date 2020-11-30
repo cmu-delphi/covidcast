@@ -1,4 +1,4 @@
-#' @importFrom assertthat assert_that
+
 get_and_check_pc_attributes <- function(predictions_cards) {
   # using do.call in the next line to keep these of class Date:
   # https://stackoverflow.com/questions/15659783/why-does-unlist-kill-dates-in-r
@@ -22,7 +22,6 @@ get_and_check_pc_attributes <- function(predictions_cards) {
 #' If TRUE, returns the unique value; if FALSE, throws an error.
 #' @param cards List of predictions cards or a list of score cards.
 #' @param attribute Name of attribute.
-#' @importFrom assertthat assert_that
 unique_attr <- function(cards, attribute) {
   attr_list <- all_attr(cards, attribute)
   if (attribute == "signals")
@@ -76,72 +75,7 @@ intersect_locations <- function(cards) {
   cards %>% map(~ .x %>% filter(location %in% intersected_locations))
 }
 
-#' Aggregate cards from a list into a single unnested data frame
-#'
-#' @param list_of_cards List of prediction or score cards.  See documentation for the outputs
-#'   of `evalcast::get_predictions()` and `evalcast::evaluate_predictions()` for the required
-#'   format.
-#' @return Data frame such that:
-#'   \item There is a one-to-one correspondence between rows of the output and the rows of
-#'     `card$forecast_distribution` across each `card` in `list_of_cards`.  That is to say, if each
-#'     card has 7 rows in its `forecast_distribution` and there are 3 such cards in
-#'     `list_of_cards`, the output will have 21 rows.
-#'   \item The columns of the output correspond to:
-#'     \itemize{
-#'       \item Columns of `card$forecast_distribution`
-#'       \item Columns of `card`
-#'       \item Attributes of `card`
-#'     }
-#' @export
-aggregate_cards <- function(list_of_cards) {
-  list_of_cards %>% purrr::map_dfr(unpack_single_card)
-}
 
-#' Unpack a single prediction or score card into an unnested tibble
-#'
-#' This is a generic method for dispatching to specific calls for score and prediction cards.
-#' @param card score or prediction card.
-#' @return See `aggregate_cards`.
-#' @export
-unpack_single_card <- function(card){
-  UseMethod("unpack_single_card", card)
-}
-
-#' Unpack a single prediction card into an unnested tibble
-#' @export
-unpack_single_card.prediction_card <- function(card) {
-  card_attr <- attributes(card)
-  card %>%
-  tidyr::unnest(.data$forecast_distribution) %>%
-  dplyr::mutate(
-    ahead = card_attr$ahead,
-    data_source = card_attr$signals$data_source,
-    forecast_date = card_attr$forecast_date,
-    geo_type = card_attr$geo_type,
-    geo_values = card_attr$geo_values,
-    incidence_period = card_attr$incidence_period,
-    name_of_forecaster = card_attr$name_of_forecaster,
-    signal = card_attr$signals$signal
-  )
-}
-
-#' Unpack a single score card into an unnested tibble
-#' @export
-unpack_single_card.score_card <- function(card) {
-  card_attr <- attributes(card)
-  card %>%
-  tidyr::unnest(.data$forecast_distribution) %>%
-  dplyr::mutate(
-    ahead = card_attr$ahead,
-    as_of = card_attr$as_of,
-    backfill_buffer = card_attr$backfill_buffer,
-    data_source = card_attr$response$data_source,
-    geo_type = card_attr$geo_type,
-    incidence_period = card_attr$incidence_period,
-    name_of_forecaster = card_attr$name_of_forecaster,
-    signal = card_attr$response$signal
-  )
-}
 
 #' Print a single prediction card.
 #' @param card Prediction card.

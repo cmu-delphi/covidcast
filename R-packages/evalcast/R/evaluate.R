@@ -44,9 +44,6 @@
 #' 
 #' @return tibble of "score cards" with additional columns for each err_measure
 #'
-#' @importFrom purrr map
-#' @importFrom magrittr %>%
-#' @importFrom assertthat assert_that
 #' @export
 evaluate_predictions <- function(
   predictions_cards,
@@ -63,7 +60,7 @@ evaluate_predictions <- function(
   for (iter in seq_along(unique_ahead)) {
     message("ahead = ", unique_ahead[iter])
     scorecards[[iter]] <- evaluate_predictions_single_ahead(
-      filter(predictions_cards, ahead == !!iter) ,
+      filter(predictions_cards, .data$ahead == !!iter) ,
       err_measures = err_measures,
       backfill_buffer = backfill_buffer)
   }
@@ -85,13 +82,7 @@ evaluate_predictions <- function(
 #' @param backfill_buffer How many days until response is deemed trustworthy
 #'   enough to be taken as correct? See details for more.
 #'   
-#' @importFrom magrittr %>%
-#' @importFrom rlang .data
-#' @importFrom purrr map2_dfr map
-#' @importFrom dplyr filter select inner_join mutate rowwise ungroup
-#' @importFrom stringr str_glue_data
 #' @importFrom rlang :=
-#' @importFrom assertthat assert_that
 evaluate_predictions_single_ahead <- function(predictions_cards,
                                               err_measures,
                                               backfill_buffer) {
@@ -162,7 +153,7 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
   
   score_card <- left_join(score_card, target_response, 
                           by=c("location", "forecast_date")) %>%
-    select(-start, -end)
+    select(-.data$start, -.data$end)
   score_card <- inner_join(score_card, predictions_cards,
                            by=c("forecaster", "location", "forecast_date"))
   score_card <- score_card %>% relocate(

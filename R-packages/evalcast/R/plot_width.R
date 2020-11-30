@@ -11,11 +11,6 @@
 #' @details Interval width does not depend on the actual outcome, so this
 #'   function can be called on predictions cards in addition to score cards.
 #' 
-#' @importFrom rlang .data set_names
-#' @importFrom purrr map
-#' @importFrom dplyr group_by summarize select bind_rows
-#' @importFrom tidyr pivot_longer unnest
-#' @importFrom ggplot2 ggplot aes geom_line geom_vline facet_wrap labs theme
 #' @importFrom stats median
 #' @export
 plot_width <- function(cards, alpha = 0.2, levels = c(0.5, 0.7, 0.9),
@@ -47,8 +42,7 @@ plot_width <- function(cards, alpha = 0.2, levels = c(0.5, 0.7, 0.9),
     theme_bw() + theme(legend.position = legend_position)
 }
 
-#' @importFrom rlang .data
-#' @importFrom dplyr left_join filter transmute
+
 compute_width_single_distribution <- function(forecast_distribution) {
   lower <- forecast_distribution %>% mutate(probs = round(.data$probs, 4))
   upper <- forecast_distribution %>% mutate(probs = round(1 - .data$probs, 4))

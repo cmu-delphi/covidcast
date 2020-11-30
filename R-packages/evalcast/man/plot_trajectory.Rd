@@ -33,16 +33,3 @@ Produces a ggplot object
 \description{
 Produce trajectory plots of forecasts and observed data
 }
-\examples{
-sister_preds = get_predictions(
-  baseline_forecaster, "sister",
-  tibble::tibble(data_source="usa-facts", signal = "deaths_incidence_num",
-    start_day=lubridate::ymd("2020-07-01")),
-    lubridate::ymd("2020-09-01"),"epiweek", 1:4, "state", c("mi"))
-baby_preds = get_predictions(
-  baseline_forecaster, "baby",
-  tibble::tibble(data_source="usa-facts", signal = "deaths_incidence_num",
-    start_day=lubridate::ymd("2020-07-01")),
-    lubridate::ymd("2020-09-08"),"epiweek", 1:4, "state", c("mi"))
- plot_trajectory(c(sister_preds, baby_preds), last_day="2020-10-01")
-}

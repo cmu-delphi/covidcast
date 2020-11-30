@@ -6,7 +6,6 @@
 #'
 #' @importFrom MMWRweek MMWRweek  MMWRweek2Date
 #' @importFrom lubridate wday
-#' @importFrom assertthat assert_that
 #' @export
 get_target_period <- function(forecast_date, incidence_period, ahead) {
   # This function gives the start and end dates of the target period,
@@ -80,7 +79,7 @@ get_target_response <- function(signals,
     if (length(bad_dates) == length(forecast_dates)) return(empty_actual())
     forecast_dates <- forecast_dates[target_periods$available]
   }
-  target_periods <- target_periods %>% filter(available) %>%
+  target_periods <- target_periods %>% filter(.data$available) %>%
     mutate(available = NULL)
   
   if (nchar(locations[1])==2){

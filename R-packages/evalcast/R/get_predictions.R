@@ -55,7 +55,6 @@
 #'     start_day=lubridate::ymd("2020-08-15")),
 #'   lubridate::ymd("2020-10-01"),"epiweek", 1L, "state", "mi",
 #'   apply_corrections = baby_correct)
-#' @importFrom assertthat assert_that
 #' @export
 get_predictions <- function(forecaster,
                             name_of_forecaster,
@@ -100,7 +99,6 @@ get_predictions <- function(forecaster,
 #' @template apply_corrections-template
 #' @param ... Additional arguments to be passed to `forecaster()`.
 #' 
-#' @importFrom stringr str_glue
 get_predictions_single_date <- function(forecaster,
                                         name_of_forecaster,
                                         signals,
@@ -158,7 +156,7 @@ get_predictions_single_date <- function(forecaster,
                                           incidence_period, ahead)$end,
       incidence_period = incidence_period
       ) 
-      ## dropped attributes: forecaster, other signals, geo_type,
+      ## dropped attributes: other signals, geo_type,
       ##   geo_values, corrections_applied, from_covidhub,
       ##   forecaster_params
 }

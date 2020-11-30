@@ -3,12 +3,6 @@
 #' This is a simple wrapper to [covidcast::covidcast_signal()] that is less verbose.
 #'
 #' @param ... Arguments that are passed to [covidcast::covidcast_signal()].
-#' @importFrom magrittr %>%
-#' @importFrom rlang .data
-#' @importFrom covidcast covidcast_signal
-#' @importFrom utils data
-#' @importFrom stringr str_glue str_sub
-#' @importFrom dplyr select mutate distinct rename
 download_signal <- function(...) {
   args <- list(...)
   if (is.null(args$start_day)) {

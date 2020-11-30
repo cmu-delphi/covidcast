@@ -10,20 +10,8 @@
 #'
 #' @return Produces a ggplot object
 #' @export
-#' @importFrom rlang .data
 #'
 #' @examples
-#' sister_preds = get_predictions(
-#'   baseline_forecaster, "sister",
-#'   tibble::tibble(data_source="usa-facts", signal = "deaths_incidence_num",
-#'     start_day=lubridate::ymd("2020-07-01")),
-#'     lubridate::ymd("2020-09-01"),"epiweek", 1:4, "state", c("mi"))
-#' baby_preds = get_predictions(
-#'   baseline_forecaster, "baby",
-#'   tibble::tibble(data_source="usa-facts", signal = "deaths_incidence_num",
-#'     start_day=lubridate::ymd("2020-07-01")),
-#'     lubridate::ymd("2020-09-08"),"epiweek", 1:4, "state", c("mi"))
-#'  plot_trajectory(c(sister_preds, baby_preds), last_day="2020-10-01")
 plot_trajectory <- function(list_of_predictions_cards,
                             first_day = "2020-07-01",
                             last_day = Sys.Date(),
@@ -182,6 +170,8 @@ sum_to_epiweek <- function(daily_df){
     ungroup()
 }
 
+
+#' @importFrom MMWRweek MMWRweek MMWRweek2Date
 shift_day_to_preceding_xxxday <- function(day, xxx){
   ew_day <- MMWRweek::MMWRweek(day)
   if(ew_day$MMWRday < xxx)

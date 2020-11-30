@@ -11,9 +11,6 @@
 #' @param value vector of forecasted values
 #' @param actual_value Actual value.
 #' 
-#' @importFrom rlang .data
-#' @importFrom tibble tibble
-#' @importFrom assertthat assert_that
 #' @export
 weighted_interval_score <- function(quantile, value, actual_value) {
   # computes the weighted interval score
@@ -73,9 +70,6 @@ weighted_interval_score <- function(quantile, value, actual_value) {
 #' @param value vector of forecasted values
 #' @param actual_value Actual value.
 #' 
-#' @importFrom magrittr %>%
-#' @importFrom dplyr filter transmute pull
-#' @importFrom rlang .data
 #' @export
 absolute_error <- function(quantile, value, actual_value) {
   point_fcast <- which(is.na(quantile))
@@ -100,10 +94,6 @@ absolute_error <- function(quantile, value, actual_value) {
 #'
 #' @param alpha Parameter defining nominal interval coverage.
 #'
-#' @importFrom magrittr %>%
-#' @importFrom rlang .data
-#' @importFrom dplyr filter pull
-#' @importFrom assertthat assert_that
 #' @export
 interval_coverage <- function(alpha) {
   function(quantiles, value, actual_value) {

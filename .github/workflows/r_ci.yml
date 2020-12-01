@@ -16,7 +16,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: macos-latest
     defaults:
       run:
         working-directory: R-packages/covidcast/
@@ -30,11 +30,6 @@ jobs:
         uses: r-lib/actions/setup-r@v1
         with:
           r-version: ${{ matrix.r-version }}
-      - name: Install linux dependencies  
-        run: |
-            sudo apt-get install libcurl4-openssl-dev
-            sudo apt-get install libudunits2-dev
-            sudo apt-get install libgdal-dev
       - name: Cache R packages
         uses: actions/cache@v2
         with:
@@ -53,5 +48,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: output-plots
-          path: /ci-default-state-choropleth-with-include.svg
-  
+          path: tests/testthat/ci-default-state-choropleth-with-include.svg

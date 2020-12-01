@@ -34,3 +34,7 @@ devtools::install_github("cmu-delphi/covidcast", ref = "main",
 
 The package documentation and examples are [available
 online](https://cmu-delphi.github.io/covidcast/covidcastR/index.html).
+
+## Developing
+
+See `DEVELOP.md` for details on how to set up, test, and document this package.

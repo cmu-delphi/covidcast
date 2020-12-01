@@ -1,0 +1,26 @@
+{
+  "result": 1,
+  "message": "success",
+  "epidata": [
+    {
+      "signal": "bar",
+      "geo_value": "pa",
+      "value": 1,
+      "time_value": "20200101",
+      "issue": "20200101",
+      "lag": 0,
+      "sample_size": 1,
+      "stderr": 1
+    },
+    {
+      "signal": "bar",
+      "geo_value": "tx",
+      "value": 1,
+      "time_value": "20200101",
+      "issue": "20200101",
+      "lag": 0,
+      "sample_size": 1,
+      "stderr": 1
+    }
+  ]
+}

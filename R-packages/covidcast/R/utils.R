@@ -15,9 +15,9 @@ latest_issue <- function(df) {
   attrs <- attrs[!(names(attrs) %in% c("row.names", "names"))]
 
   df <- df %>%
-    dplyr::group_by(.data$geo_value, .data$time_value) %>%
-    dplyr::filter(.data$issue == max(.data$issue)) %>%
-    dplyr::ungroup()
+    dplyr::arrange(dplyr::desc(.data$issue)) %>%
+    dplyr::distinct(.data$geo_value, .data$time_value,
+                    .keep_all = TRUE)
 
   attributes(df) <- c(attributes(df), attrs)
 
@@ -41,9 +41,9 @@ earliest_issue <- function(df) {
   attrs <- attrs[!(names(attrs) %in% c("row.names", "names"))]
 
   df <- df %>%
-    dplyr::group_by(.data$geo_value, .data$time_value) %>%
-    dplyr::filter(.data$issue == min(.data$issue)) %>%
-    dplyr::ungroup()
+    dplyr::arrange(.data$issue) %>%
+    dplyr::distinct(.data$geo_value, .data$time_value,
+                    .keep_all = TRUE)
 
   attributes(df) <- c(attributes(df), attrs)
 

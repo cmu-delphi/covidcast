@@ -1,5 +1,6 @@
 ---
 title: Get started with covidcast
+description: An introductory tutorial with examples.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Get started with covidcast}
@@ -38,30 +39,29 @@ devtools::install_github("cmu-delphi/covidcast", ref = "main",
 
 ## Basic examples
 
-For full usage information, see the [function
-documentation](../reference/index.html).
-
 To obtain smoothed estimates of COVID-like illness from our Facebook survey for
 every county in the United States between 2020-05-01 and 2020-05-07, we can use
 `covidcast_signal()`:
 
 ```{r, message=FALSE}
 library(covidcast)
+library(dplyr)
 
 cli <- suppressMessages(
-  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli", 
-                   start_day = "2020-05-01", end_day = "2020-05-07", 
+  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
+                   start_day = "2020-05-01", end_day = "2020-05-07",
                    geo_type = "county")
 )
-head(cli)
+knitr::kable(head(cli))
 ```
 
-Each row represents one observation in one county on one day. The county FIPS
-code is given in the `geo_value` column, the date in the `time_value` column.
-Here `value` is the requested signal---in this case, the smoothed estimate of
-the percentage of people with COVID-like illness, based on the symptom surveys,
-and `stderr` is its standard error. See the `covidcast_signal()` documentation 
-for details on the returned data frame.
+`covidcast_signal()` returns a data frame. (Here we're using `knitr::kable()` to
+make it more readable.) Each row represents one observation in one county on one
+day. The county FIPS code is given in the `geo_value` column, the date in the
+`time_value` column. Here `value` is the requested signal---in this case, the
+smoothed estimate of the percentage of people with COVID-like illness, based on
+the symptom surveys, and `stderr` is its standard error. See the
+`covidcast_signal()` documentation for details on the returned data frame.
 
 Notice the use of `suppressMessages()` to hide progress reporting from the
 function as it downloads the data; if you download particularly large amounts of
@@ -74,7 +74,10 @@ To get a basic summary of the returned data frame:
 summary(cli)
 ```
 
-To request estimates for states instead of counties:
+The COVIDcast API makes estimates available at several different geographic
+levels, and `covidcast_signal()` defaults to requesting county-level data. To
+request estimates for states instead of counties, we use the `geo_type`
+argument:
 
 ```{r}
 cli <- suppressMessages(
@@ -82,7 +85,7 @@ cli <- suppressMessages(
                    start_day = "2020-05-01", end_day = "2020-05-07", 
                    geo_type = "state")
 )
-head(cli)
+knitr::kable(head(cli))
 ```
 
 One can also select a specific geographic region by its ID. For example, this is
@@ -94,65 +97,77 @@ cli <- suppressMessages(
                    start_day = "2020-05-01", end_day = "2020-05-07", 
                    geo_type = "county", geo_value = "42003")
 )
-head(cli)
+knitr::kable(head(cli))
 ```
 
+### Plotting and mapping
+
 This package provides convenient functions for plotting and mapping these
-signals. For more details and examples, see `vignette("plotting-signals")`.
+signals. For example, simple line charts are easy to construct:
+
+```{r}
+plot(cli, plot_type = "line",
+     title = "Survey results in Allegheny County, PA")
+```
+
+For more details and examples, including choropleth and bubble maps, see
+`vignette("plotting-signals")`.
+
+
+### Finding signals of interest
+
+Above we used data from [Delphi's symptom
+surveys](https://covidcast.cmu.edu/surveys.html), but the COVIDcast API includes
+numerous data streams: medical claims data, cases and deaths, mobility, and many
+others; new signals are added regularly. This can make it a challenge to find
+the data stream that you are most interested in.
+
+The [COVIDcast Data Sources and Signals
+documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)
+lists all data sources and signals available through COVIDcast. When you find a
+signal of interest, get the data source name (such as `jhu-csse` or `fb-survey`)
+and the signal name (such as `confirmed_incidence_num` or `smoothed_wcli`).
+These are provided as arguments to `covidcast_signal()` to request the data you
+want.
+
 
 ### Finding counties and metro areas
 
 The COVIDcast API identifies counties by their 5-digit FIPS code and
-metropolitan areas by their CBSA ID number. This means that to query a specific
-county or metropolitan area, we must have some way to quickly find its
-identifier.
+metropolitan areas by their CBSA ID number. (See the [geographic coding
+documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html)
+for details.) This means that to query a specific county or metropolitan area,
+we must have some way to quickly find its identifier.
 
 This package includes several utilities intended to make the process easier. For
 example, if we look at `?county_census`, we find that the package provides
-census data on every county in the United States, including its FIPS code. To
-find Allegheny County, we could search the data frame however is most convenient
-to us:
+census data (such as population) on every county in the United States, including
+its FIPS code. Similarly, by looking at `?msa_census` we can find data about
+metropolitan statistical areas, their corresponding CBSA IDs, and recent census
+data.
 
-```{r, message = FALSE}
-library(dplyr)
+(Note: the `msa_census` data includes types of area beyond metropolitan
+statistical areas, including micropolitan statistical areas. The `LSAD` column
+identifies the type of each area. The COVIDcast API only provides estimates for
+metropolitan statistical areas, not for their divisions or for micropolitan
+areas.)
 
-county_census %>%
-  filter(CTYNAME == "Allegheny County") %>%
-  select(FIPS, CTYNAME, STNAME, POPESTIMATE2019)
-```
-
-Hence we see that 42003 is the code to provide to `geo_value` to select this
-county. We also see we can obtain a 2019 population estimate, which could be
-useful in your analyses to normalize or scale values by population.
-
-Similarly, to find the Pittsburgh metropolitan area, we can use the
-`?msa_census` data provided in the package:
-
-```{r}
-msa_census %>%
-  filter(startsWith(NAME, "Pittsburgh")) %>%
-  select(CBSA, NAME, LSAD, POPESTIMATE2019)
-```
-
-We can see that the Pittsburgh metropolitan area has CBSA ID 38300, and we can
-also get its 2019 census-estimated population. We could pass this ID to
-`covidcast_signal()` when using `geo_type = 'msa'`. (Note: the `msa_census` data
-includes types of area beyond metropolitan statistical areas, including 
-micropolitan statistical areas. The `LSAD` column identifies the type of each 
-area. The COVIDcast API only provides estimates for metropolitan statistical 
-areas, not for their divisions or for micropolitan areas.)
-
-Beyond this, the package provides convenience functions `name_to_fips()` and 
-`name_to_cbsa()` for `grep()`-based searching of county or metropolitan area 
-names in order to find FIPS or CBSA codes, respectively:
+Building on these datasets, the convenience functions `name_to_fips()` and
+`name_to_cbsa()` conduct `grep()`-based searching of county or metropolitan area
+names to find FIPS or CBSA codes, respectively:
 
 ```{r}
 name_to_fips("Allegheny")
 name_to_cbsa("Pittsburgh")
 ```
 
-The package also provides inverse mappings `fips_to_name()` and `cbsa_to_name()`
-that work in the analogous way: 
+Since these functions return vectors of IDs, we can use them to construct the
+`geo_values` argument to `covidcast_signal()` to select specific regions to
+query.
+
+You may also want to convert FIPS codes or CBSA IDs back to well-known names,
+for instance to report in tables or graphics. The package provides inverse
+mappings `fips_to_name()` and `cbsa_to_name()` that work in the analogous way:
 
 ```{r}
 fips_to_name("42003")
@@ -169,7 +184,7 @@ can use `covidcast_meta()` to fetch a data frame of the available signals:
 
 ```{r}
 meta <- covidcast_meta()
-head(meta)
+knitr::kable(head(meta))
 ```
 
 The `covidcast_meta()` documentation describes the columns and their meanings. 
@@ -237,7 +252,8 @@ period:
 covidcast_signal(data_source = "doctor-visits", signal = "smoothed_cli",
                  start_day = "2020-05-01", end_day = "2020-05-01",
                  geo_type = "state", geo_values = "pa",
-                 issues = c("2020-05-01", "2020-05-15"))
+                 issues = c("2020-05-01", "2020-05-15")) %>%
+  knitr::kable()
 ```
 
 This estimate was clearly updated many times as new data for May 1st arrived.
@@ -253,7 +269,8 @@ issues 7 days after the corresponding `time_value`:
 ```{r, message = FALSE}
 covidcast_signal(data_source = "doctor-visits", signal = "smoothed_cli",
                  start_day = "2020-05-01", end_day = "2020-05-07",
-                 geo_type = "state", geo_values = "pa", lag = 7)
+                 geo_type = "state", geo_values = "pa", lag = 7) %>%
+  knitr::kable()
 ```
 
 Note that though this query requested all values between 2020-05-01 and
@@ -265,5 +282,6 @@ on May 10th (a 7-day lag), but in fact the value was not updated on that day:
 covidcast_signal(data_source = "doctor-visits", signal = "smoothed_cli",
                  start_day = "2020-05-03", end_day = "2020-05-03",
                  geo_type = "state", geo_values = "pa",
-                 issues = c("2020-05-09", "2020-05-15"))
+                 issues = c("2020-05-09", "2020-05-15")) %>%
+  knitr::kable()
 ```

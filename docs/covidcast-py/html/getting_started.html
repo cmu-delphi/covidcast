@@ -4,10 +4,10 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Getting Started &#8212; COVIDcast API client 0.1.0 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Getting Started &#8212; COVIDcast API client 0.1.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -35,16 +35,114 @@
             
   <div class="section" id="getting-started">
 <span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>This package provides access to data from the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a>, which
-provides numerous COVID-related data streams, updated daily. To begin, you’ll
-want to browse the available data streams and determine which signals are useful
-to you. The <a class="reference external" href="https://covidcast.cmu.edu/">COVIDcast interactive map</a> displays a
-selection of the signals, and by selecting the Export Data feature, you can get
-example Python code to access each of the signals.</p>
-<p>To browse in more detail, the <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">data sources and signal documentation</a> lists
-the available signals, including many not shown on the interactive map. Simply
-obtain the data source and signal names from the list. Below we will demonstrate
-how to use these names to access each data stream.</p>
+provides numerous COVID-related data streams, updated daily. The data is retrieved
+live from the server when you make a request, and is not stored within the package
+itself. This means that each time you make a request, you will be receiving the latest
+data available. If you are conducting an analysis or powering a service which will require
+repeated access to the same signal, please download the data rather than making repeated
+requests.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>This package is available on PyPI as <a class="reference external" href="https://pypi.org/project/covidcast/">covidcast</a>, and can be installed using <code class="docutils literal notranslate"><span class="pre">pip</span></code> or
+your favorite Python package manager:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip install covidcast
+</pre></div>
+</div>
+<p>This will install the package as well as all required dependencies.</p>
+</div>
+<div class="section" id="signal-overview">
+<h2>Signal Overview<a class="headerlink" href="#signal-overview" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">API documentation</a> lists
+the available signals, including many not shown on the
+<a class="reference external" href="https://covidcast.cmu.edu/">COVIDcast interactive map</a>.</p>
+<p>The data come from a variety of sources and cover information including official case counts,
+internet search trends, hospital encounters, survey responses, and more. Below is
+a brief overview of each source, with links to their full descriptions.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/chng.html">Change Healthcare</a></dt><dd><ul>
+<li><p>Outpatient visits with COVID diagnostic codes, based on de-identified
+medical claims data.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html">Doctor Visits</a></dt><dd><ul>
+<li><p>Outpatient visits with COVID-related symptoms.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/ght.html">Google Health Trends</a></dt><dd><ul>
+<li><p>COVID-related Google search volume.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/hospital-admissions.html">Hospital Admissions</a></dt><dd><ul>
+<li><p>Hospital admissions with COVID-associated diagnoses.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/indicator-combination.html">Indicator Combination</a></dt><dd><ul>
+<li><p>Aggregated signal of other sources to provide a single COVID activity indicator.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/jhu-csse.html">JHU Cases and Deaths</a></dt><dd><ul>
+<li><p>Confirmed COVID cases and deaths based on reports made available by Johns Hopkins University.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/quidel.html">Quidel</a></dt><dd><ul>
+<li><p>Positive COVID antigen tests.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/safegraph.html">SafeGraph Mobility</a></dt><dd><ul>
+<li><p>Mobility (movement) data based on phone location data</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html">Symptom Surveys</a></dt><dd><ul>
+<li><p>Various responses to the CMU symptom survey.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html">USAFacts Cases and Deaths</a></dt><dd><ul>
+<li><p>Confirmed COVID cases and deaths based on reports made available by USAFacts.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>To specify a signal, you will need the “Source Name” and “Signal” value, which are
+listed for each source/signal combination on their respective page.
+For example, to obtain the raw Google search volume for COVID-related topics,
+the source would be <code class="docutils literal notranslate"><span class="pre">ght</span></code> and the signal would be <code class="docutils literal notranslate"><span class="pre">raw_search</span></code>, as shown on the
+<a class="reference external" href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/ght.html">Google Health Trends page</a>.
+These values will be provided as the arguments for the <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a> function to
+retrieve the desired data.</p>
+</div>
 <div class="section" id="basic-examples">
 <h2>Basic examples<a class="headerlink" href="#basic-examples" title="Permalink to this headline">¶</a></h2>
 <p>To obtain smoothed estimates of COVID-like illness from our symptom survey,
@@ -56,12 +154,12 @@ distributed through Facebook, for every county in the United States between
 <span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
 <span class="gp">... </span>                        <span class="s2">&quot;county&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-<span class="go">   direction geo_value      issue  lag  sample_size    stderr time_value     value</span>
-<span class="go">0        0.0     01000 2020-05-23   22    1722.4551  0.125573 2020-05-01  0.823080</span>
-<span class="go">1        1.0     01001 2020-05-23   22     115.8025  0.800444 2020-05-01  1.261261</span>
-<span class="go">2        0.0     01003 2020-05-23   22     584.3194  0.308680 2020-05-01  0.665129</span>
-<span class="go">3        0.0     01015 2020-05-23   22     122.5577  0.526590 2020-05-01  0.574713</span>
-<span class="go">4        NaN     01031 2020-05-23   22     114.8318  0.347450 2020-05-01  0.408163</span>
+<span class="go">   geo_value      issue  lag  sample_size    stderr time_value     value</span>
+<span class="go">0      01000 2020-05-23   22    1722.4551  0.125573 2020-05-01  0.823080</span>
+<span class="go">1      01001 2020-05-23   22     115.8025  0.800444 2020-05-01  1.261261</span>
+<span class="go">2      01003 2020-05-23   22     584.3194  0.308680 2020-05-01  0.665129</span>
+<span class="go">3      01015 2020-05-23   22     122.5577  0.526590 2020-05-01  0.574713</span>
+<span class="go">4      01031 2020-05-23   22     114.8318  0.347450 2020-05-01  0.408163</span>
 </pre></div>
 </div>
 <p>Each row represents one observation in one county on one day. The county FIPS
@@ -84,12 +182,12 @@ example, we obtain <code class="docutils literal notranslate"><span class="pre">
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;fb-survey&quot;</span><span class="p">,</span> <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                        <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;state&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-<span class="go">   direction geo_value      issue  lag  sample_size    stderr time_value     value</span>
-<span class="go">0       -1.0        ak 2020-05-23   22    1606.0000  0.158880 2020-05-01  0.460772</span>
-<span class="go">1        0.0        al 2020-05-23   22    7540.2437  0.082553 2020-05-01  0.699511</span>
-<span class="go">2       -1.0        ar 2020-05-23   22    4921.4827  0.103651 2020-05-01  0.759798</span>
-<span class="go">3        0.0        az 2020-05-23   22   11220.9587  0.061794 2020-05-01  0.566937</span>
-<span class="go">4        0.0        ca 2020-05-23   22   51870.1382  0.022803 2020-05-01  0.364908</span>
+<span class="go">   geo_value      issue  lag  sample_size    stderr time_value     value</span>
+<span class="go">0         ak 2020-05-23   22    1606.0000  0.158880 2020-05-01  0.460772</span>
+<span class="go">1         al 2020-05-23   22    7540.2437  0.082553 2020-05-01  0.699511</span>
+<span class="go">2         ar 2020-05-23   22    4921.4827  0.103651 2020-05-01  0.759798</span>
+<span class="go">3         az 2020-05-23   22   11220.9587  0.061794 2020-05-01  0.566937</span>
+<span class="go">4         ca 2020-05-23   22   51870.1382  0.022803 2020-05-01  0.364908</span>
 </pre></div>
 </div>
 <p>Using the <code class="docutils literal notranslate"><span class="pre">geo_values</span></code> argument, we can request data for a specific geography,
@@ -98,12 +196,12 @@ such as the state of Pennsylvania for the month of May 2020:</p>
 <span class="gp">... </span>                           <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
 <span class="gp">... </span>                           <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">geo_values</span><span class="o">=</span><span class="s2">&quot;pa&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pa_data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-<span class="go">   direction geo_value      issue  lag  sample_size    stderr time_value     value</span>
-<span class="go">0         -1        pa 2020-05-23   22   31576.0165  0.030764 2020-05-01  0.400011</span>
-<span class="go">0         -1        pa 2020-05-23   21   31344.0168  0.030708 2020-05-02  0.394774</span>
-<span class="go">0          0        pa 2020-05-23   20   30620.0162  0.031173 2020-05-03  0.396340</span>
-<span class="go">0         -1        pa 2020-05-23   19   30419.0163  0.029836 2020-05-04  0.357501</span>
-<span class="go">0          0        pa 2020-05-23   18   29245.0172  0.030176 2020-05-05  0.354521</span>
+<span class="go">   geo_value      issue  lag  sample_size    stderr time_value     value</span>
+<span class="go">0         pa 2020-05-23   22   31576.0165  0.030764 2020-05-01  0.400011</span>
+<span class="go">0         pa 2020-05-23   21   31344.0168  0.030708 2020-05-02  0.394774</span>
+<span class="go">0         pa 2020-05-23   20   30620.0162  0.031173 2020-05-03  0.396340</span>
+<span class="go">0         pa 2020-05-23   19   30419.0163  0.029836 2020-05-04  0.357501</span>
+<span class="go">0         pa 2020-05-23   18   29245.0172  0.030176 2020-05-05  0.354521</span>
 </pre></div>
 </div>
 <p>We can request multiple states by providing a list, such as <code class="docutils literal notranslate"><span class="pre">[&quot;pa&quot;,</span> <span class="pre">&quot;ny&quot;,</span>
@@ -165,8 +263,8 @@ the <code class="docutils literal notranslate"><span class="pre">as_of</span></c
 <span class="gp">... </span>                 <span class="n">start_day</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">end_day</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
 <span class="gp">... </span>                 <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">geo_values</span><span class="o">=</span><span class="s2">&quot;pa&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                 <span class="n">as_of</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
-<span class="go">   direction geo_value      issue  lag sample_size stderr time_value    value</span>
-<span class="go">0         -1        pa 2020-05-07    6        None   None 2020-05-01  2.32192</span>
+<span class="go">   geo_value      issue  lag sample_size stderr time_value    value</span>
+<span class="go">0         pa 2020-05-07    6        None   None 2020-05-01  2.32192</span>
 </pre></div>
 </div>
 <p>This shows that an estimate of about 2.3% was issued on May 7. If we don’t
@@ -174,8 +272,8 @@ specify <code class="docutils literal notranslate"><span class="pre">as_of</span
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;doctor-visits&quot;</span><span class="p">,</span> <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                 <span class="n">start_day</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">end_day</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
 <span class="gp">... </span>                 <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">geo_values</span><span class="o">=</span><span class="s2">&quot;pa&quot;</span><span class="p">)</span>
-<span class="go">   direction geo_value      issue  lag sample_size stderr time_value     value</span>
-<span class="go">0         -1        pa 2020-07-04   64        None   None 2020-05-01  5.075015</span>
+<span class="go">   geo_value      issue  lag sample_size stderr time_value     value</span>
+<span class="go">0         pa 2020-07-04   64        None   None 2020-05-01  5.075015</span>
 </pre></div>
 </div>
 <p>Note the substantial change in the estimate, to over 5%, reflecting new data
@@ -190,16 +288,16 @@ period:</p>
 <span class="gp">... </span>                 <span class="n">start_day</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">end_day</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
 <span class="gp">... </span>                 <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">geo_values</span><span class="o">=</span><span class="s2">&quot;pa&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                 <span class="n">issues</span><span class="o">=</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">)))</span>
-<span class="go">   direction geo_value      issue  lag sample_size stderr time_value     value</span>
-<span class="go">0         -1        pa 2020-05-05    4        None   None 2020-05-01  1.693061</span>
-<span class="go">1         -1        pa 2020-05-06    5        None   None 2020-05-01  2.524167</span>
-<span class="go">2         -1        pa 2020-05-07    6        None   None 2020-05-01  2.321920</span>
-<span class="go">3          0        pa 2020-05-08    7        None   None 2020-05-01  2.897032</span>
-<span class="go">4          0        pa 2020-05-09    8        None   None 2020-05-01  2.956456</span>
-<span class="go">5          0        pa 2020-05-12   11        None   None 2020-05-01  3.190634</span>
-<span class="go">6          0        pa 2020-05-13   12        None   None 2020-05-01  3.220023</span>
-<span class="go">7          0        pa 2020-05-14   13        None   None 2020-05-01  3.231314</span>
-<span class="go">8          0        pa 2020-05-15   14        None   None 2020-05-01  3.239970</span>
+<span class="go">   geo_value      issue  lag sample_size stderr time_value     value</span>
+<span class="go">0         pa 2020-05-05    4        None   None 2020-05-01  1.693061</span>
+<span class="go">1         pa 2020-05-06    5        None   None 2020-05-01  2.524167</span>
+<span class="go">2         pa 2020-05-07    6        None   None 2020-05-01  2.321920</span>
+<span class="go">3         pa 2020-05-08    7        None   None 2020-05-01  2.897032</span>
+<span class="go">4         pa 2020-05-09    8        None   None 2020-05-01  2.956456</span>
+<span class="go">5         pa 2020-05-12   11        None   None 2020-05-01  3.190634</span>
+<span class="go">6         pa 2020-05-13   12        None   None 2020-05-01  3.220023</span>
+<span class="go">7         pa 2020-05-14   13        None   None 2020-05-01  3.231314</span>
+<span class="go">8         pa 2020-05-15   14        None   None 2020-05-01  3.239970</span>
 </pre></div>
 </div>
 <p>This estimate was clearly updated many times as new data for May 1st arrived.
@@ -213,12 +311,12 @@ issues 7 days after the corresponding <code class="docutils literal notranslate"
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">covidcast</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="s2">&quot;doctor-visits&quot;</span><span class="p">,</span> <span class="s2">&quot;smoothed_cli&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                 <span class="n">start_day</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">end_day</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
 <span class="gp">... </span>                 <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">geo_values</span><span class="o">=</span><span class="s2">&quot;pa&quot;</span><span class="p">,</span> <span class="n">lag</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
-<span class="go">   direction geo_value      issue  lag sample_size stderr time_value     value</span>
-<span class="go">0          0        pa 2020-05-08    7        None   None 2020-05-01  2.897032</span>
-<span class="go">0         -1        pa 2020-05-09    7        None   None 2020-05-02  2.802238</span>
-<span class="go">0          0        pa 2020-05-12    7        None   None 2020-05-05  3.483125</span>
-<span class="go">0          0        pa 2020-05-13    7        None   None 2020-05-06  2.968670</span>
-<span class="go">0          0        pa 2020-05-14    7        None   None 2020-05-07  2.400255</span>
+<span class="go">   geo_value      issue  lag sample_size stderr time_value     value</span>
+<span class="go">0         pa 2020-05-08    7        None   None 2020-05-01  2.897032</span>
+<span class="go">0         pa 2020-05-09    7        None   None 2020-05-02  2.802238</span>
+<span class="go">0         pa 2020-05-12    7        None   None 2020-05-05  3.483125</span>
+<span class="go">0         pa 2020-05-13    7        None   None 2020-05-06  2.968670</span>
+<span class="go">0         pa 2020-05-14    7        None   None 2020-05-07  2.400255</span>
 </pre></div>
 </div>
 <p>Note that though this query requested all values between 2020-05-01 and
@@ -229,12 +327,12 @@ on May 10th (a 7-day lag), but in fact the value was not updated on that day:</p
 <span class="gp">... </span>                 <span class="n">start_day</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">end_day</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
 <span class="gp">... </span>                 <span class="n">geo_type</span><span class="o">=</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">geo_values</span><span class="o">=</span><span class="s2">&quot;pa&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                 <span class="n">issues</span><span class="o">=</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">)))</span>
-<span class="go">   direction geo_value      issue  lag sample_size stderr time_value     value</span>
-<span class="go">0         -1        pa 2020-05-09    6        None   None 2020-05-03  2.749537</span>
-<span class="go">1         -1        pa 2020-05-12    9        None   None 2020-05-03  2.989626</span>
-<span class="go">2         -1        pa 2020-05-13   10        None   None 2020-05-03  3.006860</span>
-<span class="go">3         -1        pa 2020-05-14   11        None   None 2020-05-03  2.970561</span>
-<span class="go">4         -1        pa 2020-05-15   12        None   None 2020-05-03  3.038054</span>
+<span class="go">   geo_value      issue  lag sample_size stderr time_value     value</span>
+<span class="go">0         pa 2020-05-09    6        None   None 2020-05-03  2.749537</span>
+<span class="go">1         pa 2020-05-12    9        None   None 2020-05-03  2.989626</span>
+<span class="go">2         pa 2020-05-13   10        None   None 2020-05-03  3.006860</span>
+<span class="go">3         pa 2020-05-14   11        None   None 2020-05-03  2.970561</span>
+<span class="go">4         pa 2020-05-15   12        None   None 2020-05-03  3.038054</span>
 </pre></div>
 </div>
 </div>
@@ -256,10 +354,10 @@ functions:</p>
 <span class="gp">... </span>                      <span class="n">start_day</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">end_day</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
 <span class="gp">... </span>                      <span class="n">geo_values</span><span class="o">=</span><span class="n">counties</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span>
-<span class="go">  geo_value        signal time_value  direction      issue  lag     value stderr sample_size geo_type    data_source</span>
-<span class="go">0     42003  smoothed_cli 2020-05-01         -1 2020-07-04   64  1.336086   None        None   county  doctor-visits</span>
-<span class="go">0     06037  smoothed_cli 2020-05-01          0 2020-07-04   64  5.787655   None        None   county  doctor-visits</span>
-<span class="go">0     12086  smoothed_cli 2020-05-01         -1 2020-07-04   64  6.405477   None        None   county  doctor-visits</span>
+<span class="go">  geo_value        signal time_value      issue  lag     value stderr sample_size geo_type    data_source</span>
+<span class="go">0     42003  smoothed_cli 2020-05-01 2020-07-04   64  1.336086   None        None   county  doctor-visits</span>
+<span class="go">0     06037  smoothed_cli 2020-05-01 2020-07-04   64  5.787655   None        None   county  doctor-visits</span>
+<span class="go">0     12086  smoothed_cli 2020-05-01 2020-07-04   64  6.405477   None        None   county  doctor-visits</span>
 </pre></div>
 </div>
 <p>We can also quickly convert back from the IDs returned by the API to
@@ -302,6 +400,9 @@ optional arguments.</p>
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#signal-overview">Signal Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#basic-examples">Basic examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#tracking-issues-and-updates">Tracking issues and updates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dealing-with-geographies">Dealing with geographies</a></li>
@@ -359,7 +460,7 @@ optional arguments.</p>
       &copy;2020, Delphi research group.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

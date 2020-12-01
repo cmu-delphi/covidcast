@@ -62,7 +62,7 @@ test_that("simple state choropleths", {
 
   expect_doppelganger("default state choropleth with include",
                       plot(fb_state, plot_type = "choro",
-                           include = c("wy")))
+                           include = c("pa", "OH", "in", "KY")))
 })
 
 test_that("state bubble plot with both missing and 0 values", {

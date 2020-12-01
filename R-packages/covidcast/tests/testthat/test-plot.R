@@ -60,9 +60,6 @@ test_that("state line graphs", {
 test_that("simple state choropleths", {
   fb_state <- readRDS(test_path("data/survey-data-state.rds"))
 
-  expect_doppelganger("default state choropleth",
-                      plot(fb_state, plot_type = "choro"))
-
   expect_doppelganger("default state choropleth with include",
                       plot(fb_state, plot_type = "choro",
                            include = c("wy")))

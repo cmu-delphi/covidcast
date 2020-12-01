@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="covidcast",
-    version="0.1.0",  # also update in docs/conf.py
+    version="0.1.1",  # also update in docs/conf.py
     author="Alex Reinhart",
     author_email="areinhar@stat.cmu.edu",
     description="Access COVID-19 data through the Delphi COVIDcast API",
@@ -31,5 +31,5 @@ setuptools.setup(
         "imageio",
         "tqdm"
     ],
-    package_data={"covidcast": ["shapefiles/*", "geo_mappings/*"]}
+    package_data={"covidcast": ["shapefiles/*/*", "geo_mappings/*"]}
 )

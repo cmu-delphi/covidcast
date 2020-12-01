@@ -49,8 +49,3 @@ jobs:
         run: |
           rcmdcheck::rcmdcheck(args = c("--no-manual", "--ignore-vignettes", "--as-cran"), build_args = c("--no-build-vignettes"), error_on = "error")
         shell: Rscript {0}
-      - name: Save results
-        uses: actions/upload-artifact@v2
-        with:
-          name: output-plots
-          path: tests/testthat/ci-default-state-choropleth-with-include.svg

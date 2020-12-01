@@ -6,20 +6,20 @@
 # See https://github.com/r-lib/actions/tree/master/examples#readme for
 # additional example workflows available for the R community.
 
-name: R
+name: R_evalcast
 
 on:
   push:
-    branches: [ main, r-pkg-devel ]
+    branches: [ main, evalcast ]
   pull_request:
-    branches: [ main, r-pkg-devel ]
+    branches: [ main, evalcast ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: R-packages/covidcast/
+        working-directory: R-packages/evalcast/
     strategy:
       matrix:
         r-version: [3.5]
@@ -30,13 +30,16 @@ jobs:
         uses: r-lib/actions/setup-r@v1
         with:
           r-version: ${{ matrix.r-version }}
-      - name: Install libcurl
-        run: sudo apt-get install libcurl4-openssl-dev
+      - name: Install linux dependencies  
+        run: |
+            sudo apt-get install libcurl4-openssl-dev
+            sudo apt-get install libudunits2-dev
+            sudo apt-get install libgdal-dev
       - name: Cache R packages
         uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-r-2-
+          key: ${{ runner.os }}-r-eval-0-
       - name: Install dependencies
         run: |
           install.packages(c("remotes", "rcmdcheck"))

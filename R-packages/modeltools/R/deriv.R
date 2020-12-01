@@ -149,7 +149,7 @@ smooth_spline_deriv = function(x, ...) {
   params$y = x$value
   
   return(tryCatch(suppressWarnings(suppressMessages({
-    object = do.call(smooth.spline, params)
+    capture.output(object <- do.call(smooth.spline, params))
     result = predict(object, x = End(params$x), deriv = deriv)$y
     if (!keep_obj) object = NULL # For memory sake
     list(object = object, result = result)

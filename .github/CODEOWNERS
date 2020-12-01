@@ -1,0 +1,19 @@
+# default owners for anything not listed below, such as README and CI workflows
+* @krivard @capnrefsmmat
+
+# covidcast R package and data generation
+/R-packages/covidcast/ @capnrefsmmat @sgsmob
+/R-packages/data-raw/ @capnrefsmmat  @sgsmob
+
+# evalcast R package
+/R-packages/evalcast/  @jacobbien @dajmcdon
+
+# covidcast Python package
+/Python-packages/covidcast-py/ @chinandrew @capnrefsmmat
+
+# notebooks
+/R-notebooks/  @benjaminysmith @capolitsch @krivard 
+
+# documentation changes go live instantly on GitHub.io, and hence require their
+# own review
+/docs/  @capnrefsmmat

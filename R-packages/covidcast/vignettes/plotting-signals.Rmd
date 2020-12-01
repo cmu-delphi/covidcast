@@ -1,5 +1,6 @@
 ---
-title: Plotting and mapping signals
+title: 1. Plotting and mapping signals
+description: Make custom time series plots, choropleth maps, and bubble plots of signals.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{1. Plotting and mapping signals}

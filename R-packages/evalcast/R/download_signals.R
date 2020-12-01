@@ -1,8 +1,8 @@
 #' Download signal from covidcast
 #'
-#' This is a simple wrapper to \code{\link[covidcast]{covidcast_signal}} that is less verbose.
+#' This is a simple wrapper to [covidcast::covidcast_signal()] that is less verbose.
 #'
-#' @param ... the arguments that are passed to [covidcast::covidcast_signal()]
+#' @param ... Arguments that are passed to [covidcast::covidcast_signal()].
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @importFrom covidcast covidcast_signal
@@ -34,12 +34,7 @@ download_signal <- function(...) {
   
   out <- base::suppressMessages({covidcast_signal(...)})
   if (args$geo_type == "state") {
-    fips_list =  covidcast::name_to_fips(paste0("^",
-        covidcast::abbr_to_name(toupper(out$geo_value)), "$"),
-        ties_method = "all")
-    out$geo_value = sapply(fips_list, FUN = function(x) {
-      return(substr(x[substr(x, 3, 5) == "000"], 1, 2))
-    })
+    out$geo_value = substr(covidcast::abbr_to_fips(out$geo_value), 1, 2)
   }
   out %>% rename(location = .data$geo_value)
 }

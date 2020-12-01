@@ -2,37 +2,44 @@
 % Please edit documentation in R/target.R
 \name{get_target_response}
 \alias{get_target_response}
-\title{Returns data frame with column names
-"forecast_date", "location", "target_start", "target_end", "actual"}
+\title{Get data frame with column names \code{forecast_date}, \code{location}, \code{target_start},
+\code{target_end}, \code{actual}}
 \usage{
 get_target_response(signals, forecast_dates, incidence_period, ahead, geo_type)
 }
 \arguments{
-\item{signals}{a tibble with columns "data_source" and "signal" that
-specifies which variables from the covidcast API will be used by
-my_forecaster. The first row of signals is taken to be the response.   If
-using incidence_period "epiweek", thre response should be something for
-which summing daily values over an epiweek makes sense (e.g., counts or
-proportions but not log(counts) or log(proportions)).  Available data
-sources and signals are documented in the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{COVIDcast signal documentation}
-documentation.  Can optionally include a column "first_day" giving the
-earliest day of data needed from that data source.}
+\item{signals}{Tibble with columns \code{data_source} and \code{signal} that specifies
+which variables from the COVIDcast API will be used by \code{forecaster}. Each
+row of \code{signals} represents a separate signal, and first row is taken to be
+the response. If using \code{incidence_period = "epiweek"}, the response should
+be something for which summing daily values over an epiweek makes sense
+(e.g., counts or proportions but not log(counts) or log(proportions)).
+Available data sources and signals are documented in the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{COVIDcast signal documentation}.
+An optional column \code{start_day} can also be included. This can be a Date
+object or string in the form "YYYY-MM-DD", indicating the earliest date of
+data needed from that data source. Importantly, \code{start_day} can also be a
+function (represented as a list column) that takes a forecast date and
+returns a start date for model training (again, Date object or string in
+the form "YYYY-MM-DD"). The latter is useful when the start date should be
+computed dynamically from the forecast date (e.g., when \code{forecaster} only
+trains on the most recent 4 weeks of data).}
 
-\item{forecast_dates}{the vector of forecast dates}
+\item{forecast_dates}{Vector of Date objects (or strings of the form
+"YYYY-MM-DD") indicating dates on which forecasts will be made.}
 
-\item{incidence_period}{either "epiweek" or "day"}
+\item{incidence_period}{String indicating the incidence period, either
+"epiweek" or "day".}
 
-\item{ahead}{vector of (one or more) integers.  How many epiweeks/days ahead
-are you forecasting?  If incidence_period is "epiweek" and forecast_date is
-Sunday or Monday, then ahead = 1 means the epiweek that includes the
-forecast date;  if forecast_date is Tuesday-Saturday, then it is the
-following epiweek. If incidence_period is "day" then ahead = 1 means the
-day after forecast date.}
+\item{ahead}{Vector of (one or more) integers. How many epiweeks/days ahead
+are you forecasting? If \code{incidence_period = "epiweek"} and forecast_date is
+Sunday or Monday, then \code{ahead = 1} means the epiweek that includes the
+forecast date; if \code{forecast_date} falls on a Tuesday through Saturday, then
+it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahead = 1} means the day after forecast date.}
 
-\item{geo_type}{one of the geographical types, matching the terms used on the
-api ("county", "dma", "hrr", "msa", "state")}
+\item{geo_type}{String indicating geographical type, one of "county", "dma",
+"hrr", "msa", or "state".}
 }
 \description{
-Returns data frame with column names
-"forecast_date", "location", "target_start", "target_end", "actual"
+Get data frame with column names \code{forecast_date}, \code{location}, \code{target_start},
+\code{target_end}, \code{actual}
 }

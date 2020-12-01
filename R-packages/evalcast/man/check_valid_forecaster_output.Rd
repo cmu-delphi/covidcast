@@ -2,13 +2,13 @@
 % Please edit documentation in R/evaluate.R
 \name{check_valid_forecaster_output}
 \alias{check_valid_forecaster_output}
-\title{Check that forecaster's output is valid}
+\title{Check that a forecaster's output is valid}
 \usage{
 check_valid_forecaster_output(pred_card)
 }
 \arguments{
-\item{pred_card}{tibble of form created by \code{\link{get_predictions}}}
+\item{pred_card}{Prediction card, in the form created by \code{\link[=get_predictions]{get_predictions()}}.}
 }
 \description{
-Check that forecaster's output is valid
+Check that a forecaster's output is valid
 }

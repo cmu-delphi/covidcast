@@ -7,8 +7,8 @@
 download_signal(...)
 }
 \arguments{
-\item{...}{the arguments that are passed to \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}}}
+\item{...}{Arguments that are passed to \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}}.}
 }
 \description{
-This is a simple wrapper to \code{\link[covidcast]{covidcast_signal}} that is less verbose.
+This is a simple wrapper to \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}} that is less verbose.
 }

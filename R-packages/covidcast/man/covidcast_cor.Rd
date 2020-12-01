@@ -18,10 +18,11 @@ covidcast_cor(
 \item{x, y}{The \code{covidcast_signal} data frames to correlate.}
 
 \item{dt_x, dt_y}{Time shifts to consider for \code{x} and \code{y}, respectively,
-before computing correlations. These must both be nonnegative, and only one
-can be positive. If \code{dt_x = 1}, for example, then data for \code{x} is shifted
-forward 1 day in time (so, data on June 1 becomes data on June 2, and so
-on). Default is 0 for both.}
+before computing correlations. Negative shifts translate into in a lag
+value and positive shifts into a lead value; for example, if \code{dt = -1},
+then the new value on June 2 is the original value on June 1; if \code{dt = 1},
+then the new value on June 2 is the original value on June 3; if \code{dt = 0},
+then the values are left as is. Default is 0 for both \code{dt_x} and \code{dt_y}.}
 
 \item{by}{If "geo_value", then correlations are computed for each geo
 location, over all time. Each correlation is measured between two time
@@ -38,8 +39,8 @@ A data frame with first column \code{geo_value} or \code{time_value} (depending
 on \code{by}), and second column \code{value}, which gives the correlation.
 }
 \description{
-Computes correlations between two \code{covidcast_signal()} data frames, allowing
-for slicing by geo location, or by time. (The latest issue from each data
-frame is used when computing correlations.) See
-\code{vignette("correlation-utils")} for examples.
+Computes correlations between two \code{covidcast_signal} data frames, allowing
+for slicing by geo location, or by time. (Only the latest issue from each
+data frame are used for correlations.) See the \href{https://cmu-delphi.github.io/covidcast/covidcastR/articles/correlation-utils.html}{correlations vignette}
+for examples.
 }

@@ -7,16 +7,18 @@
 get_target_period(forecast_date, incidence_period, ahead)
 }
 \arguments{
-\item{forecast_date}{the forecast date}
+\item{forecast_date}{Date object or string of the form "YYYY-MM-DD",
+indicating date on which forecasts will be made about some period (e.g.,
+epiweek). For example, if \code{forecast_date = "2020-05-11"}, \code{incidence_period = "day"}, and \code{ahead = 3}, then, we'd be making forecasts for "2020-05-14".}
 
-\item{incidence_period}{either "epiweek" or "day"}
+\item{incidence_period}{String indicating the incidence period, either
+"epiweek" or "day".}
 
-\item{ahead}{vector of (one or more) integers.  How many epiweeks/days ahead
-are you forecasting?  If incidence_period is "epiweek" and forecast_date is
-Sunday or Monday, then ahead = 1 means the epiweek that includes the
-forecast date;  if forecast_date is Tuesday-Saturday, then it is the
-following epiweek. If incidence_period is "day" then ahead = 1 means the
-day after forecast date.}
+\item{ahead}{Vector of (one or more) integers. How many epiweeks/days ahead
+are you forecasting? If \code{incidence_period = "epiweek"} and forecast_date is
+Sunday or Monday, then \code{ahead = 1} means the epiweek that includes the
+forecast date; if \code{forecast_date} falls on a Tuesday through Saturday, then
+it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahead = 1} means the day after forecast date.}
 }
 \description{
 Get the target period for a forecast date, incidence period and ahead

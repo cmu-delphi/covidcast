@@ -1,14 +1,16 @@
-#' Plot a measure
+#' Plot error measure
 #'
-#' @param scorecards a list of scorecards
-#' @param err_name the name of a column appearing in all scorecards
-#' @param type the plot type, default boxplot
-#' @export
+#' @param scorecards List of different score cards, all on the same forecasting
+#'   task (i.e., same ahead, etc.).
+#' @param err_name Name of a column appearing in all score cards.
+#' @param type One of "boxplot" or "dotplot".
+#'
 #' @importFrom covidcast fips_to_name
 #' @importFrom rlang .data
 #' @importFrom purrr map_chr
-#' @importFrom ggplot2 ggplot aes geom_boxplot facet_wrap scale_y_log10 geom_point
+#' @importFrom ggplot2 ggplot aes geom_boxplot facet_wrap scale_y_log10 geom_point theme
 #' @importFrom dplyr group_by mutate summarize arrange if_else
+#' @export
 plot_measure <- function(scorecards, err_name, type = "boxplot") {
   # make sure scorecards are comparable:
   unique_attr(scorecards, "ahead")
@@ -30,7 +32,8 @@ plot_measure <- function(scorecards, err_name, type = "boxplot") {
       ggplot(aes(x = .data$forecaster, y = .data[[err_name]])) +
       geom_boxplot() +
       facet_wrap(~ forecast_date) +
-      scale_y_log10()
+      scale_y_log10() + 
+      theme_bw() 
   }
   else if (type == "dotplot") {
     if (geo_type == "state") {
@@ -57,6 +60,7 @@ plot_measure <- function(scorecards, err_name, type = "boxplot") {
                  y = .data$location,
                  color = .data$forecaster,
                  pch = .data$forecast_date)) +
-      geom_point()
+      geom_point() +
+      theme_bw()
   }
 }

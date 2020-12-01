@@ -18,6 +18,9 @@ library(covidcast)
 library(dplyr)
 library(ggplot2)
 
+date_scale <- scale_x_date(date_breaks = "1 month", date_minor_breaks = "1 week",
+                           date_labels = "%b %Y")
+
 df_fb1_st = covidcast_signal("fb-survey", "raw_cli", geo_type = "state")
 n_per_day = df_fb1_st %>% 
   group_by(time_value) %>% 
@@ -27,7 +30,8 @@ ggplot(n_per_day, aes(x = time_value, y = n)) +
   geom_line() + geom_point() + theme_bw() + 
   labs(x = "Date", y = "Number of Responses",
        title = sprintf("Total responses: %i, mean per day: %i", 
-                       round(sum(n_per_day$n)), round(mean(n_per_day$n))))
+                       round(sum(n_per_day$n)), round(mean(n_per_day$n)))) +
+    date_scale
 
 df_fb1 = covidcast_signal("fb-survey", "smoothed_cli")
 county_per_week = df_fb1 %>% 
@@ -39,7 +43,8 @@ ggplot(county_per_week, aes(x = time_value, y = n)) +
   labs(x = "Date", y = "Number of Counties", 
        title = sprintf("Unique counties: %i, mean per week: %i", 
                        length(unique(df_fb1$geo_value)), 
-                       round(mean(county_per_week$n))))
+                       round(mean(county_per_week$n)))) +
+    date_scale
 ```
 
 ## Coverage
@@ -52,7 +57,7 @@ county_totals = df_fb1 %>%
 
 county_totals$time_value = "2020-04-15"
 county_totals$issue = "2020-04-15"
-attributes(county_totals)$geo_type = "county"
+attributes(county_totals)$metadata$geo_type = "county"
 class(county_totals) = c("covidcast_signal", "data.frame")
 
 plot(county_totals, title = "Which counties ever appear in our CLI signals?",
@@ -88,5 +93,6 @@ ggplot(df_cor, aes(x = time_value, y = value)) +
   labs(title = "Correlation between CLI signals and cases",
        subtitle = sprintf("Over all counties with at least %i cases", case_num),
        x = "Date", y = "Correlation") + theme_bw() +
-  theme(legend.position = "bottom", legend.title  = element_blank())
+  theme(legend.position = "bottom", legend.title  = element_blank()) +
+  date_scale
 ```

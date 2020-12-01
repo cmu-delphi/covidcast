@@ -1,1 +1,2 @@
-#' @param incidence_period either "epiweek" or "day"
+#' @param incidence_period String indicating the incidence period, either
+#'   "epiweek" or "day".

@@ -12,40 +12,60 @@ get_predictions_single_date(
   incidence_period,
   ahead,
   geo_type,
-  geo_values
+  geo_values,
+  apply_corrections,
+  ...
 )
 }
 \arguments{
-\item{forecaster}{the forecaster}
+\item{forecaster}{Function that outputs a tibble with columns \code{ahead},
+\code{location}, \code{probs}, \code{quantiles}. The \code{quantiles} column gives the
+predictive quantiles of the forecast distribution for that location and
+ahead.}
 
-\item{name_of_forecaster}{the name of the forecaster}
+\item{name_of_forecaster}{String indicating name of the forecaster.}
 
-\item{signals}{a tibble with columns "data_source" and "signal" that
-specifies which variables from the covidcast API will be used by
-my_forecaster. The first row of signals is taken to be the response.   If
-using incidence_period "epiweek", thre response should be something for
-which summing daily values over an epiweek makes sense (e.g., counts or
-proportions but not log(counts) or log(proportions)).  Available data
-sources and signals are documented in the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{COVIDcast signal documentation}
-documentation.  Can optionally include a column "first_day" giving the
-earliest day of data needed from that data source.}
+\item{signals}{Tibble with columns \code{data_source} and \code{signal} that specifies
+which variables from the COVIDcast API will be used by \code{forecaster}. Each
+row of \code{signals} represents a separate signal, and first row is taken to be
+the response. If using \code{incidence_period = "epiweek"}, the response should
+be something for which summing daily values over an epiweek makes sense
+(e.g., counts or proportions but not log(counts) or log(proportions)).
+Available data sources and signals are documented in the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{COVIDcast signal documentation}.
+An optional column \code{start_day} can also be included. This can be a Date
+object or string in the form "YYYY-MM-DD", indicating the earliest date of
+data needed from that data source. Importantly, \code{start_day} can also be a
+function (represented as a list column) that takes a forecast date and
+returns a start date for model training (again, Date object or string in
+the form "YYYY-MM-DD"). The latter is useful when the start date should be
+computed dynamically from the forecast date (e.g., when \code{forecaster} only
+trains on the most recent 4 weeks of data).}
 
-\item{forecast_date}{the forecast date}
+\item{forecast_date}{Date object or string of the form "YYYY-MM-DD",
+indicating date on which forecasts will be made about some period (e.g.,
+epiweek). For example, if \code{forecast_date = "2020-05-11"}, \code{incidence_period = "day"}, and \code{ahead = 3}, then, we'd be making forecasts for "2020-05-14".}
 
-\item{incidence_period}{either "epiweek" or "day"}
+\item{incidence_period}{String indicating the incidence period, either
+"epiweek" or "day".}
 
-\item{ahead}{vector of (one or more) integers.  How many epiweeks/days ahead
-are you forecasting?  If incidence_period is "epiweek" and forecast_date is
-Sunday or Monday, then ahead = 1 means the epiweek that includes the
-forecast date;  if forecast_date is Tuesday-Saturday, then it is the
-following epiweek. If incidence_period is "day" then ahead = 1 means the
-day after forecast date.}
+\item{ahead}{Vector of (one or more) integers. How many epiweeks/days ahead
+are you forecasting? If \code{incidence_period = "epiweek"} and forecast_date is
+Sunday or Monday, then \code{ahead = 1} means the epiweek that includes the
+forecast date; if \code{forecast_date} falls on a Tuesday through Saturday, then
+it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahead = 1} means the day after forecast date.}
 
-\item{geo_type}{one of the geographical types, matching the terms used on the
-api ("county", "dma", "hrr", "msa", "state")}
+\item{geo_type}{String indicating geographical type, one of "county", "dma",
+"hrr", "msa", or "state".}
 
-\item{geo_values}{a vector or list of locations whose data will be passed to
-my_forecaster. The default, "*", fetches all that is available in API.}
+\item{geo_values}{Vector or list of locations whose data will be passed to
+\code{forecaster}. The default, "*", fetches all that is available in the API.}
+
+\item{apply_corrections}{an optional function that applies data corrections
+to the signals. Input is a data frame as returned by \code{download_signals()}.
+The returned object must be the same but with additional variables.
+Corrected values must exist in the column \code{corrected}.}
+
+\item{...}{Additional arguments to be passed to \code{forecaster()}.}
 }
 \description{
 Get predictions cards for a single date

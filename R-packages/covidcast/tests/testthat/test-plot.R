@@ -59,33 +59,14 @@ test_that("state line graphs", {
 
 test_that("simple state choropleths", {
   fb_state <- readRDS(test_path("data/survey-data-state.rds"))
-
-  expect_doppelganger("default state choropleth",
-                      plot(fb_state, plot_type = "choro"))
+  svg("ci-default-state-choropleth-with-include.svg")
+  plot(fb_state, plot_type = "choro",
+       include = c("pa", "OH", "in", "KY"))
+  dev.off() 
 
   expect_doppelganger("default state choropleth with include",
                       plot(fb_state, plot_type = "choro",
                            include = c("pa", "OH", "in", "KY")))
-
-  expect_doppelganger("default state choropleth with range",
-                      plot(fb_state, plot_type = "choro",
-                           range = c(0, 4)))
-
-  fb_county <- readRDS(test_path("data/survey-data-county.rds"))
-  expect_doppelganger("default county choropleth",
-                      plot(fb_county, plot_type = "choro"))
-
-  expect_doppelganger("default county choropleth with include",
-                      plot(fb_county, plot_type = "choro",
-                           include = c("pa", "OH", "in", "KY")))
-
-  # Work-in-progress signals may not have metadata, so we should preserve the
-  # ability to plot them by manually specifying range
-  attributes(fb_state)$metadata <- NULL
-  attributes(fb_state)$metadata$geo_type <- "state"
-  expect_doppelganger("state choropleth with no metadata",
-                      plot(fb_state, plot_type = "choro",
-                           range = c(0, 2)))
 
 })
 

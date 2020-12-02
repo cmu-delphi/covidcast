@@ -84,7 +84,7 @@ get_target_response <- function(signals,
     mutate(available = NULL)
   
   if (nchar(locations[1])==2){
-    locations <- covidcast::fips_to_abbr(paste0(locations,"000")) %>% tolower()
+    locations <- fips_2_abbr(locations) %>% tolower()
   }
   out <- target_periods %>%
     rename(start_day = .data$start, end_day = .data$end) %>%

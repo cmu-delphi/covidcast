@@ -65,8 +65,11 @@ get_predictions <- function(forecaster,
                             geo_type,
                             geo_values = "*",
                             apply_corrections = NULL,
+                            signal_aggregation = c("long", "wide", "list"),
+                            signal_aggregation_dt = NULL,
                             ...) {
   assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
+  signal_aggregation = match.arg(signal_aggregation, c("long", "wide", "list"))
   params <- list(...)
   forecast_dates %>%
     map_dfr(~ do.call(
@@ -79,7 +82,9 @@ get_predictions <- function(forecaster,
                  ahead = ahead,
                  geo_type = geo_type,
                  geo_values = geo_values,
-                 apply_corrections = apply_corrections),
+                 apply_corrections = apply_corrections,
+                 signal_aggregation = signal_aggregation,
+                 signal_aggregation_dt = signal_aggregation_dt),
             params)))
 }
 
@@ -108,6 +113,8 @@ get_predictions_single_date <- function(forecaster,
                                         geo_type,
                                         geo_values,
                                         apply_corrections,
+                                        signal_aggregation,
+                                        signal_aggregation_dt,
                                         ...) {
   #if (length(geo_values) > 1) geo_values <- list(geo_values)
   forecast_date <- lubridate::ymd(forecast_date)
@@ -127,7 +134,9 @@ get_predictions_single_date <- function(forecaster,
                          end_day = forecast_date,
                          as_of = forecast_date,
                          geo_type = geo_type,
-                         geo_values = geo_values)
+                         geo_values = geo_values,
+                         signal_aggregation = signal_aggregation,
+                         signal_aggregation_dt = signal_aggregation_dt)
 
   if(!is.null(apply_corrections)){
     df <- data_corrector(df, apply_corrections)
@@ -151,7 +160,8 @@ get_predictions_single_date <- function(forecaster,
       signal = signals$signal[1],
       target_end_date = get_target_period(forecast_date, 
                                           incidence_period, ahead)$end,
-      incidence_period = incidence_period
+      incidence_period = incidence_period,
+      ahead = ahead
       ) 
       ## dropped attributes: other signals, geo_type,
       ##   geo_values, corrections_applied, from_covidhub,

@@ -14,7 +14,9 @@
 #'   the default, then all currently available forecast dates from the given
 #'   forecaster in the COVID Hub will be used.
 # @param ... Additional parameters to be passed to [filter_predictions()].
-#' @return tibble of predictions cards.
+#' @return tibble of predictions cards. Only incident predictions are returned.
+#'   For more flexible processing of COVID Hub data, try using 
+#'   [zoltr](https://docs.zoltardata.com/zoltr/)
 #' 
 #' @seealso [get_predictions()]
 #' @importFrom readr read_csv
@@ -43,6 +45,7 @@ get_covidhub_predictions <- function(covidhub_forecaster_name,
                        type = col_character()
                      ))
     pcards[[forecast_date]] <- pred %>%
+      filter(str_detect(.data$target, "wk ahead inc")) %>%
       separate(.data$target,
                into = c("ahead", NA, NA, NA, "response"),
                remove = TRUE) %>%

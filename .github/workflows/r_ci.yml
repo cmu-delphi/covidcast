@@ -47,7 +47,12 @@ jobs:
         shell: Rscript {0}
       - name: Check
         run: |
-          devtools::test()
+          fb_state <- readRDS(test_path("data/survey-data-state.rds"))
+          svg(test_path("c2.svg"))
+          plot(fb_state, plot_type = "choro",
+          include = c("pa", "OH", "in", "KY"))
+          dev.off() 
+  
         shell: Rscript {0}
       - name: Save results
         uses: actions/upload-artifact@v2

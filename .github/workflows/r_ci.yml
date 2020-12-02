@@ -53,4 +53,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: output-plots
-          path: tests/testthat/ci.svg
+          path: tests/testthat/*
+          retention-days: 1

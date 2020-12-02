@@ -53,5 +53,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: output-plots
-          path: R-packages/covidcast/tests/testthat/test-cor.R
+          path: README.md
           retention-days: 1

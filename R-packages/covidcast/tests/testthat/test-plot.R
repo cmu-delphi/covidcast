@@ -64,7 +64,7 @@ test_that("simple state choropleths", {
        include = c("pa", "OH", "in", "KY"))
   dev.off() 
   
-  expect_equal(1,1)
+  expect_equal(1,2)
   
 })
 

@@ -48,7 +48,7 @@ jobs:
       - name: Check
         run: |
           R.Version()
-          packageVersion("RSvgDevice")
+          packageVersion("vdiffr")
           devtools::test()
         shell: Rscript {0}
       - name: Save results

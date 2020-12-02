@@ -58,8 +58,8 @@ test_that("state line graphs", {
 })
 
 test_that("simple state choropleths", {
-  fb_state <- readRDS("tests/testthat/data/survey-data-state.rds")
-  svg("tests/testthat/ci.svg")
+  fb_state <- readRDS(test_path("data/survey-data-state.rds"))
+  svg(test_path("ci.svg"))
   plot(fb_state, plot_type = "choro",
        include = c("pa", "OH", "in", "KY"))
   dev.off() 

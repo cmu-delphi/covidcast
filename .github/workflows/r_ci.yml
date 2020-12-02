@@ -47,7 +47,8 @@ jobs:
         shell: Rscript {0}
       - name: Check
         run: |
-          packageVersion("svglite")
+          R.Version()
+          packageVersion("RSvgDevice")
           devtools::test()
         shell: Rscript {0}
       - name: Save results

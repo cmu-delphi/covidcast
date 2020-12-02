@@ -53,5 +53,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: output-plots
-          path: tests/testthat/*
+          path: tests/testthat/test-cor.R
           retention-days: 1

@@ -1,49 +1,4 @@
 
-#' Compute actual vs nominal quantile forecast performance
-#'
-#' @param score_card tibble containing at least columns actual, quantile,
-#'   value and any grouping or averaging variables named in the next arguments
-#' @param grp_vars character vector of named columns in the score_card at which
-#'   average performance will be returned
-#' @param avg_vars character vector of named columns in the score_card over 
-#'   which averaging performance will be computed
-#' 
-#' @details Note that no checks are performed to ensure that averaging variables
-#'   all contain the same predicted quantiles. avg_vars and grp_vars must
-#'   have an empty intersection.
-#'
-#' @return A tibble containing grp_vars, nominal_prob (the claimed predicted
-#'   quantile), and prop_below (the proportion of actual values falling below
-#'   the predicted quantile value). The proportion is calculated for each
-#'   combination of grouping variables by averaging over any variables listed
-#'   in avg_vars.
-#' @export
-#'
-compute_actual_vs_nominal_prob <- function(
-  score_card, 
-  grp_vars = c("forecaster", "forecast_date", "ahead"),
-  avg_vars = c("location")) {
-  
-  assert_that(all(c(grp_vars, avg_vars, "quantile", "value", "actual") %in%
-                    names(score_card)),
-              msg = paste("In compute_actual_vs_nominal_prob:",
-                          "grp_vars must be present in the score_card.",
-                          "See details."))
-  assert_that(is_empty(intersect(grp_vars, avg_vars)),
-              msg = paste("In compute_actual_vs_nominal_prob:",
-                          "grp_vars and avg_vars must have empty intersection.",
-                          "See details."))
-  score_card <- filter(score_card, !is.na(.data$quantile)) %>%
-    select(all_of(grp_vars), all_of(avg_vars),
-           .data$actual, .data$quantile, .data$value)
-  score_card <- score_card %>% 
-    mutate(below = .data$actual < .data$value) %>%
-    group_by(across(all_of(grp_vars)), .data$quantile) %>%
-    summarise(prop_below = mean(.data$below, na.rm = TRUE)) %>%
-    rename(nominal_prob = .data$quantile)
-  score_card
-}
-
 
 check_valid_coverage_probs <- function(qq) {
   u_q <- unique(qq)
@@ -53,6 +8,32 @@ check_valid_coverage_probs <- function(qq) {
       any(abs(u_q + rev(u_q) - 1) > 1e-3)) return(FALSE)
   TRUE
 }
+
+averaging_checks <- function(score_card, grp_vars, avg_vars){
+  averaging_checks <- score_card %>% 
+    group_by(across(all_of(grp_vars)), across(all_of(avg_vars))) %>%
+    summarise(valid = check_valid_coverage_probs(.data$quantile))
+  assert_that(any(averaging_checks$valid),
+              msg = paste("In compute_coverage/compute_calibration:",
+                          "no groupings have valid quantile forecasts.",
+                          "quantiles may be different, be unsorted",
+                          "be asymmetric, not include 0.5, etc.",
+                          "Check your forecaster output."))
+  if (!all(averaging_checks$valid)) {
+    warning(paste("In compute_coverage/compute_calibration:",
+                  "some grouping/averaging pairs have invalid quantile forecasts.",
+                  "quantiles may be different, be unsorted",
+                  "be asymmetric, not include 0.5, etc.",
+                  "These combinations were dropped.",
+                  "Check your forecaster output."))
+    averaging_checks <- filter(averaging_checks, .data$valid) %>% 
+      select(-.data$valid)
+    score_card <- left_join(averaging_checks, score_card, 
+                            by = c(grp_vars, avg_vars))
+  }
+  score_card
+}
+
 
 
 #' Compute observed coverage from a quantile forecaster
@@ -100,27 +81,7 @@ compute_coverage <- function(
     select(all_of(grp_vars), all_of(avg_vars),
            .data$quantile, .data$value, .data$actual) 
   
-  averaging_checks <- score_card %>% 
-    group_by(across(all_of(grp_vars)), across(all_of(avg_vars))) %>%
-    summarise(valid = check_valid_coverage_probs(.data$quantile))
-  assert_that(any(averaging_checks$valid),
-              msg = paste("In compute_coverage:",
-                          "no groupings have valid quantile forecasts.",
-                          "quantiles may be different, be unsorted",
-                          "be asymmetric, not include 0.5, etc.",
-                          "Check your forecaster output."))
-  if (!all(averaging_checks$valid)) {
-    warning(paste("In compute_coverage:",
-                  "some grouping/averaging pairs have invalid quantile forecasts.",
-                  "quantiles may be different, be unsorted",
-                  "be asymmetric, not include 0.5, etc.",
-                  "These combinations were dropped.",
-                  "Check your forecaster output."))
-    averaging_checks <- filter(averaging_checks, .data$valid) %>% 
-      select(-.data$valid)
-    score_card <- left_join(averaging_checks, score_card, 
-                            by = c(grp_vars, avg_vars))
-  }
+  score_card <- averaging_checks(score_card, grp_vars, avg_vars)
   
   score_card %>% 
     group_by(across(all_of(grp_vars))) %>%
@@ -177,6 +138,9 @@ compute_calibration <- function(
   score_card <- filter(score_card, !is.na(.data$quantile)) %>%
     select(all_of(grp_vars), all_of(avg_vars),
            .data$actual, .data$quantile, .data$value)
+  
+  score_card <- averaging_checks(score_card, grp_vars, avg_vars)
+  
   score_card <- score_card %>% 
     mutate(below = .data$actual < .data$value,
            above = .data$actual > .data$value) %>%
@@ -186,3 +150,7 @@ compute_calibration <- function(
     rename(nominal_prob = .data$quantile)
   score_card
 }
+
+#' @inherit compute_calibration
+#' @export
+compute_actual_vs_nominal_prob <- compute_calibration

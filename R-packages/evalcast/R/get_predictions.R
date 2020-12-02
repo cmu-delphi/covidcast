@@ -120,17 +120,14 @@ get_predictions_single_date <- function(forecaster,
     }
   }
   # get data that would have been available as of forecast_date
-  df <- signals %>%
-    pmap_dfr(function(...) {
-      args <- list(...)
-      download_signal(data_source=args$data_source,
-                      signal = args$signal,
-                      start_day = args$start_day,
-                      end_day = forecast_date,
-                      as_of = forecast_date,
-                      geo_type = geo_type,
-                      geo_values = geo_values)
-    })
+  args <- list(...)
+  df <- download_signals(data_source=signals$data_source,
+                         signal = signals$signal,
+                         start_day = signals$start_day,
+                         end_day = forecast_date,
+                         as_of = forecast_date,
+                         geo_type = geo_type,
+                         geo_values = geo_values)
 
   if(!is.null(apply_corrections)){
     df <- data_corrector(df, apply_corrections)

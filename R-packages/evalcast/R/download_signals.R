@@ -33,3 +33,39 @@ download_signal <- function(...) {
   out %>% rename(location = .data$geo_value)
 }
 
+#' Download multiple signals from covidcast
+#'
+#' This is a simple wrapper to [covidcast::covidcast_signals()] that is less verbose.
+#'
+#' @param ... Arguments that are passed to [covidcast::covidcast_signal()].
+download_signals <- function(...) {
+  args <- list(...)
+  if (is.null(args$start_day)) {
+    msg <- stringr::str_glue(
+      "Downloading {signal} from covidcast through {end}.",
+      start = args$start_day,
+      end = args$end_day,
+      signal = args$signal,
+      .sep = " "
+    )
+  }
+  else {
+    msg <- stringr::str_glue(
+      "Downloading {signal} from covidcast for period from",
+      "{start} to {end}.",
+      start = args$start_day,
+      end = args$end_day,
+      signal = args$signal,
+      .sep = " "
+    )
+  }
+  for (i in seq_along(msg)) message(msg[i])
+  
+  out <- base::suppressMessages({covidcast_signals(...)}) %>% 
+    covidcast::aggregate_signals(format="long")
+  if (args$geo_type == "state") {
+    out$geo_value = substr(covidcast::abbr_to_fips(out$geo_value), 1, 2)
+  }
+  out %>% rename(location = .data$geo_value)
+}
+

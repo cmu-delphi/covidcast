@@ -53,4 +53,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: output-plots
-          path: tests/testthat/ci-default-state-choropleth-with-include.svg
+          path: ci-default-state-choropleth-with-include.svg

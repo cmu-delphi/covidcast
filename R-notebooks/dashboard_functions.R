@@ -55,24 +55,6 @@ plot_28_day_sample_volume <- function(df_to_plot, y_axis_title) {
     date_scale
 }
 
-plot_28_day_unique_county <- function(df_to_plot) {
-  counties_per_day = df_to_plot %>%
-    group_by(time_value) %>%
-    summarize(n = n())
-  
-  ggplot(counties_per_day, aes(x = time_value, y = n)) +
-    geom_line() + geom_point() + theme_bw() +
-    labs(
-      x = "Date",
-      y = "Number of Counties",
-      title = sprintf(
-        "Unique Counties: %i, mean per day: %i",
-        length(unique(df_to_plot$geo_value)),
-        round(mean(counties_per_day$n))
-      )
-    ) + date_scale
-}
-
 plot_28_day_frequency_state  <- function(df_to_plot) {
   states_present = df_to_plot %>%
     group_by(geo_value) %>%

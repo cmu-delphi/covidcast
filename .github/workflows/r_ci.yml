@@ -53,5 +53,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: output-plots
-          path: README.md
+          path: R-packages/covidcast/tests/testthat/ci.svg
           retention-days: 1

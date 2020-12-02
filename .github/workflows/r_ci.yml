@@ -49,8 +49,7 @@ jobs:
         run: |
           fb_state <- readRDS("tests/testthat/data/survey-data-state.rds")
           svg("tests/testthat/ci.svg")
-          plot(fb_state, plot_type = "choro",
-          include = c("pa", "OH", "in", "KY"))
+          plot(fb_state, plot_type = "choro", include = c("pa", "OH", "in", "KY"))
           dev.off() 
   
         shell: Rscript {0}

@@ -63,7 +63,7 @@ evaluate_predictions <- function(
                       coverage_80 = interval_coverage(alpha = 0.2)),
   backfill_buffer = 10,
   side_truth = NULL,
-  grp_vars = c("forecaster", "forecast_date", "ahead", "location")) {
+  grp_vars = c("forecaster", "forecast_date", "ahead", "geo_value")) {
   
   
   assert_that(class(predictions_cards)[1] == "predictions_cards" ||
@@ -93,7 +93,7 @@ evaluate_predictions <- function(
       predictions_cards <- bind_cols(predictions_cards, actual = side_truth)
     }
     if (class(predictions_cards)[1] == "predictions_cards") {
-      grp_vars = c("forecaster", "forecast_date", "ahead", "location")
+      grp_vars = c("forecaster", "forecast_date", "ahead", "geo_value")
     }
     score_card <- predictions_cards %>% group_by(across(all_of(grp_vars)))
     sc_keys <- score_card %>% group_keys()

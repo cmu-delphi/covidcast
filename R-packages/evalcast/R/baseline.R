@@ -17,9 +17,10 @@
 #'   prediction. If `FALSE`, then point predictions can be increasing or
 #'   decreasing, depending on the historical trend.
 #'
-#' @return Data frame with columns `ahead`, `location`, `probs`, `quantiles`.
-#'   The `quantiles` column gives the predictive quantiles of the forecast
-#'   distribution for that location and ahead.
+#' @return Data frame with columns `ahead`, `geo_value`, `quantile`, `value`.
+#'   The `quantile` column gives the predicted quantiles of the forecast
+#'   distribution for that location and ahead. An NA indicates a point forecast
+#'   (same as the median in this case).
 #'
 #' @export
 baseline_forecaster <- function(df,
@@ -41,14 +42,14 @@ baseline_forecaster <- function(df,
     dat[[a]] <- df %>%
         dplyr::filter(.data$data_source == signals$data_source[1],
                       .data$signal == signals$signal[1]) %>%
-        dplyr::group_by(.data$location) %>%
+        dplyr::group_by(.data$geo_value) %>%
         dplyr::arrange(.data$time_value) %>%
         dplyr::mutate(
           summed = zoo::rollsum(.data$value, k = incidence_length, fill = NA, 
                                 align = "right"),
           resid = .data$summed - 
             dplyr::lag(.data$summed, n = incidence_length * a)) %>%
-        dplyr::select(.data$location, .data$time_value, 
+        dplyr::select(.data$geo_value, .data$time_value, 
                       .data$summed, .data$resid) %>%
         dplyr::group_modify(~ {
             point <- .x$summed[.x$time_value == max(.x$time_value)]

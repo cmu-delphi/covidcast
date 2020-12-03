@@ -14,14 +14,16 @@ get_predictions(
   geo_type,
   geo_values = "*",
   apply_corrections = NULL,
+  signal_aggregation = c("long", "wide", "list"),
+  signal_aggregation_dt = NULL,
   ...
 )
 }
 \arguments{
 \item{forecaster}{Function that outputs a tibble with columns \code{ahead},
-\code{location}, \code{probs}, \code{quantiles}. The \code{quantiles} column gives the
-predictive quantiles of the forecast distribution for that location and
-ahead.}
+\code{location}, \code{quantile}, and \code{value}. The \code{quantile} column gives the
+probabilities associated with quantile forecasts for that location and
+ahead. If your forecaster produces point forecasts, then set \code{quantile=NA}.}
 
 \item{name_of_forecaster}{String indicating name of the forecaster.}
 
@@ -64,21 +66,25 @@ to the signals. Input is a data frame as returned by \code{download_signals()}.
 The returned object must be the same but with additional variables.
 Corrected values must exist in the column \code{corrected}.}
 
+\item{signal_aggregation}{this and the next argument control the type of
+data your forecaster expects to receive from covidcast. By default,
+different signals are passed in "long" format. But you may alternatively
+request "wide" or "list". See \code{\link[covidcast:covidcast_signals]{covidcast::covidcast_signals()}} and
+\code{\link[covidcast:aggregate_signals]{covidcast::aggregate_signals()}} for more details.}
+
+\item{signal_aggregation_dt}{for any data format,
+\code{\link[covidcast:aggregate_signals]{covidcast::aggregate_signals()}} can perform leading and lagging for you.
+See that documentation for more details.}
+
 \item{...}{Additional arguments to be passed to \code{forecaster()}.}
 }
 \value{
-List of "predictions cards", with one element per forecast date. Each
-predictions card is a data frame with two columns:
-
-\item{location}{FIPS codes of the locations. For counties, this matches the
-\code{geo_value} used in the COVIDcast API. However, for states, \code{location} and
-\code{geo_value} are slightly different, in that the former is a two-digit FIPS
-code, as in "42", whereas the latter is a state abbreviation, as in "pa".}
-\item{forecast_distribution}{List column of tibbles containing the predicted
-quantiles for each location.}
-
-Each predictions card has attributes that specify the exact forecasting task
-that was being carried out, along with the name of the forecaster.
+Long data frame of forecasts with a class of \code{predictions_cards}.
+The first 4 columns are the same as those returned by the forecaster. The
+remainder specify the prediction task, 10 columns in total:
+\code{ahead}, \code{location}, \code{quantile}, \code{value}, \code{forecaster}, \code{forecast_date},
+\code{data_source}, \code{signal}, \code{target_end_date}, and \code{incidence_period}. Here
+\code{data_source} and \code{signal} correspond to the response varible only.
 }
 \description{
 For each of the provided forecast dates, runs a forecaster using the data
@@ -99,14 +105,4 @@ baby_predictions = get_predictions(
     start_day="2020-08-15"), "2020-10-01","epiweek", 1:4, 
     "state", "mi")
 
-baby_correct <- function(x) dplyr::mutate(x, corrected = 2*value)
-
-baby_corrected = get_predictions(
-  baseline_forecaster, "baby",
-  tibble::tibble(
-    data_source=c("jhu-csse", "usa-facts"),
-    signal = c("deaths_incidence_num","confirmed_incidence_num"),
-    start_day=lubridate::ymd("2020-08-15")),
-  lubridate::ymd("2020-10-01"),"epiweek", 1L, "state", "mi",
-  apply_corrections = baby_correct)
 }

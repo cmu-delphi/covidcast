@@ -14,6 +14,8 @@ get_predictions_single_date(
   geo_type,
   geo_values,
   apply_corrections,
+  signal_aggregation,
+  signal_aggregation_dt,
   ...
 )
 }

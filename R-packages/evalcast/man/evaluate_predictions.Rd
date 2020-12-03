@@ -8,7 +8,9 @@ evaluate_predictions(
   predictions_cards,
   err_measures = list(wis = weighted_interval_score, ae = absolute_error, coverage_80 =
     interval_coverage(alpha = 0.2)),
-  backfill_buffer = 10
+  backfill_buffer = 10,
+  side_truth = NULL,
+  grp_vars = c("forecaster", "forecast_date", "ahead", "location")
 )
 }
 \arguments{
@@ -26,6 +28,19 @@ takes a data frame with three columns \code{quantile}, \code{value} and \code{ac
 
 \item{backfill_buffer}{How many days until response is deemed trustworthy
 enough to be taken as correct? See details for more.}
+
+\item{side_truth}{you can optionally provide your own truth data (observed).
+Adding this column bypasses all checks to get appropriate data as
+reported at the time of the forecast. This column should either be a vector
+the same length as \code{predictions_cards} or a data frame that will be
+joined to \code{predictions_cards}. \code{grp_vars} and \code{avg_vars} must be present
+and joining will be performed on all available columns. If a data frame,
+the observed data should be named \code{actual}}
+
+\item{grp_vars}{character vector of named columns in the predictions_cards
+such that the combination gives a unique (quantile) prediction. Ignored if
+\code{predictions_cards} is of the type returned by \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}}
+or \code{\link[=get_predictions]{get_predictions()}} (class is \code{predictions_cards})}
 }
 \value{
 tibble of "score cards" with additional columns for each err_measure

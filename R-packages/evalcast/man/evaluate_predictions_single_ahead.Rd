@@ -4,11 +4,7 @@
 \alias{evaluate_predictions_single_ahead}
 \title{Create score cards for one ahead}
 \usage{
-evaluate_predictions_single_ahead(
-  predictions_cards,
-  err_measures,
-  backfill_buffer
-)
+evaluate_predictions_single_ahead(predictions_cards, backfill_buffer)
 }
 \arguments{
 \item{predictions_cards}{tibble of predictions
@@ -18,10 +14,6 @@ different forecast date or forecaster.
 A predictions card may be created by the function
 \code{\link[=get_predictions]{get_predictions()}}, downloaded with \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}} or
 possibly created manually.}
-
-\item{err_measures}{Named list of one or more functions, where each function
-takes a data frame with three columns \code{quantile}, \code{value} and \code{actual}
-(i.e., observed) returns a scalar measure of error.}
 
 \item{backfill_buffer}{How many days until response is deemed trustworthy
 enough to be taken as correct? See details for more.}

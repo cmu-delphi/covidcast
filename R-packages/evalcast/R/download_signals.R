@@ -1,8 +1,3 @@
-#' Download signal from covidcast
-#'
-#' This is a simple wrapper to [covidcast::covidcast_signal()] that is less verbose.
-#'
-#' @param ... Arguments that are passed to [covidcast::covidcast_signal()].
 download_signal <- function(...) {
   args <- list(...)
   if (is.null(args$start_day)) {
@@ -33,11 +28,7 @@ download_signal <- function(...) {
   out %>% rename(location = .data$geo_value)
 }
 
-#' Download multiple signals from covidcast
-#'
-#' This is a simple wrapper to [covidcast::covidcast_signals()] that is less verbose.
-#'
-#' @param ... Arguments that are passed to [covidcast::covidcast_signal()].
+
 download_signals <- function(..., 
                              signal_aggregation = "long", 
                              signal_aggregation_dt = NULL) {

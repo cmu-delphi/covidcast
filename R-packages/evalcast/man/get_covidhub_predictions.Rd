@@ -16,7 +16,9 @@ the default, then all currently available forecast dates from the given
 forecaster in the COVID Hub will be used.}
 }
 \value{
-tibble of predictions cards.
+tibble of predictions cards. Only incident predictions are returned.
+For more flexible processing of COVID Hub data, try using
+\href{https://docs.zoltardata.com/zoltr/}{zoltr}
 }
 \description{
 Simply converts the predictions of forecasters submitting to the \href{https://github.com/reichlab/covid19-forecast-hub/}{COVID Hub} to the format of a

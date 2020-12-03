@@ -90,24 +90,32 @@ absolute_error <- function(quantile, value, actual_value) {
 #'
 #' Returns an error measure function indicating whether a central interval
 #' covers the actual value. The interval is defined as the (alpha/2)-quantile
-#' to the (1 - alpha/2)-quantile.
+#' to the (1 - alpha/2)-quantile, where alpha = 1 - coverage.
 #'
-#' @param alpha Parameter defining nominal interval coverage.
+#' @param width Nominal interval coverage (from 0 to 1).
 #'
 #' @export
-interval_coverage <- function(alpha) {
+interval_coverage <- function(coverage) {
   function(quantiles, value, actual_value) {
-    
-    if (sum(abs(quantiles - alpha / 2) < 1e-10, na.rm = TRUE) != 1L ||
-        sum(abs(quantiles - (1 - alpha / 2)) < 1e-10, na.rm=TRUE) != 1L) {
+    if(any(duplicated(quantiles))){
       warning(paste("Interval Coverage:",
-                    "Forecaster must return unique values to cover a (1-alpha)",
-                    "interval centered at 0.5. Returning NA."))
+                    "Quantiles must be unique.",
+                    "Returning NA"))
+      return(NA)
+    }
+    alpha = 1 - coverage
+    lower_interval = alpha / 2
+    upper_interval = 1 - (alpha / 2)
+    if (all(abs(quantiles - lower_interval) > 1e-10) &
+        all(abs(quantiles - upper_interval) > 1e-10)) {
+      warning(paste("Interval Coverage:",
+                    "Quantiles must cover an interval of specified width",
+                    "centered at 0.5. Returning NA."))
       return(NA)
     }
     
-    lower <- value[which.min(quantiles - alpha / 2 < 1e-10)]
-    upper <- value[which.max(quantiles - (1 - alpha/2) < 1e-10)]
-    actual_value[1] >= lower & actual_value[1] <= upper
+    lower <- value[which.min(abs(quantiles - lower_interval))]
+    upper <- value[which.min(abs(quantiles - upper_interval))]
+    return(actual_value[1] >= lower & actual_value[1] <= upper)
   }
 }

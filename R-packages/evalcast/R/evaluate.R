@@ -60,7 +60,7 @@ evaluate_predictions <- function(
   predictions_cards,
   err_measures = list(wis = weighted_interval_score,
                       ae = absolute_error,
-                      coverage_80 = interval_coverage(alpha = 0.2)),
+                      coverage_80 = interval_coverage(coverage = 0.8)),
   backfill_buffer = 10,
   side_truth = NULL,
   grp_vars = c("forecaster", "forecast_date", "ahead", "location")) {

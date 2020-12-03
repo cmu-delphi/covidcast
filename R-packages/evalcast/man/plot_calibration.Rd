@@ -8,7 +8,7 @@ plot_calibration(
   scorecard,
   type = c("wedgeplot", "traditional"),
   grp_vars = c("forecaster", "forecast_date", "ahead"),
-  avg_vars = c("geo_values"),
+  avg_vars = c("geo_value"),
   legend_position = "bottom"
 )
 }

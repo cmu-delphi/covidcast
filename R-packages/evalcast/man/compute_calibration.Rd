@@ -7,7 +7,7 @@
 compute_calibration(
   score_card,
   grp_vars = c("forecaster", "forecast_date", "ahead"),
-  avg_vars = c("geo_values")
+  avg_vars = c("geo_value")
 )
 }
 \arguments{

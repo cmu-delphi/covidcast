@@ -35,7 +35,7 @@
 #'   remainder specify the prediction task, 10 columns in total: 
 #'   `ahead`, `geo_value`, `quantile`, `value`, `forecaster`, `forecast_date`,
 #'   `data_source`, `signal`, `target_end_date`, and `incidence_period`. Here
-#'   `data_source` and `signal` correspond to the response varible only.
+#'   `data_source` and `signal` correspond to the response variable only.
 #' 
 #' 
 #'
@@ -46,7 +46,7 @@
 #'     data_source=c("jhu-csse", "usa-facts"),
 #'     signal = c("deaths_incidence_num","confirmed_incidence_num"),
 #'     start_day="2020-08-15"), "2020-10-01","epiweek", 1:4, 
-#'     "state", "mi")
+#'     "state", "mi", signal_aggregation="long")
 #'
 #' @export
 get_predictions <- function(forecaster,

@@ -91,7 +91,7 @@ print.predictions_cards <- function(x, ...) {
 #' Print a single score card.
 #' @param card Score card.
 #' @export
-print.score_cards <- function(x, ...) {
+print.score_card <- function(x, ...) {
   z = unique(x$geo_value)
   zz = unique(x$forecaster)
   cat("Overview:\n")

@@ -73,14 +73,6 @@ evaluate_predictions <- function(
                           "appropriate responses can be downloaded from",
                           "covidcast, or you must provide your own",
                           "ground truth."))
-  erm <- function(x){
-    out <- double(length(err_measures))
-    for (i in seq_along(err_measures)) {
-      out[i] <- err_measures[[i]](x$quantile, x$value, x$actual)
-    }
-    names(out) <- names(err_measures)
-    bind_rows(out)
-  }
   
   ## Computations if actuals are provided by the user
   if (!is.null(side_truth)) {
@@ -97,7 +89,10 @@ evaluate_predictions <- function(
     }
     score_card <- predictions_cards %>% group_by(across(all_of(grp_vars)))
     sc_keys <- score_card %>% group_keys()
-    score_card <- score_card %>% group_split() %>% lapply(erm) %>% bind_rows()
+    score_card <- score_card %>%
+      group_split() %>%
+      lapply(erm, err_measures=err_measures) %>%
+      bind_rows()
     score_card <- bind_cols(score_card, sc_keys)
     score_card <- inner_join(score_card, predictions_cards, by=grp_vars)
     return(score_card)
@@ -111,11 +106,11 @@ evaluate_predictions <- function(
   for (iter in seq_along(unique_ahead)) {
     message("ahead = ", unique_ahead[iter])
     scorecards[[iter]] <- evaluate_predictions_single_ahead(
-      filter(predictions_cards, .data$ahead == !!iter) ,
+      filter(predictions_cards, .data$ahead == !!iter),
+      err_measures,
       backfill_buffer = backfill_buffer)
   }
-  scorecards <- bind_rows(scorecards)
-  class(scorecards) <- c("score_card", class(scorecards))
+  bind_rows(scorecards)
 }
 
 #' Create score cards for one ahead
@@ -130,6 +125,7 @@ evaluate_predictions <- function(
 #' @param backfill_buffer How many days until response is deemed trustworthy
 #'   enough to be taken as correct? See details for more.
 evaluate_predictions_single_ahead <- function(predictions_cards,
+                                              err_measures,
                                               backfill_buffer) {
   
   response <- predictions_cards %>% 
@@ -157,6 +153,7 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
                                          ahead,
                                          geo_type,
                                          geo_values)
+  if (nrow(target_response) == 0) return(empty_score_card(err_measures))
   as_of <- attr(target_response, "as_of")
   . <- "got this idea from https://github.com/tidyverse/magrittr/issues/29"
   if (as_of < max(target_response$end) + backfill_buffer) {
@@ -186,7 +183,10 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
   score_card <- score_card %>%
     group_by(.data$forecaster, .data$geo_value, .data$forecast_date)
   sc_keys <- score_card %>% group_keys()
-  score_card <- score_card %>% group_split() %>% lapply(erm) %>% bind_rows()
+  score_card <- score_card %>% 
+    group_split() %>%
+    lapply(erm, err_measures=err_measures) %>%
+    bind_rows()
   score_card <- bind_cols(score_card, sc_keys)
   
   score_card <- left_join(score_card, target_response, 
@@ -219,4 +219,24 @@ check_valid_forecaster_output <- function(pred_card) {
            wrong_probs = wrong_probs,
            bad_quantiles = bad_quantiles) %>%
     filter(null_forecasts | wrong_probs | bad_quantiles | wrong_format)
+}
+
+empty_score_card <- function(err_measures){
+  out <- tibble(ahead = integer(0), geo_value = character(0), 
+                quantile = double(0), value=double(0), forecaster=character(0),
+                forecast_date = Date(0), data_source=character(0), 
+                signal=character(0), target_end_date=Date(0),
+                incidence_period=character(0), actual=double(0))
+  for(iter in names(err_measures)){
+    out <- bind_cols(out, tibble(!!iter := double(0)))
+  }
+}
+
+erm <- function(x, err_measures){
+  out <- double(length(err_measures))
+  for (i in seq_along(err_measures)) {
+    out[i] <- err_measures[[i]](x$quantile, x$value, x$actual)
+  }
+  names(out) <- names(err_measures)
+  bind_rows(out)
 }

@@ -4,7 +4,11 @@
 \alias{evaluate_predictions_single_ahead}
 \title{Create score cards for one ahead}
 \usage{
-evaluate_predictions_single_ahead(predictions_cards, backfill_buffer)
+evaluate_predictions_single_ahead(
+  predictions_cards,
+  err_measures,
+  backfill_buffer
+)
 }
 \arguments{
 \item{predictions_cards}{tibble of predictions

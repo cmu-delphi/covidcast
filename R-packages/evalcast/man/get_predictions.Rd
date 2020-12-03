@@ -84,7 +84,7 @@ The first 4 columns are the same as those returned by the forecaster. The
 remainder specify the prediction task, 10 columns in total:
 \code{ahead}, \code{geo_value}, \code{quantile}, \code{value}, \code{forecaster}, \code{forecast_date},
 \code{data_source}, \code{signal}, \code{target_end_date}, and \code{incidence_period}. Here
-\code{data_source} and \code{signal} correspond to the response varible only.
+\code{data_source} and \code{signal} correspond to the response variable only.
 }
 \description{
 For each of the provided forecast dates, runs a forecaster using the data
@@ -103,6 +103,6 @@ baby_predictions = get_predictions(
     data_source=c("jhu-csse", "usa-facts"),
     signal = c("deaths_incidence_num","confirmed_incidence_num"),
     start_day="2020-08-15"), "2020-10-01","epiweek", 1:4, 
-    "state", "mi")
+    "state", "mi", signal_aggregation="long")
 
 }

@@ -4,7 +4,7 @@ fips_2_abbr <- function(fips){
   df <- tibble(fi = unique(fips),
                ab = covidcast::fips_to_abbr(fi))
   
-  ab = left_join(tibble(fi = fips), df, by="fi") %>% pull(ab)
+  ab = left_join(tibble(fi = fips), df, by="fi") %>% pull(ab) %>% tolower()
   names(ab) = NULL
   ab
 }

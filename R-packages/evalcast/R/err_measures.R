@@ -92,7 +92,7 @@ absolute_error <- function(quantile, value, actual_value) {
 #' covers the actual value. The interval is defined as the (alpha/2)-quantile
 #' to the (1 - alpha/2)-quantile, where alpha = 1 - coverage.
 #'
-#' @param width Nominal interval coverage (from 0 to 1).
+#' @param coverage Nominal interval coverage (from 0 to 1).
 #'
 #' @export
 interval_coverage <- function(coverage) {

@@ -41,6 +41,17 @@
 #'   (i.e., observed) returns a scalar measure of error.
 #' @param backfill_buffer How many days until response is deemed trustworthy
 #'   enough to be taken as correct? See details for more.
+#' @param side_truth you can optionally provide your own truth data (observed).
+#'   Adding this column bypasses all checks to get appropriate data as 
+#'   reported at the time of the forecast. This column should either be a vector
+#'   the same length as `predictions_cards` or a data frame that will be 
+#'   joined to `predictions_cards`. `grp_vars` and `avg_vars` must be present
+#'   and joining will be performed on all available columns. If a data frame,
+#'   the observed data should be named `actual` 
+#' @param grp_vars character vector of named columns in the predictions_cards
+#'  such that the combination gives a unique (quantile) prediction. Ignored if
+#'  `predictions_cards` is of the type returned by [get_covidhub_predictions()]
+#'  or [get_predictions()] (class is `predictions_cards`)
 #' 
 #' @return tibble of "score cards" with additional columns for each err_measure
 #'
@@ -50,10 +61,50 @@ evaluate_predictions <- function(
   err_measures = list(wis = weighted_interval_score,
                       ae = absolute_error,
                       coverage_80 = interval_coverage(alpha = 0.2)),
-  backfill_buffer = 10) {
-  assert_that(all(c("quantile","value") %in% names(predictions_cards)),
-              msg = paste("Predictions cards must have at least quantile",
-                          "and value columns."))
+  backfill_buffer = 10,
+  side_truth = NULL,
+  grp_vars = c("forecaster", "forecast_date", "ahead", "location")) {
+  
+  
+  assert_that(class(predictions_cards)[1] == "predictions_cards" ||
+                !is.null(side_truth),
+              msg = paste("In evaluate_predictions: either predictions_cards",
+                          "must be of class `predictions_cards` so that",
+                          "appropriate responses can be downloaded from",
+                          "covidcast, or you must provide your own",
+                          "ground truth."))
+  erm <- function(x){
+    out <- double(length(err_measures))
+    for (i in seq_along(err_measures)) {
+      out[i] <- err_measures[[i]](x$quantile, x$value, x$actual)
+    }
+    names(out) <- names(err_measures)
+    bind_rows(out)
+  }
+  
+  ## Computations if actuals are provided by the user
+  if (!is.null(side_truth)) {
+    if (is.data.frame(side_truth)) {
+      predictions_cards <- left_join(predictions_cards, side_truth)
+      assert_that("actual" %in% names(predictions_cards),
+                  msg = paste("When providing your own truth data as a data",
+                              "frame, one column must be named `actual`"))
+    } else {
+      predictions_cards <- bind_cols(predictions_cards, actual = side_truth)
+    }
+    if (class(predictions_cards)[1] == "predictions_cards") {
+      grp_vars = c("forecaster", "forecast_date", "ahead", "location")
+    }
+    score_card <- predictions_cards %>% group_by(across(all_of(grp_vars)))
+    sc_keys <- score_card %>% group_keys()
+    score_card <- score_card %>% group_split() %>% lapply(erm) %>% bind_rows()
+    score_card <- bind_cols(score_card, sc_keys)
+    score_card <- inner_join(score_card, predictions_cards, by=grp_vars)
+    return(score_card)
+  }
+  
+  
+  ## more heavy lifting if we are grabbing data from covidcast
   unique_ahead <- select(predictions_cards, .data$ahead) %>% 
     distinct() %>% pull()
   scorecards <- list()
@@ -61,7 +112,6 @@ evaluate_predictions <- function(
     message("ahead = ", unique_ahead[iter])
     scorecards[[iter]] <- evaluate_predictions_single_ahead(
       filter(predictions_cards, .data$ahead == !!iter) ,
-      err_measures = err_measures,
       backfill_buffer = backfill_buffer)
   }
   bind_rows(scorecards)
@@ -76,15 +126,9 @@ evaluate_predictions <- function(
 #'   A predictions card may be created by the function
 #'   [get_predictions()], downloaded with [get_covidhub_predictions()] or
 #'   possibly created manually.
-#' @param err_measures Named list of one or more functions, where each function
-#'   takes a data frame with three columns `quantile`, `value` and `actual`
-#'   (i.e., observed) returns a scalar measure of error.
 #' @param backfill_buffer How many days until response is deemed trustworthy
 #'   enough to be taken as correct? See details for more.
-#'   
-#' @importFrom rlang :=
 evaluate_predictions_single_ahead <- function(predictions_cards,
-                                              err_measures,
                                               backfill_buffer) {
   
   response <- predictions_cards %>% 
@@ -137,14 +181,7 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
            .data$value,
            .data$forecaster)
   # compute the error
-  erm <- function(x){
-    out <- double(length(err_measures))
-    for (i in seq_along(err_measures)) {
-      out[i] <- err_measures[[i]](x$quantile, x$value, x$actual)
-    }
-    names(out) <- names(err_measures)
-    bind_rows(out)
-  }
+  
   score_card <- score_card %>%
     group_by(.data$forecaster, .data$location, .data$forecast_date)
   sc_keys <- score_card %>% group_keys()
@@ -168,7 +205,6 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
 
 #' Check that a forecaster's output is valid
 #' @param pred_card Prediction card, in the form created by [get_predictions()].
-#' @export
 check_valid_forecaster_output <- function(pred_card) {
   null_forecasts <- pred_card$forecast_distribution %>%
     map_lgl(is.null)

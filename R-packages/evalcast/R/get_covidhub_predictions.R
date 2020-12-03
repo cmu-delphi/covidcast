@@ -62,7 +62,9 @@ get_covidhub_predictions <- function(covidhub_forecaster_name,
                .data$signal, .data$target_end_date, 
                .data$incidence_period)
   }
-  bind_rows(pcards) #%>% filter_predictions(...)
+  pcards <- bind_rows(pcards) 
+  class(pcards) = c("predictions_cards", class(pcards))
+  pcards
 }
 
 #' Get available forecast dates for a forecaster on the COVID Hub

@@ -10,9 +10,9 @@
 #' predictions made using the information as of September 14).
 #'
 #' @param forecaster Function that outputs a tibble with columns `ahead`,
-#'   `location`, `probs`, `quantiles`. The `quantiles` column gives the
-#'   predictive quantiles of the forecast distribution for that location and
-#'   ahead.
+#'   `location`, `quantile`, and `value`. The `quantile` column gives the
+#'   probabilities associated with quantile forecasts for that location and
+#'   ahead. If your forecaster produces point forecasts, then set `quantile=NA`.
 #' @param name_of_forecaster String indicating name of the forecaster.
 #' @template signals-template
 #' @template forecast_dates-template
@@ -21,19 +21,22 @@
 #' @template geo_type-template
 #' @template geo_values-template
 #' @template apply_corrections-template
+#' @param signal_aggregation this and the next argument control the type of
+#'   data your forecaster expects to receive from covidcast. By default,
+#'   different signals are passed in "long" format. But you may alternatively
+#'   request "wide" or "list". See [covidcast::covidcast_signals()] and 
+#'   [covidcast::aggregate_signals()] for more details.
+#' @param signal_aggregation_dt for any data format, 
+#'   [covidcast::aggregate_signals()] can perform leading and lagging for you.
+#'   See that documentation for more details.
 #' @param ... Additional arguments to be passed to `forecaster()`.
-#' @return List of "predictions cards", with one element per forecast date. Each
-#'   predictions card is a data frame with two columns:
-#'
-#' \item{location}{FIPS codes of the locations. For counties, this matches the
-#'   `geo_value` used in the COVIDcast API. However, for states, `location` and
-#'   `geo_value` are slightly different, in that the former is a two-digit FIPS
-#'   code, as in "42", whereas the latter is a state abbreviation, as in "pa".}
-#' \item{forecast_distribution}{List column of tibbles containing the predicted
-#'   quantiles for each location.}
+#' @return Long data frame of forecasts with a class of `predictions_cards`.
+#'   The first 4 columns are the same as those returned by the forecaster. The
+#'   remainder specify the prediction task, 10 columns in total: 
+#'   `ahead`, `location`, `quantile`, `value`, `forecaster`, `forecast_date`,
+#'   `data_source`, `signal`, `target_end_date`, and `incidence_period`. Here
+#'   `data_source` and `signal` correspond to the response varible only.
 #' 
-#' Each predictions card has attributes that specify the exact forecasting task
-#'   that was being carried out, along with the name of the forecaster.
 #' 
 #'
 #' @examples
@@ -45,16 +48,6 @@
 #'     start_day="2020-08-15"), "2020-10-01","epiweek", 1:4, 
 #'     "state", "mi")
 #'
-#' baby_correct <- function(x) dplyr::mutate(x, corrected = 2*value)
-#'
-#' baby_corrected = get_predictions(
-#'   baseline_forecaster, "baby",
-#'   tibble::tibble(
-#'     data_source=c("jhu-csse", "usa-facts"),
-#'     signal = c("deaths_incidence_num","confirmed_incidence_num"),
-#'     start_day=lubridate::ymd("2020-08-15")),
-#'   lubridate::ymd("2020-10-01"),"epiweek", 1L, "state", "mi",
-#'   apply_corrections = baby_correct)
 #' @export
 get_predictions <- function(forecaster,
                             name_of_forecaster,
@@ -71,7 +64,7 @@ get_predictions <- function(forecaster,
   assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
   signal_aggregation = match.arg(signal_aggregation, c("long", "wide", "list"))
   params <- list(...)
-  forecast_dates %>%
+  out <- forecast_dates %>%
     map_dfr(~ do.call(
           get_predictions_single_date,
           c(list(forecaster = forecaster,
@@ -86,6 +79,8 @@ get_predictions <- function(forecaster,
                  signal_aggregation = signal_aggregation,
                  signal_aggregation_dt = signal_aggregation_dt),
             params)))
+  class(out) <- c("predictions_card", class(out))
+  out
 }
 
 #' Get predictions cards for a single date
@@ -161,7 +156,6 @@ get_predictions_single_date <- function(forecaster,
       target_end_date = get_target_period(forecast_date, 
                                           incidence_period, ahead)$end,
       incidence_period = incidence_period,
-      ahead = ahead
       ) 
       ## dropped attributes: other signals, geo_type,
       ##   geo_values, corrections_applied, from_covidhub,

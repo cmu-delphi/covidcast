@@ -79,7 +79,7 @@ get_predictions <- function(forecaster,
                  signal_aggregation = signal_aggregation,
                  signal_aggregation_dt = signal_aggregation_dt),
             params)))
-  class(out) <- c("predictions_card", class(out))
+  class(out) <- c("predictions_cards", class(out))
   out
 }
 

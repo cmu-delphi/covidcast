@@ -1,4 +1,4 @@
-#' Create a list of score cards
+#' Create a data frame of score cards
 #'
 #' Performs backtesting, through the following steps:
 #' \enumerate{
@@ -114,7 +114,8 @@ evaluate_predictions <- function(
       filter(predictions_cards, .data$ahead == !!iter) ,
       backfill_buffer = backfill_buffer)
   }
-  bind_rows(scorecards)
+  scorecards <- bind_rows(scorecards)
+  class(scorecards) <- c("score_card", class(scorecards))
 }
 
 #' Create score cards for one ahead

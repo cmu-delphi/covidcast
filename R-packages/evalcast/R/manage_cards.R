@@ -77,37 +77,47 @@ intersect_locations <- function(cards) {
 
 
 
-#' Print a single prediction card.
-#' @param card Prediction card.
+#' Print method for predictions_cards
+#' 
+#' @param x Prediction card.
 #' @export
-print.prediction_card <- function(card, ...) {
-  card_attr <- attributes(card)
-  cat("Attributes:\n")
-  cat("  Ahead:", card_attr$ahead, "\n")
-  cat("  Data source:", card_attr$signals$data_source, "\n")
-  cat("  Forecast date:", as.character(card_attr$forecast_date), "\n")
-  cat("  Geo type:", card_attr$geo_type, "\n")
-  cat("  Geo values:", card_attr$geo_values, "\n")
-  cat("  Incidence period:", card_attr$incidence_period, "\n")
-  cat("  Name of forecaster:", card_attr$name_of_forecaster, "\n")
-  cat("  Signal:", card_attr$signals$signal, "\n")
-  print(as_tibble(card), ...)
+print.predictions_cards <- function(x, ...) {
+  z = unique(x$location)
+  cat("Overview:\n")
+  cat("  Name of forecaster:", x$forecaster[1], "\n")
+  cat("  Forecast date:", as.character(unique(x$forecast_date)), "\n")
+  cat("  Ahead:", unique(x$ahead), "\n")
+  cat("  Geo type:", ifelse(nchar(z[1])==2, "state", "county"), "\n")
+  if (length(z) < 4){
+    cat("  Geo values:", z, "\n")
+  } else {
+    cat("  Geo values:", "*", "\n")
+  }
+  cat("  Incidence period:", x$incidence_period[1], "\n")
+  cat("  Response Data source:", x$data_source[1], "\n")
+  cat("  Response Signal:", x$signal[1], "\n")
+  NextMethod(x, ...)
 }
 
 
 #' Print a single score card.
 #' @param card Score card.
 #' @export
-print.score_card <- function(card, ...) {
-  card_attr <- attributes(card)
-  cat("Attributes:\n")
-  cat("  Ahead:", card_attr$ahead, "\n")
-  cat("  As of:", as.character(card_attr$as_of), "\n")
-  cat("  Backfill buffer:", card_attr$backfill_buffer, "\n")
-  cat("  Data source:", card_attr$response$data_source, "\n")
-  cat("  Geo type:", card_attr$geo_type, "\n")
-  cat("  Incidence period:", card_attr$incidence_period, "\n")
-  cat("  Name of forecaster:", card_attr$name_of_forecaster, "\n")
-  cat("  Signal:", card_attr$response$signal, "\n")
-  print(as_tibble(card), ...)
+print.score_cards <- function(x, ...) {
+  z = unique(x$location)
+  zz = unique(x$forecaster)
+  cat("Overview:\n")
+  cat("  Forecaster(s):", zz, "\n")
+  cat("  Forecast date:", as.character(unique(x$forecast_date)), "\n")
+  cat("  Ahead:", unique(x$ahead), "\n")
+  cat("  Geo type:", ifelse(nchar(z[1])==2, "state", "county"), "\n")
+  if (length(z) < 4){
+    cat("  Geo values:", z, "\n")
+  } else {
+    cat("  Geo values:", "*", "\n")
+  }
+  cat("  Incidence period:", x$incidence_period[1], "\n")
+  cat("  Response Data source:", x$data_source[1], "\n")
+  cat("  Response Signal:", x$signal[1], "\n")
+  NextMethod(x, ...)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/evaluate.R
 \name{evaluate_predictions}
 \alias{evaluate_predictions}
-\title{Create a list of score cards}
+\title{Create a data frame of score cards}
 \usage{
 evaluate_predictions(
   predictions_cards,

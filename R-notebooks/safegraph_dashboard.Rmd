@@ -7,7 +7,7 @@ output:
     code_folding: hide
 params:
   source: "safegraph"
-  signal: "bars_visit_num"
+  signal: "median_home_dwell_time"
 ---
 
 ```{r, include = FALSE}

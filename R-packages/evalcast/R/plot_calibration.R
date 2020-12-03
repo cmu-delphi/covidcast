@@ -9,7 +9,7 @@
 plot_calibration <- function(scorecard,
                              type = c("wedgeplot", "traditional"),
                              grp_vars = c("forecaster", "forecast_date", "ahead"),
-                             avg_vars = c("location"),
+                             avg_vars = c("geo_values"),
                              legend_position = "bottom") {
   type <- match.arg(type)
   if (type == "wedgeplot") {
@@ -75,7 +75,7 @@ plot_calibration <- function(scorecard,
 #' @export 
 plot_coverage <- function(scorecards, type = c("all", "one"), 
                           grp_vars = c("forecaster", "forecast_date", "ahead"),
-                          avg_vars = c("location"),
+                          avg_vars = c("geo_values"),
                           alpha = 0.2, 
                           legend_position = "bottom") {
   type <- match.arg(type)

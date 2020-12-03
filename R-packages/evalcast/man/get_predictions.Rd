@@ -14,14 +14,14 @@ get_predictions(
   geo_type,
   geo_values = "*",
   apply_corrections = NULL,
-  signal_aggregation = c("long", "wide", "list"),
+  signal_aggregation = c("list", "wide", "long"),
   signal_aggregation_dt = NULL,
   ...
 )
 }
 \arguments{
 \item{forecaster}{Function that outputs a tibble with columns \code{ahead},
-\code{location}, \code{quantile}, and \code{value}. The \code{quantile} column gives the
+\code{geo_value}, \code{quantile}, and \code{value}. The \code{quantile} column gives the
 probabilities associated with quantile forecasts for that location and
 ahead. If your forecaster produces point forecasts, then set \code{quantile=NA}.}
 
@@ -68,8 +68,8 @@ Corrected values must exist in the column \code{corrected}.}
 
 \item{signal_aggregation}{this and the next argument control the type of
 data your forecaster expects to receive from covidcast. By default,
-different signals are passed in "long" format. But you may alternatively
-request "wide" or "list". See \code{\link[covidcast:covidcast_signals]{covidcast::covidcast_signals()}} and
+different signals are passed in "list" format. But you may alternatively
+request "wide" or "long". See \code{\link[covidcast:covidcast_signals]{covidcast::covidcast_signals()}} and
 \code{\link[covidcast:aggregate_signals]{covidcast::aggregate_signals()}} for more details.}
 
 \item{signal_aggregation_dt}{for any data format,
@@ -82,7 +82,7 @@ See that documentation for more details.}
 Long data frame of forecasts with a class of \code{predictions_cards}.
 The first 4 columns are the same as those returned by the forecaster. The
 remainder specify the prediction task, 10 columns in total:
-\code{ahead}, \code{location}, \code{quantile}, \code{value}, \code{forecaster}, \code{forecast_date},
+\code{ahead}, \code{geo_value}, \code{quantile}, \code{value}, \code{forecaster}, \code{forecast_date},
 \code{data_source}, \code{signal}, \code{target_end_date}, and \code{incidence_period}. Here
 \code{data_source} and \code{signal} correspond to the response varible only.
 }

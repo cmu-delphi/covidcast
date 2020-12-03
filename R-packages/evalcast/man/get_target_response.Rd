@@ -2,7 +2,7 @@
 % Please edit documentation in R/target.R
 \name{get_target_response}
 \alias{get_target_response}
-\title{Get data frame with column names \code{forecast_date}, \code{location}, \code{target_start},
+\title{Get data frame with column names \code{forecast_date}, \code{geo_values}, \code{target_start},
 \code{target_end}, \code{actual}}
 \usage{
 get_target_response(
@@ -11,7 +11,7 @@ get_target_response(
   incidence_period,
   ahead,
   geo_type,
-  locations
+  geo_values
 )
 }
 \arguments{
@@ -47,6 +47,6 @@ it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahea
 "hrr", "msa", or "state".}
 }
 \description{
-Get data frame with column names \code{forecast_date}, \code{location}, \code{target_start},
+Get data frame with column names \code{forecast_date}, \code{geo_values}, \code{target_start},
 \code{target_end}, \code{actual}
 }

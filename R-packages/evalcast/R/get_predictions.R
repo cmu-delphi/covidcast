@@ -10,7 +10,7 @@
 #' predictions made using the information as of September 14).
 #'
 #' @param forecaster Function that outputs a tibble with columns `ahead`,
-#'   `location`, `quantile`, and `value`. The `quantile` column gives the
+#'   `geo_value`, `quantile`, and `value`. The `quantile` column gives the
 #'   probabilities associated with quantile forecasts for that location and
 #'   ahead. If your forecaster produces point forecasts, then set `quantile=NA`.
 #' @param name_of_forecaster String indicating name of the forecaster.
@@ -23,8 +23,8 @@
 #' @template apply_corrections-template
 #' @param signal_aggregation this and the next argument control the type of
 #'   data your forecaster expects to receive from covidcast. By default,
-#'   different signals are passed in "long" format. But you may alternatively
-#'   request "wide" or "list". See [covidcast::covidcast_signals()] and 
+#'   different signals are passed in "list" format. But you may alternatively
+#'   request "wide" or "long". See [covidcast::covidcast_signals()] and 
 #'   [covidcast::aggregate_signals()] for more details.
 #' @param signal_aggregation_dt for any data format, 
 #'   [covidcast::aggregate_signals()] can perform leading and lagging for you.
@@ -33,7 +33,7 @@
 #' @return Long data frame of forecasts with a class of `predictions_cards`.
 #'   The first 4 columns are the same as those returned by the forecaster. The
 #'   remainder specify the prediction task, 10 columns in total: 
-#'   `ahead`, `location`, `quantile`, `value`, `forecaster`, `forecast_date`,
+#'   `ahead`, `geo_value`, `quantile`, `value`, `forecaster`, `forecast_date`,
 #'   `data_source`, `signal`, `target_end_date`, and `incidence_period`. Here
 #'   `data_source` and `signal` correspond to the response varible only.
 #' 
@@ -58,11 +58,11 @@ get_predictions <- function(forecaster,
                             geo_type,
                             geo_values = "*",
                             apply_corrections = NULL,
-                            signal_aggregation = c("long", "wide", "list"),
+                            signal_aggregation = c("list", "wide", "long"),
                             signal_aggregation_dt = NULL,
                             ...) {
   assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
-  signal_aggregation = match.arg(signal_aggregation, c("long", "wide", "list"))
+  signal_aggregation = match.arg(signal_aggregation, c("list", "wide", "long"))
   params <- list(...)
   out <- forecast_dates %>%
     map_dfr(~ do.call(
@@ -86,7 +86,7 @@ get_predictions <- function(forecaster,
 #' Get predictions cards for a single date
 #'
 #' @param forecaster Function that outputs a tibble with columns `ahead`,
-#'   `location`, `probs`, `quantiles`. The `quantiles` column gives the
+#'   `geo_value`, `probs`, `quantiles`. The `quantiles` column gives the
 #'   predictive quantiles of the forecast distribution for that location and
 #'   ahead.
 #' @param name_of_forecaster String indicating name of the forecaster.
@@ -158,7 +158,7 @@ get_predictions_single_date <- function(forecaster,
       incidence_period = incidence_period,
       ) 
       ## dropped attributes: other signals, geo_type,
-      ##   geo_values, corrections_applied, from_covidhub,
+      ##   corrections_applied, from_covidhub,
       ##   forecaster_params
 }
 

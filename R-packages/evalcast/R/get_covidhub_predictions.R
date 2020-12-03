@@ -62,7 +62,12 @@ get_covidhub_predictions <- function(covidhub_forecaster_name,
                .data$signal, .data$target_end_date, 
                .data$incidence_period)
   }
-  pcards <- bind_rows(pcards) 
+  pcards <- bind_rows(pcards) %>%
+    mutate(geo_value = if_else(nchar(.data$location)==2,
+                               fips_2_abbr(paste0(.data$location,"000")),
+                               .data$location),
+           location = NULL) %>%
+    relocate(.data$geo_value, .after = .data$ahead)
   class(pcards) = c("predictions_cards", class(pcards))
   pcards
 }

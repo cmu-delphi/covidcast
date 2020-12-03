@@ -17,11 +17,7 @@ get_and_check_pc_attributes <- function(predictions_cards) {
   )
 }
 
-#' Return unique value of attribute or throw error
-#'
-#' If TRUE, returns the unique value; if FALSE, throws an error.
-#' @param cards List of predictions cards or a list of score cards.
-#' @param attribute Name of attribute.
+
 unique_attr <- function(cards, attribute) {
   attr_list <- all_attr(cards, attribute)
   if (attribute == "signals")
@@ -48,20 +44,12 @@ unique_for_ahead <- function(cards, attribute) {
 }
 
 
-#' Return list of attributes
-#'
-#' Given a list of cards, returns a list of the same length giving the values
-#' of that attribute across all cards.
-#'
-#' @param cards List of predictions cards or a list of score cards.
-#' @param attribute Name of attribute.
+
 all_attr <- function(cards, attribute) {
   return(cards %>% map(~ attr(.x, attribute)))
 }
 
-#' Remove locations that are not in all cards
-#'
-#' @param cards List of predictions cards or a list of score cards.
+
 intersect_locations <- function(cards) {
   locations_list <- cards %>% map(~ unique(.x$location))
   intersected_locations <- Reduce(intersect, locations_list)
@@ -82,7 +70,7 @@ intersect_locations <- function(cards) {
 #' @param x Prediction card.
 #' @export
 print.predictions_cards <- function(x, ...) {
-  z = unique(x$location)
+  z = unique(x$geo_value)
   cat("Overview:\n")
   cat("  Name of forecaster:", x$forecaster[1], "\n")
   cat("  Forecast date:", as.character(unique(x$forecast_date)), "\n")
@@ -104,7 +92,7 @@ print.predictions_cards <- function(x, ...) {
 #' @param card Score card.
 #' @export
 print.score_cards <- function(x, ...) {
-  z = unique(x$location)
+  z = unique(x$geo_value)
   zz = unique(x$forecaster)
   cat("Overview:\n")
   cat("  Forecaster(s):", zz, "\n")

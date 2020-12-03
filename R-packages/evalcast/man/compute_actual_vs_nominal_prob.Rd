@@ -7,7 +7,7 @@
 compute_actual_vs_nominal_prob(
   score_card,
   grp_vars = c("forecaster", "forecast_date", "ahead"),
-  avg_vars = c("location")
+  avg_vars = c("geo_values")
 )
 }
 \arguments{

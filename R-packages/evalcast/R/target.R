@@ -40,7 +40,7 @@ get_target_period <- function(forecast_date, incidence_period, ahead) {
          end = sunday_of_ew_frcst_date + (week_ahead + 1) * 7 - 1)
 }
 
-#' Get data frame with column names `forecast_date`, `location`, `target_start`,
+#' Get data frame with column names `forecast_date`, `geo_values`, `target_start`,
 #' `target_end`, `actual`
 #'
 #' @template signals-template
@@ -53,7 +53,7 @@ get_target_response <- function(signals,
                                 incidence_period,
                                 ahead,
                                 geo_type,
-                                locations) {
+                                geo_values) {
   response <- signals[1, ]
   target_periods <- forecast_dates %>%
     enframe(name = NULL, value = "forecast_date") %>%
@@ -83,15 +83,13 @@ get_target_response <- function(signals,
   target_periods <- target_periods %>% filter(.data$available) %>%
     mutate(available = NULL)
   
-  if (nchar(locations[1])==2){
-    locations <- fips_2_abbr(locations) %>% tolower()
-  }
+  
   out <- target_periods %>%
     rename(start_day = .data$start, end_day = .data$end) %>%
     mutate(data_source = response$data_source,
            signal = response$signal,
            geo_type = geo_type) %>%
-    pmap(download_signal, geo_values = locations) # apply_corrections would need to run here,
+    pmap(download_signal, geo_values = geo_values) # apply_corrections would need to run here,
                           # but can only use part of response
                           # we don't allow this for now.
 
@@ -110,7 +108,7 @@ get_target_response <- function(signals,
   out <- out %>%
     bind_rows(.id = "forecast_date") %>%
     mutate(forecast_date = lubridate::ymd(.data$forecast_date)) %>%
-    group_by(.data$location, .data$forecast_date) %>%
+    group_by(.data$geo_value, .data$forecast_date) %>%
     summarize(actual = sum(.data$value)) %>%
 #    mutate(forecast_date = forecast_dates[as.numeric(.data$forecast_date)]) %>%
     left_join(target_periods, by = "forecast_date")
@@ -120,9 +118,9 @@ get_target_response <- function(signals,
 }
 
 empty_actual <- function(){
-  out <- tibble(location = character(0), forecast_date = lubridate::ymd(),
+  out <- tibble(geo_values = character(0), forecast_date = lubridate::ymd(),
                 actual=double(0), start = lubridate::ymd(), 
-                end = lubridate::ymd()) %>% group_by(location)
+                end = lubridate::ymd()) %>% group_by(geo_values)
   attr(out, "as_of") <- Sys.Date()
   out
 }

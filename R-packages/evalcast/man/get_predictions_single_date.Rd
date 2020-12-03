@@ -21,7 +21,7 @@ get_predictions_single_date(
 }
 \arguments{
 \item{forecaster}{Function that outputs a tibble with columns \code{ahead},
-\code{location}, \code{probs}, \code{quantiles}. The \code{quantiles} column gives the
+\code{geo_value}, \code{probs}, \code{quantiles}. The \code{quantiles} column gives the
 predictive quantiles of the forecast distribution for that location and
 ahead.}
 

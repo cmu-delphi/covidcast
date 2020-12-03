@@ -138,14 +138,14 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
               msg="All predictions cards should have the same response.")
   incidence_period <- unique_for_ahead(predictions_cards, "incidence_period")
   geo_type <- unique_for_ahead(
-    select(predictions_cards, .data$location, .data$ahead) %>%
-      mutate(geo_type = nchar(.data$location)), 
+    select(predictions_cards, .data$geo_value, .data$ahead) %>%
+      mutate(geo_type = nchar(.data$geo_value)), 
     "geo_type")
   geo_type <- ifelse(geo_type == 2L, "state", "county")
   forecast_dates <- select(predictions_cards, forecast_date) %>%
     distinct() %>% pull()
   ahead <- predictions_cards$ahead[1]
-  locations <- select(predictions_cards, location) %>%
+  geo_values <- select(predictions_cards, .data$geo_value) %>%
     distinct() %>% pull()
   
   # get information from predictions cards' attributes and check:
@@ -156,7 +156,7 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
                                          incidence_period,
                                          ahead,
                                          geo_type,
-                                         locations)
+                                         geo_values)
   as_of <- attr(target_response, "as_of")
   . <- "got this idea from https://github.com/tidyverse/magrittr/issues/29"
   if (as_of < max(target_response$end) + backfill_buffer) {
@@ -174,8 +174,8 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
   
   # join together the data frames target_response and predicted:
   score_card <- target_response %>%
-    inner_join(predictions_cards, by = c("location", "forecast_date")) %>%
-    select(.data$location,
+    inner_join(predictions_cards, by = c("geo_values", "forecast_date")) %>%
+    select(.data$geo_values,
            .data$forecast_date,
            .data$actual,
            .data$quantile,
@@ -184,18 +184,18 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
   # compute the error
   
   score_card <- score_card %>%
-    group_by(.data$forecaster, .data$location, .data$forecast_date)
+    group_by(.data$forecaster, .data$geo_values, .data$forecast_date)
   sc_keys <- score_card %>% group_keys()
   score_card <- score_card %>% group_split() %>% lapply(erm) %>% bind_rows()
   score_card <- bind_cols(score_card, sc_keys)
   
   score_card <- left_join(score_card, target_response, 
-                          by=c("location", "forecast_date")) %>%
+                          by=c("geo_values", "forecast_date")) %>%
     select(-.data$start, -.data$end)
   score_card <- inner_join(score_card, predictions_cards,
-                           by=c("forecaster", "location", "forecast_date"))
+                           by=c("forecaster", "geo_values", "forecast_date"))
   score_card <- score_card %>% relocate(
-    .data$ahead, .data$location, .data$quantile, .data$value, .data$forecaster,
+    .data$ahead, .data$geo_values, .data$quantile, .data$value, .data$forecaster,
     .data$forecast_date, .data$data_source, .data$signal, .data$target_end_date,
     .data$incidence_period, .data$actual)
     
@@ -204,8 +204,6 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
   return(score_card)
 }
 
-#' Check that a forecaster's output is valid
-#' @param pred_card Prediction card, in the form created by [get_predictions()].
 check_valid_forecaster_output <- function(pred_card) {
   null_forecasts <- pred_card$forecast_distribution %>%
     map_lgl(is.null)

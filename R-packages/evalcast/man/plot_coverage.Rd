@@ -8,7 +8,7 @@ plot_coverage(
   scorecards,
   type = c("all", "one"),
   grp_vars = c("forecaster", "forecast_date", "ahead"),
-  avg_vars = c("location"),
+  avg_vars = c("geo_values"),
   alpha = 0.2,
   legend_position = "bottom"
 )

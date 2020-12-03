@@ -40,7 +40,7 @@ get_target_period <- function(forecast_date, incidence_period, ahead) {
          end = sunday_of_ew_frcst_date + (week_ahead + 1) * 7 - 1)
 }
 
-#' Get data frame with column names `forecast_date`, `geo_values`, `target_start`,
+#' Get data frame with column names `forecast_date`, `geo_value`, `target_start`,
 #' `target_end`, `actual`
 #'
 #' @template signals-template
@@ -118,9 +118,9 @@ get_target_response <- function(signals,
 }
 
 empty_actual <- function(){
-  out <- tibble(geo_values = character(0), forecast_date = lubridate::ymd(),
+  out <- tibble(geo_value = character(0), forecast_date = lubridate::ymd(),
                 actual=double(0), start = lubridate::ymd(), 
-                end = lubridate::ymd()) %>% group_by(geo_values)
+                end = lubridate::ymd()) %>% group_by(geo_value)
   attr(out, "as_of") <- Sys.Date()
   out
 }

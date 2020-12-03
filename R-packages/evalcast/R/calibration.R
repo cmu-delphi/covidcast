@@ -64,7 +64,7 @@ averaging_checks <- function(score_card, grp_vars, avg_vars){
 compute_coverage <- function(
   score_card, 
   grp_vars = c("forecaster", "forecast_date", "ahead"),
-  avg_vars = c("geo_values")) {
+  avg_vars = c("geo_value")) {
   
   assert_that(all(c(grp_vars, avg_vars, "quantile", "value", "actual") %in%
                     names(score_card)),
@@ -124,7 +124,7 @@ compute_coverage <- function(
 compute_calibration <- function(
   score_card, 
   grp_vars = c("forecaster", "forecast_date", "ahead"),
-  avg_vars = c("geo_values")) {
+  avg_vars = c("geo_value")) {
   
   assert_that(all(c(grp_vars, avg_vars, "quantile", "value", "actual") %in%
                     names(score_card)),

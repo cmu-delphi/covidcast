@@ -174,8 +174,8 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
   
   # join together the data frames target_response and predicted:
   score_card <- target_response %>%
-    inner_join(predictions_cards, by = c("geo_values", "forecast_date")) %>%
-    select(.data$geo_values,
+    inner_join(predictions_cards, by = c("geo_value", "forecast_date")) %>%
+    select(.data$geo_value,
            .data$forecast_date,
            .data$actual,
            .data$quantile,
@@ -184,18 +184,18 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
   # compute the error
   
   score_card <- score_card %>%
-    group_by(.data$forecaster, .data$geo_values, .data$forecast_date)
+    group_by(.data$forecaster, .data$geo_value, .data$forecast_date)
   sc_keys <- score_card %>% group_keys()
   score_card <- score_card %>% group_split() %>% lapply(erm) %>% bind_rows()
   score_card <- bind_cols(score_card, sc_keys)
   
   score_card <- left_join(score_card, target_response, 
-                          by=c("geo_values", "forecast_date")) %>%
+                          by=c("geo_value", "forecast_date")) %>%
     select(-.data$start, -.data$end)
   score_card <- inner_join(score_card, predictions_cards,
-                           by=c("forecaster", "geo_values", "forecast_date"))
+                           by=c("forecaster", "geo_value", "forecast_date"))
   score_card <- score_card %>% relocate(
-    .data$ahead, .data$geo_values, .data$quantile, .data$value, .data$forecaster,
+    .data$ahead, .data$geo_value, .data$quantile, .data$value, .data$forecaster,
     .data$forecast_date, .data$data_source, .data$signal, .data$target_end_date,
     .data$incidence_period, .data$actual)
     

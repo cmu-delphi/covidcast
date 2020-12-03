@@ -16,6 +16,7 @@ library(tidyr)
 library(lubridate)
 library(ggplot2)
 library(RColorBrewer)
+library(stringr)
 ```
 # {.tabset}
 
@@ -27,7 +28,7 @@ we should do this more comprehensively. Pull all forecasters that have enough
 submissions to make useful comparisons. To do this, we can expose the function 
 `get_covidhub_forecaster_names()`.
 
-```{r, eval = FALSE}
+```{r}
 forecasters = c("CMU-TimeSeries", 
                 "YYG-ParamSearch", 
                 "UMass-MechBayes", 
@@ -56,56 +57,77 @@ for (i in 1:length(forecasters)) {
 }
 ```
 
+Load data from previous run so we don't have to reingest / process it. This
+data could end up out of date if a forecast is retrospectively updated, but in
+that case it's no longer a true prediction. We can always restart from scratch
+by deleting covidhub_evaluation.rda.
+```{r}
+load(file = "covidhub_evaluation.rda")
+if(exists("predictions_cards")){
+seen_dates = predictions_cards %>% 
+  distinct(forecast_date, forecaster)
+}
+```
+
 Now figure out "comparable" forecast dates: making a forecast on a Sunday or a 
 Monday of the same epiweek should be comparable. **TODO**: we should switch over 
 to using the Zoltar API, and soon it should have an "as of" parameter, so then 
 we shouldn't need to do this. 
 
-```{r, eval = FALSE}
-forecast_dates_comparable = vector("list", length = length(forecasters)) 
+```{r}
 forecast_dates_cmu = forecast_dates[[1]]
+# new_dates, as opposed to dates for which we already have data for a forecaster
+new_dates = list()
 for (i in 1:length(forecasters)) {
   given_dates = forecast_dates[[i]]
-  for (j in 1:length(forecast_dates_cmu)) {
-    # Find the last forecast date before the current CMU one
-    given_date = given_dates[max(which(given_dates <= forecast_dates_cmu[j]))]
-    
-    # If the dates match exactly, or the given date falls on a Sunday and the
-    # CMU date falls on a Monday of the same epiweek, the call it comparable
-    if (!is.na(given_date) &&
-        (given_date == forecast_dates_cmu[j] ||
-        (as.Date(forecast_dates_cmu[j]) - as.Date(given_date) == 1 &&
-         wday(forecast_dates_cmu[j]) == 2 && wday(given_date) == 1))) {
-      forecast_dates_comparable[[i]][j] = given_date
+  # If the dates match exactly, or the given date falls on a Sunday and the
+  # CMU date falls on a Monday of the same epiweek, then call it comparable...
+  comparable_forecast_dates = given_dates[(given_dates %in% forecast_dates_cmu | 
+                            ((given_dates + 1) %in% forecast_dates_cmu) &
+                            wday(given_dates) == 1)]
+  
+  # ...but if there is an exact match on dates, ignore predictions made on the
+  # previous day
+  comparable_forecast_dates = comparable_forecast_dates[!((comparable_forecast_dates + 1) %in% comparable_forecast_dates)]
+  if(exists("seen_dates")){
+    if(forecasters[[i]] %in% seen_dates$forecaster){
+      seen_forecaster_dates = (seen_dates %>% 
+                                filter(forecaster == forecasters[[i]]))$forecast_date
+      comparable_forecast_dates = as_date(setdiff(comparable_forecast_dates, seen_forecaster_dates))
     }
-    
-    # Otherwise call it NA
-    else forecast_dates_comparable[[i]][j] = NA
   }
+  new_dates[[i]] = comparable_forecast_dates
 }
+names(new_dates) = forecasters
 ```
 
 Now get predictions for each forecaster, looping over forecast dates from the
 CMU-TimeSeries model. **TODO**: this part is very very slow. Maybe (hopefully) 
 by changing to use the Zoltar API, this will be much faster.
 
-```{r, eval = FALSE}
-predictions_cards = vector("list", length = length(forecasters))
+```{r}
+predictions_cards_list = vector("list", length = length(forecasters))
 for (i in 1:length(forecasters)) {
   cat(forecasters[i], "...\n")
-  predictions_cards[[i]] = tryCatch({
+  if (length(new_dates[[i]] > 0)){
+  predictions_cards_list[[i]] = tryCatch({
     get_covidhub_predictions(forecasters[i], 
-                             na.omit(forecast_dates_comparable[[i]]), 
-                             geo_type = "state")
+                             new_dates[[i]])
   },
   error = function(e) cat(e$message))
+  }
+}
+predictions_cards_new = bind_rows(predictions_cards_list)
+
+# Combine old and new predictions cards
+if(exists("predictions_cards")){
+  predictions_cards = rbind(predictions_cards, predictions_cards_new)
+} else {
+  predictions_cards = predictions_cards_new
 }
 
-# Looks like we had errors for both Google-Harvard and Yu Group, who didn't set
-# anything for the response ...  
-inds_missing = which(sapply(predictions_cards, length) == 0)
-predictions_cards = predictions_cards[-inds_missing]
-forecasters = forecasters[-inds_missing]
+# Discard any forecasters without data
+forecasters = unique(as.data.frame(predictions_cards)$forecaster)
 ```
 
 On reflection: part of the problem here is that `get_covidhub_predictions()` 
@@ -122,12 +144,14 @@ currently unstable. **TODO**: we shouldn't require `evaluate_predictions()` to
 have the response match what's in the forecaster. If I train my forecaster on
 (say) JHU-CSSE data, then I should be able to evaluate it on USAFacts data. 
 
-```{r, eval = FALSE}
-for (i in 1:length(predictions_cards)) {
-  for (j in 1:length(predictions_cards[[i]])) {
-    attributes(predictions_cards[[i]][[j]])$signals$data_source = "usa-facts"
-  }
-}
+```{r}
+predictions_cards$data_source = "usa-facts"
+
+response_sig = "deaths_incidence_num"
+predictions_cards = predictions_cards %>% 
+                    filter(ahead < 5) %>% 
+                    filter(str_detect(geo_value, "[a-z]{2}")) %>% # States
+                    filter(signal == response_sig)
 ```
 
 Evaluate the predictions based on weighted interval score (WIS), absolute error
@@ -143,33 +167,47 @@ would help but I don't think it's the right solution. We're fetching the exact
 same data something like 15 times in a row. If we simply changed the order of 
 operations then we wouldn't even need caching at all.
 
-```{r, eval = FALSE}
-ahead = 1:4
-last_date = as.Date("2020-09-28")
-response_dat = "usa-facts"
-response_sig = "deaths_incidence_num"
-err_measures = list(wis = weighted_interval_score, ae = absolute_error,
-                    cov_80 = interval_coverage(alpha = 0.2))
 
-score_cards = vector("list", length = length(predictions_cards))
-for (i in 1:length(predictions_cards)) {
-  given_dates = do.call("c", lapply(predictions_cards[[i]], function(x) {
-    attributes(x)$forecast_date }))
-  given_dates_trimmed = given_dates[given_dates <= last_date]
-  given_predictions = filter_predictions(predictions_cards[[i]], ahead = ahead,
-                                         response_data_source = response_dat,
-                                         response_signal = response_sig,
-                                         forecast_date = given_dates_trimmed)
-  score_cards[[i]] = evaluate_predictions(given_predictions, err_measures,
-                                          backfill_buffer = 0)
+```{r}
+if(exists("score_cards")){
+  scored_forecasters = (score_cards %>% distinct(forecaster))$forecaster
+} else {
+  scored_forecasters = NULL
+}
+err_measures = list(wis = weighted_interval_score, ae = absolute_error,
+                    cov_80 = interval_coverage(coverage = 0.8))
+
+# Create new score cards
+score_cards_new = vector("list", length = length(forecasters))
+
+preds_to_eval = predictions_cards %>% 
+                      filter(target_end_date < today())
+
+preds_to_eval = anti_join(preds_to_eval, 
+                          score_cards, 
+                          by = c("ahead", "forecaster", "forecast_date"))
+
+if(length(preds_to_eval) > 0){
+  score_cards_new = evaluate_predictions(preds_to_eval, 
+                                              err_measures,
+                                              backfill_buffer = 0)
+} else {
+  score_cards_new = data.frame()
+}
+if(exists("score_cards")){
+  score_cards = rbind(score_cards, score_cards_new)
+} else {
+  score_cards = score_cards_new
 }
 ```
 
 As the above contained some pretty expensive steps, we save the results in an
 RData file (and we set `eval = FALSE` on this and all the above code chunks). 
 
-```{r, eval = FALSE}
-save(list = ls(), file = "covidhub_evaluation.rda", compress = "xz")
+```{r}
+save(list = c("predictions_cards", "score_cards"), 
+     file = "covidhub_evaluation.rda", 
+     compress = "xz")
 ```
 
 Wrangle the score cards into a single data frame (more convenient). **TODO**:
@@ -177,32 +215,19 @@ define some convenience functions to do this. I have it in "long" format here.
 
 ```{r}
 load(file = "covidhub_evaluation.rda")
-
-score_cards_df = score_cards
-for (i in 1:length(score_cards_df)) {
-  for (j in 1:length(score_cards_df[[i]])) {
-    score_cards_df[[i]][[j]]$ahead = attributes(score_cards_df[[i]][[j]])$ahead
-    score_cards_df[[i]][[j]]$forecaster = forecasters[i]
-  }
-}
-
-for (i in 1:length(score_cards_df)) {
-  score_cards_df[[i]] = do.call(rbind, score_cards_df[[i]])
-}
-score_cards_df = do.call(rbind, score_cards_df)
 ```
 
 Compute summary statistics.
 
 ```{r}
-score_cards_df %>% group_by(forecaster, ahead) %>% 
+score_cards %>% group_by(forecaster, ahead) %>% 
   summarize(num = sum(!is.na(wis))) %>%
   pivot_wider(names_from = ahead, names_prefix = "num_", 
               values_from = num) %>%
   print(n = Inf)
 
 # CovidAnalytics-DELPHI and IHME-CurveFit didn't submit that many forecasts ...
-score_cards_df = score_cards_df %>% 
+score_cards = score_cards %>% 
   filter(forecaster != "CovidAnalytics-DELPHI",
          forecaster != "IHME-CurveFit")
 ```
@@ -221,7 +246,7 @@ Median = function(x) median(x, na.rm = TRUE)
 
 summarize_var = function(df, var, aggr = Mean) {
   df_by_date = df %>% 
-    group_by(forecaster, ahead, start) %>%
+    group_by(forecaster, ahead, target_end_date) %>%
     summarize(var = aggr(!!as.symbol(var))) %>%
     ungroup()
   df_overall = df %>%
@@ -239,7 +264,7 @@ dot_plot = function(df, var = "wis", ylab = var, ylim = NULL, aggr = Mean) {
   df_sum$ahead = factor(paste("ahead =", df_sum$ahead))
   
   ggplot(df_sum, aes(x = order, y = var)) +
-    geom_point(aes(color = start)) + 
+    geom_point(aes(color = target_end_date)) + 
     geom_point(aes(x = order, y = var_overall), color = "red", shape = 3) +
     facet_wrap(vars(ahead), scales = "free") + 
     labs(x = "Forecaster", y = ylab) +
@@ -248,9 +273,9 @@ dot_plot = function(df, var = "wis", ylab = var, ylim = NULL, aggr = Mean) {
     coord_cartesian(ylim = ylim)
 }
 
-dot_plot(score_cards_df, var = "wis", ylab = "Mean WIS") + scale_y_log10()
-dot_plot(score_cards_df, var = "ae", ylab = "Mean AE") + scale_y_log10()
-dot_plot(score_cards_df, var = "cov_80", ylab = "Coverage-80", ylim = c(0,1)) +
+dot_plot(score_cards, var = "wis", ylab = "Mean WIS") + scale_y_log10()
+dot_plot(score_cards, var = "ae", ylab = "Mean AE") + scale_y_log10()
+dot_plot(score_cards, var = "cov_80", ylab = "Coverage-80", ylim = c(0,1)) +
   geom_hline(yintercept = 0.8)
 ```
 
@@ -260,14 +285,14 @@ Same as before, but change the aggregator function to the median. Omitting AE
 for brevity, hencforth.
 
 ```{r, fig.width = 10, fig.height = 10}
-dot_plot(score_cards_df, var = "wis", ylab = "Median WIS", aggr = Median) +
+dot_plot(score_cards, var = "wis", ylab = "Median WIS", aggr = Median) +
   scale_y_log10()
 ```
 
 And now we change the aggregator function to be the 90th percentile.
 
 ```{r, fig.width = 10, fig.height = 10}
-dot_plot(score_cards_df, var = "wis", ylab = "90th percentile WIS", 
+dot_plot(score_cards, var = "wis", ylab = "90th percentile WIS", 
          aggr = function(x) quantile(x, prob = 0.9, na.rm = TRUE)) +
   scale_y_log10()
 ```
@@ -289,7 +314,7 @@ line_plot = function(df, var = "wis", ylab = var, ylim = NULL, aggr = Mean) {
   df_sum = summarize_var(df, var, aggr)
   df_sum$ahead = factor(paste("ahead =", df_sum$ahead))
   
-  ggplot(df_sum, aes(x = start, y = var)) +
+  ggplot(df_sum, aes(x = target_end_date, y = var)) +
     geom_line(aes(color = forecaster, linetype = forecaster)) +
     geom_point(aes(color = forecaster)) +
     facet_wrap(vars(ahead), scales = "free") + 
@@ -298,8 +323,8 @@ line_plot = function(df, var = "wis", ylab = var, ylim = NULL, aggr = Mean) {
     scale_color_manual(values = color_picker(length(unique(forecaster))))
 }
 
-line_plot(score_cards_df, var = "wis", ylab = "Mean WIS") + scale_y_log10() 
-line_plot(score_cards_df, var = "cov_80", ylab = "Coverage-80", ylim = c(0,1)) +
+line_plot(score_cards, var = "wis", ylab = "Mean WIS") + scale_y_log10() 
+line_plot(score_cards, var = "cov_80", ylab = "Coverage-80", ylim = c(0,1)) +
   geom_hline(yintercept = 0.8)
 ```
 
@@ -322,10 +347,11 @@ for brevity.
 # Note to self: mutate_at() gave me a weird bug below! From now on, better use
 # mutate() with across() instead ...
 scale_df = function(df, var, base_forecaster = "COVIDhub-baseline") {
-  df %>% select(-c(forecast_distribution, forecast_date)) %>%
-    pivot_wider(id_cols = c(location, start, end, ahead),
+  df %>% select(-c(quantile, value, forecast_date)) %>%
+    distinct() %>%
+    pivot_wider(id_cols = c(geo_value, target_end_date, ahead),
                 names_from = "forecaster", names_prefix = var, 
-                values_from = var) %>% 
+                values_from = var) %>%
     mutate(across(starts_with(var), ~ .x /
                 !!as.symbol(paste0(var, base_forecaster)))) %>%
     pivot_longer(cols = starts_with(var), names_to = "forecaster",
@@ -334,14 +360,14 @@ scale_df = function(df, var, base_forecaster = "COVIDhub-baseline") {
     filter(forecaster != base_forecaster)
 }
 
-dot_plot(scale_df(score_cards_df, var = "wis"), var = "scaled", 
+dot_plot(scale_df(score_cards, var = "wis"), var = "scaled", 
          ylab = "Mean scaled WIS") + geom_hline(yintercept = 1) 
 ```
 
 Here are now line plots for mean scaled WIS. 
 
 ```{r, fig.width = 10, fig.height = 8}
-line_plot(scale_df(score_cards_df, var = "wis"), var = "scaled", 
+line_plot(scale_df(score_cards, var = "wis"), var = "scaled", 
           ylab = "Mean scaled WIS") + geom_hline(yintercept = 1) 
 ```
 
@@ -365,14 +391,14 @@ center_df = function(df, var, base_forecaster = "COVIDhub-baseline") {
     mutate(centered = log(scaled)) %>% select(-scaled)
 }
  
-dot_plot(center_df(score_cards_df, var = "wis"), var = "centered", 
+dot_plot(center_df(score_cards, var = "wis"), var = "centered", 
          ylab = "Mean centered WIS") + geom_hline(yintercept = 0) 
 ```
 
 Here are now the line plots for mean centered WIS.
 
 ```{r, fig.width = 10, fig.height = 8}
-line_plot(center_df(score_cards_df, var = "wis"), var = "centered", 
+line_plot(center_df(score_cards, var = "wis"), var = "centered", 
           ylab = "Mean centered WIS") + geom_hline(yintercept = 0) 
 ```
 
@@ -435,7 +461,7 @@ pairwise_tournament = function(df, var, aggr = Mean) {
               vec2 = theta_vec2))
 }
 
-theta = pairwise_tournament(score_cards_df, var = "wis", aggr = 
+theta = pairwise_tournament(score_cards, var = "wis", aggr = 
                               function(x) mean(x, trim = 0.01, na.rm = TRUE))
 
 ranked_list = rownames(theta$mat)[order(theta$vec1)]
@@ -467,7 +493,7 @@ ggplot() + geom_point(aes(x = theta$vec1, y = theta$vec2)) +
 Repeat the same pairwise tournament but with the median as the aggregator.
 
 ```{r, fig.width = 10, fig.height = 10}
-theta = pairwise_tournament(score_cards_df, var = "wis", aggr = Median)
+theta = pairwise_tournament(score_cards, var = "wis", aggr = Median)
 
 ranked_list = rownames(theta$mat)[order(theta$vec1)]
 colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
@@ -488,7 +514,7 @@ knitr::kable(data.frame(rank = 1:length(theta$vec1), forecaster = ranked_list,
 And now with the 90th percentile as the aggregator. 
 
 ```{r, fig.width = 10, fig.height = 10}
-theta = pairwise_tournament(score_cards_df, var = "wis", aggr =
+theta = pairwise_tournament(score_cards, var = "wis", aggr =
                               function(x) quantile(x, prob = 0.9, na.rm = TRUE))
 
 ranked_list = rownames(theta$mat)[order(theta$vec1)]

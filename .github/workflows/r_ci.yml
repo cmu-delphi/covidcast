@@ -22,7 +22,7 @@ jobs:
         working-directory: R-packages/covidcast/
     strategy:
       matrix:
-        r-version: [3.5]
+        r-version: [3.5, 3.6]
 
     steps:
       - uses: actions/checkout@v2

@@ -58,6 +58,8 @@ test_that("state line graphs", {
 })
 
 test_that("simple state choropleths", {
+  skip_if(startsWith(R.Version()$minor, "5") & R.Version()$major == "3",
+          "Only test on R 3.6+")
   fb_state <- readRDS(test_path("data/survey-data-state.rds"))
 
   expect_doppelganger("default state choropleth",

@@ -7,7 +7,7 @@ output: html_document
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(message = FALSE, warning = FALSE)
-knitr::opts_chunk$set(cache = TRUE, autodep = TRUE, cache.comments = TRUE)
+# knitr::opts_chunk$set(cache = TRUE, autodep = TRUE, cache.comments = TRUE)
 
 library(covidcast)
 library(evalcast)
@@ -41,7 +41,7 @@ forecasters = c("CMU-TimeSeries",
                 "OliverWyman-Navigator", 
                 "JHU_IDD-CovidSP", 
                 "CovidAnalytics-DELPHI", 
-                "Google_Harvard-CPF", 
+             #   "Google_Harvard-CPF", Excluded for now. Doesn't have quantiles for all forecasts
                 "Yu_Group-CLEP", 
                 "COVIDhub-ensemble", 
                 "COVIDhub-baseline")
@@ -107,12 +107,16 @@ by changing to use the Zoltar API, this will be much faster.
 
 ```{r}
 predictions_cards_list = vector("list", length = length(forecasters))
+response_sig = "deaths_incidence_num"
 for (i in 1:length(forecasters)) {
   cat(forecasters[i], "...\n")
   if (length(new_dates[[i]] > 0)){
   predictions_cards_list[[i]] = tryCatch({
     get_covidhub_predictions(forecasters[i], 
-                             new_dates[[i]])
+                             new_dates[[i]]) %>% 
+                    filter(ahead < 5) %>% 
+                    filter(str_detect(geo_value, "[a-z]{2}")) %>%
+                    filter(signal == response_sig)
   },
   error = function(e) cat(e$message))
   }
@@ -146,12 +150,6 @@ have the response match what's in the forecaster. If I train my forecaster on
 
 ```{r}
 predictions_cards$data_source = "usa-facts"
-
-response_sig = "deaths_incidence_num"
-predictions_cards = predictions_cards %>% 
-                    filter(ahead < 5) %>% 
-                    filter(str_detect(geo_value, "[a-z]{2}")) %>% # States
-                    filter(signal == response_sig)
 ```
 
 Evaluate the predictions based on weighted interval score (WIS), absolute error
@@ -220,16 +218,23 @@ load(file = "covidhub_evaluation.rda")
 Compute summary statistics.
 
 ```{r}
-score_cards %>% group_by(forecaster, ahead) %>% 
-  summarize(num = sum(!is.na(wis))) %>%
-  pivot_wider(names_from = ahead, names_prefix = "num_", 
-              values_from = num) %>%
-  print(n = Inf)
+recent_score_by_frcstr = score_cards %>% 
+                           filter(target_end_date > today() - 28) %>%
+                           group_by(forecaster, ahead) %>% 
+                           summarize(num = sum(!is.na(wis))) %>%
+                           pivot_wider(names_from = ahead, 
+                                       names_prefix = "num_", 
+                                       values_from = num)
+recent_score_by_frcstr = recent_score_by_frcstr %>% 
+                           mutate(num_total = num_1 + num_2 + num_3 + num_4) %>%
+                           arrange(desc(num_total))
+print(recent_score_by_frcstr, n = Inf)
+max_forecasts = 51 * 24 * 4 * 4 # States * quantiles * ahead * weeks
 
+active_forecasters = recent_score_by_frcstr[recent_score_by_frcstr$num_total > max_forecasts / 2,]$forecaster
 # CovidAnalytics-DELPHI and IHME-CurveFit didn't submit that many forecasts ...
 score_cards = score_cards %>% 
-  filter(forecaster != "CovidAnalytics-DELPHI",
-         forecaster != "IHME-CurveFit")
+                filter(forecaster %in% active_forecasters)
 ```
 
 ## Dot plots

@@ -43,7 +43,7 @@ def plot(data: pd.DataFrame,
          time_value: date = None,
          plot_type: str = "choropleth",
          combine_megacounties: bool = True,
-         ax = None,
+         ax: axes.Axes = None,
          **kwargs: Any) -> axes.Axes:
     """Given the output data frame of :py:func:`covidcast.signal`, plot a choropleth or bubble map.
 
@@ -289,7 +289,7 @@ def _plot_bubble(ax: axes.Axes, data: gpd.GeoDataFrame, geo_type: str, **kwargs:
     ax.legend(frameon=False, ncol=8, loc="lower center", bbox_to_anchor=(0.5, -0.1))
 
 
-def _plot_background_states(figsize: tuple, ax=None) -> axes.Axes:
+def _plot_background_states(figsize: tuple, ax: axes.Axes = None) -> axes.Axes:
     """Plot US states in light grey as the background for other plots.
 
     :param figsize: Dimensions of plot.

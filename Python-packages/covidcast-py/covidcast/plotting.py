@@ -44,6 +44,7 @@ def plot(data: pd.DataFrame,
          plot_type: str = "choropleth",
          combine_megacounties: bool = True,
          ax: axes.Axes = None,
+         title: str = None,
          **kwargs: Any) -> axes.Axes:
     """Given the output data frame of :py:func:`covidcast.signal`, plot a choropleth or bubble map.
 
@@ -81,8 +82,8 @@ def plot(data: pd.DataFrame,
     :param kwargs: Optional keyword arguments passed to ``GeoDataFrame.plot()``.
     :param plot_type: Type of plot to create. Either choropleth (default) or bubble map.
     :param ax: Optional matplotlib axis to plot on.
-    :return: Matplotlib axes object.
-
+    :param title: Plot title. If not provided, will default to "source: signal, day"
+    :return: Matplotlib figure object.
     """
     if plot_type not in {"choropleth", "bubble"}:
         raise ValueError("`plot_type` must be 'choropleth' or 'bubble'.")
@@ -93,10 +94,10 @@ def plot(data: pd.DataFrame,
     day_data = data.loc[data.time_value == pd.to_datetime(day_to_plot), :]
     kwargs["vmax"] = kwargs.get("vmax", meta["mean_value"] + 3 * meta["stdev_value"])
     kwargs["figsize"] = kwargs.get("figsize", (12.8, 9.6))
-
     ax = _plot_background_states(kwargs["figsize"]) if ax is None else ax
     ax.axis("off")
-    ax.set_title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")
+    ax.set_title(
+        f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}" if title is None else title)
     if plot_type == "choropleth":
         _plot_choro(ax, day_data, combine_megacounties, **kwargs)
     else:

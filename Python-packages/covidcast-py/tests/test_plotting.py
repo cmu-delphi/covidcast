@@ -32,10 +32,11 @@ def _convert_to_array(fig: matplotlib.figure.Figure) -> np.array:
 @patch("covidcast.plotting._signal_metadata")
 def test_plot(mock_metadata):
     mock_metadata.side_effect = [
+        {"mean_value": 0.5330011, "stdev_value": 0.4683431},  # county metadata
         {"mean_value": 0.5330011, "stdev_value": 0.4683431},
         {"mean_value": 0.5330011, "stdev_value": 0.4683431},
-        {"mean_value": 0.5330011, "stdev_value": 0.4683431},
-        {"mean_value": 0.5304083, "stdev_value": 0.235302},
+        {"mean_value": 0.5304083, "stdev_value": 0.235302},  # state metadata
+        {"mean_value": 0.5705364, "stdev_value": 0.4348706},  # msa metadata
         {"mean_value": 0.5705364, "stdev_value": 0.4348706},
         {"mean_value": 0.5705364, "stdev_value": 0.4348706},
     ]
@@ -91,6 +92,10 @@ def test_plot(mock_metadata):
     plotting.plot(test_msa, plot_type="bubble")
     msa_bubble_fig = plt.gcf()
     assert np.allclose(_convert_to_array(msa_bubble_fig), expected["msa_bubble"], atol=2, rtol=0)
+
+    # test title
+    ax = plotting.plot(test_msa, title="test")
+    assert ax.title.get_text() == "test"
 
 
 def test_get_geo_df():

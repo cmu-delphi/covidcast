@@ -233,12 +233,8 @@ get_covidhub_predictions <- function(covidhub_forecaster_name,
 #' @param covidhub_forecaster_name String indicating of the forecaster
 #'   (matching what it is called on the COVID Hub).
 #' 
-#' @importFrom rvest html_nodes html_text
-#' @importFrom xml2 read_html
-#' @importFrom stringr str_remove_all str_match_all
-#' @importFrom covidHubUtils get_all_models
 #' @export
-get_forecast_dates <- function(covidhub_forecaster_name) {
+get_covidhub_forecast_dates <- function(covidhub_forecaster_name) {
   url <- "https://github.com/reichlab/covid19-forecast-hub/tree/master/data-processed/"
   out <- xml2::read_html(paste0(url, covidhub_forecaster_name)) %>%
     rvest::html_nodes(xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div/div[3]") %>%
@@ -266,7 +262,6 @@ get_forecast_dates <- function(covidhub_forecaster_name) {
 #' @export
 #'
 #'
-#' @importFrom covidHubUtils get_all_models
 get_covidhub_forecaster_names <- function(
   repo = c("zoltar", "covid19forecast_repo")) {
   

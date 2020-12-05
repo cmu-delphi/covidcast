@@ -40,6 +40,8 @@ get_target_period <- function(forecast_date, incidence_period, ahead) {
          end = sunday_of_ew_frcst_date + (week_ahead + 1) * 7 - 1)
 }
 
+
+
 #' Get data frame with column names `forecast_date`, `geo_value`, `target_start`,
 #' `target_end`, `actual`
 #'
@@ -83,7 +85,7 @@ get_target_response <- function(signals,
   target_periods <- target_periods %>% filter(.data$available) %>%
     mutate(available = NULL)
   
-  
+  if (length(geo_values > 30)) geo_values = "*"
   out <- target_periods %>%
     rename(start_day = .data$start, end_day = .data$end) %>%
     mutate(data_source = response$data_source,

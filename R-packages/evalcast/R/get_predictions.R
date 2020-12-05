@@ -30,13 +30,7 @@
 #'   [covidcast::aggregate_signals()] can perform leading and lagging for you.
 #'   See that documentation for more details.
 #' @param ... Additional arguments to be passed to `forecaster()`.
-#' @return Long data frame of forecasts with a class of `predictions_cards`.
-#'   The first 4 columns are the same as those returned by the forecaster. The
-#'   remainder specify the prediction task, 10 columns in total: 
-#'   `ahead`, `geo_value`, `quantile`, `value`, `forecaster`, `forecast_date`,
-#'   `data_source`, `signal`, `target_end_date`, and `incidence_period`. Here
-#'   `data_source` and `signal` correspond to the response variable only.
-#' 
+#' @template predictions_cards-template
 #' 
 #'
 #' @examples
@@ -123,13 +117,14 @@ get_predictions_single_date <- function(forecaster,
   }
   # get data that would have been available as of forecast_date
   args <- list(...)
+  if (length(geo_values) > 30) geo_values_dl = "*" else geo_values_dl = NULL
   df <- download_signals(data_source=signals$data_source,
                          signal = signals$signal,
                          start_day = signals$start_day,
                          end_day = forecast_date,
                          as_of = forecast_date,
                          geo_type = geo_type,
-                         geo_values = geo_values,
+                         geo_values = geo_values_dl,
                          signal_aggregation = signal_aggregation,
                          signal_aggregation_dt = signal_aggregation_dt)
 
@@ -139,6 +134,7 @@ get_predictions_single_date <- function(forecaster,
     apply_corrections <- NA
   }
 
+  if (!is.null(geo_values_dl)) df <- filter(df, geo_value %in% geo_values)
   out <- forecaster(df,
                     forecast_date,
                     signals,

@@ -116,10 +116,10 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
       ahead = as.numeric(.data$ahead),
       inc = if_else(.data$inc == "inc", "incidence", "cumulative"),
       response = case_when(.data$response == "death" ~ "deaths", 
-                           .data$response == "hosp" ~ "drop",
-                           .data$response == "case" ~ "confirmed"),
+                           .data$response == "case" ~ "confirmed",
+                           TRUE ~ "drop",),
       signal = paste(response, inc, "num", sep="_"),
-      data_source = if_else(.data$response != "hosp", "jhu-csse", "drop"),
+      data_source = if_else(.data$response != "drop", "jhu-csse", "drop"),
       forecast_date = ymd(.data$forecast_date),
       target_end_date = .data$forecast_date + .data$ahead)
   epw <- forecasts$incidence_period == "epiweek"
@@ -165,6 +165,24 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
 #'   "YYYY-MM-DD") indicating dates on which forecasts will be made. If `NULL`,
 #'   the default, then all currently available forecast dates from the given
 #'   forecaster in the COVID Hub will be used.
+#' @param geo_values vector of character strings containing FIPS codes of
+#'   counties, or lower case state abbreviations (or "us" for national). The
+#'   default "*" fetches all available locations
+#' @param forecast_type "quantile", "point" or both (the default)
+#' @param ahead number of periods ahead for which the forecast is required.
+#'   NULL will fetch all available aheads
+#' @param incidence_period one of "epiweek" or "day". NULL will attempt to 
+#'   return both
+#' @param signal this function supports only "confirmed_incidence_num",
+#'   "deaths_incidence_num", and/or "deaths_cumulative_num" (those currently)
+#'   forecast by the COVIDhub-ensemble). For other types, use one of the 
+#'   alternatives mentioned above
+#'   
+#' @template predictions_cards-template
+#' 
+#' @seealso [get_predictions()]
+#' @seealso [get_zoltar_predictions()]
+
 # @param ... Additional parameters to be passed to [filter_predictions()].
 #' @return tibble of predictions cards. Only incident predictions are returned.
 #'   For more flexible processing of COVID Hub data, try using 
@@ -174,11 +192,19 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
 #' @importFrom readr read_csv
 #' @export
 get_covidhub_predictions <- function(covidhub_forecaster_name,
-                                     forecast_dates = NULL) {
+                                     forecast_dates = NULL,
+                                     geo_values = "*",
+                                     forecast_type = c("point","quantile"),
+                                     ahead = 1:4,
+                                     incidence_period = c("epiweek", "day"),
+                                     signal = c("confirmed_incidence_num",
+                                                "deaths_incidence_num",
+                                                "deaths_cumulative_num")
+                                     ) {
   url <- "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed"
   pcards <- list()
   if (is.null(forecast_dates))
-    forecast_dates <- get_forecast_dates(covidhub_forecaster_name)
+    forecast_dates <- get_covidhub_forecast_dates(covidhub_forecaster_name)
   forecast_dates <- as.character(forecast_dates)
   for (forecast_date in forecast_dates) {
     filename <- sprintf("%s/%s/%s-%s.csv",
@@ -197,22 +223,31 @@ get_covidhub_predictions <- function(covidhub_forecaster_name,
                        type = col_character()
                      ))
     pcards[[forecast_date]] <- pred %>%
-      filter(str_detect(.data$target, "wk ahead inc")) %>%
       separate(.data$target,
-               into = c("ahead", NA, NA, NA, "response"),
+               into = c("ahead", "incidence_period", NA, "inc", "response"),
                remove = TRUE) %>%
       mutate(forecaster = covidhub_forecaster_name, 
-             incidence_period = 'epiweek',
-             data_source = "jhu-csse",
-             ahead = as.integer(ahead),
-             signal = if_else(.data$response=="death",
-                                     "deaths_incidence_num",
-                                     "confirmed_incidence_num")) %>%
-      select(-.data$response, -.data$type) %>%
-      relocate(.data$ahead, .data$location, .data$quantile, .data$value,
+             incidence_period = if_else(
+               .data$incidence_period == "wk", "epiweek","day"),
+             inc = if_else(.data$inc == "inc", "incidence", "cumulative"),
+             response = case_when(.data$response == "death" ~ "deaths", 
+                                  .data$response == "case" ~ "confirmed",
+                                  TRUE ~ "drop",),
+             signal = paste(response, inc, "num", sep="_"),
+             data_source = if_else(.data$response != "drop", 
+                                    "jhu-csse", "drop"),
+             ahead = as.integer(ahead)) %>%
+      filter(.data$response != "drop", .data$type %in% forecast_type,
+             .data$incidence_period %in% incidence_period,
+             .data$signal %in% signal) %>%
+      select(.data$ahead, .data$location, .data$quantile, .data$value,
                .data$forecaster, .data$forecast_date, .data$data_source,
                .data$signal, .data$target_end_date, 
                .data$incidence_period)
+    if (!is.null(ahead)) {
+      pcards[[forecast_date]] <- filter(pcards[[forecast_date]], 
+                                        .data$ahead %in% ahead)
+    }
   }
   pcards <- bind_rows(pcards) %>%
     mutate(geo_value = if_else(nchar(.data$location)==2,
@@ -220,6 +255,9 @@ get_covidhub_predictions <- function(covidhub_forecaster_name,
                                .data$location),
            location = NULL) %>%
     relocate(.data$geo_value, .after = .data$ahead)
+  if (geo_values != "*") {
+    pcards <- filter(pcards, .data$geo_value %in% geo_values)
+  }
   class(pcards) = c("predictions_cards", class(pcards))
   pcards
 }

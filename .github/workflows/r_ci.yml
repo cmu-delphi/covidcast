@@ -16,13 +16,13 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     defaults:
       run:
         working-directory: R-packages/covidcast/
     strategy:
       matrix:
-        r-version: [3.5]
+        r-version: [3.6]
 
     steps:
       - uses: actions/checkout@v2

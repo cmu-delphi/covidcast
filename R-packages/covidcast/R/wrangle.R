@@ -183,7 +183,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
   for (i in 1:N) {
     meta_list[[i]] = attributes(x[[i]])$metadata
   }
-  meta_all = do.call(rbind, meta_list)
+  meta_all = dplyr::bind_rows(meta_list)
   
   # Issue a warning if there's more than one geo type present
   if (length(unique(meta_all$geo_type)) > 1) {
@@ -218,7 +218,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
 
     # Set covidcast_signal_wide class, attributes, and return
     class(y) = c("covidcast_signal_wide", "data.frame")
-    attributes(y)$metadata = meta_all
+    attributes(y)$metadata = as.data.frame(meta_all)
     return(y)
   }
 
@@ -237,7 +237,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
 
     # Set covidcast_signal_wide class, attributes, and return
     class(y) = c("covidcast_signal_long", "data.frame")
-    attributes(y)$metadata = meta_all
+    attributes(y)$metadata = as.data.frame(meta_all)
     return(y)
   }
 }
@@ -265,6 +265,8 @@ covidcast_longer = function(x) {
     stop("`x` must be a `covidcast_signal_wide` object.")
   }
 
+  metadata <- attributes(x)$metadata
+
   # First pivot into long format
   x = x %>%
     tidyr::pivot_longer(dplyr::starts_with("value"),
@@ -284,6 +286,8 @@ covidcast_longer = function(x) {
 
   # Change class and return
   class(x) = c("covidcast_signal_long", "data.frame")
+  attributes(x)$metadata <- metadata
+
   return(x)
 }
 
@@ -293,6 +297,8 @@ covidcast_wider = function(x) {
   if (!inherits(x, "covidcast_signal_long")) {
     stop("`x` must be a `covidcast_signal_long` object.")
   }
+
+  metadata <- attributes(x)$metadata
 
   # Select only essential columns
   x <- dplyr::select(x, .data$data_source, .data$signal, .data$dt, .data$value)
@@ -315,5 +321,7 @@ covidcast_wider = function(x) {
 
   # Change class and return
   class(x) = c("covidcast_signal_wide", "data.frame")
+  attributes(x)$metadata <- metadata
+
   return(x)
 }

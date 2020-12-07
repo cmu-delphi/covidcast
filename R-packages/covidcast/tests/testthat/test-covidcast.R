@@ -1,4 +1,3 @@
-library(covidcast)
 library(httptest)
 library(mockery)
 library(dplyr)
@@ -118,7 +117,8 @@ with_mock_api({
         sample_size = 2
       ),
       class = c("covidcast_signal", "data.frame"),
-      metadata = list(geo_type = "county", num_locations = 100)
+      metadata = data.frame(geo_type = "county", num_locations = 100,
+                            data_source = "foo", signal = "bar-not-found")
       )
     )
   })
@@ -233,4 +233,101 @@ test_that("covidcast_days batches calls to covidcast", {
       ),
       regexp = NA)
   expect_called(m, 2)
+})
+
+test_that("as.covidcast_signal produces valid covidcast_signal objects", {
+  foo <- data.frame(
+    geo_value = "01000",
+    time_value = as.Date("2020-01-01"),
+    value = 1
+  )
+
+  expected <- structure(
+    data.frame(
+      data_source = "user",
+      signal = "foo",
+      geo_value = "01000",
+      time_value = as.Date("2020-01-01"),
+      value = 1,
+      issue = as.Date("2020-10-01")
+    ),
+    class = c("covidcast_signal", "data.frame"),
+    metadata = data.frame(data_source = "user", signal = "foo",
+                          geo_type = "county")
+  )
+
+  expect_equal(as.covidcast_signal(foo,
+                                   signal = "foo",
+                                   issue = as.Date("2020-10-01")),
+               expected)
+
+  expected <- structure(
+    data.frame(
+      data_source = "some-source",
+      signal = "some-signal",
+      geo_value = "01000",
+      time_value = as.Date("2020-01-01"),
+      value = 1,
+      issue = as.Date("2020-10-01")
+    ),
+    class = c("covidcast_signal", "data.frame"),
+    metadata = data.frame(data_source = "some-source", signal = "some-signal",
+                          geo_type = "county")
+  )
+
+  expect_equal(
+    as.covidcast_signal(
+      foo,
+      data_source = "some-source",
+      signal = "some-signal",
+      issue = as.Date("2020-10-01")
+    ),
+    expected
+  )
+})
+
+test_that("as.covidcast_signal throws errors when input is unsuitable", {
+  foo <- data.frame(
+    geo_value = "01000",
+    time_value = as.Date("2020-10-01"),
+    ducks = "rabbit"
+  )
+
+  expect_error(as.covidcast_signal(foo, signal = "foo"),
+               class = "covidcast_coerce_value")
+
+  foo <- data.frame(
+    county = "01000",
+    time_value = as.Date("2020-10-01"),
+    value = 1
+  )
+
+  expect_error(as.covidcast_signal(foo, signal = "foo"),
+               class = "covidcast_coerce_geo_value")
+
+  foo <- data.frame(
+    geo_value = "01000",
+    day = as.Date("2020-10-01"),
+    value = 1
+  )
+
+  expect_error(as.covidcast_signal(foo, signal = "foo"),
+               class = "covidcast_coerce_time_value")
+})
+
+test_that("as.covidcast_signal does not affect covidcast_signal objects", {
+  expected <- structure(
+    data.frame(
+      data_source = "some-source",
+      signal = "some-signal",
+      geo_value = "01000",
+      time_value = as.Date("2020-01-01"),
+      value = 1,
+      issue = as.Date("2020-10-01")
+    ),
+    class = c("covidcast_signal", "data.frame"),
+    metadata = list(geo_type = "county")
+  )
+
+  expect_equal(as.covidcast_signal(expected), expected)
 })

@@ -12,7 +12,8 @@ test_that("aggregated signals have times shifted correctly", {
     stderr = 0.1,
     sample_size = 10,
     lag = 1),
-    class = c("covidcast_signal", "data.frame"))
+    class = c("covidcast_signal", "data.frame"),
+    metadata = list(geo_type = "state"))
 
   agg <- aggregate_signals(foo, dt = c(-1, 1, 2))
 
@@ -24,7 +25,8 @@ test_that("aggregated signals have times shifted correctly", {
                  "value+1:foo_foo" = c(2:5, NA),
                  "value+2:foo_foo" = c(3:5, NA, NA),
                  check.names = FALSE),
-                 class = c("covidcast_signal_wide", "data.frame")))
+                 class = c("covidcast_signal_wide", "data.frame"),
+                 metadata = data.frame(geo_type = "state")))
 })
 
 test_that("list of aggregated signals have times shifted correctly", {
@@ -38,7 +40,8 @@ test_that("list of aggregated signals have times shifted correctly", {
     stderr = 0.1,
     sample_size = 10,
     lag = 1),
-    class = c("covidcast_signal", "data.frame"))
+    class = c("covidcast_signal", "data.frame"),
+    metadata = list(geo_type = "state"))
 
   bar <- structure(data.frame(
     data_source = "bar",
@@ -50,7 +53,8 @@ test_that("list of aggregated signals have times shifted correctly", {
     stderr = 0.1,
     sample_size = 10,
     lag = 1),
-    class = c("covidcast_signal", "data.frame"))
+    class = c("covidcast_signal", "data.frame"),
+    metadata = list(geo_type = "state"))
 
   # list of lags for each input signal
   agg <- aggregate_signals(list(foo, bar), dt = list(0, c(-1, 1, 2)))
@@ -64,7 +68,8 @@ test_that("list of aggregated signals have times shifted correctly", {
                  "value+1:bar_bar" = c(7:10, NA),
                  "value+2:bar_bar" = c(8:10, NA, NA),
                  check.names = FALSE),
-                 class = c("covidcast_signal_wide", "data.frame")))
+                 class = c("covidcast_signal_wide", "data.frame"),
+                 metadata = data.frame(geo_type = rep("state", 2))))
 
   # single vector of lags for all input signals
   agg <- aggregate_signals(list(foo, bar), dt = c(-1, 1, 2))
@@ -80,7 +85,8 @@ test_that("list of aggregated signals have times shifted correctly", {
                  "value+1:bar_bar" = c(7:10, NA),
                  "value+2:bar_bar" = c(8:10, NA, NA),
                  check.names = FALSE),
-                 class = c("covidcast_signal_wide", "data.frame")))
+                 class = c("covidcast_signal_wide", "data.frame"),
+                 metadata = data.frame(geo_type = rep("state", 2))))
 })
 
 test_that("signals are joined with full join", {
@@ -94,6 +100,8 @@ test_that("signals are joined with full join", {
     stderr = 0.1,
     sample_size = 10,
     lag = 1),
+    metadata = data.frame(data_source = "foo", signal = "foo",
+                          geo_type = "state"),
     class = c("covidcast_signal", "data.frame"))
 
   bar <- structure(data.frame(
@@ -106,6 +114,8 @@ test_that("signals are joined with full join", {
     stderr = 0.1,
     sample_size = 10,
     lag = 1),
+    metadata = data.frame(data_source = "bar", signal = "bar",
+                          geo_type = "state"),
     class = c("covidcast_signal", "data.frame"))
 
   agg <- aggregate_signals(list(foo, bar))
@@ -118,6 +128,9 @@ test_that("signals are joined with full join", {
                  "value+0:foo_foo" = c(1:5, NA, NA),
                  "value+0:bar_bar" = c(NA, NA, 6:10),
                  check.names = FALSE),
+                 metadata = data.frame(data_source = c("foo", "bar"),
+                                       signal = c("foo", "bar"),
+                                       geo_type = "state"),
                  class = c("covidcast_signal_wide", "data.frame")))
 })
 
@@ -131,6 +144,8 @@ test_that("aggregated data can be made longer", {
     issue = as.Date("2020-01-02"),
     stderr = 0.5,
     lag = 1),
+    metadata = data.frame(data_source = "foo", signal = "foo",
+                          geo_type = "state"),
     class = c("covidcast_signal", "data.frame"))
 
   bar <- structure(data.frame(
@@ -142,6 +157,8 @@ test_that("aggregated data can be made longer", {
     issue = as.Date("2020-01-02"),
     sample_size = 10,
     lag = 1),
+    metadata = data.frame(data_source = "bar", signal = "bar",
+                          geo_type = "state"),
     class = c("covidcast_signal", "data.frame"))
 
   agg_wide <- aggregate_signals(list(foo, bar), format = "wide")
@@ -153,6 +170,10 @@ test_that("aggregated data can be made longer", {
                  "value+0:foo_foo" = c(1, 3, 2),
                  "value+0:bar_bar" = c(4, 6, 5),
                  check.names = FALSE),
+                 metadata = data.frame(
+                     data_source = c("foo", "bar"),
+                     signal = c("foo", "bar"),
+                     geo_type = "state"),
                  class = c("covidcast_signal_wide", "data.frame")))
 
   long <- covidcast_longer(agg_wide)
@@ -165,6 +186,10 @@ test_that("aggregated data can be made longer", {
                  time_value = as.Date("2020-01-01"),
                  dt = 0,
                  value = c(4, 6, 5, 1, 3, 2)),
+                 metadata = data.frame(
+                     data_source = c("foo", "bar"),
+                     signal = c("foo", "bar"),
+                     geo_type = "state"),
                  class = c("covidcast_signal_long", "data.frame")))
 
   # Now try it long in the first place. TODO Currently fails because wide format
@@ -188,7 +213,10 @@ test_that("can aggregate signals with different metadata", {
   )
 
   baz <- foo
-  attributes(baz)$metadata$num_locations <- 100
+  attributes(baz)$metadata <- data.frame(
+    geo_type = "county",
+    num_locations = 100
+  )
 
   expect_silent(aggregate_signals(list(foo, baz)))
 })

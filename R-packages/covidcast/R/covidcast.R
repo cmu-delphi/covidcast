@@ -73,6 +73,26 @@ MAX_RESULTS <- 3649
 #' `geo_values` argument to select specific areas, and basic information on
 #' population and other Census data.
 #'
+#' Downloading large amounts of data may be slow, so this function prints
+#' messages for each day of data it downloads. To suppress these, use
+#' [base::suppressMessages()], as in
+#' `suppressMessages(covidcast_signal("fb-survey", ...))`.
+#'
+#' @section Metadata:
+#'
+#' The returned object has a `metadata` attribute attached containing basic
+#' information about the signal. Use `attributes(x)$metadata` to access this
+#' metadata. The metadata is stored as a data frame of one row, and contains the
+#' same information that `covidcast_meta()` would return for a given signal.
+#'
+#' Note that not all `covidcast_signal` objects may have all fields of metadata
+#' attached; for example, an object created with `as.covidcast_signal()` using
+#' data from another source may only contain the `geo_type` variable, along with
+#' `data_source` and `signal`. Before using the metadata of a `covidcast_signal`
+#' object, always check for the presence of the attributes you need.
+#'
+#' @section Issue dates and revisions:
+#'
 #' The COVIDcast API tracks updates and changes to its underlying data, and
 #' records the first date each observation became available. For example, a data
 #' source may report its estimate for a specific state on June 3rd on June 5th,
@@ -88,7 +108,7 @@ MAX_RESULTS <- 3649
 #' Note that the API only tracks the initial value of an estimate and *changes*
 #' to that value. If a value was first issued on June 5th and never updated,
 #' asking for data issued on June 6th (using `issues` or `lag`) would *not*
-#' return that value, though asking for data `as_of` June 6th would. See the 
+#' return that value, though asking for data `as_of` June 6th would. See the
 #' [covidcast
 #' vignette](https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html)
 #' for examples.
@@ -102,11 +122,6 @@ MAX_RESULTS <- 3649
 #' issued in this case. To see all results, split your query across multiple
 #' calls with different `issues` arguments.
 #'
-#' Downloading large amounts of data may be slow, so this function prints
-#' messages for each day of data it downloads. To suppress these, use
-#' [base::suppressMessages()], as in
-#' `suppressMessages(covidcast_signal("fb-survey", ...))`.
-#'
 #' @param data_source String identifying the data source to query. See the
 #'   [signal
 #'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)
@@ -116,8 +131,8 @@ MAX_RESULTS <- 3649
 #'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)
 #'   for a list of available signals.
 #' @param start_day Query data beginning on this date. Date object, or string in
-#'   the form "YYYY-MM-DD". If `start_day` is `NULL`, defaults to first day
-#'   data is available for this signal.
+#'   the form "YYYY-MM-DD". If `start_day` is `NULL`, defaults to first day data
+#'   is available for this signal.
 #' @param end_day Query data up to this date, inclusive. Date object or string
 #'   in the form "YYYY-MM-DD". If `end_day` is `NULL`, defaults to the most
 #'   recent day data is available for this signal.
@@ -125,20 +140,21 @@ MAX_RESULTS <- 3649
 #'   "county" or "state". Defaults to "county". See the [geographic coding
 #'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html)
 #'   for details on which types are available.
-#' @param geo_values Which geographies to return. The default, "*", fetches
-#'   all geographies. To fetch specific geographies, specify their IDs as a
-#'   vector or list of strings. See the [geographic coding
+#' @param geo_values Which geographies to return. The default, "*", fetches all
+#'   geographies. To fetch specific geographies, specify their IDs as a vector
+#'   or list of strings. See the [geographic coding
 #'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html)
 #'   for details on how to specify these IDs.
 #' @param as_of Fetch only data that was available on or before this date,
-#'   provided as a `Date` object or string in the form "YYYY-MM-DD". If
-#'   `NULL`, the default, return the most recent available data. Note that only
-#'   one of `as_of`, `issues`, and `lag` should be provided; it does not make
-#'   sense to specify more than one.
+#'   provided as a `Date` object or string in the form "YYYY-MM-DD". If `NULL`,
+#'   the default, return the most recent available data. Note that only one of
+#'   `as_of`, `issues`, and `lag` should be provided; it does not make sense to
+#'   specify more than one. For more on data revisions, see
+#'   "Issue dates and revisions" below.
 #' @param issues Fetch only data that was published or updated ("issued") on
 #'   these dates. Provided as either a single `Date` object (or string in the
-#'   form "YYYY-MM-DD"), indicating a single date to fetch data issued on, or
-#'   a vector specifying two dates, start and end. In this case, return all data
+#'   form "YYYY-MM-DD"), indicating a single date to fetch data issued on, or a
+#'   vector specifying two dates, start and end. In this case, return all data
 #'   issued in this range. There may be multiple rows for each observation,
 #'   indicating several updates to its value. If `NULL`, the default, return the
 #'   most recently issued data.
@@ -148,7 +164,8 @@ MAX_RESULTS <- 3649
 #'   data was issued or updated on June 6. If `NULL`, the default, return the
 #'   most recently issued data regardless of its lag.
 #'
-#' @return Data frame with matching data. Each row is one observation of one
+#' @return `covidcast_signal` object with matching data. The object is a data
+#'   frame with additional metadata attached. Each row is one observation of one
 #'   signal on one day in one geographic location. Contains the following
 #'   columns:
 #'
@@ -174,7 +191,10 @@ MAX_RESULTS <- 3649
 #'
 #'   Consult the signal documentation for more details on how values and
 #'   standard errors are calculated for specific signals.
-#' 
+#'
+#'   The returned data frame has a `metadata` attribute containing metadata
+#'   about the signal contained within; see "Metadata" below for details.
+#'
 #' @references COVIDcast API documentation:
 #'   \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html}
 #'
@@ -200,8 +220,9 @@ MAX_RESULTS <- 3649
 #'                  geo_values = name_to_cbsa("Pittsburgh"))
 #' }
 #'
-#' @seealso [plot.covidcast_signal()], [covidcast_signals()], [`county_census`],
-#'   [`msa_census`], [`state_census`]
+#' @seealso [plot.covidcast_signal()], [covidcast_signals()],
+#'   [`as.covidcast_signal()`], [`county_census`], [`msa_census`],
+#'   [`state_census`]
 #' @export
 #' @importFrom rlang abort
 #' @importFrom dplyr %>%
@@ -256,16 +277,127 @@ covidcast_signal <- function(data_source, signal,
   }
 
   df <- covidcast_days(data_source, signal, start_day, end_day, geo_type,
-                       geo_values, as_of, issues, lag, 
+                       geo_values, as_of, issues, lag,
                        relevant_meta$num_locations)
 
   # Drop direction column (if it still exists)
   df$direction <- NULL
 
-  # Assign covidcast_signal class and add some helpful attributes
-  class(df) <- c("covidcast_signal", "data.frame")
-  attributes(df)$metadata <- relevant_meta
-  return(df)
+  return(as.covidcast_signal(df, signal, geo_type, data_source,
+                             metadata = relevant_meta))
+}
+
+#' Convert data from an external source into a form compatible with
+#' `covidcast_signal`.
+#'
+#' Several methods are provided to convert common objects (such as data frames)
+#' into `covidcast_signal` objects, which can be used with the various
+#' `covidcast_signal` methods (such as `plot.covidcast_signal()` or
+#' `covidcast_cor()`). See `vignette("external-data")` for examples.
+#'
+#' @param x Object to be converted. See Methods section below for details on
+#'   formatting of each input type.
+#' @param geo_type The geography type stored in this object.
+#' @param data_source The name of the data source to use as a label for this
+#'   data.
+#' @param signal The signal name to use for this data.
+#' @param issue Issue date to use for this data, if not present in `x`, as a
+#'   `Date` object. If no issue date is present in `x` and `issue` is `NULL`,
+#'   today's date will be used.
+#' @param metadata List of metadata to attach to the `covidcast_signal` object.
+#'   See the "Metadata" section of `covidcast_signal()`. All objects will have
+#'   `geo_type`, `data_source`, and `signal` columns included in their metadata;
+#'   named entries in this list are added as additional columns.
+#' @param ... Additional arguments passed to methods.
+#' @seealso [`covidcast_signal()`]
+#' @export
+as.covidcast_signal <- function(x, ...) {
+  UseMethod("as.covidcast_signal")
+}
+
+#' @method as.covidcast_signal covidcast_signal
+#' @describeIn as.covidcast_signal Simply returns the `covidcast_signal` object
+#'   unchanged.
+#' @export
+as.covidcast_signal.covidcast_signal <-
+  function(x,
+           ...) {
+  return(x)
+}
+
+#' @method as.covidcast_signal data.frame
+#' @describeIn as.covidcast_signal The input data frame `x` must contain the
+#'   columns `time_value`, `value`, and `geo_value`. If an `issue` column is
+#'   present in `x`, it will be used as the issue date for each observation; if
+#'   not, the `issue` argument will be used. Other columns will be preserved
+#'   as-is.
+#' @export
+as.covidcast_signal.data.frame <-
+  function(x,
+           signal = NULL,
+           geo_type = c("county", "msa", "hrr", "dma", "state"),
+           data_source = "user",
+           issue = NULL,
+           metadata = list()) {
+  if (is.null(signal)) {
+    abort("signal name must be provided",
+          class = "covidcast_coerce_signal")
+  }
+
+  geo_type <- match.arg(geo_type)
+
+  metadata$data_source <- data_source
+  metadata$signal <- signal
+  metadata$geo_type <- geo_type
+  metadata <- as.data.frame(metadata)
+
+  if (!("data_source" %in% names(x))) {
+    x$data_source <- data_source
+  }
+
+  if (!("signal" %in% names(x))) {
+    x$signal <- signal
+  }
+
+  class(x) <- c("covidcast_signal", "data.frame")
+
+  if (nrow(x) == 0) {
+    # No data; columns don't matter.
+    return(x)
+  }
+
+  if (!("time_value" %in% names(x))) {
+    abort("`x` must contain a `time_value` column containing the time of each observation",
+          class = "covidcast_coerce_time_value")
+  }
+
+  if (!("value" %in% names(x))) {
+    abort("`x` must contain a `value` column containing the value of each observation",
+          class = "covidcast_coerce_value")
+  }
+
+  if (!("geo_value" %in% names(x))) {
+    abort("`x` must contain a `geo_value` column containing the location of each observation",
+          class = "covidcast_coerce_geo_value")
+  }
+
+  # issue is optional; if omitted, use default
+  if (!("issue" %in% names(x))) {
+    if (is.null(issue)) {
+      x$issue <- Sys.Date()
+    } else {
+      x$issue <- issue
+    }
+  }
+
+  # Reorder data_source, signal, geo_value, time_value, so that they appear in
+  # this order.
+  x <- dplyr::relocate(x, .data$data_source, .data$signal, .data$geo_value,
+                       .data$time_value)
+
+  attributes(x)$metadata <- metadata
+
+  return(x)
 }
 
 #' Print `covidcast_signal` object
@@ -655,13 +787,6 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
     # If no data is found, there is no time_value column to report
     df$time_value <- api_to_date(df$time_value)
     df$issue <- api_to_date(df$issue)
-    df$data_source <- data_source
-    df$signal <- signal
-
-    # Reorder data_source, signal, geo_value, time_value, so that they appear in
-    # this order
-    df <- dplyr::relocate(df, .data$data_source, .data$signal, .data$geo_value,
-                          .data$time_value)
   }
 
   return(df)

@@ -295,11 +295,11 @@ def _plot_bubble(ax: axes.Axes, data: gpd.GeoDataFrame, geo_type: str, **kwargs:
     ax.legend(frameon=False, ncol=8, loc="lower center", bbox_to_anchor=(0.5, -0.1))
 
 
-def _plot_background_states(ax: axes.Axes = None, figsize: tuple = (12.8, 9.6)) -> axes.Axes:
+def _plot_background_states(figsize: tuple = (12.8, 9.6),ax: axes.Axes = None) -> axes.Axes:
     """Plot US states in light grey as the background for other plots.
 
-    :param ax: Optional matplotlib axis to plot on.
     :param figsize: Dimensions of plot. Ignored if ax is provided.
+    :param ax: Optional matplotlib axis to plot on.
     :return: Matplotlib axes.
     """
     if ax is None:

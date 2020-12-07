@@ -12,63 +12,101 @@ get_predictions(
   incidence_period,
   ahead,
   geo_type,
-  geo_values = "*"
+  geo_values = "*",
+  apply_corrections = NULL,
+  ...
 )
 }
 \arguments{
-\item{forecaster}{a function that outputs a tibble with columns...}
+\item{forecaster}{Function that outputs a tibble with columns \code{ahead},
+\code{location}, \code{probs}, \code{quantiles}. The \code{quantiles} column gives the
+predictive quantiles of the forecast distribution for that location and
+ahead.}
 
-\item{name_of_forecaster}{the name of forecaster}
+\item{name_of_forecaster}{String indicating name of the forecaster.}
 
-\item{signals}{a tibble with columns "data_source" and "signal" that
-specifies which variables from the covidcast API will be used by
-my_forecaster. The first row of signals is taken to be the response.   If
-using incidence_period "epiweek", thre response should be something for
-which summing daily values over an epiweek makes sense (e.g., counts or
-proportions but not log(counts) or log(proportions)).  Available data
-sources and signals are documented in the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{COVIDcast signal documentation}
-documentation.  Can optionally include a column "first_day" giving the
-earliest day of data needed from that data source.}
+\item{signals}{Tibble with columns \code{data_source} and \code{signal} that specifies
+which variables from the COVIDcast API will be used by \code{forecaster}. Each
+row of \code{signals} represents a separate signal, and first row is taken to be
+the response. If using \code{incidence_period = "epiweek"}, the response should
+be something for which summing daily values over an epiweek makes sense
+(e.g., counts or proportions but not log(counts) or log(proportions)).
+Available data sources and signals are documented in the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{COVIDcast signal documentation}.
+An optional column \code{start_day} can also be included. This can be a Date
+object or string in the form "YYYY-MM-DD", indicating the earliest date of
+data needed from that data source. Importantly, \code{start_day} can also be a
+function (represented as a list column) that takes a forecast date and
+returns a start date for model training (again, Date object or string in
+the form "YYYY-MM-DD"). The latter is useful when the start date should be
+computed dynamically from the forecast date (e.g., when \code{forecaster} only
+trains on the most recent 4 weeks of data).}
 
-\item{forecast_dates}{a vector of class Date on which forecasts will be made.
-e.g. \code{c(lubridate::ymd("2020-09-07"), lubridate::ymd("2020-09-14"))}}
+\item{forecast_dates}{Vector of Date objects (or strings of the form
+"YYYY-MM-DD") indicating dates on which forecasts will be made.}
 
-\item{incidence_period}{either "epiweek" or "day"}
+\item{incidence_period}{String indicating the incidence period, either
+"epiweek" or "day".}
 
-\item{ahead}{vector of (one or more) integers.  How many epiweeks/days ahead
-are you forecasting?  If incidence_period is "epiweek" and forecast_date is
-Sunday or Monday, then ahead = 1 means the epiweek that includes the
-forecast date;  if forecast_date is Tuesday-Saturday, then it is the
-following epiweek. If incidence_period is "day" then ahead = 1 means the
-day after forecast date.}
+\item{ahead}{Vector of (one or more) integers. How many epiweeks/days ahead
+are you forecasting? If \code{incidence_period = "epiweek"} and forecast_date is
+Sunday or Monday, then \code{ahead = 1} means the epiweek that includes the
+forecast date; if \code{forecast_date} falls on a Tuesday through Saturday, then
+it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahead = 1} means the day after forecast date.}
 
-\item{geo_type}{one of the geographical types, matching the terms used on the
-api ("county", "dma", "hrr", "msa", "state")}
+\item{geo_type}{String indicating geographical type, one of "county", "dma",
+"hrr", "msa", or "state".}
 
-\item{geo_values}{see \link[covidcast]{covidcast_signal} for a description
-of this parameter.}
+\item{geo_values}{Vector or list of locations whose data will be passed to
+\code{forecaster}. The default, "*", fetches all that is available in the API.}
+
+\item{apply_corrections}{an optional function that applies data corrections
+to the signals. Input is a data frame as returned by \code{download_signals()}.
+The returned object must be the same but with additional variables.
+Corrected values must exist in the column \code{corrected}.}
+
+\item{...}{Additional arguments to be passed to \code{forecaster()}.}
 }
 \value{
-a list of predictions cards
+List of "predictions cards", with one element per forecast date. Each
+predictions card is a data frame with two columns:
+
+\item{location}{FIPS codes of the locations. For counties, this matches the
+\code{geo_value} used in the COVIDcast API. However, for states, \code{location} and
+\code{geo_value} are slightly different, in that the former is a two-digit FIPS
+code, as in "42", whereas the latter is a state abbreviation, as in "pa".}
+\item{forecast_distribution}{List column of tibbles containing the predicted
+quantiles for each location.}
+
+Each predictions card has attributes that specify the exact forecasting task
+that was being carried out, along with the name of the forecaster.
 }
 \description{
 For each of the provided forecast dates, runs a forecaster using the data
 that would have been available as of that given forecast date. Returns a list
-of "predictions cards."  A prediction card is a data frame giving the
-forecast distributions of a given forecaster for a given forecast task.  A
-forecast task is specified by the forecast date, ahead, response, incidence
-period, and geo_type (e.g., 1-epiweek ahead death forecasting at the state
-level with predictions made using the information as of Sept. 14).
+of "predictions cards", where each list element corresponds to a different
+forecast date. A predictions card is a data frame giving the forecast
+distributions of a given forecaster for a given forecast task. A forecast
+task is specified by the forecast date, ahead, response, incidence period,
+and geo type (e.g., 1-epiweek-ahead death forecasting at the state level with
+predictions made using the information as of September 14).
 }
-\details{
-A predictions card has two columns:
-\enumerate{
-\item location - the FIPS code of the location.  For counties, this is the
-same as the geo_value used in the API.  However, for states, the location
-and geo_value are different because the API uses state abbreviations instead
-of FIPS for geo_value.
-\item forecast_distribution - this is a list column... each element itself
-contains a tibble with the covidhub quantiles.}
-A predictions card has attributes that specify the exact forecasting
-task that was being carried out and the name of the forecaster.
+\examples{
+baby_predictions = get_predictions(
+  baseline_forecaster, "baby",
+  tibble::tibble(
+    data_source=c("jhu-csse", "usa-facts"),
+    signal = c("deaths_incidence_num","confirmed_incidence_num"),
+    start_day=lubridate::ymd("2020-09-15")),
+  lubridate::ymd("2020-10-01"),"epiweek", 1:4, "state", "mi")
+
+baby_correct <- function(x) dplyr::mutate(x, corrected = 2*value)
+
+baby_corrected = get_predictions(
+  baseline_forecaster, "baby",
+  tibble::tibble(
+    data_source=c("jhu-csse", "usa-facts"),
+    signal = c("deaths_incidence_num","confirmed_incidence_num"),
+    start_day=lubridate::ymd("2020-09-15")),
+  lubridate::ymd("2020-10-01"),"epiweek", 1L, "state", "mi",
+  apply_corrections = baby_correct)
 }

@@ -1,14 +1,177 @@
+#' Plot `covidcast_signal` object
+#'
+#' Several plot types are provided, including choropleth plots (maps), bubble
+#' plots, and time series plots showing the change of signals over time, for a 
+#' data frame returned by `covidcast_signal()`. (Only the latest issue from the
+#' data frame is used for plotting.) See the [plotting
+#' vignette](https://cmu-delphi.github.io/covidcast/covidcastR/articles/plotting-signals.html)
+#' for examples.
+#'
+#' @param x The `covidcast_signal` object to map or plot. If the object contains
+#'   multiple issues of the same observation, only the most recent issue is
+#'   mapped or plotted. 
+#' @param plot_type One of "choro", "bubble", "line" indicating whether to plot
+#'   a choropleth map, bubble map, or line (time series) graph, respectively.
+#'   The default is "choro".
+#' @param time_value Date object (or string in the form "YYYY-MM-DD")
+#'   specifying the day to map, for choropleth and bubble maps. If `NULL`, the
+#'   default, then the last date in `x` is used for the maps. Time series plots
+#'   always include all available time values in `x`.
+#' @param include Vector of state abbreviations (case insensitive, so "pa" and
+#'   "PA" both denote Pennsylvania) indicating which states to include in the
+#'   choropleth and bubble maps. Default is `c()`, which is interpreted to mean
+#'   all states.
+#' @param range Vector of two values: min and max, in this order, to use when
+#'   defining the color scale for choropleth maps and the size scale for bubble
+#'   maps, or the range of the y-axis for the time series plot. If `NULL`, the
+#'   default, then for the maps, the min and max are set to be the mean +/- 3
+#'   standard deviations, where this mean and standard deviation are as provided
+#'   in the metadata for the given data source and signal; and for the time
+#'   series plot, they are set to be the observed min and max of the values over  
+#'   the given time period.
+#' @param choro_col Vector of colors, as specified in hex code, to use for the
+#'   choropleth color scale. Can be arbitrary in length. Default is similar to
+#'   that from covidcast.cmu.edu.
+#' @param alpha Number between 0 and 1, indicating the transparency level to be
+#'   used in the maps. For choropleth maps, this determines the transparency
+#'   level for the mega counties. For bubble maps, this determines the
+#'   transparency level for the bubbles. Default is 0.5.
+#' @param bubble_col Bubble color for the bubble map. Default is "purple".
+#' @param num_bins Number of bins for determining the bubble sizes for the
+#'   bubble map (here and throughout, to be precise, by bubble size we mean
+#'   bubble area). Default is 8. These bins are evenly-spaced in between the min
+#'   and max as specified through the `range` parameter. Each bin is assigned
+#'   the same bubble size. Also, values of zero special: it has its own separate
+#'   (small) bin, and values mapped to the zero bin are not drawn.
+#' @param title Title for the plot. If `NULL`, the default, then a simple title
+#'   is used based on the given data source, signal, and time values.
+#' @param choro_params,bubble_params,line_params Additional parameter lists for
+#'   the different plot types, for further customization. See details below.
+#' @param ... Additional arguments, for compatibility with `plot()`. Currently
+#'   unused.
+#'
+#' @details The following named arguments are supported through the lists 
+#'   `choro_params`, `bubble_params`, and `line_params`.
+#'
+#' For both choropleth and bubble maps:
+#' \describe{
+#' \item{`subtitle`}{Subtitle for the map.}
+#' \item{`missing_col`}{Color assigned to missing or NA geo locations.}
+#' \item{`border_col`}{Border color for geo locations.}
+#' \item{`border_size`}{Border size for geo locations.}
+#' \item{`legend_position`}{Position for legend; use "none" to hide legend.} 
+#' \item{`legend_height`, `legend_width`}{Height and width of the legend.} 
+#' \item{`breaks`}{Breaks for a custom (discrete) color or size scale.  Note
+#'   that we must set `breaks` to be a vector of the same length as `choro_col`
+#'   for choropleth maps. This works as follows: we assign the `i`th color for
+#'   choropleth maps, or the `i`th size for bubble maps, if and only if the
+#'   given value satisfies `breaks[i] <= value < breaks[i+1]`, where we take by 
+#'   convention `breaks[0] = -Inf` and `breaks[N+1] = Inf` for `N =
+#'   length(breaks)`.}   
+#' \item{`legend_digits`}{Number of decimal places to show for the legend
+#'   labels.}  
+#' }
+#'
+#' For choropleth maps only:
+#' \describe{
+#' \item{`legend_n`}{Number of values to label on the legend color bar. Ignored
+#'   for discrete color scales (when `breaks` is set manually).}
+#' }
+#'
+#' For bubble maps only:
+#' \describe{
+#' \item{`remove_zero`}{Should zeros be excluded from the size scale (hence
+#'   effectively drawn as bubbles of zero size)?}
+#' \item{`min_size`, `max_size`}{Min size for the size scale.}
+#' }
+#'
+#' For line graphs:
+#' \describe{
+#' \item{`xlab`, `ylab`}{Labels for the x-axis and y-axis.}
+#' \item{`stderr_bands`}{Should standard error bands be drawn?}
+#' \item{`stderr_alpha`}{Transparency level for the standard error bands.}
+#' }
+#'
+#' @method plot covidcast_signal
+#' @importFrom stats sd
+#' @importFrom rlang warn
+#' @export
+plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
+                                 time_value = NULL, include = c(),
+                                 range = NULL,
+                                 choro_col = c("#FFFFCC", "#FD893C", "#800026"),
+                                 alpha = 0.5, bubble_col = "purple", num_bins = 8,
+                                 title = NULL, choro_params = list(),
+                                 bubble_params = list(), line_params = list(),
+                                 ...) {
+  plot_type = match.arg(plot_type)
+  x = latest_issue(x)
+
+  # For the maps, set range, if we need to (to mean +/- 3 standard deviations,
+  # from metadata) 
+  if (is.null(range) && (plot_type == "choro" || plot_type == "bubble")) {
+    if (is.null(attributes(x)$metadata)) { 
+      warn(paste("Metadata for signal mean and standard deviation not",
+                 "available; defaulting to observed mean and standard",
+                 "deviation to set plot range."),
+           class = "covidcast_plot_meta_not_found")
+      mean_value = mean(x$value)
+      stdev_value = sd(x$value)
+    } else {
+      mean_value = attributes(x)$metadata$mean_value
+      stdev_value = attributes(x)$metadata$stdev_value
+    }
+    range = c(mean_value - 3 * stdev_value, mean_value + 3 * stdev_value)
+    range = pmax(0, range)
+    # TODO: figure out for which signals we need to clip the top of the range.
+    # For example, for percentages, we need to clip it at 100
+  }
+
+  # For the maps, take the most recent time value if more than one is passed,
+  # and check that the include arguments indeed contains state names
+  if (plot_type == "choro" || plot_type == "bubble") {
+    if (!is.null(include)) {
+      include = toupper(include)
+      no_match = which(!(include %in% c(state.abb, "DC")))
+
+      if (length(no_match) > 0) {
+        warn("'include' must only contain US state abbreviations or 'DC'.",
+             not_match = include[no_match], class = "plot_include_no_match")
+        include = include[-no_match]
+      }
+    }
+  }
+
+  # Choropleth map
+  if (plot_type == "choro") {
+    plot_choro(x, time_value = time_value, include = include, range = range,
+               col = choro_col, alpha = alpha, title = title,
+               params = choro_params)
+  }
+
+
+  # Bubble map
+  else if (plot_type == "bubble") {
+    plot_bubble(x, time_value = time_value, include = include, range = range,
+                col = bubble_col, alpha = alpha, num_bins = num_bins,
+                title = title, params = bubble_params)
+  }
+
+  # Line (time series) plot
+  else {
+    plot_line(x, range = range, title = title, params = line_params)
+  }
+}
+
 # Plot a choropleth map of a covidcast_signal object.
 
 #' @importFrom stats approx
 plot_choro = function(x, time_value = NULL, include = c(), range,
                       col = c("#FFFFCC", "#FD893C", "#800026"),
-                      alpha = 0.5, direction = FALSE,
-                      dir_col = c("#6F9CC6", "#E4E4E4", "#C56B59"),
-                      title = NULL, params = list()) {
+                      alpha = 0.5, title = NULL, params = list()) {
   # Check that we're looking at either counties or states
-  if (!(attributes(x)$geo_type == "county" ||
-                     attributes(x)$geo_type == "state")) {
+  if (!(attributes(x)$metadata$geo_type == "county" ||
+                     attributes(x)$metadata$geo_type == "state")) {
     stop("Only 'county' and 'state' are supported for choropleth maps.")
   }
 
@@ -31,15 +194,17 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   border_size = params$border_size
   legend_height = params$legend_height
   legend_width = params$legend_width
+  legend_digits = params$legend_digits
   if (is.null(missing_col)) missing_col = "gray"
   if (is.null(border_col)) border_col = "white"
   if (is.null(border_size)) border_size = 0.1
   if (is.null(legend_height)) legend_height = 0.5
   if (is.null(legend_width)) legend_width = 15
+  if (is.null(legend_digits)) legend_digits = 2
 
-  # For intensity, create a continuous color function, if we need to
+  # Create a continuous color function, if we need to
   breaks = params$breaks
-  if (!direction && is.null(breaks)) {
+  if (is.null(breaks)) {
     ramp_fun = grDevices::colorRamp(col)
     col_fun = function(val, alpha = 1) {
       val = pmin(pmax(val, range[1]), range[2])
@@ -52,10 +217,10 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     }
   }
 
-  # For intensity, create a discrete color function, if we need to
-  else if (!direction && !is.null(breaks)) {
+  # Create a discrete color function, if we need to
+  else {
     if (length(breaks) != length(col)) {
-      stop("'breaks' must have length equal to the number of colors.")
+      stop("`breaks` must have length equal to the number of colors.")
     }
     col_fun = function(val, alpha = 1) {
       alpha_str = substr(grDevices::rgb(0, 0, 0, alpha = alpha), 8, 9)
@@ -64,20 +229,6 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
       col_out[not_na] = col[1]
       for (i in 1:length(breaks)) col_out[val >= breaks[i]] = col[i]
       col_out[not_na] = paste0(col_out[not_na], alpha_str)
-      return(col_out)
-    }
-  }
-
-  # For direction, create a discrete color function
-  else {
-    if (length(dir_col) != 3) {
-      stop("'dir_col' must have length 3.")
-    }
-    col_fun = function(val, alpha = 1) {
-      alpha_str = substr(grDevices::rgb(0, 0, 0, alpha = alpha), 8, 9)
-      not_na = !is.na(val)
-      col_out = rep(NA, length(val))
-      col_out[not_na] = paste0(dir_col[val[not_na] + 2], alpha_str)
       return(col_out)
     }
   }
@@ -96,14 +247,13 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   given_time_value = time_value
   df = x %>%
     dplyr::filter(time_value == given_time_value) %>%
-    dplyr::select(val = ifelse(direction, "direction", "value"),
-                  geo = "geo_value")
+    dplyr::select(val = "value", geo = "geo_value")
   val = df$val
   geo = df$geo
   names(val) = geo
 
   # Create the choropleth colors for counties
-  if (attributes(x)$geo_type == "county") {
+  if (attributes(x)$metadata$geo_type == "county") {
     map_df = usmap::us_map("county", include = include)
     map_geo = map_df$fips
     map_col = rep(missing_col, length(map_geo))
@@ -126,7 +276,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   }
 
   # Create the choropleth colors for states
-  else if (attributes(x)$geo_type == "state") {
+  else if (attributes(x)$metadata$geo_type == "state") {
     map_df = usmap::us_map("state", include = include)
     map_geo = tolower(map_df$abbr)
     map_col = rep(missing_col, length(map_geo))
@@ -137,21 +287,22 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   }
 
   # Create the polygon layer
+  aes = ggplot2::aes
   geom_args = list()
   geom_args$color = border_col
   geom_args$size = border_size
   geom_args$fill = map_col
-  geom_args$mapping = ggplot2::aes(x = map_df$x, y = map_df$y,
-                                   group = map_df$group)
+  geom_args$mapping = aes(x = x, y = y, group = group)
+  geom_args$data = map_df
   polygon_layer = do.call(ggplot2::geom_polygon, geom_args)
-
-  # For intensity and continuous color scale, create a legend layer
-  if (!direction && is.null(breaks)) {
-    # Create legend breaks and legend labels
+  
+  # For continuous color scale, create a legend layer
+  if (is.null(breaks)) {
+    # Create legend breaks and legend labels, if we need to
     n = params$legend_n
     if (is.null(n)) n = 8
-    legend_breaks = seq(range[1], range[2], length = n)
-    legend_labels = round(legend_breaks, 2)
+    legend_breaks = seq(range[1], range[2], len = n)
+    legend_labels = round(legend_breaks, legend_digits)
 
     # Create a dense set of breaks, for the color gradient (especially important
     # if many colors were passed)
@@ -159,7 +310,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
 
     # Now the legend layer (hidden + scale)
     hidden_df = data.frame(x = rep(Inf, n), z = legend_breaks)
-    hidden_layer = ggplot2::geom_point(ggplot2::aes(x = x, y = x, color = z),
+    hidden_layer = ggplot2::geom_point(aes(x = x, y = x, color = z),
                                        data = hidden_df, alpha = 0)
     guide = ggplot2::guide_colorbar(title = NULL, horizontal = TRUE,
                                     barheight = legend_height,
@@ -171,16 +322,16 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
                                                  guide = guide)
   }
 
-  # For intensity and discrete color scale, create a legend layer
-  else if (!direction && !is.null(breaks)) {
+  # For discrete color scale, create a legend layer
+  else {
     # Create legend breaks and legend labels
     n = length(breaks)
     legend_breaks = breaks
-    legend_labels = round(legend_breaks, 2)
+    legend_labels = round(legend_breaks, legend_digits)
 
     # Now the legend layer (hidden + scale)
     hidden_df = data.frame(x = rep(Inf, n), z = as.factor(legend_breaks))
-    hidden_layer = ggplot2::geom_polygon(ggplot2::aes(x = x, y = x, fill = z),
+    hidden_layer = ggplot2::geom_polygon(aes(x = x, y = x, fill = z),
                                          data = hidden_df, alpha = 0)
     guide = ggplot2::guide_legend(title = NULL, horizontal = TRUE, nrow = 1,
                                   keyheight = legend_height,
@@ -188,27 +339,6 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
                                   label.position = "bottom", label.hjust = 0,
                                   override.aes = list(alpha = 1))
     scale_layer = ggplot2::scale_fill_manual(values = col,
-                                             breaks = legend_breaks,
-                                             labels = legend_labels,
-                                             guide = guide)
-  }
-
-  # For direction, create a legend layer
-  else {
-    # Create legend breaks and legend labels
-    legend_breaks = -1:1
-    legend_labels = c("Decreasing", "Steady", "Increasing")
-
-    # Now the legend layer (hidden + scale)
-    hidden_df = data.frame(x = rep(Inf, 3), z = as.factor(legend_breaks))
-    hidden_layer = ggplot2::geom_polygon(ggplot2::aes(x = x, y = x, fill = z),
-                                         data = hidden_df, alpha = 1)
-    guide = ggplot2::guide_legend(title = NULL, horizontal = TRUE, nrow = 1,
-                                  keyheight = legend_height,
-                                  keywidth = legend_width / 3,
-                                  label.position = "bottom",
-                                  override.aes = list(alpha = 1))
-    scale_layer = ggplot2::scale_fill_manual(values = dir_col,
                                              breaks = legend_breaks,
                                              labels = legend_labels,
                                              guide = guide)
@@ -225,8 +355,8 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
                        col = "purple", alpha = 0.5, num_bins = 8,
                        title = NULL, params = list()) {
   # Check that we're looking at either counties or states
-  if (!(attributes(x)$geo_type == "county" ||
-                     attributes(x)$geo_type == "state")) {
+  if (!(attributes(x)$metadata$geo_type == "county" ||
+                     attributes(x)$metadata$geo_type == "state")) {
     stop("Only 'county' and 'state' are supported for bubble maps.")
   }
 
@@ -249,11 +379,15 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   border_size = params$border_size
   legend_height = params$legend_height
   legend_width = params$legend_width
+  legend_digits = params$legend_digits
+  legend_pos = params$legend_position
   if (is.null(missing_col)) missing_col = "gray"
   if (is.null(border_col)) border_col = "darkgray"
   if (is.null(border_size)) border_size = 0.1
   if (is.null(legend_height)) legend_height = 0.5
   if (is.null(legend_width)) legend_width = 15
+  if (is.null(legend_digits)) legend_digits = 2
+  if (is.null(legend_pos)) legend_pos = "bottom"
 
   # Create breaks, if we need to
   breaks = params$breaks
@@ -267,14 +401,20 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     breaks = seq(lower_bd, range[2], length = num_bins)
   }
 
-  # Create bubble sizes
+  # Max and min bubble sizes
   min_size = params$min_size
   max_size = params$max_size
-  if (is.null(min_size)) min_size = ifelse(attributes(x)$geo_type == "county",
-                                           0.1, 1)
-  if (is.null(max_size)) max_size = ifelse(attributes(x)$geo_type == "county",
-                                           4, 12)
-  sizes = seq(min_size, max_size, length = num_bins)
+  if (is.null(min_size)) {
+    min_size = ifelse(attributes(x)$metadata$geo_type == "county", 0.1, 1)
+  }
+  if (is.null(max_size)) {
+    max_size = ifelse(attributes(x)$metadata$geo_type == "county", 4, 12)
+  }
+
+  # Bubble sizes. Important note the way we set sizes later, via
+  # scale_size_manual(), this actually sets the *radius* not the *area*, so we
+  # need to define these sizes to be evenly-spaced on the squared scale
+  sizes = sqrt(seq(min_size^2, max_size^2, length = num_bins))
 
   # Create discretization function
   dis_fun = function(val) {
@@ -291,7 +431,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     ggplot2::theme(plot.title = element_text(hjust = 0.5, size = 12),
                    plot.subtitle = element_text(hjust = 0.5, size = 10,
                                                 margin = margin(t = 5)),
-                   legend.position = "bottom")
+                   legend.position = legend_pos)
 
   # Grab the values
   given_time_value = time_value
@@ -303,13 +443,13 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   names(val) = geo
 
   # Grap the map data frame for counties
-  if (attributes(x)$geo_type == "county") {
+  if (attributes(x)$metadata$geo_type == "county") {
     map_df = usmap::us_map("county", include = include)
     map_geo = map_df$fips
   }
 
   # Grap the map data frame for states
-  else if (attributes(x)$geo_type == "state") {
+  else if (attributes(x)$metadata$geo_type == "state") {
     map_df = usmap::us_map("state", include = include)
     map_geo = tolower(map_df$abbr)
   }
@@ -325,30 +465,27 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   }
 
   # Create the polygon layer
+  aes = ggplot2::aes
   geom_args = list()
   geom_args$color = border_col
   geom_args$size = border_size
   geom_args$fill = c("white", missing_col)[map_mis + 1]
-  geom_args$mapping = ggplot2::aes(x = map_df$x, y = map_df$y,
-                                   group = map_df$group)
+  geom_args$mapping = aes(x = x, y = y, group = group)
+  geom_args$data = map_df
   polygon_layer = do.call(ggplot2::geom_polygon, geom_args)
 
-  # Set the lats and lons for counties
-  if (attributes(x)$geo_type == "county") {
-    g = county_geo[county_geo$FIPS %in% map_geo, ]
-    cur_geo = g$FIPS
-    cur_lon = g$LON
-    cur_lat = g$LAT
+  # Retrieve coordinates for mapping
+  # Reading from usmap files to ensure consistency with borders
+  if (attributes(x)$metadata$geo_type == "county") {
+    centroids = covidcast::county_geo[covidcast::county_geo$fips %in% map_geo, ]
+    cur_geo = centroids$fips
     cur_val = rep(NA, length(cur_geo))
   }
-
-  # Set the lats and lons for states
-  else if (attributes(x)$geo_type == "state") {
-    state_geo$STATE = tolower(state_geo$STATE)
-    g = state_geo[state_geo$STATE %in% map_geo, ]
-    cur_geo = g$STATE
-    cur_lon = g$LON
-    cur_lat = g$LAT
+  else if (attributes(x)$metadata$geo_type == "state") {
+    centroids = covidcast::state_geo
+    centroids$abbr = tolower(centroids$abbr)
+    centroids = centroids[centroids$abbr %in% map_geo, ]
+    cur_geo = centroids$abbr
     cur_val = rep(NA, length(cur_geo))
   }
 
@@ -366,15 +503,13 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   }
 
   # Create the bubble layer
-  bubble_df = data.frame(lon = cur_lon, lat = cur_lat, val = cur_val)
-  bubble_trans = usmap::usmap_transform(bubble_df)
-  bubble_layer = ggplot2::geom_point(ggplot2::aes(x = lon.1, y = lat.1,
-                                                  size = val),
-                                     data = bubble_trans, color = col,
+  bubble_df = data.frame(lat = centroids$x, lon = centroids$y, val = cur_val)
+  bubble_layer = ggplot2::geom_point(aes(x = lat, y = lon, size = val),
+                                     data = bubble_df, color = col,
                                      alpha = alpha, na.rm = TRUE)
 
   # Create the scale layer
-  labels = round(breaks, 2)
+  labels = round(breaks, legend_digits)
   guide = ggplot2::guide_legend(title = NULL, horizontal = TRUE, nrow = 1)
   scale_layer = ggplot2::scale_size_manual(values = sizes, breaks = breaks,
                                            labels = labels, drop = FALSE,
@@ -386,24 +521,27 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 }
 
 # Plot a line (time series) graph of a covidcast_signal object.
-plot_line = function(x, range = NULL, col = 1:6, line_type = rep(1:6, each = length(col)),
-                     title = NULL, params = list()) {
+plot_line = function(x, range = NULL, title = NULL, params = list()) {
   # Set a title, if we need to (simple combo of data source, signal)
   if (is.null(title)) title = paste0(unique(x$data_source), ": ",
                                      unique(x$signal))
 
-  # Set other map parameters, if we need to
+  # Set other plot parameters, if we need to
   xlab = params$xlab
   ylab = params$ylab
+  stderr_bands = params$stderr_bands
+  stderr_alpha = params$stderr_alpha
   if (is.null(xlab)) xlab = "Date"
   if (is.null(ylab)) ylab = "Value"
+  if (is.null(stderr_bands)) stderr_bands = FALSE
+  if (is.null(stderr_alpha)) stderr_alpha = 0.5
 
   # Grab the values
-  df = x %>% dplyr::select(value, time_value, geo_value)
+  df = x %>% dplyr::select(value, time_value, geo_value, stderr)
 
-  # Expand the range, if we need to
-  range = base::range(c(range, df$value))
-  
+  # Set the range, if we need to
+  if (is.null(range)) range = base::range(df$value, na.rm = TRUE)
+
   # Create label and theme layers
   label_layer = ggplot2::labs(title = title, x = xlab, y = ylab)
   theme_layer = ggplot2::theme_bw() +
@@ -411,16 +549,20 @@ plot_line = function(x, range = NULL, col = 1:6, line_type = rep(1:6, each = len
     ggplot2::theme(legend.position = "bottom",
                    legend.title = ggplot2::element_blank())
 
-  # Create line and lim layers
-  line_layer = ggplot2::geom_line(ggplot2::aes(x = time_value, y = value,
-                                               color = geo_value,
-                                               group = geo_value), data = df) 
-  lim_layer = ggplot2::lims(y = c(range[1], range[2]))
-  
-  # TODO: show standard error bands?
+  # Create lim, line, and ribbon layers
+  aes = ggplot2::aes
+  lim_layer = ggplot2::coord_cartesian(ylim = range)
+  line_layer = ggplot2::geom_line(aes(y = value, color = geo_value,
+                                      group = geo_value))
+  ribbon_layer = NULL
+  if (stderr_bands) {
+    ribbon_layer = ggplot2::geom_ribbon(aes(ymin = value - stderr,
+                                            ymax = value + stderr,
+                                            fill = geo_value),
+                                        alpha = stderr_alpha)
+  }
 
   # Put it all together and return
-  return(ggplot2::ggplot() + line_layer + lim_layer + label_layer + theme_layer)
+  return(ggplot2::ggplot(aes(x = time_value), data = df) +
+         line_layer + ribbon_layer + lim_layer + label_layer + theme_layer)
 }
-
-# TODO: plot functions for covidcast_signals objects (note the plural form)?

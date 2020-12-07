@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{latest_issue}
 \alias{latest_issue}
-\title{Fetch only the latest issue for each observation in a data frame.}
+\title{Fetch only the latest issue for each observation in a data frame}
 \usage{
 latest_issue(df)
 }

@@ -321,14 +321,13 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
     # Get rid of unobserved counties and megacounties
     # Those are taken care of by background layer
     # Then set color for those observed counties
-    map_df = map_df %>% dplyr::filter(
-      (GEOID %in% geo) & !(COUNTYFP == "000")
+    map_df = map_df %>% dplyr::filter((GEOID %in% geo) & !(COUNTYFP == "000")
       ) %>% dplyr::mutate(
-      is_alaska = STATEFP == '02',
-      is_hawaii = STATEFP == '15',
-      is_pr = STATEFP == '72',
-      is_state = as.numeric(STATEFP) < 57,
-      color = col_fun(val[GEOID])) 
+        is_alaska = STATEFP == '02',
+        is_hawaii = STATEFP == '15',
+        is_pr = STATEFP == '72',
+        is_state = as.numeric(STATEFP) < 57,
+        color = col_fun(val[GEOID])) 
 
     if (length(include) > 0) {
       map_df = map_df %>% dplyr::filter(
@@ -699,6 +698,9 @@ plot_line = function(x, range = NULL, title = NULL, params = list()) {
 
 
 # Use the following CRS values
+# final_crs is ESRI:102003, alaska_crs is ESRI:102006, 
+# hawaii_crs is ESRI:102007. There were errors using the integers, so these
+# were copied from spatialreference.org
 
 final_crs = '+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 
              +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs'
@@ -707,6 +709,9 @@ alaska_crs = '+proj=aea +lat_1=55 +lat_2=65 +lat_0=50 +lon_0=-154 +x_0=0
 hawaii_crs = '+proj=aea +lat_1=8 +lat_2=18 +lat_0=13 +lon_0=-157 +x_0=0 
               +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs'
 
+# These functions move Hawaii, Puerto Rico and Alaska close to the mainland,
+# and rotate/scale them for the plots.
+
 shift_pr = function(map_df){
   pr_df = map_df %>% dplyr::filter(.$is_pr)
   pr_df = sf::st_transform(pr_df, final_crs)
@@ -714,7 +719,7 @@ shift_pr = function(map_df){
   pr_df = sf::st_set_geometry(pr_df, pr_shift)
   r = 16 * pi / 180
   rotation = matrix(c(cos(r), sin(r), -sin(r), cos(r)), nrow = 2, ncol = 2)
-  pr_rotate = (sf::st_geometry(pr_df) - c(0,0)) * rotation + c(0,0)
+  pr_rotate = (sf::st_geometry(pr_df)) * rotation 
   pr_df = sf::st_set_geometry(pr_df, pr_rotate)
   sf::st_crs(pr_df) <- final_crs
   return(pr_df)
@@ -723,7 +728,7 @@ shift_pr = function(map_df){
 shift_alaska = function(map_df){
   alaska_df = map_df %>% dplyr::filter(.$is_alaska)
   alaska_df = sf::st_transform(alaska_df, alaska_crs)
-  alaska_scale = (sf::st_geometry(alaska_df) - c(0,0)) * 0.35 + c(0,0)
+  alaska_scale = sf::st_geometry(alaska_df) * 0.35 
   alaska_df = sf::st_set_geometry(alaska_df, alaska_scale)
   alaska_shift = sf::st_geometry(alaska_df) + c(-1.8e+6, -1.6e+6)
   alaska_df = sf::st_set_geometry(alaska_df, alaska_shift)
@@ -745,10 +750,8 @@ shift_main = function(map_df){
       !.$is_alaska) %>% dplyr::filter(
         !.$is_hawaii) %>% dplyr::filter(!.$is_pr)
   # Remove other territories if that attribute is there
-  if("is_state" %in% colnames(main_df)){
-    main_df = main_df %>% dplyr::filter(
-      .$is_state
-    )
+  if ("is_state" %in% colnames(main_df)){
+    main_df = main_df %>% dplyr::filter(.$is_state)
   }
   main_df = sf::st_transform(main_df, final_crs)
   sf::st_crs(main_df) <- final_crs

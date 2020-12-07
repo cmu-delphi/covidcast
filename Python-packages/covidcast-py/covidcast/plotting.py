@@ -72,6 +72,9 @@ def plot(data: pd.DataFrame,
     bubble but have the region displayed in white, and values above the mean + 3 std dev are binned
     into the highest bubble. Bubbles are scaled by area.
 
+    A Matplotlib Axes object can be provided to plot the maps onto an existing figure. Otherwise,
+    a new Axes object will be created and returned.
+
     :param data: Data frame of signal values, as returned from :py:func:`covidcast.signal`.
     :param time_value: If multiple days of data are present in ``data``, map only values from this
       day. Defaults to plotting the most recent day of data in ``data``.
@@ -94,7 +97,7 @@ def plot(data: pd.DataFrame,
     kwargs["vmax"] = kwargs.get("vmax", meta["mean_value"] + 3 * meta["stdev_value"])
     kwargs["figsize"] = kwargs.get("figsize", (12.8, 9.6))
 
-    ax = _plot_background_states(kwargs["figsize"]) if ax is None else ax
+    ax = _plot_background_states(kwargs["figsize"]) if ax is None else _plot_background_states(ax)
     ax.axis("off")
     ax.set_title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")
     if plot_type == "choropleth":
@@ -109,6 +112,9 @@ def plot_choropleth(data: pd.DataFrame,
                     combine_megacounties: bool = True,
                     **kwargs: Any) -> axes.Axes:
     """Plot choropleths for a signal. This method is deprecated and has been generalized to plot().
+
+    .. deprecated:: 0.1.1
+    Use ``plot()`` instead.
 
     :param data: Data frame of signal values, as returned from :py:func:`covidcast.signal`.
     :param time_value: If multiple days of data are present in ``data``, map only values from this
@@ -289,11 +295,11 @@ def _plot_bubble(ax: axes.Axes, data: gpd.GeoDataFrame, geo_type: str, **kwargs:
     ax.legend(frameon=False, ncol=8, loc="lower center", bbox_to_anchor=(0.5, -0.1))
 
 
-def _plot_background_states(figsize: tuple, ax: axes.Axes = None) -> axes.Axes:
+def _plot_background_states(ax: axes.Axes = None, figsize: tuple = (12.8, 9.6)) -> axes.Axes:
     """Plot US states in light grey as the background for other plots.
 
-    :param figsize: Dimensions of plot.
     :param ax: Optional matplotlib axis to plot on.
+    :param figsize: Dimensions of plot. Ignored if ax is provided.
     :return: Matplotlib axes.
     """
     if ax is None:

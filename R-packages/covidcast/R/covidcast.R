@@ -338,7 +338,8 @@ as.covidcast_signal.data.frame <-
            geo_type = c("county", "msa", "hrr", "dma", "state"),
            data_source = "user",
            issue = NULL,
-           metadata = list()) {
+           metadata = list(),
+           ...) {
   if (is.null(signal)) {
     abort("signal name must be provided",
           class = "covidcast_coerce_signal")

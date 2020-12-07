@@ -17,7 +17,8 @@ as.covidcast_signal(x, ...)
   geo_type = c("county", "msa", "hrr", "dma", "state"),
   data_source = "user",
   issue = NULL,
-  metadata = list()
+  metadata = list(),
+  ...
 )
 }
 \arguments{

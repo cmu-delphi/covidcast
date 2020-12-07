@@ -296,7 +296,7 @@ def _plot_bubble(ax: axes.Axes, data: gpd.GeoDataFrame, geo_type: str, **kwargs:
     ax.legend(frameon=False, ncol=8, loc="lower center", bbox_to_anchor=(0.5, -0.1))
 
 
-def _plot_background_states(figsize: tuple = (12.8, 9.6),ax: axes.Axes = None) -> axes.Axes:
+def _plot_background_states(figsize: tuple = (12.8, 9.6), ax: axes.Axes = None) -> axes.Axes:
     """Plot US states in light grey as the background for other plots.
 
     :param figsize: Dimensions of plot. Ignored if ax is provided.
@@ -309,8 +309,8 @@ def _plot_background_states(figsize: tuple = (12.8, 9.6),ax: axes.Axes = None) -
     state = gpd.read_file(state_shapefile_path)
     for state in _project_and_transform(state, "STATEFP"):
         state.plot(color="0.9", ax=ax, edgecolor="0.8", linewidth=0.5)
-    ax.set_xlim(plt.xlim())
-    ax.set_ylim(plt.ylim())
+    ax.set_xlim(ax.get_xlim())
+    ax.set_ylim(ax.get_ylim())
     return ax
 
 

@@ -361,6 +361,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
       package = "covidcast"))
     map_df = map_df %>% dplyr::filter(map_df$LSAD == 'M1') # only get metro and not micropolitan areas
     if (length(include) > 0) {
+      # Last two letters are state abbreviation
       map_df = map_df %>% dplyr::filter(
         substr(.$NAME, nchar(.$NAME) - 1, nchar(.$NAME)) %in% include)
     }
@@ -377,6 +378,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
       "shapefiles/hrr/geo_export_ad86cff5-e5ed-432e-9ec2-2ce8732099ee.shp",
       package = "covidcast"))
     if (length(include) > 0) {
+      # First two letters are state abbreviation
       map_df = map_df %>% filter(substr(.$hrr_name, 1, 2) %in% include)
     }
     map_df = sf::st_transform(map_df, background_crs)

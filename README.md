@@ -1,6 +1,7 @@
 # covidcast
 
-Public-facing tools supporting [Delphi's](https://delphi.cmu.edu)
+R and Python packages, and related public-facing tools and materials,
+supporting [Delphi's](https://delphi.cmu.edu) 
 [COVIDcast](https://covidcast.cmu.edu) effort. 
 
 ## API clients

@@ -97,7 +97,8 @@ def plot(data: pd.DataFrame,
     kwargs["vmax"] = kwargs.get("vmax", meta["mean_value"] + 3 * meta["stdev_value"])
     kwargs["figsize"] = kwargs.get("figsize", (12.8, 9.6))
 
-    ax = _plot_background_states(kwargs["figsize"]) if ax is None else _plot_background_states(ax)
+    ax = _plot_background_states(kwargs["figsize"]) if ax is None \
+        else _plot_background_states(ax=ax)
     ax.axis("off")
     ax.set_title(f"{data_source}: {signal}, {day_to_plot.strftime('%Y-%m-%d')}")
     if plot_type == "choropleth":

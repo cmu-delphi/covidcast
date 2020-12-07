@@ -128,13 +128,38 @@ with_mock_api({
     expect_error(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-01"))
   })
 
-  ## covidcast_signals()
-
   test_that("covidcast_signals rejects incorrect start/end_day length", {
     expect_error(covidcast_signals("foo", "bar",
                                    start_day = c("2020-01-01", "2020-01-02")))
     expect_error(covidcast_signals("foo", "bar",
                                    end_day = c("2020-01-01", "2020-01-02")))
+  })
+
+  test_that("covidcast_signal warns when many geo_values", {
+    # When requesting many geo_values, request "*" instead due to URI length
+    # restrictions, and warn the user because other messages may be confusing
+    # api.php-79f49e.csv
+
+    geo_vals <- as.character(c(10001:11000))
+    expect_warning(covidcast_signal("foo",
+                                    "bar",
+                                    start_day = "2020-10-01",
+                                    end_day = "2020-10-01",
+                                    geo_values = geo_vals))
+  })
+  test_that("covidcast_signal returns correct results when many geo_values", {
+    # If many geo_values, covidcast returns a superset of expected results.
+    # Confirm that this is filtered appropriately for the user.
+    # Note that api.php-a1807e.csv is a copy of api.php-79f49e.csv, because they
+    # should return a simulated full dataset, even with different geo_values.
+
+    geo_vals <- as.character(c(10001:10900))
+    df <- suppressWarnings(covidcast_signal("foo",
+                                    "bar",
+                                    start_day = "2020-10-01",
+                                    end_day = "2020-10-01",
+                                    geo_values = geo_vals))
+    expect_equal(nrow(df), length(geo_vals))
   })
 })
 

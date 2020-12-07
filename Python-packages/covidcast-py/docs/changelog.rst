@@ -5,7 +5,7 @@ v0.1.1, November 22, 2020
 -------------------------
 
 - Bug fix: A shapefile packaging issue, which broke
-  :py:func:`covidcast.plot_choropleth` for metropolitan statistical areas and
+  :py:func:`covidcast.plot` for metropolitan statistical areas and
   hospital referral regions, is now resolved.
 
 - Update: ``Direction`` is no longer supported and has been removed from the
@@ -16,6 +16,9 @@ v0.1.1, November 22, 2020
 - New feature: Functions :py:func:`covidcast.fips_to_abbr` and
   :py:func:`covidcast.abbr_to_fips` to convert between state FIPS codes and
   their abbreviations.
+
+- New feature: Function :py:func:`covidcast.plot` now supports bubble plots with
+  the argument ``plot_type="bubble"``
 
 
 v0.1.0, October 1, 2020
@@ -50,6 +53,9 @@ v0.1.0, October 1, 2020
 
 - Bug fix: :py:func:`covidcast.signal` no longer returns duplicate values if duplicate
   ``geo_values`` are provided in the function call.
+
+- Deprecated function: :py:func:`covidcast.plot_choropleth` has been deprecated and is
+  not replaced by :py:func:`covidcast.plot`.
 
 v0.0.9, August 30, 2020
 -----------------------

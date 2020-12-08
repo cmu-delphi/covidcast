@@ -33,8 +33,7 @@ enough to be taken as correct? See details for more.}
 Adding this column bypasses all checks to get appropriate data as
 reported at the time of the forecast. This column should either be a vector
 the same length as \code{predictions_cards} or a data frame that will be
-joined to \code{predictions_cards}. \code{grp_vars} and \code{avg_vars} must be present
-and joining will be performed on all available columns. If a data frame,
+joined to \code{predictions_cards} by all available columns. If a data frame,
 the observed data should be named \code{actual}}
 
 \item{grp_vars}{character vector of named columns in the predictions_cards

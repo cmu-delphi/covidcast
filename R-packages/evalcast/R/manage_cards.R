@@ -65,47 +65,47 @@ intersect_locations <- function(cards) {
 
 
 
-#' Print method for predictions_cards
-#' 
-#' @param x Prediction card.
-#' @export
-print.predictions_cards <- function(x, ...) {
-  z = unique(x$geo_value)
-  cat("Overview:\n")
-  cat("  Name of forecaster:", x$forecaster[1], "\n")
-  cat("  Forecast date:", as.character(unique(x$forecast_date)), "\n")
-  cat("  Ahead:", unique(x$ahead), "\n")
-  cat("  Geo type:", ifelse(nchar(z[1])==2, "state", "county"), "\n")
-  if (length(z) < 4){
-    cat("  Geo values:", z, "\n")
-  } else {
-    cat("  Geo values:", "*", "\n")
-  }
-  cat("  Incidence period:", x$incidence_period[1], "\n")
-  cat("  Response Data source:", x$data_source[1], "\n")
-  cat("  Response Signal:", x$signal[1], "\n")
-  NextMethod(x, ...)
-}
+# Print method for predictions_cards
+# 
+# @param x Prediction card.
+# @export
+# print.predictions_cards <- function(x, ...) {
+#   z = unique(x$geo_value)
+#   cat("Overview:\n")
+#   cat("  Name of forecaster:", x$forecaster[1], "\n")
+#   cat("  Forecast date:", as.character(unique(x$forecast_date)), "\n")
+#   cat("  Ahead:", unique(x$ahead), "\n")
+#   cat("  Geo type:", ifelse(nchar(z[1])==2, "state", "county"), "\n")
+#   if (length(z) < 4){
+#     cat("  Geo values:", z, "\n")
+#   } else {
+#     cat("  Geo values:", "*", "\n")
+#   }
+#   cat("  Incidence period:", x$incidence_period[1], "\n")
+#   cat("  Response Data source:", x$data_source[1], "\n")
+#   cat("  Response Signal:", x$signal[1], "\n")
+#   NextMethod(x, ...)
+# }
 
 
-#' Print a single score card.
-#' @param card Score card.
-#' @export
-print.score_card <- function(x, ...) {
-  z = unique(x$geo_value)
-  zz = unique(x$forecaster)
-  cat("Overview:\n")
-  cat("  Forecaster(s):", zz, "\n")
-  cat("  Forecast date:", as.character(unique(x$forecast_date)), "\n")
-  cat("  Ahead:", unique(x$ahead), "\n")
-  cat("  Geo type:", ifelse(nchar(z[1])==2, "state", "county"), "\n")
-  if (length(z) < 4){
-    cat("  Geo values:", z, "\n")
-  } else {
-    cat("  Geo values:", "*", "\n")
-  }
-  cat("  Incidence period:", x$incidence_period[1], "\n")
-  cat("  Response Data source:", x$data_source[1], "\n")
-  cat("  Response Signal:", x$signal[1], "\n")
-  NextMethod(x, ...)
-}
+# Print a single score card.
+# @param card Score card.
+# @export
+# print.score_card <- function(x, ...) {
+#   z = unique(x$geo_value)
+#   zz = unique(x$forecaster)
+#   cat("Overview:\n")
+#   cat("  Forecaster(s):", zz, "\n")
+#   cat("  Forecast date:", as.character(unique(x$forecast_date)), "\n")
+#   cat("  Ahead:", unique(x$ahead), "\n")
+#   cat("  Geo type:", ifelse(nchar(z[1])==2, "state", "county"), "\n")
+#   if (length(z) < 4){
+#     cat("  Geo values:", z, "\n")
+#   } else {
+#     cat("  Geo values:", "*", "\n")
+#   }
+#   cat("  Incidence period:", x$incidence_period[1], "\n")
+#   cat("  Response Data source:", x$data_source[1], "\n")
+#   cat("  Response Signal:", x$signal[1], "\n")
+#   NextMethod(x, ...)
+# }

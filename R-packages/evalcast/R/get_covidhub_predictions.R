@@ -266,21 +266,52 @@ get_covidhub_predictions <- function(covidhub_forecaster_name,
 #'
 #' Retrieves the forecast dates that a forecaster submitted to
 #' the [COVID Hub](https://github.com/reichlab/covid19-forecast-hub/). 
-#' Currently no way to query Zoltar for this information.
 #'
-#' @param covidhub_forecaster_name String indicating of the forecaster
+#' @param forecaster_name String indicating of the forecaster
 #'   (matching what it is called on the COVID Hub).
+#'   
+#' @return vector of forecast dates
 #' 
 #' @export
-get_covidhub_forecast_dates <- function(covidhub_forecaster_name) {
+get_covidhub_forecast_dates <- function(forecaster_name) {
   url <- "https://github.com/reichlab/covid19-forecast-hub/tree/master/data-processed/"
-  out <- xml2::read_html(paste0(url, covidhub_forecaster_name)) %>%
+  out <- xml2::read_html(paste0(url, forecaster_name)) %>%
     rvest::html_nodes(xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div/div[3]") %>%
     rvest::html_text() %>%
     stringr::str_remove_all("\\n") %>%
     stringr::str_match_all(sprintf("(20\\d{2}-\\d{2}-\\d{2})-%s.csv",
-                                   covidhub_forecaster_name))
-  return(lubridate::as_date(out[[1]][, 2]))
+                                   forecaster_name))
+  lubridate::as_date(out[[1]][, 2])
+}
+
+
+#' Get available forecast dates for a COVID forecaster on Zoltar
+#'
+#' Retrieves the forecast dates that a forecaster submitted to
+#'  [Zoltar](https://www.zoltardata.com). 
+#'
+#' @param forecaster_name String indicating of the forecaster
+#'   (matching what it is called on the COVID Hub).
+#'   
+#' @return vector of forecast dates
+#' 
+#' @export
+get_zoltar_forecast_dates <- function(forecaster_name) {
+  # set up Zoltar connection
+  zoltar_connection <- zoltr::new_connection()
+  if(Sys.getenv("Z_USERNAME") == "" | Sys.getenv("Z_PASSWORD") == "") {
+    zoltr::zoltar_authenticate(zoltar_connection, "zoltar_demo","Dq65&aP0nIlG")
+  } else {
+    zoltr::zoltar_authenticate(zoltar_connection, Sys.getenv("Z_USERNAME"),
+                               Sys.getenv("Z_PASSWORD"))
+  }
+  the_projects <- zoltr::projects(zoltar_connection)
+  project_url <- the_projects[the_projects$name == "COVID-19 Forecasts", "url"]
+  the_models <- zoltr::models(zoltar_connection, project_url)
+  model_url <- the_models[the_models$model_abbr == forecaster_name, "url"]
+  the_forecasts <- zoltr::forecasts(zoltar_connection, model_url)
+  
+  rev(the_forecasts$timezero_date)
 }
 
 

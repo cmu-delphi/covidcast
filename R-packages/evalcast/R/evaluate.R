@@ -45,8 +45,7 @@
 #'   Adding this column bypasses all checks to get appropriate data as 
 #'   reported at the time of the forecast. This column should either be a vector
 #'   the same length as `predictions_cards` or a data frame that will be 
-#'   joined to `predictions_cards`. `grp_vars` and `avg_vars` must be present
-#'   and joining will be performed on all available columns. If a data frame,
+#'   joined to `predictions_cards` by all available columns. If a data frame,
 #'   the observed data should be named `actual` 
 #' @param grp_vars character vector of named columns in the predictions_cards
 #'  such that the combination gives a unique (quantile) prediction. Ignored if

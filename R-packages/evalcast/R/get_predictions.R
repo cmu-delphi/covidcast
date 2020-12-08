@@ -117,7 +117,7 @@ get_predictions_single_date <- function(forecaster,
   }
   # get data that would have been available as of forecast_date
   args <- list(...)
-  if (length(geo_values) > 30) geo_values_dl = "*" else geo_values_dl = NULL
+  geo_values_dl <- ifelse(length(geo_values) > 30, "*", unique(geo_values))
   df <- download_signals(data_source=signals$data_source,
                          signal = signals$signal,
                          start_day = signals$start_day,

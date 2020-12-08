@@ -752,7 +752,7 @@ shift_main = function(map_df){
       !.$is_alaska) %>% dplyr::filter(
         !.$is_hawaii) %>% dplyr::filter(!.$is_pr)
   # Remove other territories if that attribute is there
-  if ("is_state" %in% colnames(main_df)){
+  if ("is_state" %in% colnames(main_df)) {
     main_df = main_df %>% dplyr::filter(.$is_state)
   }
   main_df = sf::st_transform(main_df, final_crs)

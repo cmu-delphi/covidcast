@@ -270,8 +270,8 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   if(attributes(x)$metadata$geo_type == "county"){
     map_df = map_df %>% dplyr::mutate(
       color = ifelse(paste0(STATEFP,"000") %in% geo,
-              col_fun(val[paste0(STATEFP, "000")], alpha = alpha),
-              missing_col))
+                     col_fun(val[paste0(STATEFP, "000")], alpha = alpha),
+                     missing_col))
   }
   # Else, just set background to missing color
   else {

@@ -714,7 +714,7 @@ hawaii_crs = '+proj=aea +lat_1=8 +lat_2=18 +lat_0=13 +lon_0=-157 +x_0=0
 # These functions move Hawaii, Puerto Rico and Alaska close to the mainland,
 # and rotate/scale them for the plots.
 
-shift_pr = function(map_df){
+shift_pr = function(map_df) {
   pr_df = map_df %>% dplyr::filter(.$is_pr)
   pr_df = sf::st_transform(pr_df, final_crs)
   pr_shift = sf::st_geometry(pr_df) + c(-0.9e+6, 1e+6)

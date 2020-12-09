@@ -31,7 +31,7 @@ We start by specifying which signals the forecaster will be using.  See [here](h
 library(tibble)
 signals <- tibble(data_source = "jhu-csse", 
                   signal = c("deaths_incidence_num", "confirmed_incidence_num"), 
-                  start_day = "2020-06-15")
+                  start_day = "2020-05-15")
 signals
 ```
 
@@ -44,13 +44,18 @@ library(evalcast)
 library(covidcast)
 library(lubridate)
 
-forecast_dates <- get_forecast_dates("CMU-TimeSeries")
-forecast_dates_july <- forecast_dates[forecast_dates >= "2020-07-01" & forecast_dates <= "2020-07-31"]
+forecast_dates <- get_covidhub_forecast_dates("CMU-TimeSeries")
+forecast_dates_july <- forecast_dates[forecast_dates >= "2020-07-01" & 
+                                        forecast_dates <= "2020-07-31"]
 
 # Retrieve past predictions from CovidHub
-predictions_cards_yyg <- get_covidhub_predictions("YYG-ParamSearch", forecast_dates_july)
-predictions_cards_cmu <- get_covidhub_predictions("CMU-TimeSeries", forecast_dates_july)
-
+predictions_cards_ens <- get_covidhub_predictions(
+  "COVIDhub-ensemble", forecast_dates_july, ahead = 3, 
+  signal = "deaths_incidence_num") %>%
+  filter(nchar(geo_value)==2) # remove counties
+predictions_cards_cmu <- get_covidhub_predictions(
+  "CMU-TimeSeries", forecast_dates_july,  ahead = 3, 
+  signal = "deaths_incidence_num")
 # Make new predictions using baseline_forecaster
 predictions_cards <- get_predictions(baseline_forecaster,
                                      name_of_forecaster = "baseline",
@@ -58,22 +63,34 @@ predictions_cards <- get_predictions(baseline_forecaster,
                                      forecast_dates = forecast_dates_july,
                                      incidence_period = "epiweek",
                                      ahead = 3,
+                                     signal_aggregation = "long",
                                      geo_type = "state")
 ```
 
-`baseline_forecaster` created a list of `r length(predictions_cards)` predictions cards, (one for each `(forecast date, ahead)` pair).  Let's look at a predictions card:
+`get_predictions()` and `get_covidhub_predictions()` return a long `data.frame` with `r nrow(predictions_cards)` rows, (one for each `(forecast date, ahead, geo_value, quantile)` combination).
 
 ```{r}
-predictions_cards[[1]]
+predictions_cards_cmu
 ```
 
-Forecasts are probabilistic, meaning that rather than predicting a single value, a distribution of values is generated. For example, the baseline forecaster would have predicted the following distribution in California for `r attributes(predictions_cards_cmu[[1]])$ahead` week(s) after `r attributes(predictions_cards_cmu[[1]])$forecast_date`
+
+Let's look one location:
+
 ```{r}
-pc <- predictions_cards_cmu[[1]]
-ca_fips = covidcast::name_to_fips("California")
-ca_code = substr(ca_fips, 0, 2) # States are identified by a 2 character code
-pc[pc$location == ca_code, ]$forecast_distribution[[1]]
+predictions_cards_cmu %>% 
+  filter(geo_value == "mi", forecast_date == forecast_dates_july[1]) %>%
+  select(geo_value, quantile, value, forecast_date) %>% str()
 ```
+
+Forecasts are generally probabilistic, meaning that rather than predicting a single value, a distribution of values at different quantiles. For example, the Covidhub ensemble forecaster would have predicted the following distribution in California for `r predictions_cards_cmu$ahead[1]` week(s) after `r predictions_cards_cmu$forecast_date[1]`
+```{r}
+predictions_cards_ens %>%
+  filter(geo_value == "ca", forecast_date == forecast_dates_july[1]) %>%
+  select(quantile, value) %>% str()
+```
+
+An `NA` in the `quantile` column indicates a point forecast (possibly different from the median).
+
 
 ### Evaluate the performance of a forecaster
 
@@ -82,26 +99,25 @@ Now that we've made these predictions, we'd like to know how well they perform. 
 ```{r}
 err_measures <- list(wis = weighted_interval_score,
                      ae = absolute_error,
-                     coverage_80 = interval_coverage(alpha = 0.2))
+                     coverage_80 = interval_coverage(coverage = 0.8))
 ```
 
 We may now create scorecards for each forecaster's predictions or for a filtered subset. 
 
 ```{r}
-scorecards_yyg <- evaluate_predictions(filter_predictions(predictions_cards_yyg, ahead = 3), 
-                                   err_measures, 
-                                   backfill_buffer = 10)
-pcards_cmu_death3 <- filter_predictions(predictions_cards_cmu, 
-                                        ahead = 3,
-                                        response_data_source = "jhu-csse",
-                                        response_signal = "deaths_incidence_num")
-scorecards_cmu <- evaluate_predictions(pcards_cmu_death3, 
-                                   err_measures, 
-                                   backfill_buffer = 10)
-scorecards <- evaluate_predictions(filter_predictions(predictions_cards, ahead = 3), 
-                                   err_measures, 
-                                   backfill_buffer = 10)
+scorecards <- evaluate_predictions(
+  bind_rows(predictions_cards, 
+            predictions_cards_cmu, 
+            predictions_cards_ens) %>%
+    # not always data for these locations
+    filter(! geo_value %in% c("us", "vi", "gu", "mp")),
+  err_measures = err_measures,
+  backfill_buffer = 10
+  )
 ```
+
+__DJM:__ Everything works to here.
+
 
 Let's look at the `baseline_forecaster`'s scorecard for 3-epiweek ahead forecasts.
 

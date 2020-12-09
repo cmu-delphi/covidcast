@@ -105,24 +105,14 @@ evaluate_predictions <- function(
   for (iter in seq_along(unique_ahead)) {
     message("ahead = ", unique_ahead[iter])
     scorecards[[iter]] <- evaluate_predictions_single_ahead(
-      filter(predictions_cards, .data$ahead == !!iter),
+      filter(predictions_cards, .data$ahead == unique_ahead[iter]),
       err_measures,
       backfill_buffer = backfill_buffer)
   }
-  bind_rows(scorecards)
+   bind_rows(scorecards)
 }
 
-#' Create score cards for one ahead
-#' 
-#' @param predictions_cards tibble of predictions 
-#'   that are all for the same prediction task, meaning they are for the same
-#'   response, incidence period, ahead, and geo type. Forecasts may be for a
-#'   different forecast date or forecaster.  
-#'   A predictions card may be created by the function
-#'   [get_predictions()], downloaded with [get_covidhub_predictions()] or
-#'   possibly created manually.
-#' @param backfill_buffer How many days until response is deemed trustworthy
-#'   enough to be taken as correct? See details for more.
+
 evaluate_predictions_single_ahead <- function(predictions_cards,
                                               err_measures,
                                               backfill_buffer) {
@@ -137,7 +127,7 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
       mutate(geo_type = nchar(.data$geo_value)), 
     "geo_type")
   geo_type <- ifelse(geo_type == 2L, "state", "county")
-  forecast_dates <- select(predictions_cards, forecast_date) %>%
+  forecast_dates <- select(predictions_cards, .data$forecast_date) %>%
     distinct() %>% pull()
   ahead <- predictions_cards$ahead[1]
   geo_values <- select(predictions_cards, .data$geo_value) %>%
@@ -220,11 +210,12 @@ check_valid_forecaster_output <- function(pred_card) {
     filter(null_forecasts | wrong_probs | bad_quantiles | wrong_format)
 }
 
+#' @importFrom rlang :=
 empty_score_card <- function(err_measures){
   out <- tibble(ahead = integer(0), geo_value = character(0), 
                 quantile = double(0), value=double(0), forecaster=character(0),
-                forecast_date = Date(0), data_source=character(0), 
-                signal=character(0), target_end_date=Date(0),
+                forecast_date = ymd(), data_source=character(0), 
+                signal=character(0), target_end_date=ymd(),
                 incidence_period=character(0), actual=double(0))
   for(iter in names(err_measures)){
     out <- bind_cols(out, tibble(!!iter := double(0)))

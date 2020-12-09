@@ -42,14 +42,7 @@ get_target_period <- function(forecast_date, incidence_period, ahead) {
 
 
 
-#' Get data frame with column names `forecast_date`, `geo_value`, `target_start`,
-#' `target_end`, `actual`
-#'
-#' @template signals-template
-#' @template forecast_dates-template
-#' @template incidence_period-template
-#' @template ahead-template
-#' @template geo_type-template
+
 get_target_response <- function(signals,
                                 forecast_dates,
                                 incidence_period,
@@ -122,7 +115,7 @@ get_target_response <- function(signals,
 empty_actual <- function(){
   out <- tibble(geo_value = character(0), forecast_date = lubridate::ymd(),
                 actual=double(0), start = lubridate::ymd(), 
-                end = lubridate::ymd()) %>% group_by(geo_value)
+                end = lubridate::ymd()) %>% group_by(.data$geo_value)
   attr(out, "as_of") <- Sys.Date()
   out
 }

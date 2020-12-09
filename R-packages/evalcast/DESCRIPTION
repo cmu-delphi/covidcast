@@ -65,7 +65,8 @@ Imports:
     ggplot2,
     memoise,
     zoltr,
-    covidHubUtils
+    covidHubUtils,
+    forcats
 Suggests: 
     testthat
 Depends: 

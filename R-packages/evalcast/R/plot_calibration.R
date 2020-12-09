@@ -2,8 +2,9 @@
 #'
 #' @param scorecard Single score card.
 #' @param type One of "wedgeplot" or "traditional".
-#' @param alpha Deprecated parameter to be removed soon.
-#' @param legend_position Legend position, the default being "bottom".
+#' @param grp_vars 
+#' @param avg_vars 
+#' @param legend_position 
 #'
 #' @export
 plot_calibration <- function(scorecard,
@@ -33,7 +34,8 @@ plot_calibration <- function(scorecard,
       geom_abline(intercept = 1, slope = -1) +
       labs(x = "Nominal quantile level",
            y = "Proportion",
-           title = sprintf("%s (ahead = %s): Proportion above/below", name, ahead)) +
+           title = sprintf("%s (ahead = %s): Proportion above/below", 
+                           .data$name, .data$ahead)) +
       scale_colour_discrete(name = "") +
       scale_alpha_continuous(range = c(0.5, 1)) +
       scale_size_continuous(range = c(0.5, 1)) +
@@ -47,7 +49,8 @@ plot_calibration <- function(scorecard,
       geom_abline(slope = 1, intercept = 0) +
       labs(x = "Quantile level",
            y = "Proportion",
-           title = sprintf("%s (ahead %s): Calibration", name, ahead))
+           title = sprintf("%s (ahead %s): Calibration", 
+                           .data$name, .data$ahead))
   }
   g +
     facet_wrap(~ forecast_date) +

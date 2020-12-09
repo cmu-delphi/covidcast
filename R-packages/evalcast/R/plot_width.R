@@ -11,7 +11,6 @@
 #' @details Interval width does not depend on the actual outcome, so this
 #'   function can be called on predictions cards in addition to score cards.
 #' 
-#' @importFrom stats median
 #' @export
 plot_width <- function(cards, alpha = 0.2, levels = c(0.5, 0.7, 0.9),
                        legend_position = "bottom") {
@@ -31,7 +30,7 @@ plot_width <- function(cards, alpha = 0.2, levels = c(0.5, 0.7, 0.9),
     unnest(.data$coverage) %>%
     group_by(.data$forecaster, .data$nominal, .data$forecast_date) %>%
     summarize(level = as.factor(levels),
-              width = quantile(.data$width, probs = levels)) %>%
+              width = stats::quantile(.data$width, probs = levels)) %>%
     ggplot(aes(x = .data$nominal,
                y = .data$width,
                color = .data$forecaster,

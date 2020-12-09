@@ -76,7 +76,7 @@ absolute_error <- function(quantile, value, actual_value) {
   if (length(point_fcast) == 1L) {
     return(abs(value[point_fcast] - actual_value[point_fcast]))
   }
-  point_fcast <- which(abs(quantile - 0.5) < 1e-10)
+  point_fcast <- which(abs(quantile - 0.5) < 1e-8)
   if (length(point_fcast) == 1L) {
     return(abs(value[point_fcast] - actual_value[point_fcast]))
   }

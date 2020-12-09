@@ -17,9 +17,11 @@ plot_calibration(
 
 \item{type}{One of "wedgeplot" or "traditional".}
 
-\item{legend_position}{Legend position, the default being "bottom".}
+\item{grp_vars}{}
 
-\item{alpha}{Deprecated parameter to be removed soon.}
+\item{avg_vars}{}
+
+\item{legend_position}{}
 }
 \description{
 Plot calibration curves

@@ -17,6 +17,15 @@ plot_trajectory(
 )
 }
 \arguments{
+\item{predictions_cards}{long data frame of forecasts with a class of
+\code{predictions_cards} as created by \code{\link[=get_predictions]{get_predictions()}} or
+\code{\link[=get_zoltar_predictions]{get_zoltar_predictions()}} or \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}}.
+The first 4 columns are the same as those returned by the forecaster. The
+remainder specify the prediction task, 10 columns in total:
+\code{ahead}, \code{geo_value}, \code{quantile}, \code{value}, \code{forecaster}, \code{forecast_date},
+\code{data_source}, \code{signal}, \code{target_end_date}, and \code{incidence_period}. Here
+\code{data_source} and \code{signal} correspond to the response variable only.}
+
 \item{intervals}{vector of confidence intervals to show. More than 3 is ugly
 and will be reduced to the default set.}
 
@@ -44,13 +53,6 @@ with \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}}. Mu
 \item{...}{additional arguments passed to \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}}}
 }
 \value{
-Long data frame of forecasts with a class of \code{predictions_cards}.
-The first 4 columns are the same as those returned by the forecaster. The
-remainder specify the prediction task, 10 columns in total:
-\code{ahead}, \code{geo_value}, \code{quantile}, \code{value}, \code{forecaster}, \code{forecast_date},
-\code{data_source}, \code{signal}, \code{target_end_date}, and \code{incidence_period}. Here
-\code{data_source} and \code{signal} correspond to the response variable only.
-
 invisibly returns a ggplot object
 }
 \description{

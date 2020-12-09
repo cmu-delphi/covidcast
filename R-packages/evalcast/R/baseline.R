@@ -37,32 +37,32 @@ baseline_forecaster <- function(df,
   covidhub_probs <- c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99)
   dat <- list()
   s <- ifelse(symmetrize, -1, NA)
-  for (a in ahead) {
+  for (a in seq_along(ahead)) {
     # recall the first row of signals is the response
     dat[[a]] <- df %>%
-        dplyr::filter(.data$data_source == signals$data_source[1],
-                      .data$signal == signals$signal[1]) %>%
-        dplyr::group_by(.data$geo_value) %>%
-        dplyr::arrange(.data$time_value) %>%
-        dplyr::mutate(
-          summed = zoo::rollsum(.data$value, k = incidence_length, fill = NA, 
-                                align = "right"),
-          resid = .data$summed - 
-            dplyr::lag(.data$summed, n = incidence_length * a)) %>%
-        dplyr::select(.data$geo_value, .data$time_value, 
-                      .data$summed, .data$resid) %>%
-        dplyr::group_modify(~ {
-            point <- .x$summed[.x$time_value == max(.x$time_value)]
-            tibble::tibble(quantile = covidhub_probs,
-                           value = point + 
-                             stats::quantile(c(.x$resid, s * .x$resid),
-                                             probs = covidhub_probs,
-                                             na.rm = TRUE))
+      filter(.data$data_source == signals$data_source[1],
+             .data$signal == signals$signal[1]) %>%
+      group_by(.data$geo_value) %>%
+      arrange(.data$time_value) %>%
+      mutate(summed = zoo::rollsum(.data$value, k = incidence_length, fill = NA, 
+                                   align = "right"),
+             resid = .data$summed - lag(.data$summed, 
+                                        n = incidence_length * ahead[a])
+             ) %>%
+      dplyr::select(.data$geo_value, .data$time_value, .data$summed, 
+                    .data$resid) %>%
+      group_modify(~ {
+        point <- .x$summed[.x$time_value == max(.x$time_value)]
+        tibble(quantile = covidhub_probs,
+               value = point + stats::quantile(
+                 c(.x$resid, s * .x$resid),
+                 probs = covidhub_probs,
+                 na.rm = TRUE)
+               )
         }, .keep = TRUE) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(value = pmax(.data$value, 0))
   }
-  dat <- dat[ahead]
   names(dat) <- as.character(ahead)
   dplyr::bind_rows(dat, .id = "ahead") %>%
       dplyr::mutate(ahead = as.integer(ahead))

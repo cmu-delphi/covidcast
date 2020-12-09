@@ -59,7 +59,7 @@ get_predictions <- function(forecaster,
   signal_aggregation = match.arg(signal_aggregation, c("list", "wide", "long"))
   params <- list(...)
   out <- forecast_dates %>%
-    map_dfr(~ do.call(
+    map(~ do.call(
           get_predictions_single_date,
           c(list(forecaster = forecaster,
                  name_of_forecaster = name_of_forecaster,
@@ -72,27 +72,13 @@ get_predictions <- function(forecaster,
                  apply_corrections = apply_corrections,
                  signal_aggregation = signal_aggregation,
                  signal_aggregation_dt = signal_aggregation_dt),
-            params)))
+                 params)))
+  out <- bind_rows(out)
   class(out) <- c("predictions_cards", class(out))
   out
 }
 
-#' Get predictions cards for a single date
-#'
-#' @param forecaster Function that outputs a tibble with columns `ahead`,
-#'   `geo_value`, `probs`, `quantiles`. The `quantiles` column gives the
-#'   predictive quantiles of the forecast distribution for that location and
-#'   ahead.
-#' @param name_of_forecaster String indicating name of the forecaster.
-#' @template signals-template
-#' @template forecast_date-template
-#' @template incidence_period-template
-#' @template ahead-template
-#' @template geo_type-template
-#' @template geo_values-template
-#' @template apply_corrections-template
-#' @param ... Additional arguments to be passed to `forecaster()`.
-#' 
+
 get_predictions_single_date <- function(forecaster,
                                         name_of_forecaster,
                                         signals,
@@ -116,8 +102,11 @@ get_predictions_single_date <- function(forecaster,
     }
   }
   # get data that would have been available as of forecast_date
-  args <- list(...)
-  geo_values_dl <- ifelse(length(geo_values) > 30, "*", unique(geo_values))
+  if(length(geo_values) > 30) {
+    geo_values_dl <- "*"
+  } else {
+    geo_values_dl <- unique(geo_values)
+  }
   df <- download_signals(data_source=signals$data_source,
                          signal = signals$signal,
                          start_day = signals$start_day,
@@ -128,13 +117,10 @@ get_predictions_single_date <- function(forecaster,
                          signal_aggregation = signal_aggregation,
                          signal_aggregation_dt = signal_aggregation_dt)
 
-  if(!is.null(apply_corrections)){
-    df <- data_corrector(df, apply_corrections)
-  } else {
-    apply_corrections <- NA
-  }
+  if(!is.null(apply_corrections)) df <- data_corrector(df, apply_corrections)
+  
 
-  if (!is.null(geo_values_dl)) df <- filter(df, geo_value %in% geo_values)
+  if (geo_values_dl != "*") df <- filter(df, .data$geo_value %in% geo_values)
   out <- forecaster(df,
                     forecast_date,
                     signals,

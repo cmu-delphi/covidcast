@@ -2,6 +2,7 @@
 
 export(absolute_error)
 export(baseline_forecaster)
+export(collapse_cards)
 export(compute_actual_vs_nominal_prob)
 export(compute_calibration)
 export(compute_coverage)

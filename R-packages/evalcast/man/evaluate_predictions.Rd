@@ -42,7 +42,10 @@ such that the combination gives a unique (quantile) prediction. Ignored if
 or \code{\link[=get_predictions]{get_predictions()}} (class is \code{predictions_cards})}
 }
 \value{
-tibble of "score cards" with additional columns for each err_measure
+tibble of "score cards". Contains the same information as the
+\code{predictions_cards()} with additional columns for each err_measure and
+for the truth (named \code{actual}). All the columns may be necessary for
+some types of plotting, but it may be useful to shrink this down
 }
 \description{
 Performs backtesting, through the following steps:

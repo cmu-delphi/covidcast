@@ -46,13 +46,6 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 # Max rows returned by API
 MAX_RESULTS <- 3649
 
-# URI can be a maximum of 2**13 = 8192 characters. Because the geo_values are
-# passed as a comma-separated list, and commas are encoded as "%2C", each county
-# after the first will add 8 characters. After accounting for other params,
-# there are typically ~8000 characters left for listing geo_values.
-# 8000 / 8 = 1000, round down to 950 for safety.
-MAX_GEOS <- 950
-
 .onAttach <- function(libname, pkgname) {
   msg <- c("We encourage COVIDcast API users to register on our mailing list:",
            "https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api",
@@ -263,28 +256,11 @@ covidcast_signal <- function(data_source, signal,
   }
   if (identical(geo_values, "*")) {
     max_geos <- relevant_meta$num_locations
-    geo_values_param <- "*"
   } else {
-    num_geo_values <- length(geo_values)
-    if (num_geo_values > MAX_GEOS) {
-      max_geos <- MAX_RESULTS
-      geo_values_param <- "*"
-      warn(paste0("Number of distinct geo_values requested exceeds limit (",
-                 num_geo_values, " > ", MAX_GEOS,
-                 "). Instead requesting all and filtering."),
-           data_source = data_source,
-           signal = signal,
-           start_day = start_day,
-           end_day = end_day,
-           geo_value = geo_values,
-           class = "covidcast_fetch_failed")
-    } else {
-      max_geos <- num_geo_values
-      geo_values_param <- geo_values
-    }
+    max_geos <- length(geo_values)
   }
   df <- covidcast_days(data_source, signal, start_day, end_day, geo_type,
-                       geo_values_param, as_of, issues, lag, max_geos)
+                       geo_values, as_of, issues, lag, max_geos)
 
   # covidcast_days can return an empty dataframe with no columns, so need to
   # ensure that it is populated before filtering

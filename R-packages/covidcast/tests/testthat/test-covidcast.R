@@ -35,7 +35,10 @@ library(dplyr)
 #   Replaces all calls from a specified function to another specified function
 #   with a specified result (without regard for arguments). The specified
 #   result can be a function, so using stub with a mock object allows you to
-#   return different values for each call.
+#   return different values for each call. By default, only direct calls to a
+#   function are stubbed. Increase the depth argument if you need to stub
+#   indirect calls as well (i.e. You call f() -> g() -> h() and need to stub g's
+#   call to h).
 
 
 with_mock_api({
@@ -134,33 +137,6 @@ with_mock_api({
     expect_error(covidcast_signals("foo", "bar",
                                    end_day = c("2020-01-01", "2020-01-02")))
   })
-
-  test_that("covidcast_signal warns when many geo_values", {
-    # When requesting many geo_values, request "*" instead due to URI length
-    # restrictions, and warn the user because other messages may be confusing
-    # api.php-79f49e.csv
-
-    geo_vals <- as.character(c(10001:11000))
-    expect_warning(covidcast_signal("foo",
-                                    "bar",
-                                    start_day = "2020-10-01",
-                                    end_day = "2020-10-01",
-                                    geo_values = geo_vals))
-  })
-  test_that("covidcast_signal returns correct results when many geo_values", {
-    # If many geo_values, covidcast returns a superset of expected results.
-    # Confirm that this is filtered appropriately for the user.
-    # Note that api.php-a1807e.csv is a copy of api.php-79f49e.csv, because they
-    # should return a simulated full dataset, even with different geo_values.
-
-    geo_vals <- as.character(c(10001:10900))
-    df <- suppressWarnings(covidcast_signal("foo",
-                                    "bar",
-                                    start_day = "2020-10-01",
-                                    end_day = "2020-10-01",
-                                    geo_values = geo_vals))
-    expect_equal(nrow(df), length(geo_vals))
-  })
 })
 
 test_that("covidcast_days does not treat \"*\" as a missing geo_value", {
@@ -237,7 +213,7 @@ test_that("covidcast_days batches calls to covidcast", {
         stderr = NA,
         sample_size = NA
       )),
-    10)
+    2)
   covidcast_returns[[1]]$time_value <- 20101001:20101003
   covidcast_returns[[2]]$time_value <- 20101004:20101006
 
@@ -258,4 +234,32 @@ test_that("covidcast_days batches calls to covidcast", {
       ),
       regexp = NA)
   expect_called(m, 2)
+})
+
+test_that("covidcast_days batches calls with few geo_values", {
+  covidcast_returns <-  data.frame(
+                          geo_value = c("geoa"),
+                          signal = "signal",
+                          time_value = 20101001:20101006,
+                          direction = NA,
+                          issue = as.Date("2020-11-07"),
+                          lag = 2,
+                          value = 3,
+                          stderr = NA,
+                          sample_size = NA
+                        )
+
+  m <- mock(covidcast_returns)
+  stub(covidcast_days, "covidcast", m, depth = 2)
+  expect_warning(
+    covidcast_signal(
+      data_source = "fb-survey",
+      signal = "raw_cli",
+      start_day = as.Date("2020-10-01"),
+      end_day = as.Date("2020-10-06"),
+      geo_type = "county",
+      geo_values = "geoa"
+    ),
+    regexp = NA)
+  expect_called(m, 1)
 })

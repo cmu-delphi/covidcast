@@ -204,7 +204,7 @@ MAX_RESULTS <- 3649
 #'   [`msa_census`], [`state_census`]
 #' @export
 #' @importFrom rlang abort
-#' @importFrom dplyr %>% filter
+#' @importFrom dplyr %>%
 covidcast_signal <- function(data_source, signal,
                              start_day = NULL, end_day = NULL,
                              geo_type = c("county", "hrr", "msa", "dma", "state"),
@@ -262,13 +262,6 @@ covidcast_signal <- function(data_source, signal,
   df <- covidcast_days(data_source, signal, start_day, end_day, geo_type,
                        geo_values, as_of, issues, lag, max_geos)
 
-  # covidcast_days can return an empty dataframe with no columns, so need to
-  # ensure that it is populated before filtering
-  if (nrow(df) > 0) {
-    if (!identical(geo_values, "*")) {
-      df <- df %>% filter(geo_value %in% geo_values)
-    }
-  }
   # Drop direction column (if it still exists)
   df$direction <- NULL
 

@@ -52,7 +52,10 @@
 #'  `predictions_cards` is of the type returned by [get_covidhub_predictions()]
 #'  or [get_predictions()] (class is `predictions_cards`)
 #' 
-#' @return tibble of "score cards" with additional columns for each err_measure
+#' @return tibble of "score cards". Contains the same information as the
+#'   `predictions_cards()` with additional columns for each err_measure and
+#'   for the truth (named `actual`). All the columns may be necessary for 
+#'   some types of plotting, but it may be useful to shrink this down
 #'
 #' @export
 evaluate_predictions <- function(
@@ -83,7 +86,8 @@ evaluate_predictions <- function(
     } else {
       predictions_cards <- bind_cols(predictions_cards, actual = side_truth)
     }
-    if (class(predictions_cards)[1] == "predictions_cards") {
+    if (class(predictions_cards)[1] == "predictions_cards" &&
+        is.null(grp_vars)) {
       grp_vars = c("forecaster", "forecast_date", "ahead", "geo_value")
     }
     score_card <- predictions_cards %>% group_by(across(all_of(grp_vars)))
@@ -94,6 +98,7 @@ evaluate_predictions <- function(
       bind_rows()
     score_card <- bind_cols(score_card, sc_keys)
     score_card <- inner_join(score_card, predictions_cards, by=grp_vars)
+    class(score_card) <- c("score_cards", class(score_card))
     return(score_card)
   }
   
@@ -106,10 +111,12 @@ evaluate_predictions <- function(
     message("ahead = ", unique_ahead[iter])
     scorecards[[iter]] <- evaluate_predictions_single_ahead(
       filter(predictions_cards, .data$ahead == unique_ahead[iter]),
-      err_measures,
+      err_measures = err_measures,
       backfill_buffer = backfill_buffer)
   }
-   bind_rows(scorecards)
+  scorecards <- bind_rows(scorecards)
+  class(scorecards) <- c("score_cards", class(scorecards))
+  scorecards
 }
 
 
@@ -188,8 +195,8 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
     .data$forecast_date, .data$data_source, .data$signal, .data$target_end_date,
     .data$incidence_period, .data$actual)
     
-  attributes(score_card) <- c(attributes(score_card), as_of = as_of)
-  class(score_card) <- c("score_card", class(score_card))
+  # attributes(score_card) <- c(attributes(score_card), 
+  #                             as_of = lubridate::as_date(as_of))
   return(score_card)
 }
 

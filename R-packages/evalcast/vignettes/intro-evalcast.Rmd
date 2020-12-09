@@ -31,7 +31,7 @@ We start by specifying which signals the forecaster will be using.  See [here](h
 library(tibble)
 signals <- tibble(data_source = "jhu-csse", 
                   signal = c("deaths_incidence_num", "confirmed_incidence_num"), 
-                  start_day = "2020-05-15")
+                  start_day = "2020-06-15")
 signals
 ```
 
@@ -116,13 +116,11 @@ scorecards <- evaluate_predictions(
   )
 ```
 
-__DJM:__ Everything works to here.
 
-
-Let's look at the `baseline_forecaster`'s scorecard for 3-epiweek ahead forecasts.
+`evaluate_predictions()` returns a long data frame with one column for each error measure added to the `predictions_cards`. Keeping all quantile predictions may be useful for plotting or other downstream analysis. For a more compact version, use `collapse_cards()` to return one row for each geo_value/ahead/forecast_date/forecaster combination.
 
 ```{r}
-scorecards[[1]]
+collapse_cards(scorecards) %>% str()
 ```
 
 **Technical note:** What does `backfill_buffer = 10` do?  When we evaluate a forecaster in backtesting we are assuming that we know what actually occurred.  However, in light of backfill, we may not trust the data for some period of time.  The argument `backfill_buffer` allows us to specify how many days until we believe that the data has "settled down" and is unlikely to be updated further.  The choice of this argument will depend on the particular signal you are forecasting.
@@ -132,7 +130,6 @@ scorecards[[1]]
 `evalcast` provides a number of tools to visually assess a forecaster (including comparisons with other forecasters):
 
 ```{r}
-scorecards_list <- c(scorecards_yyg,scorecards_cmu,scorecards)
 plot_measure(scorecards_list, "wis")
 plot_measure(scorecards_list, "ae", type = "dotplot") +
   ggplot2::scale_x_log10()

@@ -74,6 +74,7 @@ get_predictions <- function(forecaster,
                  signal_aggregation_dt = signal_aggregation_dt),
                  params)))
   out <- bind_rows(out)
+  names(out$value) = NULL
   class(out) <- c("predictions_cards", class(out))
   out
 }

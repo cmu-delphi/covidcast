@@ -36,9 +36,10 @@ library(dplyr)
 #   with a specified result (without regard for arguments). The specified
 #   result can be a function, so using stub with a mock object allows you to
 #   return different values for each call. By default, only direct calls to a
-#   function are stubbed. Increase the depth argument if you need to stub
+#   function are stubbed. There is a depth argument to allow stubbing
 #   indirect calls as well (i.e. You call f() -> g() -> h() and need to stub g's
-#   call to h).
+#   call to h), but there is a bug in mockery that should be fixed with the next
+#   release. See https://github.com/r-lib/mockery/pull/39.
 
 
 with_mock_api({
@@ -236,30 +237,38 @@ test_that("covidcast_days batches calls to covidcast", {
   expect_called(m, 2)
 })
 
-test_that("covidcast_days batches calls with few geo_values", {
-  covidcast_returns <-  data.frame(
-                          geo_value = c("geoa"),
-                          signal = "signal",
-                          time_value = 20101001:20101006,
-                          direction = NA,
-                          issue = as.Date("2020-11-07"),
-                          lag = 2,
-                          value = 3,
-                          stderr = NA,
-                          sample_size = NA
-                        )
+# This test requires the use of stub's depth parameter, but there is a bug in
+# mockery's current release (0.4.2) which doesn't handle locked bindings
+# properly, so it errors when running devtools::check(). The test can be run
+# using testthat::test_package("covidcast"), but overwrites some functions, so
+# devtools:load_all() should be run after. This should be fixed with the next
+# release of mockery, at which point we can uncomment the test.
+# See: https://github.com/r-lib/mockery/pull/39
 
-  m <- mock(covidcast_returns)
-  stub(covidcast_days, "covidcast", m, depth = 2)
-  expect_warning(
-    covidcast_signal(
-      data_source = "fb-survey",
-      signal = "raw_cli",
-      start_day = as.Date("2020-10-01"),
-      end_day = as.Date("2020-10-06"),
-      geo_type = "county",
-      geo_values = "geoa"
-    ),
-    regexp = NA)
-  expect_called(m, 1)
-})
+# test_that("covidcast_days batches calls with few geo_values", {
+#   covidcast_returns <-  data.frame(
+#                           geo_value = c("geoa"),
+#                           signal = "signal",
+#                           time_value = 20101001:20101006,
+#                           direction = NA,
+#                           issue = as.Date("2020-11-07"),
+#                           lag = 2,
+#                           value = 3,
+#                           stderr = NA,
+#                           sample_size = NA
+#                         )
+# 
+#   m <- mock(covidcast_returns)
+#   stub(covidcast_days, "covidcast", m, depth = 2)
+#   expect_warning(
+#     covidcast_signal(
+#       data_source = "fb-survey",
+#       signal = "raw_cli",
+#       start_day = as.Date("2020-10-01"),
+#       end_day = as.Date("2020-10-06"),
+#       geo_type = "county",
+#       geo_values = "geoa"
+#     ),
+#     regexp = NA)
+#   expect_called(m, 1)
+# })

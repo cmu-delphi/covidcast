@@ -29,7 +29,8 @@ setuptools.setup(
         "descartes",
         "imageio-ffmpeg",
         "imageio",
-        "tqdm"
+        "tqdm",
+        "epiweeks"
     ],
     package_data={"covidcast": ["shapefiles/*/*", "geo_mappings/*"]}
 )

@@ -5,7 +5,9 @@ from functools import reduce
 from typing import Union, Iterable, Tuple, List
 
 import pandas as pd
+import numpy as np
 from delphi_epidata import Epidata
+from epiweeks import Week
 
 from .errors import NoDataWarning
 
@@ -266,8 +268,8 @@ def metadata() -> pd.DataFrame:
                            meta["message"])
 
     meta_df = pd.DataFrame.from_dict(meta["epidata"])
-    meta_df["min_time"] = pd.to_datetime(meta_df["min_time"], format="%Y%m%d")
-    meta_df["max_time"] = pd.to_datetime(meta_df["max_time"], format="%Y%m%d")
+    meta_df["min_time"] = meta_df["min_time"].astype(str).apply(_parse_datetime_weeks)
+    meta_df["max_time"] = meta_df["max_time"].astype(str).apply(_parse_datetime_weeks)
     meta_df["last_update"] = pd.to_datetime(meta_df["last_update"], unit="s")
     return meta_df
 
@@ -322,6 +324,27 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
     joined_df = reduce(lambda x, y: pd.merge(x, y, on=join_cols, how=join_type, sort=True), dt_dfs)
     joined_df["geo_type"] = geo_type
     return joined_df
+
+
+def _parse_datetime_weeks(date_str: str, format="%Y%m%d") -> str:
+    """Convert a date or epiweeks string into timestamp objects.
+
+    Datetimes (length 8) are converted to their corresponding date, while epiweeks (length 6)
+    are converted to the date of the start of the week.
+
+    Epiweeks use the CDC format.
+
+    :param date_str: String of date or epiweek
+    :param format: String of the date format to parse.
+    :returns: Timestamp
+    """
+    if len(date_str) == 8:
+        return pd.to_datetime(date_str, format=format)
+    elif len(date_str) == 6:
+        epiwk = Week(int(date_str[:4]), int(date_str[-2:]))
+        return pd.to_datetime(epiwk.startdate())
+    else:
+        return np.nan
 
 
 def _detect_metadata(data: pd.DataFrame,

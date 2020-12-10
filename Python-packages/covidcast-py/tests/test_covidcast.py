@@ -10,6 +10,7 @@ matplotlib.use("AGG")
 import pandas as pd
 import numpy as np
 import pytest
+from epiweeks import Week
 from covidcast import covidcast
 from covidcast.errors import NoDataWarning
 
@@ -175,6 +176,12 @@ def test_aggregate_signals():
          "data_source": ["z", "z", "z", "z"]})
     with pytest.raises(ValueError):
         covidcast.aggregate_signals([test_input1, test_input4])
+
+
+def test__parse_datetime_weeks():
+    assert covidcast._parse_datetime_weeks("202001") == pd.Timestamp(Week(2020, 1).startdate())
+    assert covidcast._parse_datetime_weeks("20200205") == pd.Timestamp("20200205")
+    assert pd.isna(covidcast._parse_datetime_weeks("2020"))
 
 
 def test__detect_metadata():

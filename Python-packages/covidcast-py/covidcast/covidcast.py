@@ -226,10 +226,12 @@ def metadata() -> pd.DataFrame:
         metadata.
 
       ``min_time``
-        First day for which this signal is available.
+        First day for which this signal is available. For weekly signals, will be
+        the first day of the epiweek.
 
       ``max_time``
-        Most recent day for which this signal is available.
+        Most recent day for which this signal is available. For weekly signals, will be
+        the first day of the epiweek.
 
       ``num_locations``
         Number of distinct geographic locations available for this signal. For

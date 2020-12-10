@@ -44,7 +44,7 @@ library(dplyr)
 
 with_mock_api({
   test_that("covidcast_meta formats result correctly", {
-    # api.php-d74864-POST.csv
+    # api.php-dd024f.csv
     expect_equal(covidcast_meta(),
                  structure(
                    data.frame(
@@ -74,13 +74,13 @@ test_that("covidcast_meta raises error when API signals one", {
 with_mock_api({
   ## covidcast_signal() tests
   test_that("covidcast_signal warns when requested geo_values are unavailable", {
-    # api.php-ed7ba9-POST.csv
+    # api.php-3e1dc3.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-01", "2020-01-01",
                                     geo_values = c("pa", "tx", "DUCKS")),
                    class = "covidcast_missing_geo_values")
 
     # ...but not when they *are* available.
-    # api.php-7a0eca-POST.csv
+    # api.php-f666a2.csv
     expect_silent(suppressMessages(
       covidcast_signal("foo", "bar", "2020-01-01", "2020-01-01",
                        geo_values = c("pa", "tx"))))
@@ -88,25 +88,26 @@ with_mock_api({
 
   test_that("covidcast_signal warns when requested dates are unavailable", {
     # with geo_values = "*".
-    # api.php-edd995-POST.csv
+    # api.php-b6e478.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-02"),
                    class = "covidcast_fetch_failed")
 
     # and with geo_values = "pa"
-    # api.php-afc14a-POST.csv
+    # api.php-d707dc.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-02",
                                     geo_values = "pa"),
                    class = "covidcast_fetch_failed")
   })
 
   test_that("covidcast_signal aborts when meta not found", {
+    # api.php-dd024f.csv
     expect_error(covidcast_signal("foo", "bar-not-found"),
                  class = "covidcast_meta_not_found")
   })
 
   test_that("covidcast_signal works for signals with no meta", {
     # when no meta is available, we must provide start_day and end_day.
-    # api.php-5cfd5d-POST.csv
+    # api.php-1d9b5c.csv
     expect_equal(
       covidcast_signal("foo", "bar-not-found",
                        "2020-01-01", "2020-01-01"),

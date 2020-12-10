@@ -99,6 +99,8 @@ evaluate_predictions <- function(
     score_card <- bind_cols(score_card, sc_keys)
     score_card <- inner_join(score_card, predictions_cards, by=grp_vars)
     class(score_card) <- c("score_cards", class(score_card))
+    attributes(score_card) <- c(attributes(score_card), 
+                                as_of = lubridate::as_date(as_of))
     return(score_card)
   }
   
@@ -167,13 +169,7 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
   
   # join together the data frames target_response and predicted:
   score_card <- target_response %>%
-    inner_join(predictions_cards, by = c("geo_value", "forecast_date")) %>%
-    select(.data$geo_value,
-           .data$forecast_date,
-           .data$actual,
-           .data$quantile,
-           .data$value,
-           .data$forecaster)
+    inner_join(predictions_cards, by = c("geo_value", "forecast_date")) 
   # compute the error
   
   score_card <- score_card %>%
@@ -195,8 +191,8 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
     .data$forecast_date, .data$data_source, .data$signal, .data$target_end_date,
     .data$incidence_period, .data$actual)
     
-  # attributes(score_card) <- c(attributes(score_card), 
-  #                             as_of = lubridate::as_date(as_of))
+  attributes(score_card) <- c(attributes(score_card), 
+                              as_of = lubridate::as_date(as_of))
   return(score_card)
 }
 

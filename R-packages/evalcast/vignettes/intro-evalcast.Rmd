@@ -30,7 +30,8 @@ We start by specifying which signals the forecaster will be using.  See [here](h
 ```{r}
 library(tibble)
 signals <- tibble(data_source = "jhu-csse", 
-                  signal = c("deaths_incidence_num", "confirmed_incidence_num"), 
+                  signal = c("deaths_incidence_num", 
+                             "confirmed_incidence_num"), 
                   start_day = "2020-06-15")
 signals
 ```

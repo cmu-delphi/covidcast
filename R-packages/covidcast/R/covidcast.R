@@ -765,7 +765,7 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   # API call. Allow base API URL to be replaced, e.g. to use a staging/testing
   # server when needed.
   response <- httr::GET(getOption("covidcast.base_url", default = COVIDCAST_BASE_URL),
-                         httr::user_agent("covidcastR"), query = params)
+                        httr::user_agent("covidcastR"), query = params)
   if (httr::status_code(response) == 414){
     response <- httr::POST(getOption("covidcast.base_url",
                            default = COVIDCAST_BASE_URL),

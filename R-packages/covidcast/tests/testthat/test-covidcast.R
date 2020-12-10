@@ -129,7 +129,7 @@ with_mock_api({
   })
 
   test_that("covidcast_signal stops when end_day < start_day", {
-    # reusing api.php-d74864-POST.csv for metadata
+    # reusing api.php-dd024f.csv for metadata
     expect_error(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-01"))
   })
 

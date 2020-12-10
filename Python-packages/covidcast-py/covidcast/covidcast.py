@@ -328,7 +328,8 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
     return joined_df
 
 
-def _parse_datetime_weeks(date_str: str, format: str="%Y%m%d") -> Union[pd.Timestamp, np.nan]:
+def _parse_datetime_weeks(date_str: str,
+                          format: str="%Y%m%d") -> Union[pd.Timestamp]:  # annotating nan errors
     """Convert a date or epiweeks string into timestamp objects.
 
     Datetimes (length 8) are converted to their corresponding date, while epiweeks (length 6)

@@ -328,11 +328,11 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
     return joined_df
 
 
-def _parse_datetime_weeks(date_str: str, format="%Y%m%d") -> str:
+def _parse_datetime_weeks(date_str: str, format: str="%Y%m%d") -> Union[pd.Timestamp, np.nan]:
     """Convert a date or epiweeks string into timestamp objects.
 
     Datetimes (length 8) are converted to their corresponding date, while epiweeks (length 6)
-    are converted to the date of the start of the week.
+    are converted to the date of the start of the week. Returns nan otherwise
 
     Epiweeks use the CDC format.
 

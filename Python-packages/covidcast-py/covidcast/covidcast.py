@@ -270,8 +270,8 @@ def metadata() -> pd.DataFrame:
                            meta["message"])
 
     meta_df = pd.DataFrame.from_dict(meta["epidata"])
-    meta_df["min_time"] = meta_df["min_time"].astype(str).apply(_parse_datetime_weeks)
-    meta_df["max_time"] = meta_df["max_time"].astype(str).apply(_parse_datetime_weeks)
+    meta_df["min_time"] = meta_df.apply(lambda x: _parse_datetimes(x.min_time, x.time_type), axis=1)
+    meta_df["max_time"] = meta_df.apply(lambda x: _parse_datetimes(x.max_time, x.time_type), axis=1)
     meta_df["last_update"] = pd.to_datetime(meta_df["last_update"], unit="s")
     return meta_df
 
@@ -328,8 +328,9 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
     return joined_df
 
 
-def _parse_datetime_weeks(date_str: str,
-                          format: str="%Y%m%d") -> Union[pd.Timestamp]:  # annotating nan errors
+def _parse_datetimes(date_int: int,
+                     time_type: str,
+                     format: str="%Y%m%d") -> Union[pd.Timestamp]:  # annotating nan errors
     """Convert a date or epiweeks string into timestamp objects.
 
     Datetimes (length 8) are converted to their corresponding date, while epiweeks (length 6)
@@ -337,13 +338,14 @@ def _parse_datetime_weeks(date_str: str,
 
     Epiweeks use the CDC format.
 
-    :param date_str: String of date or epiweek
+    :param date_int: Int representation of date.
     :param format: String of the date format to parse.
-    :returns: Timestamp
+    :returns: Timestamp.
     """
-    if len(date_str) == 8:
+    date_str = str(date_int)
+    if time_type == "day":
         return pd.to_datetime(date_str, format=format)
-    elif len(date_str) == 6:
+    elif time_type == "week":
         epiwk = Week(int(date_str[:4]), int(date_str[-2:]))
         return pd.to_datetime(epiwk.startdate())
     else:

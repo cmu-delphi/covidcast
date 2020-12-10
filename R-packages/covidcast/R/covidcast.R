@@ -319,9 +319,7 @@ as.covidcast_signal <- function(x, ...) {
 #' @describeIn as.covidcast_signal Simply returns the `covidcast_signal` object
 #'   unchanged.
 #' @export
-as.covidcast_signal.covidcast_signal <-
-  function(x,
-           ...) {
+as.covidcast_signal.covidcast_signal <- function(x, ...) {
   return(x)
 }
 
@@ -332,16 +330,15 @@ as.covidcast_signal.covidcast_signal <-
 #'   not, the `issue` argument will be used. Other columns will be preserved
 #'   as-is.
 #' @export
-as.covidcast_signal.data.frame <-
-  function(x,
-           signal = NULL,
-           geo_type = c("county", "msa", "hrr", "dma", "state"),
-           data_source = "user",
-           issue = NULL,
-           metadata = list(),
-           ...) {
+as.covidcast_signal.data.frame <- function(x,
+                                           signal = NULL,
+                                           geo_type = c("county", "msa", "hrr", "dma", "state"),
+                                           data_source = "user",
+                                           issue = NULL,
+                                           metadata = list(),
+                                           ...) {
   if (is.null(signal)) {
-    abort("signal name must be provided",
+    abort("when `x` is a data frame, signal name must be provided to as.covidcast_signal",
           class = "covidcast_coerce_signal")
   }
 

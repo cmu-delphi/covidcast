@@ -21,6 +21,7 @@ This repository also includes some talks we've given about the COVIDcast project
 - [Survey Through Facebook](https://cmu-delphi.github.io/covidcast/talks/fb-survey/talk.html)
 - [Medical Claims Indicators](https://docs.google.com/presentation/d/1Pt2qMwIHyyuyGwwigZyndPGjcjILAS6RYxBcXKuuQ4U/edit?usp=sharing)
 - [Forecast Evaluation Toolkit](https://cmu-delphi.github.io/covidcast/talks/evalcast/talk.html)
+- [Overview Talk: Data, API, Surveys](https://cmu-delphi.github.io/covidcast/talks/aws/talk.html)
 
 ## Related repos
 

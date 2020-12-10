@@ -1,6 +1,12 @@
 Changelog
 =========
 
+
+v0.1.2, December 10, 2020
+-------------------------
+
+- Bug fix: Fix issue where introduction of weekly signals broke the :py:func:`covidcast.metadata` function.
+
 v0.1.1, November 22, 2020
 -------------------------
 

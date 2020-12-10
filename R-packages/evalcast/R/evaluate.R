@@ -151,7 +151,9 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
                                          ahead,
                                          geo_type,
                                          geo_values)
-  if (nrow(target_response) == 0) return(empty_score_card(err_measures))
+  if (nrow(target_response) == 0) {
+    return(empty_score_card(predictions_cards, err_measures))
+  }
   as_of <- attr(target_response, "as_of")
   . <- "got this idea from https://github.com/tidyverse/magrittr/issues/29"
   if (as_of < max(target_response$end) + backfill_buffer) {
@@ -214,12 +216,9 @@ check_valid_forecaster_output <- function(pred_card) {
 }
 
 #' @importFrom rlang :=
-empty_score_card <- function(err_measures){
-  out <- tibble(ahead = integer(0), geo_value = character(0), 
-                quantile = double(0), value=double(0), forecaster=character(0),
-                forecast_date = ymd(), data_source=character(0), 
-                signal=character(0), target_end_date=ymd(),
-                incidence_period=character(0), actual=double(0))
+empty_score_card <- function(pcards, err_measures){
+  out <- pcards[0,]
+  out$actual <- double(0)
   for(iter in names(err_measures)){
     out <- bind_cols(out, tibble(!!iter := double(0)))
   }

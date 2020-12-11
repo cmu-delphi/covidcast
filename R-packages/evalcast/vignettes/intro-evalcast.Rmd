@@ -128,17 +128,59 @@ collapse_cards(scorecards) %>% str()
 
 ### Plots of performance measures
 
-`evalcast` provides a number of tools to visually assess a forecaster (including comparisons with other forecasters):
+While `evalcast` provides a number of tools to visually assess a forecaster (including comparisons with other forecasters), because `score_cards` are just long data frames, many plots can be achieved using [{ggplot2}](http://ggplot2.tidyverse.org).
 
 ```{r}
-plot_measure(scorecards_list, "wis")
-plot_measure(scorecards_list, "ae", type = "dotplot") +
-  ggplot2::scale_x_log10()
-plot_calibration(scorecards_cmu[[1]], type = "wedge")
-plot_calibration(scorecards_cmu[[1]], type = "traditional")
-plot_coverage(list(scorecards_yyg[[1]],
-                  scorecards_cmu[[1]]))
-plot_width(scorecards_cmu)
+scorecards %>% filter(geo_value != "us") %>%
+  ggplot(aes(y=forecaster, x=wis, fill=forecaster)) +
+  geom_boxplot() +
+  facet_wrap(~forecast_date) +
+  scale_x_log10() +
+  theme_bw() +
+  scale_fill_viridis_d() +
+  theme(legend.position = "bottom")
+```
+
+Of course, if we had multiple aheads we could facet by those as well. Or we could assume that aheads and forecast dates are comparable and include them all in the boxplots, if the assumption is reasonable.
+
+We can also examine forecaster calibration.
+
+```{r}
+plot_calibration(scorecards, type = "wedge")
+```
+
+By default, the proportion is the number of `geo_values` that fall above/below the quantile at each forecast date and ahead. But this can be changed if desired.
+
+```{r}
+plot_calibration(scorecards, 
+                 grp_vars = "forecaster", 
+                 avg_vars = c("geo_value", "forecast_date"))
+```
+
+One can also examine a more traditional calibration plot
+
+```{r}
+plot_calibration(scorecards, type = "traditional")
+```
+
+
+For extra flexibility, you can perform the core calculations using something like
+
+```{r, eval=FALSE}
+calib <- compute_calibration(scorecard, grp_vars, avg_vars) %>%
+      setup_wedgeplot()
+```
+
+We can display the coverage of the interval forecasts.
+
+```{r}
+plot_coverage(scorecards)
+```
+
+Or the width of the intervals.
+
+```{r}
+plot_width(scorecards)
 ```
 
 

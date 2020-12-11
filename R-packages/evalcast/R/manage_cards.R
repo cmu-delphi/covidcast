@@ -83,17 +83,32 @@ all_attr <- function(cards, attribute) {
 }
 
 
-intersect_locations <- function(cards) {
-  locations_list <- cards %>% map(~ unique(.x$location))
-  intersected_locations <- Reduce(intersect, locations_list)
-  for (i in seq_along(locations_list)) {
-    removed <- setdiff(locations_list[[i]], intersected_locations)
-    if (length(removed) > 0)
-      message(sprintf("Removed the following locations for cards[[%s]]: %s",
-                      i,
-                      paste(removed, collapse = ", ")))
+intersect_averagers <- function(cards, grp_vars, avg_vars) {
+  
+  assert_that(length(intersect(grp_vars, avg_vars)) == 0L,
+              msg = paste("In intersect_averagers: grp_vars and avg_vars",
+                          "must not overlap"))
+  distinct_averagers <- cards %>%
+    select(all_of(avg_vars)) %>%
+    distinct()
+  
+  averagers_intersected <- cards %>% 
+    select(all_of(c(grp_vars, avg_vars))) %>%
+    group_by(across(all_of(grp_vars))) %>%
+    group_split(.keep = FALSE) %>% 
+    lapply(distinct) %>%
+    reduce(intersect)
+  
+  assert_that(nrow(averagers_intersected) > 1L,
+              msg = paste("In intersect_averagers: there was at most one",
+                          "common row to average over."))
+
+  if (nrow(distinct_averagers) > nrow(averagers_intersected)) {
+      message(paste("In intersect_averagers: Some avg_vars were not common",
+                    "to all grp_vars. Only the intersection is used for",
+                    "averaging."))
   }
-  cards %>% map(~ .x %>% filter(location %in% intersected_locations))
+  cards %>% right_join(averagers_intersected)
 }
 
 

@@ -14,18 +14,18 @@ averaging_checks <- function(score_card, grp_vars, avg_vars){
     group_by(across(all_of(grp_vars)), across(all_of(avg_vars))) %>%
     summarise(valid = check_valid_coverage_probs(.data$quantile))
   assert_that(any(averaging_checks$valid),
-              msg = paste("In compute_coverage/compute_calibration:",
-                          "no groupings have valid quantile forecasts.",
-                          "quantiles may be different, be unsorted",
-                          "be asymmetric, not include 0.5, etc.",
-                          "Check your forecaster output."))
+              msg = paste(
+                "no groupings have valid quantile forecasts.",
+                "quantiles may be different, be unsorted",
+                "be asymmetric, not include 0.5, etc.",
+                "Check your forecaster output."))
   if (!all(averaging_checks$valid)) {
-    warning(paste("In compute_coverage/compute_calibration:",
-                  "some grouping/averaging pairs have invalid quantile forecasts.",
-                  "quantiles may be different, be unsorted",
-                  "be asymmetric, not include 0.5, etc.",
-                  "These combinations were dropped.",
-                  "Check your forecaster output."))
+    warning(paste(
+      "some grouping/averaging pairs have invalid quantile forecasts.",
+      "quantiles may be different, be unsorted",
+      "be asymmetric, not include 0.5, etc.",
+      "These combinations were dropped.",
+      "Check your forecaster output."))
     averaging_checks <- filter(averaging_checks, .data$valid) %>% 
       select(-.data$valid)
     score_card <- left_join(averaging_checks, score_card, 
@@ -75,7 +75,7 @@ compute_coverage <- function(
               msg = paste("In compute_coverage:",
                           "grp_vars and avg_vars must have empty intersection.",
                           "See details."))
-  
+  score_card <- intersect_averagers(score_card, grp_vars, avg_vars)
   score_card <- score_card %>% 
     filter(!is.na(.data$quantile)) %>%
     select(all_of(grp_vars), all_of(avg_vars),
@@ -84,16 +84,17 @@ compute_coverage <- function(
   score_card <- averaging_checks(score_card, grp_vars, avg_vars)
   
   score_card %>% 
-    group_by(across(all_of(grp_vars))) %>%
+    group_by(across(all_of(c(grp_vars,avg_vars)))) %>%
     mutate(rev_value = rev(.data$value)) %>%
     filter(.data$quantile < 0.5) %>%
     mutate(is_below = .data$actual < .data$value,
            is_above = .data$actual > .data$rev_value,
            is_covered = !.data$is_below & !.data$is_above,
            nominal_prob = 1 - 2 * .data$quantile) %>%
+    ungroup() %>%
     select(all_of(grp_vars), .data$is_above, .data$is_below, .data$is_covered,
            .data$nominal_prob) %>%
-    group_by(.data$nominal_prob, .add = TRUE) %>%
+    group_by(across(all_of(grp_vars)), .data$nominal_prob) %>%
     summarise(prop_below = mean(.data$is_below, na.rm = TRUE),
               prop_above = mean(.data$is_above, na.rm = TRUE),
               prop_covered = mean(.data$is_covered, na.rm = TRUE))
@@ -135,6 +136,7 @@ compute_calibration <- function(
               msg = paste("In compute_actual_vs_nominal_prob:",
                           "grp_vars and avg_vars must have empty intersection.",
                           "See details."))
+  score_card <- intersect_averagers(score_card, grp_vars, avg_vars)
   score_card <- filter(score_card, !is.na(.data$quantile)) %>%
     select(all_of(grp_vars), all_of(avg_vars),
            .data$actual, .data$quantile, .data$value)

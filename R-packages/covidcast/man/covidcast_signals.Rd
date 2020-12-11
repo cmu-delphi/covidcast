@@ -9,7 +9,7 @@ covidcast_signals(
   signal,
   start_day = NULL,
   end_day = NULL,
-  geo_type = c("county", "hrr", "msa", "dma", "state"),
+  geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation"),
   geo_values = "*",
   as_of = NULL,
   issues = NULL,

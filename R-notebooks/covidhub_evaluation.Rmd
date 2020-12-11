@@ -30,19 +30,19 @@ submissions to make useful comparisons. To do this, we can expose the function
 
 ```{r}
 forecasters = c("CMU-TimeSeries", 
-             #   "YYG-ParamSearch", 
-             #   "UMass-MechBayes", 
-             #   "GT-DeepCOVID", 
-             #   "IHME-CurveFit", 
-             #   "LANL-GrowthRate", 
-             #   "UCLA-SuEIR", 
-             #   "MOBS-GLEAM_COVID", 
-             #  "UT-Mobility", 
-             #  "OliverWyman-Navigator", 
-             #  "JHU_IDD-CovidSP", 
-             #   "CovidAnalytics-DELPHI", 
+                "YYG-ParamSearch", 
+                "UMass-MechBayes", 
+                "GT-DeepCOVID", 
+                "IHME-CurveFit", 
+                "LANL-GrowthRate", 
+                "UCLA-SuEIR", 
+                "MOBS-GLEAM_COVID", 
+               "UT-Mobility", 
+               "OliverWyman-Navigator", 
+               "JHU_IDD-CovidSP", 
+                "CovidAnalytics-DELPHI", 
              #   "Google_Harvard-CPF", Excluded for now. Doesn't have quantiles for all forecasts
-             #   "Yu_Group-CLEP", 
+                "Yu_Group-CLEP", 
                 "COVIDhub-ensemble", 
                 "COVIDhub-baseline")
 
@@ -248,7 +248,7 @@ rm(list = setdiff(ls(),
 Compute summary statistics.
 
 ```{r}
-# load(file = "covidhub_evaluation.rda")
+load(file = "covidhub_evaluation.rda")
 recent_score_by_frcstr = score_cards_state %>% 
                            filter(target_end_date > today() - 28) %>%
                            group_by(forecaster, ahead) %>% 

@@ -437,7 +437,7 @@ covidcast_signals <- function(data_source, signal,
 #'
 #' @export
 covidcast_meta <- function() {
-  meta <- .request(list(source='covidcast_meta', cached="true"))
+  meta <- .request(list(endpoint='covidcast_meta', cached="true"))
 
   if (meta$message != "success") {
     abort(paste0("Failed to obtain metadata: ", meta$message, "."),
@@ -612,7 +612,7 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
 
   # Set up request
   params <- list(
-    source = 'covidcast',
+    endpoint = 'covidcast',
     data_source = data_source,
     signal = signal,
     time_type = time_type,

@@ -14,7 +14,7 @@ as.covidcast_signal(x, ...)
 \method{as.covidcast_signal}{data.frame}(
   x,
   signal = NULL,
-  geo_type = c("county", "msa", "hrr", "dma", "state"),
+  geo_type = c("county", "msa", "hrr", "dma", "state", "hhs", "nation"),
   data_source = "user",
   issue = NULL,
   metadata = list(),

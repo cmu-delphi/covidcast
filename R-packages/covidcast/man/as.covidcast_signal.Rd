@@ -15,6 +15,7 @@ as.covidcast_signal(x, ...)
   x,
   signal = NULL,
   geo_type = c("county", "msa", "hrr", "dma", "state", "hhs", "nation"),
+  time_type = c("day", "week"),
   data_source = "user",
   issue = NULL,
   metadata = list(),
@@ -30,6 +31,11 @@ formatting of each input type.}
 \item{signal}{The signal name to use for this data.}
 
 \item{geo_type}{The geography type stored in this object.}
+
+\item{time_type}{The time resolution stored in this object. If "day", the
+default, each observation covers one day. If "week", each time value is
+assumed to be the start date of the epiweek (MMWR week) that the data
+represents.}
 
 \item{data_source}{The name of the data source to use as a label for this
 data.}

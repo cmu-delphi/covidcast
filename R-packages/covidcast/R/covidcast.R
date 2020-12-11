@@ -294,7 +294,7 @@ covidcast_signal <- function(data_source, signal,
   # Drop direction column (if it still exists)
   df$direction <- NULL
 
-  return(as.covidcast_signal(df, signal, geo_type, data_source,
+  return(as.covidcast_signal(df, signal, geo_type, time_type, data_source,
                              metadata = relevant_meta))
 }
 
@@ -309,6 +309,10 @@ covidcast_signal <- function(data_source, signal,
 #' @param x Object to be converted. See Methods section below for details on
 #'   formatting of each input type.
 #' @param geo_type The geography type stored in this object.
+#' @param time_type The time resolution stored in this object. If "day", the
+#'   default, each observation covers one day. If "week", each time value is
+#'   assumed to be the start date of the epiweek (MMWR week) that the data
+#'   represents.
 #' @param data_source The name of the data source to use as a label for this
 #'   data.
 #' @param signal The signal name to use for this data.
@@ -345,6 +349,7 @@ as.covidcast_signal.data.frame <- function(x,
                                            signal = NULL,
                                            geo_type = c("county", "msa", "hrr", "dma", "state",
                                                         "hhs", "nation"),
+                                           time_type = c("day", "week"),
                                            data_source = "user",
                                            issue = NULL,
                                            metadata = list(),
@@ -355,10 +360,12 @@ as.covidcast_signal.data.frame <- function(x,
   }
 
   geo_type <- match.arg(geo_type)
+  time_type <- match.arg(time_type)
 
   metadata$data_source <- data_source
   metadata$signal <- signal
   metadata$geo_type <- geo_type
+  metadata$time_type <- time_type
   metadata <- as.data.frame(metadata)
 
   if (!("data_source" %in% names(x))) {

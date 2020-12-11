@@ -123,7 +123,8 @@ with_mock_api({
       ),
       class = c("covidcast_signal", "data.frame"),
       metadata = data.frame(geo_type = "county", num_locations = 100,
-                            data_source = "foo", signal = "bar-not-found")
+                            data_source = "foo", signal = "bar-not-found",
+                            time_type = "day")
       )
     )
   })
@@ -295,7 +296,7 @@ test_that("as.covidcast_signal produces valid covidcast_signal objects", {
     ),
     class = c("covidcast_signal", "data.frame"),
     metadata = data.frame(data_source = "user", signal = "foo",
-                          geo_type = "county")
+                          geo_type = "county", time_type = "day")
   )
 
   expect_equal(as.covidcast_signal(foo,
@@ -314,7 +315,7 @@ test_that("as.covidcast_signal produces valid covidcast_signal objects", {
     ),
     class = c("covidcast_signal", "data.frame"),
     metadata = data.frame(data_source = "some-source", signal = "some-signal",
-                          geo_type = "county")
+                          geo_type = "county", time_type = "day")
   )
 
   expect_equal(

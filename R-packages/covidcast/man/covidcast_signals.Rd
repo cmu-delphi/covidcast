@@ -46,7 +46,8 @@ for details on how to specify these IDs.}
 provided as a \code{Date} object or string in the form "YYYY-MM-DD". If \code{NULL},
 the default, return the most recent available data. Note that only one of
 \code{as_of}, \code{issues}, and \code{lag} should be provided; it does not make sense to
-specify more than one.}
+specify more than one. For more on data revisions, see
+"Issue dates and revisions" below.}
 
 \item{issues}{Fetch only data that was published or updated ("issued") on
 these dates. Provided as either a single \code{Date} object (or string in the

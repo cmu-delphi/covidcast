@@ -49,6 +49,7 @@ reference:
       - earliest_issue
       - aggregate_signals
       - covidcast_longer
+      - as.covidcast_signal
   - title: Geographic utilities
     desc: Manipulate geographic IDs like FIPS codes and CBSAs
   - contents:

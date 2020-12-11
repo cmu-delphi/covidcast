@@ -4,6 +4,11 @@ Released TODO DATE.
 
 ## Major changes
 
+- A new `as.covidcast_signal()` generic function makes it easy to turn any
+  data frame, such as data loaded from an external source, into a
+  `covidcast_signal` object that can be plotted and wrangled using the functions
+  in this package. See `vignette("external-data")` for examples.
+
 - The new `latest_issue()` and `earliest_issue()` functions make it easy to
   filter data frames with multiple issues of each observation, obtaining only
   the latest or earliest issue of each.

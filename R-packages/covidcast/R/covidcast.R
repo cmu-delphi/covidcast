@@ -163,6 +163,9 @@ MAX_RESULTS <- 3649
 #'   with `time_value` of June 3 will only be included in the results if its
 #'   data was issued or updated on June 6. If `NULL`, the default, return the
 #'   most recently issued data regardless of its lag.
+#' @param time_type The temporal resolution to request this data. Most signals
+#'   are available at the "day" resolution (the default); some are only
+#'   available at the "week" resolution, representing an MMWR week ("epiweek").
 #'
 #' @return `covidcast_signal` object with matching data. The object is a data
 #'   frame with additional metadata attached. Each row is one observation of one
@@ -173,7 +176,9 @@ MAX_RESULTS <- 3649
 #'   \item{signal}{Signal from which this observation was obtained.}
 #'   \item{geo_value}{String identifying the location, such as a state name or
 #'   county FIPS code.}
-#'   \item{time_value}{Date object identifying the date of this observation.}
+#'   \item{time_value}{Date object identifying the date of this observation. For
+#'   data with `time_type = "week"`, this is the first day of the corresponding
+#'   epiweek.}
 #'   \item{issue}{Date object identifying the date this estimate was issued.
 #'   For example, an estimate with a `time_value` of June 3 might have been
 #'   issued on June 5, after the data for June 3rd was collected and ingested
@@ -231,23 +236,25 @@ covidcast_signal <- function(data_source, signal,
                              geo_type = c("county", "hrr", "msa", "dma", "state",
                                           "hhs", "nation"),
                              geo_values = "*",
-                             as_of = NULL, issues = NULL, lag = NULL) {
+                             as_of = NULL, issues = NULL, lag = NULL,
+                             time_type = c("day", "week")) {
   geo_type <- match.arg(geo_type)
-  relevant_meta <- specific_meta(data_source, 
-                                 signal, 
-                                 geo_type)
+  time_type <- match.arg(time_type)
+
+  relevant_meta <- specific_meta(data_source, signal, geo_type, time_type)
 
   if (is.null(start_day) || is.null(end_day)) {
     if (is.null(relevant_meta$max_time) || is.null(relevant_meta$min_time)) {
       abort(
         paste0("No match in metadata for source '", data_source,
                "', signal '", signal, "', and geo_type '", geo_type,
-               "' at the daily level. ",
+               "' at the ", time_type, " level. ",
                "Check that the source and signal are correctly spelled and ",
                "that the signal is available at this geographic level."),
         data_source = data_source,
         signal = signal,
         geo_type = geo_type,
+        time_type = time_type,
         class = "covidcast_meta_not_found"
       )
     }
@@ -282,7 +289,7 @@ covidcast_signal <- function(data_source, signal,
     max_geos <- length(geo_values)
   }
   df <- covidcast_days(data_source, signal, start_day, end_day, geo_type,
-                       geo_values, as_of, issues, lag, max_geos)
+                       geo_values, time_type, as_of, issues, lag, max_geos)
 
   # Drop direction column (if it still exists)
   df$direction <- NULL
@@ -573,10 +580,19 @@ covidcast_meta <- function() {
     abort("Failed to obtain metadata", class = "covidcast_meta_fetch_failed")
   }
 
+  # helper to do the right api_to_date for each time_type, since it does not
+  # take a vectorized time_type
+  adjust_dates <- function(col, time_type) {
+    # map2 returns a list of entries and doesn't provide a way to get a vector
+    # of Dates automatically. however, if we c() everything together, we get the
+    # right type.
+    do.call("c", purrr::map2(col, time_type, api_to_date))
+  }
+
   meta <- read.csv(textConnection(meta), stringsAsFactors = FALSE) %>%
-    dplyr::mutate(min_time = api_to_date(.data$min_time),
-                  max_time = api_to_date(.data$max_time),
-                  max_issue = api_to_date(.data$max_issue))
+    dplyr::mutate(min_time = adjust_dates(.data$min_time, .data$time_type),
+                  max_time = adjust_dates(.data$max_time, .data$time_type),
+                  max_issue = adjust_dates(.data$max_issue, .data$time_type))
 
   class(meta) <- c("covidcast_meta", "data.frame")
   return(meta)
@@ -671,20 +687,17 @@ specific_meta <- function(data_source, signal, geo_type, time_type = "day") {
 # batches of days based on expected number of results, queries covidcast for
 # each batch and combines the resutls.
 covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
-                       geo_value, as_of, issues, lag, max_geos = NA) {
-  days <- seq(start_day, end_day, by = 1)
+                           geo_value, time_type, as_of, issues, lag,
+                           max_geos = MAX_RESULTS) {
+  days <- date_sequence(start_day, end_day, time_type)
   ndays <- length(days)
 
   # issues is either a single date, or a vector with a start and end date.
+  # TODO FIXME issues for weekly = epiweeks too
   if (length(issues) == 2) {
     nissues <- as.numeric(issues[2] - issues[1]) + 1
   } else {
     nissues <- 1
-  }
-
-  # if not provided, assume worst case
-  if (is.na(max_geos)) {
-    max_geos <- MAX_RESULTS
   }
 
   # Theoretically, each geo_value could have data issued each day. Likely
@@ -706,10 +719,10 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
     query_start_day <- start_day + start_offset
     query_end_day <- start_day + end_offset
 
-    time_values <- date_to_string(days[(start_offset + 1):(end_offset + 1)])
+    time_values <- days[(start_offset + 1):(end_offset + 1)]
     response <- covidcast(data_source = data_source,
                           signal = signal,
-                          time_type = "day",
+                          time_type = time_type,
                           geo_type = geo_type,
                           time_values = time_values,
                           geo_value = geo_value,
@@ -726,6 +739,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
            start_day = query_start_day,
            end_day = query_end_day,
            geo_value = geo_value,
+           time_type = time_type,
            class = "covidcast_fetch_failed")
 
       next
@@ -754,7 +768,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
 
       if (length(returned_time_values) != length(time_values)) {
         missing_time_values <- setdiff(time_values, returned_time_values)
-        missing_dates <- api_to_date(missing_time_values)
+        missing_dates <- api_to_date(missing_time_values, time_type)
 
         warn(sprintf("Data not fetched for the following days: %s",
                      paste(missing_dates, collapse = ", ")),
@@ -762,6 +776,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
              signal = signal,
              day = missing_dates,
              geo_value = geo_value,
+             time_type = time_type,
              class = "covidcast_missing_time_values"
         )
       }
@@ -774,13 +789,15 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
           missing_geo_array$warning <-
             unlist(apply(returned_geo_array,
                          1,
-                         FUN = function(row) geo_warning_message(row,
-                                                                 desired_geos)))
+                         FUN = function(row) {
+                           geo_warning_message(row, desired_geos, time_type)
+                         }))
           warn(missing_geo_array$warning,
                data_source = data_source,
                signal = signal,
-               day = api_to_date(missing_geo_array$time_value),
+               day = api_to_date(missing_geo_array$time_value, time_type),
                geo_value = geo_value,
+               time_type = time_type,
                class = "covidcast_missing_geo_values")
         }
       }
@@ -793,21 +810,38 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
 
   if (nrow(df) > 0) {
     # If no data is found, there is no time_value column to report
-    df$time_value <- api_to_date(df$time_value)
-    df$issue <- api_to_date(df$issue)
+    df$time_value <- api_to_date(df$time_value, time_type)
+    df$issue <- api_to_date(df$issue, time_type)
   }
 
   return(df)
 }
 
+# Get a sequence of dates, in the format required by the API, representing the
+# range from start_day to end_day.
+#' @importFrom MMWRweek MMWRweek
+date_sequence <- function(start_day, end_day, time_type = c("day", "week")) {
+  time_type <- match.arg(time_type)
+
+  if (time_type == "day") {
+    return(date_to_string(seq(start_day, end_day, by = 1)))
+  } else if (time_type == "week") {
+    dates <- seq(start_day, end_day, by = "1 week")
+    weeks <- MMWRweek(dates)
+
+    # API takes MMWRweeks in YYYYMM format, so force zero-padding as needed.
+    return(sprintf("%d%02d", weeks$MMWRyear, weeks$MMWRweek))
+  }
+}
+
 # Helper function (not user facing) to create warning messages when geo_values
 # are missing.
-geo_warning_message <- function(row, desired_geos) {
+geo_warning_message <- function(row, desired_geos, time_type) {
   missing_geos <- setdiff(desired_geos, unlist(row$geo_value))
   if (length(missing_geos) > 0) {
     missing_geos_str <- paste0(missing_geos, collapse = ", ")
     err_msg <- sprintf("Data not fetched for some geographies on %s: %s",
-                       api_to_date(row$time_value), missing_geos_str)
+                       api_to_date(row$time_value, time_type), missing_geos_str)
     return(err_msg)
   }
 }
@@ -914,7 +948,18 @@ date_to_string <- function(mydate) {
   format(mydate, "%Y%m%d")
 }
 
-# Convert dates from API to Date objects
-api_to_date <- function(str) {
-  as.Date(as.character(str), format = "%Y%m%d")
+# Convert dates from API to Date objects. For days, get a Date; for epiweeks,
+# get the Date of the first day in the epiweek.
+#' @importFrom MMWRweek MMWRweek2Date
+api_to_date <- function(str, time_type = c("day", "week")) {
+  time_type <- match.arg(time_type)
+
+  if (time_type == "day") {
+    return(as.Date(as.character(str), format = "%Y%m%d"))
+  } else if (time_type == "week") {
+    # Extract year and week number from string.
+    years <- as.numeric(substr(str, 1, 4))
+    weeks <- as.numeric(substr(str, 5, 6))
+    return(MMWRweek2Date(years, weeks))
+  }
 }

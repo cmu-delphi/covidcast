@@ -4,10 +4,10 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Changelog &#8212; COVIDcast API client 0.1.0 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Changelog &#8212; COVIDcast API client 0.1.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -34,6 +34,21 @@
             
   <div class="section" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="v0-1-1-november-22-2020">
+<h2>v0.1.1, November 22, 2020<a class="headerlink" href="#v0-1-1-november-22-2020" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Bug fix: A shapefile packaging issue, which broke
+<code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot_choropleth()</span></code> for metropolitan statistical areas and
+hospital referral regions, is now resolved.</p></li>
+<li><p>Update: <code class="docutils literal notranslate"><span class="pre">Direction</span></code> is no longer supported and has been removed from the
+output of <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a>. To measure increasing or decreasing
+trends in signals, we recommend implementing your own method based on your
+application’s specific needs.</p></li>
+<li><p>New feature: Functions <a class="reference internal" href="signals.html#covidcast.fips_to_abbr" title="covidcast.fips_to_abbr"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.fips_to_abbr()</span></code></a> and
+<a class="reference internal" href="signals.html#covidcast.abbr_to_fips" title="covidcast.abbr_to_fips"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.abbr_to_fips()</span></code></a> to convert between state FIPS codes and
+their abbreviations.</p></li>
+</ul>
+</div>
 <div class="section" id="v0-1-0-october-1-2020">
 <h2>v0.1.0, October 1, 2020<a class="headerlink" href="#v0-1-0-october-1-2020" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -48,13 +63,13 @@ provided to convert human-readable names into FIPS codes, CBSA IDs, and state
 abbreviations, for use when querying the COVIDcast API.</p></li>
 <li><p>New feature: Function <a class="reference internal" href="plotting.html#covidcast.animate" title="covidcast.animate"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.animate()</span></code></a> can take a DataFrame returned by
 <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a> and generate an animated video of the signal over time.</p></li>
-<li><p>New feature: Function <a class="reference internal" href="plotting.html#covidcast.plot_choropleth" title="covidcast.plot_choropleth"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot_choropleth()</span></code></a> can now plot signals for
+<li><p>New feature: Function <code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot_choropleth()</span></code> can now plot signals for
 hospital referral regions (HRRs) and metropolitan statistical areas (MSAs), in addition
 to states and counties.</p></li>
 <li><p>New feature: Function <a class="reference internal" href="signals.html#covidcast.aggregate_signals" title="covidcast.aggregate_signals"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.aggregate_signals()</span></code></a> shifts and combines
 multiple signals into a single DataFrame for convenient signal comparisons across
 time.</p></li>
-<li><p>Bug fix: The <code class="docutils literal notranslate"><span class="pre">time_value</span></code> argument to the <a class="reference internal" href="plotting.html#covidcast.plot_choropleth" title="covidcast.plot_choropleth"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot_choropleth()</span></code></a>
+<li><p>Bug fix: The <code class="docutils literal notranslate"><span class="pre">time_value</span></code> argument to the <code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot_choropleth()</span></code>
 function can now accept <a class="reference external" href="https://docs.python.org/3/library/datetime.html">datetime</a>
 <code class="docutils literal notranslate"><span class="pre">datetime</span></code> and <code class="docutils literal notranslate"><span class="pre">date</span></code> objects, instead of only <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html">pandas Timestamps</a>.</p></li>
 <li><p>Bug fix: <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a> no longer returns duplicate values if duplicate
@@ -64,7 +79,7 @@ function can now accept <a class="reference external" href="https://docs.python.
 <div class="section" id="v0-0-9-august-30-2020">
 <h2>v0.0.9, August 30, 2020<a class="headerlink" href="#v0-0-9-august-30-2020" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>New feature: <a class="reference internal" href="plotting.html#covidcast.plot_choropleth" title="covidcast.plot_choropleth"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot_choropleth()</span></code></a> and <a class="reference internal" href="plotting.html#covidcast.get_geo_df" title="covidcast.get_geo_df"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.get_geo_df()</span></code></a>
+<li><p>New feature: <code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot_choropleth()</span></code> and <a class="reference internal" href="plotting.html#covidcast.get_geo_df" title="covidcast.get_geo_df"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.get_geo_df()</span></code></a>
 add mapping and plotting capabilities that can be used with the data returned by
 <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a>. See the <a class="reference internal" href="plotting.html#plotting-data"><span class="std std-ref">function documentation</span></a>
 and <a class="reference internal" href="plot_examples.html#plotting-examples"><span class="std std-ref">plotting examples</span></a> for more details.</p></li>
@@ -126,6 +141,7 @@ argument that can include multiple geographies, rather than a single
 <li class="toctree-l1"><a class="reference internal" href="plot_examples.html">Plotting Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#v0-1-1-november-22-2020">v0.1.1, November 22, 2020</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-1-0-october-1-2020">v0.1.0, October 1, 2020</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-9-august-30-2020">v0.0.9, August 30, 2020</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-8-july-26-2020">v0.0.8, July 26, 2020</a></li>
@@ -181,7 +197,7 @@ argument that can include multiple geographies, rather than a single
       &copy;2020, Delphi research group.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

@@ -46,7 +46,6 @@ plot_trajectory <- function(predictions_cards,
     predictions_cards <- predictions_cards %>%
       filter(.data$forecaster %in% show_forecaster)
   }
-  
   if (length(intervals) > 3) {
     warning("More than 3 intervals are difficult to see. Resetting to default.")
     intervals = c(.5, .8, .95)

@@ -113,6 +113,7 @@ intersect_averagers <- function(cards, grp_vars, avg_vars) {
 
 
 
+
 # Print method for predictions_cards
 # 
 # @param x Prediction card.

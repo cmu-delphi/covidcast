@@ -228,7 +228,8 @@ MAX_RESULTS <- 3649
 #' @importFrom dplyr %>%
 covidcast_signal <- function(data_source, signal,
                              start_day = NULL, end_day = NULL,
-                             geo_type = c("county", "hrr", "msa", "dma", "state"),
+                             geo_type = c("county", "hrr", "msa", "dma", "state",
+                                          "hhs", "nation"),
                              geo_values = "*",
                              as_of = NULL, issues = NULL, lag = NULL) {
   geo_type <- match.arg(geo_type)
@@ -275,10 +276,13 @@ covidcast_signal <- function(data_source, signal,
   if (!is.null(issues)) {
     issues <- as.Date(issues)
   }
-
+  if (identical(geo_values, "*")) {
+    max_geos <- relevant_meta$num_locations
+  } else {
+    max_geos <- length(geo_values)
+  }
   df <- covidcast_days(data_source, signal, start_day, end_day, geo_type,
-                       geo_values, as_of, issues, lag,
-                       relevant_meta$num_locations)
+                       geo_values, as_of, issues, lag, max_geos)
 
   # Drop direction column (if it still exists)
   df$direction <- NULL
@@ -488,7 +492,8 @@ summary.covidcast_signal = function(object, ...) {
 #' @export
 covidcast_signals <- function(data_source, signal,
                               start_day = NULL, end_day = NULL,
-                              geo_type = c("county", "hrr", "msa", "dma", "state"),
+                              geo_type = c("county", "hrr", "msa", "dma", "state",
+                                           "hhs", "nation"),
                               geo_values = "*",
                               as_of = NULL, issues = NULL, lag = NULL) {
   N <- max(length(data_source), length(signal))
@@ -629,8 +634,12 @@ summary.covidcast_meta = function(object, ...) {
     x %>% dplyr::group_by(data_source, signal) %>%
     dplyr::summarize(county = ifelse("county" %in% geo_type, "*", ""),
                      msa = ifelse("msa" %in% geo_type, "*", ""),
+                     dma = ifelse("dma" %in% geo_type, "*", ""),
                      hrr = ifelse("hrr" %in% geo_type, "*", ""),
-                     state = ifelse("state" %in% geo_type, "*", "")) %>%
+                     state = ifelse("state" %in% geo_type, "*", ""),
+                     hhs = ifelse("hhs" %in% geo_type, "*", ""),
+                     nation = ifelse("nation" %in% geo_type, "*", "")
+                     ) %>%
     dplyr::ungroup()
   )
   print(as.data.frame(df), right = FALSE, row.names = FALSE)
@@ -886,6 +895,12 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   # server when needed.
   response <- httr::GET(getOption("covidcast.base_url", default = COVIDCAST_BASE_URL),
                         httr::user_agent("covidcastR"), query = params)
+  if (httr::status_code(response) == 414){
+    response <- httr::POST(getOption("covidcast.base_url",
+                           default = COVIDCAST_BASE_URL),
+                           httr::user_agent("covidcastR"), 
+                           body = params)
+  }
 
   httr::stop_for_status(response, task = "fetch data from API")
 

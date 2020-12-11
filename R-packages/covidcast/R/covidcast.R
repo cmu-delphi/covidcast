@@ -207,7 +207,8 @@ MAX_RESULTS <- 3649
 #' @importFrom dplyr %>%
 covidcast_signal <- function(data_source, signal,
                              start_day = NULL, end_day = NULL,
-                             geo_type = c("county", "hrr", "msa", "dma", "state"),
+                             geo_type = c("county", "hrr", "msa", "dma", "state",
+                                          "hhs", "nation"),
                              geo_values = "*",
                              as_of = NULL, issues = NULL, lag = NULL) {
   geo_type <- match.arg(geo_type)
@@ -358,7 +359,8 @@ summary.covidcast_signal = function(object, ...) {
 #' @export
 covidcast_signals <- function(data_source, signal,
                               start_day = NULL, end_day = NULL,
-                              geo_type = c("county", "hrr", "msa", "dma", "state"),
+                              geo_type = c("county", "hrr", "msa", "dma", "state",
+                                           "hhs", "nation"),
                               geo_values = "*",
                               as_of = NULL, issues = NULL, lag = NULL) {
   N <- max(length(data_source), length(signal))
@@ -499,8 +501,12 @@ summary.covidcast_meta = function(object, ...) {
     x %>% dplyr::group_by(data_source, signal) %>%
     dplyr::summarize(county = ifelse("county" %in% geo_type, "*", ""),
                      msa = ifelse("msa" %in% geo_type, "*", ""),
+                     dma = ifelse("dma" %in% geo_type, "*", ""),
                      hrr = ifelse("hrr" %in% geo_type, "*", ""),
-                     state = ifelse("state" %in% geo_type, "*", "")) %>%
+                     state = ifelse("state" %in% geo_type, "*", ""),
+                     hhs = ifelse("hhs" %in% geo_type, "*", ""),
+                     nation = ifelse("nation" %in% geo_type, "*", "")
+                     ) %>%
     dplyr::ungroup()
   )
   print(as.data.frame(df), right = FALSE, row.names = FALSE)

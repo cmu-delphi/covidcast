@@ -53,11 +53,11 @@ baseline_forecaster <- function(df,
                     .data$resid) %>%
       group_modify(~ {
         point <- .x$summed[.x$time_value == max(.x$time_value)]
-        tibble(quantile = covidhub_probs,
-               value = point + stats::quantile(
+        tibble(quantile = c(covidhub_probs, NA),
+               value = point + c(stats::quantile(
                  c(.x$resid, s * .x$resid),
                  probs = covidhub_probs,
-                 na.rm = TRUE)
+                 na.rm = TRUE), 0)
                )
         }, .keep = TRUE) %>%
         dplyr::ungroup() %>%

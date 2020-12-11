@@ -199,6 +199,71 @@ test_that("aggregated data can be made longer", {
   ## expect_equal(long, agg_long)
 })
 
+test_that("aggregated data can be made wider", {
+  foo <- structure(data.frame(
+    data_source = "foo",
+    signal = "foo",
+    geo_value = c("pa", "tx", "ri"),
+    value = 1:3,
+    time_value = as.Date("2020-01-01"),
+    issue = as.Date("2020-01-02"),
+    stderr = 0.5,
+    sample_size = 10,
+    lag = 1),
+    metadata = data.frame(data_source = "foo", signal = "foo",
+                          geo_type = "state"),
+    class = c("covidcast_signal", "data.frame"))
+
+  bar <- structure(data.frame(
+    data_source = "bar",
+    signal = "bar",
+    geo_value = c("pa", "tx", "ri"),
+    value = 4:6,
+    time_value = as.Date("2020-01-01"),
+    issue = as.Date("2020-01-02"),
+    stderr = 0.5,
+    sample_size = 10,
+    lag = 1),
+    metadata = data.frame(data_source = "bar", signal = "bar",
+                          geo_type = "state"),
+    class = c("covidcast_signal", "data.frame"))
+
+  agg_long <- aggregate_signals(list(foo, bar), format = "long")
+
+  expect_equal(arrange(agg_long, data_source, geo_value),
+               structure(data.frame(
+                 data_source = c(rep("bar", 3), rep("foo", 3)),
+                 signal = c(rep("bar", 3), rep("foo", 3)),
+                 geo_value = rep(c("pa", "ri", "tx"), 2),
+                 time_value = as.Date("2020-01-01"),
+                 issue = as.Date("2020-01-02"),
+                 stderr = 0.5,
+                 sample_size = 10,
+                 lag = 1,
+                 dt = 0,
+                 value = c(4, 6, 5, 1, 3, 2)),
+                 metadata = data.frame(
+                     data_source = c("foo", "bar"),
+                     signal = c("foo", "bar"),
+                     geo_type = "state"),
+                 class = c("covidcast_signal_long", "data.frame")))
+
+  wide <- covidcast_wider(agg_long)
+
+  expect_equal(arrange(wide, geo_value),
+               structure(data.frame(
+                 geo_value = c("pa", "ri", "tx"),
+                 time_value = as.Date("2020-01-01"),
+                 "value+0:foo_foo" = c(1, 3, 2),
+                 "value+0:bar_bar" = c(4, 6, 5),
+                 check.names = FALSE),
+                 metadata = data.frame(
+                     data_source = c("foo", "bar"),
+                     signal = c("foo", "bar"),
+                     geo_type = "state"),
+                 class = c("covidcast_signal_wide", "data.frame")))
+})
+
 test_that("can aggregate signals with different metadata", {
   # signals from as.covidcast_signal() may have less metadata available than
   # those from covidcast_signal()

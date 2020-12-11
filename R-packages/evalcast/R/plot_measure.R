@@ -1,4 +1,4 @@
-#' Plot error measure
+#' Plot error measure (deprecated)
 #'
 #' @param scorecards List of different score cards, all on the same forecasting
 #'   task (i.e., same ahead, etc.).
@@ -7,6 +7,7 @@
 #'
 #' @export
 plot_measure <- function(scorecards, err_name, type = "boxplot") {
+  stop("This function has been deprecated. Pass the scorecards to ggplot.")
   # make sure scorecards are comparable:
   unique_attr(scorecards, "ahead")
   unique_attr(scorecards, "as_of")

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot interval width — plot_width • evalcast</title>
+<title>Get predictions from a COVID forecaster in Zoltar — get_zoltar_predictions • evalcast</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Plot interval width — plot_width" />
-<meta property="og:description" content="Plot interval width" />
+<meta property="og:title" content="Get predictions from a COVID forecaster in Zoltar — get_zoltar_predictions" />
+<meta property="og:description" content="Simply converts the predictions of forecasters submitting to the COVID Hub to the format of a
+predictions card, so it can be easily evaluated and compared." />
 
 
 
@@ -118,56 +119,93 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot interval width</h1>
+    <h1>Get predictions from a COVID forecaster in <a href='https://www.zoltardata.com'>Zoltar</a></h1>
     
-    <div class="hidden name"><code>plot_width.Rd</code></div>
+    <div class="hidden name"><code>get_zoltar_predictions.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Plot interval width</p>
+    <p>Simply converts the predictions of forecasters submitting to the <a href='https://github.com/reichlab/covid19-forecast-hub/'>COVID Hub</a> to the format of a
+predictions card, so it can be easily evaluated and compared.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plot_width</span><span class='op'>(</span>
-  <span class='va'>cards</span>,
-  levels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.7</span>, <span class='fl'>0.9</span><span class='op'>)</span>,
-  grp_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forecaster"</span>, <span class='st'>"forecast_date"</span>, <span class='st'>"ahead"</span><span class='op'>)</span>,
-  avg_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"geo_value"</span><span class='op'>)</span>,
-  legend_position <span class='op'>=</span> <span class='st'>"bottom"</span>
+    <pre class="usage"><span class='fu'>get_zoltar_predictions</span><span class='op'>(</span>
+  forecaster_names <span class='op'>=</span> <span class='cn'>NULL</span>,
+  forecast_dates <span class='op'>=</span> <span class='cn'>NULL</span>,
+  geo_values <span class='op'>=</span> <span class='st'>"*"</span>,
+  forecast_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"point"</span>, <span class='st'>"quantile"</span><span class='op'>)</span>,
+  ahead <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>,
+  incidence_period <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"epiweek"</span>, <span class='st'>"day"</span><span class='op'>)</span>,
+  signal <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"confirmed_incidence_num"</span>, <span class='st'>"deaths_incidence_num"</span>,
+    <span class='st'>"deaths_cumulative_num"</span><span class='op'>)</span>,
+  as_of <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>cards</th>
-      <td><p>scorecards or predictions cards (or a data frame with columns
-<code>quantile</code>, <code>value</code> and any grouping vars and averaging vars)</p></td>
+      <th>forecaster_names</th>
+      <td><p>Vector of strings indicating of the forecaster(s)
+(matching what it is called on the COVID Hub).</p></td>
     </tr>
     <tr>
-      <th>levels</th>
-      <td><p>Quantile levels for the summary of interval width, to be
-plotted. For example, <code>levels = c(0.5, 0.7, 0.9)</code>, the default, plots the
-median, 70% and 90% quantiles of interval widths.</p></td>
+      <th>forecast_dates</th>
+      <td><p>Vector of Date objects (or strings of the form
+"YYYY-MM-DD") indicating dates on which forecasts will be made. If <code>NULL</code>,
+the default, then all currently available forecast dates from the given
+forecaster in the COVID Hub will be used.</p></td>
     </tr>
     <tr>
-      <th>grp_vars</th>
-      <td><p>variables over which to compare widths The first
-determines the color of the lines while the rest will be faceted over</p></td>
+      <th>geo_values</th>
+      <td><p>vector of character strings containing FIPS codes of
+counties, or lower case state abbreviations (or "us" for national). The
+default "*" fetches all available locations</p></td>
     </tr>
     <tr>
-      <th>avg_vars</th>
-      <td><p>variables over which we compute quantiles.</p></td>
+      <th>forecast_type</th>
+      <td><p>"quantile", "point" or both (the default)</p></td>
     </tr>
     <tr>
-      <th>legend_position</th>
-      <td><p>Legend position, the default being "bottom".</p></td>
+      <th>ahead</th>
+      <td><p>number of periods ahead for which the forecast is required.
+NULL will fetch all available aheads</p></td>
+    </tr>
+    <tr>
+      <th>incidence_period</th>
+      <td><p>one of "epiweek" or "day". NULL will attempt to fetch
+both</p></td>
+    </tr>
+    <tr>
+      <th>signal</th>
+      <td><p>this function supports only "confirmed_incidence_num",
+"deaths_incidence_num", and/or "deaths_cumulative_num" (those currently)
+forecast by the COVIDhub-ensemble). For other types, use one of the
+alternatives mentioned above</p></td>
+    </tr>
+    <tr>
+      <th>as_of</th>
+      <td><p>only forecasts available as of this date will be retrieved.
+Default (NULL) is effectively as of today</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Long data frame of forecasts with a class of <code>predictions_cards</code>.
+The first 4 columns are the same as those returned by the forecaster. The
+remainder specify the prediction task, 10 columns in total:
+<code>ahead</code>, <code>geo_value</code>, <code>quantile</code>, <code>value</code>, <code>forecaster</code>, <code>forecast_date</code>,
+<code>data_source</code>, <code>signal</code>, <code>target_end_date</code>, and <code>incidence_period</code>. Here
+<code>data_source</code> and <code>signal</code> correspond to the response variable only.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Interval width does not depend on the actual outcome, so this
-function can be called on predictions cards in addition to score cards.</p>
+    <p>Note: For greater flexibility, use <code><a href='http://reichlab.io/zoltr/reference/do_zoltar_query.html'>zoltr::do_zoltar_query()</a></code> or perhaps
+<code><a href='https://rdrr.io/pkg/covidHubUtils/man/load_forecasts.html'>covidHubUtils::load_forecasts()</a></code>.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code><a href='get_predictions.html'>get_predictions()</a></code></p>
+<p><code><a href='get_covidhub_predictions.html'>get_covidhub_predictions()</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

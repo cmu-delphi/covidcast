@@ -73,7 +73,7 @@ forecast distribution." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -97,9 +97,6 @@ forecast distribution." />
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/intro-evalcast.html">Introduction to evalcast</a>
-    </li>
-    <li>
-      <a href="../articles/intro_vignette.html">Introduction to evalcast</a>
     </li>
   </ul>
 </li>
@@ -132,14 +129,18 @@ forecast distribution." />
 forecast distribution.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>absolute_error</span>(<span class='no'>quantile_forecasts</span>, <span class='no'>actual_value</span>)</pre>
+    <pre class="usage"><span class='fu'>absolute_error</span><span class='op'>(</span><span class='va'>quantile</span>, <span class='va'>value</span>, <span class='va'>actual_value</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>quantile_forecasts</th>
-      <td><p>Tibble of quantile forecasts.</p></td>
+      <th>quantile</th>
+      <td><p>vector of forecasted quantiles</p></td>
+    </tr>
+    <tr>
+      <th>value</th>
+      <td><p>vector of forecasted values</p></td>
     </tr>
     <tr>
       <th>actual_value</th>
@@ -163,7 +164,7 @@ forecast distribution.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

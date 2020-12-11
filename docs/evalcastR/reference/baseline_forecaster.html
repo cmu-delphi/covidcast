@@ -75,7 +75,7 @@ this point based on quantiles of symmetrized week-to-week residuals." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -99,9 +99,6 @@ this point based on quantiles of symmetrized week-to-week residuals." />
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/intro-evalcast.html">Introduction to evalcast</a>
-    </li>
-    <li>
-      <a href="../articles/intro_vignette.html">Introduction to evalcast</a>
     </li>
   </ul>
 </li>
@@ -136,15 +133,15 @@ augments a flat-line point prediction with a forecast distribution around
 this point based on quantiles of symmetrized week-to-week residuals.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>baseline_forecaster</span>(
-  <span class='no'>df</span>,
-  <span class='no'>forecast_date</span>,
-  <span class='no'>signals</span>,
-  <span class='kw'>incidence_period</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"epiweek"</span>, <span class='st'>"day"</span>),
-  <span class='no'>ahead</span>,
-  <span class='no'>geo_type</span>,
-  <span class='kw'>symmetrize</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>baseline_forecaster</span><span class='op'>(</span>
+  <span class='va'>df</span>,
+  <span class='va'>forecast_date</span>,
+  <span class='va'>signals</span>,
+  incidence_period <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"epiweek"</span>, <span class='st'>"day"</span><span class='op'>)</span>,
+  <span class='va'>ahead</span>,
+  <span class='va'>geo_type</span>,
+  symmetrize <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -152,7 +149,7 @@ this point based on quantiles of symmetrized week-to-week residuals.</p>
     <tr>
       <th>df</th>
       <td><p>Data frame of the format that is returned by
-<code><a href='https://rdrr.io/pkg/covidcast/man/covidcast_signal.html'>covidcast::covidcast_signal()</a></code>.</p></td>
+<code><a href='https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html'>covidcast::covidcast_signal()</a></code>.</p></td>
     </tr>
     <tr>
       <th>forecast_date</th>
@@ -207,9 +204,10 @@ decreasing, depending on the historical trend.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Data frame with columns <code>ahead</code>, <code>location</code>, <code>probs</code>, <code>quantiles</code>.
-The <code>quantiles</code> column gives the predictive quantiles of the forecast
-distribution for that location and ahead.</p>
+    <p>Data frame with columns <code>ahead</code>, <code>geo_value</code>, <code>quantile</code>, <code>value</code>.
+The <code>quantile</code> column gives the predicted quantiles of the forecast
+distribution for that location and ahead. An NA indicates a point forecast
+(same as the median in this case).</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -226,7 +224,7 @@ distribution for that location and ahead.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

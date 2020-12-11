@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create a list of score cards — evaluate_predictions • evalcast</title>
+<title>Create a data frame of score cards — evaluate_predictions • evalcast</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Create a list of score cards — evaluate_predictions" />
+<meta property="og:title" content="Create a data frame of score cards — evaluate_predictions" />
 <meta property="og:description" content="Performs backtesting, through the following steps:
 Takes a list of predictions cards (as created by
 get_predictions()). These should be from a single forecaster, each card
@@ -83,7 +83,7 @@ distributions and the actual response values)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -108,9 +108,6 @@ distributions and the actual response values)." />
     <li>
       <a href="../articles/intro-evalcast.html">Introduction to evalcast</a>
     </li>
-    <li>
-      <a href="../articles/intro_vignette.html">Introduction to evalcast</a>
-    </li>
   </ul>
 </li>
 <li>
@@ -132,7 +129,7 @@ distributions and the actual response values)." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create a list of score cards</h1>
+    <h1>Create a data frame of score cards</h1>
     
     <div class="hidden name"><code>evaluate_predictions.Rd</code></div>
     </div>
@@ -152,40 +149,63 @@ error measures (along with other information including the forecast
 distributions and the actual response values).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>evaluate_predictions</span>(
-  <span class='no'>predictions_cards</span>,
-  <span class='kw'>err_measures</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>wis</span> <span class='kw'>=</span> <span class='no'>weighted_interval_score</span>, <span class='kw'>ae</span> <span class='kw'>=</span> <span class='no'>absolute_error</span>, <span class='kw'>coverage_80</span> <span class='kw'>=</span>
-    <span class='fu'><a href='interval_coverage.html'>interval_coverage</a></span>(<span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.2</span>)),
-  <span class='kw'>backfill_buffer</span> <span class='kw'>=</span> <span class='fl'>10</span>
-)</pre>
+    <pre class="usage"><span class='fu'>evaluate_predictions</span><span class='op'>(</span>
+  <span class='va'>predictions_cards</span>,
+  err_measures <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>wis <span class='op'>=</span> <span class='va'>weighted_interval_score</span>, ae <span class='op'>=</span> <span class='va'>absolute_error</span>, coverage_80 <span class='op'>=</span>
+    <span class='fu'><a href='interval_coverage.html'>interval_coverage</a></span><span class='op'>(</span>coverage <span class='op'>=</span> <span class='fl'>0.8</span><span class='op'>)</span><span class='op'>)</span>,
+  backfill_buffer <span class='op'>=</span> <span class='fl'>10</span>,
+  side_truth <span class='op'>=</span> <span class='cn'>NULL</span>,
+  grp_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forecaster"</span>, <span class='st'>"forecast_date"</span>, <span class='st'>"ahead"</span>, <span class='st'>"geo_value"</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>predictions_cards</th>
-      <td><p>List of predictions cards from the same forecaster
-that are all for the same response, incidence period, and geo type. Each
-should be from a different forecast date or for a different ahead.  A
-predictions card is created by the function <code><a href='get_predictions.html'>get_predictions()</a></code>.</p></td>
+      <td><p>tibble of predictions
+that are all for the same prediction task, meaning they are for the same
+response, incidence period, ahead, and geo type. Forecasts may be for a
+different forecast date or forecaster.
+A predictions card may be created by the function
+<code><a href='get_predictions.html'>get_predictions()</a></code>, downloaded with <code><a href='get_covidhub_predictions.html'>get_covidhub_predictions()</a></code> or
+possibly created manually.</p></td>
     </tr>
     <tr>
       <th>err_measures</th>
       <td><p>Named list of one or more functions, where each function
-takes a data frame with two columns <code>probs</code> and <code>quantiles</code> and an actual
-(i.e., observed) scalar value and returns some measure of error.  If empty,
-returns the scorecard without any error measure columns.</p></td>
+takes a data frame with three columns <code>quantile</code>, <code>value</code> and <code>actual</code>
+(i.e., observed) returns a scalar measure of error.</p></td>
     </tr>
     <tr>
       <th>backfill_buffer</th>
       <td><p>How many days until response is deemed trustworthy
 enough to be taken as correct? See details for more.</p></td>
     </tr>
+    <tr>
+      <th>side_truth</th>
+      <td><p>you can optionally provide your own truth data (observed).
+Adding this column bypasses all checks to get appropriate data as
+reported at the time of the forecast. This column should either be a vector
+the same length as <code>predictions_cards</code> or a data frame that will be
+joined to <code>predictions_cards</code> by all available columns. If a data frame,
+the observed data should be named <code>actual</code></p></td>
+    </tr>
+    <tr>
+      <th>grp_vars</th>
+      <td><p>character vector of named columns in the predictions_cards
+such that the combination gives a unique (quantile) prediction. Ignored if
+<code>predictions_cards</code> is of the type returned by <code><a href='get_covidhub_predictions.html'>get_covidhub_predictions()</a></code>
+or <code><a href='get_predictions.html'>get_predictions()</a></code> (class is <code>predictions_cards</code>)</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>List of "score cards", with one element per ahead value.</p>
+    <p>tibble of "score cards". Contains the same information as the
+<code>predictions_cards()</code> with additional columns for each err_measure and
+for the truth (named <code>actual</code>). All the columns may be necessary for
+some types of plotting, but it may be useful to shrink this down</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Backfill refers to the process by which some data sources go back in time
@@ -217,7 +237,7 @@ signal you are predicting, then you can set <code>backfill_buffer</code> to 0.</
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -95,9 +95,6 @@
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/intro-evalcast.html">Introduction to evalcast</a>
-    </li>
-    <li>
-      <a href="../articles/intro_vignette.html">Introduction to evalcast</a>
     </li>
   </ul>
 </li>
@@ -165,15 +162,39 @@
       <tr>
         
         <td>
-          <p><code><a href="get_covidhub_predictions.html">get_covidhub_predictions()</a></code> </p>
-        </td>
-        <td><p>Get predictions from a forecaster on the COVID Hub</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="get_predictions.html">get_predictions()</a></code> </p>
         </td>
         <td><p>Get predictions</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_zoltar_forecast_dates.html">get_zoltar_forecast_dates()</a></code> </p>
+        </td>
+        <td><p>Get available forecast dates for a COVID forecaster on Zoltar</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_zoltar_predictions.html">get_zoltar_predictions()</a></code> </p>
+        </td>
+        <td><p>Get predictions from a COVID forecaster in <a href='https://www.zoltardata.com'>Zoltar</a></p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_covidhub_forecast_dates.html">get_covidhub_forecast_dates()</a></code> </p>
+        </td>
+        <td><p>Get available forecast dates for a forecaster on the COVID Hub</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_covidhub_forecaster_names.html">get_covidhub_forecaster_names()</a></code> </p>
+        </td>
+        <td><p>List all COVID forecast models available</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_covidhub_predictions.html">get_covidhub_predictions()</a></code> </p>
+        </td>
+        <td><p>Get predictions from a forecaster on the COVID Hub</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -192,7 +213,7 @@
         <td>
           <p><code><a href="evaluate_predictions.html">evaluate_predictions()</a></code> </p>
         </td>
-        <td><p>Create a list of score cards</p></td>
+        <td><p>Create a data frame of score cards</p></td>
       </tr><tr>
         
         <td>
@@ -211,6 +232,43 @@
           <p><code><a href="interval_coverage.html">interval_coverage()</a></code> </p>
         </td>
         <td><p>Generate interval coverage error measure function</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-summarizing-scorecards-or-predictions" class="hasAnchor"><a href="#section-summarizing-scorecards-or-predictions" class="anchor"></a>Summarizing scorecards or predictions</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="compute_actual_vs_nominal_prob.html">compute_actual_vs_nominal_prob()</a></code> </p>
+        </td>
+        <td><p>Compute calibration of a quantile forecaster</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="compute_calibration.html">compute_calibration()</a></code> </p>
+        </td>
+        <td><p>Compute calibration of a quantile forecaster</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="compute_coverage.html">compute_coverage()</a></code> </p>
+        </td>
+        <td><p>Compute observed coverage from a quantile forecaster</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="compute_width.html">compute_width()</a></code> </p>
+        </td>
+        <td><p>Summarize forecast interval widths</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -241,13 +299,13 @@
         <td>
           <p><code><a href="plot_measure.html">plot_measure()</a></code> </p>
         </td>
-        <td><p>Plot error measure</p></td>
+        <td><p>Plot error measure (deprecated)</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="plot_trajectory.html">plot_trajectory()</a></code> </p>
         </td>
-        <td><p>Produce trajectory plots of forecasts and observed data</p></td>
+        <td><p>Plot predictions along with truth</p></td>
       </tr><tr>
         
         <td>
@@ -270,27 +328,21 @@
       <tr>
         
         <td>
-          <p><code><a href="check_valid_forecaster_output.html">check_valid_forecaster_output()</a></code> </p>
-        </td>
-        <td><p>Check that a forecaster's output is valid</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="get_target_period.html">get_target_period()</a></code> </p>
         </td>
         <td><p>Get the target period for a forecast date, incidence period and ahead</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="get_forecast_dates.html">get_forecast_dates()</a></code> </p>
+          <p><code><a href="setup_wedgeplot.html">setup_wedgeplot()</a></code> </p>
         </td>
-        <td><p>Get available forecast dates for a forecaster on the COVID Hub</p></td>
+        <td><p>Preprocessing for wedge calibration plot</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="filter_predictions.html">filter_predictions()</a></code> </p>
+          <p><code><a href="collapse_cards.html">collapse_cards()</a></code> </p>
         </td>
-        <td><p>Filter a list of predictions cards based on attributes</p></td>
+        <td><p>Reduce size of cards</p></td>
       </tr>
     </tbody>
     </table>
@@ -310,7 +362,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

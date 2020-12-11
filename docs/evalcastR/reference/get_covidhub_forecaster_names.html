@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot interval width — plot_width • evalcast</title>
+<title>List all COVID forecast models available — get_covidhub_forecaster_names • evalcast</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Plot interval width — plot_width" />
-<meta property="og:description" content="Plot interval width" />
+<meta property="og:title" content="List all COVID forecast models available — get_covidhub_forecaster_names" />
+<meta property="og:description" content="Utility function to list all forecasters submitting COVID-19 forecasts to
+the COVID 19 Forecast Hub." />
 
 
 
@@ -118,56 +119,34 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot interval width</h1>
+    <h1>List all COVID forecast models available</h1>
     
-    <div class="hidden name"><code>plot_width.Rd</code></div>
+    <div class="hidden name"><code>get_covidhub_forecaster_names.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Plot interval width</p>
+    <p>Utility function to list all forecasters submitting COVID-19 forecasts to
+the <a href='http://covid19forecasthub.org/'>COVID 19 Forecast Hub</a>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plot_width</span><span class='op'>(</span>
-  <span class='va'>cards</span>,
-  levels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.7</span>, <span class='fl'>0.9</span><span class='op'>)</span>,
-  grp_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forecaster"</span>, <span class='st'>"forecast_date"</span>, <span class='st'>"ahead"</span><span class='op'>)</span>,
-  avg_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"geo_value"</span><span class='op'>)</span>,
-  legend_position <span class='op'>=</span> <span class='st'>"bottom"</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_covidhub_forecaster_names</span><span class='op'>(</span>repo <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"zoltar"</span>, <span class='st'>"covid19forecast_repo"</span><span class='op'>)</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>cards</th>
-      <td><p>scorecards or predictions cards (or a data frame with columns
-<code>quantile</code>, <code>value</code> and any grouping vars and averaging vars)</p></td>
-    </tr>
-    <tr>
-      <th>levels</th>
-      <td><p>Quantile levels for the summary of interval width, to be
-plotted. For example, <code>levels = c(0.5, 0.7, 0.9)</code>, the default, plots the
-median, 70% and 90% quantiles of interval widths.</p></td>
-    </tr>
-    <tr>
-      <th>grp_vars</th>
-      <td><p>variables over which to compare widths The first
-determines the color of the lines while the rest will be faceted over</p></td>
-    </tr>
-    <tr>
-      <th>avg_vars</th>
-      <td><p>variables over which we compute quantiles.</p></td>
-    </tr>
-    <tr>
-      <th>legend_position</th>
-      <td><p>Legend position, the default being "bottom".</p></td>
+      <th>repo</th>
+      <td><p>character strinng either "zoltar" indicating the
+<a href='https://zoltardata.com'>Zoltar</a> Forecast Archive or "covid19forecast_repo"
+which lists those available at the
+<a href='https://github.com/reichlab/covid19-forecast-hub'>Reichlab</a>
+Github submission repo.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Interval width does not depend on the actual outcome, so this
-function can be called on predictions cards in addition to score cards.</p>
+    <p>character vector of all available forecasters</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

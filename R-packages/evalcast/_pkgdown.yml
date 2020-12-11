@@ -15,21 +15,24 @@ reference:
   - baseline_forecaster
 - title: "Creating or importing predictions"
 - contents:
-  - get_covidhub_predictions
   - get_predictions
+  - contains("zoltar")
+  - contains("covidhub")
 - title: "Evaluating predictions"
 - contents:
   - evaluate_predictions
   - weighted_interval_score
   - absolute_error
   - interval_coverage
+- title: "Summarizing scorecards or predictions"
+- contents:
+  - starts_with("compute_")
 - title: "Visualizing performance"
 - contents:
   - starts_with("plot_")
 - title: "Utilities"
 - contents:
-  - check_valid_forecaster_output
   - get_target_period
-  - get_forecast_dates
-  - filter_predictions
+  - setup_wedgeplot
+  - collapse_cards
   

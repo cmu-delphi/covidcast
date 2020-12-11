@@ -301,7 +301,8 @@ covidcast_wider = function(x) {
   metadata <- attributes(x)$metadata
 
   # Select only essential columns
-  x <- dplyr::select(x, .data$data_source, .data$signal, .data$dt, .data$value)
+  x <- dplyr::select(x, .data$geo_value, .data$time_value, .data$data_source,
+                     .data$signal, .data$dt, .data$value)
 
   # Renamer function (bit ugly)
   renamer = Vectorize(function(name) {
@@ -317,7 +318,8 @@ covidcast_wider = function(x) {
                        names_prefix = "value:",
                        names_sep = "_",
                        values_from = "value") %>%
-    dplyr::rename_with(renamer, dplyr::starts_with("value"))
+    dplyr::rename_with(renamer, dplyr::starts_with("value")) %>%
+    dplyr::ungroup()
 
   # Change class and return
   class(x) = c("covidcast_signal_wide", "data.frame")

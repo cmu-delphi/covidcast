@@ -43,6 +43,9 @@ NULL
 # API base url
 COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 
+# Max rows returned by API
+MAX_RESULTS <- 3649
+
 .onAttach <- function(libname, pkgname) {
   msg <- c("We encourage COVIDcast API users to register on our mailing list:",
            "https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api",
@@ -197,8 +200,8 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 #'                  geo_values = name_to_cbsa("Pittsburgh"))
 #' }
 #'
-#' @seealso [plot.covidcast_signal()], [`county_census`], [`msa_census`],
-#'     [`state_census`]
+#' @seealso [plot.covidcast_signal()], [covidcast_signals()], [`county_census`],
+#'   [`msa_census`], [`state_census`]
 #' @export
 #' @importFrom rlang abort
 #' @importFrom dplyr %>%
@@ -208,21 +211,9 @@ covidcast_signal <- function(data_source, signal,
                              geo_values = "*",
                              as_of = NULL, issues = NULL, lag = NULL) {
   geo_type <- match.arg(geo_type)
-  meta <- covidcast_meta()
-  given_data_source <- data_source
-  given_signal <- signal
-  given_geo_type <- geo_type
-  relevant_meta <- meta %>%
-    dplyr::filter(.data$data_source == given_data_source,
-                  .data$signal == given_signal,
-                  .data$time_type == "day",
-                  .data$geo_type == given_geo_type)
-
-  if (nrow(relevant_meta) == 0) {
-    # even if no other metadata is available, we should set the geo_type so
-    # plotting functions can deal with this signal.
-    relevant_meta <- list(geo_type = geo_type)
-  }
+  relevant_meta <- specific_meta(data_source, 
+                                 signal, 
+                                 geo_type)
 
   if (is.null(start_day) || is.null(end_day)) {
     if (is.null(relevant_meta$max_time) || is.null(relevant_meta$min_time)) {
@@ -263,9 +254,13 @@ covidcast_signal <- function(data_source, signal,
   if (!is.null(issues)) {
     issues <- as.Date(issues)
   }
-
+  if (identical(geo_values, "*")) {
+    max_geos <- relevant_meta$num_locations
+  } else {
+    max_geos <- length(geo_values)
+  }
   df <- covidcast_days(data_source, signal, start_day, end_day, geo_type,
-                       geo_values, as_of, issues, lag)
+                       geo_values, as_of, issues, lag, max_geos)
 
   # Drop direction column (if it still exists)
   df$direction <- NULL
@@ -359,8 +354,8 @@ summary.covidcast_signal = function(object, ...) {
 #' @examples
 #' \dontrun{
 #' ## Fetch USAFacts confirmed cases and deaths over the same time period
-#' covidcast_signals("usa-facts", signal=c("confirmed_incidence_num",
-#'                                         "deaths_incidence_num"),
+#' covidcast_signals("usa-facts", signal = c("confirmed_incidence_num",
+#'                                           "deaths_incidence_num"),
 #'                    start_day = "2020-08-15", end_day = "2020-10-01")
 #' }
 #' @export
@@ -437,18 +432,18 @@ covidcast_signals <- function(data_source, signal,
 #'
 #' @export
 covidcast_meta <- function() {
-  meta <- .request(list(source='covidcast_meta', cached="true"))
+  meta <- .request(
+    list(source = "covidcast_meta",
+         format = "csv"))
 
-  if (meta$message != "success") {
-    abort(paste0("Failed to obtain metadata: ", meta$message, "."),
-          err_msg = meta$message,
-          class = "covidcast_meta_fetch_failed")
+  if (nchar(meta) == 0) {
+    abort("Failed to obtain metadata", class = "covidcast_meta_fetch_failed")
   }
 
-  meta <- meta$epidata %>%
-    dplyr::mutate(min_time = as.Date(as.character(.data$min_time), format = "%Y%m%d"),
-                  max_time = as.Date(as.character(.data$max_time), format = "%Y%m%d"),
-                  max_issue = as.Date(as.character(.data$max_issue), format = "%Y%m%d"))
+  meta <- read.csv(textConnection(meta), stringsAsFactors = FALSE) %>%
+    dplyr::mutate(min_time = api_to_date(.data$min_time),
+                  max_time = api_to_date(.data$max_time),
+                  max_issue = api_to_date(.data$max_issue))
 
   class(meta) <- c("covidcast_meta", "data.frame")
   return(meta)
@@ -515,79 +510,154 @@ summary.covidcast_meta = function(object, ...) {
   invisible(df)
 }
 
-##########
+# Retrieve only the metadata that is specific to the values of interest (signal,
+# geo_type, etc.)
+specific_meta <- function(data_source, signal, geo_type, time_type = "day") {
+  meta_info <- covidcast_meta()
+  relevant_meta <- meta_info[meta_info$data_source == data_source &
+                              meta_info$signal == signal &
+                              meta_info$geo_type == geo_type &
+                              meta_info$time_type == time_type, ]
 
-# Helper function, not user-facing, to loop through a sequence of days, call
-# covidcast for each one and combine the results
+  # If no metadata for source/signal/geo_type combo, still return minimal data.
+  # Use maximum observed values of desired geo_type as an upper bound for
+  # num_locations.
+  if (nrow(relevant_meta) == 0) {
+    geo_nums <- max(meta_info[meta_info$geo_type == geo_type, ]$num_locations)
+    relevant_meta <- list(geo_type = geo_type, num_locations = geo_nums)
+  }
+  return(relevant_meta)
+}
+
+
+# Helper function, not user-facing, to loop through a sequence of days. Chooses
+# batches of days based on expected number of results, queries covidcast for
+# each batch and combines the resutls.
 covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
-                       geo_value, as_of, issues, lag) {
-  ndays <- as.numeric(end_day - start_day)
+                       geo_value, as_of, issues, lag, max_geos = NA) {
+  days <- seq(start_day, end_day, by = 1)
+  ndays <- length(days)
+
+  # issues is either a single date, or a vector with a start and end date.
+  if (length(issues) == 2) {
+    nissues <- as.numeric(issues[2] - issues[1]) + 1
+  } else {
+    nissues <- 1
+  }
+
+  # if not provided, assume worst case
+  if (is.na(max_geos)) {
+    max_geos <- MAX_RESULTS
+  }
+
+  # Theoretically, each geo_value could have data issued each day. Likely
+  # overestimates when handling multiple issue dates, resulting in more batches.
+  max_days_at_time <- floor(MAX_RESULTS / (max_geos * nissues))
+
+  # In theory, we could exceed max rows with 1 day, but try anyway
+  if (max_days_at_time == 0) {
+    max_days_at_time <- 1
+  }
+  num_batches <- ceiling(ndays / max_days_at_time)
   dat <- list()
 
   # The API limits the number of rows that can be returned at once, so we query
-  # each day separately.
-  for (i in seq(ndays + 1)) {
-    query_day <- start_day + i - 1
-    day_str <- date_to_string(query_day)
-    dat[[i]] <- covidcast(data_source = data_source,
+  # in batches.
+  for (i in seq_len(num_batches)) {
+    start_offset <- (i - 1) * max_days_at_time
+    end_offset <- min(i * max_days_at_time, ndays) - 1
+    query_start_day <- start_day + start_offset
+    query_end_day <- start_day + end_offset
+
+    time_values <- date_to_string(days[(start_offset + 1):(end_offset + 1)])
+    response <- covidcast(data_source = data_source,
                           signal = signal,
                           time_type = "day",
                           geo_type = geo_type,
-                          time_values = day_str,
+                          time_values = time_values,
                           geo_value = geo_value,
                           as_of = as_of,
                           issues = issues,
                           lag = lag)
+
+    if (is.null(response)) {
+      warn(paste0("Fetching ", signal, " from ", data_source, " for ",
+                  query_start_day, " to ", query_end_day,
+                  " in geography '", geo_value, "': no results"),
+           data_source = data_source,
+           signal = signal,
+           start_day = query_start_day,
+           end_day = query_end_day,
+           geo_value = geo_value,
+           class = "covidcast_fetch_failed")
+
+      next
+    }
+
+    dat[[i]] <- response
+
     summary <- sprintf(
-      "Fetched day %s: %s, %s, num_entries = %s",
-      query_day,
-      dat[[i]]$result,
-      dat[[i]]$message,
-      nrow(dat[[i]]$epidata)
-    )
+      "Fetched day %s to %s: num_entries = %s",
+      query_start_day,
+      query_end_day,
+      nrow(response))
+
     if (length(summary) != 0) {
       message(summary)
     }
-    if (dat[[i]]$message == "success") {
-      returned_geo_values <- dat[[i]]$epidata$geo_value
+
+    if (nrow(response) > 0) {
+      desired_geos <- tolower(unique(geo_value))
+
+      returned_geo_array <- response %>%
+        dplyr::select(geo_value, time_value) %>%
+        dplyr::group_by(time_value) %>%
+        dplyr::summarize(geo_value = list(geo_value))
+      returned_time_values <- returned_geo_array$time_value
+
+      if (length(returned_time_values) != length(time_values)) {
+        missing_time_values <- setdiff(time_values, returned_time_values)
+        missing_dates <- api_to_date(missing_time_values)
+
+        warn(sprintf("Data not fetched for the following days: %s",
+                     paste(missing_dates, collapse = ", ")),
+             data_source = data_source,
+             signal = signal,
+             day = missing_dates,
+             geo_value = geo_value,
+             class = "covidcast_missing_time_values"
+        )
+      }
+
       if (!identical("*", geo_value)) {
-        missed_geos <- setdiff(tolower(geo_value),
-                               tolower(returned_geo_values))
-        if (length(missed_geos) > 0) {
-          missed_geos_str <- paste0(missed_geos, collapse = ", ")
-          warn(sprintf("Data not fetched for some geographies on %s: %s",
-                         query_day, missed_geos_str),
+        missing_geo_array <- returned_geo_array[
+          lapply(returned_geo_array$geo_value, length) < length(desired_geos), ]
+
+        if (nrow(missing_geo_array) > 0) {
+          missing_geo_array$warning <-
+            unlist(apply(returned_geo_array,
+                         1,
+                         FUN = function(row) geo_warning_message(row,
+                                                                 desired_geos)))
+          warn(missing_geo_array$warning,
                data_source = data_source,
                signal = signal,
-               day = query_day,
+               day = api_to_date(missing_geo_array$time_value),
                geo_value = geo_value,
-               api_msg = dat[[i]]$message,
-               class = "covidcast_missing_geo_values"
-               )
+               class = "covidcast_missing_geo_values")
         }
       }
-    } else {
-      warn(paste0("Fetching ", signal, " from ", data_source, " for ",
-                  query_day, " in geography '", geo_value, "': ",
-                  dat[[i]]$message),
-           data_source = data_source,
-           signal = signal,
-           day = query_day,
-           geo_value = geo_value,
-           api_msg = dat[[i]]$message,
-           class = "covidcast_fetch_failed")
     }
   }
 
   df <- dat %>%
-    purrr::map("epidata") %>% # just want $epidata part
     purrr::map(purrr::compact) %>% # remove the list elements that are NULL
     dplyr::bind_rows() # make this into a data frame
 
   if (nrow(df) > 0) {
     # If no data is found, there is no time_value column to report
-    df$time_value <- as.Date(as.character(df$time_value), format = "%Y%m%d")
-    df$issue <- as.Date(as.character(df$issue), format = "%Y%m%d")
+    df$time_value <- api_to_date(df$time_value)
+    df$issue <- api_to_date(df$issue)
     df$data_source <- data_source
     df$signal <- signal
 
@@ -600,11 +670,23 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
   return(df)
 }
 
+# Helper function (not user facing) to create warning messages when geo_values
+# are missing.
+geo_warning_message <- function(row, desired_geos) {
+  missing_geos <- setdiff(desired_geos, unlist(row$geo_value))
+  if (length(missing_geos) > 0) {
+    missing_geos_str <- paste0(missing_geos, collapse = ", ")
+    err_msg <- sprintf("Data not fetched for some geographies on %s: %s",
+                       api_to_date(row$time_value), missing_geos_str)
+    return(err_msg)
+  }
+}
+
 # Fetch Delphi's COVID-19 indicators
 covidcast <- function(data_source, signal, time_type, geo_type, time_values,
                       geo_value, as_of, issues, lag) {
   # Check parameters
-  if(missing(data_source) || missing(signal) || missing(time_type) ||
+  if (missing(data_source) || missing(signal) || missing(time_type) ||
        missing(geo_type) || missing(time_values) || missing(geo_value)) {
     stop("`data_source`, `signal`, `time_type`, `geo_type`, `time_values`, ",
          "and `geo_value` are all required.")
@@ -612,14 +694,16 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
 
   # Set up request
   params <- list(
-    source = 'covidcast',
+    source = "covidcast",
     data_source = data_source,
     signal = signal,
     time_type = time_type,
     geo_type = geo_type,
     time_values = .list(time_values),
-    geo_value = geo_value
+    geo_value = geo_value,
+    format = "csv"
   )
+
   if (length(params$geo_value) > 1) {
     params$geo_values <- paste0(params$geo_value, collapse = ",") #convert to string
     params$geo_value <- NULL
@@ -644,8 +728,19 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
     params$lag <- lag
   }
 
-  # Make the API call
-  return(.request(params))
+  # Make the API call. If the API returns a non-200 status code, indicating e.g.
+  # a database error, .request() raises an error. It returns an empty string if
+  # there are no results for our query.
+  response <- .request(params)
+  if (nchar(response) == 0) {
+    # empty if no results
+    return(NULL)
+  }
+
+  # geo_value must be read as character so FIPS codes are returned as character,
+  # not numbers (with leading 0s potentially removed)
+  return(read.csv(textConnection(response), stringsAsFactors = FALSE,
+                  colClasses = c("geo_value" = "character")))
 }
 
 # Helper function to cast values and/or ranges to strings
@@ -667,17 +762,23 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
 
 # Helper function to request and parse epidata
 .request <- function(params) {
-  # API call
-  response <- httr::GET(COVIDCAST_BASE_URL, httr::user_agent("covidcastR"),
-                        query=params)
+  # API call. Allow base API URL to be replaced, e.g. to use a staging/testing
+  # server when needed.
+  response <- httr::POST(getOption("covidcast.base_url", default = COVIDCAST_BASE_URL),
+                        httr::user_agent("covidcastR"), body = params)
 
   httr::stop_for_status(response, task = "fetch data from API")
 
-  return(jsonlite::fromJSON(httr::content(response, as = "text",
-                                          encoding = "utf-8")))
+  return(httr::content(response, as = "text",
+                       encoding = "utf-8"))
 }
 
 # This is the date format expected by the API
 date_to_string <- function(mydate) {
   format(mydate, "%Y%m%d")
+}
+
+# Convert dates from API to Date objects
+api_to_date <- function(str) {
+  as.Date(as.character(str), format = "%Y%m%d")
 }

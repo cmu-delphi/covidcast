@@ -255,10 +255,13 @@ covidcast_signal <- function(data_source, signal,
   if (!is.null(issues)) {
     issues <- as.Date(issues)
   }
-
+  if (identical(geo_values, "*")) {
+    max_geos <- relevant_meta$num_locations
+  } else {
+    max_geos <- length(geo_values)
+  }
   df <- covidcast_days(data_source, signal, start_day, end_day, geo_type,
-                       geo_values, as_of, issues, lag, 
-                       relevant_meta$num_locations)
+                       geo_values, as_of, issues, lag, max_geos)
 
   # Drop direction column (if it still exists)
   df$direction <- NULL
@@ -769,6 +772,12 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   # server when needed.
   response <- httr::GET(getOption("covidcast.base_url", default = COVIDCAST_BASE_URL),
                         httr::user_agent("covidcastR"), query = params)
+  if (httr::status_code(response) == 414){
+    response <- httr::POST(getOption("covidcast.base_url",
+                           default = COVIDCAST_BASE_URL),
+                           httr::user_agent("covidcastR"), 
+                           body = params)
+  }
 
   httr::stop_for_status(response, task = "fetch data from API")
 

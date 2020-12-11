@@ -25,7 +25,7 @@ of \code{grp_vars} over the \code{avg_vars}}
 \item{avg_vars}{variables over which we compute quantiles.}
 }
 \value{
-
+a summarized data frame (by grp_vars)
 }
 \description{
 Summarize forecast interval widths

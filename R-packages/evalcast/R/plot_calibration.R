@@ -2,9 +2,10 @@
 #'
 #' @param scorecard Single score card.
 #' @param type One of "wedgeplot" or "traditional".
-#' @param grp_vars 
-#' @param avg_vars 
-#' @param legend_position 
+#' @param grp_vars variables over which to compare calibration. These
+#'   determines the color of the lines and faceting depending on `type`
+#' @param avg_vars variables over which we average to determine the calibration.
+#' @param legend_position Legend position, the default being "bottom".
 #'
 #' @export
 plot_calibration <- function(scorecard,

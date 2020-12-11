@@ -100,7 +100,7 @@ evaluate_predictions <- function(
     score_card <- inner_join(score_card, predictions_cards, by=grp_vars)
     class(score_card) <- c("score_cards", class(score_card))
     attributes(score_card) <- c(attributes(score_card), 
-                                as_of = lubridate::as_date(as_of))
+                                as_of = lubridate::as_date(Sys.Date()))
     return(score_card)
   }
   

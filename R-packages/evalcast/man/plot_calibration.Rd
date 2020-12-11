@@ -17,11 +17,12 @@ plot_calibration(
 
 \item{type}{One of "wedgeplot" or "traditional".}
 
-\item{grp_vars}{}
+\item{grp_vars}{variables over which to compare calibration. These
+determines the color of the lines and faceting depending on \code{type}}
 
-\item{avg_vars}{}
+\item{avg_vars}{variables over which we average to determine the calibration.}
 
-\item{legend_position}{}
+\item{legend_position}{Legend position, the default being "bottom".}
 }
 \description{
 Plot calibration curves

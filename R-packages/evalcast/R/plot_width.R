@@ -62,7 +62,7 @@ plot_width <- function(cards,
 #' @param grp_vars variables over which to compare widths 
 #' @param avg_vars variables over which we compute quantiles.
 #'
-#' @return
+#' @return a summarized data frame (by grp_vars)
 #' @export
 compute_width <- function(cards, 
                           levels = c(0.5, 0.7, 0.9),
@@ -87,7 +87,7 @@ compute_width <- function(cards,
     mutate(rev_value = rev(.data$value)) %>%
     filter(.data$quantile < 0.5) %>%
     mutate(nominal_prob = 1 - 2 * .data$quantile,
-           width = rev_value - value) %>%
+           width = .data$rev_value - .data$value) %>%
     ungroup() %>%
     select(all_of(grp_vars), .data$nominal_prob, .data$width) %>%
     group_by(across(all_of(grp_vars)), .data$nominal_prob) %>%

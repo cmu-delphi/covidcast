@@ -62,7 +62,14 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/cmu-delphi/covidcast/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -79,7 +86,7 @@
       <h1 data-toc-skip>Introduction to evalcast</h1>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/cmu-delphi/covidcast/blob/master/vignettes/intro-evalcast.Rmd"><code>vignettes/intro-evalcast.Rmd</code></a></small>
       <div class="hidden name"><code>intro-evalcast.Rmd</code></div>
 
     </div>
@@ -117,7 +124,7 @@
 <a href="#run-the-forecaster-on-some-dates" class="anchor"></a>Run the forecaster on some dates</h3>
 <p>Within the <code>evalcast</code> framework, forecasters do not directly retrieve historic data. Instead, <code>get_predictions</code> provides <em>only the data that would have been available at the time</em> to the specified forecaster in order to generate retrospective predictions.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">evalcast</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cmu-delphi.github.io/covidcast/evalcastR/">evalcast</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/">covidcast</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://lubridate.tidyverse.org">lubridate</a></span><span class="op">)</span>
 
@@ -284,7 +291,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Jacob Bien, Alden Green, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Jed Grabman, Alden Green, Daniel McDonald, Balasubramanian Narasimhan, Mike O'Brien, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

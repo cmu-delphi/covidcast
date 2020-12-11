@@ -183,7 +183,9 @@ setup_plot_trajectory <- function(predictions_cards,
              alp = if_else(.data$endpoint_type == 'lower',
                            format(2*.data$quantile, digits=3, nsmall=3),
                            format(2*(1-.data$quantile), digits=3, nsmall=3)),
-             interval = forcats::fct_rev(paste0((1-as.numeric(alp))*100, "%"))
+             interval = forcats::fct_rev(
+               paste0((1-as.numeric(.data$alp))*100, "%")
+               )
       ) %>%
       select(-.data$quantile, -.data$alp) %>%
       pivot_wider(names_from = "endpoint_type", values_from = "value")

@@ -700,9 +700,8 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
   ndays <- length(days)
 
   # issues is either a single date, or a vector with a start and end date.
-  # TODO FIXME issues for weekly = epiweeks too
   if (length(issues) == 2) {
-    nissues <- as.numeric(issues[2] - issues[1]) + 1
+    nissues <- length(date_sequence(issues[1], issues[2], time_type))
   } else {
     nissues <- 1
   }
@@ -834,10 +833,7 @@ date_sequence <- function(start_day, end_day, time_type = c("day", "week")) {
     return(date_to_string(seq(start_day, end_day, by = 1)))
   } else if (time_type == "week") {
     dates <- seq(start_day, end_day, by = "1 week")
-    weeks <- MMWRweek(dates)
-
-    # API takes MMWRweeks in YYYYMM format, so force zero-padding as needed.
-    return(sprintf("%d%02d", weeks$MMWRyear, weeks$MMWRweek))
+    return(date_to_string(dates, time_type))
   }
 }
 
@@ -880,16 +876,16 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
     params$geo_value <- NULL
   }
   if (!is.null(as_of)) {
-    params$as_of <- date_to_string(as_of)
+    params$as_of <- date_to_string(as_of, time_type)
   }
 
   if (!is.null(issues)) {
     if (length(issues) == 2) {
-      params$issues <- paste0(date_to_string(issues[1]),
+      params$issues <- paste0(date_to_string(issues[1], time_type),
                               "-",
-                              date_to_string(issues[2]))
+                              date_to_string(issues[2], time_type))
     } else if (length(issues) == 1) {
-      params$issues <- date_to_string(issues)
+      params$issues <- date_to_string(issues, time_type)
     } else {
       stop("`issues` must be either a single date or a date interval.")
     }
@@ -951,8 +947,17 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
 }
 
 # This is the date format expected by the API
-date_to_string <- function(mydate) {
-  format(mydate, "%Y%m%d")
+date_to_string <- function(mydate, time_type = c("day", "week")) {
+  time_type <- match.arg(time_type)
+
+  if (time_type == "day") {
+    format(mydate, "%Y%m%d")
+  } else {
+    weeks <- MMWRweek(mydate)
+
+    # API takes MMWRweeks in YYYYMM format, so force zero-padding as needed.
+    return(sprintf("%d%02d", weeks$MMWRyear, weeks$MMWRweek))
+  }
 }
 
 # Convert dates from API to Date objects. For days, get a Date; for epiweeks,

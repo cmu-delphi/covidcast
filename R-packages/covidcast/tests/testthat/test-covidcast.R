@@ -167,6 +167,7 @@ test_that("covidcast_days does not treat \"*\" as a missing geo_value", {
       as_of = NULL,
       issues = NULL,
       lag = NULL,
+      time_type = "day",
       max_geos = 1),
     regexp = NA)
 })
@@ -197,6 +198,7 @@ test_that("covidcast_days does not raise warnings for full response", {
       as_of = NULL,
       issues = NULL,
       lag = NULL,
+      time_type = "day",
       max_geos = 1),
     regexp = NA)
 })
@@ -231,6 +233,7 @@ test_that("covidcast_days batches calls to covidcast", {
         geo_value = "*",
         as_of = NULL,
         issues = NULL,
+        time_type = "day",
         lag = NULL,
         max_geos = 1000
       ),

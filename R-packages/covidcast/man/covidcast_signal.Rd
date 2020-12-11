@@ -13,7 +13,8 @@ covidcast_signal(
   geo_values = "*",
   as_of = NULL,
   issues = NULL,
-  lag = NULL
+  lag = NULL,
+  time_type = c("day", "week")
 )
 }
 \arguments{
@@ -26,8 +27,8 @@ see the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.
 for a list of available signals.}
 
 \item{start_day}{Query data beginning on this date. Date object, or string in
-the form "YYYY-MM-DD". If \code{start_day} is \code{NULL}, defaults to first day
-data is available for this signal.}
+the form "YYYY-MM-DD". If \code{start_day} is \code{NULL}, defaults to first day data
+is available for this signal.}
 
 \item{end_day}{Query data up to this date, inclusive. Date object or string
 in the form "YYYY-MM-DD". If \code{end_day} is \code{NULL}, defaults to the most
@@ -37,21 +38,21 @@ recent day data is available for this signal.}
 "county" or "state". Defaults to "county". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
 for details on which types are available.}
 
-\item{geo_values}{Which geographies to return. The default, "*", fetches
-all geographies. To fetch specific geographies, specify their IDs as a
-vector or list of strings. See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
+\item{geo_values}{Which geographies to return. The default, "*", fetches all
+geographies. To fetch specific geographies, specify their IDs as a vector
+or list of strings. See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
 for details on how to specify these IDs.}
 
 \item{as_of}{Fetch only data that was available on or before this date,
-provided as a \code{Date} object or string in the form "YYYY-MM-DD". If
-\code{NULL}, the default, return the most recent available data. Note that only
-one of \code{as_of}, \code{issues}, and \code{lag} should be provided; it does not make
-sense to specify more than one.}
+provided as a \code{Date} object or string in the form "YYYY-MM-DD". If \code{NULL},
+the default, return the most recent available data. Note that only one of
+\code{as_of}, \code{issues}, and \code{lag} should be provided; it does not make sense to
+specify more than one.}
 
 \item{issues}{Fetch only data that was published or updated ("issued") on
 these dates. Provided as either a single \code{Date} object (or string in the
-form "YYYY-MM-DD"), indicating a single date to fetch data issued on, or
-a vector specifying two dates, start and end. In this case, return all data
+form "YYYY-MM-DD"), indicating a single date to fetch data issued on, or a
+vector specifying two dates, start and end. In this case, return all data
 issued in this range. There may be multiple rows for each observation,
 indicating several updates to its value. If \code{NULL}, the default, return the
 most recently issued data.}
@@ -61,6 +62,10 @@ was published or updated exactly 3 days after the date. For example, a row
 with \code{time_value} of June 3 will only be included in the results if its
 data was issued or updated on June 6. If \code{NULL}, the default, return the
 most recently issued data regardless of its lag.}
+
+\item{time_type}{The temporal resolution to request this data. Most signals
+are available at the "day" resolution (the default); some are only
+available at the "week" resolution, representing an MMWR week ("epiweek").}
 }
 \value{
 Data frame with matching data. Each row is one observation of one
@@ -71,7 +76,9 @@ columns:
 \item{signal}{Signal from which this observation was obtained.}
 \item{geo_value}{String identifying the location, such as a state name or
 county FIPS code.}
-\item{time_value}{Date object identifying the date of this observation.}
+\item{time_value}{Date object identifying the date of this observation. For
+data with \code{time_type = "week"}, this is the first day of the corresponding
+epiweek.}
 \item{issue}{Date object identifying the date this estimate was issued.
 For example, an estimate with a \code{time_value} of June 3 might have been
 issued on June 5, after the data for June 3rd was collected and ingested
@@ -169,6 +176,6 @@ Documentation of all COVIDcast sources and signals:
 COVIDcast public map: \url{https://covidcast.cmu.edu/}
 }
 \seealso{
-\code{\link[=plot.covidcast_signal]{plot.covidcast_signal()}}, \code{\link{county_census}}, \code{\link{msa_census}},
-\code{\link{state_census}}
+\code{\link[=plot.covidcast_signal]{plot.covidcast_signal()}}, \code{\link[=covidcast_signals]{covidcast_signals()}}, \code{\link{county_census}},
+\code{\link{msa_census}}, \code{\link{state_census}}
 }

@@ -35,6 +35,7 @@ jobs:
             sudo apt-get install libcurl4-openssl-dev
             sudo apt-get install libudunits2-dev
             sudo apt-get install libgdal-dev
+            sudo apt-get install libicu-dev
       - name: Cache R packages
         uses: actions/cache@v2
         with:

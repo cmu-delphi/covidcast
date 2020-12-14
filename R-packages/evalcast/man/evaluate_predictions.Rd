@@ -2,31 +2,50 @@
 % Please edit documentation in R/evaluate.R
 \name{evaluate_predictions}
 \alias{evaluate_predictions}
-\title{Create a list of score cards}
+\title{Create a data frame of score cards}
 \usage{
 evaluate_predictions(
   predictions_cards,
   err_measures = list(wis = weighted_interval_score, ae = absolute_error, coverage_80 =
-    interval_coverage(alpha = 0.2)),
-  backfill_buffer = 10
+    interval_coverage(coverage = 0.8)),
+  backfill_buffer = 10,
+  side_truth = NULL,
+  grp_vars = c("forecaster", "forecast_date", "ahead", "geo_value")
 )
 }
 \arguments{
-\item{predictions_cards}{List of predictions cards from the same forecaster
-that are all for the same response, incidence period, and geo type. Each
-should be from a different forecast date or for a different ahead.  A
-predictions card is created by the function \code{\link[=get_predictions]{get_predictions()}}.}
+\item{predictions_cards}{tibble of predictions
+that are all for the same prediction task, meaning they are for the same
+response, incidence period, ahead, and geo type. Forecasts may be for a
+different forecast date or forecaster.
+A predictions card may be created by the function
+\code{\link[=get_predictions]{get_predictions()}}, downloaded with \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}} or
+possibly created manually.}
 
 \item{err_measures}{Named list of one or more functions, where each function
-takes a data frame with two columns \code{probs} and \code{quantiles} and an actual
-(i.e., observed) scalar value and returns some measure of error.  If empty,
-returns the scorecard without any error measure columns.}
+takes a data frame with three columns \code{quantile}, \code{value} and \code{actual}
+(i.e., observed) returns a scalar measure of error.}
 
 \item{backfill_buffer}{How many days until response is deemed trustworthy
 enough to be taken as correct? See details for more.}
+
+\item{side_truth}{you can optionally provide your own truth data (observed).
+Adding this column bypasses all checks to get appropriate data as
+reported at the time of the forecast. This column should either be a vector
+the same length as \code{predictions_cards} or a data frame that will be
+joined to \code{predictions_cards} by all available columns. If a data frame,
+the observed data should be named \code{actual}}
+
+\item{grp_vars}{character vector of named columns in the predictions_cards
+such that the combination gives a unique (quantile) prediction. Ignored if
+\code{predictions_cards} is of the type returned by \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}}
+or \code{\link[=get_predictions]{get_predictions()}} (class is \code{predictions_cards})}
 }
 \value{
-List of "score cards", with one element per ahead value.
+tibble of "score cards". Contains the same information as the
+\code{predictions_cards()} with additional columns for each err_measure and
+for the truth (named \code{actual}). All the columns may be necessary for
+some types of plotting, but it may be useful to shrink this down
 }
 \description{
 Performs backtesting, through the following steps:

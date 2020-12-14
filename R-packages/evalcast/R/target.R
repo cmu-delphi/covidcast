@@ -5,8 +5,7 @@
 #' @template ahead-template
 #'
 #' @importFrom MMWRweek MMWRweek  MMWRweek2Date
-#' @importFrom lubridate wday
-#' @importFrom assertthat assert_that
+#' @importFrom lubridate ymd wday
 #' @export
 get_target_period <- function(forecast_date, incidence_period, ahead) {
   # This function gives the start and end dates of the target period,
@@ -23,83 +22,100 @@ get_target_period <- function(forecast_date, incidence_period, ahead) {
   assert_that(incidence_period == "epiweek",
               msg="Unsupported `incidence_period`.")
   # incidence_period: epiweek
-  ew_frcst_date <- MMWRweek(forecast_date) # get epiweek of forecast_dates
-  sunday_of_ew_frcst_date <- MMWRweek2Date(MMWRyear = ew_frcst_date$MMWRyear,
-                                           MMWRweek = ew_frcst_date$MMWRweek,
-                                           MMWRday = 1) # 1 is Sunday
+  ew_frcst_date <- MMWRweek::MMWRweek(forecast_date) # get epiweek of forecast_dates
+  sunday_of_ew_frcst_date <- MMWRweek::MMWRweek2Date(
+    MMWRyear = ew_frcst_date$MMWRyear,
+    MMWRweek = ew_frcst_date$MMWRweek,
+    MMWRday = 1) # 1 is Sunday
   # From https://github.com/reichlab/covid19-forecast-hub/blob/master/data-processed/README.md:
   # "For week-ahead forecasts with forecast_date of Sunday or Monday of EW12, a
   # 1 week ahead forecast corresponds to EW12 and should have target_end_date of
   # the Saturday of EW12. For week-ahead forecasts with forecast_date of Tuesday
   # through Saturday of EW12, a 1 week ahead forecast corresponds to EW13 and
   # should have target_end_date of the Saturday of EW13."
-  week_ahead <- ifelse(wday(forecast_date) <= 2, # forecasting on a Sun/Monday
+  week_ahead <- ifelse(lubridate::wday(forecast_date) <= 2, # forecasting on a Sun/Monday
                        ahead - 1,
                        ahead)
   tibble(start = sunday_of_ew_frcst_date + week_ahead * 7,
          end = sunday_of_ew_frcst_date + (week_ahead + 1) * 7 - 1)
 }
 
-#' Get data frame with column names `forecast_date`, `location`, `target_start`,
-#' `target_end`, `actual`
-#'
-#' @template signals-template
-#' @template forecast_dates-template
-#' @template incidence_period-template
-#' @template ahead-template
-#' @template geo_type-template
-#'
-#' @importFrom rlang .data
-#' @importFrom tibble enframe
-#' @importFrom dplyr mutate left_join rename bind_rows group_by summarize
-#' @importFrom purrr pmap pmap_dfr pmap_lgl
-#' @importFrom assertthat assert_that
+
+
+
 get_target_response <- function(signals,
                                 forecast_dates,
                                 incidence_period,
                                 ahead,
-                                geo_type) {
+                                geo_type,
+                                geo_values) {
   response <- signals[1, ]
   target_periods <- forecast_dates %>%
     enframe(name = NULL, value = "forecast_date") %>%
-      mutate(incidence_period = incidence_period,
-           ahead = ahead) %>%
+    mutate(incidence_period = incidence_period, ahead = ahead) %>%
     pmap_dfr(get_target_period)
 
   # Compute the actual values that the forecaster is trying to
   # predict. In particular,
   # - get most recent data available from covidcast for these target periods
   # - sum up the response over the target incidence period
-  problems <- target_periods %>%
-    mutate(not_available = .data$end > Sys.Date())
-  assert_that(!any(problems$not_available),
-              msg=paste0("When `ahead` is ", ahead, ", it is too soon to evaluate ",
-                         "forecasts on these forecast dates: ",
-                         paste(forecast_dates[problems$not_available], collapse=", "),
-                         "."))
+  target_periods <- target_periods %>%
+    mutate(available = .data$end <= Sys.Date()) 
+  bad_dates <- forecast_dates[!target_periods$available]
+  
+  
+  # Altered to return results for any available forecasts
+  
+  if (length(bad_dates) > 0) {
+    # we try not to crash everything here. Instead, issue a warning.
+    warning(paste0("When `ahead` is ", ahead, ", it is too soon to evaluate ",
+                   "forecasts on these forecast dates: ",
+                   paste(bad_dates, collapse=", "),
+                   "."))
+    if (length(bad_dates) == length(forecast_dates)) return(empty_actual())
+    forecast_dates <- forecast_dates[target_periods$available]
+  }
+  target_periods <- target_periods %>% filter(.data$available) %>%
+    mutate(available = NULL)
+  
+  if (length(geo_values) > 30) geo_values = "*"
   out <- target_periods %>%
     rename(start_day = .data$start, end_day = .data$end) %>%
     mutate(data_source = response$data_source,
            signal = response$signal,
            geo_type = geo_type) %>%
-    pmap(download_signal)
+    pmap(download_signal, geo_values = geo_values) # apply_corrections would need to run here,
+                          # but can only use part of response
+                          # we don't allow this for now.
 
-  problem_date <- out %>% map_lgl(~ nrow(.x) == 0) %>% which()
-  assert_that(length(problem_date) == 0,
-              msg=paste0("No data available for the target periods of these ",
-                         "forecast dates: ",
-                         paste(forecast_dates[problem_date], collapse = ", "),
-                         "."))
+  problem_dates <- out %>% map_lgl(~ nrow(.x) == 0)
+  if (any(problem_dates)) {
+    warning(paste0("No data available for the target periods of these ",
+                   "forecast dates: ",
+                   paste(forecast_dates[problem_dates], collapse = ", "),
+                   "."))
+    if (length(problem_dates) == length(forecast_dates)) return(empty_actual())
+    out <- out[!problem_dates]
+    forecast_dates <- forecast_dates[!problem_dates]
+  }
   names(out) <- forecast_dates
+  target_periods$forecast_date = lubridate::ymd(forecast_dates)
   out <- out %>%
     bind_rows(.id = "forecast_date") %>%
     mutate(forecast_date = lubridate::ymd(.data$forecast_date)) %>%
-    group_by(.data$location, .data$forecast_date) %>%
+    group_by(.data$geo_value, .data$forecast_date) %>%
     summarize(actual = sum(.data$value)) %>%
 #    mutate(forecast_date = forecast_dates[as.numeric(.data$forecast_date)]) %>%
-    left_join(target_periods %>% mutate(forecast_date = forecast_dates),
-              by = "forecast_date")
+    left_join(target_periods, by = "forecast_date")
   # record date that this function was run for reproducibility
   attr(out, "as_of") <- Sys.Date()
-  return(out)
+  out
+}
+
+empty_actual <- function(){
+  out <- tibble(geo_value = character(0), forecast_date = lubridate::ymd(),
+                actual=double(0), start = lubridate::ymd(), 
+                end = lubridate::ymd()) %>% group_by(.data$geo_value)
+  attr(out, "as_of") <- Sys.Date()
+  out
 }

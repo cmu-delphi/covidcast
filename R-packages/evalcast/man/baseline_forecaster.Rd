@@ -56,9 +56,10 @@ prediction. If \code{FALSE}, then point predictions can be increasing or
 decreasing, depending on the historical trend.}
 }
 \value{
-Data frame with columns \code{ahead}, \code{location}, \code{probs}, \code{quantiles}.
-The \code{quantiles} column gives the predictive quantiles of the forecast
-distribution for that location and ahead.
+Data frame with columns \code{ahead}, \code{geo_value}, \code{quantile}, \code{value}.
+The \code{quantile} column gives the predicted quantiles of the forecast
+distribution for that location and ahead. An NA indicates a point forecast
+(same as the median in this case).
 }
 \description{
 The "flat-line" forecaster, which essentially mirrors the baseline in the

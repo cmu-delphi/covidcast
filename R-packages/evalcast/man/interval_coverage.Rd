@@ -4,13 +4,13 @@
 \alias{interval_coverage}
 \title{Generate interval coverage error measure function}
 \usage{
-interval_coverage(alpha)
+interval_coverage(coverage)
 }
 \arguments{
-\item{alpha}{Parameter defining nominal interval coverage.}
+\item{coverage}{Nominal interval coverage (from 0 to 1).}
 }
 \description{
 Returns an error measure function indicating whether a central interval
 covers the actual value. The interval is defined as the (alpha/2)-quantile
-to the (1 - alpha/2)-quantile.
+to the (1 - alpha/2)-quantile, where alpha = 1 - coverage.
 }

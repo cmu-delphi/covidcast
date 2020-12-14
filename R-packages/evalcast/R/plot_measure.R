@@ -1,17 +1,13 @@
-#' Plot error measure
+#' Plot error measure (deprecated)
 #'
 #' @param scorecards List of different score cards, all on the same forecasting
 #'   task (i.e., same ahead, etc.).
 #' @param err_name Name of a column appearing in all score cards.
 #' @param type One of "boxplot" or "dotplot".
 #'
-#' @importFrom covidcast fips_to_name
-#' @importFrom rlang .data
-#' @importFrom purrr map_chr
-#' @importFrom ggplot2 ggplot aes geom_boxplot facet_wrap scale_y_log10 geom_point theme
-#' @importFrom dplyr group_by mutate summarize arrange if_else
 #' @export
 plot_measure <- function(scorecards, err_name, type = "boxplot") {
+  stop("This function has been deprecated. Pass the scorecards to ggplot.")
   # make sure scorecards are comparable:
   unique_attr(scorecards, "ahead")
   unique_attr(scorecards, "as_of")

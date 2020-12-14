@@ -7,7 +7,9 @@
 plot_coverage(
   scorecards,
   type = c("all", "one"),
-  alpha = 0.2,
+  grp_vars = c("forecaster", "forecast_date", "ahead"),
+  avg_vars = c("geo_value"),
+  coverage = 0.8,
   legend_position = "bottom"
 )
 }
@@ -17,11 +19,17 @@ task (i.e., same ahead, etc.).}
 
 \item{type}{One of "all" or "none", indicating whether to show coverage
 across all nominal levels (in which case averaging is performed across
-forecast dates and locations) or whether to show it for one specific alpha
+\code{avg_vars}) or whether to show it for one specific alpha
 value.}
 
-\item{alpha}{If \code{type = "one"}, then 1-alpha is the nominal interval coverage
-shown.}
+\item{grp_vars}{variables over which to compare coverage. The first
+determines the color of the lines while the rest will be faceted over}
+
+\item{avg_vars}{variables over which we average to determine the proportion
+of coverage. If \code{type = "one"},}
+
+\item{coverage}{If \code{type = "one"}, then coverage is the nominal interval
+coverage shown.}
 
 \item{legend_position}{Legend position, the default being "bottom".}
 }

@@ -7,7 +7,8 @@
 plot_calibration(
   scorecard,
   type = c("wedgeplot", "traditional"),
-  alpha = 0.2,
+  grp_vars = c("forecaster", "forecast_date", "ahead"),
+  avg_vars = c("geo_value"),
   legend_position = "bottom"
 )
 }
@@ -16,7 +17,10 @@ plot_calibration(
 
 \item{type}{One of "wedgeplot" or "traditional".}
 
-\item{alpha}{Deprecated parameter to be removed soon.}
+\item{grp_vars}{variables over which to compare calibration. These
+determines the color of the lines and faceting depending on \code{type}}
+
+\item{avg_vars}{variables over which we average to determine the calibration.}
 
 \item{legend_position}{Legend position, the default being "bottom".}
 }

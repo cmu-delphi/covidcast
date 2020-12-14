@@ -6,20 +6,24 @@
 \usage{
 plot_width(
   cards,
-  alpha = 0.2,
   levels = c(0.5, 0.7, 0.9),
+  grp_vars = c("forecaster", "forecast_date", "ahead"),
+  avg_vars = c("geo_value"),
   legend_position = "bottom"
 )
 }
 \arguments{
-\item{cards}{List of different score cards (or predictions cards), all on the
-same forecasting task (i.e., same ahead, etc.).}
-
-\item{alpha}{Deprecated parameter to be removed soon.}
+\item{cards}{scorecards or predictions cards (or a data frame with columns
+\code{quantile}, \code{value} and any grouping vars and averaging vars)}
 
 \item{levels}{Quantile levels for the summary of interval width, to be
 plotted. For example, \code{levels = c(0.5, 0.7, 0.9)}, the default, plots the
 median, 70\% and 90\% quantiles of interval widths.}
+
+\item{grp_vars}{variables over which to compare widths The first
+determines the color of the lines while the rest will be faceted over}
+
+\item{avg_vars}{variables over which we compute quantiles.}
 
 \item{legend_position}{Legend position, the default being "bottom".}
 }

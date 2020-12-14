@@ -4,10 +4,12 @@
 \alias{absolute_error}
 \title{Compute absolute error}
 \usage{
-absolute_error(quantile_forecasts, actual_value)
+absolute_error(quantile, value, actual_value)
 }
 \arguments{
-\item{quantile_forecasts}{Tibble of quantile forecasts.}
+\item{quantile}{vector of forecasted quantiles}
+
+\item{value}{vector of forecasted values}
 
 \item{actual_value}{Actual value.}
 }

@@ -2,63 +2,115 @@
 #'
 #' @param scorecard Single score card.
 #' @param type One of "wedgeplot" or "traditional".
-#' @param alpha Deprecated parameter to be removed soon.
+#' @param grp_vars variables over which to compare calibration. These
+#'   determines the color of the lines and faceting depending on `type`
+#' @param avg_vars variables over which we average to determine the calibration.
 #' @param legend_position Legend position, the default being "bottom".
 #'
-#' @importFrom rlang .data
-#' @importFrom ggplot2 ggplot aes geom_point geom_abline geom_vline geom_hline labs scale_colour_discrete scale_alpha_continuous scale_size_continuous guides facet_wrap xlim ylim theme_bw theme 
-#' @importFrom dplyr filter mutate recode
-#' @importFrom tidyr pivot_longer
 #' @export
 plot_calibration <- function(scorecard,
                              type = c("wedgeplot", "traditional"),
-                             alpha = 0.2,
+                             grp_vars = c("forecaster", "forecast_date", "ahead"),
+                             avg_vars = c("geo_value"),
                              legend_position = "bottom") {
-  name <- attr(scorecard, "name_of_forecaster")
-  ahead <- attr(scorecard, "ahead")
+  
   type <- match.arg(type)
+  grp_tbl <- scorecard %>% 
+    summarise(across(all_of(grp_vars), ~n_distinct(.x))) %>%
+    pivot_longer(everything()) %>%
+    filter(.data$value > 1) 
+  if (nrow(grp_tbl) > 0) {
+    grps <- grp_tbl %>% 
+      arrange(desc(.data$value)) %>%
+      select(.data$name) %>%
+      pull()
+  }
+    
   if (type == "wedgeplot") {
-    g <- compute_calibration(scorecard) %>%
-      pivot_longer(contains("prop"),
-                   names_to = "coverage_type",
-                   values_to = "proportion") %>%
-      filter(.data$coverage_type != "prop_covered") %>%
-      mutate(emph = ifelse((.data$coverage_type == "prop_above" & .data$nominal_quantile < 0.5) |
-                              (.data$coverage_type == "prop_below" & .data$nominal_quantile >= 0.5), 0.5, 1)) %>%
-      mutate(coverage_type = recode(.data$coverage_type,
-                                    prop_above = "Proportion above",
-                                    prop_below = "Proportion below")) %>%
-      ggplot(aes(x = .data$nominal_quantile,
+    assert_that(nrow(grp_tbl) < 3,
+                msg = paste("For wedgeplots, it's challenging to see results",
+                            "with more than two groupings. Either filter your",
+                            "scorecard, use the traditional version, or try",
+                            "writing your own version."))
+    calib <- compute_calibration(scorecard, grp_vars, avg_vars) %>%
+      setup_wedgeplot()
+
+    g <- calib %>%
+      ggplot(aes(x = .data$nominal_prob,
                  y = .data$proportion,
                  colour = .data$coverage_type)) +
       geom_line(aes(alpha = .data$emph, size = .data$emph)) +
+      scale_color_manual(values = c("blue","orange"), name="") +
       geom_point(aes(alpha = .data$emph, size = .data$emph)) +
       geom_abline(intercept = 0, slope = 1) +
       geom_abline(intercept = 1, slope = -1) +
       labs(x = "Nominal quantile level",
            y = "Proportion",
-           title = sprintf("%s (ahead = %s): Proportion above/below", name, ahead)) +
-      scale_colour_discrete(name = "") +
+           title = sprintf("%s (ahead = %s): Proportion above/below", 
+                           .data$name, .data$ahead)) +
       scale_alpha_continuous(range = c(0.5, 1)) +
       scale_size_continuous(range = c(0.5, 1)) +
       guides(alpha = FALSE, size = FALSE)
+    if (nrow(grp_tbl) == 2L) {
+      g <- g + facet_grid(stats::as.formula(paste(grps, collapse = "~")))
+    }
+    if (nrow(grp_tbl) == 1L) {
+      g <- g + facet_wrap(stats::as.formula(paste0("~", grps)))
+    }
+    
   } else if (type == "traditional") {
-    calib <- compute_actual_vs_nominal_prob(scorecard)
+    assert_that(nrow(grp_tbl) < 4,
+                msg = paste("For traditional calibration plots, it's",
+                            "challenging to see results",
+                            "with more than three groupings. Either filter",
+                            "your scorecard or try writing your own version."))
+    calib <- compute_calibration(scorecard, grp_vars, avg_vars)
     g <- calib %>%
       ggplot(aes(x = .data$nominal_prob, y = .data$prop_below)) +
-      geom_line(color = "red") +
-      geom_point(color = "red") +
       geom_abline(slope = 1, intercept = 0) +
       labs(x = "Quantile level",
            y = "Proportion",
-           title = sprintf("%s (ahead %s): Calibration", name, ahead))
+           title = sprintf("%s (ahead %s): Calibration", 
+                           .data$name, .data$ahead))
+    if (nrow(grp_tbl) == 3L) {
+      g <- g + geom_line(aes(color = !!sym(grps[1]))) +
+        scale_color_viridis_d() +
+        facet_grid(stats::as.formula(paste(grps[2:3], collapse = "~")))
+    }
+    if (nrow(grp_tbl) == 2L) {
+      g <- g + geom_line(aes(color = !!sym(grps[1]))) +
+        scale_color_viridis_d() +
+        facet_wrap(stats::as.formula(paste0("~", grps[2])))
+    }
+    if (nrow(grp_tbl) == 1L) {
+      g <- g + geom_line(color="orange") + geom_point() + 
+        facet_wrap(stats::as.formula(paste0("~", grps)))
+    }
   }
-  g +
-    facet_wrap(~ forecast_date) +
-    xlim(0, 1) +
-    ylim(0, 1) +
-    theme_bw() + theme(legend.position = legend_position)
+  g + xlim(0, 1) + ylim(0, 1) + theme_bw() + 
+    theme(legend.position = legend_position)
 }
+
+#' Preprocessing for wedge calibration plot
+#'
+#' @param calib the output from [compute_calibration()]
+#'
+#' @return a data frame
+#' @export
+setup_wedgeplot <- function(calib) {
+  calib %>%
+    pivot_longer(contains("prop"), 
+                 names_to = "coverage_type", 
+                 values_to = "proportion") %>%
+    mutate(emph = ifelse(
+      (.data$coverage_type == "prop_above" & .data$nominal_prob < 0.5) |
+        (.data$coverage_type == "prop_below" & .data$nominal_prob >= 0.5), 
+      0.5, 1)) %>%
+    mutate(coverage_type = recode(.data$coverage_type,
+                                  prop_above = "Proportion above",
+                                  prop_below = "Proportion below"))
+}
+
 
 #' Plot interval coverage
 #'
@@ -66,53 +118,92 @@ plot_calibration <- function(scorecard,
 #'   task (i.e., same ahead, etc.).
 #' @param type One of "all" or "none", indicating whether to show coverage
 #'   across all nominal levels (in which case averaging is performed across
-#'   forecast dates and locations) or whether to show it for one specific alpha
+#'   `avg_vars`) or whether to show it for one specific alpha
 #'   value.
-#' @param alpha If `type = "one"`, then 1-alpha is the nominal interval coverage
-#'   shown.
+#' @param grp_vars variables over which to compare coverage. The first 
+#'   determines the color of the lines while the rest will be faceted over
+#' @param avg_vars variables over which we average to determine the proportion
+#'   of coverage. If `type = "one"`, 
+#' @param coverage If `type = "one"`, then coverage is the nominal interval 
+#'   coverage shown.
 #' @param legend_position Legend position, the default being "bottom".
 #' 
-#' @importFrom rlang .data set_names
-#' @importFrom purrr map_dfr
-#' @importFrom ggplot2 ggplot geom_abline geom_vline geom_hline labs facet_wrap xlim ylim theme_bw theme 
 #' @export 
-plot_coverage <- function(scorecards, type = c("all", "one"), alpha = 0.2, 
+plot_coverage <- function(scorecards, 
+                          type = c("all", "one"), 
+                          grp_vars = c("forecaster", "forecast_date", "ahead"),
+                          avg_vars = c("geo_value"),
+                          coverage = 0.8, 
                           legend_position = "bottom") {
   type <- match.arg(type)
   # make sure scorecards are comparable:
-  unique_attr(scorecards, "ahead")
-  unique_attr(scorecards, "as_of")
-  unique_attr(scorecards, "geo_type")
-  unique_attr(scorecards, "incidence_period")
-  unique_attr(scorecards, "backfill_buffer")
-  unique_attr(scorecards, "response")
-  scorecards <- intersect_locations(scorecards)
-  cover <- scorecards %>%
-    set_names(all_attr(scorecards, "name_of_forecaster")) %>%
-    map_dfr(compute_coverage, .id = "forecaster")
+  grps <- grp_processing_for_facets(scorecards, grp_vars)
+  ngrps <- length(grps)
+  
+  cover <- compute_coverage(scorecards, grp_vars, avg_vars)
   if (type == "all") {
-    cover %>%
-      ggplot(aes(x = .data$nominal_coverage_prob,
-                 y = .data$prop_covered,
-                 color = .data$forecaster)) +
-      geom_line() +
+   
+    assert_that(ngrps < 4,
+                msg = paste("For `all` coverage plots, it's",
+                            "challenging to see results",
+                            "with more than three groupings. Either filter",
+                            "your scorecard or try writing your own version."))
+    
+    g <- cover %>%
+      ggplot(aes(x = .data$nominal_prob, y = .data$prop_covered)) +
       geom_abline(slope = 1, intercept = 0) +
-      facet_wrap(~ .data$forecast_date) +
       xlim(0, 1) +
       ylim(0, 1) +
-      labs(x = "Nominal coverage", y = "Empirical coverage") +
-      theme_bw() + theme(legend.position = legend_position)
+      labs(x = "Nominal coverage", y = "Empirical coverage")
+    
+    
+    if (ngrps == 3L) {
+      g <- g + geom_line(aes(color = !!sym(grps[1]))) +
+        scale_color_viridis_d() +
+        facet_grid(stats::as.formula(paste(grps[2:3], collapse = "~")))
+    }
+    if (ngrps == 2L) {
+      g <- g + geom_line(aes(color = !!sym(grps[1]))) +
+        scale_color_viridis_d() +
+        facet_wrap(stats::as.formula(paste0("~", grps[2])))
+    }
+    if (ngrps == 1L) {
+      g <- g + geom_line(aes(color = !!sym(grps)))
+    }
+    if (ngrps == 0L) {
+      g <- g + geom_line(color = "orange") + geom_point(color="orange")
+    }
   } else {
-    cover %>%
-      filter(.data$nominal_coverage_prob == 1 - alpha) %>%
-      group_by(.data$forecast_date, .data$forecaster) %>%
+    assert_that(ngrps < 5,
+                msg = paste("For `one` coverage plots, it's",
+                            "challenging to see results",
+                            "with more than four groupings. Either filter",
+                            "your scorecard or try writing your own version."))
+    g <- cover %>%
+      filter(.data$nominal_prob == coverage) %>%
+      group_by(across(all_of(grp_vars))) %>%
       summarize(prop_covered = mean(.data$prop_covered, na.rm = TRUE)) %>%
-      ggplot(aes(x = .data$forecast_date,
-                 y = .data$prop_covered,
-                 color = .data$forecaster)) +
-      geom_point() + geom_line() +
+      ggplot(aes(x = !! sym(grps[1]),
+                 y = .data$prop_covered)) +
       geom_hline(yintercept = 1 - alpha, lty = 2) +
-      labs(x = "Forecast date", y = "Empirical coverage") +
-      theme_bw() + theme(legend.position = legend_position)
+      labs(x = grps[1], y = "Empirical coverage")
+    if (ngrps > 1L) {
+      g <- g + 
+        geom_line(aes(color = !!sym(grps[2]))) +
+        geom_point(aes(color = !!sym(grps[2]))) +
+        scale_color_viridis_d()
+    }
+    if (ngrps == 4L) {
+      g <- g + facet_grid(stats::as.formula(paste(grps[3:4], collapse = "~")))
+    }
+    if (ngrps == 3L) {
+      g <- g + facet_wrap(stats::as.formula(paste0("~", grps[3])))
+    }
+    if (ngrps == 1L) {
+      g <- g + 
+        geom_line(color = "orange") +
+        geom_point(color = "orange")
+    }
   }
+  g + theme_bw() + theme(legend.position = legend_position)
 }

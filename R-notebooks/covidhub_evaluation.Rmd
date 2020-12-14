@@ -688,7 +688,7 @@ And now with the 90th percentile as the aggregator.
 ### State
 
 ```{r, fig.width = 10, fig.height = 10}
-theta_state = pairwise_tournament(score_cards_county, var = "wis", aggr =
+theta_state = pairwise_tournament(score_cards_state, var = "wis", aggr =
                               function(x) quantile(x, prob = 0.9, na.rm = TRUE))
 
 ranked_list = rownames(theta_state$mat)[order(theta_state$vec1)]

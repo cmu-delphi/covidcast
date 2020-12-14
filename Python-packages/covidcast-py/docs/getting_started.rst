@@ -42,6 +42,9 @@ The data come from a variety of sources and cover information including official
 internet search trends, hospital encounters, survey responses, and more. Below is
 a brief overview of each source, with links to their full descriptions.
 
+- `Change Healthcare <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/chng.html>`_
+    - Outpatient visits with COVID diagnostic codes, based on de-identified
+      medical claims data.
 - `Doctor Visits <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html>`_
     - Outpatient visits with COVID-related symptoms.
 - `Google Health Trends <https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/ght.html>`_

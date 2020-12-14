@@ -1,6 +1,7 @@
 # covidcast
 
-Public-facing tools supporting [Delphi's](https://delphi.cmu.edu)
+R and Python packages, and related public-facing tools and materials,
+supporting [Delphi's](https://delphi.cmu.edu) 
 [COVIDcast](https://covidcast.cmu.edu) effort. 
 
 ## API clients
@@ -12,14 +13,6 @@ provides access to Delphi's COVID-19 indicators and related data:
 - R: [covidcast](https://cmu-delphi.github.io/covidcast/covidcastR/)
 - Python: [covidcast](https://cmu-delphi.github.io/covidcast/covidcast-py/html/)
 
-## R notebooks
-
-This repository also includes some (very preliminary) R notebooks for monitoring
-our signals: 
-
-- [Signal correlations](https://cmu-delphi.github.io/covidcast/R-notebooks/signal_correlations.html)
-- [Facebook survey dashboard](https://cmu-delphi.github.io/covidcast/R-notebooks/fb_dashboard.html)
-
 ## Presentations
 
 This repository also includes some talks we've given about the COVIDcast project: 
@@ -28,6 +21,7 @@ This repository also includes some talks we've given about the COVIDcast project
 - [Survey Through Facebook](https://cmu-delphi.github.io/covidcast/talks/fb-survey/talk.html)
 - [Medical Claims Indicators](https://docs.google.com/presentation/d/1Pt2qMwIHyyuyGwwigZyndPGjcjILAS6RYxBcXKuuQ4U/edit?usp=sharing)
 - [Forecast Evaluation Toolkit](https://cmu-delphi.github.io/covidcast/talks/evalcast/talk.html)
+- [Overview Talk: Data, API, Surveys](https://cmu-delphi.github.io/covidcast/talks/aws/talk.html)
 
 ## Related repos
 

@@ -15,7 +15,9 @@ Released TODO DATE.
 
 - `covidcast_signal()`, `covidcast_signals()`, and `covidcast_meta()` now
   support signals with `time_type = "week"`. Select signals in the API are
-  offered at weekly resolution.
+  offered at weekly resolution. They also now support signals with `geo_types`
+  of "nation" and "hhs", corresponding to national estimates and Department of
+  Health & Human Services Regional Offices ("HHS regions").
 
 - `covidcast_signal()` now batches requests, so that many days of data can be
   fetched in one API call. This dramatically improves the speed of fetching

@@ -13,6 +13,10 @@ Released TODO DATE.
   filter data frames with multiple issues of each observation, obtaining only
   the latest or earliest issue of each.
 
+- `covidcast_signal()`, `covidcast_signals()`, and `covidcast_meta()` now
+  support signals with `time_type = "week"`. Select signals in the API are
+  offered at weekly resolution.
+
 - `covidcast_signal()` now batches requests, so that many days of data can be
   fetched in one API call. This dramatically improves the speed of fetching
   state-, MSA-, and HRR-level data, since many days of data can be fetched in

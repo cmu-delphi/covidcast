@@ -1,7 +1,8 @@
 Package: covidcast
 Type: Package
-Title: Client for Delphi's COVIDcast API
-Version: 0.3.1
+Title: Client for Delphi's COVIDcast Epidata API
+Version: 0.4.0
+Date: 2020-12-21
 Authors@R: 
   c(
     person(given = "Jacob",
@@ -32,7 +33,7 @@ Authors@R:
 URL: https://cmu-delphi.github.io/covidcast/covidcastR/,
     https://github.com/cmu-delphi/covidcast 
 BugReports: https://github.com/cmu-delphi/covidcast/issues
-Description: Tools for Delphi's COVIDcast API: data access (for Delphi's
+Description: Tools for Delphi's COVIDcast Epidata API: data access (for Delphi's
     COVID-19 indicators), maps and time series plotting, and basic signal
     processing.
 Depends: R (>= 3.5.0)

@@ -263,6 +263,18 @@ Compute summary statistics.
 load(file = "predictions_cards.rda")
 load(file = "score_cards_county.rda")
 load(file = "score_cards_state.rda")
+score_cards_county_cmu = score_cards_county %>% 
+                    filter(forecaster == "CMU-TimeSeries") %>% 
+                    distinct(ahead, geo_value, target_end_date)
+
+score_cards_county = semi_join(score_cards_county, score_cards_county_cmu)
+
+
+score_cards_state_cmu = score_cards_state %>% 
+                    filter(forecaster == "CMU-TimeSeries") %>% 
+                    distinct(ahead, geo_value, target_end_date)
+score_cards_state = semi_join(score_cards_state, score_cards_state_cmu)
+
 recent_score_by_frcstr = score_cards_state %>% 
                            filter(target_end_date > today() - 28) %>%
                            group_by(forecaster, ahead) %>% 
@@ -274,7 +286,7 @@ recent_score_by_frcstr = recent_score_by_frcstr %>%
                            mutate(num_total = num_1 + num_2 + num_3 + num_4) %>%
                            arrange(desc(num_total))
 print(recent_score_by_frcstr, n = Inf)
-max_forecasts = 51 * 24 * 4 * 4 # States * quantiles * ahead * weeks
+max_forecasts = max(recent_score_by_frcstr$num_total)
 
 active_forecasters = recent_score_by_frcstr[recent_score_by_frcstr$num_total > max_forecasts / 2,]$forecaster
 # CovidAnalytics-DELPHI and IHME-CurveFit didn't submit that many forecasts ...
@@ -292,8 +304,9 @@ recent_score_by_frcstr = recent_score_by_frcstr %>%
                            mutate(num_total = num_1 + num_2 + num_3 + num_4) %>%
                            arrange(desc(num_total))
 print(recent_score_by_frcstr, n = Inf)
+max_forecasts = max(recent_score_by_frcstr$num_total)
 
-active_forecasters = recent_score_by_frcstr[recent_score_by_frcstr$num_total > 10000,]$forecaster
+active_forecasters = recent_score_by_frcstr[recent_score_by_frcstr$num_total > max_forecasts / 2,]$forecaster
 # CovidAnalytics-DELPHI and IHME-CurveFit didn't submit that many forecasts ...
 score_cards_county = score_cards_county %>% 
                     filter(forecaster %in% active_forecasters)

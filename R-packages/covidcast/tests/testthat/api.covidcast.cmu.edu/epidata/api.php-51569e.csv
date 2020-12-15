@@ -1,0 +1,6 @@
+geo_value,signal,time_value,issue,lag,value,stderr,sample_size
+01000,barweek,202001,202002,1,1.0,0.1,2.0
+01000,barweek,202002,202003,1,2.0,0.2,3.0
+01000,barweek,202003,202004,1,3.0,0.3,4.0
+01000,barweek,202004,202005,1,4.0,0.4,5.0
+01000,barweek,202005,202006,1,5.0,0.5,6.0

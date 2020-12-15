@@ -1,5 +1,6 @@
 library(httptest)
 library(mockery)
+library(MMWRweek)
 library(dplyr)
 
 # Many of these tests use mockery::with_mock_api. This replaces calls to the
@@ -48,15 +49,18 @@ with_mock_api({
                  structure(
                    data.frame(
                      data_source = "foo",
-                     signal = c("bar", "bar2"),
-                     time_type = "day",
+                     signal = c("bar", "bar2", "barweek"),
+                     time_type = c("day", "day", "week"),
                      geo_type = "county",
-                     min_time = as.Date(c("2020-01-01", "2020-10-02")),
-                     max_time = as.Date(c("2020-01-02", "2020-10-03")),
+                     min_time = c(as.Date(c("2020-01-01", "2020-10-02")),
+                                  MMWRweek2Date(2020, 1)),
+                     max_time = c(as.Date(c("2020-01-02", "2020-10-03")),
+                                  MMWRweek2Date(2020, 50)),
                      min_value = 0,
                      max_value = 10,
                      num_locations = 100,
-                     max_issue = as.Date(c("2020-04-04", "2020-11-01"))
+                     max_issue = c(as.Date(c("2020-04-04", "2020-11-01")),
+                                   MMWRweek2Date(2020, 51))
                    ),
                    class = c("covidcast_meta", "data.frame")
                  ))
@@ -123,7 +127,8 @@ with_mock_api({
       ),
       class = c("covidcast_signal", "data.frame"),
       metadata = data.frame(geo_type = "county", num_locations = 100,
-                            data_source = "foo", signal = "bar-not-found")
+                            data_source = "foo", signal = "bar-not-found",
+                            time_type = "day")
       )
     )
   })
@@ -138,6 +143,38 @@ with_mock_api({
                                    start_day = c("2020-01-01", "2020-01-02")))
     expect_error(covidcast_signals("foo", "bar",
                                    end_day = c("2020-01-01", "2020-01-02")))
+  })
+
+  test_that("covidcast_signal fetches signals with time_type = week", {
+    # api.php-51569e.csv
+    # this covers 5 MMWR weeks, weeks 1-5
+    foo <- covidcast_signal("foo", "barweek", "2020-01-01", "2020-02-01",
+                            time_type = "week")
+
+    expect_equal(
+      foo,
+      structure(data.frame(
+        data_source = "foo",
+        signal = "barweek",
+        geo_value = "01000",
+        time_value = MMWRweek2Date(rep(2020, 5), 1:5),
+        issue = MMWRweek2Date(rep(2020, 5), 2:6),
+        lag = 1,
+        value = 1:5,
+        stderr = c(0.1, 0.2, 0.3, 0.4, 0.5),
+        sample_size = 2:6
+      ),
+      class = c("covidcast_signal", "data.frame"),
+      metadata = data.frame(data_source = "foo", signal = "barweek",
+                            time_type = "week", geo_type = "county",
+                            min_time = MMWRweek2Date(2020, 1),
+                            max_time = MMWRweek2Date(2020, 50),
+                            min_value = 0,
+                            max_value = 10, num_locations = 100,
+                            max_issue = MMWRweek2Date(2020, 51))
+      ),
+      ignore_attr = "row.names"
+    )
   })
 })
 
@@ -167,6 +204,7 @@ test_that("covidcast_days does not treat \"*\" as a missing geo_value", {
       as_of = NULL,
       issues = NULL,
       lag = NULL,
+      time_type = "day",
       max_geos = 1),
     regexp = NA)
 })
@@ -197,6 +235,7 @@ test_that("covidcast_days does not raise warnings for full response", {
       as_of = NULL,
       issues = NULL,
       lag = NULL,
+      time_type = "day",
       max_geos = 1),
     regexp = NA)
 })
@@ -231,6 +270,7 @@ test_that("covidcast_days batches calls to covidcast", {
         geo_value = "*",
         as_of = NULL,
         issues = NULL,
+        time_type = "day",
         lag = NULL,
         max_geos = 1000
       ),
@@ -292,7 +332,7 @@ test_that("as.covidcast_signal produces valid covidcast_signal objects", {
     ),
     class = c("covidcast_signal", "data.frame"),
     metadata = data.frame(data_source = "user", signal = "foo",
-                          geo_type = "county")
+                          geo_type = "county", time_type = "day")
   )
 
   expect_equal(as.covidcast_signal(foo,
@@ -311,7 +351,7 @@ test_that("as.covidcast_signal produces valid covidcast_signal objects", {
     ),
     class = c("covidcast_signal", "data.frame"),
     metadata = data.frame(data_source = "some-source", signal = "some-signal",
-                          geo_type = "county")
+                          geo_type = "county", time_type = "day")
   )
 
   expect_equal(

@@ -13,7 +13,8 @@ covidcast_signal(
   geo_values = "*",
   as_of = NULL,
   issues = NULL,
-  lag = NULL
+  lag = NULL,
+  time_type = c("day", "week")
 )
 }
 \arguments{
@@ -26,8 +27,8 @@ see the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.
 for a list of available signals.}
 
 \item{start_day}{Query data beginning on this date. Date object, or string in
-the form "YYYY-MM-DD". If \code{start_day} is \code{NULL}, defaults to first day
-data is available for this signal.}
+the form "YYYY-MM-DD". If \code{start_day} is \code{NULL}, defaults to first day data
+is available for this signal.}
 
 \item{end_day}{Query data up to this date, inclusive. Date object or string
 in the form "YYYY-MM-DD". If \code{end_day} is \code{NULL}, defaults to the most
@@ -37,21 +38,22 @@ recent day data is available for this signal.}
 "county" or "state". Defaults to "county". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
 for details on which types are available.}
 
-\item{geo_values}{Which geographies to return. The default, "*", fetches
-all geographies. To fetch specific geographies, specify their IDs as a
-vector or list of strings. See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
+\item{geo_values}{Which geographies to return. The default, "*", fetches all
+geographies. To fetch specific geographies, specify their IDs as a vector
+or list of strings. See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
 for details on how to specify these IDs.}
 
 \item{as_of}{Fetch only data that was available on or before this date,
-provided as a \code{Date} object or string in the form "YYYY-MM-DD". If
-\code{NULL}, the default, return the most recent available data. Note that only
-one of \code{as_of}, \code{issues}, and \code{lag} should be provided; it does not make
-sense to specify more than one.}
+provided as a \code{Date} object or string in the form "YYYY-MM-DD". If \code{NULL},
+the default, return the most recent available data. Note that only one of
+\code{as_of}, \code{issues}, and \code{lag} should be provided; it does not make sense to
+specify more than one. For more on data revisions, see
+"Issue dates and revisions" below.}
 
 \item{issues}{Fetch only data that was published or updated ("issued") on
 these dates. Provided as either a single \code{Date} object (or string in the
-form "YYYY-MM-DD"), indicating a single date to fetch data issued on, or
-a vector specifying two dates, start and end. In this case, return all data
+form "YYYY-MM-DD"), indicating a single date to fetch data issued on, or a
+vector specifying two dates, start and end. In this case, return all data
 issued in this range. There may be multiple rows for each observation,
 indicating several updates to its value. If \code{NULL}, the default, return the
 most recently issued data.}
@@ -61,9 +63,14 @@ was published or updated exactly 3 days after the date. For example, a row
 with \code{time_value} of June 3 will only be included in the results if its
 data was issued or updated on June 6. If \code{NULL}, the default, return the
 most recently issued data regardless of its lag.}
+
+\item{time_type}{The temporal resolution to request this data. Most signals
+are available at the "day" resolution (the default); some are only
+available at the "week" resolution, representing an MMWR week ("epiweek").}
 }
 \value{
-Data frame with matching data. Each row is one observation of one
+\code{covidcast_signal} object with matching data. The object is a data
+frame with additional metadata attached. Each row is one observation of one
 signal on one day in one geographic location. Contains the following
 columns:
 
@@ -71,7 +78,9 @@ columns:
 \item{signal}{Signal from which this observation was obtained.}
 \item{geo_value}{String identifying the location, such as a state name or
 county FIPS code.}
-\item{time_value}{Date object identifying the date of this observation.}
+\item{time_value}{Date object identifying the date of this observation. For
+data with \code{time_type = "week"}, this is the first day of the corresponding
+epiweek.}
 \item{issue}{Date object identifying the date this estimate was issued.
 For example, an estimate with a \code{time_value} of June 3 might have been
 issued on June 5, after the data for June 3rd was collected and ingested
@@ -89,6 +98,9 @@ due to privacy or other constraints, in which case it will be \code{NA}.}
 
 Consult the signal documentation for more details on how values and
 standard errors are calculated for specific signals.
+
+The returned data frame has a \code{metadata} attribute containing metadata
+about the signal contained within; see "Metadata" below for details.
 }
 \description{
 Obtains data for selected date ranges for all geographic regions of the
@@ -106,6 +118,29 @@ package provides the \code{\link{county_census}}, \code{\link{msa_census}}, and 
 datasets. These include each area's unique identifier, used in the
 \code{geo_values} argument to select specific areas, and basic information on
 population and other Census data.
+
+Downloading large amounts of data may be slow, so this function prints
+messages for each day of data it downloads. To suppress these, use
+\code{\link[base:message]{base::suppressMessages()}}, as in
+\code{suppressMessages(covidcast_signal("fb-survey", ...))}.
+}
+\section{Metadata}{
+
+
+The returned object has a \code{metadata} attribute attached containing basic
+information about the signal. Use \code{attributes(x)$metadata} to access this
+metadata. The metadata is stored as a data frame of one row, and contains the
+same information that \code{covidcast_meta()} would return for a given signal.
+
+Note that not all \code{covidcast_signal} objects may have all fields of metadata
+attached; for example, an object created with \code{as.covidcast_signal()} using
+data from another source may only contain the \code{geo_type} variable, along with
+\code{data_source} and \code{signal}. Before using the metadata of a \code{covidcast_signal}
+object, always check for the presence of the attributes you need.
+}
+
+\section{Issue dates and revisions}{
+
 
 The COVIDcast API tracks updates and changes to its underlying data, and
 records the first date each observation became available. For example, a data
@@ -134,12 +169,8 @@ However, if data for one day has been issued many times, using the \code{issues}
 argument may return more results than the query limit. A warning will be
 issued in this case. To see all results, split your query across multiple
 calls with different \code{issues} arguments.
-
-Downloading large amounts of data may be slow, so this function prints
-messages for each day of data it downloads. To suppress these, use
-\code{\link[base:message]{base::suppressMessages()}}, as in
-\code{suppressMessages(covidcast_signal("fb-survey", ...))}.
 }
+
 \examples{
 \dontrun{
 ## Fetch all counties from 2020-05-10 to the most recent available data
@@ -169,6 +200,7 @@ Documentation of all COVIDcast sources and signals:
 COVIDcast public map: \url{https://covidcast.cmu.edu/}
 }
 \seealso{
-\code{\link[=plot.covidcast_signal]{plot.covidcast_signal()}}, \code{\link{county_census}}, \code{\link{msa_census}},
+\code{\link[=plot.covidcast_signal]{plot.covidcast_signal()}}, \code{\link[=covidcast_signals]{covidcast_signals()}},
+\code{\link[=as.covidcast_signal]{as.covidcast_signal()}}, \code{\link{county_census}}, \code{\link{msa_census}},
 \code{\link{state_census}}
 }

@@ -74,7 +74,7 @@ plot_trajectory <- function(predictions_cards,
     geom_line(data = pd$points_df, 
               mapping = aes(y = .data$value, 
                             group = .data$forecast_date, 
-                            color = .data$forecaster)) +
+                            color = .data$forecaster))
   if (show_points) {
     g <- g + 
       geom_point(aes(y = .data$value)) +
@@ -103,16 +103,20 @@ setup_plot_trajectory <- function(predictions_cards,
                                   side_truth = NULL,
                                   ...){
   args <- list(...)
+  max_api_geos <- 30 # threshold for the API. Not really important. Easier
+                     # to grab everything if this is big (typical use case)
   ## add check that incidence period and geo_type are all the same, default to
   ## the first otherwise
   if (is.null(side_truth)) {
-    if (is.null(args$geo_values)) {
-      geo_values <- unique(predictions_cards$geo_value) # fix this
-      if (length(geo_values) > 30) {
-        args$geo_values <-  "*"
-      } else {
-        args$geo_values <- geo_values
-      }
+    if (is.null(args$geo_values)) { # what do we download
+      geo_values <- unique(predictions_cards$geo_value) 
+    } else {
+      geo_values <- args$geo_values
+    }
+    if (length(geo_values) > max_api_geos) { # if lots, grab everything
+      args$geo_values <-  "*"
+    } else {
+      args$geo_values <- geo_values
     }
     if (is.null(args$data_source)) {
       args$data_source <- predictions_cards$data_source[1]
@@ -130,8 +134,10 @@ setup_plot_trajectory <- function(predictions_cards,
       signal = args$signal,
       geo_type = args$geo_type,
       geo_values = args$geo_values,
-      ...) %>%
-      filter(.data$geo_value %in% geo_values)
+      ...)
+    if (geo_values != "*" && length(geo_values) > max_api_geos ) {
+      truth_data <- filter(truth_data, .data$geo_value %in% geo_values)
+    }
     if (ip == "epiweek") {
       assert_that(
         min(truth_data$time_value) < max(truth_data$time_value) - 14,
@@ -200,7 +206,7 @@ setup_plot_trajectory <- function(predictions_cards,
       select(-.data$`0.5`, -.data$`NA`)
   } else {
     points_df <- points_df %>%
-      rename(value = .data$quantile)
+      select(-.data$quantile)
   }
   
   if(!is.null(side_truth)) truth_data <- side_truth

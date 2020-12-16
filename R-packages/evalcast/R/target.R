@@ -39,6 +39,8 @@ get_target_period <- function(forecast_date, incidence_period, ahead) {
 }
 
 
+# Get data frame with column names `forecast_date`, `location`, `target_start`,
+# `target_end`, `actual`
 get_target_response <- function(signals,
                                 forecast_dates,
                                 incidence_period,

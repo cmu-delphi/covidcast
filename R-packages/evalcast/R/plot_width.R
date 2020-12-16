@@ -22,9 +22,7 @@ plot_width <- function(cards,
   
   grps <- grp_processing_for_facets(cards, grp_vars, 4, "interval width plots")
   ngrps <- length(grps)
-  
   cards <- compute_width(cards, levels, grp_vars, avg_vars)
-  
   
   g <- cards %>%
     ggplot(aes(x = .data$nominal_prob,
@@ -79,10 +77,8 @@ compute_width <- function(cards,
     filter(!is.na(.data$quantile)) %>%
     select(all_of(grp_vars), all_of(avg_vars),
            .data$quantile, .data$value)
-  cards <- averaging_checks(cards, grp_vars, avg_vars)
   
-  
-  cards %>% 
+  cards <- averaging_checks(cards, grp_vars, avg_vars) %>%
     group_by(across(all_of(c(grp_vars,avg_vars)))) %>%
     mutate(rev_value = rev(.data$value)) %>%
     filter(.data$quantile < 0.5) %>%

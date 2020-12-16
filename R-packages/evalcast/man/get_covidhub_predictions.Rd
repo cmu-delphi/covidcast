@@ -61,6 +61,4 @@ predictions card, so it can be easily evaluated and compared.
 \code{\link[=get_predictions]{get_predictions()}}
 
 \code{\link[=get_zoltar_predictions]{get_zoltar_predictions()}}
-
-\code{\link[=get_predictions]{get_predictions()}}
 }

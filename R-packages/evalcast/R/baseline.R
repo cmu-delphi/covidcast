@@ -49,7 +49,7 @@ baseline_forecaster <- function(df,
              resid = .data$summed - lag(.data$summed, 
                                         n = incidence_length * ahead[a])
              ) %>%
-      dplyr::select(.data$geo_value, .data$time_value, .data$summed, 
+      select(.data$geo_value, .data$time_value, .data$summed, 
                     .data$resid) %>%
       group_modify(~ {
         point <- .x$summed[.x$time_value == max(.x$time_value)]
@@ -60,10 +60,10 @@ baseline_forecaster <- function(df,
                  na.rm = TRUE), 0)
                )
         }, .keep = TRUE) %>%
-        dplyr::ungroup() %>%
-        dplyr::mutate(value = pmax(.data$value, 0))
+        ungroup() %>%
+        mutate(value = pmax(.data$value, 0))
   }
   names(dat) <- as.character(ahead)
-  dplyr::bind_rows(dat, .id = "ahead") %>%
-      dplyr::mutate(ahead = as.integer(ahead))
+  bind_rows(dat, .id = "ahead") %>%
+    mutate(ahead = as.integer(ahead))
 }

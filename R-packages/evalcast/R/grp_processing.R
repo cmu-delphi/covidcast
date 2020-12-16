@@ -1,5 +1,7 @@
-
-grp_processing_for_facets <- function(cards, grp_vars, bad_n, fname){
+grp_processing_for_facets <- function(cards, 
+                                      grp_vars, 
+                                      grp_limit = NULL, 
+                                      fname = NULL){
   
   assert_that(all(grp_vars %in% names(cards)),
               msg = paste("When processing by groups, all grp_vars",
@@ -14,12 +16,12 @@ grp_processing_for_facets <- function(cards, grp_vars, bad_n, fname){
       select(.data$name) %>%
       pull()
   }
-  if (missing(bad_n) || missing(fname)) return(grps)
+  if (is.null(grp_limit) || is.null(fname)) return(grps)
   assert_that(
-    nrow(grp_tbl) < bad_n,
+    nrow(grp_tbl) < grp_limit,
     msg = str_glue("For {fname}, it's",
                    "challenging to see results",
-                   "with more than {bad_n - 1} groupings. Either filter",
+                   "with more than {grp_limit - 1} groupings. Either filter",
                    "your scorecard or try writing your own version."))
   grps
 }

@@ -3,13 +3,12 @@
 #' Performs backtesting, through the following steps:
 #' \enumerate{
 #'   \item Takes a list of predictions cards (as created by
-#'   [get_predictions()]). These should be from a single forecaster, each card 
-#'   corresponding to a different forecast date.
+#'   [get_predictions()]). 
 #'   \item Downloads from the COVIDcast API the latest available data to compute
 #'   what actually occurred (summing the response over the incidence period).
 #'   \item Computes various user-specified error measures.
 #' }
-#' The result is a list of "score cards", where each list element corresponds to
+#' The result is a data frame of "score cards", where each row corresponds to
 #' a distinct ahead value. A score card is a data frame in which each row
 #' corresponds to a location-day pair, and the columns give the values of the
 #' error measures (along with other information including the forecast
@@ -31,7 +30,7 @@
 #'
 #' @param predictions_cards tibble of predictions 
 #'   that are all for the same prediction task, meaning they are for the same
-#'   response, incidence period, ahead, and geo type. Forecasts may be for a
+#'   response, incidence period,and geo type. Forecasts may be for a
 #'   different forecast date or forecaster.  
 #'   A predictions card may be created by the function
 #'   [get_predictions()], downloaded with [get_covidhub_predictions()] or
@@ -67,8 +66,7 @@ evaluate_predictions <- function(
   side_truth = NULL,
   grp_vars = c("forecaster", "forecast_date", "ahead", "geo_value")) {
   
-  
-  assert_that(class(predictions_cards)[1] == "predictions_cards" ||
+  assert_that("predictions_cards" %in% class(predictions_cards) ||
                 !is.null(side_truth),
               msg = paste("In evaluate_predictions: either predictions_cards",
                           "must be of class `predictions_cards` so that",
@@ -76,7 +74,7 @@ evaluate_predictions <- function(
                           "covidcast, or you must provide your own",
                           "ground truth."))
   
-  ## Computations if actuals are provided by the user
+  # Computations if actuals are provided by the user
   if (!is.null(side_truth)) {
     if (is.data.frame(side_truth)) {
       predictions_cards <- left_join(predictions_cards, side_truth)
@@ -95,9 +93,9 @@ evaluate_predictions <- function(
     score_card <- score_card %>%
       group_split() %>%
       lapply(erm, err_measures=err_measures) %>%
-      bind_rows()
-    score_card <- bind_cols(score_card, sc_keys)
-    score_card <- inner_join(score_card, predictions_cards, by=grp_vars)
+      bind_rows() %>%
+      bind_cols(sc_keys) %>%
+      inner_join(predictions_cards, by=grp_vars)
     class(score_card) <- c("score_cards", class(score_card))
     attributes(score_card) <- c(attributes(score_card), 
                                 as_of = lubridate::as_date(Sys.Date()))
@@ -105,20 +103,20 @@ evaluate_predictions <- function(
   }
   
   
-  ## more heavy lifting if we are grabbing data from covidcast
+  # more heavy lifting if we are grabbing data from covidcast
   unique_ahead <- select(predictions_cards, .data$ahead) %>% 
     distinct() %>% pull()
   scorecards <- list()
-  for (iter in seq_along(unique_ahead)) {
-    message("ahead = ", unique_ahead[iter])
-    scorecards[[iter]] <- evaluate_predictions_single_ahead(
-      filter(predictions_cards, .data$ahead == unique_ahead[iter]),
+  for (i in seq_along(unique_ahead)) {
+    message("ahead = ", unique_ahead[i])
+    scorecards[[i]] <- evaluate_predictions_single_ahead(
+      filter(predictions_cards, .data$ahead == unique_ahead[i]),
       err_measures = err_measures,
       backfill_buffer = backfill_buffer)
   }
   scorecards <- bind_rows(scorecards)
   class(scorecards) <- c("score_cards", class(scorecards))
-  scorecards
+  return(scorecards)
 }
 
 
@@ -131,19 +129,17 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
   assert_that(nrow(response) == 1,
               msg="All predictions cards should have the same response.")
   incidence_period <- unique_for_ahead(predictions_cards, "incidence_period")
-  geo_type <- unique_for_ahead(
+  geo_type_len <- unique_for_ahead(
     select(predictions_cards, .data$geo_value, .data$ahead) %>%
       mutate(geo_type = nchar(.data$geo_value)), 
     "geo_type")
-  geo_type <- ifelse(geo_type == 2L, "state", "county")
+  geo_type <- ifelse(geo_type_len == 2L, "state", "county")
   forecast_dates <- select(predictions_cards, .data$forecast_date) %>%
     distinct() %>% pull()
   ahead <- predictions_cards$ahead[1]
   geo_values <- select(predictions_cards, .data$geo_value) %>%
     distinct() %>% pull()
   
-  # get information from predictions cards' attributes and check:
-  # att <- get_and_check_pc_attributes(predictions_cards)
   # calculate the actual value we're trying to predict:
   target_response <- get_target_response(response,
                                          forecast_dates,
@@ -166,8 +162,6 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
               "{backfill_buffer}.", forecast_date=.$forecast_date[1],
               end=.$end[1], backfill_buffer=backfill_buffer))
   }
-  # combine all predictions cards into a single data frame with an additional
-  # column called forecast_date:
   
   # join together the data frames target_response and predicted:
   score_card <- target_response %>%
@@ -177,46 +171,35 @@ evaluate_predictions_single_ahead <- function(predictions_cards,
   score_card <- score_card %>%
     group_by(.data$forecaster, .data$geo_value, .data$forecast_date)
   sc_keys <- score_card %>% group_keys()
+  
+  # split-apply-recombine
   score_card <- score_card %>% 
     group_split() %>%
     lapply(erm, err_measures=err_measures) %>%
-    bind_rows()
-  score_card <- bind_cols(score_card, sc_keys)
+    bind_rows() %>%
+    bind_cols(sc_keys)
   
-  score_card <- left_join(score_card, target_response, 
-                          by=c("geo_value", "forecast_date")) %>%
-    select(-.data$start, -.data$end)
-  score_card <- inner_join(score_card, predictions_cards,
-                           by=c("forecaster", "geo_value", "forecast_date"))
-  score_card <- score_card %>% relocate(
-    .data$ahead, .data$geo_value, .data$quantile, .data$value, .data$forecaster,
-    .data$forecast_date, .data$data_source, .data$signal, .data$target_end_date,
-    .data$incidence_period, .data$actual)
+  # now add back the other data
+  score_card <- score_card %>%
+    left_join(target_response, by=c("geo_value", "forecast_date")) %>%
+    select(-.data$start, -.data$end) %>%
+    inner_join(predictions_cards,
+               by=c("forecaster", "geo_value", "forecast_date")) %>%
+    relocate(.data$ahead, .data$geo_value, .data$quantile, .data$value, 
+             .data$forecaster, .data$forecast_date, .data$data_source, 
+             .data$signal, .data$target_end_date, .data$incidence_period, 
+             .data$actual)
     
   attributes(score_card) <- c(attributes(score_card), 
                               as_of = lubridate::as_date(as_of))
   return(score_card)
 }
 
-check_valid_forecaster_output <- function(pred_card) {
-  null_forecasts <- pred_card$forecast_distribution %>%
-    map_lgl(is.null)
-  covidhub_probs <- c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99)
-  wrong_format <- pred_card$forecast_distribution %>%
-    map_lgl(~ any(names(.x) != c("probs", "quantiles")))
-  wrong_probs <- pred_card$forecast_distribution %>%
-    map_lgl(~ all(abs(.x$probs - covidhub_probs) > 1e-8))
-  bad_quantiles <- pred_card$forecast_distribution %>%
-    map_lgl(~ all(diff(.x$quantiles) < -1e-8))
-  pred_card %>%
-    mutate(null_forecasts = null_forecasts,
-           wrong_probs = wrong_probs,
-           bad_quantiles = bad_quantiles) %>%
-    filter(null_forecasts | wrong_probs | bad_quantiles | wrong_format)
-}
 
 #' @importFrom rlang :=
 empty_score_card <- function(pcards, err_measures){
+  # Creates a score card with nothing in it in case there's no available data
+  # to evaluate some particular forecast task. Avoids errors later on.
   out <- pcards[0,]
   out$actual <- double(0)
   for(iter in names(err_measures)){
@@ -225,6 +208,8 @@ empty_score_card <- function(pcards, err_measures){
 }
 
 erm <- function(x, err_measures){
+  # just binds up any error measure functions for an lapply
+  # I'm sure there's a better way to do this, but I couldn't think of one
   out <- double(length(err_measures))
   for (i in seq_along(err_measures)) {
     out[i] <- err_measures[[i]](x$quantile, x$value, x$actual)

@@ -4,8 +4,6 @@
 #' Hub](https://github.com/reichlab/covid19-forecast-hub/) to the format of a
 #' predictions card, so it can be easily evaluated and compared.
 #'
-# For now, this function only supports (i) incident not cumulative predictions
-# and (ii) epiweek not daily incidence period predictions.
 #'
 #' @param covidhub_forecaster_name String indicating of the forecaster
 #'   (matching what it is called on the COVID Hub).
@@ -30,13 +28,10 @@
 #' 
 #' @seealso [get_predictions()]
 #' @seealso [get_zoltar_predictions()]
-
-# @param ... Additional parameters to be passed to [filter_predictions()].
 #' @return tibble of predictions cards. Only incident predictions are returned.
 #'   For more flexible processing of COVID Hub data, try using 
 #'   [zoltr](https://docs.zoltardata.com/zoltr/)
 #' 
-#' @seealso [get_predictions()]
 #' @importFrom readr read_csv
 #' @export
 get_covidhub_predictions <- function(covidhub_forecaster_name,
@@ -131,8 +126,6 @@ get_covidhub_forecast_dates <- function(forecaster_name) {
                                    forecaster_name))
   lubridate::as_date(out[[1]][, 2])
 }
-
-
 
 
 #' List all COVID forecast models available

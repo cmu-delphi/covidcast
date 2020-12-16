@@ -83,13 +83,14 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
   # get all valid timezeros in project
   all_valid_timezeros <- zoltr::timezeros(
     zoltar_connection = zoltar_connection,
-    project_url = project_url)$timezero_date
+    project_url = project_url
+    )$timezero_date
   
-  if (!missing(forecast_dates)){
+  if (missing(forecast_dates)){
+    valid_forecast_dates <- all_valid_timezeros
+  } else {
     valid_forecast_dates <- intersect(as.character(forecast_dates), 
                                       as.character(all_valid_timezeros))
-  } else {
-    valid_forecast_dates <- all_valid_timezeros
   }
   
   print("Grabbing forecasts from Zoltar...")
@@ -99,7 +100,7 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
       query_type = "forecasts", units = geo_values, 
       timezeros = valid_forecast_dates, models = forecaster_names,
       targets = targets, types = forecast_type, as_of = as_of, verbose = FALSE))
-  if (nrow(forecasts) ==0){
+  if (nrow(forecasts) == 0) {
     warning(paste("Warning in do_zotar_query: Forecasts are not available.\n", 
                   "Please check your parameters."))
   }
@@ -121,7 +122,7 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
                            TRUE ~ "drop",),
       signal = paste(.data$response, .data$inc, "num", sep="_"),
       data_source = if_else(.data$response != "drop", "jhu-csse", "drop"),
-      forecast_date = ymd(.data$forecast_date),
+      forecast_date = lubridate::ymd(.data$forecast_date),
       target_end_date = .data$forecast_date + .data$ahead)
   epw <- forecasts$incidence_period == "epiweek"
   forecasts$target_end_date[epw] <- get_target_period(

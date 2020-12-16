@@ -39,8 +39,9 @@
 #'   tibble::tibble(
 #'     data_source=c("jhu-csse", "usa-facts"),
 #'     signal = c("deaths_incidence_num","confirmed_incidence_num"),
-#'     start_day="2020-08-15"), "2020-10-01","epiweek", 1:4, 
-#'     "state", "mi", signal_aggregation="long")
+#'     start_day="2020-08-15"), 
+#'   "2020-10-01","epiweek", 1:4, 
+#'   "state", "mi", signal_aggregation="long")
 #'
 #' @export
 get_predictions <- function(forecaster,
@@ -72,9 +73,11 @@ get_predictions <- function(forecaster,
                  apply_corrections = apply_corrections,
                  signal_aggregation = signal_aggregation,
                  signal_aggregation_dt = signal_aggregation_dt),
-                 params)))
-  out <- bind_rows(out)
-  names(out$value) = NULL
+                 params))) %>%
+    bind_rows()
+
+  # for some reason, `value` gets named and ends up in attr
+  names(out$value) = NULL 
   class(out) <- c("predictions_cards", class(out))
   out
 }
@@ -92,7 +95,8 @@ get_predictions_single_date <- function(forecaster,
                                         signal_aggregation,
                                         signal_aggregation_dt,
                                         ...) {
-  #if (length(geo_values) > 1) geo_values <- list(geo_values)
+  # see get_predictions() for descriptions of the arguments
+
   forecast_date <- lubridate::ymd(forecast_date)
   # compute the start_day from the forecast_date, if we need to
   if (!is.null(signals$start_day) && is.list(signals$start_day)) {
@@ -103,6 +107,8 @@ get_predictions_single_date <- function(forecaster,
     }
   }
   # get data that would have been available as of forecast_date
+  # API has trouble with too many individual calls, 30 seemed safe
+  # (imagining ~50 states). So bigger, just grab everything and then filter
   if(length(geo_values) > 30) {
     geo_values_dl <- "*"
   } else {
@@ -138,10 +144,6 @@ get_predictions_single_date <- function(forecaster,
       signal = signals$signal[1],
       target_end_date = get_target_period(forecast_date, 
                                           incidence_period, ahead)$end,
-      incidence_period = incidence_period,
-      ) 
-      ## dropped attributes: other signals, geo_type,
-      ##   corrections_applied, from_covidhub,
-      ##   forecaster_params
+      incidence_period = incidence_period) 
 }
 

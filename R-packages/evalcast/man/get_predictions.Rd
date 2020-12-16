@@ -102,7 +102,8 @@ baby_predictions = get_predictions(
   tibble::tibble(
     data_source=c("jhu-csse", "usa-facts"),
     signal = c("deaths_incidence_num","confirmed_incidence_num"),
-    start_day="2020-08-15"), "2020-10-01","epiweek", 1:4, 
-    "state", "mi", signal_aggregation="long")
+    start_day="2020-08-15"), 
+  "2020-10-01","epiweek", 1:4, 
+  "state", "mi", signal_aggregation="long")
 
 }

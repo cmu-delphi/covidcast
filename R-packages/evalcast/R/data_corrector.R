@@ -19,7 +19,8 @@ data_corrector <- function(df, apply_corrections) {
 
   assertthat::assert_that(nr == nrow(df),
                           msg="requested corrections generate duplicate rows.")
-  df <-  mutate(df, value = ifelse(!is.na(.data$corrected),.data$corrected,.data$value),
+  df <-  mutate(df, value = ifelse(!is.na(.data$corrected),
+                                   .data$corrected, .data$value),
                 corrected = NULL)
   df
 }

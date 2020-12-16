@@ -11,9 +11,14 @@ absolute_error(quantile, value, actual_value)
 
 \item{value}{vector of forecasted values}
 
-\item{actual_value}{Actual value.}
+\item{actual_value}{vector of actual values of the same length as
+\code{quantile}/\code{value} or a scalar}
 }
 \description{
-Computes absolute error between the actual value and the median of the
-forecast distribution.
+Absolute error of a forecaster
+}
+\details{
+Intended to be used with \code{evaluate_predictions()}, it expects three arguments
+of the same length, finds the location of the point forecast, and returns
+the absolute error.
 }

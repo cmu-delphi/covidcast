@@ -137,17 +137,12 @@ plot_coverage <- function(scorecards,
                           legend_position = "bottom") {
   type <- match.arg(type)
   # make sure scorecards are comparable:
-  grps <- grp_processing_for_facets(scorecards, grp_vars)
-  ngrps <- length(grps)
   
-  cover <- compute_coverage(scorecards, grp_vars, avg_vars)
   if (type == "all") {
-   
-    assert_that(ngrps < 4,
-                msg = paste("For `all` coverage plots, it's",
-                            "challenging to see results",
-                            "with more than three groupings. Either filter",
-                            "your scorecard or try writing your own version."))
+    grps <- grp_processing_for_facets(scorecards, grp_vars, 4, 
+                                      "`all` coverage plots")
+    ngrps <- length(grps)
+    cover <- compute_coverage(scorecards, grp_vars, avg_vars)
     
     g <- cover %>%
       ggplot(aes(x = .data$nominal_prob, y = .data$prop_covered)) +
@@ -174,11 +169,11 @@ plot_coverage <- function(scorecards,
       g <- g + geom_line(color = "orange") + geom_point(color="orange")
     }
   } else {
-    assert_that(ngrps < 5,
-                msg = paste("For `one` coverage plots, it's",
-                            "challenging to see results",
-                            "with more than four groupings. Either filter",
-                            "your scorecard or try writing your own version."))
+    grps <- grp_processing_for_facets(scorecards, grp_vars, 5, 
+                                      "`all` coverage plots")
+    ngrps <- length(grps)
+    cover <- compute_coverage(scorecards, grp_vars, avg_vars)
+
     g <- cover %>%
       filter(.data$nominal_prob == coverage) %>%
       group_by(across(all_of(grp_vars))) %>%

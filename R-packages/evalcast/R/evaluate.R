@@ -119,7 +119,7 @@ evaluate_predictions <- function(
   return(scorecards)
 }
 
-
+#' Create score cards for a single ahead value.
 evaluate_predictions_single_ahead <- function(predictions_cards,
                                               err_measures,
                                               backfill_buffer) {

@@ -106,7 +106,7 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
   }
   
   forecasts <- forecasts %>%
-    dplyr::select(.data$model, .data$timezero, .data$unit, 
+    select(.data$model, .data$timezero, .data$unit, 
                   .data$target, .data$quantile, .data$value) %>%
     rename(forecaster = .data$model, forecast_date = .data$timezero,
            geo_value = .data$unit) %>%
@@ -121,7 +121,7 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
                            .data$response == "case" ~ "confirmed",
                            TRUE ~ "drop",),
       signal = paste(.data$response, .data$inc, "num", sep="_"),
-      data_source = if_else(.data$response != "drop", "jhu-csse", "drop"),
+      data_source = if_else(.data$response == "drop", "drop", "jhu-csse"),
       forecast_date = lubridate::ymd(.data$forecast_date),
       target_end_date = .data$forecast_date + .data$ahead)
   epw <- forecasts$incidence_period == "epiweek"
@@ -129,8 +129,8 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
     forecasts$forecast_date[epw], "epiweek", forecasts$ahead[epw])$end
   
   forecasts <- forecasts %>%
-    dplyr::filter(.data$response != "hosp") %>%
-    dplyr::select(.data$ahead, .data$geo_value, .data$quantile, .data$value,
+    filter(.data$response != "hosp") %>%
+    select(.data$ahead, .data$geo_value, .data$quantile, .data$value,
                   .data$forecaster, .data$forecast_date, .data$data_source,
                   .data$signal, .data$target_end_date, 
                   .data$incidence_period) %>%

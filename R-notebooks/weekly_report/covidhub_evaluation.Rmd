@@ -286,9 +286,9 @@ recent_score_by_frcstr = recent_score_by_frcstr %>%
                            mutate(num_total = num_1 + num_2 + num_3 + num_4) %>%
                            arrange(desc(num_total))
 print(recent_score_by_frcstr, n = Inf)
-max_forecasts = max(recent_score_by_frcstr$num_total)
+cmu_forecasts = recent_score_by_frcstr[recent_score_by_frcstr$forecaster == "CMU-TimeSeries",]$num_total
 
-active_forecasters = recent_score_by_frcstr[recent_score_by_frcstr$num_total > max_forecasts / 2,]$forecaster
+active_forecasters = recent_score_by_frcstr[recent_score_by_frcstr$num_total > cmu_forecasts * 0.80,]$forecaster
 # CovidAnalytics-DELPHI and IHME-CurveFit didn't submit that many forecasts ...
 score_cards_state = score_cards_state %>% 
                     filter(forecaster %in% active_forecasters)
@@ -304,12 +304,40 @@ recent_score_by_frcstr = recent_score_by_frcstr %>%
                            mutate(num_total = num_1 + num_2 + num_3 + num_4) %>%
                            arrange(desc(num_total))
 print(recent_score_by_frcstr, n = Inf)
-max_forecasts = max(recent_score_by_frcstr$num_total)
+cmu_forecasts = recent_score_by_frcstr[recent_score_by_frcstr$forecaster == "CMU-TimeSeries",]$num_total
 
-active_forecasters = recent_score_by_frcstr[recent_score_by_frcstr$num_total > max_forecasts / 2,]$forecaster
+active_forecasters = recent_score_by_frcstr[recent_score_by_frcstr$num_total > cmu_forecasts * 0.80,]$forecaster
 # CovidAnalytics-DELPHI and IHME-CurveFit didn't submit that many forecasts ...
 score_cards_county = score_cards_county %>% 
                     filter(forecaster %in% active_forecasters)
+```
+
+```{r}
+# TODO: Use evalcast::intersect_averagers after merging the kill-cards updates
+forecaster_coverage = score_cards_county %>% 
+                        filter(quantile == 0.5) %>% 
+                        group_by(ahead, geo_value, target_end_date) %>% 
+                        summarise(num_forecasts = n())
+max_forecasts = max(forecaster_coverage$num_forecasts)
+table(forecaster_coverage$num_forecasts)
+common_forecasts_county = forecaster_coverage %>% 
+                            filter(num_forecasts == max_forecasts) %>%
+                            select(ahead, geo_value, target_end_date)
+
+score_cards_county = semi_join(score_cards_county, common_forecasts_county)
+
+forecaster_coverage = score_cards_state %>% 
+                        filter(quantile == 0.5) %>% 
+                        group_by(ahead, geo_value, target_end_date) %>% 
+                        summarise(num_forecasts = n())
+max_forecasts = max(forecaster_coverage$num_forecasts)
+table(forecaster_coverage$num_forecasts)
+common_forecasts_state = forecaster_coverage %>% 
+                            filter(num_forecasts == max_forecasts) %>%
+                            select(ahead, geo_value, target_end_date)
+
+
+score_cards_state = semi_join(score_cards_state, common_forecasts_state)
 ```
 
 ## Dot plots

@@ -257,7 +257,8 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   # necessary but it just hides in the background
   map_df = sf::st_read(system.file(
     "shapefiles/state/cb_2019_us_state_5m.shp",
-    package = "covidcast"))
+    package = "covidcast"),
+    quiet = TRUE)
   background_crs = sf::st_crs(map_df)
   map_df$STATEFP <- as.character(map_df$STATEFP)
   map_df = map_df %>% dplyr::mutate(
@@ -315,7 +316,8 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   if (attributes(x)$metadata$geo_type == "county") {
     map_df = sf::st_read(system.file(
       "shapefiles/county/cb_2019_us_county_5m.shp",
-      package = "covidcast"))
+      package = "covidcast"),
+      quiet = TRUE)
     map_df$STATEFP <- as.character(map_df$STATEFP)
     map_df$GEOID <- as.character(map_df$GEOID)
     # Get rid of unobserved counties and megacounties
@@ -339,7 +341,8 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   else if (attributes(x)$metadata$geo_type == "state") {
     map_df = sf::st_read(system.file(
       "shapefiles/state/cb_2019_us_state_5m.shp",
-      package = "covidcast"))
+      package = "covidcast"),
+      quiet = TRUE)
     background_crs = sf::st_crs(map_df)
     map_df$STATEFP <- as.character(map_df$STATEFP)
     map_df = map_df %>% dplyr::mutate(
@@ -358,7 +361,8 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   else if (attributes(x)$metadata$geo_type == "msa") {
     map_df = sf::st_read(system.file(
       "shapefiles/msa/cb_2019_us_cbsa_5m.shp",
-      package = "covidcast"))
+      package = "covidcast"),
+      quiet = TRUE)
     map_df = map_df %>% dplyr::filter(map_df$LSAD == 'M1') # only get metro and not micropolitan areas
     if (length(include) > 0) {
       # Last two letters are state abbreviation
@@ -376,7 +380,8 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   else if (attributes(x)$metadata$geo_type == "hrr") {
     map_df = sf::st_read(system.file(
       "shapefiles/hrr/geo_export_ad86cff5-e5ed-432e-9ec2-2ce8732099ee.shp",
-      package = "covidcast"))
+      package = "covidcast"),
+      quiet = TRUE)
     if (length(include) > 0) {
       # First two letters are state abbreviation
       map_df = map_df %>% filter(substr(.$hrr_name, 1, 2) %in% include)

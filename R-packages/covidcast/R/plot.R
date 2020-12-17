@@ -395,7 +395,10 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
       is_alaska = substr(hrr_name, 1, 2) == 'AK',
       is_hawaii = substr(hrr_name, 1, 2) == 'HI',
       is_pr = substr(hrr_name, 1, 2) == 'PR',
-      color = ifelse(hrr_num %in% geo, col_fun(val[hrr_num]), missing_col))
+      # use the HRR numbers to index the named val vector -- but convert to
+      # character, otherwise the indices will be positional, not using the
+      # names.
+      color = ifelse(hrr_num %in% geo, col_fun(val[as.character(hrr_num)]), missing_col))
   }
 
   main_df = shift_main(map_df)

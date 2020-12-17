@@ -89,6 +89,28 @@ test_that("simple state choropleths", {
 
 })
 
+test_that("simple HRR choropleths", {
+  fb_hrr <- readRDS(test_path("data/survey-data-hrr.rds"))
+
+  expect_doppelganger("default HRR choropleth",
+                      plot(fb_hrr, plot_type = "choro"))
+
+  expect_doppelganger("default HRR choropleth with include",
+                      plot(fb_hrr, plot_type = "choro",
+                           include = c("tx", "CA")))
+})
+
+test_that("simple MSA choropleths", {
+  fb_msa <- readRDS(test_path("data/survey-data-msa.rds"))
+
+  expect_doppelganger("default MSA choropleth",
+                      plot(fb_msa, plot_type = "choro"))
+
+  expect_doppelganger("default MSA choropleth with include",
+                      plot(fb_msa, plot_type = "choro",
+                           include = c("tx", "CA")))
+})
+
 test_that("state bubble plot with both missing and 0 values", {
   fake_data <- structure(data.frame(
     data_source = "foo",

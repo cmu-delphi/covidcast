@@ -15,23 +15,11 @@ plot_calibration <- function(scorecard,
                              legend_position = "bottom") {
   
   type <- match.arg(type)
-  grp_tbl <- scorecard %>% 
-    summarise(across(all_of(grp_vars), ~n_distinct(.x))) %>%
-    pivot_longer(everything()) %>%
-    filter(.data$value > 1) 
-  if (nrow(grp_tbl) > 0) {
-    grps <- grp_tbl %>% 
-      arrange(desc(.data$value)) %>%
-      select(.data$name) %>%
-      pull()
-  }
+  
     
   if (type == "wedgeplot") {
-    assert_that(nrow(grp_tbl) < 3,
-                msg = paste("For wedgeplots, it's challenging to see results",
-                            "with more than two groupings. Either filter your",
-                            "scorecard, use the traditional version, or try",
-                            "writing your own version."))
+    grps <- grp_processing_for_facets(scorecard, grp_vars, 3, "wedgeplots")
+    ngrps <- length(grps)
     calib <- compute_calibration(scorecard, grp_vars, avg_vars) %>%
       setup_wedgeplot()
 
@@ -51,19 +39,17 @@ plot_calibration <- function(scorecard,
       scale_alpha_continuous(range = c(0.5, 1)) +
       scale_size_continuous(range = c(0.5, 1)) +
       guides(alpha = FALSE, size = FALSE)
-    if (nrow(grp_tbl) == 2L) {
+    if (ngrps == 2L) {
       g <- g + facet_grid(stats::as.formula(paste(grps, collapse = "~")))
     }
-    if (nrow(grp_tbl) == 1L) {
+    if (ngrps == 1L) {
       g <- g + facet_wrap(stats::as.formula(paste0("~", grps)))
     }
     
   } else if (type == "traditional") {
-    assert_that(nrow(grp_tbl) < 4,
-                msg = paste("For traditional calibration plots, it's",
-                            "challenging to see results",
-                            "with more than three groupings. Either filter",
-                            "your scorecard or try writing your own version."))
+    grps <- grp_processing_for_facets(scorecard, grp_vars, 4, 
+                                      "traditional calibration plots")
+    ngrps <- length(grps)
     calib <- compute_calibration(scorecard, grp_vars, avg_vars)
     g <- calib %>%
       ggplot(aes(x = .data$nominal_prob, y = .data$prop_below)) +
@@ -72,17 +58,17 @@ plot_calibration <- function(scorecard,
            y = "Proportion",
            title = sprintf("%s (ahead %s): Calibration", 
                            .data$name, .data$ahead))
-    if (nrow(grp_tbl) == 3L) {
+    if (ngrps == 3L) {
       g <- g + geom_line(aes(color = !!sym(grps[1]))) +
         scale_color_viridis_d() +
         facet_grid(stats::as.formula(paste(grps[2:3], collapse = "~")))
     }
-    if (nrow(grp_tbl) == 2L) {
+    if (ngrps == 2L) {
       g <- g + geom_line(aes(color = !!sym(grps[1]))) +
         scale_color_viridis_d() +
         facet_wrap(stats::as.formula(paste0("~", grps[2])))
     }
-    if (nrow(grp_tbl) == 1L) {
+    if (ngrps == 1L) {
       g <- g + geom_line(color="orange") + geom_point() + 
         facet_wrap(stats::as.formula(paste0("~", grps)))
     }

@@ -23,5 +23,5 @@ grp_processing_for_facets <- function(cards,
                    "challenging to see results",
                    "with more than {grp_limit - 1} groupings. Either filter",
                    "your scorecard or try writing your own version."))
-  grps
+  return(grps)
 }

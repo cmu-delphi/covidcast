@@ -2,8 +2,8 @@
 
 check_valid_coverage_probs <- function(df, avg_vars) {
   # The goal is to ensure that for a particular group, the quantiles at which
-  # forcasts are made are the same and reasonable
-  # Input is a grouped dataframe, with a column of "locations" that all need to
+  # forecasts are made are the same and reasonable
+  # Input is a grouped data frame, with a column of "locations" that all need to
   # comply. Rather than trying to locate some minimal set of "locations" that
   # work, if there's a problem, we toss the whole group. The reason being,
   # this likely reflects an error in the forecaster or the setup rather than
@@ -19,6 +19,7 @@ check_valid_coverage_probs <- function(df, avg_vars) {
     summarise(valid = length(.data$quantile) == n_uq && # number of q's
                 # sorted + commensurate
                 all(find_quantile_match(.data$quantile, uq))) %>%
+    ungroup() %>%
     summarise(valid = all(valid))
   return(df$valid)
 }
@@ -46,8 +47,8 @@ averaging_checks <- function(
   gr <- cards %>% 
     group_by(across(all_of(grp_vars)))
   checks <- gr %>% group_keys()
-  checks$valid <- t(sapply(gr %>% group_split(), 
-                         function(x) check_valid_coverage_probs(x, avg_vars)))
+  checks$valid <- sapply(gr %>% group_split(), 
+                         function(x) check_valid_coverage_probs(x, avg_vars))
   assert_that(any(checks$valid),
               msg = paste(
                 "no groupings have valid quantile forecasts.",

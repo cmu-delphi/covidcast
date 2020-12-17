@@ -46,8 +46,8 @@ averaging_checks <- function(
   gr <- cards %>% 
     group_by(across(all_of(grp_vars)))
   checks <- gr %>% group_keys()
-  checks$valid <- sapply(gr %>% group_split(), 
-                         function(x) check_valid_coverage_probs(x, avg_vars))
+  checks$valid <- t(sapply(gr %>% group_split(), 
+                         function(x) check_valid_coverage_probs(x, avg_vars)))
   assert_that(any(checks$valid),
               msg = paste(
                 "no groupings have valid quantile forecasts.",

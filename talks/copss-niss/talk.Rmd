@@ -163,16 +163,17 @@ plot(cases, title = "Cumulative COVID-19 cases per 100,000 people",
 How do some cities compare in terms of doctor's visits due to COVID-like illness?
 
 ```{r, fig.width = 8, fig.height = 6}
-cities = c("Miami", "New York", "Pittsburgh", "San Antonio")
 dv = covidcast_signal(data_source = "doctor-visits", 
                       signal = "smoothed_adj_cli", 
                       start_day = start_day, end_day = end_day,
-                      geo_type = "msa", geo_values = name_to_cbsa(cities))
+                      geo_type = "msa", 
+                      geo_values = name_to_cbsa(c("Miami", "New York", 
+                                                  "Pittsburgh", "San Antonio")))
 
 plot(dv, plot_type = "line", 
      title = "% of doctor's visits due to COVID-like illness") + 
-  scale_x_date(date_breaks = "1 month", date_labels = "%b %Y")  +
-  scale_color_hue(labels = cities)
+  scale_x_date(date_breaks = "1 month", date_labels = "%b %Y") +
+  scale_color_hue(labels = cbsa_to_name(unique(dv$geo_value)))
 ```
 
 # Example: Symptoms
@@ -180,18 +181,17 @@ plot(dv, plot_type = "line",
 How do my county and my friend's county compare in terms of COVID symptoms?
 
 ```{r, fig.width = 8, fig.height = 6}
-counties = c("Allegheny", "Fulton")
 sympt = covidcast_signal(data_source = "fb-survey", 
                          signal = "smoothed_hh_cmnty_cli",
                          start_day = "2020-04-15", end_day = end_day,
-                         geo_values = c(name_to_fips(counties[1]),
-                                        name_to_fips(counties[2], 
+                         geo_values = c(name_to_fips("Allegheny"),
+                                        name_to_fips("Fulton", 
                                                      state = "GA")))
 
 plot(sympt, plot_type = "line", 
      title = "% of people who know somebody with COVID symptoms") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b %Y") +
-  scale_color_hue(labels = counties)
+  scale_color_hue(labels = fips_to_name(unique(sympt$geo_value)))
 ```
 
 # Example: Mask Use

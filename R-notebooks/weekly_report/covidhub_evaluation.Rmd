@@ -293,6 +293,9 @@ active_forecasters = recent_score_by_frcstr[recent_score_by_frcstr$num_total > c
 score_cards_state = score_cards_state %>% 
                     filter(forecaster %in% active_forecasters)
 
+# save for pairwise tournament
+score_cards_state_tourney = score_cards_state
+
 recent_score_by_frcstr = score_cards_county %>% 
                            filter(target_end_date > today() - 28) %>%
                            group_by(forecaster, ahead) %>% 
@@ -310,6 +313,7 @@ active_forecasters = recent_score_by_frcstr[recent_score_by_frcstr$num_total > c
 # CovidAnalytics-DELPHI and IHME-CurveFit didn't submit that many forecasts ...
 score_cards_county = score_cards_county %>% 
                     filter(forecaster %in% active_forecasters)
+score_cards_county_tourney = score_cards_county
 ```
 
 ```{r}
@@ -640,7 +644,7 @@ pairwise_tournament = function(df, var, aggr = Mean) {
 
 ### States
 ```{r, fig.width = 10, fig.height = 10}
-theta_state = pairwise_tournament(score_cards_state, var = "wis", aggr = 
+theta_state = pairwise_tournament(score_cards_state_tourney, var = "wis", aggr = 
                               function(x) mean(x, trim = 0.01, na.rm = TRUE))
 ranked_list = rownames(theta_state$mat)[order(theta_state$vec1)]
 colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
@@ -660,7 +664,7 @@ knitr::kable(data.frame(rank = 1:length(theta_state$vec1), forecaster = ranked_l
 
 ### Counties
 ```{r, fig.width = 10, fig.height = 10}
-theta_county = pairwise_tournament(score_cards_county, var = "wis", aggr = 
+theta_county = pairwise_tournament(score_cards_county_tourney, var = "wis", aggr = 
                               function(x) mean(x, trim = 0.01, na.rm = TRUE))
 
 ranked_list = rownames(theta_county$mat)[order(theta_county$vec1)]
@@ -700,7 +704,7 @@ Repeat the same pairwise tournament but with the median as the aggregator.
 
 ### State
 ```{r, fig.width = 10, fig.height = 10}
-theta_state = pairwise_tournament(score_cards_state, var = "wis", aggr = Median)
+theta_state = pairwise_tournament(score_cards_state_tourney, var = "wis", aggr = Median)
 
 ranked_list = rownames(theta_state$mat)[order(theta_state$vec1)]
 colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
@@ -720,7 +724,7 @@ knitr::kable(data.frame(rank = 1:length(theta_state$vec1), forecaster = ranked_l
 
 ### County
 ```{r, fig.width = 10, fig.height = 10}
-theta_county = pairwise_tournament(score_cards_county, var = "wis", aggr = Median)
+theta_county = pairwise_tournament(score_cards_county_tourney, var = "wis", aggr = Median)
 
 ranked_list = rownames(theta_county$mat)[order(theta_county$vec1)]
 colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
@@ -743,7 +747,7 @@ And now with the 90th percentile as the aggregator.
 ### State
 
 ```{r, fig.width = 10, fig.height = 10}
-theta_state = pairwise_tournament(score_cards_state, var = "wis", aggr =
+theta_state = pairwise_tournament(score_cards_state_tourney, var = "wis", aggr =
                               function(x) quantile(x, prob = 0.9, na.rm = TRUE))
 
 ranked_list = rownames(theta_state$mat)[order(theta_state$vec1)]
@@ -765,7 +769,7 @@ knitr::kable(data.frame(rank = 1:length(theta_state$vec1), forecaster = ranked_l
 ### County
 
 ```{r, fig.width = 10, fig.height = 10}
-theta_county = pairwise_tournament(score_cards_county, var = "wis", aggr =
+theta_county = pairwise_tournament(score_cards_county_tourney, var = "wis", aggr =
                               function(x) quantile(x, prob = 0.9, na.rm = TRUE))
 
 ranked_list = rownames(theta_county$mat)[order(theta_county$vec1)]

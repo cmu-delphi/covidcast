@@ -95,7 +95,7 @@ get_covidhub_predictions <- function(covidhub_forecaster_name,
   }
   pcards <- bind_rows(pcards) %>%
     mutate(geo_value = if_else(nchar(.data$location)==2,
-                               fips_2_abbr(.data$location),
+                               fips_to_abbr(.data$location),
                                .data$location),
            location = NULL) %>%
     relocate(.data$geo_value, .after = .data$ahead)

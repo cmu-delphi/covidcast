@@ -62,9 +62,11 @@ it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahea
 \code{forecaster}. The default, "*", fetches all that is available in the API.}
 
 \item{apply_corrections}{an optional function that applies data corrections
-to the signals. Input is a data frame as returned by \code{download_signals()}.
-The returned object must be the same but with additional variables.
-Corrected values must exist in the column \code{corrected}.}
+to the signals. Input is a data frame or list as returned as
+\code{df <- covidcast::download_signals()}.
+The returned object should be of the type expected by your forecaster.
+This function will be called as \code{apply_corrections(df, ...)} using any
+named arguments passed in \code{...} to \code{get_predictions()}.}
 
 \item{signal_aggregation}{this and the next argument control the type of
 data your forecaster expects to receive from covidcast. By default,
@@ -76,7 +78,8 @@ request "wide" or "long". See \code{\link[covidcast:covidcast_signals]{covidcast
 \code{\link[covidcast:aggregate_signals]{covidcast::aggregate_signals()}} can perform leading and lagging for you.
 See that documentation for more details.}
 
-\item{...}{Additional arguments to be passed to \code{forecaster()}.}
+\item{...}{Additional named arguments to be passed to \code{forecaster()} and
+\code{apply_corrections()}}
 }
 \value{
 Long data frame of forecasts with a class of \code{predictions_cards}.

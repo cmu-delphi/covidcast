@@ -1,8 +1,11 @@
 ---
-title: "Evaluating State-Level COVID-19 Death Forecasts and County-Level Case Forecasts"
+title: "COVID-19 Forecast Evaluation"
 author: "Delphi Group"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output: html_document
+params:
+  score_file: "scor_cards_state.rda"
+  card_name: "scre_cards_state"
 ---
 
 ```{r, include = FALSE}
@@ -20,262 +23,26 @@ library(stringr)
 ```
 # {.tabset}
 
-## Get forecasts from COVID Hub
-
-First fetch forecast dates for a bunch of forecasters. **TODO** (this is more of 
-a general one to make this notebook better, and not specific to evalcast dev): 
-we should do this more comprehensively. Pull all forecasters that have enough 
-submissions to make useful comparisons. To do this, we can expose the function 
-`get_covidhub_forecaster_names()`.
+## Find Common Forecasts
 
 ```{r}
-forecasters = c("CMU-TimeSeries", 
-                "YYG-ParamSearch", 
-                "UMass-MechBayes", 
-                "GT-DeepCOVID", 
-                "IHME-CurveFit", 
-                "LANL-GrowthRate", 
-                "UCLA-SuEIR", 
-                "MOBS-GLEAM_COVID", 
-               "UT-Mobility", 
-               "OliverWyman-Navigator", 
-               "JHU_IDD-CovidSP", 
-                "CovidAnalytics-DELPHI", 
-             #   "Google_Harvard-CPF", Excluded for now. Doesn't have quantiles for all forecasts
-                "Yu_Group-CLEP", 
-                "COVIDhub-ensemble", 
-                "COVIDhub-baseline")
-
-# Get all forecast dates for these forecasters from COVID Hub
-forecast_dates = vector("list", length = length(forecasters))
-for (i in 1:length(forecasters)) {
-  forecast_dates[[i]] = tryCatch({
-    as_date(get_forecast_dates(forecasters[i]))
-  },
-  error = function(e) cat(sprintf("%i. %s\n", i, e$message))
-  )
-}
-```
-
-Load data from previous run so we don't have to reingest / process it. This
-data could end up out of date if a forecast is retrospectively updated, but in
-that case it's no longer a true prediction. We can always restart from scratch
-by deleting predictions_cards.rda.
-```{r}
-if (file.exists("predictions_cards.rda")) {
-  load(file = "predictions_cards.rda")
-}
-if(exists("predictions_cards")){
-seen_dates = predictions_cards %>% 
-  distinct(forecast_date, forecaster)
-}
-```
-
-Now figure out "comparable" forecast dates: making a forecast on a Sunday or a 
-Monday of the same epiweek should be comparable. **TODO**: we should switch over 
-to using the Zoltar API, and soon it should have an "as of" parameter, so then 
-we shouldn't need to do this. 
-
-```{r}
-forecast_dates_cmu = forecast_dates[[1]]
-# new_dates, as opposed to dates for which we already have data for a forecaster
-new_dates = list()
-for (i in 1:length(forecasters)) {
-  given_dates = forecast_dates[[i]]
-  # If the dates match exactly, or the given date falls on a Sunday and the
-  # CMU date falls on a Monday of the same epiweek, then call it comparable...
-  comparable_forecast_dates = given_dates[(given_dates %in% forecast_dates_cmu | 
-                            ((given_dates + 1) %in% forecast_dates_cmu) &
-                            wday(given_dates) == 1)]
-  
-  # ...but if there is an exact match on dates, ignore predictions made on the
-  # previous day
-  comparable_forecast_dates = comparable_forecast_dates[!((comparable_forecast_dates + 1) %in% comparable_forecast_dates)]
-  if(exists("seen_dates")){
-    if(forecasters[[i]] %in% seen_dates$forecaster){
-      seen_forecaster_dates = (seen_dates %>% 
-                                filter(forecaster == forecasters[[i]]))$forecast_date
-      comparable_forecast_dates = as_date(setdiff(comparable_forecast_dates, seen_forecaster_dates))
-    }
+if (file.exists(params$score_file)){
+  load(params$score_file)
+  if (exists(params$card_name)){
+    score_cards = get(params$card_name)
+  } else {
+    stop(paste("score_card not in file, no object named", params$card_name))
   }
-  new_dates[[i]] = comparable_forecast_dates
-}
-names(new_dates) = forecasters
-```
-
-Now get predictions for each forecaster, looping over forecast dates from the
-CMU-TimeSeries model. **TODO**: this part is very very slow. Maybe (hopefully) 
-by changing to use the Zoltar API, this will be much faster.
-
-```{r}
-predictions_cards_list = vector("list", length = length(forecasters))
-deaths_sig = "deaths_incidence_num"
-cases_sig = "confirmed_incidence_num"
-for (i in 1:length(forecasters)) {
-  cat(forecasters[i], "...\n")
-  if (length(new_dates[[i]] > 0)){
-  predictions_cards_list[[i]] = tryCatch({
-    get_covidhub_predictions(forecasters[i], 
-                             rev(new_dates[[i]])) %>% 
-                    filter(ahead < 5) %>% 
-                    filter((nchar(geo_value) == 2 & signal == deaths_sig) |
-                           (nchar(geo_value) == 5 & signal == cases_sig))
-  },
-  error = function(e) cat(e$message))
-  }
-}
-predictions_cards_new = bind_rows(predictions_cards_list)
-
-# Combine old and new predictions cards
-if(exists("predictions_cards")){
-  predictions_cards = rbind(predictions_cards, predictions_cards_new)
 } else {
-  predictions_cards = predictions_cards_new
+  stop(paste("File not found:", params$score_file))
 }
 
-# Discard any forecasters without data
-forecasters = unique(as.data.frame(predictions_cards)$forecaster)
-
-
-```
-
-On reflection: part of the problem here is that `get_covidhub_predictions()` 
-downloads *all* predictions from COVID Hub and *then* filters them as needed. 
-This makes the above extra slow because we end up downloading state and county 
-forecasts, when we just want state forecasts. **TODO**: even before switching 
-over to use the Zoltar API, we should redesign `get_covidhub_predictions()` so 
-that it fetches from GitHub only the forecasts we specify, if possible.
-
-## Evaluate predictions
-
-Hack: must change the response data source to be USAFacts, as JHU-CSSE data is
-currently unstable. **TODO**: we shouldn't require `evaluate_predictions()` to 
-have the response match what's in the forecaster. If I train my forecaster on
-(say) JHU-CSSE data, then I should be able to evaluate it on USAFacts data. 
-
-```{r}
-predictions_cards$data_source = "usa-facts"
-save(list = c("predictions_cards"), 
-     file = "predictions_cards.rda", 
-     compress = "xz")
-```
-
-Evaluate the predictions based on weighted interval score (WIS), absolute error
-(AE), and coverage of the central 80% prediction interval. **TODO**: we need to
-make sure evalcast "fails gracefully" in as many places as possible, and doesn't
-throw an error (which would halt all execution) when it should be instead just
-throwing a warning and moving on. Basically I needed to artifically trim the
-forecast dates to have the latest one by "2020-09-28" so that I wouldn't get
-errors with the aheads here. This is undesirable obviously ...
-
-Also, another **TODO**: just want to note that this is again very slow. Caching
-would help but I don't think it's the right solution. We're fetching the exact 
-same data something like 15 times in a row. If we simply changed the order of 
-operations then we wouldn't even need caching at all.
-
-
-```{r}
-err_measures = list(wis = weighted_interval_score, ae = absolute_error,
-                    cov_80 = interval_coverage(coverage = 0.8))
-
-preds_to_eval = predictions_cards %>% 
-                      filter(target_end_date < today())
-
-preds_to_eval_state = preds_to_eval %>% 
-                        filter(nchar(geo_value) == 2)
-if (file.exists("score_cards_state.rda")){
-  load("score_cards_state.rda")
-}
-if(exists("score_cards_state")){
-  preds_to_eval_state = anti_join(preds_to_eval_state, 
-                                  score_cards_state, 
-                                  by = c("ahead", "forecaster", "forecast_date"))
-}
-
-if(nrow(preds_to_eval_state) > 0){
-  score_cards_new_state = evaluate_predictions(preds_to_eval_state, 
-                                              err_measures,
-                                              backfill_buffer = 0)
-} else {
-  score_cards_new_state = data.frame()
-}
-
-if(exists("score_cards_state")){
-  score_cards_state = rbind(score_cards_state, score_cards_new_state)
-} else {
-  score_cards_state = score_cards_new_state
-}
-
-preds_to_eval_county = preds_to_eval %>% 
-                        filter(nchar(geo_value) == 5)
-if (file.exists("score_cards_county.rda")){
-  load("score_cards_county.rda")
-}
-if(exists("score_cards_county")){
-  preds_to_eval_county = anti_join(preds_to_eval_county, 
-                                  score_cards_county, 
-                                  by = c("ahead", "forecaster", "forecast_date"))
-}
-
-if(nrow(preds_to_eval_county) > 0){
-  evaluable_forecasters = (preds_to_eval_county %>% 
-                            distinct(forecaster, quantile) %>% 
-                            filter(!is.na(quantile)) %>% 
-                            count(forecaster) %>%
-                            filter(n > 1))$forecaster
-  preds_to_eval_county = preds_to_eval_county %>% 
-                           filter(forecaster %in% evaluable_forecasters)
-}
-if(nrow(preds_to_eval_county) > 0){
-  score_cards_new_county = evaluate_predictions(preds_to_eval_county, 
-                                              err_measures,
-                                              backfill_buffer = 0)
-} else {
-  score_cards_new_county = data.frame()
-}
-
-if(exists("score_cards_county")){
-  score_cards_county = rbind(score_cards_county, score_cards_new_county)
-} else {
-  score_cards_county = score_cards_new_county
-}
-```
-
-As the above contained some pretty expensive steps, we save the results in an
-RData file (and we set `eval = FALSE` on this and all the above code chunks). 
-
-```{r}
-save(list = c("score_cards_county"), 
-     file = "score_cards_county.rda", 
-     compress = "xz")
-save(list = c("score_cards_state"), 
-     file = "score_cards_state.rda", 
-     compress = "xz")
-rm(list = setdiff(ls(), 
-                  c("predictions_cards", 
-                    "score_cards_county", 
-                    "score_cards_state")))
-```
-
-Compute summary statistics.
-
-```{r}
-load(file = "predictions_cards.rda")
-load(file = "score_cards_county.rda")
-load(file = "score_cards_state.rda")
-score_cards_county_cmu = score_cards_county %>% 
+score_cards_cmu = score_cards %>% 
                     filter(forecaster == "CMU-TimeSeries") %>% 
                     distinct(ahead, geo_value, target_end_date)
+score_cards = semi_join(score_cards, score_cards_cmu)
 
-score_cards_county = semi_join(score_cards_county, score_cards_county_cmu)
-
-
-score_cards_state_cmu = score_cards_state %>% 
-                    filter(forecaster == "CMU-TimeSeries") %>% 
-                    distinct(ahead, geo_value, target_end_date)
-score_cards_state = semi_join(score_cards_state, score_cards_state_cmu)
-
-recent_score_by_frcstr = score_cards_state %>% 
+recent_score_by_frcstr = score_cards %>% 
                            filter(target_end_date > today() - 28) %>%
                            group_by(forecaster, ahead) %>% 
                            summarize(num = sum(!is.na(wis))) %>%
@@ -289,59 +56,28 @@ print(recent_score_by_frcstr, n = Inf)
 cmu_forecasts = recent_score_by_frcstr[recent_score_by_frcstr$forecaster == "CMU-TimeSeries",]$num_total
 
 active_forecasters = recent_score_by_frcstr[recent_score_by_frcstr$num_total > cmu_forecasts * 0.80,]$forecaster
-# CovidAnalytics-DELPHI and IHME-CurveFit didn't submit that many forecasts ...
-score_cards_state = score_cards_state %>% 
-                    filter(forecaster %in% active_forecasters)
+
+score_cards = score_cards %>% 
+                filter(forecaster %in% active_forecasters)
 
 # save for pairwise tournament
-score_cards_state_tourney = score_cards_state
-
-recent_score_by_frcstr = score_cards_county %>% 
-                           filter(target_end_date > today() - 28) %>%
-                           group_by(forecaster, ahead) %>% 
-                           summarize(num = sum(!is.na(wis))) %>%
-                           pivot_wider(names_from = ahead, 
-                                       names_prefix = "num_", 
-                                       values_from = num)
-recent_score_by_frcstr = recent_score_by_frcstr %>% 
-                           mutate(num_total = num_1 + num_2 + num_3 + num_4) %>%
-                           arrange(desc(num_total))
-print(recent_score_by_frcstr, n = Inf)
-cmu_forecasts = recent_score_by_frcstr[recent_score_by_frcstr$forecaster == "CMU-TimeSeries",]$num_total
-
-active_forecasters = recent_score_by_frcstr[recent_score_by_frcstr$num_total > cmu_forecasts * 0.80,]$forecaster
-# CovidAnalytics-DELPHI and IHME-CurveFit didn't submit that many forecasts ...
-score_cards_county = score_cards_county %>% 
-                    filter(forecaster %in% active_forecasters)
-score_cards_county_tourney = score_cards_county
+score_cards_tourney = score_cards
 ```
 
 ```{r}
 # TODO: Use evalcast::intersect_averagers after merging the kill-cards updates
-forecaster_coverage = score_cards_county %>% 
+forecaster_coverage = score_cards %>% 
                         filter(quantile == 0.5) %>% 
                         group_by(ahead, geo_value, target_end_date) %>% 
                         summarise(num_forecasts = n())
 max_forecasts = max(forecaster_coverage$num_forecasts)
 table(forecaster_coverage$num_forecasts)
-common_forecasts_county = forecaster_coverage %>% 
-                            filter(num_forecasts == max_forecasts) %>%
-                            select(ahead, geo_value, target_end_date)
-
-score_cards_county = semi_join(score_cards_county, common_forecasts_county)
-
-forecaster_coverage = score_cards_state %>% 
-                        filter(quantile == 0.5) %>% 
-                        group_by(ahead, geo_value, target_end_date) %>% 
-                        summarise(num_forecasts = n())
-max_forecasts = max(forecaster_coverage$num_forecasts)
-table(forecaster_coverage$num_forecasts)
-common_forecasts_state = forecaster_coverage %>% 
+common_forecasts = forecaster_coverage %>% 
                             filter(num_forecasts == max_forecasts) %>%
                             select(ahead, geo_value, target_end_date)
 
 
-score_cards_state = semi_join(score_cards_state, common_forecasts_state)
+score_cards = semi_join(score_cards, common_forecasts)
 ```
 
 ## Dot plots
@@ -386,19 +122,10 @@ dot_plot = function(df, var = "wis", ylab = var, ylim = NULL, aggr = Mean) {
 }
 ```
 
-### States
 ```{r, fig.width = 10, fig.height = 10}
-dot_plot(score_cards_state, var = "wis", ylab = "Mean WIS") + scale_y_log10()
-dot_plot(score_cards_state, var = "ae", ylab = "Mean AE") + scale_y_log10()
-dot_plot(score_cards_state, var = "cov_80", ylab = "Coverage-80", ylim = c(0,1)) +
-  geom_hline(yintercept = 0.8)
-```
-
-### Counties
-```{r, fig.width = 10, fig.height = 10}
-dot_plot(score_cards_county, var = "wis", ylab = "Mean WIS") + scale_y_log10()
-dot_plot(score_cards_county, var = "ae", ylab = "Mean AE") + scale_y_log10()
-dot_plot(score_cards_county, var = "cov_80", ylab = "Coverage-80", ylim = c(0,1)) +
+dot_plot(score_cards, var = "wis", ylab = "Mean WIS") + scale_y_log10()
+dot_plot(score_cards, var = "ae", ylab = "Mean AE") + scale_y_log10()
+dot_plot(score_cards, var = "cov_80", ylab = "Coverage-80", ylim = c(0,1)) +
   geom_hline(yintercept = 0.8)
 ```
 
@@ -407,38 +134,23 @@ dot_plot(score_cards_county, var = "cov_80", ylab = "Coverage-80", ylim = c(0,1)
 Same as before, but change the aggregator function to the median. Omitting AE
 for brevity, hencforth.
 
-### States
 ```{r, fig.width = 10, fig.height = 10}
-dot_plot(score_cards_state, var = "wis", ylab = "Median WIS", aggr = Median) +
-  scale_y_log10()
-```
-
-### Counties
-```{r, fig.width = 10, fig.height = 10}
-dot_plot(score_cards_county, var = "wis", ylab = "Median WIS", aggr = Median) +
+dot_plot(score_cards, var = "wis", ylab = "Median WIS", aggr = Median) +
   scale_y_log10()
 ```
 
 And now we change the aggregator function to be the 90th percentile.
 
-### States
 ```{r, fig.width = 10, fig.height = 10}
-dot_plot(score_cards_state, var = "wis", ylab = "90th percentile WIS", 
-         aggr = function(x) quantile(x, prob = 0.9, na.rm = TRUE)) +
-  scale_y_log10()
-```
-
-### Counties
-```{r, fig.width = 10, fig.height = 10}
-dot_plot(score_cards_county, var = "wis", ylab = "90th percentile WIS", 
+dot_plot(score_cards, var = "wis", ylab = "90th percentile WIS", 
          aggr = function(x) quantile(x, prob = 0.9, na.rm = TRUE)) +
   scale_y_log10()
 ```
 
 ## Line plots
 
-Now we make line plots: one line per ahead and forecaster, as a function of f
-orecast date. Here we use the mean as the aggregator function, and we look at
+Now we make line plots: one line per ahead and forecaster, as a function of
+forecast date. Here we use the mean as the aggregator function, and we look at
 WIS and coverage-80. 
 
 ```{r, fig.width = 10, fig.height = 8}
@@ -462,17 +174,9 @@ line_plot = function(df, var = "wis", ylab = var, ylim = NULL, aggr = Mean) {
 }
 ```
 
-### States
 ```{r, fig.width = 10, fig.height = 8}
-line_plot(score_cards_state, var = "wis", ylab = "Mean WIS") + scale_y_log10() 
-line_plot(score_cards_state, var = "cov_80", ylab = "Coverage-80", ylim = c(0,1)) +
-  geom_hline(yintercept = 0.8)
-```
-
-### Counties
-```{r, fig.width = 10, fig.height = 8}
-line_plot(score_cards_county, var = "wis", ylab = "Mean WIS") + scale_y_log10() 
-line_plot(score_cards_county, var = "cov_80", ylab = "Coverage-80", ylim = c(0,1)) +
+line_plot(score_cards, var = "wis", ylab = "Mean WIS") + scale_y_log10() 
+line_plot(score_cards, var = "cov_80", ylab = "Coverage-80", ylim = c(0,1)) +
   geom_hline(yintercept = 0.8)
 ```
 
@@ -509,29 +213,15 @@ scale_df = function(df, var, base_forecaster = "COVIDhub-baseline") {
 }
 ```
 
-### States
 ```{r, fig.width = 10, fig.height = 10}
-dot_plot(scale_df(score_cards_state, var = "wis"), var = "scaled", 
-         ylab = "Mean scaled WIS") + geom_hline(yintercept = 1) 
-```
-
-### Counties
-```{r, fig.width = 10, fig.height = 10}
-dot_plot(scale_df(score_cards_county, var = "wis"), var = "scaled", 
+dot_plot(scale_df(score_cards, var = "wis"), var = "scaled", 
          ylab = "Mean scaled WIS") + geom_hline(yintercept = 1) 
 ```
 
 Here are now line plots for mean scaled WIS. 
 
-### States
 ```{r, fig.width = 10, fig.height = 8}
-line_plot(scale_df(score_cards_state, var = "wis"), var = "scaled", 
-          ylab = "Mean scaled WIS") + geom_hline(yintercept = 1) 
-```
-
-### Counties
-```{r, fig.width = 10, fig.height = 8}
-line_plot(scale_df(score_cards_county, var = "wis"), var = "scaled", 
+line_plot(scale_df(score_cards, var = "wis"), var = "scaled", 
           ylab = "Mean scaled WIS") + geom_hline(yintercept = 1) 
 ```
 
@@ -556,29 +246,15 @@ center_df = function(df, var, base_forecaster = "COVIDhub-baseline") {
 }
 ```
 
-### States
 ```{r, fig.width = 10, fig.height = 10}
-dot_plot(center_df(score_cards_state, var = "wis"), var = "centered", 
+dot_plot(center_df(score_cards, var = "wis"), var = "centered", 
          ylab = "Mean centered WIS") + geom_hline(yintercept = 0)  
-```
-
-### Counties
-```{r, fig.width = 10, fig.height = 10}
-dot_plot(center_df(score_cards_county, var = "wis"), var = "centered", 
-         ylab = "Mean centered WIS") + geom_hline(yintercept = 0) 
 ```
 
 Here are now the line plots for mean centered WIS.
 
-### States
 ```{r, fig.width = 10, fig.height = 8}
-line_plot(center_df(score_cards_state, var = "wis"), var = "centered", 
-          ylab = "Mean centered WIS") + geom_hline(yintercept = 0) 
-```
-
-### Counties
-```{r, fig.width = 10, fig.height = 10}
-line_plot(center_df(score_cards_county, var = "wis"), var = "centered", 
+line_plot(center_df(score_cards, var = "wis"), var = "centered", 
           ylab = "Mean centered WIS") + geom_hline(yintercept = 0) 
 ```
 
@@ -642,13 +318,12 @@ pairwise_tournament = function(df, var, aggr = Mean) {
 }
 ```
 
-### States
 ```{r, fig.width = 10, fig.height = 10}
-theta_state = pairwise_tournament(score_cards_state_tourney, var = "wis", aggr = 
+theta = pairwise_tournament(score_cards_tourney, var = "wis", aggr = 
                               function(x) mean(x, trim = 0.01, na.rm = TRUE))
-ranked_list = rownames(theta_state$mat)[order(theta_state$vec1)]
+ranked_list = rownames(theta$mat)[order(theta$vec1)]
 colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
-ggplot(theta_state$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
+ggplot(theta$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
                      y = factor(Forecaster1, levels = rev(ranked_list)))) +
   geom_tile(aes(fill = value)) +
   geom_text(aes(label = round(value, 3))) +
@@ -658,43 +333,20 @@ ggplot(theta_state$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
                      axis.text.x = element_text(angle = 90, hjust = 1))
 
 # Overall metric (computed via GM of pairwise metrics):
-knitr::kable(data.frame(rank = 1:length(theta_state$vec1), forecaster = ranked_list,
-                        theta_state = sort(theta_state$vec1), row.names = NULL))
-```
-
-### Counties
-```{r, fig.width = 10, fig.height = 10}
-theta_county = pairwise_tournament(score_cards_county_tourney, var = "wis", aggr = 
-                              function(x) mean(x, trim = 0.01, na.rm = TRUE))
-
-ranked_list = rownames(theta_county$mat)[order(theta_county$vec1)]
-colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
-ggplot(theta_county$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
-                     y = factor(Forecaster1, levels = rev(ranked_list)))) +
-  geom_tile(aes(fill = value)) +
-  geom_text(aes(label = round(value, 3))) +
-  scale_fill_gradientn(colours = colors) +
-  labs(x = NULL, y = NULL) +
-  theme_bw() + theme(legend.position = "none", 
-                     axis.text.x = element_text(angle = 90, hjust = 1))
-
-# Overall metric (computed via GM of pairwise metrics):
-knitr::kable(data.frame(rank = 1:length(theta_county$vec1), forecaster = ranked_list,
-                        theta_county = sort(theta_county$vec1), row.names = NULL))
+knitr::kable(data.frame(rank = 1:length(theta$vec1), forecaster = ranked_list,
+                        theta = sort(theta$vec1), row.names = NULL))
 ```
 
 For curiosity, we can plot the agreement the overall metric computed via GM and
 SVD. The agreement is basically perfect!
 
-### State
 ```{r}
-ggplot() + geom_point(aes(x = theta_state$vec1, y = theta_state$vec2)) +
+ggplot() + geom_point(aes(x = theta$vec1, y = theta$vec2)) +
   labs(x = "Geometric mean", y = "Top left singular vector")
 ```
 
-### County
 ```{r}
-ggplot() + geom_point(aes(x = theta_county$vec1, y = theta_county$vec2)) +
+ggplot() + geom_point(aes(x = theta$vec1, y = theta$vec2)) +
   labs(x = "Geometric mean", y = "Top left singular vector")
 ```
 
@@ -702,13 +354,12 @@ ggplot() + geom_point(aes(x = theta_county$vec1, y = theta_county$vec2)) +
 
 Repeat the same pairwise tournament but with the median as the aggregator.
 
-### State
 ```{r, fig.width = 10, fig.height = 10}
-theta_state = pairwise_tournament(score_cards_state_tourney, var = "wis", aggr = Median)
+theta = pairwise_tournament(score_cards_tourney, var = "wis", aggr = Median)
 
-ranked_list = rownames(theta_state$mat)[order(theta_state$vec1)]
+ranked_list = rownames(theta$mat)[order(theta$vec1)]
 colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
-ggplot(theta_state$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
+ggplot(theta$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
                      y = factor(Forecaster1, levels = rev(ranked_list)))) +
   geom_tile(aes(fill = value)) +
   geom_text(aes(label = round(value, 3))) +
@@ -718,41 +369,19 @@ ggplot(theta_state$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
                      axis.text.x = element_text(angle = 90, hjust = 1))
 
 # Overall metric (computed via GM of pairwise metrics):
-knitr::kable(data.frame(rank = 1:length(theta_state$vec1), forecaster = ranked_list,
-                        theta_state = sort(theta_state$vec1), row.names = NULL))
-```
-
-### County
-```{r, fig.width = 10, fig.height = 10}
-theta_county = pairwise_tournament(score_cards_county_tourney, var = "wis", aggr = Median)
-
-ranked_list = rownames(theta_county$mat)[order(theta_county$vec1)]
-colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
-ggplot(theta_county$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
-                     y = factor(Forecaster1, levels = rev(ranked_list)))) +
-  geom_tile(aes(fill = value)) +
-  geom_text(aes(label = round(value, 3))) +
-  scale_fill_gradientn(colours = colors) +
-  labs(x = NULL, y = NULL) +
-  theme_bw() + theme(legend.position = "none", 
-                     axis.text.x = element_text(angle = 90, hjust = 1))
-
-# Overall metric (computed via GM of pairwise metrics):
-knitr::kable(data.frame(rank = 1:length(theta_county$vec1), forecaster = ranked_list,
-                        theta_county = sort(theta_county$vec1), row.names = NULL))
+knitr::kable(data.frame(rank = 1:length(theta$vec1), forecaster = ranked_list,
+                        theta = sort(theta$vec1), row.names = NULL))
 ```
 
 And now with the 90th percentile as the aggregator. 
 
-### State
-
 ```{r, fig.width = 10, fig.height = 10}
-theta_state = pairwise_tournament(score_cards_state_tourney, var = "wis", aggr =
+theta = pairwise_tournament(score_cards_tourney, var = "wis", aggr =
                               function(x) quantile(x, prob = 0.9, na.rm = TRUE))
 
-ranked_list = rownames(theta_state$mat)[order(theta_state$vec1)]
+ranked_list = rownames(theta$mat)[order(theta$vec1)]
 colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
-ggplot(theta_state$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
+ggplot(theta$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
                      y = factor(Forecaster1, levels = rev(ranked_list)))) +
   geom_tile(aes(fill = value)) +
   geom_text(aes(label = round(value, 3))) +
@@ -762,28 +391,6 @@ ggplot(theta_state$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
                      axis.text.x = element_text(angle = 90, hjust = 1))
 
 # Overall metric (computed via GM of pairwise metrics):
-knitr::kable(data.frame(rank = 1:length(theta_state$vec1), forecaster = ranked_list,
-                        theta_state = sort(theta_state$vec1), row.names = NULL))
-```
-
-### County
-
-```{r, fig.width = 10, fig.height = 10}
-theta_county = pairwise_tournament(score_cards_county_tourney, var = "wis", aggr =
-                              function(x) quantile(x, prob = 0.9, na.rm = TRUE))
-
-ranked_list = rownames(theta_county$mat)[order(theta_county$vec1)]
-colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
-ggplot(theta_county$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
-                     y = factor(Forecaster1, levels = rev(ranked_list)))) +
-  geom_tile(aes(fill = value)) +
-  geom_text(aes(label = round(value, 3))) +
-  scale_fill_gradientn(colours = colors) +
-  labs(x = NULL, y = NULL) +
-  theme_bw() + theme(legend.position = "none", 
-                     axis.text.x = element_text(angle = 90, hjust = 1))
-
-# Overall metric (computed via GM of pairwise metrics):
-knitr::kable(data.frame(rank = 1:length(theta_county$vec1), forecaster = ranked_list,
-                        theta_county = sort(theta_county$vec1), row.names = NULL))
+knitr::kable(data.frame(rank = 1:length(theta$vec1), forecaster = ranked_list,
+                        theta = sort(theta$vec1), row.names = NULL))
 ```

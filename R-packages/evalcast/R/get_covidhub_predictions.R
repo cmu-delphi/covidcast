@@ -20,7 +20,7 @@
 #' @param incidence_period one of "epiweek" or "day". NULL will attempt to 
 #'   return both
 #' @param signal this function supports only "confirmed_incidence_num",
-#'   "deaths_incidence_num", and/or "deaths_cumulative_num" (those currently)
+#'   "deaths_incidence_num", and/or "deaths_cumulative_num" (those currently
 #'   forecast by the COVIDhub-ensemble). For other types, use one of the 
 #'   alternatives mentioned above
 #'   

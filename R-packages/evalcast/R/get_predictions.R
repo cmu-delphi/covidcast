@@ -29,7 +29,8 @@
 #' @param signal_aggregation_dt for any data format, 
 #'   [covidcast::aggregate_signals()] can perform leading and lagging for you.
 #'   See that documentation for more details.
-#' @param ... Additional arguments to be passed to `forecaster()`.
+#' @param ... Additional named arguments to be passed to `forecaster()` and 
+#'   `apply_corrections()`
 #' @template predictions_cards-template
 #' 
 #'
@@ -124,10 +125,20 @@ get_predictions_single_date <- function(forecaster,
                          signal_aggregation = signal_aggregation,
                          signal_aggregation_dt = signal_aggregation_dt)
 
-  if(!is.null(apply_corrections)) df <- data_corrector(df, apply_corrections)
+  # Dump out any extra geo_values we don't want.
+  if (geo_values != "*") {
+    if (signal_aggregation == "list") {
+      df <- map(df, ~filter(.x, .data$geo_value %in% geo_values))  
+    } else {
+      df <- filter(df, .data$geo_value %in% geo_values)
+    }
+  }
+    
+  
+  
+  if(!is.null(apply_corrections)) df <- apply_corrections(df, ...)
   
 
-  if (geo_values_dl != "*") df <- filter(df, .data$geo_value %in% geo_values)
   out <- forecaster(df,
                     forecast_date,
                     signals,
@@ -135,6 +146,10 @@ get_predictions_single_date <- function(forecaster,
                     ahead,
                     geo_type,
                     ...)
+  assert_that(c("ahead", "geo_value", "quantile", "value") %in% names(out),
+              msg = paste("Your forecaster must return a data frame with",
+                          "(at least) the columnns `ahead`, `geo_value`,",
+                          "`quantile`, and `value`."))
   # make a predictions card for each ahead
   out %>% 
     mutate(

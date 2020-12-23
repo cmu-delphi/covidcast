@@ -4,8 +4,8 @@ author: "Delphi Group"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output: html_document
 params:
-  score_file: "scor_cards_state.rda"
-  card_name: "scre_cards_state"
+  score_file: "score_cards_state.rda"
+  card_name: "score_cards_state"
 ---
 
 ```{r, include = FALSE}
@@ -128,6 +128,7 @@ dot_plot(score_cards, var = "ae", ylab = "Mean AE") + scale_y_log10()
 dot_plot(score_cards, var = "cov_80", ylab = "Coverage-80", ylim = c(0,1)) +
   geom_hline(yintercept = 0.8)
 ```
+
 
 ## Dot plots: median and 90th percentile
 
@@ -393,4 +394,84 @@ ggplot(theta$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
 # Overall metric (computed via GM of pairwise metrics):
 knitr::kable(data.frame(rank = 1:length(theta$vec1), forecaster = ranked_list,
                         theta = sort(theta$vec1), row.names = NULL))
+```
+
+## Interval Error (experimental)
+Probabilistic forecasters may be judged on both their point estimates and confidence intervals.
+In the previous tabs, we have primarily focused on coverage-80 (which evaluates 80% confidence intervals)
+and WIS (which evaluates a combination of intervals). We briefly touched on Average Error
+as a measure of point estimates, however this does not account for spatial and temporal differences in forecasting difficulty.
+
+Interval Error is an experimental attempt to evaluate point estimates while considering that forecasting difficulty is not uniform.
+
+The essential idea is to use the COVIDhub-ensemble 80% confidence interval as a proxy for forecasting difficulty.
+As most forecasters use a long tailed distribution for COVID cases and deaths, we presume a multiplicative uncertainty model.
+In particular,
+
+$$
+D_{\ell,d,a} = log(P^{*90}_{\ell,d,a} / P^{*10}_{\ell,d,a})
+$$
+Where $D_{\ell, d, a}$ is the normalization score at a location, date, ahead combo
+and $P^{*90}_{\ell,d,a}$ is the ensemble forecaster's distribution for the same combo.
+
+For each forecaster $f$ we take 
+$$s_{\ell,d,a} = log((P^{f50} + 1) / (A_{\ell,d} + 1)) / D_{\ell,d,a}$$
+where $A_{\ell,d}$ is the actual value observed for that date and location.
+The rationale here is similar to if one were making predictions on normally distributed variables with different variances and chose to use standard deviation as a normalization metric, but with multiplicative error instead.
+Or to put it another way, if your forecast is off by a factor of 5, you'll be dinged more if the ensemble indicated that the result would be within a factor of 2 than if it indicated a factor of 10.
+Because the normalization is based on the ensemble interval, it is provisionally referred to as "Interval Error" or IE.
+
+```{r, fig.width = 10, fig.height = 10}
+ensemble_widths = score_cards %>%
+                    filter(forecaster == "COVIDhub-ensemble") %>%
+                    filter(quantile %in% c(0.1, 0.9)) %>%
+                    arrange(quantile) %>%
+                    group_by(geo_value, ahead, target_end_date) %>%
+                    mutate(width = value / lag(value)) %>%
+                    filter(!is.na(width)) %>%
+                    filter(!is.infinite(width)) %>%
+                    mutate(log_width = log(width)) %>%
+                    select(ahead, geo_value, target_end_date, width, log_width)
+
+score_cards_ie = score_cards %>% filter(quantile == 0.5)
+score_cards_ie = score_cards_ie %>% mutate(actual = actual + 1) %>% mutate(value = value + 1)
+
+score_cards_ie = inner_join(score_cards_ie, ensemble_widths) %>%
+        mutate(ie = abs(log(value/actual)/log_width))
+
+ie_summary = score_cards_ie %>%
+               select(ahead, forecaster, target_end_date, ie) %>%
+               group_by(forecaster, ahead, target_end_date) %>% 
+               summarise_at(vars(ie), mean)
+dot_plot(ie_summary, var = "ie", ylab = "IE")
+line_plot(ie_summary, var = "ie", ylab = "IE")
+```
+
+We may still compare to the baseline forecaster to compare the results to an unskilled forecaster.
+
+```{r, fig.width = 10, fig.height = 10}
+baseline_ie = ie_summary %>%
+                    filter(forecaster == "COVIDhub-baseline") %>%
+                    rename(baseline_ie = ie) %>%
+                    ungroup() %>%
+                    select(ahead, target_end_date, baseline_ie)
+
+ie_summary = inner_join(ie_summary, baseline_ie, by = c("ahead", "target_end_date")) %>% 
+                        mutate(difference = ie - baseline_ie)
+
+dot_plot(ie_summary, var = "difference", ylab = "IE Difference")
+line_plot(ie_summary, var = "difference", ylab = "IE Difference")
+
+```
+
+and the same graphs with just CMU, the baseline and Ensemble for visibility:
+```{r, fig.width = 10, fig.height = 10}
+selected_forecasters = c("CMU-TimeSeries", "COVIDhub-baseline", "COVIDhub-ensemble")
+ie_summary_small = ie_summary %>% filter(forecaster %in% selected_forecasters)
+
+dot_plot(ie_summary_small, var = "ie", ylab = "IE")
+line_plot(ie_summary_small, var = "ie", ylab = "IE")
+
+dot_plot(ie_summary_small, var = "difference", ylab = "IE Difference")
+line_plot(ie_summary_small, var = "difference", ylab = "IE Difference")
 ```

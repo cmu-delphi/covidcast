@@ -78,7 +78,7 @@ weighted_interval_score <- function(quantile, value, actual_value) {
 #' @export
 absolute_error <- function(quantile, value, actual_value) {
   point_fcast <- which(is.na(quantile))
-  ae <- abs(quantile - value)
+  ae <- abs(actual_value - value)
   if (length(point_fcast) == 1L) return(ae[point_fcast])
   point_fcast <- which(find_quantile_match(quantile, 0.5))
   if (length(point_fcast) == 1L) return(ae[point_fcast])

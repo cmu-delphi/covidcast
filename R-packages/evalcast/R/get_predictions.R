@@ -146,7 +146,7 @@ get_predictions_single_date <- function(forecaster,
                     ahead,
                     geo_type,
                     ...)
-  assert_that(c("ahead", "geo_value", "quantile", "value") %in% names(out),
+  assert_that(all(c("ahead", "geo_value", "quantile", "value") %in% names(out)),
               msg = paste("Your forecaster must return a data frame with",
                           "(at least) the columnns `ahead`, `geo_value`,",
                           "`quantile`, and `value`."))

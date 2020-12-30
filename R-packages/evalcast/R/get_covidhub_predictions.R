@@ -151,3 +151,6 @@ get_covidhub_forecaster_names <- function(
   covidHubUtils::get_all_models(source = repo)
 }
 
+covidhub_probs <- function() {
+  c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99)
+}

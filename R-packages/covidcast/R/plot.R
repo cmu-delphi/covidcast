@@ -270,7 +270,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   # Set megacounty colors here
   if (attributes(x)$metadata$geo_type == "county") {
     map_df = map_df %>% dplyr::mutate(
-      color = ifelse(paste0(STATEFP,"000") %in% geo,
+      color = ifelse(paste0(STATEFP, "000") %in% geo,
                      col_fun(val[paste0(STATEFP, "000")], alpha = alpha),
                      missing_col))
   }
@@ -332,8 +332,8 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
         color = col_fun(val[GEOID])) 
 
     if (length(include) > 0) {
-      map_df = map_df %>% dplyr::filter(
-        covidcast::fips_to_abbr(as.numeric(.$STATEFP)) %in% include)
+      map_df = map_df %>%
+        dplyr::filter(fips_to_abbr(paste0(.$STATEFP, "000")) %in% include)
     }
   }
 

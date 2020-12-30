@@ -764,6 +764,5 @@ shift_main = function(map_df){
     main_df = main_df %>% dplyr::filter(.$is_state)
   }
   main_df = sf::st_transform(main_df, final_crs)
-  sf::st_crs(main_df) <- final_crs
   return(main_df)
 }

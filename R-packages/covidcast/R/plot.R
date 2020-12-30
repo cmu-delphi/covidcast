@@ -729,20 +729,28 @@ shift_pr = function(map_df) {
   pr_df = sf::st_set_geometry(pr_df, pr_shift)
   r = 16 * pi / 180
   rotation = matrix(c(cos(r), sin(r), -sin(r), cos(r)), nrow = 2, ncol = 2)
-  pr_rotate = (sf::st_geometry(pr_df)) * rotation 
+  pr_rotate = (sf::st_geometry(pr_df)) * rotation
   pr_df = sf::st_set_geometry(pr_df, pr_rotate)
-  sf::st_crs(pr_df) <- final_crs
+
+  # Pretend this was in final_crs all along
+  suppressWarnings({
+    sf::st_crs(pr_df) <- final_crs
+  })
   return(pr_df)
 }
 
 shift_alaska = function(map_df){
   alaska_df = map_df %>% dplyr::filter(.$is_alaska)
   alaska_df = sf::st_transform(alaska_df, alaska_crs)
-  alaska_scale = sf::st_geometry(alaska_df) * 0.35 
+  alaska_scale = sf::st_geometry(alaska_df) * 0.35
   alaska_df = sf::st_set_geometry(alaska_df, alaska_scale)
   alaska_shift = sf::st_geometry(alaska_df) + c(-1.8e+6, -1.6e+6)
   alaska_df = sf::st_set_geometry(alaska_df, alaska_shift)
-  sf::st_crs(alaska_df) <- final_crs
+
+  # Pretend this was in final_crs all along
+  suppressWarnings({
+    sf::st_crs(alaska_df) <- final_crs
+  })
   return(alaska_df)
 }
 
@@ -751,7 +759,11 @@ shift_hawaii = function(map_df){
   hawaii_df = sf::st_transform(hawaii_df, hawaii_crs)
   hawaii_shift = sf::st_geometry(hawaii_df) + c(-1e+6, -2e+6)
   hawaii_df = sf::st_set_geometry(hawaii_df, hawaii_shift)
-  sf::st_crs(hawaii_df) <- final_crs
+
+  # Pretend this was in final_crs all along
+  suppressWarnings({
+    sf::st_crs(hawaii_df) <- final_crs
+  })
   return(hawaii_df)
 }
 

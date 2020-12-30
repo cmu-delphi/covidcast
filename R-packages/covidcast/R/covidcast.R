@@ -278,6 +278,10 @@ covidcast_signal <- function(data_source, signal,
 
   if (!is.null(as_of)) {
     as_of <- as.Date(as_of)
+
+    # By definition, there can never be data from the future. So clamp `end_day`
+    # to be no larger than `as_of`.
+    end_day <- min(as_of, end_day)
   }
 
   if (!is.null(issues)) {

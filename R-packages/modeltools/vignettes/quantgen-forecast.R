@@ -1,7 +1,7 @@
 library(covidcast)
 library(evalcast)
-#library(modeltools)
-devtools::load_all("../")
+library(modeltools)
+library(dplyr)
 
 ## Setup 
 
@@ -24,10 +24,22 @@ nonneg <- TRUE
 # Important: functions to considerably speed up data fetching steps. Only pull 
 # recent data for each forecast date, depending on the training set size (and 
 # other parameters for quantgen)
+
+# Due to inevitable latency in the signals, if we look at training sets defined
+# by taking all n days before the forecast date, then we don't actually have n
+# time points worth of data available to us (we're always fetching data "as of"
+# the forecast date). As here n = max(ahead) = 28, the baseline forecaster can't 
+# actually produce 28-days-ahead forecasts with the most recent n time points
+# worth of data, since it would need to calculate differences of signal values
+# spaced 28 days apart. This is why we've included an extra 4 days in the data
+# we make available to the baseline forecaster
 start_day_baseline <- function(forecast_date) {
   return(as.Date(forecast_date) - n - 4 + 1)
 }
 
+# For the autoregressive models fit by quantgen, we need to ensure that we pull
+# enough training data so that 1. we actually have the response (defined by some
+# number of days ahead into the future) and 2. we have the lagged features 
 start_day_quantgen <- function(forecast_date) {
   return(as.Date(forecast_date) - max(ahead) - n - max(lags) + 1)
 }
@@ -90,7 +102,6 @@ pred_quantgen2 <- suppressMessages(suppressWarnings(
 # evaluation function so we can do it ourselves later. This is because I'd
 # rather see results compressed down to have one row per forecast task (not one
 # row per forecasted quantile value) and it's easier to use dplyr::summarize()
-library(dplyr)
 results <- suppressMessages(suppressWarnings(
   evaluate_predictions(
     predictions_cards = rbind(pred_baseline, pred_quantgen1, pred_quantgen2),

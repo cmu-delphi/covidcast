@@ -8,7 +8,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-TODO, blah load data
+A basic way of assessing growth in a signal is to look at its percentage change
+over two neighboring time windows. We investigate this in the current vignette,
+using the `pct_change()` function in the `modeltools` package. As in the getting
+started guide, we focus on state-level COVID-19 case rates from the USAFacts 
+data source, smoothed via 7-day trailing averages, from June to mid November. 
 
 ```{r}
 library(covidcast)
@@ -28,23 +32,31 @@ summary(case_rates)
 
 ## Percentage change
 
-TODO, blah try trailing average
+The `pct_change()` function operates on a `covidcast_signal` data frame, and 
+takes an argument `n`, indicating the size of the local window (in days) to use. 
+For example, if `n = 10`, then to compute the percentage change on November 10, 
+we use 100 * (B - A) / A, where A is the sum of the values between November 6 
+and November 10, and A is the sum of the values between November 1 and November 
+5. The default is `n = 14`, giving the percentage change between back-to-back
+weeks.
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 library(modeltools)
 library(dplyr)
 
-case_rates <- pct_change(case_rates, n = 14, col_name = "pct_change")
+case_rates <- pct_change(case_rates, n = 14)
 
 case_rates %>% 
   arrange(geo_value) %>% 
   select(geo_value, time_value, value, pct_change) %>%
-  head(n = 21)
+  print(n = 21)
 ```
 
-TODO, blah plot it
+We can see that a column `pct_change` column has been appended to the output 
+data frame, which contains the percentage change values estimates. Next we plot 
+these values alongside the signal itself. 
 
-```{r, fig.width = 8, fig.height = 4}
+```{r, message = FALSE, warning = FALSE, fig.width = 8, fig.height = 4}
 library(ggplot2)
 library(gridExtra)
 
@@ -58,17 +70,19 @@ p1 <- ggplot(case_rates %>% filter(geo_value == state),
 p2 <- ggplot(case_rates %>% filter(geo_value == state),
              aes(x = time_value, y = pct_change)) +
   geom_line() + 
-  labs(x = "Date", y = "Weekly percent change") 
+  labs(x = "Date", y = "Weekly percentage change") 
 
 grid.arrange(p1, p2, nrow = 1)
 ```
 
 ## Smoothing via 7-day averaging
 
-TODO blah we can compute daily percentage change values and smooth via 7-day
-averaging
+Computing the percentage change between back-to-back days, using `n = 2`, will
+generally return a pretty volatile sequence; below we show how to smooth this 
+sequence by post-applying a 7-day trailing average, with a suitable application 
+of `slide_by_geo()`. 
 
-```{r, fig.width = 8, fig.height = 4}
+```{r, message = FALSE, warning = FALSE, fig.width = 8, fig.height = 4}
 case_rates <- case_rates %>%
   pct_change(n = 2, col_name = "pct_change_daily") %>%
   slide_by_geo(~ Mean(.x$pct_change_daily), n = 7, 
@@ -89,7 +103,7 @@ p2 <- ggplot(case_rates %>% filter(geo_value == state),
              aes(x = time_value)) +
   geom_line(aes(y = pct_change_daily), col = "red") + 
   geom_line(aes(y = pct_change_daily_7dav), col = "blue") + 
-  labs(x = "Date", y = "Daily percent change") 
+  labs(x = "Date", y = "Daily percentage change") 
 
 grid.arrange(p1, p2, nrow = 1)
 ```

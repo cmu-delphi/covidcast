@@ -68,7 +68,7 @@ For example, to apply a 7-day trailing average to the raw values in the first
 `covidcast_signal` data frame, we can specify a formula via the `slide_fun` 
 argument of `slide_by_geo()`:
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 library(modeltools)
 library(dplyr)
 

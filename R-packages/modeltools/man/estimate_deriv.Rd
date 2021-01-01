@@ -53,7 +53,8 @@ to the \code{col_name} argument, containing the estimated derivative values.
 Estimates derivatives of the values in a \code{covidcast_signal} data frame, using
 a local (in time) linear regression or smoothing spline. (When multiple issue
 dates are present, only the latest issue is considered.)  See the
-\url{derivatives vignette} for examples.
+\href{https://cmu-delphi.github.io/covidcast/modeltools/articles/estimate-deriv.html}{estimating derivatives vignette}
+for examples.
 }
 \details{
 Derivatives are estimated using:

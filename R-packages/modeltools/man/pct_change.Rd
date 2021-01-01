@@ -26,5 +26,6 @@ to the \code{col_name} argument, containing the percentage change values.
 \description{
 Computes the percentage change of the values in a \code{covidcast_signal} data
 frame. (When multiple issue dates are present, only the latest issue is
-considered.)  See the \url{percentage change vignette} for examples.
+considered.)  See the \href{https://cmu-delphi.github.io/covidcast/modeltools/articles/pct-change.html}{percentage change vignette}
+for examples.
 }

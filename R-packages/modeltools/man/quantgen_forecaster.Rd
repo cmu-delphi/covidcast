@@ -139,5 +139,6 @@ quantile forecasts for that location and ahead.
 }
 \description{
 A simple quantile autoregressive forecaster based on \code{quantgen}, to be used
-with \code{evalcast}, via \code{\link[evalcast:get_predictions]{evalcast::get_predictions()}}. See the \url{quantgenvignette} for examples.
+with \code{evalcast}, via \code{\link[evalcast:get_predictions]{evalcast::get_predictions()}}. See the \href{https://cmu-delphi.github.io/covidcast/modeltools/articles/quantgen-forecast.html}{quantgen forecast vignette}
+for examples.
 }

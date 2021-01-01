@@ -1,3 +1,13 @@
+# Deploy to central docs directory that's on GitHub Pages
+destination: ../../docs/modeltoolsR/
+
+home:
+  links:
+    - text: Get the covidcast R package 
+      href: https://cmu-delphi.github.io/covidcast/covidcastR/
+    - text: Get the evalcast R package
+      href: https://cmu-delphi.github.io/covidcast/evalcastR/
+
 articles:
   - title: Using the package
     desc: Basic usage and examples.
@@ -6,3 +16,11 @@ articles:
       - modeltools
       - pct-change
       - estimate-deriv
+      - quantgen-forecast
+
+repo:
+  url:
+    home: https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools
+    source: https://github.com/cmu-delphi/covidcast/blob/main/R-packages/modeltools/
+    issue: https://github.com/cmu-delphi/covidcast/issues
+    user: https://github.com/

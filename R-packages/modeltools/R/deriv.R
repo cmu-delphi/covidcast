@@ -3,7 +3,9 @@
 #' Estimates derivatives of the values in a `covidcast_signal` data frame, using
 #' a local (in time) linear regression or smoothing spline. (When multiple issue
 #' dates are present, only the latest issue is considered.)  See the
-#' [derivatives vignette]() for examples.
+#' [estimating derivatives
+#' vignette](https://cmu-delphi.github.io/covidcast/modeltools/articles/estimate-deriv.html)
+#' for examples.  
 #'
 #' @param x The `covidcast_signal` data frame under consideration. 
 #' @param method One of "lin", "ss", or "tf" indicating the method to use for

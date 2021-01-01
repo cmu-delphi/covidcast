@@ -3,7 +3,9 @@
 #'
 #' Slides a given function over the values in a  `covidcast_signal` data frame,
 #' grouped by `geo_value`. (When multiple issue dates are present, only the
-#' latest issue is considered.)  See the [slide vignette]() for examples. 
+#' latest issue is considered.) See the [getting started
+#' guide](https://cmu-delphi.github.io/covidcast/modeltools/articles/modeltools.html)
+#' for examples.    
 #'
 #' @param x The `covidcast_signal` data frame under consideration. 
 #' @param slide_fun Function or formula to slide over the values in `x`, grouped

@@ -46,5 +46,6 @@ to the \code{col_name} argument, containing the function values.
 \description{
 Slides a given function over the values in a  \code{covidcast_signal} data frame,
 grouped by \code{geo_value}. (When multiple issue dates are present, only the
-latest issue is considered.)  See the \url{slide vignette} for examples.
+latest issue is considered.) See the \href{https://cmu-delphi.github.io/covidcast/modeltools/articles/modeltools.html}{getting started guide}
+for examples.
 }

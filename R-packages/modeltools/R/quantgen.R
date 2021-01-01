@@ -2,7 +2,9 @@
 #'
 #' A simple quantile autoregressive forecaster based on `quantgen`, to be used
 #' with `evalcast`, via [evalcast::get_predictions()]. See the [quantgen
-#' vignette]() for examples.  
+#' forecast
+#' vignette](https://cmu-delphi.github.io/covidcast/modeltools/articles/quantgen-forecast.html)
+#' for examples.
 #' 
 #' @param df Data frame of signal values to use for forecasting, of the format
 #'   that is returned by [covidcast::covidcast_signals()].

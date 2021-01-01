@@ -2,8 +2,8 @@
 % Please edit documentation in R/slide.R
 \name{slide_by_geo}
 \alias{slide_by_geo}
-\title{Slide a function over values in `covidcast_signal` data frame, grouped by
-`geo_value`}
+\title{Slide a function over values in \code{covidcast_signal} data frame, grouped by
+\code{geo_value}}
 \usage{
 slide_by_geo(
   x,
@@ -15,37 +15,36 @@ slide_by_geo(
 )
 }
 \arguments{
-\item{x}{The `covidcast_signal` data frame under consideration.}
+\item{x}{The \code{covidcast_signal} data frame under consideration.}
 
-\item{slide_fun}{Function or formula to slide over the values in `x`, grouped
-by `geo_value`. To "slide" means to apply the function or formula over a
-trailing window of `n` days of data. If a function, `slide_fun` must take
-`x`, a data frame the same column names as the original data frame;
+\item{slide_fun}{Function or formula to slide over the values in \code{x}, grouped
+by \code{geo_value}. To "slide" means to apply the function or formula over a
+trailing window of \code{n} days of data. If a function, \code{slide_fun} must take
+\code{x}, a data frame the same column names as the original data frame;
 followed by any number of named additional arguments; and ending with
-`...`, to capture general additional arguments. If a formula, `slide_fun`
-can operate directly on `.x$value`, `.x$time_value`, etc., as in `~
-mean(.x$value)` to compute a trailing mean over the last `n` days of data.}
+\code{...}, to capture general additional arguments. If a formula, \code{slide_fun}
+can operate directly on \code{.x$value}, \code{.x$time_value}, etc., as in \code{~ mean(.x$value)} to compute a trailing mean over the last \code{n} days of data.}
 
-\item{n}{Size of the local window (in days) to use. For example, if `n = 5`,
+\item{n}{Size of the local window (in days) to use. For example, if \code{n = 5},
 then to estimate the derivative on November 5, we train the given method on
 data in between November 1 and November 5. Default is 14.}
 
 \item{col_name}{String indicating the name of the new column that will
 contain the derivative values. Default is "slide_value"; note that setting
-`col_name = "value"` will overwrite the existing "value" column.}
+\code{col_name = "value"} will overwrite the existing "value" column.}
 
 \item{col_type}{One of "dbl", "int", "lgl", "chr", or "list", indicating the
 data type (as tibble abbreviation) for the new column. Default is "dbl".}
 
 \item{...}{Additional arguments to pass to the function or formula specified
-via `slide_fun`.}
+via \code{slide_fun}.}
 }
 \value{
-A data frame given by appending a new column to `x` named according
-  to the `col_name` argument, containing the function values.
+A data frame given by appending a new column to \code{x} named according
+to the \code{col_name} argument, containing the function values.
 }
 \description{
-Slides a given function over the values in a  `covidcast_signal` data frame,
-grouped by `geo_value`. (When multiple issue dates are present, only the
-latest issue is considered.)  See the [slide vignette]() for examples.
+Slides a given function over the values in a  \code{covidcast_signal} data frame,
+grouped by \code{geo_value}. (When multiple issue dates are present, only the
+latest issue is considered.)  See the \url{slide vignette} for examples.
 }

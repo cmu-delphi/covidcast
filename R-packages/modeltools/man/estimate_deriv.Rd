@@ -2,7 +2,7 @@
 % Please edit documentation in R/deriv.R
 \name{estimate_deriv}
 \alias{estimate_deriv}
-\title{Estimate derivatives of values in `covidcast_signal` data frame}
+\title{Estimate derivatives of values in \code{covidcast_signal} data frame}
 \usage{
 estimate_deriv(
   x,
@@ -15,85 +15,84 @@ estimate_deriv(
 )
 }
 \arguments{
-\item{x}{The `covidcast_signal` data frame under consideration.}
+\item{x}{The \code{covidcast_signal} data frame under consideration.}
 
 \item{method}{One of "lin", "ss", or "tf" indicating the method to use for
 the derivative calculation. To estimate the derivative at any time point,
-we run the given method on the last `n` days of data, and use the
+we run the given method on the last \code{n} days of data, and use the
 corresponding predicted derivative (that is, the derivative of the
 underlying estimated function, linear or spline) at the current time
 point. Default is "lin". See details below.}
 
-\item{n}{Size of the local window (in days) to use. For example, if `n = 5`,
+\item{n}{Size of the local window (in days) to use. For example, if \code{n = 5},
 then to estimate the derivative on November 5, we train the given method on
 data in between November 1 and November 5. Default is 14.}
 
 \item{col_name}{String indicating the name of the new column that will
 contain the derivative values. Default is "deriv"; note that setting
-`col_name = "value"` will overwrite the existing "value" column.}
+\code{col_name = "value"} will overwrite the existing "value" column.}
 
-\item{keep_obj}{Should the fitted object (from linear regression, smoothing 
-spline, or trend filtering) be kept as a separate column? If `TRUE`, then
-this column name is given by  appending "_obj" to `col_name`. Default is
-`FALSE`.}
+\item{keep_obj}{Should the fitted object (from linear regression, smoothing
+spline, or trend filtering) be kept as a separate column? If \code{TRUE}, then
+this column name is given by  appending "_obj" to \code{col_name}. Default is
+\code{FALSE}.}
 
 \item{deriv}{Order of derivative to estimate. Only orders 1 or 2 are allowed,
 with the default being 1. (In some cases, a second-order derivative will
-return a trivial result: for example: when `method = "lin"`, this will
+return a trivial result: for example: when \code{method = "lin"}, this will
 always be zero.)}
 
 \item{...}{Additional arguments to pass to the function that estimates
 derivatives. See details below.}
 }
 \value{
-A data frame given by appending a new column to `x` named according
-  to the `col_name` argument, containing the estimated derivative values.
+A data frame given by appending a new column to \code{x} named according
+to the \code{col_name} argument, containing the estimated derivative values.
 }
 \description{
-Estimates derivatives of the values in a `covidcast_signal` data frame, using
+Estimates derivatives of the values in a \code{covidcast_signal} data frame, using
 a local (in time) linear regression or smoothing spline. (When multiple issue
 dates are present, only the latest issue is considered.)  See the
-[derivatives vignette]() for examples.
+\url{derivatives vignette} for examples.
 }
 \details{
 Derivatives are estimated using:
 
 \itemize{
-\item Linear regression, when `method = "lin"`, via `stats::lsfit()`. 
-\item Cubic smoothing spline, when `method = "ss"`, via
-  `stats::smooth.spline()`.
-\item Polynomial trend filtering, when `method = "tf"`, via
-  `genlasso::trendfilter()`.
+\item Linear regression, when \code{method = "lin"}, via \code{stats::lsfit()}.
+\item Cubic smoothing spline, when \code{method = "ss"}, via
+\code{stats::smooth.spline()}.
+\item Polynomial trend filtering, when \code{method = "tf"}, via
+\code{genlasso::trendfilter()}.
 }
 
 The second and third cases base the derivative calculation on a nonparametric
-  fit and should typically be used with a larger window `n`. The third case
-  (trend filtering) is more locally adaptive than the second (smoothing
-  spline) and can work better when there are sharp changes in the smoothness
-  of the underlying values.
+fit and should typically be used with a larger window \code{n}. The third case
+(trend filtering) is more locally adaptive than the second (smoothing
+spline) and can work better when there are sharp changes in the smoothness
+of the underlying values.
 
 In the first and second cases (linear regression and smoothing spline), the
-  additional arguments in `...` are directly passed to the underlying 
-  estimation function (`stats::lsfit()` and `stats::smooth.spline()`).   
+additional arguments in \code{...} are directly passed to the underlying
+estimation function (\code{stats::lsfit()} and \code{stats::smooth.spline()}).
 
-The third case (trend filtering) works a little differently. Here, a custom 
-  set of arguments is allowed (and are internally distributed as appropriate
-  to `genlasso::trendfilter()`, `genlasso::cv.trendfilter()`, and
-  `genlasso::coef.genlasso()`): 
+The third case (trend filtering) works a little differently. Here, a custom
+set of arguments is allowed (and are internally distributed as appropriate
+to \code{genlasso::trendfilter()}, \code{genlasso::cv.trendfilter()}, and
+\code{genlasso::coef.genlasso()}):
 
 \describe{
-\item{`ord`}{Order of piecewise polynomial for the trend filtering fit,
-  default is 2.}
-\item{`maxsteps`}{Maximum number of steps to take in the solution path before
-  terminating, default is 100.} 
-\item{`cv`}{Boolean indicating whether cross-validation should be used to
-  choose an effective degrees of freedom for the fit, default is `FALSE`.}
-\item{`k`}{Number of folds if cross-validation is to be used. Default is 5.} 
-\item{`df`}{Desired effective degrees of freedom for the trend filtering
-  fit. If `cv = FALSE`, then `df` must be an integer; if `cv = TRUE`, then
-  `df` should be one of "min" or "1se" indicating the selection rule to use
-  based on the cross-validation error curve (minimum or 1-standard-error
-  rule, respectively). Default is 8 when `cv = FALSE`, and "1se" when `cv =
-  TRUE`.} 
+\item{\code{ord}}{Order of piecewise polynomial for the trend filtering fit,
+default is 2.}
+\item{\code{maxsteps}}{Maximum number of steps to take in the solution path before
+terminating, default is 100.}
+\item{\code{cv}}{Boolean indicating whether cross-validation should be used to
+choose an effective degrees of freedom for the fit, default is \code{FALSE}.}
+\item{\code{k}}{Number of folds if cross-validation is to be used. Default is 5.}
+\item{\code{df}}{Desired effective degrees of freedom for the trend filtering
+fit. If \code{cv = FALSE}, then \code{df} must be an integer; if \code{cv = TRUE}, then
+\code{df} should be one of "min" or "1se" indicating the selection rule to use
+based on the cross-validation error curve (minimum or 1-standard-error
+rule, respectively). Default is 8 when \code{cv = FALSE}, and "1se" when \code{cv = TRUE}.}
 }
 }

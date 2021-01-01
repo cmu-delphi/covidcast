@@ -8,7 +8,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-TODO, blah load data
+In this vignette, we'll take a look at estimating derivatives of signals using
+the `estimate_deriv()` function. We'll again demonstrate this functionality on 
+state-level COVID-19 case rates, smoothed via 7-day trailing averages, from the 
+USAFacts data source. 
 
 ```{r}
 library(covidcast)
@@ -28,9 +31,14 @@ summary(case_rates)
 
 ## Estimating derivatives via linear regression
 
-TODO, blah try linear regression
+The function for estimating derivatives is called `estimate_deriv()`, and (aside
+from a `covidcast_signal` data frame) takes two primary arguments: `method`, 
+indicating the method to use for derivative estimation; and `n` indicating the 
+trailing sample size (number of days) to use in training the given method. Here 
+we use `method = "lin"`, the default, which uses the slope from a simple linear 
+regression, and `n = 14`, also the default. 
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 library(modeltools)
 library(dplyr)
 
@@ -41,9 +49,13 @@ case_rates %>%
   select(geo_value, time_value, value, deriv) 
 ```
 
-TODO, blah plot it
+We can see that a column `deriv` has been added to the output data frame, which
+contains the derivative estimates. Below we visualize these estimates in tandem
+with the signal itself. The red dots mark time points at which the derivative 
+estimate exceeds a threshold (arbitrarily chosen) of 0.25. These seem to roughly
+but reasonably mark times of upswing in the underlying signal. 
 
-```{r, fig.width = 8, fig.height = 4}
+```{r, message = FALSE, warning = FALSE, fig.width = 8, fig.height = 4}
 library(ggplot2)
 library(gridExtra)
 
@@ -69,9 +81,19 @@ grid.arrange(p1, p2, nrow = 1)
 
 ## Estimating derivatives via smoothing spline
 
-TODO, blah try smoothing splines two ways, plot them
+Now we consider `method = "ss"`, which uses a smoothing spline for the estimate
+of the derivative. That is, at each time point, we fit a natural cubic spline to 
+the data from the trailing `n` days, and return the derivative of the underlying 
+fitted spline at the current time as the estimate. Here we set `n = 28`, a bit
+higher sample size, and fit the spline in two ways: first, using a fixed degrees 
+of freedom of 8; and second, using cross-validation to choose the amount of 
+regularization (tuning parameter). This is accomplished by passing additional 
+arguments to `estimate_deriv()`, which are in turn passed on to the underlying
+function it uses to fit smoothing splines, `stats::smooth.spline()`. Note that 
+we also set a custom name for the output column with the estimated derivatives, 
+via the `col_name` argument.
 
-```{r, fig.width = 8, fig.height = 4}
+```{r, message = FALSE, warning = FALSE, fig.width = 8, fig.height = 4}
 case_rates <- estimate_deriv(case_rates, method = "ss", n = 28,
                              col_name = "deriv_ss1", df = 8)
 
@@ -99,11 +121,23 @@ p2 <- ggplot(case_rates %>% filter(geo_value == state),
 grid.arrange(p1, p2, nrow = 1)
 ```
 
+The estimated derivates---in red for the smoothing spline with a fixed degrees 
+of freedom of 8, and in blue for that tuned by cross-validation---appear less
+smooth than those above, from linear regression. Using cross-validation offers
+more adaptivity to the time-varying level of smoothness, as is apparent from 
+comparing the red and blue derivative estimates in October and November. 
+
 ## Estimating derivatives via trend filtering 
 
-TODO, blah try trend filtering two ways, plot them. As it takes a while (here 
-using solution path algorithm from `genlasso` package), just compute derivatives
-for Florida
+Lastly we consider `method = tf"`, which uses trend filtering for estimating the
+derivative. That is, at each time point, we fit a discrete spline of quadratic
+order to the data from the trailing `n` days, and return the discrete derivative 
+of the underlying fitted spline at the current time as the estimate. As before,
+we fit the spline in two ways: first, using a fixed degrees of freedom of 8; and 
+second, using cross-validation to choose the amount of regularization. Since the
+optimization here takes a while (it's based on computing a full solution path  
+for the trend filtering problem, via the `genlasso::trendfilter()` function), we
+only compute derivatives for Florida.
 
 ```{r, fig.width = 8, fig.height = 4}
 case_rates_state <- case_rates %>% filter(geo_value == state)
@@ -126,16 +160,22 @@ p2 <- ggplot(case_rates_state, aes(x = time_value)) +
   geom_line(aes(y = deriv_tf1), color = "red") + 
   geom_line(aes(y = deriv_tf2), color = "blue") + 
   geom_hline(yintercept = threshold, linetype = 2) +
-  labs(x = "Date", y = "Derivative (smoothing spline)") 
+  labs(x = "Date", y = "Derivative (trend filtering)") 
 
 grid.arrange(p1, p2, nrow = 1)
 ```
 
+The estimated derivates now appear a bit smoother than the last ones, from the 
+smoothing spline methods. Again, using cross-validation offers a noticeable 
+improvement in adapting to to the time-varying level of smoothness, as is very 
+clear from the differences between red and blue derivative estimates in October 
+and November. 
+
 ## Post-hoc inspection
 
-TODO blah we can set `keep_obj = TRUE` to keep around a second column with the
-fitted model objects. For example, here, we can look at the p-values associated
-with the estimated slopes from `lsfit()`
+In the call to `estimate_deriv()`, we can set `keep_obj = TRUE` to keep around a
+second column with the fitted model objects. For example, here, we can look at 
+the p-values associated with the estimated slopes from `lsfit()`. 
 
 ```{r}
 case_rates <- estimate_deriv(case_rates, method = "lin", n = 14, 

@@ -8,32 +8,37 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Due to inevitable latency in the signals, if we look at training sets defined by
-taking all data `n` days before the forecast date, then we don't actually have 
-`n` time points worth of data available to us (we're always fetching data "as 
-of" the forecast date). As here `n = max(ahead) = 28`, the baseline forecaster 
-can't actually produce 28-days-ahead forecasts with the most recent `n` time 
-points worth of data, since it would need to calculate differences of signal 
-values spaced 28 days apart. This is why we've included an extra 4 days in the 
-data we make available to the baseline forecaster (nb. the extra minus 4 in the 
-definition of `start_day_baseline()`).
+TODO
 
-The effect of latency on the quantile forecaster is more complicated. TODO blah
+- Exposition here needs to be fleshed out (as with other vignettes). In doing so
+some of the longer comments I left in the code can be moved into the text
+- This vignette is quite long, should we consider splitting into two?
+- Some of this should be updated as evalcast gets fixed up, e.g., shouldn't need
+my custom definitions for `absolute_error()` or `weighted_interval_score()`; and
+shouldn't need to pass a temporary evaluation metric to `get_predictions()` so
+that it just populates the `actual` column; etc. 
+- It might make sense to integrate the functions `scale_by_forecaster()` and 
+`canonical_plot()`, defined below, into the evalcast package (and that would
+certainly shorten this vignette, and maybe we don't need to split it into two)
 
-TODO blah get predictions from forecasters. covidcast is 0.4.0 beta release and
-evalcast is on evalcast-killcards branch
+Note that I'm using covidcast from the "r/0.4.0-release" branch, and evalcast
+from the "evalcast-killcards" branch
+
+Also, the code chunk below took a while to run, so I ran it separately and
+saved the results in a file that you can find in the modeltools/vignettes/ 
+subfolder
 
 ```{r, eval = FALSE, code = readLines("quantgen-forecast.R")}
 ```
 
-TODO blah load the data and take a peak at the `results` and `evals` tibbles
+Load the data and take a peak at the `evals` tibble
 
 ```{r}
 load("quantgen-forecast.rda")
 head(evals)
 ```
 
-TODO blah now produce some convenient functions for analysis and plotting
+Some convenient functions for analysis and plotting
 
 ```{r, message = FALSE, warning = FALSE}
 library(dplyr)

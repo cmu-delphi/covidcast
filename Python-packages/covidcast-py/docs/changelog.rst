@@ -4,7 +4,8 @@ Changelog
 v0.1.3, January 5, 2021
 -------------------------
 
-- New feature: :py:func:`covidcast.signal` now retrieves HHS and Nation level signals (if available from the API).
+- New feature: :py:func:`covidcast.signal` now retrieves HHS (``geo_type="hhs"``) and nation (``geo_type="nation"``)
+  level signals (if available from the Epidata API).
 
 v0.1.2, December 10, 2020
 -------------------------

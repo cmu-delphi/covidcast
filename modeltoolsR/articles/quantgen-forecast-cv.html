@@ -85,15 +85,15 @@
 
       
 
-      </header><script src="quantgen-forecast_files/header-attrs-2.5/header-attrs.js"></script><link href="quantgen-forecast_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="quantgen-forecast_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
+      </header><script src="quantgen-forecast-cv_files/header-attrs-2.5/header-attrs.js"></script><link href="quantgen-forecast-cv_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="quantgen-forecast-cv_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>3. Produce and evaluate quantile forecasts</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cmu-delphi/covidcast/blob/main/R-packages/modeltools/vignettes/quantgen-forecast.Rmd"><code>vignettes/quantgen-forecast.Rmd</code></a></small>
-      <div class="hidden name"><code>quantgen-forecast.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/cmu-delphi/covidcast/blob/main/R-packages/modeltools/vignettes/quantgen-forecast-cv.Rmd"><code>vignettes/quantgen-forecast-cv.Rmd</code></a></small>
+      <div class="hidden name"><code>quantgen-forecast-cv.Rmd</code></div>
 
     </div>
 
@@ -119,6 +119,8 @@
 <span class="co"># Some quantgen parameters </span>
 <span class="no">n</span> <span class="kw">&lt;-</span> <span class="fl">21</span>               <span class="co"># Training set size (in days) </span>
 <span class="no">lags</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">7</span>, <span class="fl">14</span>)   <span class="co"># Lags (in days) for features</span>
+<span class="no">no_pen_vars</span> <span class="kw">&lt;-</span> <span class="fl">1</span>      <span class="co"># Variables to leave unpenalized (lastest response value)</span>
+<span class="no">nlambda</span> <span class="kw">&lt;-</span> <span class="fl">20</span>         <span class="co"># Number of lambda values to consider in cross-validation</span>
 <span class="no">lp_solver</span> <span class="kw">&lt;-</span> <span class="st">"gurobi"</span>
 <span class="no">sort</span> <span class="kw">&lt;-</span> <span class="fl">TRUE</span>
 <span class="no">nonneg</span> <span class="kw">&lt;-</span> <span class="fl">TRUE</span>
@@ -126,22 +128,10 @@
 <span class="co"># Important: functions to considerably speed up data fetching steps. Only pull </span>
 <span class="co"># recent data for each forecast date, depending on the training set size (and </span>
 <span class="co"># other parameters for quantgen)</span>
-
-<span class="co"># Due to inevitable latency in the signals, if we look at training sets defined</span>
-<span class="co"># by taking all n days before the forecast date, then we don't actually have n</span>
-<span class="co"># time points worth of data available to us (we're always fetching data "as of"</span>
-<span class="co"># the forecast date). As here n = max(ahead) = 28, the baseline forecaster can't </span>
-<span class="co"># actually produce 28-days-ahead forecasts with the most recent n time points</span>
-<span class="co"># worth of data, since it would need to calculate differences of signal values</span>
-<span class="co"># spaced 28 days apart. This is why we've included an extra 4 days in the data</span>
-<span class="co"># we make available to the baseline forecaster</span>
 <span class="no">start_day_baseline</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">forecast_date</span>) {
   <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="no">forecast_date</span>) - <span class="no">n</span> - <span class="fl">4</span> + <span class="fl">1</span>)
 }
 
-<span class="co"># For the autoregressive models fit by quantgen, we need to ensure that we pull</span>
-<span class="co"># enough training data so that 1. we actually have the response (defined by some</span>
-<span class="co"># number of days ahead into the future) and 2. we have the lagged features </span>
 <span class="no">start_day_quantgen</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">forecast_date</span>) {
   <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="no">forecast_date</span>) - <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="no">ahead</span>) - <span class="no">n</span> - <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="no">lags</span>) + <span class="fl">1</span>)
 }
@@ -173,7 +163,8 @@
   <span class="kw">incidence_period</span> <span class="kw">=</span> <span class="no">incidence_period</span>,
   <span class="kw">ahead</span> <span class="kw">=</span> <span class="no">ahead</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="no">geo_type</span>,
   <span class="kw">signal_aggregation</span> <span class="kw">=</span> <span class="st">"list"</span>,
-  <span class="kw">n</span> <span class="kw">=</span> <span class="no">n</span>, <span class="kw">lags</span> <span class="kw">=</span> <span class="no">lags</span>, <span class="kw">lambda</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="co"># Just do quantile regression </span>
+  <span class="kw">n</span> <span class="kw">=</span> <span class="no">n</span>, <span class="kw">lags</span> <span class="kw">=</span> <span class="no">lags</span>,
+  <span class="kw">nlambda</span> <span class="kw">=</span> <span class="no">nlambda</span>, <span class="kw">no_pen_vars</span> <span class="kw">=</span> <span class="no">no_pen_vars</span>,
   <span class="kw">lp_solver</span> <span class="kw">=</span> <span class="no">lp_solver</span>, <span class="kw">sort</span> <span class="kw">=</span> <span class="no">sort</span>, <span class="kw">nonneg</span> <span class="kw">=</span> <span class="no">nonneg</span>)
 
 <span class="co"># Quantile autoregression with 3 lags, plus 3 lags of the CLI-in-community</span>
@@ -189,7 +180,8 @@
   <span class="kw">incidence_period</span> <span class="kw">=</span> <span class="no">incidence_period</span>,
   <span class="kw">ahead</span> <span class="kw">=</span> <span class="no">ahead</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="no">geo_type</span>,
   <span class="kw">signal_aggregation</span> <span class="kw">=</span> <span class="st">"list"</span>,
-  <span class="kw">n</span> <span class="kw">=</span> <span class="no">n</span>, <span class="kw">lags</span> <span class="kw">=</span> <span class="no">lags</span>, <span class="kw">lambda</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="co"># Just do quantile regression</span>
+  <span class="kw">n</span> <span class="kw">=</span> <span class="no">n</span>, <span class="kw">lags</span> <span class="kw">=</span> <span class="no">lags</span>,
+  <span class="kw">nlambda</span> <span class="kw">=</span> <span class="no">nlambda</span>, <span class="kw">no_pen_vars</span> <span class="kw">=</span> <span class="no">no_pen_vars</span>,
   <span class="kw">lp_solver</span> <span class="kw">=</span> <span class="no">lp_solver</span>, <span class="kw">sort</span> <span class="kw">=</span> <span class="no">sort</span>, <span class="kw">nonneg</span> <span class="kw">=</span> <span class="no">nonneg</span>)
 
 <span class="co">## Evaluate forecasts</span>
@@ -228,9 +220,9 @@
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span>()
 
 <span class="co"># Save everything to file</span>
-<span class="fu"><a href="https://rdrr.io/r/base/save.html">save</a></span>(<span class="kw">list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ls.html">ls</a></span>(), <span class="kw">file</span> <span class="kw">=</span> <span class="st">"quantgen-forecast.rda"</span>, <span class="kw">compress</span> <span class="kw">=</span> <span class="st">"xz"</span>)</pre></body></html></div>
+<span class="fu"><a href="https://rdrr.io/r/base/save.html">save</a></span>(<span class="kw">list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ls.html">ls</a></span>(), <span class="kw">file</span> <span class="kw">=</span> <span class="st">"quantgen-forecast-cv.rda"</span>, <span class="kw">compress</span> <span class="kw">=</span> <span class="st">"xz"</span>)</pre></body></html></div>
 <p>Load the data and take a peak at the <code>evals</code> tibble</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span>(<span class="st">"quantgen-forecast.rda"</span>)
+<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span>(<span class="st">"quantgen-forecast-cv.rda"</span>)
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">evals</span>)</pre></body></html></div>
 <pre><code>##   geo_value ahead forecaster forecast_date target_end_date        ae       wis
 ## 1        ak     1   Baseline    2020-07-01      2020-07-02 2.1851385 2.0609845
@@ -331,44 +323,44 @@
 
 <span class="fu">canonical_plot</span>(<span class="no">evals</span>, <span class="kw">x</span> <span class="kw">=</span> <span class="st">"ahead"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"ae"</span>, <span class="kw">aggr</span> <span class="kw">=</span> <span class="no">mean</span>,
                <span class="kw">subtitle</span> <span class="kw">=</span> <span class="no">subtitle</span>, <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">"Days ahead"</span>, <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">"Mean AE"</span>)</pre></body></html></div>
-<p><img src="quantgen-forecast_files/figure-html/unnamed-chunk-4-1.png" width="672"></p>
+<p><img src="quantgen-forecast-cv_files/figure-html/unnamed-chunk-4-1.png" width="672"></p>
 <div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="fu">canonical_plot</span>(<span class="no">evals</span>, <span class="kw">x</span> <span class="kw">=</span> <span class="st">"ahead"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"wis"</span>, <span class="kw">aggr</span> <span class="kw">=</span> <span class="no">mean</span>,
                <span class="kw">subtitle</span> <span class="kw">=</span> <span class="no">subtitle</span>, <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">"Days ahead"</span>, <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">"Mean WIS"</span>)</pre></body></html></div>
-<p><img src="quantgen-forecast_files/figure-html/unnamed-chunk-4-2.png" width="672"></p>
+<p><img src="quantgen-forecast-cv_files/figure-html/unnamed-chunk-4-2.png" width="672"></p>
 <p>Let’s just focus on WIS from here on, since AE behaves qualitatively similarly. Here’s relative mean WIS (relative to baseline)</p>
 <div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu">canonical_plot</span>(<span class="no">evals</span>, <span class="kw">x</span> <span class="kw">=</span> <span class="st">"ahead"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"wis"</span>, <span class="kw">aggr</span> <span class="kw">=</span> <span class="no">mean</span>,
                <span class="kw">denom_forecaster</span> <span class="kw">=</span> <span class="st">"Baseline"</span>, <span class="kw">subtitle</span> <span class="kw">=</span> <span class="no">subtitle</span>,
                <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">"Days ahead"</span>, <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">"Relative mean WIS"</span>)</pre></body></html></div>
-<p><img src="quantgen-forecast_files/figure-html/unnamed-chunk-5-1.png" width="672"></p>
+<p><img src="quantgen-forecast-cv_files/figure-html/unnamed-chunk-5-1.png" width="672"></p>
 <p>Median relative WIS (still relative to baseline; note the reversal in the order of operaitons, and median for robustness)</p>
 <div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu">canonical_plot</span>(<span class="no">evals</span>, <span class="kw">x</span> <span class="kw">=</span> <span class="st">"ahead"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"wis"</span>, <span class="kw">aggr</span> <span class="kw">=</span> <span class="no">median</span>,
                <span class="kw">denom</span> <span class="kw">=</span> <span class="st">"Baseline"</span>, <span class="kw">scale_before</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">sub</span> <span class="kw">=</span> <span class="no">subtitle</span>,
                <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">"Days ahead"</span>, <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">"Median relative WIS"</span>)</pre></body></html></div>
-<p><img src="quantgen-forecast_files/figure-html/unnamed-chunk-6-1.png" width="672"></p>
+<p><img src="quantgen-forecast-cv_files/figure-html/unnamed-chunk-6-1.png" width="672"></p>
 <p>Now produce some plots of forecast scores time, i.e., by target end date</p>
 <div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="fu">canonical_plot</span>(<span class="no">evals</span>, <span class="kw">x</span> <span class="kw">=</span> <span class="st">"target_end_date"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"wis"</span>, <span class="kw">aggr</span> <span class="kw">=</span> <span class="no">mean</span>,
                <span class="kw">dots</span> <span class="kw">=</span> <span class="fl">FALSE</span>, <span class="kw">group_vars</span> <span class="kw">=</span> <span class="st">"forecaster"</span>, <span class="kw">sub</span> <span class="kw">=</span> <span class="no">subtitle</span>,
                <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">"Target date"</span>, <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">"Mean WIS"</span>)</pre></body></html></div>
-<p><img src="quantgen-forecast_files/figure-html/unnamed-chunk-7-1.png" width="672"></p>
+<p><img src="quantgen-forecast-cv_files/figure-html/unnamed-chunk-7-1.png" width="672"></p>
 <div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="fu">canonical_plot</span>(<span class="no">evals</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">ahead</span> <span class="kw">%in%</span> (<span class="fl">1</span>:<span class="fl">3</span> * <span class="fl">7</span>)),
                <span class="kw">x</span> <span class="kw">=</span> <span class="st">"target_end_date"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"wis"</span>, <span class="kw">aggr</span> <span class="kw">=</span> <span class="no">mean</span>,
                <span class="kw">dots</span> <span class="kw">=</span> <span class="fl">FALSE</span>, <span class="kw">group_vars</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"forecaster"</span>, <span class="st">"ahead"</span>),
                <span class="kw">facet_rows</span> <span class="kw">=</span> <span class="st">"ahead"</span>, <span class="kw">sub</span> <span class="kw">=</span> <span class="no">subtitle</span>,
                <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">"Target date"</span>, <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">"Mean WIS"</span>)</pre></body></html></div>
-<p><img src="quantgen-forecast_files/figure-html/unnamed-chunk-7-2.png" width="672"></p>
+<p><img src="quantgen-forecast-cv_files/figure-html/unnamed-chunk-7-2.png" width="672"></p>
 <div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="fu">canonical_plot</span>(<span class="no">evals</span>, <span class="kw">x</span> <span class="kw">=</span> <span class="st">"target_end_date"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"wis"</span>, <span class="kw">aggr</span> <span class="kw">=</span> <span class="no">mean</span>,
                <span class="kw">dots</span> <span class="kw">=</span> <span class="fl">FALSE</span>, <span class="kw">group_vars</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"forecaster"</span>, <span class="st">"ahead"</span>),
                <span class="kw">facet_rows</span> <span class="kw">=</span> <span class="st">"forecaster"</span>, <span class="kw">sub</span> <span class="kw">=</span> <span class="no">subtitle</span>,
                <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">"Target date"</span>, <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">"Mean WIS"</span>,
                <span class="kw">legend_pos</span> <span class="kw">=</span> <span class="st">"right"</span>, <span class="kw">legend_title</span> <span class="kw">=</span> <span class="st">"Ahead"</span>)</pre></body></html></div>
-<p><img src="quantgen-forecast_files/figure-html/unnamed-chunk-7-3.png" width="672"></p>
+<p><img src="quantgen-forecast-cv_files/figure-html/unnamed-chunk-7-3.png" width="672"></p>
 <p>Now of a plot forecast scores broken down by target end date and ahead</p>
 <div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="fu">canonical_plot</span>(<span class="no">evals</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">ahead</span> <span class="kw">%in%</span> (<span class="fl">1</span>:<span class="fl">3</span> * <span class="fl">7</span>)),
                <span class="kw">x</span> <span class="kw">=</span> <span class="st">"forecaster"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"wis"</span>, <span class="kw">aggr</span> <span class="kw">=</span> <span class="no">mean</span>, <span class="kw">lines</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
                <span class="kw">group_vars</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"target_end_date"</span>, <span class="st">"ahead"</span>), <span class="kw">facet_cols</span> <span class="kw">=</span> <span class="st">"ahead"</span>,
                <span class="kw">sub</span> <span class="kw">=</span> <span class="no">subtitle</span>, <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">"Forecaster"</span>, <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">"Mean WIS"</span>,
                <span class="kw">legend_position</span> <span class="kw">=</span> <span class="st">"right"</span>, <span class="kw">legend_title</span> <span class="kw">=</span> <span class="st">"Target date"</span>)</pre></body></html></div>
-<p><img src="quantgen-forecast_files/figure-html/unnamed-chunk-8-1.png" width="672"></p>
+<p><img src="quantgen-forecast-cv_files/figure-html/unnamed-chunk-8-1.png" width="672"></p>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

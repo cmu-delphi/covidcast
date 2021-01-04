@@ -16,7 +16,6 @@ forecast_dates <- seq(as.Date("2020-07-01"), as.Date("2020-08-15"), by = "day")
 # Some quantgen parameters 
 n <- 21               # Training set size (in days) 
 lags <- c(0, 7, 14)   # Lags (in days) for features
-lambda <- 0           # Just do quantile regression
 lp_solver <- "gurobi"
 sort <- TRUE
 nonneg <- TRUE
@@ -47,54 +46,48 @@ start_day_quantgen <- function(forecast_date) {
 ## Produce forecasts
 
 # Produce forecasts using a baseline forecaster
-pred_baseline <- suppressMessages(suppressWarnings(
-  get_predictions(
-    forecaster = baseline_forecaster, 
-    name_of_forecaster = "Baseline",
-    signals = tibble::tibble(
-                        data_source = response_source, 
-                        signal = response_signal,
-                        start_day = list(start_day_baseline)),
-    forecast_dates = forecast_dates, 
-    incidence_period = incidence_period, 
-    ahead = ahead, geo_type = geo_type, 
-    signal_aggregation = "long") 
-))
+pred_baseline <- get_predictions(
+  forecaster = baseline_forecaster, 
+  name_of_forecaster = "Baseline",
+  signals = tibble::tibble(
+                      data_source = response_source, 
+                      signal = response_signal,
+                      start_day = list(start_day_baseline)),
+  forecast_dates = forecast_dates, 
+  incidence_period = incidence_period, 
+  ahead = ahead, geo_type = geo_type, 
+  signal_aggregation = "long") 
 
 # Quantile autoregression with 3 lags, or QAR3
-pred_quantgen1 <- suppressMessages(suppressWarnings(
-  get_predictions(
-    forecaster = quantgen_forecaster, 
-    name_of_forecaster = "QAR3",
-    signals = tibble::tibble(
-                        data_source = response_source, 
-                        signal = response_signal,
-                        start_day = list(start_day_quantgen)),
-    forecast_dates = forecast_dates, 
-    incidence_period = incidence_period, 
-    ahead = ahead, geo_type = geo_type, 
-    signal_aggregation = "list",
-    n = n, lags = lags, lambda = lambda,
-    lp_solver = lp_solver, sort = sort, nonneg = nonneg)
-))
+pred_quantgen1 <- get_predictions(
+  forecaster = quantgen_forecaster, 
+  name_of_forecaster = "QAR3",
+  signals = tibble::tibble(
+                      data_source = response_source, 
+                      signal = response_signal,
+                      start_day = list(start_day_quantgen)),
+  forecast_dates = forecast_dates, 
+  incidence_period = incidence_period, 
+  ahead = ahead, geo_type = geo_type, 
+  signal_aggregation = "list", 
+  n = n, lags = lags, lambda = 0, # Just do quantile regression 
+  lp_solver = lp_solver, sort = sort, nonneg = nonneg)
 
 # Quantile autoregression with 3 lags, plus 3 lags of the CLI-in-community
 # signal from Delphi's symptom survey, or QAR3 + CLI3  
-pred_quantgen2 <- suppressMessages(suppressWarnings(
-  get_predictions(
-    forecaster = quantgen_forecaster, 
-    name_of_forecaster = "QAR3 + CLI3",
-    signals = tibble::tibble(
-                        data_source = c(response_source, "fb-survey"),
-                        signal = c(response_signal, "smoothed_hh_cmnty_cli"),
-                        start_day = list(start_day_quantgen)),
-    forecast_dates = forecast_dates, 
-    incidence_period = incidence_period, 
-    ahead = ahead, geo_type = geo_type, 
-    signal_aggregation = "list", 
-    n = n, lags = lags, lambda = lambda,
-    lp_solver = lp_solver, sort = sort, nonneg = nonneg)
-))
+pred_quantgen2 <- get_predictions(
+  forecaster = quantgen_forecaster, 
+  name_of_forecaster = "QAR3 + CLI3",
+  signals = tibble::tibble(
+                      data_source = c(response_source, "fb-survey"),
+                      signal = c(response_signal, "smoothed_hh_cmnty_cli"),
+                      start_day = list(start_day_quantgen)),
+  forecast_dates = forecast_dates, 
+  incidence_period = incidence_period, 
+  ahead = ahead, geo_type = geo_type, 
+  signal_aggregation = "list", 
+  n = n, lags = lags, lambda = 0, # Just do quantile regression
+  lp_solver = lp_solver, sort = sort, nonneg = nonneg)
 
 ## Evaluate forecasts
 
@@ -102,11 +95,9 @@ pred_quantgen2 <- suppressMessages(suppressWarnings(
 # evaluation function so we can do it ourselves later. This is because I'd
 # rather see results compressed down to have one row per forecast task (not one
 # row per forecasted quantile value) and it's easier to use dplyr::summarize()
-results <- suppressMessages(suppressWarnings(
-  evaluate_predictions(
-    predictions_cards = rbind(pred_baseline, pred_quantgen1, pred_quantgen2),
-    err_measures = list(temp = function(quantile, value, actual) NA))
-)) %>%
+results <- evaluate_predictions(
+  predictions_cards = rbind(pred_baseline, pred_quantgen1, pred_quantgen2),
+  err_measures = list(temp = function(quantile, value, actual) NA)) %>%
   select(geo_value, ahead, quantile, forecaster, forecast_date, target_end_date,
          value, actual)
 

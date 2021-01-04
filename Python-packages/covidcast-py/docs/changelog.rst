@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v0.1.3, January 5, 2021
+-------------------------
+
+- New feature: :py:func:`covidcast.signal` now retrieves HHS and Nation level signals (if available from the API).
 
 v0.1.2, December 10, 2020
 -------------------------

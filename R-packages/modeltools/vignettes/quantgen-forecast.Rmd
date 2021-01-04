@@ -8,19 +8,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-TODO
-
-- Exposition here needs to be fleshed out (as with other vignettes). In doing so
-some of the longer comments I left in the code can be moved into the text
-- This vignette is quite long, should we consider splitting into two?
-- Some of this should be updated as evalcast gets fixed up, e.g., shouldn't need
-my custom definitions for `absolute_error()` or `weighted_interval_score()`; and
-shouldn't need to pass a temporary evaluation metric to `get_predictions()` so
-that it just populates the `actual` column; etc. 
-- It might make sense to integrate the functions `scale_by_forecaster()` and 
-`canonical_plot()`, defined below, into the evalcast package (and that would
-certainly shorten this vignette, and maybe we don't need to split it into two)
-
 Note that I'm using covidcast from the "r/0.4.0-release" branch, and evalcast
 from the "evalcast-killcards" branch
 

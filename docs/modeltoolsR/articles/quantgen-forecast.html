@@ -99,13 +99,6 @@
 
     
     
-<p>TODO</p>
-<ul>
-<li>Exposition here needs to be fleshed out (as with other vignettes). In doing so some of the longer comments I left in the code can be moved into the text</li>
-<li>This vignette is quite long, should we consider splitting into two?</li>
-<li>Some of this should be updated as evalcast gets fixed up, e.g., shouldn’t need my custom definitions for <code><a href="https://rdrr.io/pkg/evalcast/man/absolute_error.html">absolute_error()</a></code> or <code><a href="https://rdrr.io/pkg/evalcast/man/weighted_interval_score.html">weighted_interval_score()</a></code>; and shouldn’t need to pass a temporary evaluation metric to <code><a href="https://rdrr.io/pkg/evalcast/man/get_predictions.html">get_predictions()</a></code> so that it just populates the <code>actual</code> column; etc.</li>
-<li>It might make sense to integrate the functions <code>scale_by_forecaster()</code> and <code>canonical_plot()</code>, defined below, into the evalcast package (and that would certainly shorten this vignette, and maybe we don’t need to split it into two)</li>
-</ul>
 <p>Note that I’m using covidcast from the “r/0.4.0-release” branch, and evalcast from the “evalcast-killcards” branch</p>
 <p>Also, the code chunk below took a while to run, so I ran it separately and saved the results in a file that you can find in the modeltools/vignettes/ subfolder</p>
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">covidcast</span>)
@@ -126,7 +119,6 @@
 <span class="co"># Some quantgen parameters </span>
 <span class="no">n</span> <span class="kw">&lt;-</span> <span class="fl">21</span>               <span class="co"># Training set size (in days) </span>
 <span class="no">lags</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">7</span>, <span class="fl">14</span>)   <span class="co"># Lags (in days) for features</span>
-<span class="no">lambda</span> <span class="kw">&lt;-</span> <span class="fl">0</span>           <span class="co"># Just do quantile regression</span>
 <span class="no">lp_solver</span> <span class="kw">&lt;-</span> <span class="st">"gurobi"</span>
 <span class="no">sort</span> <span class="kw">&lt;-</span> <span class="fl">TRUE</span>
 <span class="no">nonneg</span> <span class="kw">&lt;-</span> <span class="fl">TRUE</span>
@@ -157,54 +149,48 @@
 <span class="co">## Produce forecasts</span>
 
 <span class="co"># Produce forecasts using a baseline forecaster</span>
-<span class="no">pred_baseline</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span>(
-  <span class="fu"><a href="https://rdrr.io/pkg/evalcast/man/get_predictions.html">get_predictions</a></span>(
-    <span class="kw">forecaster</span> <span class="kw">=</span> <span class="no">baseline_forecaster</span>,
-    <span class="kw">name_of_forecaster</span> <span class="kw">=</span> <span class="st">"Baseline"</span>,
-    <span class="kw">signals</span> <span class="kw">=</span> <span class="kw pkg">tibble</span><span class="kw ns">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span>(
-                        <span class="kw">data_source</span> <span class="kw">=</span> <span class="no">response_source</span>,
-                        <span class="kw">signal</span> <span class="kw">=</span> <span class="no">response_signal</span>,
-                        <span class="kw">start_day</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">start_day_baseline</span>)),
-    <span class="kw">forecast_dates</span> <span class="kw">=</span> <span class="no">forecast_dates</span>,
-    <span class="kw">incidence_period</span> <span class="kw">=</span> <span class="no">incidence_period</span>,
-    <span class="kw">ahead</span> <span class="kw">=</span> <span class="no">ahead</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="no">geo_type</span>,
-    <span class="kw">signal_aggregation</span> <span class="kw">=</span> <span class="st">"long"</span>)
-))
+<span class="no">pred_baseline</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/evalcast/man/get_predictions.html">get_predictions</a></span>(
+  <span class="kw">forecaster</span> <span class="kw">=</span> <span class="no">baseline_forecaster</span>,
+  <span class="kw">name_of_forecaster</span> <span class="kw">=</span> <span class="st">"Baseline"</span>,
+  <span class="kw">signals</span> <span class="kw">=</span> <span class="kw pkg">tibble</span><span class="kw ns">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span>(
+                      <span class="kw">data_source</span> <span class="kw">=</span> <span class="no">response_source</span>,
+                      <span class="kw">signal</span> <span class="kw">=</span> <span class="no">response_signal</span>,
+                      <span class="kw">start_day</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">start_day_baseline</span>)),
+  <span class="kw">forecast_dates</span> <span class="kw">=</span> <span class="no">forecast_dates</span>,
+  <span class="kw">incidence_period</span> <span class="kw">=</span> <span class="no">incidence_period</span>,
+  <span class="kw">ahead</span> <span class="kw">=</span> <span class="no">ahead</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="no">geo_type</span>,
+  <span class="kw">signal_aggregation</span> <span class="kw">=</span> <span class="st">"long"</span>)
 
 <span class="co"># Quantile autoregression with 3 lags, or QAR3</span>
-<span class="no">pred_quantgen1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span>(
-  <span class="fu"><a href="https://rdrr.io/pkg/evalcast/man/get_predictions.html">get_predictions</a></span>(
-    <span class="kw">forecaster</span> <span class="kw">=</span> <span class="no">quantgen_forecaster</span>,
-    <span class="kw">name_of_forecaster</span> <span class="kw">=</span> <span class="st">"QAR3"</span>,
-    <span class="kw">signals</span> <span class="kw">=</span> <span class="kw pkg">tibble</span><span class="kw ns">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span>(
-                        <span class="kw">data_source</span> <span class="kw">=</span> <span class="no">response_source</span>,
-                        <span class="kw">signal</span> <span class="kw">=</span> <span class="no">response_signal</span>,
-                        <span class="kw">start_day</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">start_day_quantgen</span>)),
-    <span class="kw">forecast_dates</span> <span class="kw">=</span> <span class="no">forecast_dates</span>,
-    <span class="kw">incidence_period</span> <span class="kw">=</span> <span class="no">incidence_period</span>,
-    <span class="kw">ahead</span> <span class="kw">=</span> <span class="no">ahead</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="no">geo_type</span>,
-    <span class="kw">signal_aggregation</span> <span class="kw">=</span> <span class="st">"list"</span>,
-    <span class="kw">n</span> <span class="kw">=</span> <span class="no">n</span>, <span class="kw">lags</span> <span class="kw">=</span> <span class="no">lags</span>, <span class="kw">lambda</span> <span class="kw">=</span> <span class="no">lambda</span>,
-    <span class="kw">lp_solver</span> <span class="kw">=</span> <span class="no">lp_solver</span>, <span class="kw">sort</span> <span class="kw">=</span> <span class="no">sort</span>, <span class="kw">nonneg</span> <span class="kw">=</span> <span class="no">nonneg</span>)
-))
+<span class="no">pred_quantgen1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/evalcast/man/get_predictions.html">get_predictions</a></span>(
+  <span class="kw">forecaster</span> <span class="kw">=</span> <span class="no">quantgen_forecaster</span>,
+  <span class="kw">name_of_forecaster</span> <span class="kw">=</span> <span class="st">"QAR3"</span>,
+  <span class="kw">signals</span> <span class="kw">=</span> <span class="kw pkg">tibble</span><span class="kw ns">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span>(
+                      <span class="kw">data_source</span> <span class="kw">=</span> <span class="no">response_source</span>,
+                      <span class="kw">signal</span> <span class="kw">=</span> <span class="no">response_signal</span>,
+                      <span class="kw">start_day</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">start_day_quantgen</span>)),
+  <span class="kw">forecast_dates</span> <span class="kw">=</span> <span class="no">forecast_dates</span>,
+  <span class="kw">incidence_period</span> <span class="kw">=</span> <span class="no">incidence_period</span>,
+  <span class="kw">ahead</span> <span class="kw">=</span> <span class="no">ahead</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="no">geo_type</span>,
+  <span class="kw">signal_aggregation</span> <span class="kw">=</span> <span class="st">"list"</span>,
+  <span class="kw">n</span> <span class="kw">=</span> <span class="no">n</span>, <span class="kw">lags</span> <span class="kw">=</span> <span class="no">lags</span>, <span class="kw">lambda</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="co"># Just do quantile regression </span>
+  <span class="kw">lp_solver</span> <span class="kw">=</span> <span class="no">lp_solver</span>, <span class="kw">sort</span> <span class="kw">=</span> <span class="no">sort</span>, <span class="kw">nonneg</span> <span class="kw">=</span> <span class="no">nonneg</span>)
 
 <span class="co"># Quantile autoregression with 3 lags, plus 3 lags of the CLI-in-community</span>
 <span class="co"># signal from Delphi's symptom survey, or QAR3 + CLI3  </span>
-<span class="no">pred_quantgen2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span>(
-  <span class="fu"><a href="https://rdrr.io/pkg/evalcast/man/get_predictions.html">get_predictions</a></span>(
-    <span class="kw">forecaster</span> <span class="kw">=</span> <span class="no">quantgen_forecaster</span>,
-    <span class="kw">name_of_forecaster</span> <span class="kw">=</span> <span class="st">"QAR3 + CLI3"</span>,
-    <span class="kw">signals</span> <span class="kw">=</span> <span class="kw pkg">tibble</span><span class="kw ns">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span>(
-                        <span class="kw">data_source</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">response_source</span>, <span class="st">"fb-survey"</span>),
-                        <span class="kw">signal</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">response_signal</span>, <span class="st">"smoothed_hh_cmnty_cli"</span>),
-                        <span class="kw">start_day</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">start_day_quantgen</span>)),
-    <span class="kw">forecast_dates</span> <span class="kw">=</span> <span class="no">forecast_dates</span>,
-    <span class="kw">incidence_period</span> <span class="kw">=</span> <span class="no">incidence_period</span>,
-    <span class="kw">ahead</span> <span class="kw">=</span> <span class="no">ahead</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="no">geo_type</span>,
-    <span class="kw">signal_aggregation</span> <span class="kw">=</span> <span class="st">"list"</span>,
-    <span class="kw">n</span> <span class="kw">=</span> <span class="no">n</span>, <span class="kw">lags</span> <span class="kw">=</span> <span class="no">lags</span>, <span class="kw">lambda</span> <span class="kw">=</span> <span class="no">lambda</span>,
-    <span class="kw">lp_solver</span> <span class="kw">=</span> <span class="no">lp_solver</span>, <span class="kw">sort</span> <span class="kw">=</span> <span class="no">sort</span>, <span class="kw">nonneg</span> <span class="kw">=</span> <span class="no">nonneg</span>)
-))
+<span class="no">pred_quantgen2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/evalcast/man/get_predictions.html">get_predictions</a></span>(
+  <span class="kw">forecaster</span> <span class="kw">=</span> <span class="no">quantgen_forecaster</span>,
+  <span class="kw">name_of_forecaster</span> <span class="kw">=</span> <span class="st">"QAR3 + CLI3"</span>,
+  <span class="kw">signals</span> <span class="kw">=</span> <span class="kw pkg">tibble</span><span class="kw ns">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span>(
+                      <span class="kw">data_source</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">response_source</span>, <span class="st">"fb-survey"</span>),
+                      <span class="kw">signal</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">response_signal</span>, <span class="st">"smoothed_hh_cmnty_cli"</span>),
+                      <span class="kw">start_day</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">start_day_quantgen</span>)),
+  <span class="kw">forecast_dates</span> <span class="kw">=</span> <span class="no">forecast_dates</span>,
+  <span class="kw">incidence_period</span> <span class="kw">=</span> <span class="no">incidence_period</span>,
+  <span class="kw">ahead</span> <span class="kw">=</span> <span class="no">ahead</span>, <span class="kw">geo_type</span> <span class="kw">=</span> <span class="no">geo_type</span>,
+  <span class="kw">signal_aggregation</span> <span class="kw">=</span> <span class="st">"list"</span>,
+  <span class="kw">n</span> <span class="kw">=</span> <span class="no">n</span>, <span class="kw">lags</span> <span class="kw">=</span> <span class="no">lags</span>, <span class="kw">lambda</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="co"># Just do quantile regression</span>
+  <span class="kw">lp_solver</span> <span class="kw">=</span> <span class="no">lp_solver</span>, <span class="kw">sort</span> <span class="kw">=</span> <span class="no">sort</span>, <span class="kw">nonneg</span> <span class="kw">=</span> <span class="no">nonneg</span>)
 
 <span class="co">## Evaluate forecasts</span>
 
@@ -212,11 +198,9 @@
 <span class="co"># evaluation function so we can do it ourselves later. This is because I'd</span>
 <span class="co"># rather see results compressed down to have one row per forecast task (not one</span>
 <span class="co"># row per forecasted quantile value) and it's easier to use dplyr::summarize()</span>
-<span class="no">results</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span>(
-  <span class="fu"><a href="https://rdrr.io/pkg/evalcast/man/evaluate_predictions.html">evaluate_predictions</a></span>(
-    <span class="kw">predictions_cards</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span>(<span class="no">pred_baseline</span>, <span class="no">pred_quantgen1</span>, <span class="no">pred_quantgen2</span>),
-    <span class="kw">err_measures</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">temp</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">quantile</span>, <span class="no">value</span>, <span class="no">actual</span>) <span class="fl">NA</span>))
-)) <span class="kw">%&gt;%</span>
+<span class="no">results</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/evalcast/man/evaluate_predictions.html">evaluate_predictions</a></span>(
+  <span class="kw">predictions_cards</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span>(<span class="no">pred_baseline</span>, <span class="no">pred_quantgen1</span>, <span class="no">pred_quantgen2</span>),
+  <span class="kw">err_measures</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">temp</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">quantile</span>, <span class="no">value</span>, <span class="no">actual</span>) <span class="fl">NA</span>)) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">geo_value</span>, <span class="no">ahead</span>, <span class="no">quantile</span>, <span class="no">forecaster</span>, <span class="no">forecast_date</span>, <span class="no">target_end_date</span>,
          <span class="no">value</span>, <span class="no">actual</span>)
 

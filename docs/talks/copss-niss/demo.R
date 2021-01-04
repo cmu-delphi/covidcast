@@ -199,4 +199,4 @@ for (i in 1:length(leads)) {
 
 # Bind results over different leads into one big data frame, and save 
 res = do.call(rbind, res_list)
-save(list = ls(), file = "demo-extended.rda", compress = "xz")
+save(list = ls(), file = "demo.rda", compress = "xz")

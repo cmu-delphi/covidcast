@@ -599,21 +599,6 @@ ggplot(err_by_lead %>% filter(time_period == 1), aes(x = lead, y = err)) +
   theme_bw() + theme(legend.pos = "bottom", legend.title = element_blank())
 ```
 
-# Simple Forecasting Demo (Cont.)
-
-Results from forecasts made over October 15 to current day:
-
-```{r, fig.width = 7, fig.height = 5}
-ggplot(err_by_lead %>% filter(time_period == 2), aes(x = lead, y = err)) + 
-  geom_line(aes(color = model)) + 
-  geom_point(aes(color = model)) + 
-  scale_color_manual(values = c("black", ggplot_colors)) +
-  labs(title = "Forecasting errors by number of days ahead",
-       subtitle = "From early October 15 through current day",
-       x = "Number of days ahead", y = "Median scaled error") +
-  theme_bw() + theme(legend.pos = "bottom", legend.title = element_blank())
-```
-
 # Wrapping Up
 
 Delphi's COVIDcast ecosystem has many parts:

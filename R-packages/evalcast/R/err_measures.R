@@ -19,16 +19,19 @@ weighted_interval_score <- function(quantile, value, actual_value) {
   # per Ryan: WIS is equivalent to quantile loss modulo an extra 0.5 AE term
   # for the median forecast (counted twice). 
   # 
+  # update: WIS is now being redefined to match exactly, still some question
+  # about the correct denominator but the formula seems to be  1 / (K + 0.5)
+  # 
+  # Finally, the multiplication by 2 is because alpha_k = 2*quantile_k
+  # 
   med <- value[find_quantile_match(quantile, 0.5)]
   
   if (length(med) != 1L) return(NA)
   
-  wis <- ( abs(med - actual_value[1]) / 2 +
-            sum(pmax(
-              quantile * (actual_value - value),
-              (1 - quantile) * (value - actual_value), 
-              na.rm = TRUE)) 
-           ) / (length(quantile) + 1) * 2
+  wis <- 2 * mean(pmax(
+    quantile * (actual_value - value),
+    (1 - quantile) * (value - actual_value), 
+    na.rm = TRUE)) 
   
   return(wis)
 }

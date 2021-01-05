@@ -54,7 +54,7 @@ covidcast_cor = function(x, y, dt_x = 0, dt_y = 0,
          dplyr::mutate(value.x = shift(value.x, n = dt_x), # shift values
                        value.y = shift(value.y, n = dt_y)) %>%
          dplyr::ungroup() %>% # get rid of grouping by geo value
-         dplyr::group_by(.dots = as.symbol(by)) %>% # group by what's specified
+         dplyr::group_by(dplyr::across(dplyr::all_of(by))) %>% # group by what's specified
          dplyr::summarize(value = cor(x = value.x, y = value.y, # compute cor
                                       use = use, method = method)))
 }

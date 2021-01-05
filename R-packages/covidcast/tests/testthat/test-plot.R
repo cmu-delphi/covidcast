@@ -79,6 +79,11 @@ test_that("simple state choropleths", {
                       plot(fb_county, plot_type = "choro",
                            include = c("pa", "OH", "in", "KY")))
 
+  # Alaska has FIPS beginning with 02, which can confuse FIPS-based subsetting
+  expect_doppelganger("default county choropleth with Alaska",
+                      plot(fb_county, plot_type = "choro",
+                           include = "ak"))
+
   # Work-in-progress signals may not have metadata, so we should preserve the
   # ability to plot them by manually specifying range
   attributes(fb_state)$metadata <- NULL

@@ -278,6 +278,10 @@ covidcast_signal <- function(data_source, signal,
 
   if (!is.null(as_of)) {
     as_of <- as.Date(as_of)
+
+    # By definition, there can never be data from the future. So clamp `end_day`
+    # to be no larger than `as_of`.
+    end_day <- min(as_of, end_day)
   }
 
   if (!is.null(issues)) {
@@ -518,17 +522,26 @@ covidcast_signals <- function(data_source, signal,
     stop("When `start_day` is not `NULL`, it should have length 1 or N, where ",
          "`N = max(length(data_source), length(signal)`.")
   }
-  
-  if (!(length(end_day) %in% c(0, 1, N))) { 
+
+  if (!(length(end_day) %in% c(0, 1, N))) {
     stop("When `end_day` is not `NULL`, it should have length 1 or N, where ",
          "`N = max(length(data_source), length(signal)`.")
   }
 
   data_source <- rep(data_source, length.out = N)
   signal <- rep(signal, length.out = N)
-  start_day <- rep(start_day, length.out = N)
-  end_day <- rep(end_day, length.out = N)
-  
+
+  # rep() throws a warning on NULLs (and you can't make a vector of NULLs), so
+  # only replicate these when provided. When NULL, leave as NULL so
+  # `covidcast_signal()` can determine correct dates from metadata.
+  if (!is.null(start_day)) {
+    start_day <- rep(start_day, length.out = N)
+  }
+
+  if (!is.null(end_day)) {
+    end_day <- rep(end_day, length.out = N)
+  }
+
   for (i in 1:N) {
     df_list[[i]] <- covidcast_signal(data_source = data_source[i],
                                      signal = signal[i],

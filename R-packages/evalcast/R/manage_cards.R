@@ -24,8 +24,10 @@ collapse_cards <- function(cards){
              value = ifelse(is.na(.data$p), .data$m, .data$p)) %>%
       select(-.data$p, -.data$m)
   }
-  cards <- cards %>% 
-    relocate(.data$quantile:.data$value, .after = .data$geo_value)
+  if ("geo_value" %in% colnames(cards)) {
+    cards <- cards %>%
+      relocate(.data$quantile:.data$value, .after = .data$geo_value)
+  }
   class(cards) = c(cls, class(cards))
   cards
 }

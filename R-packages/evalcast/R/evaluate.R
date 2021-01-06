@@ -85,7 +85,6 @@ evaluate_predictions <- function(
   } else {
     # Computations if actuals are provided by the user
     if (is.data.frame(side_truth)) {
-      actual_data <- side_truth
       assert_that("actual" %in% names(side_truth),
                   msg = paste("When providing your own truth data as a data",
                               "frame, one column must be named `actual`"))

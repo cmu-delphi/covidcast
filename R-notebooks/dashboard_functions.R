@@ -20,10 +20,14 @@ make_covidcast_signal <- function(destination, source, geo_type) {
   return(destination)
 }
 
-plot_28_day_unique <- function(df_to_plot, plural_geo_title) {
+plot_unique_geo_types_present <- function(df_to_plot, plural_geo_title) {
   samples_per_day = df_to_plot %>%
     group_by(time_value) %>%
     summarize(n = n())
+  
+  day_diff =
+    samples_per_day %>% 
+    summarise(difftime(max(time_value), min(time_value), units = "days"))
   
   ggplot(samples_per_day, aes(x = time_value, y = n)) +
     geom_line() + geom_point() + theme_bw() +
@@ -31,15 +35,16 @@ plot_28_day_unique <- function(df_to_plot, plural_geo_title) {
       x = "Date",
       y = sprintf("Number of %s", plural_geo_title),
       title = sprintf(
-        "Unique %s present in signal (last 28 days): %i, mean per day: %i",
+        "Unique %s present in signal (last %s days of data): %i, mean per day: %i",
         plural_geo_title,
+        as.numeric(day_diff),
         length(unique(df_to_plot$geo_value)),
         round(mean(samples_per_day$n))
       )
     ) + date_scale
 }
 
-plot_28_day_sample_volume <- function(df_to_plot, y_axis_title) {
+plot_sample_volume <- function(df_to_plot, y_axis_title) {
   n_per_day = df_to_plot %>%
     group_by(time_value) %>%
     summarize(n = sum(value))
@@ -55,39 +60,35 @@ plot_28_day_sample_volume <- function(df_to_plot, y_axis_title) {
     date_scale
 }
 
-plot_28_day_frequency_state  <- function(df_to_plot) {
-  states_present = df_to_plot %>%
-    group_by(geo_value) %>%
-    summarize(value = n())
+plot_data_frequency_choro <- function(df_to_plot, geo_type) {
+  if (geo_type == "county") {
+    geo_types_present = df_to_plot %>%
+      group_by(geo_value) %>%
+      summarize(value = n()) %>% ungroup() %>%
+      filter(substr(geo_value, 3, 5) != "000")
+  } else if (geo_type == "state") {
+    geo_types_present = df_to_plot %>%
+      group_by(geo_value) %>%
+      summarize(value = n())
+  } else {
+    return()
+  }
   
-  covidcast_signal_to_plot = make_covidcast_signal(states_present, df_to_plot, "state")
+  day_diff = as.numeric(df_to_plot %>% 
+                          summarise(difftime(max(time_value), min(time_value), units="days")))
+  covidcast_signal_to_plot = make_covidcast_signal(geo_types_present, df_to_plot, geo_type)
   
   plot(
     covidcast_signal_to_plot,
     title = sprintf(
-      "# of times state appears in data in last 28 days (start date: %s); grey = no data for state.",
-      covidcast_signal_to_plot$time_value[1]
+      "# of times %s appears in data in last %i days of data (start date: %s); grey = no data for %s.",
+      geo_type,
+      day_diff,
+      covidcast_signal_to_plot$time_value[1],
+      geo_type
     ),
-    range = c(1, 28),
+    range = c(1, day_diff),
     choro_params = list(legend_digits = 0)
   )
 }
 
-plot_28_day_frequency_county  <- function(df_to_plot) {
-  counties_present = df_to_plot %>%
-    group_by(geo_value) %>%
-    summarize(value = n()) %>% ungroup() %>%
-    filter(substr(geo_value, 3, 5) != "000")
-  
-  covidcast_signal_to_plot = make_covidcast_signal(counties_present, df_to_plot, "county")
-  
-  plot(
-    covidcast_signal_to_plot,
-    title = sprintf(
-      "# of times county appears in data in last 28 days (start date: %s); grey = no data for county.",
-      covidcast_signal_to_plot$time_value[1]
-    ),
-    range = c(1, 28),
-    choro_params = list(legend_digits = 0)
-  )
-}

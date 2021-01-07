@@ -13,8 +13,15 @@
 #' 
 #' @export
 weighted_interval_score <- function(quantile, value, actual_value) {
- 
   if (all(is.na(actual_value))) return(NA)
+  actual_value <- unique(actual_value)
+  assert_that(length(actual_value) == 1,
+              msg = "actual_value must only have 1 value")
+  assert_that(length(quantile) == length(value),
+              msg = "quantiles and values must be of the same length")
+
+  value <- value[!is.na(quantile)]
+  quantile <- quantile[!is.na(quantile)]
   
   # per Ryan: WIS is equivalent to quantile loss modulo an extra 0.5 AE term
   # for the median forecast (counted twice). 

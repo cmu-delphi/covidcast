@@ -123,7 +123,7 @@ setup_plot_trajectory <- function(predictions_cards,
       args$signal <- predictions_cards$signal[1]
     }
     if (is.null(args$geo_type)) {
-      args$geo_type <- ifelse(nchar(geo_values[1] == 2L), "state", "county")
+      args$geo_type <- ifelse(nchar(geo_values[1]) == 2L, "state", "county")
     }
     ip <- predictions_cards$incidence_period[1]
     assert_that(ip %in% c("epiweek", "day"),

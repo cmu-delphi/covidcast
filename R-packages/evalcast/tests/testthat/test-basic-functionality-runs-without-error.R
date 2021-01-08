@@ -1,29 +1,18 @@
 library(mockery)
 
-fake_downloaded_signals <- c(
+create_fake_downloaded_signal <- function(geo_value) {
   list(tibble(data_source = "jhu-csse",
-                signal =  c("deaths_incidence_num", "confirmed_incidence_num"),
-                geo_value = "nc",
-                time_value = as.Date("2020-01-01"),
-                issue = as.Date("2020-01-02"),
-                lag = 1L,
-                value = c(1, 2),
-                stderr = c(0.1, 0.2),
-                sample_size = c(2, 2)
+              signal =  c("deaths_incidence_num", "confirmed_incidence_num"),
+              geo_value = geo_value,
+              time_value = as.Date("2020-01-01"),
+              issue = as.Date("2020-01-02"),
+              lag = 1L,
+              value = c(1, 2),
+              stderr = c(0.1, 0.2),
+              sample_size = c(2, 2)
         )
-  ),
-  list(tibble(data_source = "jhu-csse",
-                signal =  c("deaths_incidence_num", "confirmed_incidence_num"),
-                geo_value = "in",
-                time_value = as.Date("2020-01-01"),
-                issue = as.Date("2020-01-02"),
-                lag = 1L,
-                value = c(1, 2),
-                stderr = c(0.1, 0.2),
-                sample_size = c(2, 2)
-        )
-  )
-)
+  )  
+}
 
 create_fake_forecast <- function(ahead) {
   quantiles <- c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99)
@@ -37,6 +26,8 @@ create_fake_forecast <- function(ahead) {
 }
 
 test_that("get_predictions and evaluate_predictions on baseline_forecaster works", {
+  fake_downloaded_signals <- c(create_fake_downloaded_signal("in"),
+                               create_fake_downloaded_signal("nc"))
   mock_download_signals <- do.call(mock, fake_downloaded_signals)
   stub(get_predictions, "download_signals", mock_download_signals, depth = 2)
   mock_forecaster <- mock(create_fake_forecast(3),

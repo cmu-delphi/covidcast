@@ -13,73 +13,57 @@
 #' 
 #' @export
 weighted_interval_score <- function(quantile, value, actual_value) {
-  # computes the weighted interval score
-  #
-  # interval score: width + (2/alpha) * dist_from_interval
-  #
-  # weighted interval score:
-  # (|y - median| + sum_k (alpha_k/2) * interval_score_k) / (num_intervals + 1)
-  #
-  # (|y - median| + sum_k [alpha_k*width_k/2 + dfi_k]) / (num_intervals + 1)
-  # where dfi_k = dist_from_interval_k
-  point_fcast <- is.na(quantile)
-  quantile <- quantile[!point_fcast]
-  value <- value[!point_fcast]
   if (all(is.na(actual_value))) return(NA)
-  actual_value <- actual_value[1]
-  num_prob <- length(quantile) # 23
-  if (num_prob %% 2 != 1 || num_prob < 3){
-    warning(paste("WIS calculation:",
-                  "Forecaster must return at least 3 symmetric probabilities",
-                  "for this calculation. Returning NA."))
-    return(NA)
-  }
-  if (is.unsorted(quantile)) {
-    warning(paste("WIS computation requires sorted quantiles to be in",
-                  "increasing order. Returning NA."))
-    return(NA)
-  }
-  num_intervals <- (num_prob - 1) / 2 # 11
-  if (any(is.na(value)) || any(diff(value)<0)) {
-    warning(paste("some predicted values may have quantile crossings or are",
-                  "missing. Returning NA for WIS computation."))
-    return(NA)
-  }
-  if (!all(abs(quantile + rev(quantile) - 1) < 1e-10)) {
-    warning(paste("Predicted quantiles are not symmetric about 0.5.",
-                  "Returning NA for WIS computation."))
-    return(NA)
-  }
-  # note: I will treat the median as a 0% predictive interval
-  # (alpha = 1) of width 0.  This is equivalent to the expression above
-  lower <- value[1:(num_intervals + 1)]
-  upper <- value[num_prob:(num_prob - num_intervals)]
-  alpha <- 2 * quantile[1:(num_intervals + 1)]
-  width <- upper - lower
-  dist_from_interval <- pmax(actual_value - upper, lower - actual_value, 0)
-  scaled_int_scores <- alpha * width / 2 + dist_from_interval
-  mean(scaled_int_scores)
+  actual_value <- unique(actual_value)
+  assert_that(length(actual_value) == 1,
+              msg = "actual_value must only have 1 value")
+  assert_that(length(quantile) == length(value),
+              msg = "quantiles and values must be of the same length")
+
+  value <- value[!is.na(quantile)]
+  quantile <- quantile[!is.na(quantile)]
+  
+  # per Ryan: WIS is equivalent to quantile loss modulo an extra 0.5 AE term
+  # for the median forecast (counted twice). 
+  # 
+  # update: WIS is now being redefined to match exactly, still some question
+  # about the correct denominator but the formula seems to be  1 / (K + 0.5)
+  # 
+  # Finally, the multiplication by 2 is because alpha_k = 2*quantile_k
+  # 
+  med <- value[find_quantile_match(quantile, 0.5)]
+  
+  if (length(med) != 1L) return(NA)
+  
+  wis <- 2 * mean(pmax(
+    quantile * (actual_value - value),
+    (1 - quantile) * (value - actual_value), 
+    na.rm = TRUE)) 
+  
+  return(wis)
 }
 
 #' Compute absolute error
 #'
-#' Computes absolute error between the actual value and the median of the
-#' forecast distribution.
+#' Absolute error of a forecaster 
+#' 
+#' 
+#' Intended to be used with `evaluate_predictions()`, it expects three arguments
+#' of the same length, finds the location of the point forecast, and returns
+#' the absolute error.
 #'
 #' @param quantile vector of forecasted quantiles
 #' @param value vector of forecasted values
-#' @param actual_value Actual value.
+#' @param actual_value vector of actual values of the same length as 
+#'   `quantile`/`value` or a scalar
 #' 
 #' @export
 absolute_error <- function(quantile, value, actual_value) {
   point_fcast <- which(is.na(quantile))
-  if (length(point_fcast) == 1L) {
-    return(abs(value[point_fcast] - actual_value[point_fcast]))
-  }
-  point_fcast <- which(abs(quantile - 0.5) < 1e-10)
-  if (length(point_fcast) == 1L) {
-    return(abs(value[point_fcast] - actual_value[point_fcast]))
-  }
+  ae <- abs(actual_value - value)
+  if (length(point_fcast) == 1L) return(ae[point_fcast])
+  point_fcast <- which(find_quantile_match(quantile, 0.5))
+  if (length(point_fcast) == 1L) return(ae[point_fcast])
   warning(paste("Absolute error: Forecaster must return either a point forecast",
                 "with quantile == NA or a median with quantile == 0.5",
                 "Returning NA."))
@@ -106,16 +90,20 @@ interval_coverage <- function(coverage) {
     alpha = 1 - coverage
     lower_interval = alpha / 2
     upper_interval = 1 - (alpha / 2)
-    if (all(abs(quantiles - lower_interval) > 1e-10) &
-        all(abs(quantiles - upper_interval) > 1e-10)) {
+    if (!any(find_quantile_match(quantiles, lower_interval)) |
+        !any(find_quantile_match(quantiles, upper_interval))) {
       warning(paste("Interval Coverage:",
                     "Quantiles must cover an interval of specified width",
                     "centered at 0.5. Returning NA."))
       return(NA)
     }
     
-    lower <- value[which.min(abs(quantiles - lower_interval))]
-    upper <- value[which.min(abs(quantiles - upper_interval))]
+    lower <- value[which(find_quantile_match(quantiles, lower_interval))]
+    upper <- value[which(find_quantile_match(quantiles, upper_interval))]
     return(actual_value[1] >= lower & actual_value[1] <= upper)
   }
 }
+
+
+is_symmetric <- function(x, tol=1e-8) all(abs(x + rev(x) - 1) < tol)
+find_quantile_match <- function(x, q, tol=1e-8) abs(x - q) < tol

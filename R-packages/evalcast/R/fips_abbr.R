@@ -1,19 +1,15 @@
-
-
 fips_2_abbr <- function(fips){
-  df <- tibble(fi = unique(fips),
-               ab = covidcast::fips_to_abbr(fi))
-  
-  ab = left_join(tibble(fi = fips), df, by="fi") %>% pull(ab) %>% tolower()
+  # faster version of covidcast::fips_to_abbr
+  ab = left_join(tibble(fips = fips), state_fips, by="fips") %>% 
+    pull(.data$abbr) 
   names(ab) = NULL
   ab
 }
 
 abbr_2_fips <- function(abbr){
-  df <- tibble(ab = unique(abbr),
-               fi = covidcast::abbr_to_fips(ab))
-  
-  fi = left_join(tibble(ab = abbr), df, by="ab") %>% pull(fi)
+  # the reverse operation
+  fi = left_join(tibble(abbr = abbr), state_fips, by="abbr") %>% 
+    pull(.data$fips)
   names(fi) = NULL
   fi
 }

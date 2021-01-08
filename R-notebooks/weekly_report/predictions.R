@@ -26,7 +26,7 @@ create_prediction_cards = function(){
   forecast_dates = vector("list", length = length(forecasters))
   for (i in 1:length(forecasters)) {
     forecast_dates[[i]] = tryCatch({
-      as_date(get_forecast_dates(forecasters[i]))
+      as_date(get_covidhub_forecast_dates(forecasters[i]))
     },
     error = function(e) cat(sprintf("%i. %s\n", i, e$message))
     )

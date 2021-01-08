@@ -1,14 +1,14 @@
-library(tibble)
-library(lubridate)
-signals <- tibble(data_source = "jhu-csse",
-                  signal = c("deaths_incidence_num", "confirmed_incidence_num"),
-                  start_day = "2020-06-15")
-forecast_dates <- ymd(c("2020-07-20", "2020-08-10"))
-common_objects <- new.env(parent = emptyenv())
 
 test_that("get_predictions and evaluate_predictions on baseline_forecaster works", {
   # in addition to making sure these functions run, we will also use
   # the generated pc and sc in other tests.
+  skip("To be revised...")
+  signals <- tibble(data_source = "jhu-csse",
+                    signal = c("deaths_incidence_num", "confirmed_incidence_num"),
+                    start_day = "2020-06-15")
+  forecast_dates <- ymd(c("2020-07-20", "2020-08-10"))
+  common_objects <- new.env(parent = emptyenv())
+  
   pc <- get_predictions(baseline_forecaster,
                         name_of_forecaster = "baseline",
                         signals = signals,
@@ -17,12 +17,8 @@ test_that("get_predictions and evaluate_predictions on baseline_forecaster works
                         ahead = 3,
                         geo_type = "state")
   expect_equal(length(pc), 2)
-  err_measures <- list(wis = weighted_interval_score,
-                       ae = absolute_error,
-                       coverage_80 = interval_coverage(alpha = 0.2))
-  sc <- evaluate_predictions(filter_predictions(pc, ahead = 3),
-                             err_measures,
-                             backfill_buffer = 10)
+  
+  sc <- evaluate_predictions(filter(pc, ahead == 3))
   # let's save these for other tests:
   common_objects$pc <- pc
   common_objects$sc <- sc
@@ -31,6 +27,7 @@ test_that("get_predictions and evaluate_predictions on baseline_forecaster works
 test_that("geo_values argument to get_predictions works", {
   # if we run get_predictions on a subset of locations, the predictions
   # of baseline_forecaster should not change on those locations
+  skip("To be revised...")
   geo_values <- c("ca", "pa", "al")
   pc2 <- get_predictions(baseline_forecaster,
                          name_of_forecaster = "baseline",
@@ -46,6 +43,7 @@ test_that("geo_values argument to get_predictions works", {
 
 test_that("backfill_buffer works", {
   # how long has it been since the last target period ends in the scorecards?
+  skip("To be revised...")
   days_elapsed <- common_objects$sc %>%
     map_dbl(~ today() - max(.x$end)) %>% 
     unlist()
@@ -58,6 +56,7 @@ test_that("backfill_buffer works", {
 })
 
 test_that("get_predictions works when forecaster has additional arguments", {
+  skip("To be revised...")
   forecaster_with_args <- function(df,
                                    forecast_date,
                                    signals,
@@ -95,6 +94,7 @@ test_that("get_predictions works when forecaster has additional arguments", {
 
 test_that("start_day within signals works", {
   # if signals does not have a start_day, does all still run?
+  skip("To be revised...")
   signals_no_start_day <- tibble(data_source = "jhu-csse",
                                  signal = c("deaths_incidence_num",
                                             "confirmed_incidence_num"))

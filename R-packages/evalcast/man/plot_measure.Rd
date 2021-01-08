@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_measure.R
 \name{plot_measure}
 \alias{plot_measure}
-\title{Plot error measure}
+\title{Plot error measure (deprecated)}
 \usage{
 plot_measure(scorecards, err_name, type = "boxplot")
 }
@@ -15,5 +15,5 @@ task (i.e., same ahead, etc.).}
 \item{type}{One of "boxplot" or "dotplot".}
 }
 \description{
-Plot error measure
+Plot error measure (deprecated)
 }

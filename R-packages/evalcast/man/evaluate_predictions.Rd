@@ -24,7 +24,8 @@ possibly created manually.}
 
 \item{err_measures}{Named list of one or more functions, where each function
 takes a data frame with three columns \code{quantile}, \code{value} and \code{actual}
-(i.e., observed) returns a scalar measure of error.}
+(i.e., observed) returns a scalar measure of error. Null or an empty list
+may be provided if scoring is not desired.}
 
 \item{backfill_buffer}{How many days until response is deemed trustworthy
 enough to be taken as correct? See details for more.}

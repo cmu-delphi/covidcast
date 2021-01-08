@@ -1,27 +1,87 @@
+library(mockery)
+
+fake_downloaded_signals <- c(
+  list(tibble(data_source = "jhu-csse",
+                signal =  c("deaths_incidence_num", "confirmed_incidence_num"),
+                geo_value = "nc",
+                time_value = as.Date("2020-01-01"),
+                issue = as.Date("2020-01-02"),
+                lag = 1L,
+                value = c(1, 2),
+                stderr = c(0.1, 0.2),
+                sample_size = c(2, 2)
+        )
+  ),
+  list(tibble(data_source = "jhu-csse",
+                signal =  c("deaths_incidence_num", "confirmed_incidence_num"),
+                geo_value = "in",
+                time_value = as.Date("2020-01-01"),
+                issue = as.Date("2020-01-02"),
+                lag = 1L,
+                value = c(1, 2),
+                stderr = c(0.1, 0.2),
+                sample_size = c(2, 2)
+        )
+  )
+)
+
+create_fake_forecast <- function(ahead) {
+  quantiles <- c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99)
+  ahead_list <- c(ahead)
+  tibble(
+    ahead = rep(ahead_list, each=length(quantiles)),
+    geo_value = "pa",
+    quantile = rep(quantiles, length(ahead_list)),
+    value = rep(100 * quantiles, length(ahead_list))
+  )
+}
 
 test_that("get_predictions and evaluate_predictions on baseline_forecaster works", {
-  # in addition to making sure these functions run, we will also use
-  # the generated pc and sc in other tests.
-  skip("To be revised...")
+  mock_download_signals <- do.call(mock, fake_downloaded_signals)
+  stub(get_predictions, "download_signals", mock_download_signals, depth = 2)
+  mock_forecaster <- mock(create_fake_forecast(3),
+                          create_fake_forecast(3))
+
   signals <- tibble(data_source = "jhu-csse",
                     signal = c("deaths_incidence_num", "confirmed_incidence_num"),
-                    start_day = "2020-06-15")
-  forecast_dates <- ymd(c("2020-07-20", "2020-08-10"))
-  common_objects <- new.env(parent = emptyenv())
-  
-  pc <- get_predictions(baseline_forecaster,
-                        name_of_forecaster = "baseline",
+                    start_day = "2020-01-01")
+  forecast_dates <- as.Date(c("2020-01-01", "2020-01-02"))
+
+  pcard <- get_predictions(mock_forecaster,
+                        name_of_forecaster = "fake",
                         signals = signals,
                         forecast_dates = forecast_dates,
                         incidence_period = "epiweek",
                         ahead = 3,
                         geo_type = "state")
-  expect_equal(length(pc), 2)
-  
-  sc <- evaluate_predictions(filter(pc, ahead == 3))
-  # let's save these for other tests:
-  common_objects$pc <- pc
-  common_objects$sc <- sc
+
+  expect_called(mock_download_signals, 2)
+  expect_called(mock_forecaster, 2)
+  expect_equal(mock_args(mock_forecaster),
+               list(list(fake_downloaded_signals[[1]],
+                         as.Date("2020-01-01"),
+                         signals,
+                         "epiweek",
+                         3,
+                         "state"),
+                    list(fake_downloaded_signals[[2]],
+                         as.Date("2020-01-02"),
+                         signals,
+                         "epiweek",
+                         3,
+                         "state")))
+  expect_equal(colnames(pcard),
+    c("ahead", "geo_value", "quantile", "value", "forecaster", "forecast_date", "data_source",
+      "signal", "target_end_date", "incidence_period"))
+  n <- 46
+  expect_equal(nrow(pcard), n)
+  expect_equal(pcard$ahead, rep(3, n))
+  expect_equal(pcard$forecaster, rep("fake", n))
+  expect_equal(pcard$forecast_date, rep(forecast_dates, each=n/2))
+  expect_equal(pcard$data_source, rep("jhu-csse", n))
+  expect_equal(pcard$signal, rep("deaths_incidence_num", n))
+  expect_equal(pcard$target_end_date, rep(as.Date("2020-01-25"), n))
+  expect_equal(pcard$incidence_period, rep("epiweek", n))
 })
 
 test_that("geo_values argument to get_predictions works", {

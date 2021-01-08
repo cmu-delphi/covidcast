@@ -14,12 +14,12 @@ create_fake_downloaded_signal <- function(geo_value) {
   )  
 }
 
-create_fake_forecast <- function(ahead) {
+create_fake_forecast <- function(ahead, geo_value) {
   quantiles <- c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99)
   ahead_list <- c(ahead)
   tibble(
     ahead = rep(ahead_list, each=length(quantiles)),
-    geo_value = "pa",
+    geo_value = geo_value,
     quantile = rep(quantiles, length(ahead_list)),
     value = rep(100 * quantiles, length(ahead_list))
   )
@@ -30,8 +30,8 @@ test_that("get_predictions and evaluate_predictions on baseline_forecaster works
                                create_fake_downloaded_signal("nc"))
   mock_download_signals <- do.call(mock, fake_downloaded_signals)
   stub(get_predictions, "download_signals", mock_download_signals, depth = 2)
-  mock_forecaster <- mock(create_fake_forecast(3),
-                          create_fake_forecast(3))
+  mock_forecaster <- mock(create_fake_forecast(3, "in"),
+                          create_fake_forecast(3, "nc"))
 
   signals <- tibble(data_source = "jhu-csse",
                     signal = c("deaths_incidence_num", "confirmed_incidence_num"),
@@ -67,6 +67,7 @@ test_that("get_predictions and evaluate_predictions on baseline_forecaster works
   n <- 46
   expect_equal(nrow(pcard), n)
   expect_equal(pcard$ahead, rep(3, n))
+  expect_equal(pcard$geo_value, rep(c("in", "nc"), each=n/2))
   expect_equal(pcard$forecaster, rep("fake", n))
   expect_equal(pcard$forecast_date, rep(forecast_dates, each=n/2))
   expect_equal(pcard$data_source, rep("jhu-csse", n))

@@ -37,7 +37,8 @@
 #'   possibly created manually.
 #' @param err_measures Named list of one or more functions, where each function
 #'   takes a data frame with three columns `quantile`, `value` and `actual`
-#'   (i.e., observed) returns a scalar measure of error.
+#'   (i.e., observed) returns a scalar measure of error. Null or an empty list
+#'   may be provided if scoring is not desired.
 #' @param backfill_buffer How many days until response is deemed trustworthy
 #'   enough to be taken as correct? See details for more.
 #' @param side_truth you can optionally provide your own truth data (observed).
@@ -93,15 +94,18 @@ evaluate_predictions <- function(
       predictions_cards <- bind_cols(predictions_cards, actual = side_truth)
     }
   }
-
-  score_card <- predictions_cards %>% group_by(across(all_of(grp_vars)))
-  sc_keys <- score_card %>% group_keys()
-  score_card <- score_card %>%
-    group_split() %>%
-    lapply(erm, err_measures = err_measures) %>%
-    bind_rows() %>%
-    bind_cols(sc_keys) %>%
-    inner_join(predictions_cards, by = grp_vars)
+  if (is.null(err_measures) || length(err_measures) == 0) {
+    score_card <- predictions_cards
+  } else {
+    score_card <- predictions_cards %>% group_by(across(all_of(grp_vars)))
+    sc_keys <- score_card %>% group_keys()
+    score_card <- score_card %>%
+      group_split() %>%
+      lapply(erm, err_measures = err_measures) %>%
+      bind_rows() %>%
+      bind_cols(sc_keys) %>%
+      inner_join(predictions_cards, by = grp_vars)
+  }
   class(score_card) <- c("score_cards", class(score_card))
   attributes(score_card) <- c(attributes(score_card),
                               as_of = lubridate::as_date(Sys.Date()))
@@ -177,6 +181,28 @@ get_covidcast_data <- function(predictions_cards,
   }
   response <- bind_rows(actuals) %>% select(-c(start, end))
   return(response)
+}
+
+#' Retrieve actual results for provided forecasts
+#'
+#' @param predictions_cards tibble of predictions
+#'   that are all for the same prediction task, meaning they are for the same
+#'   response, incidence period and geo_type. Forecasts may be for a
+#'   different forecast date or forecaster.
+#'   A predictions card may be created by the function
+#'   [get_predictions()], downloaded with [get_covidhub_predictions()] or
+#'   possibly created manually.
+#' @return 'predictions_cards' with an added column `actual`, which represents
+#'   the observed value on the date. The `quantile` and `value` columns are
+#'   dropped, as the actual value does not depend on the quantile predictions.
+#' @export
+get_actuals <- function(predictions_cards) {
+  assert_that("predictions_cards" %in% class(predictions_cards),
+              msg = paste("predictions_cards",
+                          "must be of class `predictions_cards`."))
+  actuals <- evaluate_predictions(predictions_cards,
+                                  err_measures = NULL)
+  return(actuals)
 }
 
 #' @importFrom rlang :=

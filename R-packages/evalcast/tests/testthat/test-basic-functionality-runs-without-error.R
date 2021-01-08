@@ -28,52 +28,53 @@ create_fake_forecast <- function(ahead, geo_value) {
 test_that("get_predictions and evaluate_predictions on baseline_forecaster works", {
   fake_downloaded_signals <- c(create_fake_downloaded_signal("in"),
                                create_fake_downloaded_signal("nc"))
-  mock_download_signals <- do.call(mock, fake_downloaded_signals)
-  stub(get_predictions, "download_signals", mock_download_signals, depth = 2)
-  mock_forecaster <- mock(create_fake_forecast(3, "in"),
-                          create_fake_forecast(3, "nc"))
+  mock_download_signals <- do.call(mock, c(fake_downloaded_signals))
+  with_mock(download_signals = mock_download_signals, {
+    mock_forecaster <- mock(create_fake_forecast(3, "in"),
+                            create_fake_forecast(3, "nc"))
 
-  signals <- tibble(data_source = "jhu-csse",
-                    signal = c("deaths_incidence_num", "confirmed_incidence_num"),
-                    start_day = "2020-01-01")
-  forecast_dates <- as.Date(c("2020-01-01", "2020-01-02"))
+    signals <- tibble(data_source = "jhu-csse",
+                      signal = c("deaths_incidence_num", "confirmed_incidence_num"),
+                      start_day = "2020-01-01")
+    forecast_dates <- as.Date(c("2020-01-01", "2020-01-02"))
 
-  pcard <- get_predictions(mock_forecaster,
-                        name_of_forecaster = "fake",
-                        signals = signals,
-                        forecast_dates = forecast_dates,
-                        incidence_period = "epiweek",
-                        ahead = 3,
-                        geo_type = "state")
+    pcard <- get_predictions(mock_forecaster,
+                          name_of_forecaster = "fake",
+                          signals = signals,
+                          forecast_dates = forecast_dates,
+                          incidence_period = "epiweek",
+                          ahead = 3,
+                          geo_type = "state")
 
-  expect_called(mock_download_signals, 2)
-  expect_called(mock_forecaster, 2)
-  expect_equal(mock_args(mock_forecaster),
-               list(list(fake_downloaded_signals[[1]],
-                         as.Date("2020-01-01"),
-                         signals,
-                         "epiweek",
-                         3,
-                         "state"),
-                    list(fake_downloaded_signals[[2]],
-                         as.Date("2020-01-02"),
-                         signals,
-                         "epiweek",
-                         3,
-                         "state")))
-  expect_equal(colnames(pcard),
-    c("ahead", "geo_value", "quantile", "value", "forecaster", "forecast_date", "data_source",
-      "signal", "target_end_date", "incidence_period"))
-  n <- 46
-  expect_equal(nrow(pcard), n)
-  expect_equal(pcard$ahead, rep(3, n))
-  expect_equal(pcard$geo_value, rep(c("in", "nc"), each=n/2))
-  expect_equal(pcard$forecaster, rep("fake", n))
-  expect_equal(pcard$forecast_date, rep(forecast_dates, each=n/2))
-  expect_equal(pcard$data_source, rep("jhu-csse", n))
-  expect_equal(pcard$signal, rep("deaths_incidence_num", n))
-  expect_equal(pcard$target_end_date, rep(as.Date("2020-01-25"), n))
-  expect_equal(pcard$incidence_period, rep("epiweek", n))
+    expect_called(mock_download_signals, 2)
+    expect_called(mock_forecaster, 2)
+    expect_equal(mock_args(mock_forecaster),
+                 list(list(fake_downloaded_signals[[1]],
+                           as.Date("2020-01-01"),
+                           signals,
+                           "epiweek",
+                           3,
+                           "state"),
+                      list(fake_downloaded_signals[[2]],
+                           as.Date("2020-01-02"),
+                           signals,
+                           "epiweek",
+                           3,
+                           "state")))
+    expect_equal(colnames(pcard),
+      c("ahead", "geo_value", "quantile", "value", "forecaster", "forecast_date", "data_source",
+        "signal", "target_end_date", "incidence_period"))
+    n <- 46
+    expect_equal(nrow(pcard), n)
+    expect_equal(pcard$ahead, rep(3, n))
+    expect_equal(pcard$geo_value, rep(c("in", "nc"), each=n/2))
+    expect_equal(pcard$forecaster, rep("fake", n))
+    expect_equal(pcard$forecast_date, rep(forecast_dates, each=n/2))
+    expect_equal(pcard$data_source, rep("jhu-csse", n))
+    expect_equal(pcard$signal, rep("deaths_incidence_num", n))
+    expect_equal(pcard$target_end_date, rep(as.Date("2020-01-25"), n))
+    expect_equal(pcard$incidence_period, rep("epiweek", n))
+  })
 })
 
 test_that("geo_values argument to get_predictions works", {

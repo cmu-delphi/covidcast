@@ -4,7 +4,7 @@
 #' Slides a given function over the values in a  `covidcast_signal` data frame,
 #' grouped by `geo_value`. (When multiple issue dates are present, only the
 #' latest issue is considered.) See the [getting started
-#' guide](https://cmu-delphi.github.io/covidcast/modeltools/articles/modeltools.html)
+#' guide](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html)
 #' for examples.    
 #'
 #' @param x The `covidcast_signal` data frame under consideration. 

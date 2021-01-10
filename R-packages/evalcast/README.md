@@ -26,7 +26,7 @@ remotes::install_github("cmu-delphi/covidcast", ref = "main",
 ## Documentation
 
 The package documentation and examples are [available
-online](https://cmu-delphi.github.io/covidcast/evalcast/index.html).
+online](https://cmu-delphi.github.io/covidcast/evalcastR/index.html).
 
 ## Getting started
 

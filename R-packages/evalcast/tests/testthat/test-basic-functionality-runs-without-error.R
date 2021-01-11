@@ -1,17 +1,20 @@
 library(mockery)
 
+# Create a fake result from the covidcast API as returned by the `evalcast::download_signals()`
+# function.
 create_fake_downloaded_signal <- function(geo_value) {
   tibble(data_source = "jhu-csse",
-              signal =  c("deaths_incidence_num", "confirmed_incidence_num"),
-              geo_value = geo_value,
-              time_value = as.Date("2020-01-01"),
-              issue = as.Date("2020-01-02"),
-              lag = 1L,
-              value = c(1, 2),
-              stderr = c(0.1, 0.2),
-              sample_size = c(2, 2)) 
+         signal =  c("deaths_incidence_num", "confirmed_incidence_num"),
+         geo_value = geo_value,
+         time_value = as.Date("2020-01-01"),
+         issue = as.Date("2020-01-02"),
+         lag = 1L,
+         value = c(1, 2),
+         stderr = c(0.1, 0.2),
+         sample_size = c(2, 2)) 
 }
 
+# Create a fake forecast output with arbitrary predictions for each quantile.
 create_fake_forecast <- function(ahead, geo_value) {
   quantiles <- c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99)
   ahead_list <- c(ahead)
@@ -24,9 +27,14 @@ create_fake_forecast <- function(ahead, geo_value) {
 }
 
 test_that("get_predictions and evaluate_predictions on baseline_forecaster works", {
+  # Set up mocks for the following functions:
+  # - `evalcast::download_signals()` to avoid dependencies on the covidcast API.
+  # - the forecaster to avoid dependencies on its internal prediction algorithm.
   fake_downloaded_signals <- c(list(create_fake_downloaded_signal("in")),
                                list(create_fake_downloaded_signal("nc")))
   mock_download_signals <- do.call(mock, fake_downloaded_signals)
+  # Ideally we should use `mockery::stub` here but there is bug that persists the mock across tests.
+  # See https://github.com/r-lib/mockery/issues/20.
   with_mock(download_signals = mock_download_signals, {
     mock_forecaster <- mock(create_fake_forecast(3, "in"),
                             create_fake_forecast(3, "nc"))
@@ -76,11 +84,16 @@ test_that("get_predictions and evaluate_predictions on baseline_forecaster works
 })
 
 test_that("geo_values argument to get_predictions works", {
+  # Set up mocks for the following functions:
+  # - `evalcast::download_signals()` to avoid dependencies on the covidcast API.
+  # - the forecaster to avoid dependencies on its internal prediction algorithm.
   fake_downloaded_signals <- list(
     bind_rows(create_fake_downloaded_signal("nd"),
               create_fake_downloaded_signal("ia"),
               create_fake_downloaded_signal("sd")))
   mock_download_signals <- mock(fake_downloaded_signals)
+  # Ideally we should use `mockery::stub` here but there is bug that persists the mock across tests.
+  # See https://github.com/r-lib/mockery/issues/20.
   with_mock(download_signals = mock_download_signals, {
     mock_forecaster <- mock(bind_rows(
       create_fake_forecast(3, "nd"),

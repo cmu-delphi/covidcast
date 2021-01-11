@@ -26,7 +26,12 @@ create_fake_forecast <- function(ahead, geo_value) {
   )
 }
 
-test_that("get_predictions and evaluate_predictions on baseline_forecaster works", {
+create_pcard <- function(card) {
+  class(card) <- c("predictions_cards", class(card))
+  return(card)
+}
+
+test_that("get_predictions on baseline_forecaster works", {
   # Set up mocks for the following functions:
   # - `evalcast::download_signals()` to avoid dependencies on the covidcast API.
   # - the forecaster to avoid dependencies on its internal prediction algorithm.
@@ -139,20 +144,6 @@ test_that("geo_values argument to get_predictions works", {
   })
 })
 
-test_that("backfill_buffer works", {
-  # how long has it been since the last target period ends in the scorecards?
-  skip("To be revised...")
-  days_elapsed <- common_objects$sc %>%
-    map_dbl(~ today() - max(.x$end)) %>% 
-    unlist()
-  # too soon should give error:
-  expect_error(evaluate_predictions(common_objects$pc,
-                                    backfill_buffer = days_elapsed),
-               "backfill_buffer")
-  # waited long enough should have no error:
-  evaluate_predictions(common_objects$pc, backfill_buffer = days_elapsed - 1)
-})
-
 test_that("get_predictions works when forecaster has additional arguments", {
   skip("To be revised...")
   forecaster_with_args <- function(df,
@@ -251,4 +242,27 @@ test_that("start_day within signals works", {
   med_pred_mix <- pc_mix[[1]]$forecast_distribution %>%
     map_dbl(~ .x %>% filter(probs == 0.5) %>% pull(quantiles))
   expect_equal(med_pred1, med_pred_mix)
+})
+
+test_that("backfill_buffer works", {
+  skip("To be revised...")
+  mock_download_signal <- mock(create_fake_downloaded_signal("al"), cycle=TRUE)
+  with_mock(download_signal = mock_download_signal, {
+    pcard <- create_pcard(tibble(
+      ahead = 1,
+      geo_value = rep(c("al", "wy"), each=3),
+      quantile = c(0.1, 0.5, 0.9, 0.1, 0.5, 0.9),
+      value = seq(1, 6),
+      forecaster = "a",
+      forecast_date = rep(as.Date(c("2020-01-02", "2020-01-03")), each=3),
+      data_source = "source",
+      signal = "signal",
+      target_end_date = as.Date("2020-01-05"),
+      incidence_period = "epiweek"
+    ))
+    expect_warning(evaluate_predictions(pcard, backfill_buffer = 4),
+                "backfill_buffer")
+    # waited long enough should have no error:
+    evaluate_predictions(pcard, backfill_buffer = 2)
+  })
 })

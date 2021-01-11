@@ -31,7 +31,7 @@ create_pcard <- function(card) {
   return(card)
 }
 
-test_that("get_predictions on baseline_forecaster works", {
+test_that("get_predictions works", {
   # Set up mocks for the following functions:
   # - `evalcast::download_signals()` to avoid dependencies on the covidcast API.
   # - the forecaster to avoid dependencies on its internal prediction algorithm.
@@ -50,12 +50,12 @@ test_that("get_predictions on baseline_forecaster works", {
     forecast_dates <- as.Date(c("2020-01-01", "2020-01-02"))
 
     pcard <- get_predictions(mock_forecaster,
-                          name_of_forecaster = "fake",
-                          signals = signals,
-                          forecast_dates = forecast_dates,
-                          incidence_period = "epiweek",
-                          ahead = 3,
-                          geo_type = "state")
+                             name_of_forecaster = "fake",
+                             signals = signals,
+                             forecast_dates = forecast_dates,
+                             incidence_period = "epiweek",
+                             ahead = 3,
+                             geo_type = "state")
 
     expect_called(mock_download_signals, 2)
     expect_called(mock_forecaster, 2)
@@ -163,14 +163,14 @@ test_that("get_predictions works when forecaster has additional arguments", {
     forecast_dates <- as.Date(c("2020-01-01", "2020-01-02"))
 
     pcard <- get_predictions(mock_forecaster,
-                          name_of_forecaster = "fake",
-                          signals = signals,
-                          forecast_dates = forecast_dates,
-                          incidence_period = "epiweek",
-                          ahead = 3,
-                          geo_type = "state",
-                          forecaster_arg1 = 1,
-                          forecaster_arg2 = "2")
+                             name_of_forecaster = "fake",
+                             signals = signals,
+                             forecast_dates = forecast_dates,
+                             incidence_period = "epiweek",
+                             ahead = 3,
+                             geo_type = "state",
+                             forecaster_arg1 = 1,
+                             forecaster_arg2 = "2")
 
     expect_called(mock_download_signals, 2)
     expect_called(mock_forecaster, 2)
@@ -207,67 +207,118 @@ test_that("get_predictions works when forecaster has additional arguments", {
   })
 })
 
-test_that("start_day within signals works", {
-  # if signals does not have a start_day, does all still run?
-  skip("To be revised...")
-  signals_no_start_day <- tibble(data_source = "jhu-csse",
-                                 signal = c("deaths_incidence_num",
-                                            "confirmed_incidence_num"))
-  forecast_dates <- ymd(c("2020-07-20", "2020-07-27"))
-  pc_no_start_day <- get_predictions(baseline_forecaster,
-                                     name_of_forecaster = "baseline",
-                                     signals = signals_no_start_day,
-                                     forecast_dates = forecast_dates,
-                                     incidence_period = "epiweek",
-                                     ahead = 3,
-                                     geo_type = "state")
-  sc_no_start_day <- evaluate_predictions(pc_no_start_day)
-  
-  # if signals has a start_day, does all still run?
-  signals <- signals_no_start_day %>% mutate(start_day = "2020-06-15")
-  forecast_date <- ymd("2020-07-20")
-  pc1 <- get_predictions(baseline_forecaster,
-                         name_of_forecaster = "baseline",
-                         signals = signals,
-                         forecast_dates = forecast_date,
-                         incidence_period = "epiweek",
-                         ahead = 3,
-                         geo_type = "state")
-  # the median should be the same for both for the
-  # baseline_forecaster in the symmetrized case:
-  med_pred_no_start_day <- pc_no_start_day[[1]]$forecast_distribution %>%
-    map_dbl(~ .x %>% filter(probs == 0.5) %>% pull(quantiles))
-  med_pred1 <- pc1[[1]]$forecast_distribution %>%
-    map_dbl(~ .x %>% filter(probs == 0.5) %>% pull(quantiles))
-  expect_equal(med_pred1, med_pred_no_start_day)
+test_that("no start_day within signals raises warning but works", {
+  # Set up mocks for the following functions:
+  # - `evalcast::download_signals()` to avoid dependencies on the covidcast API.
+  # - the forecaster to avoid dependencies on its internal prediction algorithm.
+  fake_downloaded_signals <- list(create_fake_downloaded_signal("fl"))
+  mock_download_signals <- mock(fake_downloaded_signals)
+  # Ideally we should use `mockery::stub` here but there is bug that persists the mock across tests.
+  # See https://github.com/r-lib/mockery/issues/20.
+  with_mock(download_signals = mock_download_signals, {
+    mock_forecaster <- mock(create_fake_forecast(2, "fl"))
 
-  # if signals has a start_day that is a function, does all still run?
-  signals_f <- signals_no_start_day %>% 
-    mutate(start_day = list(function(forecast_date) forecast_date - 40))
-  pc_f <- get_predictions(baseline_forecaster,
-                          name_of_forecaster = "baseline",
-                          signals = signals_f,
-                          forecast_dates = forecast_date,
-                          incidence_period = "epiweek",
-                          ahead = 3,
-                          geo_type = "state")
-  med_pred_f <- pc_f[[1]]$forecast_distribution %>%
-    map_dbl(~ .x %>% filter(probs == 0.5) %>% pull(quantiles))
-  expect_equal(med_pred1, med_pred_f)
-  
-  # what about a mix of start_day types? (currently fails)
-  signals_mix <- signals_f
-  signals_mix$start_day[[1]] <- "2020-06-15"
-  pc_mix <- get_predictions(baseline_forecaster,
-                            name_of_forecaster = "baseline",
-                            signals = signals_mix,
-                            forecast_dates = forecast_date,
-                            incidence_period = "epiweek",
-                            ahead = 3,
-                            geo_type = "state")
-  med_pred_mix <- pc_mix[[1]]$forecast_distribution %>%
-    map_dbl(~ .x %>% filter(probs == 0.5) %>% pull(quantiles))
-  expect_equal(med_pred1, med_pred_mix)
+    signals_no_start_day <- tibble(
+                              data_source = "jhu-csse",
+                              signal = c("deaths_incidence_num", "confirmed_incidence_num"))
+    forecast_dates <- as.Date(c("2020-01-01"))
+
+    expect_warning(
+      pcard <- get_predictions(mock_forecaster,
+                               name_of_forecaster = "fake",
+                               signals = signals_no_start_day,
+                               forecast_dates = forecast_dates,
+                               incidence_period = "epiweek",
+                               ahead = 2,
+                               geo_type = "state"),
+      "Unknown or uninitialised column: `start_day`.")
+
+    expect_called(mock_download_signals, 1)
+    expect_called(mock_forecaster, 1)
+    expect_equal(mock_args(mock_forecaster),
+                 list(list(fake_downloaded_signals,
+                           as.Date("2020-01-01"),
+                           signals_no_start_day,
+                           "epiweek",
+                           2,
+                           "state")))
+    expect_equal(colnames(pcard),
+      c("ahead", "geo_value", "quantile", "value", "forecaster", "forecast_date", "data_source",
+        "signal", "target_end_date", "incidence_period"))
+    n <- 23
+    expect_equal(nrow(pcard), n)
+    expect_equal(pcard$ahead, rep(2, n))
+    expect_equal(pcard$geo_value, rep("fl", n))
+    expect_equal(pcard$forecaster, rep("fake", n))
+    expect_equal(pcard$forecast_date, rep(forecast_dates, each=n))
+    expect_equal(pcard$data_source, rep("jhu-csse", n))
+    expect_equal(pcard$signal, rep("deaths_incidence_num", n))
+    expect_equal(pcard$target_end_date, rep(as.Date("2020-01-18"), n))
+    expect_equal(pcard$incidence_period, rep("epiweek", n))
+  })
+})
+
+test_that("start_day function within signals works", {
+  # Set up mocks for the following functions:
+  # - `evalcast::download_signals()` to avoid dependencies on the covidcast API.
+  # - the forecaster to avoid dependencies on its internal prediction algorithm.
+  fake_downloaded_signals <- c(list(create_fake_downloaded_signal("fl")),
+                               list(create_fake_downloaded_signal("ga")))
+  mock_download_signals <- do.call(mock, fake_downloaded_signals)
+  # Ideally we should use `mockery::stub` here but there is bug that persists the mock across tests.
+  # See https://github.com/r-lib/mockery/issues/20.
+  with_mock(download_signals = mock_download_signals, {
+    mock_forecaster <- mock(create_fake_forecast(2, "fl"),
+                            create_fake_forecast(2, "ga"))
+
+    signals_with_start_day_fn <- tibble(
+                                  data_source = "jhu-csse",
+                                  signal = c("deaths_incidence_num", "confirmed_incidence_num"),
+                                  start_day = list(function(forecast_date) forecast_date - 10)
+                                 )
+    forecast_dates <- as.Date(c("2020-12-11", "2020-12-12"))
+
+    pcard <- get_predictions(mock_forecaster,
+                             name_of_forecaster = "fake",
+                             signals = signals_with_start_day_fn,
+                             forecast_dates = forecast_dates,
+                             incidence_period = "epiweek",
+                             ahead = 2,
+                             geo_type = "state")
+
+    expect_called(mock_download_signals, 2)
+    expect_called(mock_forecaster, 2)
+    expect_equal(mock_args(mock_forecaster),
+                 list(list(fake_downloaded_signals[[1]],
+                           as.Date("2020-12-11"),
+                           tibble(data_source = "jhu-csse",
+                                  signal = c("deaths_incidence_num", "confirmed_incidence_num"),
+                                  start_day = as.Date("2020-12-01")),
+                           "epiweek",
+                           2,
+                           "state"),
+                      list(fake_downloaded_signals[[2]],
+                           as.Date("2020-12-12"),
+                           tibble(data_source = "jhu-csse",
+                                  signal = c("deaths_incidence_num", "confirmed_incidence_num"),
+                              start_day = as.Date("2020-12-02")),
+                           "epiweek",
+                           2,
+                           "state")))
+    expect_equal(colnames(pcard),
+      c("ahead", "geo_value", "quantile", "value", "forecaster", "forecast_date", "data_source",
+        "signal", "target_end_date", "incidence_period"))
+    n <- 46
+    expect_equal(nrow(pcard), n)
+    expect_equal(pcard$ahead, rep(2, n))
+    expect_equal(pcard$geo_value, rep(c("fl", "ga"), each=n/2))
+    expect_equal(pcard$forecaster, rep("fake", n))
+    expect_equal(pcard$forecast_date, rep(forecast_dates, each=n/2))
+    expect_equal(pcard$data_source, rep("jhu-csse", n))
+    expect_equal(pcard$signal, rep("deaths_incidence_num", n))
+    expect_equal(pcard$target_end_date, rep(as.Date("2020-12-26"), n))
+    expect_equal(pcard$incidence_period, rep("epiweek", n))
+  })
 })
 
 test_that("backfill_buffer works", {

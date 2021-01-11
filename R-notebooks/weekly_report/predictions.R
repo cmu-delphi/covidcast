@@ -4,20 +4,20 @@ library(dplyr)
 
 # TODO: Use `get_covidhub_forecaster_names()` instead of listing forecasters
 create_prediction_cards = function(){
-  forecasters = c("CMU-TimeSeries", 
-                  "YYG-ParamSearch", 
-                  "UMass-MechBayes", 
+  forecasters = c("CMU-TimeSeries",
+                  "CovidAnalytics-DELPHI",
+                  #   "Google_Harvard-CPF", Excluded for now. Doesn't have quantiles for all forecasts
                   "GT-DeepCOVID", 
                   "IHME-CurveFit", 
+                  "JHU_IDD-CovidSP",
                   "LANL-GrowthRate", 
-                  "UCLA-SuEIR", 
-                  "MOBS-GLEAM_COVID", 
-                  "UT-Mobility", 
+                  "MOBS-GLEAM_COVID",
                   "OliverWyman-Navigator", 
-                  "JHU_IDD-CovidSP", 
-                  "CovidAnalytics-DELPHI", 
-                  #   "Google_Harvard-CPF", Excluded for now. Doesn't have quantiles for all forecasts
-                  "Yu_Group-CLEP", 
+                  "UCLA-SuEIR",
+                  "UMass-MechBayes",
+                  "UT-Mobility",
+                  "Yu_Group-CLEP",
+                  "YYG-ParamSearch", 
                   "COVIDhub-ensemble", 
                   "COVIDhub-baseline")
   

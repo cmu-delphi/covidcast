@@ -1,4 +1,5 @@
 library(mockr)
+library(mockery)
 
 # Create a fake result from the covidcast API as returned by the `evalcast::download_signals()`
 # function.

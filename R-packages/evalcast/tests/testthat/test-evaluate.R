@@ -77,7 +77,21 @@ test_that("evaluate_predictions evaluates against downloaded data", {
 })
 
 test_that("evaluate_predictions fails on non-predictions cards data frames", {
-
+  expect_error(
+    evaluate_predictions(
+      tibble(
+        ahead = 1,
+        geo_value = rep(c("al", "wy"), each=3),
+        quantile = c(0.1, 0.5, 0.9, 0.1, 0.5, 0.9),
+        value = seq(1, 6),
+        forecaster = "a",
+        forecast_date = rep(as.Date(c("2020-01-02", "2020-01-09")), each=3),
+        data_source = "source",
+        signal = "signal",
+        target_end_date = as.Date("2020-01-21"),
+        incidence_period = "epiweek"
+      )),
+    "must be of class `predictions_cards`")
 })
 
 test_that("evaluate_predictions evaluates against side truth", {

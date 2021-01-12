@@ -321,6 +321,81 @@ test_that("start_day function within signals works", {
   })
 })
 
+test_that("start_day function and date mix within signals works", {
+  skip("To be revised...")
+  # Set up mocks for the following functions:
+  # - `evalcast::download_signals()` to avoid dependencies on the covidcast API.
+  # - the forecaster to avoid dependencies on its internal prediction algorithm.
+  fake_downloaded_signals <- c(list(create_fake_downloaded_signal("fl")),
+                               list(create_fake_downloaded_signal("ga")))
+  mock_download_signals <- do.call(mock, fake_downloaded_signals)
+  # Ideally we should use `mockery::stub` here but there is bug that persists the mock across tests.
+  # See https://github.com/r-lib/mockery/issues/20.
+  with_mock(download_signals = mock_download_signals, {
+    mock_forecaster <- mock(create_fake_forecast(2, "fl"),
+                            create_fake_forecast(2, "ga"))
+
+    signals_with_start_day_fn <- tibble(
+                                  data_source = "jhu-csse",
+                                  signal = c("deaths_incidence_num", "confirmed_incidence_num"),
+                                  start_day = c("2020-11-07",
+                                                list(function(forecast_date) forecast_date - 10))
+                                 )
+    forecast_dates <- as.Date(c("2020-12-11", "2020-12-12"))
+
+    pcard <- get_predictions(mock_forecaster,
+                             name_of_forecaster = "fake",
+                             signals = signals_with_start_day_fn,
+                             forecast_dates = forecast_dates,
+                             incidence_period = "epiweek",
+                             ahead = 2,
+                             geo_type = "state")
+
+    print(mock_args(mock_forecaster)[[1]])
+    print(list(fake_downloaded_signals[[1]],
+                           as.Date("2020-12-11"),
+                           tibble(data_source = "jhu-csse",
+                                  signal = c("deaths_incidence_num", "confirmed_incidence_num"),
+                                  start_day = as.Date(c("2020-11-07", "2020-12-01"))),
+                           "epiweek",
+                           2,
+                           "state"))
+
+    expect_called(mock_download_signals, 2)
+    expect_called(mock_forecaster, 2)
+    expect_equal(mock_args(mock_forecaster),
+                 list(list(fake_downloaded_signals[[1]],
+                           as.Date("2020-12-11"),
+                           tibble(data_source = "jhu-csse",
+                                  signal = c("deaths_incidence_num", "confirmed_incidence_num"),
+                                  start_day = as.Date(c("2020-11-07", "2020-12-01"))),
+                           "epiweek",
+                           2,
+                           "state"),
+                      list(fake_downloaded_signals[[2]],
+                           as.Date("2020-12-12"),
+                           tibble(data_source = "jhu-csse",
+                                  signal = c("deaths_incidence_num", "confirmed_incidence_num"),
+                                  start_day = as.Date(c("2020-11-07", "2020-12-02"))),
+                           "epiweek",
+                           2,
+                           "state")))
+    expect_equal(colnames(pcard),
+      c("ahead", "geo_value", "quantile", "value", "forecaster", "forecast_date", "data_source",
+        "signal", "target_end_date", "incidence_period"))
+    n <- 46
+    expect_equal(nrow(pcard), n)
+    expect_equal(pcard$ahead, rep(2, n))
+    expect_equal(pcard$geo_value, rep(c("fl", "ga"), each=n/2))
+    expect_equal(pcard$forecaster, rep("fake", n))
+    expect_equal(pcard$forecast_date, rep(forecast_dates, each=n/2))
+    expect_equal(pcard$data_source, rep("jhu-csse", n))
+    expect_equal(pcard$signal, rep("deaths_incidence_num", n))
+    expect_equal(pcard$target_end_date, rep(as.Date("2020-12-26"), n))
+    expect_equal(pcard$incidence_period, rep("epiweek", n))
+  })
+})
+
 test_that("backfill_buffer works", {
   skip("To be revised...")
   mock_download_signal <- mock(create_fake_downloaded_signal("al"), cycle=TRUE)

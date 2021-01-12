@@ -26,11 +26,6 @@ create_fake_forecast <- function(ahead, geo_value) {
   )
 }
 
-create_pcard <- function(card) {
-  class(card) <- c("predictions_cards", class(card))
-  return(card)
-}
-
 test_that("get_predictions works", {
   # Set up mocks for the following functions:
   # - `evalcast::download_signals()` to avoid dependencies on the covidcast API.
@@ -393,28 +388,5 @@ test_that("start_day function and date mix within signals works", {
     expect_equal(pcard$signal, rep("deaths_incidence_num", n))
     expect_equal(pcard$target_end_date, rep(as.Date("2020-12-26"), n))
     expect_equal(pcard$incidence_period, rep("epiweek", n))
-  })
-})
-
-test_that("backfill_buffer works", {
-  skip("To be revised...")
-  mock_download_signal <- mock(create_fake_downloaded_signal("al"), cycle=TRUE)
-  with_mock(download_signal = mock_download_signal, {
-    pcard <- create_pcard(tibble(
-      ahead = 1,
-      geo_value = rep(c("al", "wy"), each=3),
-      quantile = c(0.1, 0.5, 0.9, 0.1, 0.5, 0.9),
-      value = seq(1, 6),
-      forecaster = "a",
-      forecast_date = rep(as.Date(c("2020-01-02", "2020-01-03")), each=3),
-      data_source = "source",
-      signal = "signal",
-      target_end_date = as.Date("2020-01-05"),
-      incidence_period = "epiweek"
-    ))
-    expect_warning(evaluate_predictions(pcard, backfill_buffer = 4),
-                "backfill_buffer")
-    # waited long enough should have no error:
-    evaluate_predictions(pcard, backfill_buffer = 2)
   })
 })

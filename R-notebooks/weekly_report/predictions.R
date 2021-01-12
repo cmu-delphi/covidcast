@@ -4,6 +4,8 @@ library(dplyr)
 
 # TODO: Use `get_covidhub_forecaster_names()` instead of listing forecasters
 create_prediction_cards = function(){
+  start_date = today() - 12 * 7 # last 12 weeks
+  
   forecasters = c("CMU-TimeSeries",
                   "CovidAnalytics-DELPHI",
                   "CU-select",
@@ -41,6 +43,8 @@ create_prediction_cards = function(){
     )
   }
   
+  forecast_dates = lapply(forecast_dates, function(date) date[date >= start_date])
+  
   # Load data from previous run so we don't have to re-ingest / process it. This
   # data could end up out of date if a forecast is retrospectively updated, but in
   # that case it's no longer a true prediction. We can always restart from scratch
@@ -57,7 +61,7 @@ create_prediction_cards = function(){
   # Now figure out "comparable" forecast dates: making a forecast on a Sunday or a 
   # Monday of the same epiweek should be comparable.
   
-  forecast_dates_cmu = forecast_dates[[1]]
+  forecast_dates_cmu = forecast_dates[[which(forecasters == "CMU-TimeSeries")]]
   
   # new_dates, as opposed to dates for which we already have data for a forecaster
   new_dates = list()
@@ -109,6 +113,8 @@ create_prediction_cards = function(){
   } else {
     predictions_cards = predictions_cards_new
   }
+  predictions_cards = predictions_cards %>%
+                        filter(forecast_date >= start_date)
   
   # Hack: must change the response data source to be USAFacts, as JHU-CSSE data is
   # currently unstable. **TODO**: we shouldn't require `evaluate_predictions()` to 

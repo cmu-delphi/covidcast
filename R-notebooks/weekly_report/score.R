@@ -3,6 +3,7 @@ library("dplyr")
 library("lubridate")
 
 create_score_cards = function(geo_type, output_file_name = NULL, score_cards_name = NULL){
+  start_date = today() - 12 * 7 # last 12 weeks
   if (!exists("predictions_cards")){
     load("predictions_cards.rda")
   }
@@ -57,6 +58,8 @@ create_score_cards = function(geo_type, output_file_name = NULL, score_cards_nam
   } else {
     score_cards = score_cards_new
   }
+  score_cards = score_cards %>% filter(forecast_date >= start_date)
+  
   assign(score_cards_name, score_cards)
   save(list = score_cards_name, 
        file = output_file_name, 

@@ -4,6 +4,9 @@ Released TODO DATE.
 
 ## Major changes
 
+- The `plot.covidcast_signal()` method now supports making choropleth plots for
+  metropolitan areas and hospital referral regions.
+
 - A new `as.covidcast_signal()` generic function makes it easy to turn any
   data frame, such as data loaded from an external source, into a
   `covidcast_signal` object that can be plotted and wrangled using the functions
@@ -28,6 +31,8 @@ Released TODO DATE.
 
 - `covidcast_signal()` now fetches data from the API server in CSV format,
   rather than JSON, which requires less bandwidth and parsing.
+
+- `covidcast_cor()` is dramatically faster than before.
 
 # covidcast 0.3.1
 

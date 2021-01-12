@@ -2,7 +2,9 @@
 title: "COVID-19 Forecast Evaluation"
 author: "Delphi Group"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
-output: html_document
+output: 
+  html_document:
+    code_folding: hide
 params:
   score_file: "score_cards_state.rda"
   card_name: "score_cards_state"
@@ -23,7 +25,9 @@ library(stringr)
 ```
 # {.tabset}
 
-## Find Common Forecasts
+## Select Forecasts
+
+Filter to forecasters that have significant overlap in predictions with CMU-TimeSeries for the last 4 weeks.This is used primarily to ensure we don't include inactive forecasters in the pairwise tournament rankings and that there is enough overlap for pairwise scores to be meaningful.
 
 ```{r}
 if (file.exists(params$score_file)){
@@ -37,6 +41,7 @@ if (file.exists(params$score_file)){
   stop(paste("File not found:", params$score_file))
 }
 
+score_cards_tourney = score_cards
 score_cards_cmu = score_cards %>% 
                     filter(forecaster == "CMU-TimeSeries") %>% 
                     distinct(ahead, geo_value, target_end_date)
@@ -57,14 +62,19 @@ cmu_forecasts = recent_score_by_frcstr[recent_score_by_frcstr$forecaster == "CMU
 
 active_forecasters = recent_score_by_frcstr[recent_score_by_frcstr$num_total > cmu_forecasts * 0.80,]$forecaster
 
-score_cards = score_cards %>% 
-                filter(forecaster %in% active_forecasters)
-
 # save for pairwise tournament
-score_cards_tourney = score_cards
+score_cards_tourney = score_cards_tourney %>% 
+                filter(forecaster %in% active_forecasters)
 ```
 
+Next, filter to forecasters of interest for line plots and find common locations.
+
 ```{r}
+highlight_forecasters = c("CMU-TimeSeries",
+                          "COVIDhub-baseline",
+                          "COVIDhub-ensemble")
+score_cards = score_cards %>% filter(forecaster %in% highlight_forecasters)
+
 # TODO: Use evalcast::intersect_averagers after merging the kill-cards updates
 forecaster_coverage = score_cards %>% 
                         group_by(ahead, geo_value, target_end_date) %>% 
@@ -79,14 +89,14 @@ common_forecasts = forecaster_coverage %>%
 score_cards = semi_join(score_cards, common_forecasts)
 ```
 
-## Dot plots
+## Line plots
 
-First we make dot plots (not the same as that in evalcast): one dot per ahead, 
-forecaster, and forecast date. The red plus marks the score computed over all 
-dates. Here we use the mean as the aggregator function, and we study WIS, AE,
-and coverage-80. 
+Now we make line plots: one line per ahead and forecaster, as a function of
+forecast date. Here we use the mean as the aggregator function, and we look at
+WIS and coverage-80. 
 
-```{r, fig.width = 10, fig.height = 10}
+
+```{r, fig.width = 10, fig.height = 8}
 # Define mean and median functions that deal with missingness well
 Mean = function(x) mean(x, na.rm = TRUE)
 Median = function(x) median(x, na.rm = TRUE)
@@ -106,54 +116,6 @@ summarize_var = function(df, var, aggr = Mean) {
   df_sum = full_join(df_by_date, df_overall, by = c("forecaster", "ahead"))
 }
 
-dot_plot = function(df, var = "wis", ylab = var, ylim = NULL, aggr = Mean) {
-  df_sum = summarize_var(df, var, aggr)
-  df_sum$ahead = factor(paste("ahead =", df_sum$ahead))
-  
-  ggplot(df_sum, aes(x = order, y = var)) +
-    geom_point(aes(color = target_end_date)) + 
-    geom_point(aes(x = order, y = var_overall), color = "red", shape = 3) +
-    facet_wrap(vars(ahead), scales = "free") + 
-    labs(x = "Forecaster", y = ylab) +
-    scale_x_continuous(breaks = df_sum$order, labels = df_sum$forecaster) + 
-    theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
-    coord_cartesian(ylim = ylim)
-}
-```
-
-```{r, fig.width = 10, fig.height = 10}
-dot_plot(score_cards, var = "wis", ylab = "Mean WIS") + scale_y_log10()
-dot_plot(score_cards, var = "ae", ylab = "Mean AE") + scale_y_log10()
-dot_plot(score_cards, var = "cov_80", ylab = "Coverage-80", ylim = c(0,1)) +
-  geom_hline(yintercept = 0.8)
-```
-
-
-## Dot plots: median and 90th percentile
-
-Same as before, but change the aggregator function to the median. Omitting AE
-for brevity, hencforth.
-
-```{r, fig.width = 10, fig.height = 10}
-dot_plot(score_cards, var = "wis", ylab = "Median WIS", aggr = Median) +
-  scale_y_log10()
-```
-
-And now we change the aggregator function to be the 90th percentile.
-
-```{r, fig.width = 10, fig.height = 10}
-dot_plot(score_cards, var = "wis", ylab = "90th percentile WIS", 
-         aggr = function(x) quantile(x, prob = 0.9, na.rm = TRUE)) +
-  scale_y_log10()
-```
-
-## Line plots
-
-Now we make line plots: one line per ahead and forecaster, as a function of
-forecast date. Here we use the mean as the aggregator function, and we look at
-WIS and coverage-80. 
-
-```{r, fig.width = 10, fig.height = 8}
 # From https://stackoverflow.com/questions/15282580/
 color_picker = function(n) {
   qual_col_pals = brewer.pal.info[brewer.pal.info$category == 'qual',]
@@ -192,9 +154,6 @@ different final metric altogether. It is potentially interesting as it provides
 a nonparametric spatiotemporal adjustment; assuming that space and time effects 
 are *multiplicative*, we're directly "canceling them out" by taking ratios. 
 
-Here are dot plots for scaled WIS, with mean as the aggregator. Omitting median
-for brevity.
-
 ```{r, fig.width = 10, fig.height = 10}
 # Note to self: mutate_at() gave me a weird bug below! From now on, better use
 # mutate() with across() instead ...
@@ -213,49 +172,11 @@ scale_df = function(df, var, base_forecaster = "COVIDhub-baseline") {
 }
 ```
 
-```{r, fig.width = 10, fig.height = 10}
-dot_plot(scale_df(score_cards, var = "wis"), var = "scaled", 
-         ylab = "Mean scaled WIS") + geom_hline(yintercept = 1) 
-```
-
 Here are now line plots for mean scaled WIS. 
 
 ```{r, fig.width = 10, fig.height = 8}
 line_plot(scale_df(score_cards, var = "wis"), var = "scaled", 
           ylab = "Mean scaled WIS") + geom_hline(yintercept = 1) 
-```
-
-## Centering by baseline
-
-Similar to what we did previously but just with centering instead of scaling.
-
-Note on order of operations: center then aggregate versus aggregate then center
-are still in general different strategies. As before we're adhering to the first
-way, with a similar movitation: if space and time effects were now *additive*, 
-then this way would "cancel them out" directly. However, when the aggregator 
-is a linear operation (e.g., mean), the two strategies essentially reduce to the 
-same thing ("essentially", not exactl, because setting `na.rm = TRUE` generally
-turns any linear operator into a nonlinear one). 
-
-Here are the dot plots for mean centered WIS. Omitting median for brevity.
-
-```{r, fig.width = 10, fig.height = 10}
-center_df = function(df, var, base_forecaster = "COVIDhub-baseline") {
-  scale_df(df %>% mutate(y = exp(!!as.symbol(var))), "y", base_forecaster) %>%
-    mutate(centered = log(scaled)) %>% select(-scaled)
-}
-```
-
-```{r, fig.width = 10, fig.height = 10}
-dot_plot(center_df(score_cards, var = "wis"), var = "centered", 
-         ylab = "Mean centered WIS") + geom_hline(yintercept = 0)  
-```
-
-Here are now the line plots for mean centered WIS.
-
-```{r, fig.width = 10, fig.height = 8}
-line_plot(center_df(score_cards, var = "wis"), var = "centered", 
-          ylab = "Mean centered WIS") + geom_hline(yintercept = 0) 
 ```
 
 ## Pairwise tournament
@@ -321,64 +242,6 @@ pairwise_tournament = function(df, var, aggr = Mean) {
 ```{r, fig.width = 10, fig.height = 10}
 theta = pairwise_tournament(score_cards_tourney, var = "wis", aggr = 
                               function(x) mean(x, trim = 0.01, na.rm = TRUE))
-ranked_list = rownames(theta$mat)[order(theta$vec1)]
-colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
-ggplot(theta$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
-                     y = factor(Forecaster1, levels = rev(ranked_list)))) +
-  geom_tile(aes(fill = value)) +
-  geom_text(aes(label = round(value, 3))) +
-  scale_fill_gradientn(colours = colors) +
-  labs(x = NULL, y = NULL) +
-  theme_bw() + theme(legend.position = "none", 
-                     axis.text.x = element_text(angle = 90, hjust = 1))
-
-# Overall metric (computed via GM of pairwise metrics):
-knitr::kable(data.frame(rank = 1:length(theta$vec1), forecaster = ranked_list,
-                        theta = sort(theta$vec1), row.names = NULL))
-```
-
-For curiosity, we can plot the agreement the overall metric computed via GM and
-SVD. The agreement is basically perfect!
-
-```{r}
-ggplot() + geom_point(aes(x = theta$vec1, y = theta$vec2)) +
-  labs(x = "Geometric mean", y = "Top left singular vector")
-```
-
-```{r}
-ggplot() + geom_point(aes(x = theta$vec1, y = theta$vec2)) +
-  labs(x = "Geometric mean", y = "Top left singular vector")
-```
-
-## Pairwise tournament: median and 90th percentile
-
-Repeat the same pairwise tournament but with the median as the aggregator.
-
-```{r, fig.width = 10, fig.height = 10}
-theta = pairwise_tournament(score_cards_tourney, var = "wis", aggr = Median)
-
-ranked_list = rownames(theta$mat)[order(theta$vec1)]
-colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
-ggplot(theta$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),
-                     y = factor(Forecaster1, levels = rev(ranked_list)))) +
-  geom_tile(aes(fill = value)) +
-  geom_text(aes(label = round(value, 3))) +
-  scale_fill_gradientn(colours = colors) +
-  labs(x = NULL, y = NULL) +
-  theme_bw() + theme(legend.position = "none", 
-                     axis.text.x = element_text(angle = 90, hjust = 1))
-
-# Overall metric (computed via GM of pairwise metrics):
-knitr::kable(data.frame(rank = 1:length(theta$vec1), forecaster = ranked_list,
-                        theta = sort(theta$vec1), row.names = NULL))
-```
-
-And now with the 90th percentile as the aggregator. 
-
-```{r, fig.width = 10, fig.height = 10}
-theta = pairwise_tournament(score_cards_tourney, var = "wis", aggr =
-                              function(x) quantile(x, prob = 0.9, na.rm = TRUE))
-
 ranked_list = rownames(theta$mat)[order(theta$vec1)]
 colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
 ggplot(theta$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),

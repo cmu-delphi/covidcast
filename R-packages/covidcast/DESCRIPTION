@@ -2,7 +2,7 @@ Package: covidcast
 Type: Package
 Title: Client for Delphi's COVIDcast Epidata API
 Version: 0.4.0
-Date: 2020-12-21
+Date: 2021-01-15
 Authors@R: 
   c(
     person(given = "Jacob",

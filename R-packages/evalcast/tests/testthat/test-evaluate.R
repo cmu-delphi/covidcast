@@ -190,9 +190,12 @@ test_that("evaluate_predictions uses alternate grouping variables", {
 })
 
 test_that("evaluate_predictions backfill_buffer works", {
-  skip("To be revised...")
-  mock_download_signal <- mock(create_fake_downloaded_signal("al"), cycle=TRUE)
-  with_mock(download_signal = mock_download_signal, {
+  # Mock out the following functions:
+  # - `download_signals()` so we don't call to the covidcast API.
+  # - `Sys.Date()` so we can control "today's" date to compare against the forecasts.
+  mock_download_signal <- mock(create_fake_downloaded_signal(c("al", "wy"), 10), cycle=TRUE)
+  mock_sys_date <- mock(as.Date("2020-01-14"), cycle=TRUE)
+  with_mock(download_signal = mock_download_signal, Sys.Date = mock_sys_date, {
     pcard <- create_pcard(tibble(
       ahead = 1,
       geo_value = rep(c("al", "wy"), each=3),
@@ -206,8 +209,8 @@ test_that("evaluate_predictions backfill_buffer works", {
       incidence_period = "epiweek"
     ))
     expect_warning(evaluate_predictions(pcard, backfill_buffer = 4),
-                "backfill_buffer")
-    # waited long enough should have no error:
+                   "backfill_buffer")
+    # waited long enough should have no warning:
     evaluate_predictions(pcard, backfill_buffer = 2)
   })
 })

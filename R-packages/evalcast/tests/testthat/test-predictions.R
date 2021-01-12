@@ -1,4 +1,4 @@
-library(mockery)
+library(mockr)
 
 # Create a fake result from the covidcast API as returned by the `evalcast::download_signals()`
 # function.
@@ -33,9 +33,7 @@ test_that("get_predictions works", {
   fake_downloaded_signals <- c(list(create_fake_downloaded_signal("in")),
                                list(create_fake_downloaded_signal("nc")))
   mock_download_signals <- do.call(mock, fake_downloaded_signals)
-  # Ideally we should use `mockery::stub` here but there is bug that persists the mock across tests.
-  # See https://github.com/r-lib/mockery/issues/20.
-  with_mock(download_signals = mock_download_signals, {
+  mockr::with_mock(download_signals = mock_download_signals, {
     mock_forecaster <- mock(create_fake_forecast(3, "in"),
                             create_fake_forecast(3, "nc"))
 
@@ -92,9 +90,7 @@ test_that("geo_values argument to get_predictions works", {
               create_fake_downloaded_signal("ia"),
               create_fake_downloaded_signal("sd")))
   mock_download_signals <- mock(fake_downloaded_signals)
-  # Ideally we should use `mockery::stub` here but there is bug that persists the mock across tests.
-  # See https://github.com/r-lib/mockery/issues/20.
-  with_mock(download_signals = mock_download_signals, {
+  mockr::with_mock(download_signals = mock_download_signals, {
     mock_forecaster <- mock(bind_rows(
       create_fake_forecast(3, "nd"),
       create_fake_forecast(3, "sd")))
@@ -146,9 +142,7 @@ test_that("get_predictions works when forecaster has additional arguments", {
   fake_downloaded_signals <- c(list(create_fake_downloaded_signal("in")),
                                list(create_fake_downloaded_signal("nc")))
   mock_download_signals <- do.call(mock, fake_downloaded_signals)
-  # Ideally we should use `mockery::stub` here but there is bug that persists the mock across tests.
-  # See https://github.com/r-lib/mockery/issues/20.
-  with_mock(download_signals = mock_download_signals, {
+  mockr::with_mock(download_signals = mock_download_signals, {
     mock_forecaster <- mock(create_fake_forecast(3, "in"),
                             create_fake_forecast(3, "nc"))
 
@@ -208,9 +202,7 @@ test_that("no start_day within signals raises warning but works", {
   # - the forecaster to avoid dependencies on its internal prediction algorithm.
   fake_downloaded_signals <- list(create_fake_downloaded_signal("fl"))
   mock_download_signals <- mock(fake_downloaded_signals)
-  # Ideally we should use `mockery::stub` here but there is bug that persists the mock across tests.
-  # See https://github.com/r-lib/mockery/issues/20.
-  with_mock(download_signals = mock_download_signals, {
+  mockr::with_mock(download_signals = mock_download_signals, {
     mock_forecaster <- mock(create_fake_forecast(2, "fl"))
 
     signals_no_start_day <- tibble(
@@ -260,9 +252,8 @@ test_that("start_day function within signals works", {
   fake_downloaded_signals <- c(list(create_fake_downloaded_signal("fl")),
                                list(create_fake_downloaded_signal("ga")))
   mock_download_signals <- do.call(mock, fake_downloaded_signals)
-  # Ideally we should use `mockery::stub` here but there is bug that persists the mock across tests.
-  # See https://github.com/r-lib/mockery/issues/20.
-  with_mock(download_signals = mock_download_signals, {
+
+  mockr::with_mock(download_signals = mock_download_signals, {
     mock_forecaster <- mock(create_fake_forecast(2, "fl"),
                             create_fake_forecast(2, "ga"))
 
@@ -324,9 +315,7 @@ test_that("start_day function and date mix within signals works", {
   fake_downloaded_signals <- c(list(create_fake_downloaded_signal("fl")),
                                list(create_fake_downloaded_signal("ga")))
   mock_download_signals <- do.call(mock, fake_downloaded_signals)
-  # Ideally we should use `mockery::stub` here but there is bug that persists the mock across tests.
-  # See https://github.com/r-lib/mockery/issues/20.
-  with_mock(download_signals = mock_download_signals, {
+  mockr::with_mock(download_signals = mock_download_signals, {
     mock_forecaster <- mock(create_fake_forecast(2, "fl"),
                             create_fake_forecast(2, "ga"))
 

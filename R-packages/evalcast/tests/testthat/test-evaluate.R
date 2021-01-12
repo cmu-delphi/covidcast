@@ -1,4 +1,4 @@
-library(mockery)
+library(mockr)
 
 # Create a fake result from the covidcast API as returned by the `evalcast::download_signals()`
 # function.
@@ -24,7 +24,7 @@ test_that("evaluate_predictions evaluates against downloaded data", {
   # Mock out the call to `download_signals()`.
   mock_download_signal <- mock(create_fake_downloaded_signal(c("al", "wy"), 5),
                                create_fake_downloaded_signal(c("al", "wy"), 10))
-  with_mock(download_signal = mock_download_signal, {
+  mockr::with_mock(download_signal = mock_download_signal, {
     pcard <- create_pcard(tibble(
       ahead = 1,
       geo_value = rep(c("al", "wy"), each=3),
@@ -97,7 +97,7 @@ test_that("evaluate_predictions fails on non-predictions cards data frames", {
 test_that("evaluate_predictions evaluates against side truth", {
   # Mock out `download_signal` to verify it isn't getting called.
   mock_download_signal <- mock()
-  with_mock(download_signal = mock_download_signal, {
+  mockr::with_mock(download_signal = mock_download_signal, {
     pcard <- create_pcard(tibble(
       ahead = 1,
       geo_value = rep(c("al", "wy"), each=3),
@@ -146,7 +146,7 @@ test_that("evaluate_predictions evaluates against side truth", {
 test_that("evaluate_predictions uses alternate grouping variables", {
   # Mock out `download_signal` to verify it isn't getting called.
   mock_download_signal <- mock()
-  with_mock(download_signal = mock_download_signal, {
+  mockr::with_mock(download_signal = mock_download_signal, {
     pcard <- create_pcard(tibble(
       ahead = 1,
       geo_value = rep(c("al", "wy"), each=3),
@@ -190,27 +190,26 @@ test_that("evaluate_predictions uses alternate grouping variables", {
 })
 
 test_that("evaluate_predictions backfill_buffer works", {
-  # Mock out the following functions:
-  # - `download_signals()` so we don't call to the covidcast API.
-  # - `Sys.Date()` so we can control "today's" date to compare against the forecasts.
+  # Mock `download_signals()` so we don't call to the covidcast API.
   mock_download_signal <- mock(create_fake_downloaded_signal(c("al", "wy"), 10), cycle=TRUE)
-  mock_sys_date <- mock(as.Date("2020-01-14"), cycle=TRUE)
-  with_mock(download_signal = mock_download_signal, Sys.Date = mock_sys_date, {
+  mockr::with_mock(download_signal = mock_download_signal, {
     pcard <- create_pcard(tibble(
       ahead = 1,
       geo_value = rep(c("al", "wy"), each=3),
       quantile = c(0.1, 0.5, 0.9, 0.1, 0.5, 0.9),
       value = seq(1, 6),
       forecaster = "a",
-      forecast_date = rep(as.Date(c("2020-01-02", "2020-01-03")), each=3),
+      # The backfill buffer compares against today's date, so we need to set the forecast date
+      # dynamically here or else after n days these tests will stop working.
+      forecast_date = Sys.Date() - 21,
       data_source = "source",
       signal = "signal",
       target_end_date = as.Date("2020-01-05"),
       incidence_period = "epiweek"
     ))
-    expect_warning(evaluate_predictions(pcard, backfill_buffer = 4),
+    expect_warning(evaluate_predictions(pcard, backfill_buffer = 22),
                    "backfill_buffer")
     # waited long enough should have no warning:
-    evaluate_predictions(pcard, backfill_buffer = 2)
+    evaluate_predictions(pcard, backfill_buffer = 7)
   })
 })

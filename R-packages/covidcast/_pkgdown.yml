@@ -18,6 +18,7 @@ articles:
       - plotting-signals
       - correlation-utils
       - multi-signals
+      - external-data
 
 repo:
   url:

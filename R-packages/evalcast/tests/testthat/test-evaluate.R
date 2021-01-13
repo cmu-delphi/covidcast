@@ -211,6 +211,6 @@ test_that("evaluate_predictions backfill_buffer works", {
     expect_warning(evaluate_predictions(pcard, backfill_buffer = 22),
                    "backfill_buffer")
     # waited long enough should have no warning:
-    evaluate_predictions(pcard, backfill_buffer = 7)
+    expect_warning(evaluate_predictions(pcard, backfill_buffer = 7), NA)
   })
 })

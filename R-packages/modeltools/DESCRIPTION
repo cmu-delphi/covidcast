@@ -1,0 +1,29 @@
+Package: modeltools
+Type: Package
+Title: Tools for Building COVID Forecasters and Related Models 
+Version: 0.1.0
+Authors@R:
+	c(
+    person(given = "Ryan",
+           family = "Tibshirani",
+           role = c("aut", "cre"),
+           email = "ryantibs@cmu.edu"))
+Description: Tools for building COVID-19 models, mainly forecasting and hotspot
+    prediction models. This package is meant to be used in conjuction with the
+    covidcast and evalcast packages.
+License: MIT
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Remotes:
+    github::cmu-delphi/covidcast/R-packages/covidcast@main,
+    github::cmu-delphi/covidcast/R-packages/evalcast@main
+Imports: 
+    covidcast,
+    dplyr,
+    evalcast,
+    genlasso,
+    slider,
+    tidyselect,
+    tidyr

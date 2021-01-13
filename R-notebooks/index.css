@@ -1,0 +1,35 @@
+.menu {
+    float:left;
+    font-family: sans-serif;
+    padding-top: 50px;
+    width:160px;
+    height: 100%;
+    background:#eee; 
+    color:#fff; 
+    position:fixed; 
+    top:0px; 
+    bottom:0px; 
+}
+
+.menu a {
+    background-color: #eee;
+    color: black;
+    display: block;
+    padding: 12px;
+    text-decoration: none; 
+}
+  
+.menu a:hover {
+    background-color: #ccc; 
+}
+  
+#main {
+    margin-left: 165px;
+    height:100%;
+}
+
+#main iframe{
+    width:100%;
+    height:100%;
+    position:fixed; 
+}

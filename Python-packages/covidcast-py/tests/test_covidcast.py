@@ -10,6 +10,7 @@ matplotlib.use("AGG")
 import pandas as pd
 import numpy as np
 import pytest
+from epiweeks import Week
 from covidcast import covidcast
 from covidcast.errors import NoDataWarning
 
@@ -79,8 +80,8 @@ def test_metadata(mock_covidcast_meta):
     # not generating full DF since most attributes used
     mock_covidcast_meta.side_effect = [
         {"result": 1,  # successful API response
-         "epidata": [{"max_time": 20200622, "min_time": 20200421, "last_update": 12345},
-                     {"max_time": 20200724, "min_time": 20200512, "last_update": 99999}],
+         "epidata": [{"max_time": 20200622, "min_time": 20200421, "last_update": 12345, "time_type": "day"},
+                     {"max_time": 20200724, "min_time": 20200512, "last_update": 99999, "time_type": "day"}],
          "message": "success"},
         {"result": 0,  # unsuccessful API response
          "epidata": [{"max_time": 20200622, "min_time": 20200421},
@@ -91,7 +92,8 @@ def test_metadata(mock_covidcast_meta):
     expected = pd.DataFrame({
         "max_time": [datetime(2020, 6, 22), datetime(2020, 7, 24)],
         "min_time": [datetime(2020, 4, 21), datetime(2020, 5, 12)],
-        "last_update": [datetime(1970, 1, 1, 3, 25, 45), datetime(1970, 1, 2, 3, 46, 39)]})
+        "last_update": [datetime(1970, 1, 1, 3, 25, 45), datetime(1970, 1, 2, 3, 46, 39)],
+        "time_type": ["day", "day"]})
     assert sort_df(response).equals(sort_df(expected))
 
     # test failed response raises RuntimeError
@@ -175,6 +177,12 @@ def test_aggregate_signals():
          "data_source": ["z", "z", "z", "z"]})
     with pytest.raises(ValueError):
         covidcast.aggregate_signals([test_input1, test_input4])
+
+
+def test__parse_datetimes():
+    assert covidcast._parse_datetimes("202001", "week") == pd.Timestamp(Week(2020, 1).startdate())
+    assert covidcast._parse_datetimes("20200205", "day") == pd.Timestamp("20200205")
+    assert pd.isna(covidcast._parse_datetimes("2020", "test"))
 
 
 def test__detect_metadata():

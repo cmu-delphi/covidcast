@@ -1,6 +1,6 @@
 # covidcast 0.4.0
 
-Released TODO DATE.
+Released January 13, 2021.
 
 ## Major changes
 

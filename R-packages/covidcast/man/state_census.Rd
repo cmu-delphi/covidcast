@@ -24,4 +24,7 @@ state_census
 \description{
 Data set on state populations, from the 2019 US Census.
 }
+\seealso{
+\code{\link[=abbr_to_name]{abbr_to_name()}}, \code{\link[=name_to_abbr]{name_to_abbr()}}, \code{\link[=abbr_to_fips]{abbr_to_fips()}}, \code{\link[=fips_to_abbr]{fips_to_abbr()}}
+}
 \keyword{datasets}

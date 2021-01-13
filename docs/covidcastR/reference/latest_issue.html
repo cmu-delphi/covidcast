@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fetch only the latest issue for each observation in a data frame — latest_issue • covidcast</title>
+<title>Fetch the latest or earliest issue for each observation — latest_issue • covidcast</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,11 @@
 
 
 
-<meta property="og:title" content="Fetch only the latest issue for each observation in a data frame — latest_issue" />
-<meta property="og:description" content="Since covidcast_signal() can, with the right options, return multiple
-issues for a single observation in a single geo, we may want only the most
-recent for plotting, mapping, or other purposes." />
+<meta property="og:title" content="Fetch the latest or earliest issue for each observation — latest_issue" />
+<meta property="og:description" content="The data returned from covidcast_signal() or covidcast_signals() can, if
+called with the issues argument, contain multiple issues for a single
+observation in a single location. These functions filter the data frame to
+contain only the earliest issue or only the latest issue." />
 
 
 
@@ -74,7 +75,7 @@ recent for plotting, mapping, or other purposes." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
       </span>
     </div>
 
@@ -108,6 +109,9 @@ recent for plotting, mapping, or other purposes." />
     <li>
       <a href="../articles/multi-signals.html">3. Manipulating multiple signals</a>
     </li>
+    <li>
+      <a href="../articles/external-data.html">4. Combine external data sources and COVIDcast data</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -134,32 +138,39 @@ recent for plotting, mapping, or other purposes." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Fetch only the latest issue for each observation in a data frame</h1>
+    <h1>Fetch the latest or earliest issue for each observation</h1>
     <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/main/R-packages/covidcast/R/utils.R'><code>R/utils.R</code></a></small>
     <div class="hidden name"><code>latest_issue.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Since <code><a href='covidcast_signal.html'>covidcast_signal()</a></code> can, with the right options, return multiple
-issues for a single observation in a single geo, we may want only the most
-recent for plotting, mapping, or other purposes.</p>
+    <p>The data returned from <code><a href='covidcast_signal.html'>covidcast_signal()</a></code> or <code><a href='covidcast_signals.html'>covidcast_signals()</a></code> can, if
+called with the <code>issues</code> argument, contain multiple issues for a single
+observation in a single location. These functions filter the data frame to
+contain only the earliest issue or only the latest issue.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>latest_issue</span><span class='op'>(</span><span class='va'>df</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>latest_issue</span><span class='op'>(</span><span class='va'>df</span><span class='op'>)</span>
+
+<span class='fu'>earliest_issue</span><span class='op'>(</span><span class='va'>df</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>df</th>
-      <td><p>A <code>covidcast_signal</code> data frame</p></td>
+      <td><p>A <code>covidcast_signal</code> or <code>covidcast_signal_long</code> data frame, such as
+returned from <code><a href='covidcast_signal.html'>covidcast_signal()</a></code> or the "long" format of
+<code><a href='aggregate_signals.html'>aggregate_signals()</a></code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The same <code>covidcast_signal</code> data frame, but with only the latest
-issue of every observation</p>
+    <p>A data frame in the same form, but with only the earliest or latest
+issue of every observation. Note that these functions sort the data frame
+as part of their filtering, so the output data frame rows may be in a
+different order.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -172,7 +183,7 @@ issue of every observation</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

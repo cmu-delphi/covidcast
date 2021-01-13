@@ -38,4 +38,7 @@ areas.
 Census Bureau documentation of all columns and their meaning:
 \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.pdf}
 }
+\seealso{
+\code{\link[=cbsa_to_name]{cbsa_to_name()}}, \code{\link[=name_to_cbsa]{name_to_cbsa()}}
+}
 \keyword{datasets}

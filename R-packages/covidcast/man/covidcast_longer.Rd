@@ -24,3 +24,6 @@ between formats. \code{covidcast_longer()} takes the output of
 \code{aggregate_signals(..., format = "wide")} and converts it to "long" format,
 while \code{covidcast_wider()} takes the output of \code{aggregate_signals(..., format = "long")} and converts it to "wide" format.
 }
+\seealso{
+\code{\link[=covidcast_signals]{covidcast_signals()}}
+}

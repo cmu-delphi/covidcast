@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
       </span>
     </div>
 
@@ -104,6 +104,9 @@
     </li>
     <li>
       <a href="../articles/multi-signals.html">3. Manipulating multiple signals</a>
+    </li>
+    <li>
+      <a href="../articles/external-data.html">4. Combine external data sources and COVIDcast data</a>
     </li>
   </ul>
 </li>
@@ -219,8 +222,8 @@
     </tbody><tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-wrangle-and-correlate-multiple-signals" class="hasAnchor"><a href="#section-wrangle-and-correlate-multiple-signals" class="anchor"></a>Wrangle and correlate multiple signals</h2>
-          <p class="section-desc"><p>Calculate correlations, aggregate signals, and move between aggregated data formats</p></p>
+          <h2 id="section-wrangle-and-correlate-signals" class="hasAnchor"><a href="#section-wrangle-and-correlate-signals" class="anchor"></a>Wrangle and correlate signals</h2>
+          <p class="section-desc"><p>Calculate correlations, aggregate multiple signals, and move between aggregated data formats</p></p>
         </th>
       </tr>
       
@@ -237,6 +240,12 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="latest_issue.html">latest_issue()</a></code> <code><a href="latest_issue.html">earliest_issue()</a></code> </p>
+        </td>
+        <td><p>Fetch the latest or earliest issue for each observation</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="aggregate_signals.html">aggregate_signals()</a></code> </p>
         </td>
         <td><p>Aggregate <code>covidcast_signal</code> objects into one data frame</p></td>
@@ -246,6 +255,13 @@
           <p><code><a href="covidcast_longer.html">covidcast_longer()</a></code> <code><a href="covidcast_longer.html">covidcast_wider()</a></code> </p>
         </td>
         <td><p>Pivot aggregated signals between "wide" and "long" formats</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="as.covidcast_signal.html">as.covidcast_signal()</a></code> </p>
+        </td>
+        <td><p>Convert data from an external source into a form compatible with
+<code>covidcast_signal</code>.</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -353,7 +369,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

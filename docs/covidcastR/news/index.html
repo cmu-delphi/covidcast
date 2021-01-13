@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
       </span>
     </div>
 
@@ -105,6 +105,9 @@
     <li>
       <a href="../articles/multi-signals.html">3. Manipulating multiple signals</a>
     </li>
+    <li>
+      <a href="../articles/external-data.html">4. Combine external data sources and COVIDcast data</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -135,6 +138,24 @@
       <small>Source: <a href='https://github.com/cmu-delphi/covidcast/blob/main/R-packages/covidcast/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="covidcast-040" class="section level1">
+<h1 class="page-header" data-toc-text="0.4.0">
+<a href="#covidcast-040" class="anchor"></a>covidcast 0.4.0</h1>
+<p>Released January 13, 2021.</p>
+<div id="major-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#major-changes" class="anchor"></a>Major changes</h2>
+<ul>
+<li><p>The <code><a href="../reference/plot.covidcast_signal.html">plot.covidcast_signal()</a></code> method now supports making choropleth plots for metropolitan areas and hospital referral regions.</p></li>
+<li><p>A new <code><a href="../reference/as.covidcast_signal.html">as.covidcast_signal()</a></code> generic function makes it easy to turn any data frame, such as data loaded from an external source, into a <code>covidcast_signal</code> object that can be plotted and wrangled using the functions in this package. See <code><a href="../articles/external-data.html">vignette("external-data")</a></code> for examples.</p></li>
+<li><p>The new <code><a href="../reference/latest_issue.html">latest_issue()</a></code> and <code><a href="../reference/latest_issue.html">earliest_issue()</a></code> functions make it easy to filter data frames with multiple issues of each observation, obtaining only the latest or earliest issue of each.</p></li>
+<li><p><code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code>, <code><a href="../reference/covidcast_signals.html">covidcast_signals()</a></code>, and <code><a href="../reference/covidcast_meta.html">covidcast_meta()</a></code> now support signals with <code>time_type = "week"</code>. Select signals in the API are offered at weekly resolution. They also now support signals with <code>geo_types</code> of “nation” and “hhs”, corresponding to national estimates and Department of Health &amp; Human Services Regional Offices (“HHS regions”).</p></li>
+<li><p><code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> now batches requests, so that many days of data can be fetched in one API call. This dramatically improves the speed of fetching state-, MSA-, and HRR-level data, since many days of data can be fetched in one API call. County-level signals, such as cases and deaths, may still require one API call per day, since the API’s row limit is only slightly larger than the number of counties in the United States.</p></li>
+<li><p><code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> now fetches data from the API server in CSV format, rather than JSON, which requires less bandwidth and parsing.</p></li>
+<li><p><code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code> is dramatically faster than before.</p></li>
+</ul>
+</div>
+</div>
     <div id="covidcast-031" class="section level1">
 <h1 class="page-header" data-toc-text="0.3.1">
 <a href="#covidcast-031" class="anchor"></a>covidcast 0.3.1</h1>
@@ -146,9 +167,9 @@
 <li>The <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code> function now interprets its <code>dt_x</code> and <code>dt_y</code> arguments in the opposite way as before, i.e. what was once a positive lag is now a negative lag. See the documentation for details.</li>
 </ul>
 </div>
-<div id="major-changes" class="section level2">
+<div id="major-changes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#major-changes" class="anchor"></a>Major changes</h2>
+<a href="#major-changes-1" class="anchor"></a>Major changes</h2>
 <ul>
 <li>The new <code><a href="../reference/covidcast_signals.html">covidcast_signals()</a></code> function allows users to query multiple signals from the API at once, returning a list of data frames. The <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> function can convert this list into a “wide” or “long” format data frame for further analysis, while <code><a href="../reference/covidcast_longer.html">covidcast_wider()</a></code> and <code><a href="../reference/covidcast_longer.html">covidcast_longer()</a></code> can convert from “long” to “wide” format and vice versa.</li>
 </ul>
@@ -158,9 +179,9 @@
 <h1 class="page-header" data-toc-text="0.3.0">
 <a href="#covidcast-030" class="anchor"></a>covidcast 0.3.0</h1>
 <p>Released August 22, 2020.</p>
-<div id="major-changes-1" class="section level2">
+<div id="major-changes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#major-changes-1" class="anchor"></a>Major changes</h2>
+<a href="#major-changes-2" class="anchor"></a>Major changes</h2>
 <ul>
 <li><p>New <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code> function for calculating correlations between COVIDcast signals. See <code><a href="../articles/correlation-utils.html">vignette("correlation-utils")</a></code> for examples.</p></li>
 <li><p>New utility functions <code><a href="../reference/name_to_fips.html">name_to_fips()</a></code> and <code><a href="../reference/name_to_fips.html">name_to_cbsa()</a></code> to look up FIPS codes (for counties) or CBSA codes (for metropolitan statistical areas) based on the names of the counties or MSAs.</p></li>
@@ -173,9 +194,9 @@
 <h1 class="page-header" data-toc-text="0.2.0">
 <a href="#covidcast-020" class="anchor"></a>covidcast 0.2.0</h1>
 <p>Released July 26, 2020.</p>
-<div id="major-changes-2" class="section level2">
+<div id="major-changes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#major-changes-2" class="anchor"></a>Major changes</h2>
+<a href="#major-changes-3" class="anchor"></a>Major changes</h2>
 <ul>
 <li><p><strong>Name change:</strong> The package is now called covidcast, not covidcastR. If already installed, users should remove covidcastR using <code><a href="https://rdrr.io/r/utils/remove.packages.html">remove.packages()</a></code> and then install covidcast using the instructions in <code><a href="../articles/covidcast.html">vignette("covidcast")</a></code>.</p></li>
 <li><p><strong>Incompatible change:</strong> The <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> function now takes <code>start_day</code> and <code>end_day</code> arguments as strings in the form YYYY-MM-DD, rather than YYYYMMDD, for consistency with <code><a href="https://rdrr.io/r/base/as.Date.html">as.Date()</a></code> and other common R usage. The arguments can also be passed as <code>Date</code> objects directly.</p></li>
@@ -211,7 +232,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

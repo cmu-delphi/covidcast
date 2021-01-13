@@ -590,6 +590,7 @@ covidcast_signals <- function(data_source, signal,
 #'
 #' @seealso [summary.covidcast_meta()]
 #'
+#' @importFrom utils read.csv
 #' @export
 covidcast_meta <- function() {
   meta <- .request(

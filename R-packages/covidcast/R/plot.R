@@ -384,7 +384,7 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
       quiet = TRUE)
     if (length(include) > 0) {
       # First two letters are state abbreviation
-      map_df = map_df %>% filter(substr(.$hrr_name, 1, 2) %in% include)
+      map_df = map_df %>% dplyr::filter(substr(.$hrr_name, 1, 2) %in% include)
     }
     map_df = sf::st_transform(map_df, background_crs)
     hrr_shift = sf::st_geometry(map_df) + c(0, -0.185)

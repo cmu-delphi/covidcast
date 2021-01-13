@@ -54,7 +54,7 @@ get_predictions <- function(forecaster,
                             geo_type,
                             geo_values = "*",
                             apply_corrections = NULL,
-                            signal_aggregation = "list",
+                            signal_aggregation = c("list", "wide", "long"),
                             signal_aggregation_dt = NULL,
                             ...) {
   assert_that(is_tibble(signals), msg="`signals` should be a tibble.")

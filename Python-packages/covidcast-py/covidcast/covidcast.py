@@ -5,14 +5,16 @@ from functools import reduce
 from typing import Union, Iterable, Tuple, List
 
 import pandas as pd
+import numpy as np
 from delphi_epidata import Epidata
+from epiweeks import Week
 
 from .errors import NoDataWarning
 
 # Point API requests to the AWS endpoint
 Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
 
-VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state"}
+VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state",  "hhs", "nation"}
 
 
 def signal(data_source: str,
@@ -219,15 +221,17 @@ def metadata() -> pd.DataFrame:
 
       ``geo_type``
         Geographic level for which this signal is available, such as county,
-        state, msa, or hrr. Most signals are available at multiple geographic
+        state, msa, hss, hrr, or nation. Most signals are available at multiple geographic
         levels and will hence be listed in multiple rows with their own
         metadata.
 
       ``min_time``
-        First day for which this signal is available.
+        First day for which this signal is available. For weekly signals, will be
+        the first day of the epiweek.
 
       ``max_time``
-        Most recent day for which this signal is available.
+        Most recent day for which this signal is available. For weekly signals, will be
+        the first day of the epiweek.
 
       ``num_locations``
         Number of distinct geographic locations available for this signal. For
@@ -266,8 +270,8 @@ def metadata() -> pd.DataFrame:
                            meta["message"])
 
     meta_df = pd.DataFrame.from_dict(meta["epidata"])
-    meta_df["min_time"] = pd.to_datetime(meta_df["min_time"], format="%Y%m%d")
-    meta_df["max_time"] = pd.to_datetime(meta_df["max_time"], format="%Y%m%d")
+    meta_df["min_time"] = meta_df.apply(lambda x: _parse_datetimes(x.min_time, x.time_type), axis=1)
+    meta_df["max_time"] = meta_df.apply(lambda x: _parse_datetimes(x.max_time, x.time_type), axis=1)
     meta_df["last_update"] = pd.to_datetime(meta_df["last_update"], unit="s")
     return meta_df
 
@@ -322,6 +326,30 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
     joined_df = reduce(lambda x, y: pd.merge(x, y, on=join_cols, how=join_type, sort=True), dt_dfs)
     joined_df["geo_type"] = geo_type
     return joined_df
+
+
+def _parse_datetimes(date_int: int,
+                     time_type: str,
+                     format: str="%Y%m%d") -> Union[pd.Timestamp]:  # annotating nan errors
+    """Convert a date or epiweeks string into timestamp objects.
+
+    Datetimes (length 8) are converted to their corresponding date, while epiweeks (length 6)
+    are converted to the date of the start of the week. Returns nan otherwise
+
+    Epiweeks use the CDC format.
+
+    :param date_int: Int representation of date.
+    :param format: String of the date format to parse.
+    :returns: Timestamp.
+    """
+    date_str = str(date_int)
+    if time_type == "day":
+        return pd.to_datetime(date_str, format=format)
+    elif time_type == "week":
+        epiwk = Week(int(date_str[:4]), int(date_str[-2:]))
+        return pd.to_datetime(epiwk.startdate())
+    else:
+        return np.nan
 
 
 def _detect_metadata(data: pd.DataFrame,

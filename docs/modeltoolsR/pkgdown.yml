@@ -1,0 +1,11 @@
+pandoc: 2.10.1
+pkgdown: 1.5.1
+pkgdown_sha: ~
+articles:
+  estimate-deriv: estimate-deriv.html
+  modeltools: modeltools.html
+  pct-change: pct-change.html
+  quantgen-forecast-cv: quantgen-forecast-cv.html
+  quantgen-forecast: quantgen-forecast.html
+last_built: 2021-01-04T16:54Z
+

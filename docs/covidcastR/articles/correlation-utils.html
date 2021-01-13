@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
       </span>
     </div>
 
@@ -65,6 +65,9 @@
     <li>
       <a href="../articles/multi-signals.html">3. Manipulating multiple signals</a>
     </li>
+    <li>
+      <a href="../articles/external-data.html">4. Combine external data sources and COVIDcast data</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -88,7 +91,8 @@
 
       
 
-      </header><div class="row">
+      </header><link href="correlation-utils_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="correlation-utils_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>2. Computing signal correlations</h1>
@@ -102,7 +106,7 @@
     
     
 <p>The covidcast package provides some simple utilities for exploring the correlations between two signals, over space or time, which may be helpful for simple analyses and explorations of data.</p>
-<p>For these examples, we’ll load confirmed case and death rates. and restrict our analysis to counties with at least 500 total cases by August 15th.</p>
+<p>For these examples, we’ll load confirmed case and death rates, and restrict our analysis to counties with at least 500 total cases by August 15th.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit">
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/">covidcast</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
@@ -170,13 +174,17 @@
        x <span class="op">=</span> <span class="st">"Date"</span>, y <span class="op">=</span> <span class="st">"Correlation"</span><span class="op">)</span> </pre></div>
 <p><img src="correlation-utils_files/figure-html/unnamed-chunk-3-1.png" width="768"></p>
 <p>The above plot addresses the question: “on any given day, are case and death rates linearly associated, over US counties?”. We might be interested in broadening this question, instead asking: “on any given day, do higher case rates tend to associate with higher death rates?”, removing the dependence on a linear relationship. The latter can be addressed using Spearman correlation, accomplished by setting <code>method = "spearman"</code> in the call to <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code>. Spearman correlation is highly robust and invariant to monotone transformations (it doesn’t rely on any particular functional form for the dependence between two variables).</p>
-<p>We might also interested in interested in how case rates associate with death rates in the <em>future</em>. Using the <code>dt_x</code> parameter in <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code>, we can lag case rates back any number of days we want, before calculating correlations.</p>
+<div id="lagged-correlations" class="section level3">
+<h3 class="hasAnchor">
+<a href="#lagged-correlations" class="anchor"></a>Lagged correlations</h3>
+<p>We might also be interested in how case rates associate with death rates in the <em>future</em>. Using the <code>dt_x</code> parameter in <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code>, we can lag case rates back any number of days we want, before calculating correlations.</p>
+<p>Here we set <code>dt_x = -10</code>. This means that <code>iprop_act</code> will be lagged by 10 days, meaning that cases on June 1st will be correlated with deaths on June 11th. (It might help to think of it this way: deaths on a certain day will be correlated with cases with an offset of -10 days.)</p>
 <div class="sourceCode" id="cb7"><pre class="downlit">
 <span class="co"># Use Spearman correlation, with case rates and 10-day lagged case rates</span>
 <span class="va">df_cor1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_cor.html">covidcast_cor</a></span><span class="op">(</span><span class="va">iprop_act</span>, <span class="va">dprop_act</span>, by <span class="op">=</span> <span class="st">"time_value"</span>, 
-                        method <span class="op">=</span> <span class="st">"spearman"</span><span class="op">)</span>
+                         method <span class="op">=</span> <span class="st">"spearman"</span><span class="op">)</span>
 <span class="va">df_cor2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_cor.html">covidcast_cor</a></span><span class="op">(</span><span class="va">iprop_act</span>, <span class="va">dprop_act</span>, by <span class="op">=</span> <span class="st">"time_value"</span>, dt_x <span class="op">=</span> <span class="op">-</span><span class="fl">10</span>,
-                        method <span class="op">=</span> <span class="st">"spearman"</span><span class="op">)</span>
+                         method <span class="op">=</span> <span class="st">"spearman"</span><span class="op">)</span>
 
 <span class="co"># Stack rowwise into one data frame, then plot time series</span>
 <span class="va">df_cor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span><span class="va">df_cor1</span>, <span class="va">df_cor2</span><span class="op">)</span>
@@ -189,7 +197,8 @@
        x <span class="op">=</span> <span class="st">"Date"</span>, y <span class="op">=</span> <span class="st">"Correlation"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></pre></div>
 <p><img src="correlation-utils_files/figure-html/unnamed-chunk-4-1.png" width="768"></p>
-<p>We can see that, for the most part, the Spearman measure has bolstered the correlations; and generally, lagging the case rates time series back by 10 days improves correlations, confirming case rates are better correlated with death rates 10 days from now.</p>
+<p>We can see that, for the most part, the Spearman measure has bolstered the correlations; and generally, lagging the case rates back by 10 days improves correlations, confirming case rates are better correlated with death rates 10 days from now.</p>
+</div>
 </div>
 <div id="correlations-sliced-by-county" class="section level2">
 <h2 class="hasAnchor">
@@ -212,11 +221,11 @@
 <p><img src="correlation-utils_files/figure-html/unnamed-chunk-5-1.png" width="768"></p>
 <p>Using some tricks, we can attach the necessary properties to the data frame so we can plot these correlations in space as a choropleth map, using <code><a href="../reference/plot.covidcast_signal.html">plot.covidcast_signal()</a></code>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit">
-<span class="co"># Set a bunch of fields so that the data frame knows how to plot itself</span>
+<span class="co"># Turn the data into a covidcast_signal data frame so it can be plotted</span>
 <span class="va">df_cor2</span><span class="op">$</span><span class="va">time_value</span> <span class="op">&lt;-</span> <span class="va">start_day</span>
-<span class="va">df_cor2</span><span class="op">$</span><span class="va">issue</span> <span class="op">&lt;-</span> <span class="va">start_day</span>
-<span class="fu"><a href="https://rdrr.io/r/base/attributes.html">attributes</a></span><span class="op">(</span><span class="va">df_cor2</span><span class="op">)</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">geo_type</span> <span class="op">&lt;-</span> <span class="st">"county"</span>
-<span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="va">df_cor2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"covidcast_signal"</span>, <span class="st">"data.frame"</span><span class="op">)</span>
+<span class="va">df_cor2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.covidcast_signal.html">as.covidcast_signal</a></span><span class="op">(</span><span class="va">df_cor2</span>,
+                               geo_type <span class="op">=</span> <span class="st">"county"</span>,
+                               signal <span class="op">=</span> <span class="st">"correlations"</span><span class="op">)</span>
 
 <span class="co"># Plot choropleth maps, using the covidcast plotting functionality</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">df_cor2</span>, title <span class="op">=</span> <span class="st">"Correlations between 10-day lagged case and death rates"</span>,
@@ -262,7 +271,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

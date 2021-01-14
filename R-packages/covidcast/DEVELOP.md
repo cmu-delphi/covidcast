@@ -1,5 +1,15 @@
 # covidcast development guide
 
+We follow a Git Flow model for development. The `main` branch is for the
+"release" version of the package, since changes on `main` are immediately
+available for installation and immediately appear on the documentation website.
+New features are instead developed on the `r-pkg-devel` branch so they can be
+beta-tested before release.
+
+To make a change to the package, pull the latest version of `r-pkg-devel` and
+make a branch starting from there. When you open a pull request, set the base
+branch to be `r-pkg-devel`, *not* `main`.
+
 A short checklist for submitting pull requests:
 
 1. Run the unit tests with `devtools::test()` and ensure they pass.
@@ -10,8 +20,8 @@ A short checklist for submitting pull requests:
 3. If you changed any documentation, rebuild the documentation with
    `devtools::document()` and then `pkgdown::build_site()`. (This can be slow,
    because our vignettes take a long time to build.)
-4. Submit the pull request and see if the CI can also successfully run the
-   tests.
+4. Submit the pull request, setting the base branch to `r-pkg-devel`, and see if
+   the CI can also successfully run the tests.
 
 ## Unit tests
 
@@ -78,3 +88,20 @@ After changing a vignette or documentation, you'll need to rebuild the
 documentation. Use `devtools::document()` to do this. Then
 `pkgdown::build_site(".")` (from within the package directory) will rebuild the
 HTML documentation site.
+
+## Release checklist
+
+To release a new public version of the package, copy the template below into a
+new GitHub Issue and check off the items one at a time.
+
+```
+- [ ] Increment the version number in `DESCRIPTION`
+- [ ] Update `NEWS.md` to describe all new features, bug fixes, and breaking changes since the last version
+- [ ] Run `devtools::check()` and ensure there are no errors.
+- [ ] Run `devtools::document()` and then `pkgdown::build_site()`.
+- [ ] Browse the generated documentation site and ensure there are no problems.
+- [ ] Commit the updated HTML to `r-pkg-devel`. Make sure you don't miss any new plot files!
+- [ ] Open a pull request to merge `r-pkg-devel` to `main` and request review.
+```
+
+Once the pull request is merged, the new version is live.

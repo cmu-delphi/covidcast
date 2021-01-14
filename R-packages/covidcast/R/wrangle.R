@@ -150,7 +150,8 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
     }
 
     # Convert both x and dt to lists
-    x = list(x); dt = list(dt)
+    x = list(x)
+    dt = list(dt)
   }
   
   # If we're passed a list of covidcast_signal data frames
@@ -182,7 +183,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
   for (i in 1:N) {
     meta_list[[i]] = attributes(x[[i]])$metadata
   }
-  meta_all = do.call(rbind, meta_list)
+  meta_all = dplyr::bind_rows(meta_list)
   
   # Issue a warning if there's more than one geo type present
   if (length(unique(meta_all$geo_type)) > 1) {
@@ -202,7 +203,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
       x[[i]] = x[[i]] %>%
         dplyr::rename_with(~ paste0(.x, ":", src, "_", sig),
                            dplyr::starts_with("value")) %>%
-        dplyr::select(-c(data_source, signal, issue, lag, stderr, sample_size)) 
+        dplyr::select(.data$geo_value, .data$time_value, dplyr::starts_with("value"))
     }
     
     # This is the wide data frame that we will eventually return
@@ -217,7 +218,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
 
     # Set covidcast_signal_wide class, attributes, and return
     class(y) = c("covidcast_signal_wide", "data.frame")
-    attributes(y)$metadata = meta_all
+    attributes(y)$metadata = as.data.frame(meta_all)
     return(y)
   }
 
@@ -236,7 +237,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
 
     # Set covidcast_signal_wide class, attributes, and return
     class(y) = c("covidcast_signal_long", "data.frame")
-    attributes(y)$metadata = meta_all
+    attributes(y)$metadata = as.data.frame(meta_all)
     return(y)
   }
 }
@@ -256,11 +257,15 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
 #'   `aggregate_signals()` had been called in the first place with that
 #'   `format` argument.
 #'
+#' @seealso [covidcast_signals()]
+#'
 #' @export
 covidcast_longer = function(x) {
   if (!inherits(x, "covidcast_signal_wide")) {
     stop("`x` must be a `covidcast_signal_wide` object.")
   }
+
+  metadata <- attributes(x)$metadata
 
   # First pivot into long format
   x = x %>%
@@ -272,7 +277,7 @@ covidcast_longer = function(x) {
                     sep = ":") %>%
     tidyr::separate(col = "data_source_signal",
                     into = c("data_source", "signal"),
-                    sep = "_", extra = "merge") 
+                    sep = "_", extra = "merge")
 
   # Now add dt column, and reorder columns a bit
   x = x %>% dplyr::mutate(dt = as.numeric(sub("value", "", dt))) %>%
@@ -281,6 +286,8 @@ covidcast_longer = function(x) {
 
   # Change class and return
   class(x) = c("covidcast_signal_long", "data.frame")
+  attributes(x)$metadata <- metadata
+
   return(x)
 }
 
@@ -290,9 +297,12 @@ covidcast_wider = function(x) {
   if (!inherits(x, "covidcast_signal_long")) {
     stop("`x` must be a `covidcast_signal_long` object.")
   }
-  
-  # First drop various columns
-  x = dplyr::select(x, -c(issue, lag, stderr, sample_size))  
+
+  metadata <- attributes(x)$metadata
+
+  # Select only essential columns
+  x <- dplyr::select(x, .data$geo_value, .data$time_value, .data$data_source,
+                     .data$signal, .data$dt, .data$value)
 
   # Renamer function (bit ugly)
   renamer = Vectorize(function(name) {
@@ -300,17 +310,20 @@ covidcast_wider = function(x) {
     n = as.numeric(strsplit(substr(name, 1, k-1), ":")[[1]][2])
     return(sprintf("value%+d:%s", n, substr(name, k+1, nchar(name))))
   })
-  
+
   # Now deal with dt column
   x = x %>%
-    dplyr::group_by(geo_value, time_value) %>% 
+    dplyr::group_by(geo_value, time_value) %>%
     tidyr::pivot_wider(names_from = c("dt", "data_source", "signal"),
                        names_prefix = "value:",
                        names_sep = "_",
                        values_from = "value") %>%
-    dplyr::rename_with(renamer, dplyr::starts_with("value"))
+    dplyr::rename_with(renamer, dplyr::starts_with("value")) %>%
+    dplyr::ungroup()
 
   # Change class and return
   class(x) = c("covidcast_signal_wide", "data.frame")
+  attributes(x)$metadata <- metadata
+
   return(x)
 }

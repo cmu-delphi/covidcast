@@ -91,34 +91,3 @@ intersect_averagers <- function(cards, grp_vars, avg_vars) {
   }
   cards %>% right_join(averagers_intersected)
 }
-
-#' Scale error measures based on those of a particular forecaster.
-#'
-#' @param score_card score_card like that returned by `evaluate_predictions()`
-#' @param vars vector of column names in `score_card` to normalize
-#' @param denom_forecaster name of forecaster in `score_card$forecaster` column by whose error
-#'   values the remaining forecasters' errors will be scaled
-#' @param err_cols vector of column names in `score_card` that contain error measures.
-#'   Elements of `err_cols` that are not in `vars` will be dropped from the final output to
-#'   avoid a mix of scaled and unscaled measures.
-#'
-#' @return
-#' @export
-scale_by_forecaster <- function(score_card, vars, denom_forecaster, 
-                                err_cols = c("ae", "wis")) {
-  df_list <- map(vars, function(var) {
-    score_card %>% 
-      select(setdiff(names(score_card), setdiff(err_cols, var))) %>% 
-      pivot_wider(names_from = "forecaster", 
-                  names_prefix = var, 
-                  values_from = var) %>% 
-      mutate(across(starts_with(var), ~ .x /
-                      !!sym(paste0(var, denom_forecaster)))) %>%
-      pivot_longer(cols = starts_with(var), 
-                   names_to = "forecaster",
-                   values_to = var) %>%
-      mutate(forecaster = substring(forecaster, nchar(var) + 1)) %>%
-      filter(forecaster != denom_forecaster)
-  })
-  return(reduce(df_list, left_join))
-}

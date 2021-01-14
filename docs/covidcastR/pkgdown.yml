@@ -4,7 +4,8 @@ pkgdown_sha: ~
 articles:
   correlation-utils: correlation-utils.html
   covidcast: covidcast.html
+  external-data: external-data.html
   multi-signals: multi-signals.html
   plotting-signals: plotting-signals.html
-last_built: 2020-11-14T22:13Z
+last_built: 2021-01-13T16:44Z
 

@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
       </span>
     </div>
 
@@ -65,6 +65,9 @@
     <li>
       <a href="../articles/multi-signals.html">3. Manipulating multiple signals</a>
     </li>
+    <li>
+      <a href="../articles/external-data.html">4. Combine external data sources and COVIDcast data</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -88,7 +91,8 @@
 
       
 
-      </header><div class="row">
+      </header><link href="covidcast_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="covidcast_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Get started with covidcast</h1>
@@ -490,7 +494,7 @@
 <table class="table">
 <colgroup>
 <col width="6%">
-<col width="16%">
+<col width="15%">
 <col width="5%">
 <col width="5%">
 <col width="6%">
@@ -524,106 +528,106 @@
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">changehc</td>
-<td align="left">smoothed_adj_outpatient_covid</td>
+<td align="left">chng</td>
+<td align="left">smoothed_adj_outpatient_cli</td>
 <td align="left">day</td>
 <td align="left">county</td>
 <td align="left">2020-02-01</td>
-<td align="left">2020-11-08</td>
-<td align="right">2545</td>
-<td align="right">0.000868</td>
-<td align="right">34.931010</td>
-<td align="right">0.3505072</td>
-<td align="right">0.6384764</td>
-<td align="right">1605255860</td>
-<td align="left">2020-11-13</td>
+<td align="left">2021-01-08</td>
+<td align="right">2566</td>
+<td align="right">0.001305</td>
+<td align="right">99.92400</td>
+<td align="right">5.102781</td>
+<td align="right">8.335977</td>
+<td align="right">1610515924</td>
+<td align="left">2021-01-12</td>
 <td align="right">4</td>
-<td align="right">286</td>
+<td align="right">346</td>
 </tr>
 <tr class="even">
-<td align="left">changehc</td>
-<td align="left">smoothed_adj_outpatient_covid</td>
+<td align="left">chng</td>
+<td align="left">smoothed_adj_outpatient_cli</td>
+<td align="left">day</td>
+<td align="left">hhs</td>
+<td align="left">2020-02-01</td>
+<td align="left">2021-01-08</td>
+<td align="right">10</td>
+<td align="right">0.006477</td>
+<td align="right">13.95850</td>
+<td align="right">3.339090</td>
+<td align="right">2.751874</td>
+<td align="right">1610515929</td>
+<td align="left">2021-01-12</td>
+<td align="right">4</td>
+<td align="right">346</td>
+</tr>
+<tr class="odd">
+<td align="left">chng</td>
+<td align="left">smoothed_adj_outpatient_cli</td>
 <td align="left">day</td>
 <td align="left">hrr</td>
 <td align="left">2020-02-01</td>
-<td align="left">2020-11-08</td>
+<td align="left">2021-01-08</td>
 <td align="right">306</td>
-<td align="right">0.000635</td>
-<td align="right">7.045493</td>
-<td align="right">0.2898596</td>
-<td align="right">0.3944807</td>
-<td align="right">1605255860</td>
-<td align="left">2020-11-13</td>
-<td align="right">5</td>
-<td align="right">286</td>
+<td align="right">0.001361</td>
+<td align="right">42.31788</td>
+<td align="right">3.342070</td>
+<td align="right">3.381977</td>
+<td align="right">1610515929</td>
+<td align="left">2021-01-12</td>
+<td align="right">4</td>
+<td align="right">346</td>
 </tr>
-<tr class="odd">
-<td align="left">changehc</td>
-<td align="left">smoothed_adj_outpatient_covid</td>
+<tr class="even">
+<td align="left">chng</td>
+<td align="left">smoothed_adj_outpatient_cli</td>
 <td align="left">day</td>
 <td align="left">msa</td>
 <td align="left">2020-02-01</td>
-<td align="left">2020-11-08</td>
+<td align="left">2021-01-08</td>
 <td align="right">392</td>
-<td align="right">0.000506</td>
-<td align="right">12.866211</td>
-<td align="right">0.2540103</td>
-<td align="right">0.3769068</td>
-<td align="right">1605255861</td>
-<td align="left">2020-11-13</td>
-<td align="right">5</td>
-<td align="right">286</td>
+<td align="right">0.001282</td>
+<td align="right">47.57428</td>
+<td align="right">3.023978</td>
+<td align="right">3.501816</td>
+<td align="right">1610515929</td>
+<td align="left">2021-01-12</td>
+<td align="right">4</td>
+<td align="right">346</td>
+</tr>
+<tr class="odd">
+<td align="left">chng</td>
+<td align="left">smoothed_adj_outpatient_cli</td>
+<td align="left">day</td>
+<td align="left">nation</td>
+<td align="left">2020-02-01</td>
+<td align="left">2021-01-08</td>
+<td align="right">1</td>
+<td align="right">0.016265</td>
+<td align="right">9.64386</td>
+<td align="right">3.561693</td>
+<td align="right">2.453957</td>
+<td align="right">1610515930</td>
+<td align="left">2021-01-12</td>
+<td align="right">4</td>
+<td align="right">346</td>
 </tr>
 <tr class="even">
-<td align="left">changehc</td>
-<td align="left">smoothed_adj_outpatient_covid</td>
+<td align="left">chng</td>
+<td align="left">smoothed_adj_outpatient_cli</td>
 <td align="left">day</td>
 <td align="left">state</td>
 <td align="left">2020-02-01</td>
-<td align="left">2020-11-08</td>
+<td align="left">2021-01-08</td>
 <td align="right">52</td>
-<td align="right">0.000358</td>
-<td align="right">3.016247</td>
-<td align="right">0.2723865</td>
-<td align="right">0.3158401</td>
-<td align="right">1605255861</td>
-<td align="left">2020-11-13</td>
-<td align="right">5</td>
-<td align="right">286</td>
-</tr>
-<tr class="odd">
-<td align="left">changehc</td>
-<td align="left">smoothed_outpatient_covid</td>
-<td align="left">day</td>
-<td align="left">county</td>
-<td align="left">2020-02-01</td>
-<td align="left">2020-11-08</td>
-<td align="right">2545</td>
-<td align="right">0.000868</td>
-<td align="right">30.886603</td>
-<td align="right">0.3252638</td>
-<td align="right">0.5665026</td>
-<td align="right">1605255860</td>
-<td align="left">2020-11-13</td>
+<td align="right">0.002500</td>
+<td align="right">24.62551</td>
+<td align="right">3.130684</td>
+<td align="right">2.874132</td>
+<td align="right">1610515930</td>
+<td align="left">2021-01-12</td>
 <td align="right">4</td>
-<td align="right">286</td>
-</tr>
-<tr class="even">
-<td align="left">changehc</td>
-<td align="left">smoothed_outpatient_covid</td>
-<td align="left">day</td>
-<td align="left">hrr</td>
-<td align="left">2020-02-01</td>
-<td align="left">2020-11-08</td>
-<td align="right">306</td>
-<td align="right">0.000635</td>
-<td align="right">5.998379</td>
-<td align="right">0.2656566</td>
-<td align="right">0.3597191</td>
-<td align="right">1605255860</td>
-<td align="left">2020-11-13</td>
-<td align="right">5</td>
-<td align="right">286</td>
+<td align="right">346</td>
 </tr>
 </tbody>
 </table>
@@ -637,7 +641,10 @@
 <a href="#tracking-issues-and-updates" class="anchor"></a>Tracking issues and updates</h2>
 <p>The COVIDcast API records not just each signal’s estimate for a given location on a given day, but also <em>when</em> that estimate was made, and all updates to that estimate.</p>
 <p>For example, consider using our <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html">doctor visits signal</a>, which estimates the percentage of outpatient doctor visits that are COVID-related, and consider a result row with <code>time_value</code> 2020-05-01 for <code>geo_values = "pa"</code>. This is an estimate for the percentage in Pennsylvania on May 1, 2020. That estimate was <em>issued</em> on May 5, 2020, the delay being due to the aggregation of data by our source and the time taken by the COVIDcast API to ingest the data provided. Later, the estimate for May 1st could be updated, perhaps because additional visit data from May 1st arrived at our source and was reported to us. This constitutes a new <em>issue</em> of the data.</p>
-<p>By default, <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> fetches the most recent issue available. This is the best option for users who simply want to graph the latest data or construct dashboards. But if we are interested in knowing <em>when</em> data was reported, we can request specific data versions.</p>
+<div id="data-known-as-of-a-specific-date" class="section level3">
+<h3 class="hasAnchor">
+<a href="#data-known-as-of-a-specific-date" class="anchor"></a>Data known “as of” a specific date</h3>
+<p>By default, <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> fetches the most recent issue available. This is the best option for users who simply want to graph the latest data or construct dashboards. But if we are interested in knowing <em>when</em> data was reported, we can request specific data versions using the <code>as_of</code>, <code>issues</code>, or <code>lag</code> arguments. (Note these are mutually exclusive; only one can be specified at a time.)</p>
 <p>First, we can request the data that was available <em>as of</em> a specific date, using the <code>as_of</code> argument:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit">
 <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"doctor-visits"</span>, signal <span class="op">=</span> <span class="st">"smoothed_cli"</span>,
@@ -669,6 +676,10 @@
 ##   stderr sample_size
 ## 1     NA          NA</code></pre>
 <p>Note the substantial change in the estimate, to over 5%, reflecting new data that became available <em>after</em> May 7 about visits occurring on May 1. This illustrates the importance of issue date tracking, particularly for forecasting tasks. To backtest a forecasting model on past data, it is important to use the data that would have been available <em>at the time</em>, not data that arrived much later.</p>
+</div>
+<div id="multiple-issues-of-observations" class="section level3">
+<h3 class="hasAnchor">
+<a href="#multiple-issues-of-observations" class="anchor"></a>Multiple issues of observations</h3>
 <p>By using the <code>issues</code> argument, we can request all issues in a certain time period:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit">
 <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"doctor-visits"</span>, signal <span class="op">=</span> <span class="st">"smoothed_cli"</span>,
@@ -769,16 +780,18 @@
 </tbody>
 </table>
 <p>This estimate was clearly updated many times as new data for May 1st arrived. Note that these results include only data issued or updated between 2020-05-01 and 2020-05-15. If a value was first reported on 2020-04-15, and never updated, a query for issues between 2020-05-01 and 2020-05-15 will not include that value among its results.</p>
+<p>After fetching multiple issues of data, we can use the <code><a href="../reference/latest_issue.html">latest_issue()</a></code> or <code><a href="../reference/latest_issue.html">earliest_issue()</a></code> functions to subset the data frame to view only the latest or earliest issue of each observation.</p>
+</div>
+<div id="observations-issued-with-a-specific-lag" class="section level3">
+<h3 class="hasAnchor">
+<a href="#observations-issued-with-a-specific-lag" class="anchor"></a>Observations issued with a specific lag</h3>
 <p>Finally, we can use the <code>lag</code> argument to request only data reported with a certain lag. For example, requesting a lag of 7 days means to request only issues 7 days after the corresponding <code>time_value</code>:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit">
 <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"doctor-visits"</span>, signal <span class="op">=</span> <span class="st">"smoothed_cli"</span>,
                  start_day <span class="op">=</span> <span class="st">"2020-05-01"</span>, end_day <span class="op">=</span> <span class="st">"2020-05-07"</span>,
                  geo_type <span class="op">=</span> <span class="st">"state"</span>, geo_values <span class="op">=</span> <span class="st">"pa"</span>, lag <span class="op">=</span> <span class="fl">7</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></pre></div>
-<pre><code>## Warning: Fetching smoothed_cli from doctor-visits for 2020-05-03 in geography
-## 'pa': no results</code></pre>
-<pre><code>## Warning: Fetching smoothed_cli from doctor-visits for 2020-05-04 in geography
-## 'pa': no results</code></pre>
+<pre><code>## Warning: Data not fetched for the following days: 2020-05-03, 2020-05-04</code></pre>
 <table class="table">
 <thead><tr class="header">
 <th align="left">data_source</th>
@@ -850,7 +863,7 @@
 </tbody>
 </table>
 <p>Note that though this query requested all values between 2020-05-01 and 2020-05-07, May 3rd and May 4th were <em>not</em> included in the results set. This is because the query will only include a result for May 3rd if a value were issued on May 10th (a 7-day lag), but in fact the value was not updated on that day:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit">
+<div class="sourceCode" id="cb26"><pre class="downlit">
 <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"doctor-visits"</span>, signal <span class="op">=</span> <span class="st">"smoothed_cli"</span>,
                  start_day <span class="op">=</span> <span class="st">"2020-05-03"</span>, end_day <span class="op">=</span> <span class="st">"2020-05-03"</span>,
                  geo_type <span class="op">=</span> <span class="st">"state"</span>, geo_values <span class="op">=</span> <span class="st">"pa"</span>,
@@ -927,6 +940,7 @@
 </tbody>
 </table>
 </div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -940,7 +954,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

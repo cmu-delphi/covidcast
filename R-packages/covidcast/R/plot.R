@@ -110,7 +110,8 @@ plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
   # For the maps, set range, if we need to (to mean +/- 3 standard deviations,
   # from metadata) 
   if (is.null(range) && (plot_type == "choro" || plot_type == "bubble")) {
-    if (is.null(attributes(x)$metadata)) { 
+    if (is.null(attributes(x)$metadata$mean_value) || 
+        is.null(attributes(x)$metadata$stdev_value)) { 
       warn(paste("Metadata for signal mean and standard deviation not",
                  "available; defaulting to observed mean and standard",
                  "deviation to set plot range."),
@@ -164,15 +165,15 @@ plot.covidcast_signal = function(x, plot_type = c("choro", "bubble", "line"),
 }
 
 # Plot a choropleth map of a covidcast_signal object.
-
 #' @importFrom stats approx
 plot_choro = function(x, time_value = NULL, include = c(), range,
                       col = c("#FFFFCC", "#FD893C", "#800026"),
                       alpha = 0.5, title = NULL, params = list()) {
   # Check that we're looking at either counties or states
-  if (!(attributes(x)$metadata$geo_type == "county" ||
-                     attributes(x)$metadata$geo_type == "state")) {
-    stop("Only 'county' and 'state' are supported for choropleth maps.")
+  if (!(attributes(x)$metadata$geo_type %in%
+        c("county", "state", "hrr", "msa"))) {
+    stop("Only 'county', 'state', 'hrr' and 'msa' are supported 
+         for choropleth maps.")
   }
 
   # Set the time value, if we need to (last observed time value)
@@ -251,50 +252,186 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
   val = df$val
   geo = df$geo
   names(val) = geo
+  
+  # Make background layer for maps.  For states view this isn't
+  # necessary but it just hides in the background
+  map_df = sf::st_read(system.file(
+    "shapefiles/state/cb_2019_us_state_5m.shp",
+    package = "covidcast"),
+    quiet = TRUE)
+  background_crs = sf::st_crs(map_df)
+  map_df$STATEFP <- as.character(map_df$STATEFP)
+  map_df = map_df %>% dplyr::mutate(
+    is_alaska = STATEFP == '02',
+    is_hawaii = STATEFP == '15',
+    is_pr = STATEFP == '72',
+    is_state = as.numeric(STATEFP) < 57)
 
-  # Create the choropleth colors for counties
+  # Set megacounty colors here
   if (attributes(x)$metadata$geo_type == "county") {
-    map_df = usmap::us_map("county", include = include)
-    map_geo = map_df$fips
-    map_col = rep(missing_col, length(map_geo))
-
-    # First set the colors for mega counties
-    mega_cty = geo[which(substr(geo, 3, 5) == "000")]
-    map_mega = map_geo[substr(map_geo, 1, 2) %in% substr(mega_cty, 1, 2)]
-    map_col[substr(map_geo, 1, 2) %in% substr(mega_cty, 1, 2)] =
-      col_fun(val[paste0(substr(map_mega, 1, 2), "000")], alpha = alpha)
-
-    # Now overwrite the colors for observed counties
-    obs_cty = geo[substr(geo, 3, 5) != "000"]
-    map_obs = map_geo[map_geo %in% obs_cty]
-    map_col[map_geo %in% obs_cty] = col_fun(val[map_obs])
-
-    # TODO: implement megacounties "properly"? For this we should first draw the
-    # states (not counties) in transparent colors, then layer over the observed
-    # counties. Hence, eventually, two calls to usmap::us_map() and two polygon
-    # layers?
+    map_df = map_df %>% dplyr::mutate(
+      color = ifelse(paste0(STATEFP, "000") %in% geo,
+                     col_fun(val[paste0(STATEFP, "000")], alpha = alpha),
+                     missing_col))
+  }
+  # Else, just set background to missing color
+  else {
+     map_df = map_df %>% dplyr::mutate(color = missing_col)
   }
 
-  # Create the choropleth colors for states
-  else if (attributes(x)$metadata$geo_type == "state") {
-    map_df = usmap::us_map("state", include = include)
-    map_geo = tolower(map_df$abbr)
-    map_col = rep(missing_col, length(map_geo))
-
-    # Overwrite the colors for observed states
-    map_obs = map_geo[map_geo %in% geo]
-    map_col[map_geo %in% geo] = col_fun(val[map_obs])
+  if (length(include) > 0) {
+    map_df = map_df %>% dplyr::filter(.$STUSPS %in% include)
   }
 
-  # Create the polygon layer
+  main_df = shift_main(map_df)
+  hawaii_df = shift_hawaii(map_df)
+  alaska_df = shift_alaska(map_df)
+  pr_df = shift_pr(map_df)
+
+  main_col = main_df$color
+  hawaii_col = hawaii_df$color
+  alaska_col = alaska_df$color
+  pr_col = pr_df$color  
+
   aes = ggplot2::aes
   geom_args = list()
   geom_args$color = border_col
   geom_args$size = border_size
-  geom_args$fill = map_col
-  geom_args$mapping = aes(x = x, y = y, group = group)
-  geom_args$data = map_df
-  polygon_layer = do.call(ggplot2::geom_polygon, geom_args)
+  geom_args$mapping = aes(geometry=geometry)
+
+  geom_args$fill = main_col
+  geom_args$data = main_df
+  back_main_layer = do.call(ggplot2::geom_sf, geom_args)
+  geom_args$fill = pr_col
+  geom_args$data = pr_df
+  back_pr_layer = do.call(ggplot2::geom_sf, geom_args)
+  geom_args$fill = hawaii_col
+  geom_args$data = hawaii_df
+  back_hawaii_layer = do.call(ggplot2::geom_sf, geom_args)
+  geom_args$fill = alaska_col
+  geom_args$data = alaska_df
+  back_alaska_layer = do.call(ggplot2::geom_sf, geom_args)
+
+  # Create the choropleth colors for counties
+  if (attributes(x)$metadata$geo_type == "county") {
+    map_df = sf::st_read(system.file(
+      "shapefiles/county/cb_2019_us_county_5m.shp",
+      package = "covidcast"),
+      quiet = TRUE)
+    map_df$STATEFP <- as.character(map_df$STATEFP)
+    map_df$GEOID <- as.character(map_df$GEOID)
+    # Get rid of unobserved counties and megacounties
+    # Those are taken care of by background layer
+    # Then set color for those observed counties
+    map_df = map_df %>% dplyr::filter((GEOID %in% geo) & !(COUNTYFP == "000")
+      ) %>% dplyr::mutate(
+        is_alaska = STATEFP == '02',
+        is_hawaii = STATEFP == '15',
+        is_pr = STATEFP == '72',
+        is_state = as.numeric(STATEFP) < 57,
+        color = col_fun(val[GEOID])) 
+
+    if (length(include) > 0) {
+      map_df = map_df %>%
+        dplyr::filter(fips_to_abbr(paste0(.$STATEFP, "000")) %in% include)
+    }
+  }
+
+  # Create the choropleth colors for states
+  else if (attributes(x)$metadata$geo_type == "state") {
+    map_df = sf::st_read(system.file(
+      "shapefiles/state/cb_2019_us_state_5m.shp",
+      package = "covidcast"),
+      quiet = TRUE)
+    background_crs = sf::st_crs(map_df)
+    map_df$STATEFP <- as.character(map_df$STATEFP)
+    map_df = map_df %>% dplyr::mutate(
+      is_alaska = STATEFP == '02',
+      is_hawaii = STATEFP == '15',
+      is_pr = STATEFP == '72',
+      is_state = as.numeric(STATEFP) < 57,
+      color = ifelse(tolower(STUSPS) %in% geo,
+                     col_fun(val[tolower(STUSPS)]),
+                     missing_col))
+    if (length(include) > 0) {
+      map_df = map_df %>% dplyr::filter(.$STUSPS %in% include)
+    }
+  }
+
+  else if (attributes(x)$metadata$geo_type == "msa") {
+    map_df = sf::st_read(system.file(
+      "shapefiles/msa/cb_2019_us_cbsa_5m.shp",
+      package = "covidcast"),
+      quiet = TRUE)
+    map_df = map_df %>% dplyr::filter(map_df$LSAD == 'M1') # only get metro and not micropolitan areas
+    if (length(include) > 0) {
+      # Last two letters are state abbreviation
+      map_df = map_df %>% dplyr::filter(
+        substr(.$NAME, nchar(.$NAME) - 1, nchar(.$NAME)) %in% include)
+    }
+    map_df$NAME <- as.character(map_df$NAME)
+    map_df = map_df %>% dplyr::mutate(
+      is_alaska = substr(NAME, nchar(NAME) - 1, nchar(NAME)) == 'AK',
+      is_hawaii = substr(NAME, nchar(NAME) - 1, nchar(NAME)) == 'HI',
+      is_pr = substr(NAME, nchar(NAME) - 1, nchar(NAME)) == 'PR',
+      color = ifelse(GEOID %in% geo, col_fun(val[GEOID]), missing_col))
+  }
+
+  else if (attributes(x)$metadata$geo_type == "hrr") {
+    map_df = sf::st_read(system.file(
+      "shapefiles/hrr/geo_export_ad86cff5-e5ed-432e-9ec2-2ce8732099ee.shp",
+      package = "covidcast"),
+      quiet = TRUE)
+    if (length(include) > 0) {
+      # First two letters are state abbreviation
+      map_df = map_df %>% dplyr::filter(substr(.$hrr_name, 1, 2) %in% include)
+    }
+    map_df = sf::st_transform(map_df, background_crs)
+    hrr_shift = sf::st_geometry(map_df) + c(0, -0.185)
+    map_df = sf::st_set_geometry(map_df, hrr_shift)
+    map_df = sf::st_set_crs(map_df, background_crs)
+    map_df$hrr_name <- as.character(map_df$hrr_name)
+    map_df = map_df %>% dplyr::mutate(
+      is_alaska = substr(hrr_name, 1, 2) == 'AK',
+      is_hawaii = substr(hrr_name, 1, 2) == 'HI',
+      is_pr = substr(hrr_name, 1, 2) == 'PR',
+      # use the HRR numbers to index the named val vector -- but convert to
+      # character, otherwise the indices will be positional, not using the
+      # names.
+      color = ifelse(hrr_num %in% geo, col_fun(val[as.character(hrr_num)]), missing_col))
+  }
+
+  main_df = shift_main(map_df)
+  hawaii_df = shift_hawaii(map_df)
+  alaska_df = shift_alaska(map_df)
+  pr_df = shift_pr(map_df)
+
+  main_col = main_df$color
+  hawaii_col = hawaii_df$color
+  alaska_col = alaska_df$color
+  pr_col = pr_df$color
+
+  # Create the polygon layers
+  aes = ggplot2::aes
+  geom_args = list()
+  geom_args$color = border_col
+  geom_args$size = border_size
+  geom_args$mapping = aes(geometry=geometry)
+  coord_args = list()
+
+  geom_args$fill = main_col
+  geom_args$data = main_df
+  main_layer = do.call(ggplot2::geom_sf, geom_args)
+  geom_args$fill = pr_col
+  geom_args$data = pr_df
+  pr_layer = do.call(ggplot2::geom_sf, geom_args)
+  geom_args$fill = hawaii_col
+  geom_args$data = hawaii_df
+  hawaii_layer = do.call(ggplot2::geom_sf, geom_args)
+  geom_args$fill = alaska_col
+  geom_args$data = alaska_df
+  alaska_layer = do.call(ggplot2::geom_sf, geom_args)
+  coord_layer = do.call(ggplot2::coord_sf, coord_args)
   
   # For continuous color scale, create a legend layer
   if (is.null(breaks)) {
@@ -344,9 +481,10 @@ plot_choro = function(x, time_value = NULL, include = c(), range,
                                              guide = guide)
   }
 
-  # Put it all together and return
-  return(ggplot2::ggplot() + polygon_layer + ggplot2::coord_equal() +
-         title_layer + hidden_layer + scale_layer + theme_layer)
+  return(ggplot2::ggplot() + 
+        back_main_layer + back_pr_layer + back_hawaii_layer + back_alaska_layer + 
+        main_layer + pr_layer + alaska_layer + hawaii_layer + coord_layer +
+        title_layer + hidden_layer + scale_layer + theme_layer)
 }
 
 # Plot a bubble map of a covidcast_signal object.
@@ -356,7 +494,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
                        title = NULL, params = list()) {
   # Check that we're looking at either counties or states
   if (!(attributes(x)$metadata$geo_type == "county" ||
-                     attributes(x)$metadata$geo_type == "state")) {
+        attributes(x)$metadata$geo_type == "state")) {
     stop("Only 'county' and 'state' are supported for bubble maps.")
   }
 
@@ -565,4 +703,78 @@ plot_line = function(x, range = NULL, title = NULL, params = list()) {
   # Put it all together and return
   return(ggplot2::ggplot(aes(x = time_value), data = df) +
          line_layer + ribbon_layer + lim_layer + label_layer + theme_layer)
+}
+
+
+
+# Use the following CRS values
+# final_crs is ESRI:102003, alaska_crs is ESRI:102006, 
+# hawaii_crs is ESRI:102007. There were errors using the integers, so these
+# were copied from spatialreference.org
+
+final_crs = '+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 
+             +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs'
+alaska_crs = '+proj=aea +lat_1=55 +lat_2=65 +lat_0=50 +lon_0=-154 +x_0=0 
+              +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs'
+hawaii_crs = '+proj=aea +lat_1=8 +lat_2=18 +lat_0=13 +lon_0=-157 +x_0=0 
+              +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs'
+
+# These functions move Hawaii, Puerto Rico and Alaska close to the mainland,
+# and rotate/scale them for the plots.
+
+shift_pr = function(map_df) {
+  pr_df = map_df %>% dplyr::filter(.$is_pr)
+  pr_df = sf::st_transform(pr_df, final_crs)
+  pr_shift = sf::st_geometry(pr_df) + c(-0.9e+6, 1e+6)
+  pr_df = sf::st_set_geometry(pr_df, pr_shift)
+  r = 16 * pi / 180
+  rotation = matrix(c(cos(r), sin(r), -sin(r), cos(r)), nrow = 2, ncol = 2)
+  pr_rotate = (sf::st_geometry(pr_df)) * rotation
+  pr_df = sf::st_set_geometry(pr_df, pr_rotate)
+
+  # Pretend this was in final_crs all along
+  suppressWarnings({
+    sf::st_crs(pr_df) <- final_crs
+  })
+  return(pr_df)
+}
+
+shift_alaska = function(map_df){
+  alaska_df = map_df %>% dplyr::filter(.$is_alaska)
+  alaska_df = sf::st_transform(alaska_df, alaska_crs)
+  alaska_scale = sf::st_geometry(alaska_df) * 0.35
+  alaska_df = sf::st_set_geometry(alaska_df, alaska_scale)
+  alaska_shift = sf::st_geometry(alaska_df) + c(-1.8e+6, -1.6e+6)
+  alaska_df = sf::st_set_geometry(alaska_df, alaska_shift)
+
+  # Pretend this was in final_crs all along
+  suppressWarnings({
+    sf::st_crs(alaska_df) <- final_crs
+  })
+  return(alaska_df)
+}
+
+shift_hawaii = function(map_df){
+  hawaii_df = map_df %>% dplyr::filter(.$is_hawaii)
+  hawaii_df = sf::st_transform(hawaii_df, hawaii_crs)
+  hawaii_shift = sf::st_geometry(hawaii_df) + c(-1e+6, -2e+6)
+  hawaii_df = sf::st_set_geometry(hawaii_df, hawaii_shift)
+
+  # Pretend this was in final_crs all along
+  suppressWarnings({
+    sf::st_crs(hawaii_df) <- final_crs
+  })
+  return(hawaii_df)
+}
+
+shift_main = function(map_df){
+  main_df = map_df %>% dplyr::filter(
+      !.$is_alaska) %>% dplyr::filter(
+        !.$is_hawaii) %>% dplyr::filter(!.$is_pr)
+  # Remove other territories if that attribute is there
+  if ("is_state" %in% colnames(main_df)) {
+    main_df = main_df %>% dplyr::filter(.$is_state)
+  }
+  main_df = sf::st_transform(main_df, final_crs)
+  return(main_df)
 }

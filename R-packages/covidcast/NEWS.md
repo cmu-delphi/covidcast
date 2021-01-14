@@ -1,3 +1,39 @@
+# covidcast 0.4.0
+
+Released January 13, 2021.
+
+## Major changes
+
+- The `plot.covidcast_signal()` method now supports making choropleth plots for
+  metropolitan areas and hospital referral regions.
+
+- A new `as.covidcast_signal()` generic function makes it easy to turn any
+  data frame, such as data loaded from an external source, into a
+  `covidcast_signal` object that can be plotted and wrangled using the functions
+  in this package. See `vignette("external-data")` for examples.
+
+- The new `latest_issue()` and `earliest_issue()` functions make it easy to
+  filter data frames with multiple issues of each observation, obtaining only
+  the latest or earliest issue of each.
+
+- `covidcast_signal()`, `covidcast_signals()`, and `covidcast_meta()` now
+  support signals with `time_type = "week"`. Select signals in the API are
+  offered at weekly resolution. They also now support signals with `geo_types`
+  of "nation" and "hhs", corresponding to national estimates and Department of
+  Health & Human Services Regional Offices ("HHS regions").
+
+- `covidcast_signal()` now batches requests, so that many days of data can be
+  fetched in one API call. This dramatically improves the speed of fetching
+  state-, MSA-, and HRR-level data, since many days of data can be fetched in
+  one API call. County-level signals, such as cases and deaths, may still
+  require one API call per day, since the API's row limit is only slightly
+  larger than the number of counties in the United States.
+
+- `covidcast_signal()` now fetches data from the API server in CSV format,
+  rather than JSON, which requires less bandwidth and parsing.
+
+- `covidcast_cor()` is dramatically faster than before.
+
 # covidcast 0.3.1
 
 Released October 31, 2020.

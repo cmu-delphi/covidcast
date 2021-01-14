@@ -56,14 +56,11 @@ test_that("evaluate_predictions evaluates against downloaded data", {
                            geo_values = c("al", "wy"))))
 
     expect_equal(colnames(score_card),
-                  c("ahead", "geo_value", "quantile", "value", "forecaster", "forecast_date",
-                    "data_source", "signal", "target_end_date", "incidence_period", "actual",
-                    "wis", "ae", "coverage_80"))
-    n <- 6
+                  c("ahead", "geo_value", "forecaster", "forecast_date", "data_source", "signal",
+                    "target_end_date", "incidence_period", "actual", "wis", "ae", "coverage_80"))
+    n <- 2
     expect_equal(score_card$ahead, rep(1, n))
     expect_equal(score_card$geo_value, rep(c("al", "wy"), each=n/2))
-    expect_equal(score_card$quantile, rep(c(0.1, 0.5, 0.9), n/3))
-    expect_equal(score_card$value, seq(1, 6))
     expect_equal(score_card$forecaster, rep("a", n))
     expect_equal(score_card$forecast_date, rep(as.Date(c("2020-01-02", "2020-01-09")), each=n/2))
     expect_equal(score_card$data_source, rep("source", n))
@@ -123,14 +120,11 @@ test_that("evaluate_predictions evaluates against side truth", {
     expect_called(mock_download_signal, 0)
 
     expect_equal(colnames(score_card),
-                  c("wis", "ae", "coverage_80", "forecaster", "forecast_date", "ahead", 
-                    "geo_value", "quantile", "value", "data_source", "signal", "target_end_date",
-                    "incidence_period", "actual"))
-    n <- 6
+                  c("forecaster", "forecast_date", "ahead", "geo_value", "data_source", "signal",
+                    "target_end_date", "incidence_period", "actual", "wis", "ae", "coverage_80"))
+    n <- 2
     expect_equal(score_card$ahead, rep(1, n))
     expect_equal(score_card$geo_value, rep(c("al", "wy"), each=n/2))
-    expect_equal(score_card$quantile, rep(c(0.1, 0.5, 0.9), n/3))
-    expect_equal(score_card$value, seq(1, 6))
     expect_equal(score_card$forecaster, rep("a", n))
     expect_equal(score_card$forecast_date, rep(as.Date(c("2020-01-02", "2020-01-09")), each=n/2))
     expect_equal(score_card$data_source, rep("source", n))
@@ -169,14 +163,11 @@ test_that("evaluate_predictions uses alternate grouping variables", {
     expect_called(mock_download_signal, 0)
 
     expect_equal(colnames(score_card),
-                  c("wis", "ae", "coverage_80", "forecaster",  "ahead", "geo_value",
-                    "quantile", "value", "forecast_date", "data_source", "signal",
-                    "target_end_date", "incidence_period", "actual"))
-    n <- 6
+                  c("forecaster", "ahead", "geo_value", "forecast_date", "data_source", "signal",
+                    "target_end_date", "incidence_period", "actual", "wis", "ae", "coverage_80"))
+    n <- 2
     expect_equal(score_card$ahead, rep(1, n))
     expect_equal(score_card$geo_value, rep(c("al", "wy"), each=n/2))
-    expect_equal(score_card$quantile, rep(c(0.1, 0.5, 0.9), n/3))
-    expect_equal(score_card$value, seq(1, 6))
     expect_equal(score_card$forecaster, rep(c("a", "b"), each=n/2))
     expect_equal(score_card$forecast_date, rep(as.Date(c("2020-01-02", "2020-01-09")), each=n/2))
     expect_equal(score_card$data_source, rep("source", n))

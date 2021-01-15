@@ -153,11 +153,15 @@ fips_to_name = function(code, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
   # Leave states in county_census (so we can find state fips)
   df = covidcast::county_census # %>% dplyr::filter(COUNTY != 0)
-
+  
+  # Avoid calling grep_lookup more times than necessary
+  unique_codes = unique(code)
   # Now perform the grep-based look up
-  grep_lookup(key = code, keys = df$FIPS, values = df$CTYNAME,
-              ignore.case = ignore.case, perl = perl, fixed = fixed,
-              ties_method = ties_method)
+  out = grep_lookup(key = unique_codes, keys = df$FIPS, values = df$CTYNAME,
+                    ignore.case = ignore.case, perl = perl, fixed = fixed,
+                    ties_method = ties_method)
+  # Return a vector of same length as code
+  out[match(code, unique_codes)]
 }
 
 #' @rdname fips_to_name

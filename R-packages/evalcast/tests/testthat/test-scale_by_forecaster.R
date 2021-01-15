@@ -13,7 +13,6 @@ test_that("scale_by_forecaster works on score_cards", {
         ae = c(1, 2, 4, 16),
         wis = c(3, 5, 7, 9)
     )
-    class(score_card) <- c("score_card", class(score_card))
     scaled_card <- scale_by_forecaster(score_card, c("ae", "wis"), "f2")
 
     expect_equal(colnames(scaled_card), 
@@ -56,6 +55,7 @@ test_that("scale_by_forecaster detects base_forecaster_name argument errors", {
         ae = c(1, 2, 4, 16),
         wis = c(3, 5, 7, 9)
     )
+
     expect_error(scale_by_forecaster(score_card, c("ae"), "not_f", c("forecaster", "ahead")),
                  "score_card has no forecaster named not_f.")
 
@@ -71,6 +71,7 @@ test_that("scale_by_forecaster dies with bad columns", {
         ae = c(1, 2, 4, 16),
         wis = c(3, 5, 7, 9)
     )
+
     expect_error(scale_by_forecaster(score_card %>% select(-forecaster),
                                      c("ae"),
                                      "f1",

@@ -4,32 +4,34 @@
 #' @param score_cols vector of column names in `score_card` to normalize
 #' @param base_forecaster_name name of forecaster in `score_card$forecaster` column by whose error
 #'   values the remaining forecasters' errors will be scaled
-#' @param numeric_err_cols vector of column names in `score_card` that contain numeric error
-#'   measures. Elements of `numeric_err_cols` that are not in `score_cols` will be dropped from the
-#'   final output to avoid a mix of scaled and unscaled measures.
+#' @param id_cols vector of column names in `score_card` that identify distinct forecasts (i.e. the
+#'   independent variables of `score_card`).
+#' @param drop_base_entries whether to include the entries in `score_card` from 
+#'   `base_forecaster_name` (their corresponding `score_cols` values will all be 1)
 #'
-#' @return
+#' @return A tibble whose columns are `c(id_cols, score_cols)` whose `id_cols` values are copied
+#'   directly from `score_card` and whose `score_cols` values are normalized with respect to 
+#'   `base_forecaster_name`.
 #' @export
 scale_by_forecaster <- function(score_card,
                                 score_cols,
                                 base_forecaster_name, 
-                                numeric_err_cols = c("ae", "wis")) {
+                                id_cols = c("forecaster", "ahead", "geo_value", "forecast_date",
+                                            "data_source", "signal", "target_end_date",
+                                            "incidence_period"),
+                                drop_base_entries = TRUE) {
     # Validate columns arguments
     columns <- colnames(score_card)
     assert_that("forecaster" %in% columns,
                 msg = 'score_card must have a column named "forecaster"')
-    
-    extraneous_score_cols <- setdiff(score_cols, columns)
-    assert_that(length(extraneous_score_cols) == 0,
+    assert_that(all(score_cols %in% columns),
                 msg = paste("score_cols contains columns",
-                            paste(extraneous_score_cols, collapse=", "),
+                            paste(setdiff(score_cols, columns), collapse=", "),
                             "not present in the columns of score_card"))
-
-    nonnumeric_score_cols <- setdiff(score_cols, numeric_err_cols)
-    assert_that(length(nonnumeric_score_cols) == 0,
-                msg = paste("score_cols contains columns",
-                            paste(nonnumeric_score_cols, collapse=", "),
-                            "that are not numeric errors"))
+    assert_that(all(id_cols %in% columns),
+                msg = paste("id_cols contains columns",
+                            paste(setdiff(id_cols, columns), collapse=", "),
+                            "not present in the columns of score_card"))
 
     # Validate contents of score_card's forecaster column
     unique_forecasters <- unique(score_card$forecaster)
@@ -44,18 +46,20 @@ scale_by_forecaster <- function(score_card,
                             "other than", base_forecaster_name))
 
     df_list <- map(score_cols, function(var) {
-        score_card %>% 
-        select(setdiff(columns, setdiff(numeric_err_cols, var))) %>% 
-        pivot_wider(names_from = "forecaster", 
-                    names_prefix = var, 
-                    values_from = var) %>% 
-        mutate(across(starts_with(var), ~ .x /
-                        !!sym(paste0(var, base_forecaster_name)))) %>%
-        pivot_longer(cols = starts_with(var), 
-                    names_to = "forecaster",
-                    values_to = var) %>%
-        mutate(forecaster = substring(forecaster, nchar(var) + 1)) %>%
-        filter(forecaster != base_forecaster_name)
+        normalized_card <- score_card %>% 
+            select(c(id_cols, var)) %>% 
+            pivot_wider(names_from = "forecaster", 
+                        names_prefix = var, 
+                        values_from = var) %>% 
+            mutate(across(starts_with(var), ~ .x /
+                            !!sym(paste0(var, base_forecaster_name)))) %>%
+            pivot_longer(cols = starts_with(var), 
+                        names_to = "forecaster",
+                        values_to = var) %>%
+            mutate(forecaster = substring(forecaster, nchar(var) + 1))
+        if (drop_base_entries)
+            normalized_card <- filter(normalized_card, forecaster != base_forecaster_name)
+        return(normalized_card)
     })
     return(reduce(df_list, left_join))
 }

@@ -14,7 +14,7 @@ from .errors import NoDataWarning
 # Point API requests to the AWS endpoint
 Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
 
-VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state"}
+VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state",  "hhs", "nation"}
 
 
 def signal(data_source: str,
@@ -221,7 +221,7 @@ def metadata() -> pd.DataFrame:
 
       ``geo_type``
         Geographic level for which this signal is available, such as county,
-        state, msa, or hrr. Most signals are available at multiple geographic
+        state, msa, hss, hrr, or nation. Most signals are available at multiple geographic
         levels and will hence be listed in multiple rows with their own
         metadata.
 

@@ -30,10 +30,19 @@ jobs:
         uses: r-lib/actions/setup-r@v1
         with:
           r-version: ${{ matrix.r-version }}
+<<<<<<< HEAD
       - name: Install linux dependencies
         run: |
             sudo apt-get install libcurl4-openssl-dev
             sudo apt-get install libgit2-dev:
+=======
+      - name: Install linux dependencies  
+        run: |
+            sudo apt-get install libcurl4-openssl-dev
+            sudo apt-get install libudunits2-dev
+            sudo apt-get install libgdal-dev
+            sudo apt-get install libgit2-dev
+>>>>>>> 781c16167a5c5f2b4258fdf61c32b9f8a92c6e1f
       - name: Cache R packages
         uses: actions/cache@v2
         with:

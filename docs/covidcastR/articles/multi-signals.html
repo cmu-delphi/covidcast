@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
       </span>
     </div>
 
@@ -65,6 +65,9 @@
     <li>
       <a href="../articles/multi-signals.html">3. Manipulating multiple signals</a>
     </li>
+    <li>
+      <a href="../articles/external-data.html">4. Combine external data sources and COVIDcast data</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -88,7 +91,8 @@
 
       
 
-      </header><div class="row">
+      </header><link href="multi-signals_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="multi-signals_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>3. Manipulating multiple signals</h1>
@@ -146,24 +150,24 @@
 <div id="aggregating-signals-wide-format" class="section level2">
 <h2 class="hasAnchor">
 <a href="#aggregating-signals-wide-format" class="anchor"></a>Aggregating signals, wide format</h2>
-<p>To aggregate multiple signals together, we can use the <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> function, which acceps a list of <code>covidcast_signal</code> objects, as returned by <code><a href="../reference/covidcast_signals.html">covidcast_signals()</a></code>. With all arguments set to their default values, <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> returns a data frame in “wide” format:</p>
+<p>To aggregate multiple signals together, we can use the <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> function, which accepts a list of <code>covidcast_signal</code> objects, as returned by <code><a href="../reference/covidcast_signals.html">covidcast_signals()</a></code>. With all arguments set to their default values, <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> returns a data frame in “wide” format:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit">
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <pre><code>##   geo_value time_value value+0:usa-facts_confirmed_incidence_num
-## 1        nc 2020-09-01                                       952
-## 2        tx 2020-09-21                                      6693
-## 3        tx 2020-09-22                                     17932
-## 4        tx 2020-09-23                                      3409
-## 5        tx 2020-09-26                                      4785
-## 6        tx 2020-09-27                                      4467
+## 1        tx 2020-09-22                                     17931
+## 2        tx 2020-09-23                                      3408
+## 3        tx 2020-09-25                                      4711
+## 4        tx 2020-09-29                                      4485
+## 5        tx 2020-09-30                                      5457
+## 6        nc 2020-09-01                                       952
 ##   value+0:usa-facts_deaths_incidence_num
-## 1                                     39
-## 2                                     24
-## 3                                     77
-## 4                                    135
-## 5                                    120
+## 1                                     77
+## 2                                    135
+## 3                                     93
+## 4                                     70
+## 5                                    107
 ## 6                                     39</code></pre>
 <p>In “wide” format, only the latest issue of data is retained, and the columns <code>data_source</code>, <code>signal</code>, <code>issue</code>, <code>lag</code>, <code>stderr</code>, <code>sample_size</code> are all dropped from the returned data frame. Each unique signal—defined by a combination of data source name, signal name, and time-shift—is given its own column, whose name indicates its defining quantities.</p>
 <p>As hinted above, <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> can also apply time-shifts to the given signals, through the optional <code>dt</code> argument. This can be either be a single vector of shifts or a list of vectors of shifts, this list having the same length as the list of <code>covidcast_signal</code> objects (to apply, respectively, the same shifts or a different set of shifts to each <code>covidcast_signal</code> object). Negative shifts translate into in a <em>lag</em> value and positive shifts into a <em>lead</em> value; for example, if <code>dt = -1</code>, then the value on June 2 that gets reported is the original value on June 1; if <code>dt = 0</code>, then the values are left as is.</p>
@@ -171,80 +175,80 @@
 <span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <pre><code>##   geo_value time_value value-1:usa-facts_confirmed_incidence_num
-## 1        tx 2020-09-21                                      4888
-## 2        tx 2020-09-22                                      6693
-## 3        tx 2020-09-23                                     17932
-## 4        tx 2020-09-26                                      4712
-## 5        tx 2020-09-27                                      4785
-## 6        tx 2020-09-29                                      1736
+## 1        tx 2020-09-22                                      6693
+## 2        tx 2020-09-23                                     17931
+## 3        tx 2020-09-25                                      4381
+## 4        tx 2020-09-29                                      1736
+## 5        tx 2020-09-30                                      4485
+## 6        tx 2020-09-21                                      4888
 ##   value+0:usa-facts_confirmed_incidence_num
-## 1                                      6693
-## 2                                     17932
-## 3                                      3409
-## 4                                      4785
-## 5                                      4467
-## 6                                      4487
+## 1                                     17931
+## 2                                      3408
+## 3                                      4711
+## 4                                      4485
+## 5                                      5457
+## 6                                      6693
 ##   value-1:usa-facts_deaths_incidence_num value+0:usa-facts_deaths_incidence_num
-## 1                                     46                                     24
-## 2                                     24                                     77
-## 3                                     77                                    135
-## 4                                     93                                    120
-## 5                                    120                                     39
-## 6                                     11                                     70</code></pre>
+## 1                                     24                                     77
+## 2                                     77                                    135
+## 3                                    139                                     93
+## 4                                     11                                     70
+## 5                                     70                                    107
+## 6                                     46                                     24</code></pre>
 <div class="sourceCode" id="cb9"><pre class="downlit">
 <span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <pre><code>##   geo_value time_value value+0:usa-facts_confirmed_incidence_num
-## 1        tx 2020-09-21                                      6693
-## 2        tx 2020-09-22                                     17932
-## 3        tx 2020-09-23                                      3409
-## 4        tx 2020-09-26                                      4785
-## 5        tx 2020-09-27                                      4467
-## 6        tx 2020-09-29                                      4487
+## 1        tx 2020-09-22                                     17931
+## 2        tx 2020-09-23                                      3408
+## 3        tx 2020-09-25                                      4711
+## 4        tx 2020-09-29                                      4485
+## 5        tx 2020-09-30                                      5457
+## 6        tx 2020-09-21                                      6693
 ##   value-1:usa-facts_deaths_incidence_num value+0:usa-facts_deaths_incidence_num
-## 1                                     46                                     24
-## 2                                     24                                     77
-## 3                                     77                                    135
-## 4                                     93                                    120
-## 5                                    120                                     39
-## 6                                     11                                     70
+## 1                                     24                                     77
+## 2                                     77                                    135
+## 3                                    139                                     93
+## 4                                     11                                     70
+## 5                                     70                                    107
+## 6                                     46                                     24
 ##   value+1:usa-facts_deaths_incidence_num
-## 1                                     77
-## 2                                    135
-## 3                                    139
-## 4                                     39
-## 5                                     11
-## 6                                    107</code></pre>
+## 1                                    135
+## 2                                    139
+## 3                                    120
+## 4                                    107
+## 5                                    113
+## 6                                     77</code></pre>
 <p>Finally, <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> also accepts a single data frame (instead of a list of data frames), intended to be convenient when applying shifts to a single <code>covidcast_signal</code> object:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit">
 <span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <pre><code>##   geo_value time_value value-1:usa-facts_confirmed_incidence_num
-## 1        tx 2020-09-21                                      4888
-## 2        tx 2020-09-22                                      6693
-## 3        tx 2020-09-23                                     17932
-## 4        tx 2020-09-26                                      4712
-## 5        tx 2020-09-27                                      4785
-## 6        tx 2020-09-29                                      1736
+## 1        tx 2020-09-22                                      6693
+## 2        tx 2020-09-23                                     17931
+## 3        tx 2020-09-25                                      4381
+## 4        tx 2020-09-29                                      1736
+## 5        tx 2020-09-30                                      4485
+## 6        tx 2020-09-21                                      4888
 ##   value+0:usa-facts_confirmed_incidence_num
-## 1                                      6693
-## 2                                     17932
-## 3                                      3409
-## 4                                      4785
-## 5                                      4467
-## 6                                      4487
+## 1                                     17931
+## 2                                      3408
+## 3                                      4711
+## 4                                      4485
+## 5                                      5457
+## 6                                      6693
 ##   value+1:usa-facts_confirmed_incidence_num
-## 1                                     17932
-## 2                                      3409
-## 3                                      4381
-## 4                                      4467
-## 5                                      1736
-## 6                                      5459</code></pre>
+## 1                                      3408
+## 2                                      4381
+## 3                                      4785
+## 4                                      5457
+## 5                                      3517
+## 6                                     17931</code></pre>
 </div>
 <div id="aggregating-signals-long-format" class="section level2">
 <h2 class="hasAnchor">
 <a href="#aggregating-signals-long-format" class="anchor"></a>Aggregating signals, long format</h2>
-<p>We can also use <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> in “long” format:</p>
+<p>We can also use <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> in “long” format, with one observation per row:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit">
 <span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, format <span class="op">=</span> <span class="st">"long"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></pre></div>
@@ -325,12 +329,12 @@
   <span class="fu"><a href="../reference/covidcast_longer.html">covidcast_longer</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <pre><code>##   data_source                  signal geo_value time_value dt value
-## 1   usa-facts confirmed_incidence_num        tx 2020-09-21 -1  4888
-## 2   usa-facts    deaths_incidence_num        tx 2020-09-21  0    24
-## 3   usa-facts confirmed_incidence_num        tx 2020-09-22 -1  6693
-## 4   usa-facts    deaths_incidence_num        tx 2020-09-22  0    77
-## 5   usa-facts confirmed_incidence_num        tx 2020-09-23 -1 17932
-## 6   usa-facts    deaths_incidence_num        tx 2020-09-23  0   135</code></pre>
+## 1   usa-facts confirmed_incidence_num        tx 2020-09-22 -1  6693
+## 2   usa-facts    deaths_incidence_num        tx 2020-09-22  0    77
+## 3   usa-facts confirmed_incidence_num        tx 2020-09-23 -1 17931
+## 4   usa-facts    deaths_incidence_num        tx 2020-09-23  0   135
+## 5   usa-facts confirmed_incidence_num        tx 2020-09-25 -1  4381
+## 6   usa-facts    deaths_incidence_num        tx 2020-09-25  0    93</code></pre>
 <p>And to pivot wider:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit">
 <span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, format <span class="op">=</span> <span class="st">"long"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -377,7 +381,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

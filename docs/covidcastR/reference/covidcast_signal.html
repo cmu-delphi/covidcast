@@ -79,7 +79,7 @@ for detailed example usage." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
       </span>
     </div>
 
@@ -112,6 +112,9 @@ for detailed example usage." />
     </li>
     <li>
       <a href="../articles/multi-signals.html">3. Manipulating multiple signals</a>
+    </li>
+    <li>
+      <a href="../articles/external-data.html">4. Combine external data sources and COVIDcast data</a>
     </li>
   </ul>
 </li>
@@ -160,11 +163,12 @@ for detailed example usage.</p>
   <span class='va'>signal</span>,
   start_day <span class='op'>=</span> <span class='cn'>NULL</span>,
   end_day <span class='op'>=</span> <span class='cn'>NULL</span>,
-  geo_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"county"</span>, <span class='st'>"hrr"</span>, <span class='st'>"msa"</span>, <span class='st'>"dma"</span>, <span class='st'>"state"</span><span class='op'>)</span>,
+  geo_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"county"</span>, <span class='st'>"hrr"</span>, <span class='st'>"msa"</span>, <span class='st'>"dma"</span>, <span class='st'>"state"</span>, <span class='st'>"hhs"</span>, <span class='st'>"nation"</span><span class='op'>)</span>,
   geo_values <span class='op'>=</span> <span class='st'>"*"</span>,
   as_of <span class='op'>=</span> <span class='cn'>NULL</span>,
   issues <span class='op'>=</span> <span class='cn'>NULL</span>,
-  lag <span class='op'>=</span> <span class='cn'>NULL</span>
+  lag <span class='op'>=</span> <span class='cn'>NULL</span>,
+  time_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"day"</span>, <span class='st'>"week"</span><span class='op'>)</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -185,8 +189,8 @@ for a list of available signals.</p></td>
     <tr>
       <th>start_day</th>
       <td><p>Query data beginning on this date. Date object, or string in
-the form "YYYY-MM-DD". If <code>start_day</code> is <code>NULL</code>, defaults to first day
-data is available for this signal.</p></td>
+the form "YYYY-MM-DD". If <code>start_day</code> is <code>NULL</code>, defaults to first day data
+is available for this signal.</p></td>
     </tr>
     <tr>
       <th>end_day</th>
@@ -202,25 +206,26 @@ for details on which types are available.</p></td>
     </tr>
     <tr>
       <th>geo_values</th>
-      <td><p>Which geographies to return. The default, "*", fetches
-all geographies. To fetch specific geographies, specify their IDs as a
-vector or list of strings. See the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>geographic coding documentation</a>
+      <td><p>Which geographies to return. The default, "*", fetches all
+geographies. To fetch specific geographies, specify their IDs as a vector
+or list of strings. See the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>geographic coding documentation</a>
 for details on how to specify these IDs.</p></td>
     </tr>
     <tr>
       <th>as_of</th>
       <td><p>Fetch only data that was available on or before this date,
-provided as a <code>Date</code> object or string in the form "YYYY-MM-DD". If
-<code>NULL</code>, the default, return the most recent available data. Note that only
-one of <code>as_of</code>, <code>issues</code>, and <code>lag</code> should be provided; it does not make
-sense to specify more than one.</p></td>
+provided as a <code>Date</code> object or string in the form "YYYY-MM-DD". If <code>NULL</code>,
+the default, return the most recent available data. Note that only one of
+<code>as_of</code>, <code>issues</code>, and <code>lag</code> should be provided; it does not make sense to
+specify more than one. For more on data revisions, see
+"Issue dates and revisions" below.</p></td>
     </tr>
     <tr>
       <th>issues</th>
       <td><p>Fetch only data that was published or updated ("issued") on
 these dates. Provided as either a single <code>Date</code> object (or string in the
-form "YYYY-MM-DD"), indicating a single date to fetch data issued on, or
-a vector specifying two dates, start and end. In this case, return all data
+form "YYYY-MM-DD"), indicating a single date to fetch data issued on, or a
+vector specifying two dates, start and end. In this case, return all data
 issued in this range. There may be multiple rows for each observation,
 indicating several updates to its value. If <code>NULL</code>, the default, return the
 most recently issued data.</p></td>
@@ -233,18 +238,27 @@ with <code>time_value</code> of June 3 will only be included in the results if i
 data was issued or updated on June 6. If <code>NULL</code>, the default, return the
 most recently issued data regardless of its lag.</p></td>
     </tr>
+    <tr>
+      <th>time_type</th>
+      <td><p>The temporal resolution to request this data. Most signals
+are available at the "day" resolution (the default); some are only
+available at the "week" resolution, representing an MMWR week ("epiweek").</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Data frame with matching data. Each row is one observation of one
+    <p><code>covidcast_signal</code> object with matching data. The object is a data
+frame with additional metadata attached. Each row is one observation of one
 signal on one day in one geographic location. Contains the following
 columns:</p>
 <dt>data_source</dt><dd><p>Data source from which this observation was obtained.</p></dd>
 <dt>signal</dt><dd><p>Signal from which this observation was obtained.</p></dd>
 <dt>geo_value</dt><dd><p>String identifying the location, such as a state name or
 county FIPS code.</p></dd>
-<dt>time_value</dt><dd><p>Date object identifying the date of this observation.</p></dd>
+<dt>time_value</dt><dd><p>Date object identifying the date of this observation. For
+data with <code>time_type = "week"</code>, this is the first day of the corresponding
+epiweek.</p></dd>
 <dt>issue</dt><dd><p>Date object identifying the date this estimate was issued.
 For example, an estimate with a <code>time_value</code> of June 3 might have been
 issued on June 5, after the data for June 3rd was collected and ingested
@@ -263,6 +277,9 @@ due to privacy or other constraints, in which case it will be <code>NA</code>.</
 Consult the signal documentation for more details on how values and
 standard errors are calculated for specific signals.
 
+The returned data frame has a metadata attribute containing metadata
+about the signal contained within; see "Metadata" below for details.
+
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>For data on counties, metropolitan statistical areas, and states, this
@@ -270,6 +287,29 @@ package provides the <code><a href='county_census.html'>county_census</a></code>
 datasets. These include each area's unique identifier, used in the
 <code>geo_values</code> argument to select specific areas, and basic information on
 population and other Census data.</p>
+<p>Downloading large amounts of data may be slow, so this function prints
+messages for each day of data it downloads. To suppress these, use
+<code><a href='https://rdrr.io/r/base/message.html'>base::suppressMessages()</a></code>, as in
+<code><a href='https://rdrr.io/r/base/message.html'>suppressMessages(covidcast_signal("fb-survey", ...))</a></code>.</p>
+    <h2 class="hasAnchor" id="metadata"><a class="anchor" href="#metadata"></a>Metadata</h2>
+
+    
+
+
+<p>The returned object has a <code>metadata</code> attribute attached containing basic
+information about the signal. Use <code>attributes(x)$metadata</code> to access this
+metadata. The metadata is stored as a data frame of one row, and contains the
+same information that <code><a href='covidcast_meta.html'>covidcast_meta()</a></code> would return for a given signal.</p>
+<p>Note that not all <code>covidcast_signal</code> objects may have all fields of metadata
+attached; for example, an object created with <code><a href='as.covidcast_signal.html'>as.covidcast_signal()</a></code> using
+data from another source may only contain the <code>geo_type</code> variable, along with
+<code>data_source</code> and <code>signal</code>. Before using the metadata of a <code>covidcast_signal</code>
+object, always check for the presence of the attributes you need.</p>
+    <h2 class="hasAnchor" id="issue-dates-and-revisions"><a class="anchor" href="#issue-dates-and-revisions"></a>Issue dates and revisions</h2>
+
+    
+
+
 <p>The COVIDcast API tracks updates and changes to its underlying data, and
 records the first date each observation became available. For example, a data
 source may report its estimate for a specific state on June 3rd on June 5th,
@@ -295,10 +335,6 @@ However, if data for one day has been issued many times, using the <code>issues<
 argument may return more results than the query limit. A warning will be
 issued in this case. To see all results, split your query across multiple
 calls with different <code>issues</code> arguments.</p>
-<p>Downloading large amounts of data may be slow, so this function prints
-messages for each day of data it downloads. To suppress these, use
-<code><a href='https://rdrr.io/r/base/message.html'>base::suppressMessages()</a></code>, as in
-<code><a href='https://rdrr.io/r/base/message.html'>suppressMessages(covidcast_signal("fb-survey", ...))</a></code>.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>COVIDcast API documentation:
@@ -308,7 +344,8 @@ messages for each day of data it downloads. To suppress these, use
 <p>COVIDcast public map: <a href='https://covidcast.cmu.edu/'>https://covidcast.cmu.edu/</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='plot.covidcast_signal.html'>plot.covidcast_signal()</a></code>, <code><a href='county_census.html'>county_census</a></code>, <code><a href='msa_census.html'>msa_census</a></code>,
+    <div class='dont-index'><p><code><a href='plot.covidcast_signal.html'>plot.covidcast_signal()</a></code>, <code><a href='covidcast_signals.html'>covidcast_signals()</a></code>,
+<code><a href='as.covidcast_signal.html'>as.covidcast_signal()</a></code>, <code><a href='county_census.html'>county_census</a></code>, <code><a href='msa_census.html'>msa_census</a></code>,
 <code><a href='state_census.html'>state_census</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -341,7 +378,7 @@ messages for each day of data it downloads. To suppress these, use
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

@@ -54,6 +54,7 @@ get_predictions <- function(forecaster,
                             apply_corrections = NULL,
                             signal_aggregation = c("list", "wide", "long"),
                             signal_aggregation_dt = NULL,
+                            use_covidcast = TRUE,
                             ...) {
   assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
   signal_aggregation = match.arg(signal_aggregation, c("list", "wide", "long"))
@@ -72,6 +73,7 @@ get_predictions <- function(forecaster,
                  apply_corrections = apply_corrections,
                  signal_aggregation = signal_aggregation,
                  signal_aggregation_dt = signal_aggregation_dt),
+                 use_covidcast = use_covidcast,
                  params)))
   out <- bind_rows(out)
   names(out$value) = NULL
@@ -91,37 +93,47 @@ get_predictions_single_date <- function(forecaster,
                                         apply_corrections,
                                         signal_aggregation,
                                         signal_aggregation_dt,
+                                        use_covidcast,
                                         ...) {
   #if (length(geo_values) > 1) geo_values <- list(geo_values)
   forecast_date <- lubridate::ymd(forecast_date)
-  # compute the start_day from the forecast_date, if we need to
-  if (!is.null(signals$start_day) && is.list(signals$start_day)) {
-    for (i in 1:length(signals$start_day)) {
-      if (is.function(signals$start_day[[i]])) {
-        signals$start_day <- signals$start_day[[i]](forecast_date)
+  
+  if (use_covidcast){
+    # compute the start_day from the forecast_date, if we need to
+    if (!is.null(signals$start_day) && is.list(signals$start_day)) {
+      for (i in 1:length(signals$start_day)) {
+        if (is.function(signals$start_day[[i]])) {
+          signals$start_day <- signals$start_day[[i]](forecast_date)
+        }
       }
     }
-  }
-  # get data that would have been available as of forecast_date
-  if(length(geo_values) > 30) {
-    geo_values_dl <- "*"
-  } else {
-    geo_values_dl <- unique(geo_values)
-  }
-  df <- download_signals(data_source=signals$data_source,
-                         signal = signals$signal,
-                         start_day = signals$start_day,
-                         end_day = forecast_date,
-                         as_of = forecast_date,
-                         geo_type = geo_type,
-                         geo_values = geo_values_dl,
-                         signal_aggregation = signal_aggregation,
-                         signal_aggregation_dt = signal_aggregation_dt)
-
-  if(!is.null(apply_corrections)) df <- data_corrector(df, apply_corrections)
+    
+    # get data that would have been available as of forecast_date
+    if(length(geo_values) > 30) {
+      geo_values_dl <- "*"
+    } else {
+      geo_values_dl <- unique(geo_values)
+    }
+    
+    df <- download_signals(data_source=signals$data_source,
+                           signal = signals$signal,
+                           start_day = signals$start_day,
+                           end_day = forecast_date,
+                           as_of = forecast_date,
+                           geo_type = geo_type,
+                           geo_values = geo_values_dl,
+                           signal_aggregation = signal_aggregation,
+                           signal_aggregation_dt = signal_aggregation_dt)
+    
+    if(!is.null(apply_corrections)) df <- data_corrector(df, apply_corrections)
+    
+    if (geo_values_dl != "*") df <- filter(df, .data$geo_value %in% geo_values)
   
+  } 
+  else {
+    df <- NULL
+  }
 
-  if (geo_values_dl != "*") df <- filter(df, .data$geo_value %in% geo_values)
   out <- forecaster(df,
                     forecast_date,
                     signals,

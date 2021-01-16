@@ -1,3 +1,12 @@
+# covidcast 0.4.1
+
+Released TODO.
+
+## Minor changes
+
+- Geographic lookup functions, such as `fips_to_name()` or `name_to_cbsa()`, are
+  now much faster when given input vectors with many duplicate values.
+
 # covidcast 0.4.0
 
 Released January 13, 2021.

@@ -591,7 +591,8 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     # Get rid of megacounties
     # Set color for observed states as white, missing as missing_col
     # Set bubble size for all observed states
-    map_df = map_df %>% dplyr::filter(!(COUNTYFP == "000")) %>%
+    map_df = map_df %>%
+      dplyr::filter(!(COUNTYFP == "000")) %>%
       dplyr::mutate(
         is_alaska = STATEFP == '02',
         is_hawaii = STATEFP == '15',

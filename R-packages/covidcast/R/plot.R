@@ -687,7 +687,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 
   # Create the bubble layers
   geom_args = list()
-  geom_args$mapping = aes(geometry=geometry, size = bubble_val)
+  geom_args$mapping = aes(geometry = geometry, size = bubble_val)
   geom_args$color = col
   geom_args$alpha = alpha
   geom_args$na.rm = TRUE

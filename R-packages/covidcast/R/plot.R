@@ -582,8 +582,30 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 
   # Grap the map data frame for counties
   if (attributes(x)$metadata$geo_type == "county") {
-    map_df = usmap::us_map("county", include = include)
-    map_geo = map_df$fips
+    map_df = sf::st_read(system.file(
+      "shapefiles/county/cb_2019_us_county_5m.shp",
+      package = "covidcast"),
+      quiet = TRUE)
+    map_df$STATEFP <- as.character(map_df$STATEFP)
+    map_df$GEOID <- as.character(map_df$GEOID)
+    # Get rid of unobserved counties and megacounties
+    # Those are taken care of by background layer
+    # Then set color for those observed counties
+    map_df = map_df %>% dplyr::filter(!(COUNTYFP == "000")) %>%
+      dplyr::mutate(
+        is_alaska = STATEFP == '02',
+        is_hawaii = STATEFP == '15',
+        is_pr = STATEFP == '72',
+        is_state = as.numeric(STATEFP) < 57,
+        back_color = ifelse(GEOID %in% geo, "white", missing_col),
+        bubble_val = ifelse(GEOID %in% geo, 
+                            dis_fun(val[GEOID]), 
+                            0))
+    
+    if (length(include) > 0) {
+      map_df = map_df %>%
+        dplyr::filter(fips_to_abbr(paste0(.$STATEFP, "000")) %in% include)
+    }
   }
 
   # Grap the map data frame for states
@@ -595,6 +617,8 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     map_geo = tolower(map_df$STUSPS)
     background_crs = sf::st_crs(map_df)
     map_df$STATEFP <- as.character(map_df$STATEFP)
+    # Set color for observed states as white
+    # Set bubble size for all observed states
     map_df = map_df %>% dplyr::mutate(
       is_alaska = STATEFP == '02',
       is_hawaii = STATEFP == '15',
@@ -607,15 +631,18 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     
     if (length(include) > 0) {
       map_df = map_df %>% 
-        dplyr::filter(tolower(.$STUSPS) %in% tolower(include))
+        dplyr::filter(.$STUSPS %in% include)
     }
   }
+
   
   # Important: make into a factor and set the levels (for the legend)
   # Factor bubble values before splitting up into mainland and non-main layers
   map_df$bubble_val <- factor(map_df$bubble_val, levels = breaks)
   
-  #Explicitly drop zeros (and from levels) unless were asked not to
+  map_df <- map_df %>% dplyr::arrange(bubble_val)
+  
+  # Explicitly drop zeros (and from levels) unless were asked not to
   if (!isFALSE(params$remove_zero)) {
     map_df$bubble_val[map_df$bubble_val == 0] = NA
     levels(map_df$bubble_val)[levels(map_df$bubble_val) == 0] = NA
@@ -660,10 +687,11 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     alaska_df$geometry <- sf::st_centroid(alaska_df$geometry)
     pr_df$geometry <- sf::st_centroid(pr_df$geometry)
   })
+
   
   # Create the bubble layers
   geom_args = list()
-  geom_args$mapping = aes(geometry=geometry, size=bubble_val)
+  geom_args$mapping = aes(geometry=geometry, size = bubble_val)
   geom_args$color = col
   geom_args$alpha = alpha
   geom_args$na.rm = TRUE
@@ -692,9 +720,13 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 
   # Put it all together and return
   return(ggplot2::ggplot() + main_layer + pr_layer + alaska_layer + 
-           hawaii_layer + title_layer + main_bubble_layer + hawaii_bubble_layer + pr_bubble_layer +
-           alaska_bubble_layer + 
-           scale_layer + theme_layer)
+           hawaii_layer + title_layer + #main_bubble_layer + 
+          # hawaii_bubble_layer +
+            pr_bubble_layer +
+           # alaska_bubble_layer + 
+           scale_layer + 
+           theme_layer
+           )
 }
 
 # Plot a line (time series) graph of a covidcast_signal object.

@@ -588,9 +588,9 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
       quiet = TRUE)
     map_df$STATEFP <- as.character(map_df$STATEFP)
     map_df$GEOID <- as.character(map_df$GEOID)
-    # Get rid of unobserved counties and megacounties
-    # Those are taken care of by background layer
-    # Then set color for those observed counties
+    # Get rid of megacounties
+    # Set color for observed states as white, missing as missing_col
+    # Set bubble size for all observed states
     map_df = map_df %>% dplyr::filter(!(COUNTYFP == "000")) %>%
       dplyr::mutate(
         is_alaska = STATEFP == '02',
@@ -617,7 +617,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     map_geo = tolower(map_df$STUSPS)
     background_crs = sf::st_crs(map_df)
     map_df$STATEFP <- as.character(map_df$STATEFP)
-    # Set color for observed states as white
+    # Set color for observed states as white, missing as missing_col
     # Set bubble size for all observed states
     map_df = map_df %>% dplyr::mutate(
       is_alaska = STATEFP == '02',
@@ -635,12 +635,9 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     }
   }
 
-  
   # Important: make into a factor and set the levels (for the legend)
   # Factor bubble values before splitting up into mainland and non-main layers
   map_df$bubble_val <- factor(map_df$bubble_val, levels = breaks)
-  
-  map_df <- map_df %>% dplyr::arrange(bubble_val)
   
   # Explicitly drop zeros (and from levels) unless were asked not to
   if (!isFALSE(params$remove_zero)) {
@@ -680,7 +677,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   alaska_layer = do.call(ggplot2::geom_sf, geom_args)
   
   # Change geometry to centroids
-  # Use centroid coordinates for mapping bubbles
+  # Use centroid coordinates for plotting bubbles
   suppressWarnings({
     main_df$geometry <- sf::st_centroid(main_df$geometry)
     hawaii_df$geometry <- sf::st_centroid(hawaii_df$geometry)
@@ -688,7 +685,6 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
     pr_df$geometry <- sf::st_centroid(pr_df$geometry)
   })
 
-  
   # Create the bubble layers
   geom_args = list()
   geom_args$mapping = aes(geometry=geometry, size = bubble_val)

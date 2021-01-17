@@ -696,7 +696,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   bubble_blank_if_all_na = function(geom_args, df){
     geom_args$data = df
     bubble_layer = ggplot2::geom_blank()
-    if(!all(is.na(df$bubble_val))){
+    if (!all(is.na(df$bubble_val))) {
       bubble_layer = do.call(ggplot2::geom_sf, geom_args)
     }
     return(bubble_layer)

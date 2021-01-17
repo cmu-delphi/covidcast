@@ -640,7 +640,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   # Factor bubble values before splitting up into mainland and non-main layers
   map_df$bubble_val <- factor(map_df$bubble_val, levels = breaks)
   
-  # Explicitly drop zeros (and from levels) unless were asked not to
+  # Explicitly drop zeros (and from levels) unless we're asked not to
   if (!isFALSE(params$remove_zero)) {
     map_df$bubble_val[map_df$bubble_val == 0] = NA
     levels(map_df$bubble_val)[levels(map_df$bubble_val) == 0] = NA

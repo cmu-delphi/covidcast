@@ -720,13 +720,9 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
 
   # Put it all together and return
   return(ggplot2::ggplot() + main_layer + pr_layer + alaska_layer + 
-           hawaii_layer + title_layer + #main_bubble_layer + 
-          # hawaii_bubble_layer +
-            pr_bubble_layer +
-           # alaska_bubble_layer + 
-           scale_layer + 
-           theme_layer
-           )
+           hawaii_layer + title_layer + main_bubble_layer + 
+           hawaii_bubble_layer + pr_bubble_layer + alaska_bubble_layer + 
+           scale_layer + theme_layer)
 }
 
 # Plot a line (time series) graph of a covidcast_signal object.

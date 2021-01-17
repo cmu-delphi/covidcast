@@ -646,7 +646,7 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   }
   
   # Warn if there's any missing locations
-  if (sum(map_df$back_color == missing_col) > 0) {
+  if (any(map_df$back_color == missing_col)) {
     warning("Bubble maps can be hard to read when there is missing data;",
             "the locations without data are filled in gray.")
   }

@@ -42,8 +42,10 @@ plot_calibration <- function(scorecard,
       geom_line(aes(alpha = .data$emph, size = .data$emph)) +
       scale_color_manual(values = c("blue","orange"), name="") +
       geom_point(aes(alpha = .data$emph, size = .data$emph)) +
-      geom_abline(intercept = 0, slope = 1) +
-      geom_abline(intercept = 1, slope = -1) +
+      geom_segment(aes(x = 0, y = 0, xend = 0.5, yend = 0.5), 
+                   size = 0.25, color = "black") +
+      geom_segment(aes(x = 0.5, y = 0.5, xend = 1, yend = 0), 
+                   size = 0.25, color = "black") +
       labs(x = "Nominal quantile level",
            y = "Proportion",
            title = sprintf("%s (ahead = %s): Proportion above/below", 

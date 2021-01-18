@@ -149,7 +149,7 @@ Of course, if we had multiple aheads we could facet by those as well. Or we coul
 We can also examine forecaster calibration.
 
 ```{r}
-plot_calibration(scorecards, type = "wedge")
+plot_calibration(scorecards, type = "wedgeplot")
 ```
 
 By default, the proportion is the number of `geo_values` that fall above/below the quantile at each forecast date and ahead. But this can be changed if desired.

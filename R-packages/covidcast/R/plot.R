@@ -679,6 +679,9 @@ plot_bubble = function(x, time_value = NULL, include = c(), range = NULL,
   
   # Change geometry to centroids
   # Use centroid coordinates for plotting bubbles
+  # Warnings say centroids don't give lat/long centroid for 
+  # map data, but since we have properly projected coordinates
+  # it works fine.
   suppressWarnings({
     main_df$geometry <- sf::st_centroid(main_df$geometry)
     hawaii_df$geometry <- sf::st_centroid(hawaii_df$geometry)

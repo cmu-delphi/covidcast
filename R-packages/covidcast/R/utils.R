@@ -328,16 +328,32 @@ fips_to_abbr = function(code, ignore.case = TRUE, perl = FALSE, fixed = FALSE,
 grep_lookup = function(key, keys, values, ignore.case = FALSE, perl = FALSE,
                        fixed = FALSE,  ties_method = c("first", "all")) {
   ties_method = match.arg(ties_method)
-  res = vector("list", length(key))
-  for (i in 1:length(key)) {
-    ind = grep(key[i], keys, ignore.case = ignore.case, perl = perl,
+
+  # Only do grep lookup for unique keys, to keep the look sort. It's a common
+  # use case to, say, call fips_to_name on a covidcast_signal data frame over
+  # many days of data with many repeat observations of the same locations.
+  unique_key <- unique(key)
+
+  res = vector("list", length(unique_key))
+  for (i in seq_along(unique_key)) {
+    ind = grep(unique_key[i], keys, ignore.case = ignore.case, perl = perl,
                fixed = fixed)
-    if (length(ind) == 0) { res[[i]] = NA; names(res[[i]]) = key[i] }
-    else {  res[[i]] = values[ind]; names(res[[i]]) = keys[ind] }
+    if (length(ind) == 0) {
+      res[[i]] = NA
+      names(res[[i]]) = unique_key[i]
+    } else {
+      res[[i]] = values[ind]
+      names(res[[i]]) = keys[ind]
+    }
   }
 
+  # Restore to original length, including duplicate keys.
+  res <- res[match(key, unique_key)]
+
   # If they ask for all matches, then return the list
-  if (ties_method == "all") return(res)
+  if (ties_method == "all") {
+    return(res)
+  }
 
   # Otherwise, format into a vector, and warn if needed
   if (length(unlist(res)) > length(key)) {

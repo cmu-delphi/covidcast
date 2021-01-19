@@ -1,3 +1,23 @@
+# covidcast 0.4.1
+
+Released January 19, 2021.
+
+## Major changes
+
+- Removed the dependency on the `usmap` package, which was removed from CRAN on
+  January 10, 2021.
+
+- `plot.covidcast_signal()` now supports mapping Puerto Rico in bubble plots.
+
+- The `county_geo` and `state_geo` built-in datasets have been removed. These
+  were used to support bubble plots, but the changes to
+  `plot.covidcast_signal()` rendered them unnecessary.
+
+## Minor changes
+
+- Geographic lookup functions, such as `fips_to_name()` or `name_to_cbsa()`, are
+  now much faster when given input vectors with many duplicate values.
+
 # covidcast 0.4.0
 
 Released January 13, 2021.

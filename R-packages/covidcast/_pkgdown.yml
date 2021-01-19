@@ -64,8 +64,6 @@ reference:
     desc: Get Census reference and geographic data
   - contents:
       - county_census
-      - county_geo
       - msa_census
       - state_census
-      - state_geo
 

@@ -9,6 +9,10 @@ Released January 19, 2021.
 
 - `plot.covidcast_signal()` now supports mapping Puerto Rico in bubble plots.
 
+- The `county_geo` and `state_geo` built-in datasets have been removed. These
+  were used to support bubble plots, but the changes to
+  `plot.covidcast_signal()` rendered them unnecessary.
+
 ## Minor changes
 
 - Geographic lookup functions, such as `fips_to_name()` or `name_to_cbsa()`, are

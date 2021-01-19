@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
       </span>
     </div>
 
@@ -188,21 +188,27 @@
 <p>As an alternative to choropleth maps, we can also quickly plot bubble maps. By default, bubble maps have 8 bubble size bins evenly spaced over the range, where zero always means zero bubble size. The legend shows all bins, interpreted as each bubble size meaning <em>at least</em> the corresponding value.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">inum</span>, plot_type <span class="op">=</span> <span class="st">"bubble"</span><span class="op">)</span></pre></div>
+<pre><code>## Warning in plot_bubble(x, time_value = time_value, include = include, range
+## = range, : Bubble maps can be hard to read when there is missing data;the
+## locations without data are filled in gray.</code></pre>
 <p><img src="plotting-signals_files/figure-html/unnamed-chunk-7-1.png" width="960"></p>
 <p>As before, we can of course set customized breaks. As values to the left of the first bin do not get drawn, this map is much sparser, and highlights areas with larger case counts.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit">
+<div class="sourceCode" id="cb11"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">inum</span>, plot_type <span class="op">=</span> <span class="st">"bubble"</span>, 
      bubble_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">200</span>, len <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></pre></div>
+<pre><code>## Warning in plot_bubble(x, time_value = time_value, include = include, range
+## = range, : Bubble maps can be hard to read when there is missing data;the
+## locations without data are filled in gray.</code></pre>
 <p><img src="plotting-signals_files/figure-html/unnamed-chunk-8-1.png" width="960"></p>
 <p>As a final example, suppose we want to plot only counties in the state of Texas. We’d like to compare counts per 100,000 against absolute counts, so we fetch the proportion signal:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit">
+<div class="sourceCode" id="cb13"><pre class="downlit">
 <span class="va">iprop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span><span class="op">(</span>
   <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"usa-facts"</span>,
                    signal <span class="op">=</span> <span class="st">"confirmed_7dav_incidence_prop"</span>,
                    start_day <span class="op">=</span> <span class="st">"2020-07-01"</span>, end_day <span class="op">=</span> <span class="st">"2020-07-14"</span><span class="op">)</span>
 <span class="op">)</span></pre></div>
 <p>Then we make two maps side-by-side with custom ranges:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit">
+<div class="sourceCode" id="cb14"><pre class="downlit">
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">gridExtra</span><span class="op">)</span>
 
 <span class="va">breaks1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">10</span>, <span class="fl">100</span>, <span class="fl">1000</span><span class="op">)</span>
@@ -224,7 +230,7 @@
 <h2 class="hasAnchor">
 <a href="#time-series-plots" class="anchor"></a>Time series plots</h2>
 <p>Let’s fetch the combination indicator and case counts, but for all states rather than for all counties. This will make the time series plots more manageable.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit">
+<div class="sourceCode" id="cb15"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span><span class="op">(</span><span class="op">{</span>
 <span class="va">comb_st</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"indicator-combination"</span>,
                                signal <span class="op">=</span> <span class="st">"nmf_day_doc_fbc_fbs_ght"</span>,
@@ -236,13 +242,13 @@
                                geo_type <span class="op">=</span> <span class="st">"state"</span><span class="op">)</span>
 <span class="op">}</span><span class="op">)</span></pre></div>
 <p>By default, time series plots show all available data, including all geographies. A line for every state would be unmanageable, so let’s select a few states and plot all data for them:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit">
+<div class="sourceCode" id="cb16"><pre class="downlit">
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 
 <span class="va">states</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"ca"</span>, <span class="st">"pa"</span>, <span class="st">"tx"</span>, <span class="st">"ny"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">comb_st</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">%in%</span> <span class="va">states</span><span class="op">)</span>, plot_type <span class="op">=</span> <span class="st">"line"</span><span class="op">)</span> </pre></div>
 <p><img src="plotting-signals_files/figure-html/unnamed-chunk-14-1.png" width="768"></p>
-<div class="sourceCode" id="cb15"><pre class="downlit">
+<div class="sourceCode" id="cb17"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">inum_st</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">%in%</span> <span class="va">states</span><span class="op">)</span>, plot_type <span class="op">=</span> <span class="st">"line"</span><span class="op">)</span></pre></div>
 <p><img src="plotting-signals_files/figure-html/unnamed-chunk-14-2.png" width="768"></p>
 <p>Notice how in Texas, the combined indicator rose several weeks in advance of confirmed cases, suggesting the signal could be predictive. Delphi is investigating these signals for their usefulness in forecasting, as well as hotspot detection and will publish results when they are available.</p>
@@ -252,8 +258,8 @@
 <a href="#manual-plotting" class="anchor"></a>Manual plotting</h2>
 <p>Using <code>ggplot2</code> or your favorite plotting package, we can easily plot time series manually, without using the <code><a href="../reference/plot.covidcast_signal.html">plot.covidcast_signal()</a></code> method. You can use this to customize the appearance of your plots however you choose.</p>
 <p>For example:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<div class="sourceCode" id="cb18"><pre class="downlit">
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span><span class="op">(</span><span class="op">{</span>
 <span class="va">comb_md</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"indicator-combination"</span>,

@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
       </span>
     </div>
 
@@ -161,7 +161,7 @@
 <a href="#correlations-sliced-by-time" class="anchor"></a>Correlations sliced by time</h2>
 <p>The <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code> function is your primary way to calculate correlations. The first option we have is to “slice by time”: this calculates, for each time, correlation between the signals over all geographic locations. This is obtained by setting <code>by = "time_value"</code>:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 
 <span class="co"># Compute correlation per time, over all counties</span>
 <span class="va">df_cor</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_cor.html">covidcast_cor</a></span><span class="op">(</span><span class="va">iprop_act</span>, <span class="va">dprop_act</span>, by <span class="op">=</span> <span class="st">"time_value"</span><span class="op">)</span>

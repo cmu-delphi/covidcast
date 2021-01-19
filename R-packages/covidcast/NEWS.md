@@ -1,6 +1,13 @@
 # covidcast 0.4.1
 
-Released TODO.
+Released January 19, 2021.
+
+## Major changes
+
+- Removed the dependency on the `usmap` package, which was removed from CRAN on
+  January 10, 2021.
+
+- `plot.covidcast_signal()` now supports mapping Puerto Rico in bubble plots.
 
 ## Minor changes
 

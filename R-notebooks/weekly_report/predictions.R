@@ -17,6 +17,7 @@ create_prediction_cards = function(){
                   "JHUAPL-Bucky",
                   "JHU_IDD-CovidSP",
                   "JHU_UNC_GAS-StatMechPool",
+                  "Karlen-pypm",
                   "LANL-GrowthRate", 
                   "LNQ-ens1",
                   "MOBS-GLEAM_COVID",

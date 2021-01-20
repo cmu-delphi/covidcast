@@ -4,8 +4,6 @@
 #' Hub](https://github.com/reichlab/covid19-forecast-hub/) to the format of a
 #' predictions card, so it can be easily evaluated and compared.
 #'
-# For now, this function only supports (i) incident not cumulative predictions
-# and (ii) epiweek not daily incidence period predictions.
 #'
 #' @param covidhub_forecaster_name String indicating of the forecaster
 #'   (matching what it is called on the COVID Hub).
@@ -22,7 +20,7 @@
 #' @param incidence_period one of "epiweek" or "day". NULL will attempt to 
 #'   return both
 #' @param signal this function supports only "confirmed_incidence_num",
-#'   "deaths_incidence_num", and/or "deaths_cumulative_num" (those currently)
+#'   "deaths_incidence_num", and/or "deaths_cumulative_num" (those currently
 #'   forecast by the COVIDhub-ensemble). For other types, use one of the 
 #'   alternatives mentioned above
 #'   
@@ -30,13 +28,10 @@
 #' 
 #' @seealso [get_predictions()]
 #' @seealso [get_zoltar_predictions()]
-
-# @param ... Additional parameters to be passed to [filter_predictions()].
 #' @return tibble of predictions cards. Only incident predictions are returned.
 #'   For more flexible processing of COVID Hub data, try using 
 #'   [zoltr](https://docs.zoltardata.com/zoltr/)
 #' 
-#' @seealso [get_predictions()]
 #' @importFrom readr read_csv
 #' @export
 get_covidhub_predictions <- function(covidhub_forecaster_name,
@@ -82,8 +77,7 @@ get_covidhub_predictions <- function(covidhub_forecaster_name,
                                   .data$response == "case" ~ "confirmed",
                                   TRUE ~ "drop",),
              signal = paste(response, inc, "num", sep="_"),
-             data_source = if_else(.data$response != "drop", 
-                                    "jhu-csse", "drop"),
+             data_source = if_else(.data$response=="drop", "drop", "jhu-csse"),
              ahead = as.integer(.data$ahead)) %>%
       filter(.data$response != "drop", .data$type %in% forecast_type,
              .data$incidence_period %in% incidence_period,
@@ -133,8 +127,6 @@ get_covidhub_forecast_dates <- function(forecaster_name) {
 }
 
 
-
-
 #' List all COVID forecast models available
 #'
 #' Utility function to list all forecasters submitting COVID-19 forecasts to
@@ -159,3 +151,6 @@ get_covidhub_forecaster_names <- function(
   covidHubUtils::get_all_models(source = repo)
 }
 
+covidhub_probs <- function() {
+  c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99)
+}

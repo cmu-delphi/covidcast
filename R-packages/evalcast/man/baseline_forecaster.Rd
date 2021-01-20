@@ -16,7 +16,7 @@ baseline_forecaster(
 }
 \arguments{
 \item{df}{Data frame of the format that is returned by
-\code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}}.}
+\code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}} or \code{\link[covidcast:covidcast_signals]{covidcast::covidcast_signals()}}.}
 
 \item{forecast_date}{Date object or string of the form "YYYY-MM-DD",
 indicating date on which forecasts will be made about some period (e.g.,

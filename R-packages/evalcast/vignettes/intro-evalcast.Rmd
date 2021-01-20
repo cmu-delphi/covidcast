@@ -19,7 +19,7 @@ The `evalcast` package provides the infrastructure for developing and evaluating
 
 
 ## Testing forecasters
-We will use the included `baseline_forecaster` to demonstrate how to backtest a forecaster and compare its predictions to contemporaneous forecasts submitted to CovidHub. While `baseline_forecaster` is very simple, it can be used as a template for creating more sophisticated forecasters.
+We will use the included `baseline_forecaster` to demonstrate how to backtest a forecaster and compare its predictions to contemporaneous forecasts that were submitted to CovidHub. While `baseline_forecaster` is very simple, it can be used as a template for creating more sophisticated forecasters.
 
 The format of a forecaster is aligned with the [CovidHub submission instructions](https://github.com/reichlab/covid19-forecast-hub/blob/master/data-processed/README.md) and with the [covidcast](https://cmu-delphi.github.io/covidcast/covidcastR/) R package.
 
@@ -52,7 +52,7 @@ forecast_dates <- get_covidhub_forecast_dates("CMU-TimeSeries")
 forecast_dates_july <- forecast_dates[forecast_dates >= "2020-07-01" & 
                                         forecast_dates <= "2020-07-31"]
 
-# Retrieve past predictions from CovidHub
+# Retrieve past predictions from CovidHub...
 predictions_cards_ens <- get_covidhub_predictions(
   "COVIDhub-ensemble", forecast_dates_july, ahead = 3, 
   signal = "deaths_incidence_num") %>%
@@ -60,7 +60,7 @@ predictions_cards_ens <- get_covidhub_predictions(
 predictions_cards_cmu <- get_covidhub_predictions(
   "CMU-TimeSeries", forecast_dates_july,  ahead = 3, 
   signal = "deaths_incidence_num")
-# Make new predictions using baseline_forecaster
+# ...or make new predictions using baseline_forecaster
 predictions_cards <- get_predictions(baseline_forecaster,
                                      name_of_forecaster = "baseline",
                                      signals = signals,
@@ -71,30 +71,33 @@ predictions_cards <- get_predictions(baseline_forecaster,
                                      geo_type = "state")
 ```
 
-`get_predictions()` and `get_covidhub_predictions()` return a long `data.frame` with `r nrow(predictions_cards)` rows, (one for each `(forecast date, ahead, geo_value, quantile)` combination).
+`get_predictions()` and `get_covidhub_predictions()` return a long data frame with one row for each `(forecast date, ahead, geo_value, quantile)` combination.
 
 ```{r}
 predictions_cards_cmu
 ```
 
 
-Let's look one location:
+Let's look at one location:
 
 ```{r}
+michigan_abr = tolower(covidcast::name_to_abbr("Michigan")) # = "mi"
 predictions_cards_cmu %>% 
-  filter(geo_value == "mi", forecast_date == forecast_dates_july[1]) %>%
+  filter(geo_value == michigan_abr, forecast_date == forecast_dates_july[1]) %>%
   select(geo_value, quantile, value, forecast_date) %>% str()
 ```
 
-Forecasts are generally probabilistic, meaning that rather than predicting a single value, a distribution of values at different quantiles. For example, the Covidhub ensemble forecaster would have predicted the following distribution in California for `r predictions_cards_cmu$ahead[1]` week(s) after `r predictions_cards_cmu$forecast_date[1]`
+Forecasts are generally probabilistic, meaning that they predict a likely distribution of values (defined by quantiles) instead of a single value. For example, on `r predictions_cards_cmu$forecast_date[1]` the Covidhub ensemble forecaster made the following prediction for how many cases there would be in California `r predictions_cards_cmu$ahead[1]` week(s) later.
 ```{r}
+california_abr = tolower(covidcast::name_to_abbr("California")) # = "ca"
 predictions_cards_ens %>%
-  filter(geo_value == "ca", forecast_date == forecast_dates_july[1]) %>%
+  filter(geo_value == california_abr, 
+         forecast_date == forecast_dates_july[1]) %>%
   select(quantile, value) %>% str()
 ```
 
-An `NA` in the `quantile` column indicates a point forecast (possibly different from the median).
-
+An `NA` in the `quantile` column indicates a point forecast (typically the median or mean).
+;
 
 ### Evaluate the performance of a forecaster
 
@@ -112,9 +115,7 @@ We may now create scorecards for each forecaster's predictions or for a filtered
 scorecards <- evaluate_predictions(
   bind_rows(predictions_cards, 
             predictions_cards_cmu, 
-            predictions_cards_ens) %>%
-    # not always data for these locations
-    filter(! geo_value %in% c("us", "vi", "gu", "mp")),
+            predictions_cards_ens),
   err_measures = err_measures,
   backfill_buffer = 10
   )
@@ -131,7 +132,49 @@ collapse_cards(scorecards) %>% str()
 
 ### Plots of performance measures
 
-While `evalcast` provides a number of tools to visually assess a forecaster (including comparisons with other forecasters), because `score_cards` are just long data frames, many plots can be achieved using [{ggplot2}](http://ggplot2.tidyverse.org).
+`evalcast` provides a number of tools to visually assess a forecaster (including comparisons with other forecasters).
+
+We can examine forecaster calibration.
+
+```{r}
+plot_calibration(scorecards, type = "wedgeplot")
+```
+
+By default, the proportion is the number of `geo_values` that fall above/below the quantile at each forecast date and ahead, but the grouping and variables to average over can be specified.
+
+```{r}
+plot_calibration(scorecards, 
+                 grp_vars = "forecaster", 
+                 avg_vars = c("geo_value", "forecast_date"))
+```
+
+We can also examine a more traditional calibration plot:
+
+```{r}
+plot_calibration(scorecards, type = "traditional")
+```
+
+
+For extra flexibility, you can perform the core calculations using something like:
+
+```{r, eval=FALSE}
+calib <- compute_calibration(scorecard, grp_vars, avg_vars) %>%
+      setup_wedgeplot()
+```
+
+We can display the coverage of the interval forecasts:
+
+```{r}
+plot_coverage(scorecards)
+```
+
+Or the width of the intervals:
+
+```{r}
+plot_width(scorecards)
+```
+
+Because `score_cards` are just long data frames, custom plots can also be created by using [{ggplot2}](http://ggplot2.tidyverse.org):
 
 ```{r}
 scorecards %>% filter(geo_value != "us") %>%
@@ -142,48 +185,6 @@ scorecards %>% filter(geo_value != "us") %>%
   theme_bw() +
   scale_fill_viridis_d() +
   theme(legend.position = "bottom")
-```
-
-Of course, if we had multiple aheads we could facet by those as well. Or we could assume that aheads and forecast dates are comparable and include them all in the boxplots, if the assumption is reasonable.
-
-We can also examine forecaster calibration.
-
-```{r}
-plot_calibration(scorecards, type = "wedgeplot")
-```
-
-By default, the proportion is the number of `geo_values` that fall above/below the quantile at each forecast date and ahead. But this can be changed if desired.
-
-```{r}
-plot_calibration(scorecards, 
-                 grp_vars = "forecaster", 
-                 avg_vars = c("geo_value", "forecast_date"))
-```
-
-One can also examine a more traditional calibration plot
-
-```{r}
-plot_calibration(scorecards, type = "traditional")
-```
-
-
-For extra flexibility, you can perform the core calculations using something like
-
-```{r, eval=FALSE}
-calib <- compute_calibration(scorecard, grp_vars, avg_vars) %>%
-      setup_wedgeplot()
-```
-
-We can display the coverage of the interval forecasts.
-
-```{r}
-plot_coverage(scorecards)
-```
-
-Or the width of the intervals.
-
-```{r}
-plot_width(scorecards)
 ```
 
 

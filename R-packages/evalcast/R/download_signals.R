@@ -22,16 +22,14 @@ download_signal <- function(...) {
   message(msg)
   
   out <- base::suppressMessages({covidcast_signal(...)})
-  # if (args$geo_type == "state") {
-  #   out$geo_value = substr(abbr_2_fips(out$geo_value), 1, 2)
-  # }
-  out # %>% rename(location = .data$geo_value)
+  out 
 }
 
 
 download_signals <- function(..., 
                              signal_aggregation = "long", 
                              signal_aggregation_dt = NULL) {
+  # This is just a wrapper around covidcast::covidcast_signals()
   args <- list(...)
   if (signal_aggregation != "list" ) {
     if(!is.null(signal_aggregation_dt) && is.list(signal_aggregation_dt)){
@@ -81,18 +79,6 @@ download_signals <- function(...,
     out <- covidcast::aggregate_signals(out, dt = signal_aggregation_dt,
                                         format = signal_aggregation)
   }
-  # if (args$geo_type == "state") {
-  #   if (signal_aggregation == "list") {
-  #     out <- out %>% map(~ { 
-  #       mutate(.x, geo_value = substr(abbr_2_fips(.data$geo_value), 1, 2)) %>%
-  #         rename(location = .data$geo_value)
-  #       })
-  #   } else {
-  #     out <- out %>%
-  #       mutate(geo_value = substr(abbr_2_fips(.data$geo_value), 1, 2)) %>%
-  #       rename(location = .data$geo_value)
-  #   }
-  # }
   out 
 }
 

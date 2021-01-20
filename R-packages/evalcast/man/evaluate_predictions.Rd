@@ -16,7 +16,7 @@ evaluate_predictions(
 \arguments{
 \item{predictions_cards}{tibble of predictions
 that are all for the same prediction task, meaning they are for the same
-response, incidence period, ahead, and geo type. Forecasts may be for a
+response, incidence period,and geo type. Forecasts may be for a
 different forecast date or forecaster.
 A predictions card may be created by the function
 \code{\link[=get_predictions]{get_predictions()}}, downloaded with \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}} or
@@ -24,7 +24,8 @@ possibly created manually.}
 
 \item{err_measures}{Named list of one or more functions, where each function
 takes a data frame with three columns \code{quantile}, \code{value} and \code{actual}
-(i.e., observed) returns a scalar measure of error.}
+(i.e., observed) returns a scalar measure of error. Null or an empty list
+may be provided if scoring is not desired.}
 
 \item{backfill_buffer}{How many days until response is deemed trustworthy
 enough to be taken as correct? See details for more.}
@@ -51,13 +52,12 @@ some types of plotting, but it may be useful to shrink this down
 Performs backtesting, through the following steps:
 \enumerate{
 \item Takes a list of predictions cards (as created by
-\code{\link[=get_predictions]{get_predictions()}}). These should be from a single forecaster, each card
-corresponding to a different forecast date.
+\code{\link[=get_predictions]{get_predictions()}}).
 \item Downloads from the COVIDcast API the latest available data to compute
 what actually occurred (summing the response over the incidence period).
 \item Computes various user-specified error measures.
 }
-The result is a list of "score cards", where each list element corresponds to
+The result is a data frame of "score cards", where each row corresponds to
 a distinct ahead value. A score card is a data frame in which each row
 corresponds to a location-day pair, and the columns give the values of the
 error measures (along with other information including the forecast

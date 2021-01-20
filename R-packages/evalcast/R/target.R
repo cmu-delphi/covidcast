@@ -4,8 +4,6 @@
 #' @template incidence_period-template
 #' @template ahead-template
 #'
-#' @importFrom MMWRweek MMWRweek  MMWRweek2Date
-#' @importFrom lubridate ymd wday
 #' @export
 get_target_period <- function(forecast_date, incidence_period, ahead) {
   # This function gives the start and end dates of the target period,
@@ -41,8 +39,8 @@ get_target_period <- function(forecast_date, incidence_period, ahead) {
 }
 
 
-
-
+# Get data frame with column names `forecast_date`, `location`, `target_start`,
+# `target_end`, `actual`
 get_target_response <- function(signals,
                                 forecast_dates,
                                 incidence_period,

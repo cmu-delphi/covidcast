@@ -29,7 +29,8 @@
 #' @param signal_aggregation_dt for any data format, 
 #'   [covidcast::aggregate_signals()] can perform leading and lagging for you.
 #'   See that documentation for more details.
-#' @param ... Additional arguments to be passed to `forecaster()`.
+#' @param ... Additional named arguments to be passed to `forecaster()` and 
+#'   `apply_corrections()`
 #' @template predictions_cards-template
 #' 
 #'
@@ -39,8 +40,9 @@
 #'   tibble::tibble(
 #'     data_source=c("jhu-csse", "usa-facts"),
 #'     signal = c("deaths_incidence_num","confirmed_incidence_num"),
-#'     start_day="2020-08-15"), "2020-10-01","epiweek", 1:4, 
-#'     "state", "mi", signal_aggregation="long")
+#'     start_day="2020-08-15"), 
+#'   "2020-10-01","epiweek", 1:4, 
+#'   "state", "mi", signal_aggregation="long")
 #'
 #' @export
 get_predictions <- function(forecaster,
@@ -74,9 +76,11 @@ get_predictions <- function(forecaster,
                  signal_aggregation = signal_aggregation,
                  signal_aggregation_dt = signal_aggregation_dt),
                  use_covidcast = use_covidcast,
-                 params)))
-  out <- bind_rows(out)
-  names(out$value) = NULL
+                 params))) %>%
+    bind_rows()
+
+  # for some reason, `value` gets named and ends up in attr
+  names(out$value) = NULL 
   class(out) <- c("predictions_cards", class(out))
   out
 }
@@ -95,7 +99,8 @@ get_predictions_single_date <- function(forecaster,
                                         signal_aggregation_dt,
                                         use_covidcast,
                                         ...) {
-  #if (length(geo_values) > 1) geo_values <- list(geo_values)
+  # see get_predictions() for descriptions of the arguments
+
   forecast_date <- lubridate::ymd(forecast_date)
   
   if (use_covidcast){
@@ -109,6 +114,8 @@ get_predictions_single_date <- function(forecaster,
     }
     
     # get data that would have been available as of forecast_date
+    # API has trouble with too many individual calls, 30 seemed safe
+    # (imagining ~50 states). So bigger, just grab everything and then filter
     if(length(geo_values) > 30) {
       geo_values_dl <- "*"
     } else {
@@ -125,9 +132,16 @@ get_predictions_single_date <- function(forecaster,
                            signal_aggregation = signal_aggregation,
                            signal_aggregation_dt = signal_aggregation_dt)
     
-    if(!is.null(apply_corrections)) df <- data_corrector(df, apply_corrections)
-    
-    if (geo_values_dl != "*") df <- filter(df, .data$geo_value %in% geo_values)
+    # Dump out any extra geo_values we don't want.
+    if (geo_values != "*") {
+      if (signal_aggregation == "list") {
+        df <- map(df, ~filter(.x, .data$geo_value %in% geo_values))  
+      } else {
+        df <- filter(df, .data$geo_value %in% geo_values)
+      }
+    }
+
+    if(!is.null(apply_corrections)) df <- apply_corrections(df, ...)
   
   } 
   else {
@@ -141,6 +155,10 @@ get_predictions_single_date <- function(forecaster,
                     ahead,
                     geo_type,
                     ...)
+  assert_that(all(c("ahead", "geo_value", "quantile", "value") %in% names(out)),
+              msg = paste("Your forecaster must return a data frame with",
+                          "(at least) the columnns `ahead`, `geo_value`,",
+                          "`quantile`, and `value`."))
   # make a predictions card for each ahead
   out %>% 
     mutate(
@@ -150,10 +168,6 @@ get_predictions_single_date <- function(forecaster,
       signal = signals$signal[1],
       target_end_date = get_target_period(forecast_date, 
                                           incidence_period, ahead)$end,
-      incidence_period = incidence_period,
-      ) 
-      ## dropped attributes: other signals, geo_type,
-      ##   corrections_applied, from_covidhub,
-      ##   forecaster_params
+      incidence_period = incidence_period) 
 }
 

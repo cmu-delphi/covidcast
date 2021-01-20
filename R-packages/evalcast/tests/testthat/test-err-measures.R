@@ -26,3 +26,12 @@ test_that("Warning when duplicate quantiles", {
   
   expect_warning(interval_coverage(0.8)(quantiles, value, 9.9))
 })
+
+test_that("WIS is correct",{
+  l <- 1:11
+  u <- 23:13
+  w <- covidhub_probs()[1:11]
+  wis <- (sum(w*(u-l) + (l-10)*(10<l) + (10-u)*(10>u)) + 1) / 11.5
+  expect_equal(weighted_interval_score(covidhub_probs(), 1:23, 10), wis)
+  expect_true(is.na(weighted_interval_score(c(covidhub_probs(), 0.5), 1:24, 10)))
+})

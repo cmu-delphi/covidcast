@@ -47,7 +47,7 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
     geo_values <- NULL
   } else {
     gt_fips <- grepl("[a-z]", geo_values) & geo_values != "us"
-    geo_values[gt_fips] <- substr(abbr_2_fips(geo_values[gt_fips]), 1, 2)
+    geo_values[gt_fips] <- abbr_2_fips(geo_values[gt_fips])
     geo_values[geo_values == "us"] <- "US"
   }
   if (!is.null(forecast_type)) {
@@ -83,13 +83,14 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
   # get all valid timezeros in project
   all_valid_timezeros <- zoltr::timezeros(
     zoltar_connection = zoltar_connection,
-    project_url = project_url)$timezero_date
+    project_url = project_url
+    )$timezero_date
   
-  if (!missing(forecast_dates)){
+  if (missing(forecast_dates)){
+    valid_forecast_dates <- all_valid_timezeros
+  } else {
     valid_forecast_dates <- intersect(as.character(forecast_dates), 
                                       as.character(all_valid_timezeros))
-  } else {
-    valid_forecast_dates <- all_valid_timezeros
   }
   
   print("Grabbing forecasts from Zoltar...")
@@ -99,13 +100,13 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
       query_type = "forecasts", units = geo_values, 
       timezeros = valid_forecast_dates, models = forecaster_names,
       targets = targets, types = forecast_type, as_of = as_of, verbose = FALSE))
-  if (nrow(forecasts) ==0){
-    warning(paste("Warning in do_zotar_query: Forecasts are not available.\n", 
+  if (nrow(forecasts) == 0) {
+    warning(paste("Warning in do_zoltar_query: Forecasts are not available.\n", 
                   "Please check your parameters."))
   }
   
   forecasts <- forecasts %>%
-    dplyr::select(.data$model, .data$timezero, .data$unit, 
+    select(.data$model, .data$timezero, .data$unit, 
                   .data$target, .data$quantile, .data$value) %>%
     rename(forecaster = .data$model, forecast_date = .data$timezero,
            geo_value = .data$unit) %>%
@@ -120,22 +121,23 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
                            .data$response == "case" ~ "confirmed",
                            TRUE ~ "drop",),
       signal = paste(.data$response, .data$inc, "num", sep="_"),
-      data_source = if_else(.data$response != "drop", "jhu-csse", "drop"),
-      forecast_date = ymd(.data$forecast_date),
+      data_source = if_else(.data$response == "drop", "drop", "jhu-csse"),
+      forecast_date = lubridate::ymd(.data$forecast_date),
       target_end_date = .data$forecast_date + .data$ahead)
   epw <- forecasts$incidence_period == "epiweek"
   forecasts$target_end_date[epw] <- get_target_period(
     forecasts$forecast_date[epw], "epiweek", forecasts$ahead[epw])$end
   
   forecasts <- forecasts %>%
-    dplyr::filter(.data$response != "hosp") %>%
-    dplyr::select(.data$ahead, .data$geo_value, .data$quantile, .data$value,
+    filter(.data$response != "hosp") %>%
+    select(.data$ahead, .data$geo_value, .data$quantile, .data$value,
                   .data$forecaster, .data$forecast_date, .data$data_source,
                   .data$signal, .data$target_end_date, 
                   .data$incidence_period) %>%
-    mutate(geo_value = if_else(nchar(.data$location)==2,
-                               fips_2_abbr(.data$location),
-                               .data$location))
+    mutate(geo_value = if_else(
+      nchar(.data$geo_value) == 2,
+      fips_2_abbr(.data$geo_value),
+      tolower(.data$geo_value)))
   
   if (is.null(signal) && !is.null(ahead)) {
     forecasts <- filter(forecasts, .data$ahead %in% !!ahead)
@@ -150,6 +152,8 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
   class(forecasts) <- c("predictions_cards", class(forecasts))
   forecasts
 }
+
+
 
 
 #' Get available forecast dates for a COVID forecaster on Zoltar
@@ -178,6 +182,6 @@ get_zoltar_forecast_dates <- function(forecaster_name) {
   model_url <- the_models[the_models$model_abbr == forecaster_name, "url"]
   the_forecasts <- zoltr::forecasts(zoltar_connection, model_url)
   
-  rev(the_forecasts$timezero_date)
+  sort(the_forecasts$timezero_date)
 }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/manage_cards.R
 \name{collapse_cards}
 \alias{collapse_cards}
-\title{Reduce size of cards}
+\title{Remove all quantile forecasts}
 \usage{
 collapse_cards(cards)
 }
@@ -14,5 +14,5 @@ cards of the same class but with only one row for each
 geo_value/forecast_date/ahead/forecaster (the point estimate)
 }
 \description{
-Reduce size of cards
+Remove all quantile forecasts
 }

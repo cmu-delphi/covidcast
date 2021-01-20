@@ -6,7 +6,7 @@
 #' this point based on quantiles of symmetrized week-to-week residuals.
 #'
 #' @param df Data frame of the format that is returned by
-#'   [covidcast::covidcast_signal()].  
+#'   [covidcast::covidcast_signal()] or [covidcast::covidcast_signals()].  
 #' @template forecast_date-template
 #' @template signals-template
 #' @template incidence_period-template
@@ -37,6 +37,11 @@ baseline_forecaster <- function(df,
   covidhub_probs <- c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99)
   dat <- list()
   s <- ifelse(symmetrize, -1, NA)
+  
+  
+  df <- get_response_df(df, signals)
+  
+  
   for (a in seq_along(ahead)) {
     # recall the first row of signals is the response
     dat[[a]] <- df %>%
@@ -49,7 +54,7 @@ baseline_forecaster <- function(df,
              resid = .data$summed - lag(.data$summed, 
                                         n = incidence_length * ahead[a])
              ) %>%
-      dplyr::select(.data$geo_value, .data$time_value, .data$summed, 
+      select(.data$geo_value, .data$time_value, .data$summed, 
                     .data$resid) %>%
       group_modify(~ {
         point <- .x$summed[.x$time_value == max(.x$time_value)]
@@ -60,10 +65,33 @@ baseline_forecaster <- function(df,
                  na.rm = TRUE), 0)
                )
         }, .keep = TRUE) %>%
-        dplyr::ungroup() %>%
-        dplyr::mutate(value = pmax(.data$value, 0))
+        ungroup() %>%
+        mutate(value = pmax(.data$value, 0))
   }
   names(dat) <- as.character(ahead)
-  dplyr::bind_rows(dat, .id = "ahead") %>%
-      dplyr::mutate(ahead = as.integer(ahead))
+  bind_rows(dat, .id = "ahead") %>%
+    mutate(ahead = as.integer(ahead))
+}
+
+
+get_response_df <- function(df, signals) {
+  
+  if (class(df)[1] == "covidcast_signal_wide") {
+    df <- covidcast::covidcast_longer(df) 
+  }
+  if (class(df)[1] == "covidcast_signal_long") {
+    udt <- unique(df$dt)
+    assert_that(0L %in% as.integer(floor(udt)),
+                msg = paste("When using the baseline_forecaster() with",
+                            "covidcast_signals(), you must have dt = 0",
+                            "included in your data."))
+    df <- df %>% filter(as.integer(floor(.data$dt)) == 0L)
+  }
+  if (class(df)[1] == "list") {
+    df <- df[[1]]
+  }
+  df <- df %>% 
+    filter(.data$data_source == signals$data_source[1], 
+           .data$signal == signals$signal[1])
+  return(df)
 }

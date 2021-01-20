@@ -24,8 +24,8 @@ values the remaining forecasters' errors will be scaled}
 \item{id_cols}{vector of column names in \code{score_card} that identify distinct forecasts (i.e. the
 independent variables of \code{score_card}).}
 
-\item{drop_base_entries}{whether to include the entries in \code{score_card} from
-\code{base_forecaster_name} (their corresponding \code{score_cols} values will all be 1)}
+\item{drop_base_entries}{whether to drop the entries in \code{score_card} from
+\code{base_forecaster_name} (when FALSE their corresponding \code{score_cols} values will all be 1)}
 }
 \value{
 A tibble whose columns are \code{c(id_cols, score_cols)} whose \code{id_cols} values are copied

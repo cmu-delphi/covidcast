@@ -47,9 +47,9 @@ scale_by_forecaster <- function(score_card,
     for (var in score_cols){
         base_values <- filter(score_card,
                               forecaster == base_forecaster_name)[[var]]
-        assert_that(all(base_values > 0),
-                    msg = paste("scale_by_forecaster will produce divide-by-zero error in column",
-                                var))
+        if (!all(base_values > 0)) {
+            warning("scale_by_forecaster will divide by zero in column ", var)
+        }
     }
 
     df_list <- map(score_cols, function(var) {

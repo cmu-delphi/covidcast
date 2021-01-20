@@ -49,10 +49,10 @@ create_prediction_cards = function(){
   # Load data from previous run so we don't have to re-ingest / process it. This
   # data could end up out of date if a forecast is retrospectively updated, but in
   # that case it's no longer a true prediction. We can always restart from scratch
-  # by deleting predictions_cards.rda.
+  # by deleting predictions_cards.rds.
   
-  if (file.exists("predictions_cards.rda")) {
-    load(file = "predictions_cards.rda")
+  if (file.exists("predictions_cards.rds")) {
+    predictions_cards = readRDS(file = "predictions_cards.rds")
   }
   if(exists("predictions_cards")){
     seen_dates = predictions_cards %>% 
@@ -123,7 +123,7 @@ create_prediction_cards = function(){
   # (say) JHU-CSSE data, then I should be able to evaluate it on USAFacts data. 
   
   predictions_cards$data_source = "usa-facts"
-  save(list = c("predictions_cards"), 
-       file = "predictions_cards.rda", 
-       compress = "xz")
+  saveRDS(predictions_cards,
+          file = "predictions_cards.rds", 
+          compress = "xz")
 }

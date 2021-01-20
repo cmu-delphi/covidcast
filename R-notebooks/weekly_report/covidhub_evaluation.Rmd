@@ -6,8 +6,7 @@ output:
   html_document:
     code_folding: hide
 params:
-  score_file: "score_cards_state.rda"
-  card_name: "score_cards_state"
+  score_file: "score_cards_state.rds"
 ---
 
 ```{r, include = FALSE}
@@ -31,12 +30,7 @@ Filter to forecasters that have significant overlap in predictions with CMU-Time
 
 ```{r}
 if (file.exists(params$score_file)){
-  load(params$score_file)
-  if (exists(params$card_name)){
-    score_cards = get(params$card_name)
-  } else {
-    stop(paste("score_card not in file, no object named", params$card_name))
-  }
+  score_cards = readRDS(params$score_file)
 } else {
   stop(paste("File not found:", params$score_file))
 }

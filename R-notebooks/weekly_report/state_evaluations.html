@@ -11,7 +11,7 @@
 
 <meta name="author" content="Delphi Group" />
 
-<meta name="date" content="2021-01-19" />
+<meta name="date" content="2021-01-20" />
 
 <title>COVID-19 Forecast Evaluation</title>
 
@@ -446,7 +446,7 @@ summary {
 
 <h1 class="title toc-ignore">COVID-19 Forecast Evaluation</h1>
 <h4 class="author">Delphi Group</h4>
-<h4 class="date">January 19, 2021</h4>
+<h4 class="date">January 20, 2021</h4>
 
 </div>
 
@@ -457,12 +457,7 @@ summary {
 <h2>Select Forecasts</h2>
 <p>Filter to forecasters that have significant overlap in predictions with CMU-TimeSeries for the last 4 weeks.This is used primarily to ensure we don’t include inactive forecasters in the pairwise tournament rankings and that there is enough overlap for pairwise scores to be meaningful.</p>
 <pre class="r"><code>if (file.exists(params$score_file)){
-  load(params$score_file)
-  if (exists(params$card_name)){
-    score_cards = get(params$card_name)
-  } else {
-    stop(paste(&quot;score_card not in file, no object named&quot;, params$card_name))
-  }
+  score_cards = readRDS(params$score_file)
 } else {
   stop(paste(&quot;File not found:&quot;, params$score_file))
 }

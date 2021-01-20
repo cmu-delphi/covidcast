@@ -2,16 +2,13 @@ library("evalcast")
 library("dplyr")
 library("lubridate")
 
-create_score_cards = function(geo_type, output_file_name = NULL, score_cards_name = NULL){
+create_score_cards = function(geo_type, output_file_name = NULL){
   start_date = today() - 12 * 7 # last 12 weeks
   if (!exists("predictions_cards")){
-    load("predictions_cards.rda")
+    predictions_cards = readRDS("predictions_cards.rds")
   }
   if (is.null(output_file_name)){
-    output_file_name = paste0("score_cards_", geo_type, ".rda")
-  }
-  if (is.null(score_cards_name)){
-    score_cards_name = paste0("score_cards_", geo_type)
+    output_file_name = paste0("score_cards_", geo_type, ".rds")
   }
   err_measures = list(wis = weighted_interval_score, ae = absolute_error,
                       cov_80 = interval_coverage(coverage = 0.8)) 
@@ -26,10 +23,7 @@ create_score_cards = function(geo_type, output_file_name = NULL, score_cards_nam
       filter(nchar(geo_value) == 5)
   }
   if (file.exists(output_file_name)) {
-    load(output_file_name)
-  }
-  if (exists(score_cards_name)){
-    score_cards = get(score_cards_name)
+    score_cards = readRDS(output_file_name)
   }
   if(exists("score_cards")){
     preds_to_eval = anti_join(preds_to_eval, 
@@ -59,8 +53,7 @@ create_score_cards = function(geo_type, output_file_name = NULL, score_cards_nam
   }
   score_cards = score_cards %>% filter(forecast_date >= start_date)
   
-  assign(score_cards_name, score_cards)
-  save(list = score_cards_name, 
+  saveRDS(score_cards, 
        file = output_file_name, 
        compress = "xz")
 }

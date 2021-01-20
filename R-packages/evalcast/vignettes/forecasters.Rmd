@@ -90,7 +90,7 @@ library(dplyr)
 library(covidcast)
 library(evalcast)
 library(lubridate)
-library(ggplot2)
+library(readr)
 
 signals <- tibble(data_source = "jhu-csse", 
                   signal = c("confirmed_incidence_num"), 
@@ -167,7 +167,7 @@ We get the same results!  Same forecaster, two different ways to pass it to `get
 
 ### Covidcast forecaster inputs
 
-When building a forecaster using covidcast signals, you must select what format the signal data will be given to your forecaster and pass that format type as an input to `get_predictions`.  The three options are `list`, `long`, and `wide`.  `get_predictions` calls 'download_signals', a wrapper around `covidcast::covidcast_signals()`[https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signals.html] and `covidcast::aggregate_signals()`[https://cmu-delphi.github.io/covidcast/covidcastR/reference/aggregate_signals.html].  
+When building a forecaster using covidcast signals, you must select what format the signal data will be given to your forecaster and pass that format type as an input to `get_predictions`.  The three options are `list`, `long`, and `wide`.  `get_predictions` calls 'download_signals', a wrapper around [`covidcast::covidcast_signals()`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signals.html) and [`covidcast::aggregate_signals()`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/aggregate_signals.html).  
 
 For the signal
 
@@ -215,7 +215,7 @@ head(df[[2]])
 ```
 
 
-The `long` format will aggregate these seperate dataframes into one dataframe.  As you can see, both the `jhu-case` and `usa-facts` signals are in the same dataframe.  
+The `long` format will aggregate these seperate dataframes into one dataframe.  As you can see, both the `jhu-case` and `usa-facts` signals are in the same dataframe.  See the [`aggregate_signals`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/aggregate_signals.html) long option for more information.
 
 ```{r, include = TRUE}
 
@@ -233,7 +233,7 @@ head(df %>% dplyr::arrange(geo_value, time_value))
 
 ```
 
-The `wide` 
+The `wide` format gives the latest value for each signal for a given time_value, geo_value pair.  Only the values are reported; columns other than geo_value, time_value, and value for a signal are dropped. See the [`aggregate_signals`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/aggregate_signals.html) wide option for more information.
 
 ```{r, include = TRUE}
 
@@ -251,6 +251,8 @@ head(df)
 
 ```
 
+Lastly, the `signal_aggregation_dt` input represents a vector of shifts for the `time_value` column.  Negative shifts translate into a lag value, and positive shifts into a lead value; for example, if `dt = -1`, then the value on June 2 that gets reported is the original value on June 1; if `dt = 0`, then the values are left as is.  See the `aggregate_signals` [documentation](https://cmu-delphi.github.io/covidcast/covidcastR/reference/aggregate_signals.html) for more information.  
+
 ### Making Corrections
 
 To make corrections on the covidcast data, pass a corrections function to `get_predictions` by the `apply_corrections` input. Your `apply_corrections` function will correct the data returned by `download_signals` for each `as_of` date from `covidcast`, not the forecasts.  Additionally, `apply_corrections` passed in for `get_predictions` only corrects covidcast data, not other data.  To correct other data, that would need to be contained within the forecaster.
@@ -263,37 +265,35 @@ If you want to use non-covidcast data for your forecaster, there are a couple di
 
   1.`use_covidcast` must be set to FALSE an as input to `get_predictions` (it is set to TRUE by default).  This prevents any downloading being done by the API.
   
-  2. You need to define a `signal` input with a `data_source` and `signal` value; this is for the output dataframe.  You can just define a descriptive dummy signal, describing your data.  If you aren't using covidcast data, this will not be used for anything besides formatting the output dataframe.
+  2. You need to define a `signal` input with a `data_source` and `signal` value; this is for the output dataframe.  You can just define a descriptive dummy signal, describing your data.  If you aren't using covidcast data, this may not be used for anything besides formatting the output dataframe unless its explicitely used in your forecaster.
   
   3. You still need to define a `geo_type` and `signal_aggregation` type (there are no defaults) even if they are not used (as in the following example).
 
-We are going to use a dataset for COVID from Toronto, from the `covid19.analytics` package, Here, we change the dataset into a dataframe having columns `time_value`, `geo_value` and `value` to make it similar to covidcast dataframes.  Additionally, we define a `get_aus_data` function to get data that exists `as_of` a certain date (data that is recorded up to that date in this context).
+We are going to use a dataset for COVID from Canada.  Here, we change the dataset into a dataframe having columns `time_value`, `geo_value` and `value` to make it similar to covidcast dataframes.  Additionally, we define a `get_tor_data` function to get data that exists `as_of` a certain date (data that is recorded up to the day before in this context).
 
 
 ```{r, include = TRUE}
-library(covid19.analytics)
 
-tor <- covid19.Toronto.data() %>% as.data.frame(.)
+url_file = 'https://raw.githubusercontent.com/ccodwg/Covid19Canada/master/timeseries_prov/cases_timeseries_prov.csv'
 
-tor
+canada_data <- readr::read_csv(url(url_file)) %>% as.data.frame(.)
 
-tor <- tor %>% dplyr::mutate(
-  geo_value = paste(.$Province.City, .$Country.Region, sep = ", "))
+canada_data$date_report <- format(
+  as.Date(canada_data$date_report, '%d-%m-%Y'), '%Y-%m-%d')
 
-tor <- tor %>% tidyr::pivot_longer(
-  cols = starts_with("202"), names_to = "time_value", values_to = "value")
+canada_data <- canada_data %>% dplyr::mutate(
+  geo_value = province, 
+  time_value = date_report,
+  value = cases,
+  signal = "Cases") %>% 
+  dplyr::select(-province, -date_report, -cumulative_cases)
 
-tor
+head(canada_data)
 
-tor <- tor %>% dplyr::filter(.$status == "Deaths") %>% 
-  dplyr::select(-Lat, -Long, -Country.Region, -Province.City, -status)
-
-tor
-
-attributes(tor)$metadata <- list(.data = data.frame(data_source = c("jhu"), signal = c("Deaths")))
-
-tor
-
+get_canada_data <- function(as_of){
+  return (canada_data %>% 
+            dplyr::filter(time_value < as_of))
+}
 
 ```
 
@@ -313,28 +313,26 @@ my_forecaster <- function(df,
   }
 ```
 
-Here we implement the basic forecaster for the Australian residents dataset by passing in the whole dataset and then filtering based on date.
+Here we implement the growth factor forecaster for the Canada COVID-19 dataset by passing in the whole dataset and then filtering based on date.
 
 ```{r, include = TRUE}
-growth_factor_forecaster <- function(df,
-                                     forecast_date,
-                                     signals,
-                                     incidence_period = "epiweek",
-                                     ahead,
-                                     geo_type,
-                                     growth_factor) {
+growth_non_covidcast_forecaster <- function(df,
+                                            forecast_date,
+                                            signals,
+                                            incidence_period = "epiweek",
+                                            ahead,
+                                            geo_type,
+                                            growth_factor) {
   dat <- list()
   for (a in seq_along(ahead)) {
     # recall the first row of signals is the response
     dat[[a]] <- df %>%
-      dplyr::filter(.$data_source == signals$data_source[1],
-                    .$signal == signals$signal[1])  %>%
       dplyr::group_by(.$geo_value) %>%
       dplyr::arrange(.$time_value) %>%
       dplyr::slice_tail(n = 1) %>%
       dplyr::mutate(value = .$value * growth_factor ** a,
                     quantile = NA) %>%
-      dplyr::select(.$geo_value, .$value, .$quantile) %>%
+      dplyr::select(geo_value, value, quantile) %>%
       dplyr::ungroup() 
   }
   names(dat) <- as.character(ahead)
@@ -342,25 +340,56 @@ growth_factor_forecaster <- function(df,
     dplyr::mutate(ahead = as.integer(ahead))
 }
 
-baseline_tor_forecaster <- function(df,
-                                    forecast_date,
-                                    signals,
-                                    incidence_period = c("epiweek", "day"),
-                                    ahead,
-                                    geo_type,
-                                    symmetrize = TRUE,
-                                    tor_df){
-  return (baseline_forecaster(df = tor_df, 
-                              forecast_date = forecast_date,
-                              signals = signals,
-                              incidence_period = incidence_period,
-                              ahead = ahead,
-                              geo_type = geo_type,
-                              symmetrize = symmetrize))
+growth_factor_forecaster <- function(df,
+                                     forecast_date,
+                                     signals,
+                                     incidence_period = c("epiweek", "day"),
+                                     ahead,
+                                     geo_type,
+                                     growth_factor,
+                                     canada_df){
+  canada_df_asof <- canada_df %>% 
+    dplyr::filter(.$time_value < forecast_date)
+  print(canada_df_asof)
+  return (
+    growth_non_covidcast_forecaster(df = canada_df_asof,
+                                    forecast_date = forecast_date,
+                                    signals = signals,
+                                    incidence_period = incidence_period,
+                                    ahead = ahead,
+                                    geo_type = geo_type,
+                                    growth_factor = growth_factor))
 }
+
+forecast_dates <- get_covidhub_forecast_dates("CMU-TimeSeries")
+forecast_dates <- forecast_dates[forecast_dates >= "2020-08-01" & 
+                                   forecast_dates <= "2020-08-31"]
+
+# Put dummy signal for output dataframe, to have and for the baseline forecaster to use
+signals <- tibble(date_source = c("Canada"),
+                  signal = c("Cases"),
+                  start_day = "2020-04-01")
+
+tor_predictions <- get_predictions(forecaster = growth_factor_tor_forecaster,
+                                   name_of_forecaster = 'Doubling',
+                                   signals = signals,
+                                   forecast_dates = forecast_dates,
+                                   incidence_period = 'epiweek',
+                                   ahead = c(1,2,3),
+                                   geo_type = 'county',
+                                   signal_aggregation = 'long',
+                                   use_covidcast = FALSE,
+                                   canada_df = canada_data,
+                                   growth_factor = 2)
+
+head(canada_predictions)
+
+
+
+
 ```
 
-Another possibility is to have a querying function either passed to your forecaster or within your forecaster.  This may be slower, but if you have a large amount of data or you have similar `as_of` functionality to covidcast, this can be a simpler way to get the correct data as opposed to passing it all initiatially.  That structure will look like this example:
+Another possibility is to have a querying function either passed to your forecaster or within your forecaster.  This may be slower, but if you have a large amount of data or you have similar `as_of` functionality to covidcast, this can be a simpler way to get the correct data as opposed to passing it all initially.  That structure will look like this example:
 
 
 ```
@@ -377,51 +406,41 @@ my_forecaster <- function(df,
   }
 ```
 
-Here we implement the same forecaster as above
-
-Here we can plot 
+Here we implement the same forecaster as above using an `as_of` function: `get_canada_data`.  
 
 
 ```{r, include = TRUE}
 
-baseline_tor_forecaster <- function(df,
-                                    forecast_date,
-                                    signals,
-                                    incidence_period = c("epiweek", "day"),
-                                    ahead,
-                                    geo_type,
-                                    symmetrize = TRUE,
-                                    tor_df){
-  return (baseline_forecaster(df = tor_df, 
-                              forecast_date = forecast_date,
-                              signals = signals,
-                              incidence_period = incidence_period,
-                              ahead = ahead,
-                              geo_type = geo_type,
-                              symmetrize = symmetrize))
+growth_factor_forecaster <- function(df,
+                                     forecast_date,
+                                     signals,
+                                     incidence_period = c("epiweek", "day"),
+                                     ahead,
+                                     geo_type,
+                                     growth_factor){
+  canada_df_asof <- get_canada_data(as_of = forecast_date)
+  return (
+    growth_non_covidcast_forecaster(df = canada_df_asof,
+                                    forecast_date = forecast_date,
+                                    signals = signals,
+                                    incidence_period = incidence_period,
+                                    ahead = ahead,
+                                    geo_type = geo_type,
+                                    growth_factor = growth_factor))
 }
 
-forecast_dates <- get_covidhub_forecast_dates("CMU-TimeSeries")
-forecast_dates <- forecast_dates[forecast_dates >= "2020-10-01" & 
-                                   forecast_dates <= "2020-10-31"]
+canada_predictions <- get_predictions(forecaster = growth_factor_tor_forecaster,
+                                      name_of_forecaster = 'Doubling',
+                                      signals = signals,
+                                      forecast_dates = forecast_dates,
+                                      incidence_period = 'epiweek',
+                                      ahead = c(1,2,3),
+                                      geo_type = 'county',
+                                      signal_aggregation = 'long',
+                                      use_covidcast = FALSE,
+                                      growth_factor = 2)
 
-# Put dummy signal for output dataframe, to have and for the baseline forecaster to use
-signals <- tibble(date_source = c("jhu"),
-                  signal = c("Deaths"),
-                  start_day = "2020-04-01")
-
-tor_predictions <- get_predictions(forecaster = baseline_tor_forecaster,
-                                  name_of_forecaster = 'Baseline',
-                                  signals = signals,
-                                  forecast_dates = forecast_dates,
-                                  incidence_period = 'epiweek',
-                                  ahead = c(1,2,3),
-                                  geo_type = 'county',
-                                  signal_aggregation = 'long',
-                                  use_covidcast = FALSE,
-                                  tor_df = tor)
-
-head(tor_predictions)
+head(canada_predictions)
 
 
 ```

@@ -16,6 +16,7 @@ get_predictions(
   apply_corrections = NULL,
   signal_aggregation = c("list", "wide", "long"),
   signal_aggregation_dt = NULL,
+  use_covidcast = TRUE,
   ...
 )
 }
@@ -75,6 +76,8 @@ request "wide" or "long". See \code{\link[covidcast:covidcast_signals]{covidcast
 \item{signal_aggregation_dt}{for any data format,
 \code{\link[covidcast:aggregate_signals]{covidcast::aggregate_signals()}} can perform leading and lagging for you.
 See that documentation for more details.}
+
+\item{use_covidcast}{whether to use covidcast data or not.  True by default.}
 
 \item{...}{Additional arguments to be passed to \code{forecaster()}.}
 }

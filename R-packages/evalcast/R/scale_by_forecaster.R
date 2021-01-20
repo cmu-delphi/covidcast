@@ -6,8 +6,8 @@
 #'   values the remaining forecasters' errors will be scaled
 #' @param id_cols vector of column names in `score_card` that identify distinct forecasts (i.e. the
 #'   independent variables of `score_card`).
-#' @param drop_base_entries whether to include the entries in `score_card` from 
-#'   `base_forecaster_name` (their corresponding `score_cols` values will all be 1)
+#' @param drop_base_entries whether to drop the entries in `score_card` from 
+#'   `base_forecaster_name` (when FALSE their corresponding `score_cols` values will all be 1)
 #'
 #' @return A tibble whose columns are `c(id_cols, score_cols)` whose `id_cols` values are copied
 #'   directly from `score_card` and whose `score_cols` values are normalized with respect to 
@@ -44,6 +44,13 @@ scale_by_forecaster <- function(score_card,
     assert_that(length(unique_forecasters) > 1, 
                 msg = paste("scale_by_forecaster requires the score card to have forecasters",
                             "other than", base_forecaster_name))
+    for (var in score_cols){
+        base_values <- filter(score_card,
+                              forecaster == base_forecaster_name)[[var]]
+        assert_that(all(base_values > 0),
+                    msg = paste("scale_by_forecaster will produce divide-by-zero error in column",
+                                var))
+    }
 
     df_list <- map(score_cols, function(var) {
         normalized_card <- score_card %>% 

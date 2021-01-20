@@ -89,6 +89,12 @@ test_that("scale_by_forecaster dies with bad columns", {
                                      "f1",
                                      c("A", "forecaster", "B", "ahead")), 
                  "id_cols contains columns A, B not present in the columns of score_card")
+
+    expect_error(scale_by_forecaster(score_card,
+                                     c("ae", "coverage_80"),
+                                     "f1",
+                                     c("forecaster", "ahead")), 
+                 "divide-by-zero error in column coverage_80")
 })
 
 test_that("scale_by_forecaster keeps base forecast rows", {

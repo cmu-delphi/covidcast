@@ -46,8 +46,8 @@ with \code{facet_cols} to create a grid of plots.}
 
 \item{facet_cols}{Same as \code{facet_rows}, but with columns.}
 
-\item{base_forecaster}{If set, scales they y-value for all forecasters by
-the corresponding values of the base_forecaster}
+\item{base_forecaster}{If set, scales the y-value for all forecasters by
+the corresponding values of the \code{base_forecaster}}
 
 \item{title}{title of the plot, if set}
 
@@ -62,7 +62,8 @@ the corresponding values of the base_forecaster}
 \item{legend_title}{title of the legend, if set}
 
 \item{scale_before_aggregation}{If TRUE, scales results by the
-\code{base_forecaster} before aggregating by the \code{aggr} function}
+\code{base_forecaster} before aggregating by the \code{aggr} function. FALSE by
+default.}
 }
 \description{
 A canonical function for creating plots within evalcast

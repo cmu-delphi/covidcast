@@ -45,10 +45,6 @@ col = function(x, color = "#bb0000") {
 
 ![](covidcast_indicators.svg)
 
-# COVIDcast Ecosystem
-
-![](covidcast_overview.svg)
-
 # What Can This Be Used For?
 
 - Forecasting, e.g.
@@ -61,6 +57,10 @@ col = function(x, color = "#bb0000") {
     * What behaviors are linked to spread?
     * What symptoms are linked to cases?
     
+# COVIDcast Ecosystem
+
+![](covidcast_overview.svg)
+
 # This Talk
 
 I can't cover all of this! I'll focus on our API, and some basic demos with our survey data (please ask about `r col("medical claims data")`, or ask about forecasting or nowcasting, during the Q & A)

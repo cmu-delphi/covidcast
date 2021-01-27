@@ -3,7 +3,7 @@
 #' Computes the percentage change of the values in a `covidcast_signal` data
 #' frame. (When multiple issue dates are present, only the latest issue is
 #' considered.)  See the [percentage change
-#' vignette](https://cmu-delphi.github.io/covidcast/modeltools/articles/pct-change.html)
+#' vignette](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/pct-change.html)
 #' for examples.  
 #'
 #' @param x The `covidcast_signal` data frame under consideration.

@@ -4,7 +4,7 @@
 #' a local (in time) linear regression or smoothing spline. (When multiple issue
 #' dates are present, only the latest issue is considered.)  See the
 #' [estimating derivatives
-#' vignette](https://cmu-delphi.github.io/covidcast/modeltools/articles/estimate-deriv.html)
+#' vignette](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/estimate-deriv.html)
 #' for examples.  
 #'
 #' @param x The `covidcast_signal` data frame under consideration. 

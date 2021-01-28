@@ -178,23 +178,10 @@ def signal(data_source: str,
     if isinstance(geo_values, str):
         # User only provided one, not a list
         geo_values = [geo_values]
-
-    dfs = [
-        _fetch_single_geo(
-            data_source, signal, start_day, end_day, geo_type, geo_value,
-            as_of, issues, lag)
-        for geo_value in set(geo_values)
-    ]
-
-    try:
-        # pd.concat automatically filters out None
-        out = pd.concat(dfs)
-    except ValueError:
-        # pd.concat raises ValueError if all of the dfs are None, meaning we
-        # found no data
-        return None
-
-    return out
+    geo_values = ",".join(geo_values)
+    return _fetch_single_geo(
+        data_source, signal, start_day, end_day, geo_type, geo_values, as_of, issues, lag
+    )
 
 
 def metadata() -> pd.DataFrame:
@@ -387,7 +374,8 @@ def _fetch_single_geo(data_source: str,
                       geo_value: str,
                       as_of: date,
                       issues: Union[date, tuple, list],
-                      lag: int) -> Union[pd.DataFrame, None]:
+                      lag: int,
+                      batch_size: int = 100) -> Union[pd.DataFrame, None]:
     """Fetch data for a single geo.
 
     signal() wraps this to support fetching data over an iterable of
@@ -397,38 +385,36 @@ def _fetch_single_geo(data_source: str,
     entries.
 
     """
-    as_of_str = _date_to_api_string(as_of) if as_of is not None else None
-    issues_strs = _dates_to_api_strings(issues) if issues is not None else None
-
-    cur_day = start_day
-
     dfs = []
-
-    while cur_day <= end_day:
-        day_str = _date_to_api_string(cur_day)
-
-        day_data = Epidata.covidcast(data_source, signal, time_type="day",
-                                     geo_type=geo_type, time_values=day_str,
-                                     geo_value=geo_value, as_of=as_of_str,
-                                     issues=issues_strs, lag=lag)
-
-        # Two possible error conditions: no data or too much data.
+    params = []
+    for day in pd.date_range(start_day, end_day):
+        day_param = {
+            "source": "covidcast",
+            "data_source": data_source,
+            "signals": signal,
+            "time_type": "day",
+            "geo_type": geo_type,
+            "geo_value": geo_value,
+            "time_values": _date_to_api_string(day),
+        }
+        if as_of:
+            day_param["as_of"] = _date_to_api_string(as_of)
+        if issues:
+            day_param["issues"] = _dates_to_api_strings(issues)
+        if lag:
+            day_param["lag"] = lag
+        params.append(day_param)
+    output = Epidata.async_call(params)
+    for day_data, params in output:
         if day_data["message"] == "no results":
-            warnings.warn(f"No {data_source} {signal} data found on {day_str} "
-                          f"for geography '{geo_type}'",
-                          NoDataWarning)
+            warnings.warn(f"No {data_source} {signal} data found on {params['time_values']} "
+                          f"for geography '{geo_type}'", NoDataWarning)
         if day_data["message"] not in {"success", "no results"}:
-            warnings.warn(f"Problem obtaining {data_source} {signal} data on {day_str} "
-                          f"for geography '{geo_type}': {day_data['message']}",
-                          RuntimeWarning)
-
-        # In the too-much-data case, we continue to try putting the truncated
-        # data in our results. In the no-data case, skip this day entirely,
-        # since there is no "epidata" in the response.
+            warnings.warn(f"Problem obtaining {data_source} {signal} "
+                          f"data on {params['time_values']} "
+                          f"for geography '{geo_type}': {day_data['message']}", RuntimeWarning)
         if "epidata" in day_data:
             dfs.append(pd.DataFrame.from_dict(day_data["epidata"]))
-
-        cur_day += timedelta(1)
 
     if len(dfs) > 0:
         out = pd.concat(dfs)
@@ -438,9 +424,8 @@ def _fetch_single_geo(data_source: str,
         out["geo_type"] = geo_type
         out["data_source"] = data_source
         out["signal"] = signal
+        out.sort_values(by=["time_value", "geo_value"], inplace=True)
         return out
-
-    return None
 
 
 def _signal_metadata(data_source: str,

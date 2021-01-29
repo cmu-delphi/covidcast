@@ -330,7 +330,7 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
 
 def _parse_datetimes(date_int: int,
                      time_type: str,
-                     format: str="%Y%m%d") -> Union[pd.Timestamp]:  # annotating nan errors
+                     date_format: str = "%Y%m%d") -> Union[pd.Timestamp]:  # annotating nan errors
     """Convert a date or epiweeks string into timestamp objects.
 
     Datetimes (length 8) are converted to their corresponding date, while epiweeks (length 6)
@@ -339,17 +339,16 @@ def _parse_datetimes(date_int: int,
     Epiweeks use the CDC format.
 
     :param date_int: Int representation of date.
-    :param format: String of the date format to parse.
+    :param date_format: String of the date format to parse.
     :returns: Timestamp.
     """
     date_str = str(date_int)
     if time_type == "day":
-        return pd.to_datetime(date_str, format=format)
-    elif time_type == "week":
+        return pd.to_datetime(date_str, format=date_format)
+    if time_type == "week":
         epiwk = Week(int(date_str[:4]), int(date_str[-2:]))
         return pd.to_datetime(epiwk.startdate())
-    else:
-        return np.nan
+    return np.nan
 
 
 def _detect_metadata(data: pd.DataFrame,

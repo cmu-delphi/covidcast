@@ -21,10 +21,9 @@ build:
 	python3 setup.py sdist bdist_wheel
 
 lint:
-	. env/bin/activate; \
-	pylint covidcast/ --rcfile .pylintrc; \
-	mypy covidcast --config-file mypy.ini; \
-	pydocstyle covidcast/
+	. env/bin/activate; pylint covidcast/ --rcfile .pylintrc
+	. env/bin/activate; mypy covidcast --config-file mypy.ini
+	. env/bin/activate; pydocstyle covidcast/
 
 test:
 	. env/bin/activate; \

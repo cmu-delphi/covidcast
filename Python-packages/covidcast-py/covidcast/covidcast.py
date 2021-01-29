@@ -177,10 +177,6 @@ def signal(data_source: str,
                          "start_day = '{start}', end_day = '{end}'".format(
                              start=start_day, end=end_day))
 
-    if isinstance(geo_values, str):
-        # User only provided one, not a list
-        geo_values = [geo_values]
-    geo_values = ",".join(geo_values)
     if _ASYNC_CALL:
         return _async_fetch_single_geo(
             data_source, signal, start_day, end_day, geo_type, geo_values, as_of, issues, lag

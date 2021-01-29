@@ -16,6 +16,8 @@ Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
 
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state",  "hhs", "nation"}
 
+_ASYNC_CALL = False
+
 
 def signal(data_source: str,
            signal: str,  # pylint: disable=W0621
@@ -179,6 +181,10 @@ def signal(data_source: str,
         # User only provided one, not a list
         geo_values = [geo_values]
     geo_values = ",".join(geo_values)
+    if _ASYNC_CALL:
+        return _async_fetch_single_geo(
+            data_source, signal, start_day, end_day, geo_type, geo_values, as_of, issues, lag
+        )
     return _fetch_single_geo(
         data_source, signal, start_day, end_day, geo_type, geo_values, as_of, issues, lag
     )
@@ -374,16 +380,75 @@ def _fetch_single_geo(data_source: str,
                       geo_value: str,
                       as_of: date,
                       issues: Union[date, tuple, list],
-                      lag: int,
-                      batch_size: int = 100) -> Union[pd.DataFrame, None]:
+                      lag: int) -> Union[pd.DataFrame, None]:
     """Fetch data for a single geo.
+    signal() wraps this to support fetching data over an iterable of
+    geographies, and stacks the resulting data frames.
+    If no data is found, return None, so signal() can easily filter out these
+    entries.
+    """
+    as_of_str = _date_to_api_string(as_of) if as_of is not None else None
+    issues_strs = _dates_to_api_strings(issues) if issues is not None else None
+
+    cur_day = start_day
+
+    dfs = []
+
+    while cur_day <= end_day:
+        day_str = _date_to_api_string(cur_day)
+
+        day_data = Epidata.covidcast(data_source, signal, time_type="day",
+                                     geo_type=geo_type, time_values=day_str,
+                                     geo_value=geo_value, as_of=as_of_str,
+                                     issues=issues_strs, lag=lag)
+
+        # Two possible error conditions: no data or too much data.
+        if day_data["message"] == "no results":
+            warnings.warn(f"No {data_source} {signal} data found on {day_str} "
+                          f"for geography '{geo_type}'",
+                          NoDataWarning)
+        if day_data["message"] not in {"success", "no results"}:
+            warnings.warn(f"Problem obtaining {data_source} {signal} data on {day_str} "
+                          f"for geography '{geo_type}': {day_data['message']}",
+                          RuntimeWarning)
+
+        # In the too-much-data case, we continue to try putting the truncated
+        # data in our results. In the no-data case, skip this day entirely,
+        # since there is no "epidata" in the response.
+        if "epidata" in day_data:
+            dfs.append(pd.DataFrame.from_dict(day_data["epidata"]))
+
+        cur_day += timedelta(1)
+
+    if len(dfs) > 0:
+        out = pd.concat(dfs)
+        out.drop("direction", axis=1, inplace=True)
+        out["time_value"] = pd.to_datetime(out["time_value"], format="%Y%m%d")
+        out["issue"] = pd.to_datetime(out["issue"], format="%Y%m%d")
+        out["geo_type"] = geo_type
+        out["data_source"] = data_source
+        out["signal"] = signal
+        return out
+
+    return None
+
+
+def _async_fetch_single_geo(data_source: str,
+                            signal: str,  # pylint: disable=W0621
+                            start_day: date,
+                            end_day: date,
+                            geo_type: str,
+                            geo_value: str,
+                            as_of: date,
+                            issues: Union[date, tuple, list],
+                            lag: int) -> Union[pd.DataFrame, None]:
+    """Fetch data for a single geo asynchronously
 
     signal() wraps this to support fetching data over an iterable of
     geographies, and stacks the resulting data frames.
 
     If no data is found, return None, so signal() can easily filter out these
     entries.
-
     """
     dfs = []
     params = []
@@ -404,7 +469,7 @@ def _fetch_single_geo(data_source: str,
         if lag:
             day_param["lag"] = lag
         params.append(day_param)
-    output = Epidata.async_call(params)
+    output = Epidata.async_epidata(params, batch_size=100)
     for day_data, params in output:
         if day_data["message"] == "no results":
             warnings.warn(f"No {data_source} {signal} data found on {params['time_values']} "

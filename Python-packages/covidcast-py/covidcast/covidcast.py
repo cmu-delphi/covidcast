@@ -382,7 +382,7 @@ def _fetch_epidata(data_source: str,
                    start_day: date,
                    end_day: date,
                    geo_type: str,
-                   geo_value: str,
+                   geo_value: Union[str, Iterable[str]],
                    as_of: date,
                    issues: Union[date, tuple, list],
                    lag: int) -> Union[pd.DataFrame, None]:
@@ -401,7 +401,6 @@ def _fetch_epidata(data_source: str,
     dfs = []
     while cur_day <= end_day:
         day_str = _date_to_api_string(cur_day)
-
         day_data = Epidata.covidcast(data_source, signal, time_type="day",
                                      geo_type=geo_type, time_values=day_str,
                                      geo_value=geo_value, as_of=as_of_str,
@@ -431,7 +430,7 @@ def _async_fetch_epidata(data_source: str,
                          start_day: date,
                          end_day: date,
                          geo_type: str,
-                         geo_value: str,
+                         geo_value: Union[str, Iterable[str]],
                          as_of: date,
                          issues: Union[date, tuple, list],
                          lag: int) -> Union[pd.DataFrame, None]:

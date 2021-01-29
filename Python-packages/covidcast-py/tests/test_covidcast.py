@@ -203,7 +203,7 @@ def test__detect_metadata():
 
 
 @patch("delphi_epidata.Epidata.covidcast")
-def test__fetch_single_geo(mock_covidcast):
+def test__fetch_epidata(mock_covidcast):
     # not generating full DF since most attributes used
     mock_covidcast.side_effect = [{"result": 1,  # successful API response
                                    "epidata": [{"time_value": 20200622,
@@ -220,20 +220,23 @@ def test__fetch_single_geo(mock_covidcast):
                                   {"message": "success"}]
 
     # test happy path with 2 day range
-    response = covidcast._fetch_single_geo(
+    response = covidcast._fetch_epidata(
         None, None, date(2020, 4, 2), date(2020, 4, 3), None, None, None, None, None)
-    expected = pd.DataFrame({"time_value": [datetime(2020, 6, 22), datetime(2020, 8, 21)],
-                             "issue": [datetime(2020, 7, 24), datetime(2020, 9, 25)],
-                             "geo_type": None,
-                             "data_source": None,
-                             "signal": None
-                             },
-                            index=[0, 0])
-    assert sort_df(response).equals(sort_df(expected))
+    expected = [pd.DataFrame({"time_value": [20200622],
+                              "issue": [20200724],
+                              "direction": None
+                             }),
+                pd.DataFrame({"time_value": [20200821],
+                              "issue": [20200925],
+                              }),
+                ]
+    assert len(response) == 2
+    pd.testing.assert_frame_equal(response[0], expected[0])
+    pd.testing.assert_frame_equal(response[1], expected[1])
 
     # test warning when an unknown bad response is received
     with warnings.catch_warnings(record=True) as w:
-        covidcast._fetch_single_geo("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
+        covidcast._fetch_epidata("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
                                     "*", None, None, None, None)
         assert len(w) == 1
         assert str(w[0].message) == \
@@ -242,19 +245,19 @@ def test__fetch_single_geo(mock_covidcast):
 
     # test warning when a no data response is received
     with warnings.catch_warnings(record=True) as w:
-        covidcast._fetch_single_geo("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
+        covidcast._fetch_epidata("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
                                     "county", None, None, None, None)
         assert len(w) == 1
         assert str(w[0].message) == "No source signal data found on 20200402 for geography 'county'"
         assert w[0].category is NoDataWarning
 
     # test no epidata yields nothing
-    assert not covidcast._fetch_single_geo(None, None, date(2020, 4, 1), date(2020, 4, 1),
-                                           None, None, None, None, None)
+    assert not covidcast._fetch_epidata(None, None, date(2020, 4, 1), date(2020, 4, 1),
+                                        None, None, None, None, None)
 
     # test end_day < start_day yields nothing
-    assert not covidcast._fetch_single_geo(None, None, date(2020, 4, 1), date(2020, 4, 1),
-                                           None, None, None, None, None)
+    assert not covidcast._fetch_epidata(None, None, date(2020, 4, 1), date(2020, 4, 1),
+                                        None, None, None, None, None)
 
 
 

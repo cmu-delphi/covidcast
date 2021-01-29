@@ -382,10 +382,13 @@ def _fetch_single_geo(data_source: str,
                       issues: Union[date, tuple, list],
                       lag: int) -> Union[pd.DataFrame, None]:
     """Fetch data for a single geo.
+
     signal() wraps this to support fetching data over an iterable of
     geographies, and stacks the resulting data frames.
+
     If no data is found, return None, so signal() can easily filter out these
     entries.
+
     """
     as_of_str = _date_to_api_string(as_of) if as_of is not None else None
     issues_strs = _dates_to_api_strings(issues) if issues is not None else None

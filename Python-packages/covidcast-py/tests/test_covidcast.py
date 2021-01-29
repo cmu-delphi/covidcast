@@ -44,11 +44,6 @@ def test_signal(mock_covidcast, mock_metadata):
     expected = pd.DataFrame(return_rows, index=[0]*2)
     assert sort_df(response).equals(sort_df(expected))
 
-    # test happy path with no start or end day and two geo_values
-    response = covidcast.signal("source", "signal", geo_values=["CA", "AL"])
-    expected = pd.DataFrame(return_rows, index=[0]*4)
-    assert sort_df(response).equals(sort_df(expected))
-
     # test happy path with start and end day (8 days apart) and one geo_value
     response = covidcast.signal("source", "signal", start_day=date(2020, 8, 1),
                                 end_day=date(2020, 8, 8), geo_values="CA")
@@ -63,6 +58,8 @@ def test_signal(mock_covidcast, mock_metadata):
     assert sort_df(response).equals(sort_df(expected))
 
     # test no df output
+    mock_covidcast.return_value = {"result": -2,
+                                   "message": "no results fouds"}
     assert not covidcast.signal("source", "signal", geo_values=[])
 
     # test incorrect geo

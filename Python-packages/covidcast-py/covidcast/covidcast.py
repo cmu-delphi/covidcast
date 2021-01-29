@@ -175,26 +175,8 @@ def signal(data_source: str,
                          "start_day = '{start}', end_day = '{end}'".format(
                              start=start_day, end=end_day))
 
-    if isinstance(geo_values, str):
-        # User only provided one, not a list
-        geo_values = [geo_values]
-
-    dfs = [
-        _fetch_single_geo(
-            data_source, signal, start_day, end_day, geo_type, geo_value,
-            as_of, issues, lag)
-        for geo_value in set(geo_values)
-    ]
-
-    try:
-        # pd.concat automatically filters out None
-        out = pd.concat(dfs)
-    except ValueError:
-        # pd.concat raises ValueError if all of the dfs are None, meaning we
-        # found no data
-        return None
-
-    return out
+    return _fetch_single_geo(
+        data_source, signal, start_day, end_day, geo_type, geo_values, as_of, issues, lag)
 
 
 def metadata() -> pd.DataFrame:

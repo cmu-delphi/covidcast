@@ -373,7 +373,7 @@ def _fetch_epidata(data_source: str,
                    start_day: date,
                    end_day: date,
                    geo_type: str,
-                   geo_value: str,
+                   geo_value: Union[str, Iterable[str]],
                    as_of: date,
                    issues: Union[date, tuple, list],
                    lag: int) -> Union[pd.DataFrame, None]:

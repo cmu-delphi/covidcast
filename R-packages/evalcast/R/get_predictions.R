@@ -157,6 +157,7 @@ get_predictions_single_date <- function(forecaster,
       forecast_date = forecast_date,
       data_source = signals$data_source[1],
       signal = signals$signal[1],
+      geo_type = geo_type,
       target_end_date = get_target_period(forecast_date, 
                                           incidence_period, ahead)$end,
       incidence_period = incidence_period) 

@@ -135,7 +135,7 @@ get_covidcast_data <- function(predictions_cards,
   assert_that(length(incidence_period) == 1,
               msg = "All predictions cards should have the same incidence
                      period.")
-  geo_type <- unique(predictions_card$geo_type)
+  geo_type <- unique(predictions_cards$geo_type)
   assert_that(length(geo_type) == 1,
               msg = "All predictions cards should have the same geo_type.")
 

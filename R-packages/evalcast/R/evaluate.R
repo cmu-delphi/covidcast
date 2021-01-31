@@ -51,6 +51,7 @@
 #'  such that the combination gives a unique (quantile) prediction. Ignored if
 #'  `predictions_cards` is of the type returned by [get_covidhub_predictions()]
 #'  or [get_predictions()] (class is `predictions_cards`)
+#' @template geo_type-template 
 #'
 #' @return tibble of "score cards". Contains the same information as the
 #'   `predictions_cards()` with additional columns for each err_measure and
@@ -65,7 +66,8 @@ evaluate_predictions <- function(
                       coverage_80 = interval_coverage(coverage = 0.8)),
   backfill_buffer = 10,
   side_truth = NULL,
-  grp_vars = c("forecaster", "forecast_date", "ahead", "geo_value")) {
+  grp_vars = c("forecaster", "forecast_date", "ahead", "geo_value"),
+  geo_type = c("county", "hrr", "msa", "dma", "state")) {
 
   assert_that("predictions_cards" %in% class(predictions_cards) ||
                 !is.null(side_truth),
@@ -77,7 +79,8 @@ evaluate_predictions <- function(
 
   # Construct predictions joined with real data
   if (is.null(side_truth)) {
-    actual_data <- get_covidcast_data(predictions_cards, backfill_buffer)
+    actual_data <- get_covidcast_data(predictions_cards, backfill_buffer,
+                                      geo_type)
     predictions_cards <- left_join(predictions_cards,
                                    actual_data,
                                    by = c("geo_value",
@@ -111,13 +114,13 @@ evaluate_predictions <- function(
                               as_of = lubridate::as_date(Sys.Date()))
   score_card <- collapse_cards(score_card)
   score_card <- score_card %>%
-                 select(-c(quantile, value))
+    select(-c(quantile, value))
   if (is.null(side_truth)) {
     score_card <- score_card %>%
-                    relocate(.data$ahead, .data$geo_value, .data$forecaster,
-                             .data$forecast_date, .data$data_source,
-                             .data$signal, .data$target_end_date,
-                             .data$incidence_period, .data$actual)
+      relocate(.data$ahead, .data$geo_value, .data$forecaster,
+               .data$forecast_date, .data$data_source,
+               .data$signal, .data$target_end_date,
+               .data$incidence_period, .data$actual)
   }
   score_card <- score_card %>%
                  relocate(attr(err_measures, "name"), .after = last_col())
@@ -125,37 +128,34 @@ evaluate_predictions <- function(
 }
 
 get_covidcast_data <- function(predictions_cards,
-                               backfill_buffer) {
+                               backfill_buffer, 
+                               geo_type) {
   response <- predictions_cards %>%
-                select(.data$data_source, .data$signal) %>%
-                distinct()
+    select(.data$data_source, .data$signal) %>%
+    distinct()
   assert_that(nrow(response) == 1,
               msg = "All predictions cards should have the same response.")
   incidence_period <- unique(predictions_cards$incidence_period)
   assert_that(length(incidence_period) == 1,
               msg = "All predictions cards should have the same incidence
                      period.")
-  geo_type_len <- predictions_cards %>%
-    mutate(type_len = nchar(geo_value)) %>%
-    distinct(type_len)
-  assert_that(nrow(geo_type_len) == 1,
-              msg = "All predictions cards should have the same geo_type.")
-  geo_type <- ifelse(geo_type_len$type_len == 2L, "state", "county")
-
+  
+  geo_type <- geo_type_selector(predictions_cards, geo_type)
+  
   unique_ahead <- select(predictions_cards, .data$ahead) %>%
-                    distinct() %>%
-                    pull()
+    distinct() %>%
+    pull()
   actuals <- list()
   for (i in seq_along(unique_ahead)) {
     message("ahead = ", unique_ahead[i])
     ahead <- unique_ahead[i]
     predictions_cards_ahead <- filter(predictions_cards, .data$ahead == ahead)
     forecast_dates <- select(predictions_cards_ahead, .data$forecast_date) %>%
-                        distinct() %>%
-                        pull()
+      distinct() %>%
+      pull()
     geo_values <- select(predictions_cards_ahead, .data$geo_value) %>%
-                    distinct() %>%
-                    pull()
+      distinct() %>%
+      pull()
 
     # calculate the actual value we're trying to predict:
     target_response <- get_target_response(response,
@@ -192,16 +192,19 @@ get_covidcast_data <- function(predictions_cards,
 #'   A predictions card may be created by the function
 #'   [get_predictions()], downloaded with [get_covidhub_predictions()] or
 #'   possibly created manually.
+#' @param 
 #' @return 'predictions_cards' with an added column `actual`, which represents
 #'   the observed value on the date. The `quantile` and `value` columns are
 #'   dropped, as the actual value does not depend on the quantile predictions.
 #' @export
-get_actuals <- function(predictions_cards) {
+get_actuals <- function(predictions_cards, 
+                        geo_type = c("county", "hrr", "msa", "dma", "state")) {
   assert_that("predictions_cards" %in% class(predictions_cards),
               msg = paste("predictions_cards",
                           "must be of class `predictions_cards`."))
   actuals <- evaluate_predictions(predictions_cards,
-                                  err_measures = NULL)
+                                  err_measures = NULL,
+                                  geo_type = geo_type)
   return(actuals)
 }
 
@@ -226,3 +229,4 @@ erm <- function(x, err_measures){
   names(out) <- names(err_measures)
   bind_rows(out)
 }
+

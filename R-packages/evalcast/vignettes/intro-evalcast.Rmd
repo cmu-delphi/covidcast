@@ -137,7 +137,7 @@ collapse_cards(scorecards) %>% str()
 We can examine forecaster calibration.
 
 ```{r}
-plot_calibration(scorecards, type = "wedge")
+plot_calibration(scorecards, type = "wedgeplot")
 ```
 
 By default, the proportion is the number of `geo_values` that fall above/below the quantile at each forecast date and ahead, but the grouping and variables to average over can be specified.

@@ -11,11 +11,11 @@ collapse_cards <- function(cards){
   assert_that(cls %in% c("predictions_cards", "score_cards"),
               msg=paste("This function is only appropriate for",
                         "predictions_cards or score_cards classes."))
-  cards <- cards %>% 
+  cards <- cards %>%
     filter(abs(.data$quantile - 0.5) < 1e-8 | is.na(.data$quantile)) %>%
     mutate(quantile = ifelse(is.na(.data$quantile), "p","m"))
   if (n_distinct(cards$quantile) == 1) {
-    cards <- cards %>% 
+    cards <- cards %>%
       mutate(quantile = ifelse(.data$quantile == "p", NA, 0.5))
   } else {
     cards <- cards %>%

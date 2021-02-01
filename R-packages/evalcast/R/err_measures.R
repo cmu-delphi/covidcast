@@ -13,12 +13,9 @@
 #' 
 #' @export
 weighted_interval_score <- function(quantile, value, actual_value) {
+  score_func_param_checker(quantile, value, actual_value, "weighted_interval_score")
   if (all(is.na(actual_value))) return(NA)
   actual_value <- unique(actual_value)
-  assert_that(length(actual_value) == 1,
-              msg = "actual_value must only have 1 value")
-  assert_that(length(quantile) == length(value),
-              msg = "quantiles and values must be of the same length")
 
   value <- value[!is.na(quantile)]
   quantile <- quantile[!is.na(quantile)]
@@ -59,6 +56,7 @@ weighted_interval_score <- function(quantile, value, actual_value) {
 #' 
 #' @export
 absolute_error <- function(quantile, value, actual_value) {
+  score_func_param_checker(quantile, value, actual_value, "absolute_error")
   point_fcast <- which(is.na(quantile))
   ae <- abs(actual_value - value)
   if (length(point_fcast) == 1L) return(ae[point_fcast])
@@ -81,12 +79,9 @@ absolute_error <- function(quantile, value, actual_value) {
 #' @export
 interval_coverage <- function(coverage) {
   function(quantiles, value, actual_value) {
-    if(any(duplicated(quantiles))){
-      warning(paste("Interval Coverage:",
-                    "Quantiles must be unique.",
-                    "Returning NA"))
-      return(NA)
-    }
+    score_func_param_checker(quantiles, value, actual_value, "interval_coverage")
+    value = value[!is.na(quantiles)]
+    quantiles = quantiles[!is.na(quantiles)]
     alpha = 1 - coverage
     lower_interval = alpha / 2
     upper_interval = 1 - (alpha / 2)
@@ -104,6 +99,35 @@ interval_coverage <- function(coverage) {
   }
 }
 
-
+#' Common parameter checks for score functions
+#'
+#' A set of common checks for score functions, meant to identify common causes
+#' of issues.
+#'
+#' @param quantiles vector of forecasted quantiles
+#' @param values vector of forecasted values
+#' @param actual_value actual_value, either as a scalar or a vector of the same 
+#'   length as `quantiles` and `values`
+#' @param id string to identify the caller of the function and displayed in
+#'   error messages (recommended to be the parent function's name)
+score_func_param_checker <- function(quantiles, values, actual_value, id = ""){
+  id_str = paste0(id, ": ")
+  if(length(actual_value) > 1){
+    assert_that(length(actual_value) == length(values),
+                msg = paste0(id_str, 
+                             "actual_value must be a scalar or the same length",
+                             " as values"))
+    actual_value = unique(actual_value)
+  }
+  assert_that(length(actual_value) == 1,
+              msg = paste0(id_str,
+                           "actual_value must have exactly 1 unique value"))
+  assert_that(length(quantiles) == length(values),
+              msg = paste0(id_str, 
+                           "quantiles and values must be of the same length"))
+  assert_that(!any(duplicated(quantiles)),
+              msg = paste0(id_str,
+                           "quantiles must be unique."))
+}
 is_symmetric <- function(x, tol=1e-8) all(abs(x + rev(x) - 1) < tol)
 find_quantile_match <- function(x, q, tol=1e-8) abs(x - q) < tol

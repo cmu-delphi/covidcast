@@ -46,7 +46,7 @@ scale_by_forecaster <- function(score_card,
                             "other than", base_forecaster_name))
     for (var in score_cols){
         base_values <- filter(score_card,
-                              forecaster == base_forecaster_name)[[var]]
+                              .data$forecaster == base_forecaster_name)[[var]]
         if (!all(base_values > 0)) {
             warning("scale_by_forecaster will divide by zero in column ", var)
         }
@@ -63,9 +63,10 @@ scale_by_forecaster <- function(score_card,
             pivot_longer(cols = starts_with(var), 
                         names_to = "forecaster",
                         values_to = var) %>%
-            mutate(forecaster = substring(forecaster, nchar(var) + 1))
+            mutate(forecaster = substring(.data$forecaster, nchar(var) + 1))
         if (drop_base_entries)
-            normalized_card <- filter(normalized_card, forecaster != base_forecaster_name)
+            normalized_card <- filter(normalized_card, 
+                                      .data$forecaster != base_forecaster_name)
         return(normalized_card)
     })
     return(reduce(df_list, left_join))

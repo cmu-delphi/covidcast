@@ -62,7 +62,7 @@ unique_for_ahead <- function(cards, attribute) {
 #' @param grp_vars character vector of indicating variables to group on
 #' @param avg_vars character vector of variables to average over
 #'
-#' @return
+#' @return a data frame of the same type as input 
 #' @export
 intersect_averagers <- function(cards, grp_vars, avg_vars) {
   

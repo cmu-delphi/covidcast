@@ -10,7 +10,8 @@ evaluate_predictions(
     interval_coverage(coverage = 0.8)),
   backfill_buffer = 10,
   side_truth = NULL,
-  grp_vars = c("forecaster", "forecast_date", "ahead", "geo_value")
+  grp_vars = c("forecaster", "forecast_date", "ahead", "geo_value"),
+  geo_type = c("county", "hrr", "msa", "dma", "state")
 )
 }
 \arguments{
@@ -41,6 +42,9 @@ the observed data should be named \code{actual}}
 such that the combination gives a unique (quantile) prediction. Ignored if
 \code{predictions_cards} is of the type returned by \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}}
 or \code{\link[=get_predictions]{get_predictions()}} (class is \code{predictions_cards})}
+
+\item{geo_type}{String indicating geographical type, one of "county", "dma",
+"hrr", "msa", or "state".}
 }
 \value{
 tibble of "score cards". Contains the same information as the

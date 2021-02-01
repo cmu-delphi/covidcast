@@ -64,7 +64,17 @@ download_signals <- function(...,
   for (i in seq_along(msg)) message(msg[i])
   
   out <- base::suppressMessages({covidcast_signals(...)})
+  empty_signals <- purrr::map_lgl(out, ~nrow(.x) == 0 || is.null(.x))
 
+  assert_that(!any(empty_signals),
+              msg = paste("For as_of date", args$as_of,
+                          "there is no data in the covidcast API for signals:\n",
+                          paste(
+                            paste("\t-", args$signal[empty_signals],
+                                  "from data_source",
+                                  args$data_source[empty_signals]),
+                            collapse="\n"))
+             )
   
   if (signal_aggregation != "list") {
     out <- covidcast::aggregate_signals(out, 

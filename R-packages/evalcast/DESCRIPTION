@@ -80,6 +80,8 @@ Imports:
     covidHubUtils,
     forcats
 Suggests: 
-    testthat
+    testthat,
+    mockr,
+    mockery
 Depends: 
     R (>= 3.5.0)

@@ -114,7 +114,7 @@ evaluate_predictions <- function(
                               as_of = lubridate::as_date(Sys.Date()))
   score_card <- collapse_cards(score_card)
   score_card <- score_card %>%
-    select(-c(quantile, value))
+    select(-.data$quantile, -.data$value)
   if (is.null(side_truth)) {
     score_card <- score_card %>%
       relocate(.data$ahead, .data$geo_value, .data$forecaster,
@@ -140,7 +140,7 @@ get_covidcast_data <- function(predictions_cards,
               msg = "All predictions cards should have the same incidence
                      period.")
   
-  geo_type <- geo_type_selector(predictions_cards, geo_type)
+  geo_type <- geo_type_selector(geo_type, predictions_cards)
   
   unique_ahead <- select(predictions_cards, .data$ahead) %>%
     distinct() %>%
@@ -179,7 +179,7 @@ get_covidcast_data <- function(predictions_cards,
     }
     actuals[[i]] <- target_response
   }
-  response <- bind_rows(actuals) %>% select(-c(start, end))
+  response <- bind_rows(actuals) %>% select(-.data$start, -.data$end)
   return(response)
 }
 
@@ -192,7 +192,7 @@ get_covidcast_data <- function(predictions_cards,
 #'   A predictions card may be created by the function
 #'   [get_predictions()], downloaded with [get_covidhub_predictions()] or
 #'   possibly created manually.
-#' @param 
+#' @template geo_type-template 
 #' @return 'predictions_cards' with an added column `actual`, which represents
 #'   the observed value on the date. The `quantile` and `value` columns are
 #'   dropped, as the actual value does not depend on the quantile predictions.

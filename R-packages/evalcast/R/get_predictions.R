@@ -115,7 +115,7 @@ get_predictions_single_date <- function(forecaster,
   } else {
     geo_values_dl <- unique(geo_values)
   }
-  df <- download_signals(data_source=signals$data_source,
+  df <- download_signals(data_source = signals$data_source,
                          signal = signals$signal,
                          start_day = signals$start_day,
                          end_day = forecast_date,

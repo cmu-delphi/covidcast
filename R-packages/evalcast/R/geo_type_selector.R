@@ -13,7 +13,7 @@ geo_type_selector <- function(geo_type, predictions_cards) {
   validate_geo_type(geo_type, pred_card_types)
 }
 
-validate_geo_type <- function(geo_type, predictions_cards) {
+validate_geo_type <- function(geo_type, pred_card_types) {
   if (nrow(pred_card_types) > 1L) {
     assert_that(geo_type %in% c("hrr", "msa", "dma"),
                 msg = paste("predictions_cards",

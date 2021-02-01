@@ -4,7 +4,10 @@
 \alias{get_actuals}
 \title{Retrieve actual results for provided forecasts}
 \usage{
-get_actuals(predictions_cards)
+get_actuals(
+  predictions_cards,
+  geo_type = c("county", "hrr", "msa", "dma", "state")
+)
 }
 \arguments{
 \item{predictions_cards}{tibble of predictions
@@ -14,6 +17,9 @@ different forecast date or forecaster.
 A predictions card may be created by the function
 \code{\link[=get_predictions]{get_predictions()}}, downloaded with \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}} or
 possibly created manually.}
+
+\item{geo_type}{String indicating geographical type, one of "county", "dma",
+"hrr", "msa", or "state".}
 }
 \value{
 'predictions_cards' with an added column \code{actual}, which represents

@@ -126,7 +126,7 @@ get_predictions_single_date <- function(forecaster,
                          signal_aggregation_dt = signal_aggregation_dt)
 
   # Dump out any extra geo_values we don't want.
-  if (geo_values != "*") {
+  if (any(geo_values != "*")) {
     if (signal_aggregation == "list") {
       df <- map(df, ~filter(.x, .data$geo_value %in% geo_values))  
     } else {

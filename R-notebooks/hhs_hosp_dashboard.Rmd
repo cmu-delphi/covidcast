@@ -16,34 +16,25 @@ source("dashboard_functions.R")
 
 ### Coverage {.tabset}
 
-#### County
+#### State
 ```{r, include = FALSE}
-df_counties = covidcast_signal(params$source,
+df_state = covidcast_signal(params$source,
                                params$signal,
                                start_day = twenty_eight_days_ago,
-                               geo_type = "county")
+                               geo_type = "state")
 ```
 
 ```{r, fig.width = 10, fig.height = 5}
-plot_28_day_unique(df_counties, "counties")
+plot_28_day_unique(df_state, "states")
 ```
 
 ```{r, fig.width = 10, fig.height = 8}
-plot_28_day_frequency_county(df_counties)
+plot_28_day_frequency_state(df_state)
 ```
 
 #### Metro Areas
 
-```{r, include = FALSE}
-df_metros = covidcast_signal(params$source,
-                             params$signal,
-                             start_day = twenty_eight_days_ago,
-                             geo_type = "msa")
-```
-
-```{r, fig.width = 10, fig.height = 5}
-plot_28_day_unique(df_metros, "metros")
-```
+Not available for this signal.
 
 #### Sample Size
 

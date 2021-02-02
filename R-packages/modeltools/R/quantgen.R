@@ -106,7 +106,7 @@
 #'   `value`. The `quantile` column gives the probabilities associated with
 #'   quantile forecasts for that location and ahead. 
 #' 
-#' @importFrom dplyr filter select pull summarize between
+#' @importFrom dplyr filter select pull summarize between bind_cols
 #' @importFrom tidyr pivot_longer
 #' @export
 quantgen_forecaster = function(df, forecast_date, signals, incidence_period,

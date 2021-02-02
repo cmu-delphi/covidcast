@@ -267,7 +267,8 @@ quantgen_forecaster = function(df, forecast_date, signals, incidence_period,
                    names_to = "quantile",
                    values_to = "value") %>%
       mutate(quantile = as.numeric(quantile),
-             value = as.numeric(value),
+             # https://stackoverflow.com/questions/3418128/how-to-convert-a-factor-to-integer-numeric-without-loss-of-information
+             value = as.numeric(levels(value))[value],
              ahead = a)
     
     # TODO: allow train_obj to be appended to forecaster's output. This would

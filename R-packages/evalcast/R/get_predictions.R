@@ -115,7 +115,7 @@ get_predictions_single_date <- function(forecaster,
   } else {
     geo_values_dl <- unique(geo_values)
   }
-  df <- download_signals(data_source=signals$data_source,
+  df <- download_signals(data_source = signals$data_source,
                          signal = signals$signal,
                          start_day = signals$start_day,
                          end_day = forecast_date,
@@ -126,7 +126,7 @@ get_predictions_single_date <- function(forecaster,
                          signal_aggregation_dt = signal_aggregation_dt)
 
   # Dump out any extra geo_values we don't want.
-  if (geo_values != "*") {
+  if (any(geo_values != "*")) {
     if (signal_aggregation == "list") {
       df <- map(df, ~filter(.x, .data$geo_value %in% geo_values))  
     } else {

@@ -14,7 +14,7 @@ intersect_averagers(cards, grp_vars, avg_vars)
 \item{avg_vars}{character vector of variables to average over}
 }
 \value{
-
+a data frame of the same type as input
 }
 \description{
 Many scoring or plotting functions compute averages over "locations"

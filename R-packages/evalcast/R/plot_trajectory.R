@@ -25,6 +25,7 @@
 #'   `value` and `target_end_date`
 #' @param show_points do you want points as well as lines
 #' @param show_quantiles do you want to plot the quantiles or just lines
+#' @template geo_type-template
 #' @param ... additional arguments passed to [covidcast::covidcast_signal()]
 #'
 #' @return invisibly returns a ggplot object
@@ -37,6 +38,7 @@ plot_trajectory <- function(predictions_cards,
                             side_truth = NULL,
                             show_points = TRUE,
                             show_quantiles = TRUE,
+                            geo_type = c("county", "hrr", "msa", "dma", "state"),
                             ...) {
   if (!is.null(show_geo_value)) {
     predictions_cards <- predictions_cards %>%
@@ -50,7 +52,8 @@ plot_trajectory <- function(predictions_cards,
     warning("More than 3 intervals are difficult to see. Resetting to default.")
     intervals = c(.5, .8, .95)
   }
-  pd <- setup_plot_trajectory(predictions_cards, intervals, side_truth, ...)
+  pd <- setup_plot_trajectory(predictions_cards, intervals, side_truth, 
+                              geo_type, ...)
   
   g <- ggplot(pd$truth_df, mapping = aes(x = .data$target_end_date))
   
@@ -101,6 +104,7 @@ plot_trajectory <- function(predictions_cards,
 setup_plot_trajectory <- function(predictions_cards,
                                   intervals = c(.5, .8, .95),
                                   side_truth = NULL,
+                                  geo_type = "county",
                                   ...){
   args <- list(...)
   max_api_geos <- 30 # threshold for the API. Not really important. Easier
@@ -122,9 +126,8 @@ setup_plot_trajectory <- function(predictions_cards,
       args$data_source <- predictions_cards$data_source[1]
       args$signal <- predictions_cards$signal[1]
     }
-    if (is.null(args$geo_type)) {
-      args$geo_type <- ifelse(nchar(geo_values[1]) == 2L, "state", "county")
-    }
+    geo_type <- geo_type_selector(geo_type, predictions_cards)
+    
     ip <- predictions_cards$incidence_period[1]
     assert_that(ip %in% c("epiweek", "day"),
                 msg = paste("When grabbing data from covidcast, the incidence",
@@ -132,7 +135,7 @@ setup_plot_trajectory <- function(predictions_cards,
     truth_data <- download_signal(
       data_source = args$data_source,
       signal = args$signal,
-      geo_type = args$geo_type,
+      geo_type = geo_type,
       geo_values = args$geo_values,
       ...)
     if (geo_values != "*" && length(geo_values) > max_api_geos ) {
@@ -189,9 +192,7 @@ setup_plot_trajectory <- function(predictions_cards,
                            format(2*.data$quantile, digits=3, nsmall=3),
                            format(2*(1-.data$quantile), digits=3, nsmall=3)),
              interval = forcats::fct_rev(
-               paste0((1-as.numeric(.data$alp))*100, "%")
-               )
-      ) %>%
+               paste0((1-as.numeric(.data$alp))*100, "%"))) %>%
       select(-.data$quantile, -.data$alp) %>%
       pivot_wider(names_from = "endpoint_type", values_from = "value")
   }
@@ -213,42 +214,4 @@ setup_plot_trajectory <- function(predictions_cards,
   list(truth_df = truth_data, 
        points_df = points_df, 
        quantiles_df = quantiles_df)
-}
-
-
-
-sum_to_epiweek <- function(daily_df){
-  daily_df <- bind_cols(daily_df, MMWRweek::MMWRweek(daily_df$time_value)) %>%
-    mutate(time_value = 
-             MMWRweek::MMWRweek2Date(.data$MMWRyear, .data$MMWRweek, 7)) %>%
-    group_by(.data$geo_value, .data$time_value) %>%
-    summarise(value = sum(.data$value)) %>%
-    ungroup()
-}
-
-
-shift_day_to_preceding_xxxday <- function(day, xxx){
-  ew_day <- MMWRweek::MMWRweek(day)
-  if(ew_day$MMWRday < xxx) {
-    MMWRweek::MMWRweek2Date(MMWRyear = ew_day$MMWRyear,
-                            MMWRweek = ew_day$MMWRweek,
-                            MMWRday = xxx) - 7
-  } else {
-    MMWRweek::MMWRweek2Date(MMWRyear = ew_day$MMWRyear, 
-                            MMWRweek = ew_day$MMWRweek, 
-                            MMWRday = xxx)
-  }
-}
-
-shift_day_to_following_xxxday <- function(day, xxx){
-  ew_day <- MMWRweek::MMWRweek(day)
-  if(ew_day$MMWRday > xxx) {
-    MMWRweek::MMWRweek2Date(MMWRyear = ew_day$MMWRyear,
-                            MMWRweek = ew_day$MMWRweek,
-                            MMWRday = xxx) + 7
-  } else {
-    MMWRweek::MMWRweek2Date(MMWRyear = ew_day$MMWRyear, 
-                            MMWRweek = ew_day$MMWRweek, 
-                            MMWRday = xxx)
-  }
 }

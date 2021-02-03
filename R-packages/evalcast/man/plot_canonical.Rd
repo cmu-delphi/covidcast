@@ -49,6 +49,10 @@ with \code{facet_cols} to create a grid of plots.}
 \item{base_forecaster}{If set, scales the y-value for all forecasters by
 the corresponding values of the \code{base_forecaster}}
 
+\item{scale_before_aggr}{If TRUE, scales results by the
+\code{base_forecaster} before aggregating by the \code{aggr} function. FALSE by
+default.}
+
 \item{title}{title of the plot, if set}
 
 \item{subtitle}{subtitle of the plot, if set}
@@ -60,10 +64,6 @@ the corresponding values of the \code{base_forecaster}}
 \item{legend_position}{where to position the legend ("bottom" by default)}
 
 \item{legend_title}{title of the legend, if set}
-
-\item{scale_before_aggregation}{If TRUE, scales results by the
-\code{base_forecaster} before aggregating by the \code{aggr} function. FALSE by
-default.}
 }
 \description{
 A canonical function for creating plots within evalcast

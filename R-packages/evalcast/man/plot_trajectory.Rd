@@ -13,6 +13,7 @@ plot_trajectory(
   side_truth = NULL,
   show_points = TRUE,
   show_quantiles = TRUE,
+  geo_type = c("county", "hrr", "msa", "dma", "state"),
   ...
 )
 }
@@ -49,6 +50,9 @@ with \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}}. Mu
 \item{show_points}{do you want points as well as lines}
 
 \item{show_quantiles}{do you want to plot the quantiles or just lines}
+
+\item{geo_type}{String indicating geographical type, one of "county", "dma",
+"hrr", "msa", or "state".}
 
 \item{...}{additional arguments passed to \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}}}
 }

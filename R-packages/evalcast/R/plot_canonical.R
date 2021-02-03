@@ -14,7 +14,7 @@
 #' @param facet_cols Same as `facet_rows`, but with columns.
 #' @param base_forecaster If set, scales the y-value for all forecasters by
 #'   the corresponding values of the `base_forecaster`
-#' @param scale_before_aggregation If TRUE, scales results by the
+#' @param scale_before_aggr If TRUE, scales results by the
 #'   `base_forecaster` before aggregating by the `aggr` function. FALSE by
 #'   default.
 #' @param title title of the plot, if set
@@ -71,13 +71,17 @@ plot_canonical <- function(df, x, y, aggr = mean, dots = TRUE, lines = TRUE,
   line_layer <- NULL
   color_vars <- setdiff(group_vars, c(facet_rows, facet_cols))
   df <- df %>% mutate(color = Interaction(!!!syms(color_vars)))
-  if (dots) dots_layer <- geom_point(aes(color = color, group = color))
-  if (lines) line_layer <- geom_line(aes(color = color, group = color))
+  if (dots) { 
+    dots_layer <- geom_point(aes(color = .data$color, group = .data$color))
+  }
+  if (lines) {
+    line_layer <- geom_line(aes(color = .data$color, group = .data$color))
+  }
   facet_layer <- facet_grid(rows = vars(!!!syms(facet_rows)),
                             cols = vars(!!!syms(facet_cols)))
   label_layer <- labs(title = title, subtitle = subtitle,
                       x = xlab, y = ylab, color = legend_title)
-  theme_layer <- theme(legend.pos = legend_position)
+  theme_layer <- theme(legend.position = legend_position)
 
   # Plot and return
   ggplot(df, aes(x = !!sym(x), y = !!sym(y))) +

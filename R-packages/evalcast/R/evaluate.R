@@ -67,7 +67,7 @@ evaluate_predictions <- function(
   backfill_buffer = 10,
   side_truth = NULL,
   grp_vars = c("forecaster", "forecast_date", "ahead", "geo_value"),
-  geo_type = c("county", "hrr", "msa", "dma", "state")) {
+  geo_type = c("county", "hrr", "msa", "dma", "state", "nation")) {
 
   assert_that("predictions_cards" %in% class(predictions_cards) ||
                 !is.null(side_truth),

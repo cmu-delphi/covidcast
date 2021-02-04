@@ -204,7 +204,7 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
 #' @importFrom dplyr %>%
 covidcast_signal <- function(data_source, signal,
                              start_day = NULL, end_day = NULL,
-                             geo_type = c("county", "hrr", "msa", "dma", "state"),
+                             geo_type = c("county", "hrr", "msa", "dma", "state", "nation"),
                              geo_values = "*",
                              as_of = NULL, issues = NULL, lag = NULL) {
   geo_type <- match.arg(geo_type)

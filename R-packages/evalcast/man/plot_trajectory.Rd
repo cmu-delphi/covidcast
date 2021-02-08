@@ -13,7 +13,7 @@ plot_trajectory(
   side_truth = NULL,
   show_points = TRUE,
   show_quantiles = TRUE,
-  geo_type = c("county", "hrr", "msa", "dma", "state"),
+  geo_type,
   ...
 )
 }
@@ -51,8 +51,9 @@ with \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}}. Mu
 
 \item{show_quantiles}{do you want to plot the quantiles or just lines}
 
-\item{geo_type}{String indicating geographical type, one of "county", "dma",
-"hrr", "msa", or "state".}
+\item{geo_type}{String indicating geographical type, such as "county", or
+"state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
+for available options.}
 
 \item{...}{additional arguments passed to \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}}}
 }

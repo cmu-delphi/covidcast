@@ -67,7 +67,7 @@ evaluate_predictions <- function(
   backfill_buffer = 10,
   side_truth = NULL,
   grp_vars = c("forecaster", "forecast_date", "ahead", "geo_value"),
-  geo_type = c("county", "hrr", "msa", "dma", "state", "nation")) {
+  geo_type) {
 
   assert_that("predictions_cards" %in% class(predictions_cards) ||
                 !is.null(side_truth),
@@ -139,9 +139,7 @@ get_covidcast_data <- function(predictions_cards,
   assert_that(length(incidence_period) == 1,
               msg = "All predictions cards should have the same incidence
                      period.")
-  
-  geo_type <- geo_type_selector(geo_type, predictions_cards)
-  
+
   unique_ahead <- select(predictions_cards, .data$ahead) %>%
     distinct() %>%
     pull()
@@ -197,8 +195,8 @@ get_covidcast_data <- function(predictions_cards,
 #'   the observed value on the date. The `quantile` and `value` columns are
 #'   dropped, as the actual value does not depend on the quantile predictions.
 #' @export
-get_actuals <- function(predictions_cards, 
-                        geo_type = c("county", "hrr", "msa", "dma", "state")) {
+get_actuals <- function(predictions_cards,
+                        geo_type) {
   assert_that("predictions_cards" %in% class(predictions_cards),
               msg = paste("predictions_cards",
                           "must be of class `predictions_cards`."))

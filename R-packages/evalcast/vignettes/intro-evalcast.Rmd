@@ -128,6 +128,7 @@ scorecards <- evaluate_predictions(
 collapse_cards(scorecards) %>% str()
 ```
 
+
 **Technical note:** What does `backfill_buffer = 10` do?  When we evaluate a forecaster in backtesting we are assuming that we know what actually occurred.  However, in light of backfill, we may not trust the data for some period of time.  The argument `backfill_buffer` allows us to specify how many days until we believe that the data has "settled down" and is unlikely to be updated further.  The choice of this argument will depend on the particular signal you are forecasting.
 
 ### Plots of performance measures

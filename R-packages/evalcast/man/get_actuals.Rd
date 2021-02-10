@@ -4,7 +4,10 @@
 \alias{get_actuals}
 \title{Retrieve actual results for provided forecasts}
 \usage{
-get_actuals(predictions_cards, geo_type)
+get_actuals(
+  predictions_cards,
+  geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation")
+)
 }
 \arguments{
 \item{predictions_cards}{tibble of predictions

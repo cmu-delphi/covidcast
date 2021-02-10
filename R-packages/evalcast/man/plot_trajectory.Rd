@@ -13,7 +13,7 @@ plot_trajectory(
   side_truth = NULL,
   show_points = TRUE,
   show_quantiles = TRUE,
-  geo_type,
+  geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation"),
   ...
 )
 }

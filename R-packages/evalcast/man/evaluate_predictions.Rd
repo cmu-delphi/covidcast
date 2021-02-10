@@ -11,7 +11,7 @@ evaluate_predictions(
   backfill_buffer = 10,
   side_truth = NULL,
   grp_vars = c("forecaster", "forecast_date", "ahead", "geo_value"),
-  geo_type
+  geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation")
 )
 }
 \arguments{

@@ -38,8 +38,10 @@ plot_trajectory <- function(predictions_cards,
                             side_truth = NULL,
                             show_points = TRUE,
                             show_quantiles = TRUE,
-                            geo_type,
+                            geo_type = c("county", "hrr", "msa", "dma", "state",
+                                         "hhs", "nation"),
                             ...) {
+  geo_type = match.arg(geo_type)
   if (!is.null(show_geo_value)) {
     predictions_cards <- predictions_cards %>%
       filter(.data$geo_value %in% show_geo_value)

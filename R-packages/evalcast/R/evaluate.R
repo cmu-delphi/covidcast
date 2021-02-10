@@ -67,8 +67,9 @@ evaluate_predictions <- function(
   backfill_buffer = 10,
   side_truth = NULL,
   grp_vars = c("forecaster", "forecast_date", "ahead", "geo_value"),
-  geo_type) {
+  geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation")) {
 
+  geo_type = match.arg(geo_type)
   assert_that("predictions_cards" %in% class(predictions_cards) ||
                 !is.null(side_truth),
               msg = paste("In evaluate_predictions: either predictions_cards",
@@ -196,7 +197,9 @@ get_covidcast_data <- function(predictions_cards,
 #'   dropped, as the actual value does not depend on the quantile predictions.
 #' @export
 get_actuals <- function(predictions_cards,
-                        geo_type) {
+                        geo_type = c("county", "hrr", "msa", "dma", "state",
+                                     "hhs", "nation")) {
+  geo_type = match.arg(geo_type)
   assert_that("predictions_cards" %in% class(predictions_cards),
               msg = paste("predictions_cards",
                           "must be of class `predictions_cards`."))

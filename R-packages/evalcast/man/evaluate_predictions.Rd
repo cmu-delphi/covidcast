@@ -11,7 +11,7 @@ evaluate_predictions(
   backfill_buffer = 10,
   side_truth = NULL,
   grp_vars = c("forecaster", "forecast_date", "ahead", "geo_value"),
-  geo_type = c("county", "hrr", "msa", "dma", "state")
+  geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation")
 )
 }
 \arguments{
@@ -43,8 +43,9 @@ such that the combination gives a unique (quantile) prediction. Ignored if
 \code{predictions_cards} is of the type returned by \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}}
 or \code{\link[=get_predictions]{get_predictions()}} (class is \code{predictions_cards})}
 
-\item{geo_type}{String indicating geographical type, one of "county", "dma",
-"hrr", "msa", or "state".}
+\item{geo_type}{String indicating geographical type, such as "county", or
+"state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
+for available options.}
 }
 \value{
 tibble of "score cards". Contains the same information as the

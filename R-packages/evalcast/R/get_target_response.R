@@ -11,7 +11,7 @@ get_target_response <- function(signals,
     enframe(name = NULL, value = "forecast_date") %>%
     mutate(incidence_period = incidence_period, ahead = ahead) %>%
     pmap_dfr(get_target_period)
-  
+
   # Compute the actual values that the forecaster is trying to
   # predict. In particular,
   # - get most recent data available from covidcast for these target periods
@@ -20,9 +20,7 @@ get_target_response <- function(signals,
     mutate(available = .data$end <= Sys.Date()) 
   bad_dates <- forecast_dates[!target_periods$available]
   
-  
   # Altered to return results for any available forecasts
-  
   if (length(bad_dates) > 0) {
     # we try not to crash everything here. Instead, issue a warning.
     warning(paste0("When `ahead` is ", ahead, ", it is too soon to evaluate ",

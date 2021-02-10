@@ -64,7 +64,7 @@ download_signals <- function(...,
   for (i in seq_along(msg)) message(msg[i])
   
   out <- base::suppressMessages({covidcast_signals(...)})
-  empty_signals <- purrr::map_lgl(out, ~nrow(.x) == 0 || is.null(.x))
+  empty_signals <- purrr::map_lgl(out, ~ is.null(.x) || nrow(.x) == 0)
 
   assert_that(!any(empty_signals),
               msg = paste("For as_of date", args$as_of,

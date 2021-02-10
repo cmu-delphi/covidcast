@@ -79,7 +79,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -105,7 +105,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/cmu-delphi/covidcast/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -134,25 +134,6 @@
     </colgroup>
 
     <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-example-forecasters" class="hasAnchor"><a href="#section-example-forecasters" class="anchor"></a>Example forecasters</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="baseline_forecaster.html">baseline_forecaster()</a></code> </p>
-        </td>
-        <td><p>Baseline forecaster</p></td>
-      </tr>
-    </tbody><tbody>
       <tr>
         <th colspan="2">
           <h2 id="section-creating-or-importing-predictions" class="hasAnchor"><a href="#section-creating-or-importing-predictions" class="anchor"></a>Creating or importing predictions</h2>
@@ -237,6 +218,12 @@
           <p><code><a href="interval_coverage.html">interval_coverage()</a></code> </p>
         </td>
         <td><p>Generate interval coverage error measure function</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_actuals.html">get_actuals()</a></code> </p>
+        </td>
+        <td><p>Retrieve actual results for provided forecasts</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -274,6 +261,12 @@
           <p><code><a href="compute_width.html">compute_width()</a></code> </p>
         </td>
         <td><p>Summarize forecast interval widths</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="scale_by_forecaster.html">scale_by_forecaster()</a></code> </p>
+        </td>
+        <td><p>Scale error measures based on those of a particular forecaster.</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -296,15 +289,15 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="plot_coverage.html">plot_coverage()</a></code> </p>
+          <p><code><a href="plot_canonical.html">plot_canonical()</a></code> </p>
         </td>
-        <td><p>Plot interval coverage</p></td>
+        <td><p>A canonical function for creating plots within evalcast</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="plot_measure.html">plot_measure()</a></code> </p>
+          <p><code><a href="plot_coverage.html">plot_coverage()</a></code> </p>
         </td>
-        <td><p>Plot error measure (deprecated)</p></td>
+        <td><p>Plot interval coverage</p></td>
       </tr><tr>
         
         <td>
@@ -317,6 +310,25 @@
           <p><code><a href="plot_width.html">plot_width()</a></code> </p>
         </td>
         <td><p>Plot interval width</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-example-forecasters" class="hasAnchor"><a href="#section-example-forecasters" class="anchor"></a>Example forecasters</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="baseline_forecaster.html">baseline_forecaster()</a></code> </p>
+        </td>
+        <td><p>Baseline forecaster</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -347,7 +359,19 @@
         <td>
           <p><code><a href="collapse_cards.html">collapse_cards()</a></code> </p>
         </td>
-        <td><p>Reduce size of cards</p></td>
+        <td><p>Remove all quantile forecasts</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="averaging_checks.html">averaging_checks()</a></code> </p>
+        </td>
+        <td><p>Check if quantile forecasts are commensurate across groups</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="intersect_averagers.html">intersect_averagers()</a></code> </p>
+        </td>
+        <td><p>Find common averaging "locations"</p></td>
       </tr>
     </tbody>
     </table>

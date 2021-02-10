@@ -23,13 +23,15 @@
 #' @param ylab y-axis label, if set
 #' @param legend_position where to position the legend ("bottom" by default)
 #' @param legend_title title of the legend, if set
+#' 
+#' @export
 plot_canonical <- function(df, x, y, aggr = mean, dots = TRUE, lines = TRUE,
-                          group_vars = "forecaster", facet_rows = NULL,
-                          facet_cols = NULL, base_forecaster = NULL,
-                          scale_before_aggr = FALSE,
-                          title = waiver(), subtitle = waiver(),
-                          xlab = waiver(), ylab  = waiver(),
-                          legend_position = "bottom", legend_title = NULL) {
+                           group_vars = "forecaster", facet_rows = NULL,
+                           facet_cols = NULL, base_forecaster = NULL,
+                           scale_before_aggr = FALSE,
+                           title = waiver(), subtitle = waiver(),
+                           xlab = waiver(), ylab  = waiver(),
+                           legend_position = "bottom", legend_title = NULL) {
   assert_that("data.frame" %in% class(df),
               msg = "df must be of class data.frame")
   assert_that(dots | lines,

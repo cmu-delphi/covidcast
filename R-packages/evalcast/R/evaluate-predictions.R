@@ -207,26 +207,3 @@ get_actuals <- function(predictions_cards,
                                   geo_type = geo_type)
   return(actuals)
 }
-
-#' @importFrom rlang :=
-empty_score_card <- function(pcards, err_measures){
-  # Creates a score card with nothing in it in case there's no available data
-  # to evaluate some particular forecast task. Avoids errors later on.
-  out <- pcards[0,]
-  out$actual <- double(0)
-  for(iter in names(err_measures)){
-    out <- bind_cols(out, tibble(!!iter := double(0)))
-  }
-}
-
-erm <- function(x, err_measures){
-  # just binds up any error measure functions for an lapply
-  # I'm sure there's a better way to do this, but I couldn't think of one
-  out <- double(length(err_measures))
-  for (i in seq_along(err_measures)) {
-    out[i] <- err_measures[[i]](x$quantile, x$value, x$actual)
-  }
-  names(out) <- names(err_measures)
-  bind_rows(out)
-}
-

@@ -62,13 +62,14 @@ plot_trajectory <- function(predictions_cards,
     l_quantiles = levels(pd$quantiles_df$interval)
     alp = c(.4, .2, .1)
     for (qq in n_quantiles:1) {
-      g <- g + geom_ribbon(data = pd$quantiles_df %>%
-                             filter(.data$interval == l_quantiles[qq]),
-                           mapping = aes(ymin = .data$lower, 
-                                         ymax = .data$upper,
-                                         group = .data$forecast_date,
-                                         fill = .data$forecaster),
-                           alpha = alp[qq]) 
+      g <- g + 
+        geom_ribbon(data = pd$quantiles_df %>%
+                      filter(.data$interval == l_quantiles[qq]),
+                    mapping = aes(ymin = .data$lower, 
+                                  ymax = .data$upper,
+                                  group = .data$forecast_date,
+                                  fill = .data$forecaster),
+                    alpha = alp[qq]) 
     }
   }
     

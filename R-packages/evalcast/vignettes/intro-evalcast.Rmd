@@ -122,10 +122,10 @@ scorecards <- evaluate_predictions(
 ```
 
 
-`evaluate_predictions()` returns a long data frame with one column for each error measure added to the `predictions_cards`. Keeping all quantile predictions may be useful for plotting or other downstream analysis. For a more compact version, use `collapse_cards()` to return one row for each geo_value/ahead/forecast_date/forecaster combination.
+`evaluate_predictions()` returns a long data frame with one column for each error measure added to the `predictions_cards` and the `quantile` and `value` columns removed and one row for each geo_value/ahead/forecast_date/forecaster combination. If quantile predictions are needed for plotting or other downstream analysis, then use the `predictions_cards`. 
 
 ```{r}
-collapse_cards(scorecards) %>% str()
+scorecards %>% str()
 ```
 
 

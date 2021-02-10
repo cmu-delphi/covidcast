@@ -18,4 +18,3 @@ empty_score_card <- function(pcards, err_measures){
     out <- bind_cols(out, tibble(!!iter := double(0)))
   }
 }
-

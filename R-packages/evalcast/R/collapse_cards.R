@@ -31,5 +31,3 @@ collapse_cards <- function(cards){
   class(cards) = c(cls, class(cards))
   cards
 }
-
-

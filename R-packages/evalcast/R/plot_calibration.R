@@ -98,4 +98,3 @@ setup_wedgeplot <- function(calib) {
                                   prop_above = "Proportion above",
                                   prop_below = "Proportion below"))
 }
-

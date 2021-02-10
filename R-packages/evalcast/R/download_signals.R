@@ -83,4 +83,3 @@ download_signals <- function(...,
   }
   out 
 }
-

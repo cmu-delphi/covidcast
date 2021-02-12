@@ -193,7 +193,7 @@ def signal(data_source: str,
         out["data_source"] = data_source
         out["signal"] = signal
         return out
-
+    return None
 
 def metadata() -> pd.DataFrame:
     """Fetch COVIDcast surveillance stream metadata.
@@ -328,7 +328,7 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
 
 def _parse_datetimes(date_int: int,
                      time_type: str,
-                     format: str="%Y%m%d") -> Union[pd.Timestamp]:  # annotating nan errors
+                     date_format: str= "%Y%m%d") -> Union[pd.Timestamp]:  # annotating nan errors
     """Convert a date or epiweeks string into timestamp objects.
 
     Datetimes (length 8) are converted to their corresponding date, while epiweeks (length 6)
@@ -337,17 +337,16 @@ def _parse_datetimes(date_int: int,
     Epiweeks use the CDC format.
 
     :param date_int: Int representation of date.
-    :param format: String of the date format to parse.
+    :param date_format: String of the date format to parse.
     :returns: Timestamp.
     """
     date_str = str(date_int)
     if time_type == "day":
-        return pd.to_datetime(date_str, format=format)
-    elif time_type == "week":
+        return pd.to_datetime(date_str, format=date_format)
+    if time_type == "week":
         epiwk = Week(int(date_str[:4]), int(date_str[-2:]))
         return pd.to_datetime(epiwk.startdate())
-    else:
-        return np.nan
+    return np.nan
 
 
 def _detect_metadata(data: pd.DataFrame,
@@ -434,7 +433,7 @@ def _async_fetch_epidata(data_source: str,
                          as_of: date,
                          issues: Union[date, tuple, list],
                          lag: int) -> Union[pd.DataFrame, None]:
-    """Fetch data for a single geo asynchronously
+    """Fetch data for a single geo asynchronously.
 
     signal() wraps this to support fetching data over an iterable of
     geographies, and stacks the resulting data frames.

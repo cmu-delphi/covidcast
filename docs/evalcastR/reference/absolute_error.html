@@ -40,8 +40,7 @@
 
 
 <meta property="og:title" content="Compute absolute error — absolute_error" />
-<meta property="og:description" content="Computes absolute error between the actual value and the median of the
-forecast distribution." />
+<meta property="og:description" content="Absolute error of a forecaster" />
 
 
 
@@ -81,7 +80,7 @@ forecast distribution." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -107,7 +106,7 @@ forecast distribution." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/cmu-delphi/covidcast/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -125,13 +124,12 @@ forecast distribution." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Compute absolute error</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/err_measures.R'><code>R/err_measures.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/error_measures.R'><code>R/error_measures.R</code></a></small>
     <div class="hidden name"><code>absolute_error.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Computes absolute error between the actual value and the median of the
-forecast distribution.</p>
+    <p>Absolute error of a forecaster</p>
     </div>
 
     <pre class="usage"><span class='fu'>absolute_error</span><span class='op'>(</span><span class='va'>quantile</span>, <span class='va'>value</span>, <span class='va'>actual_value</span><span class='op'>)</span></pre>
@@ -149,10 +147,16 @@ forecast distribution.</p>
     </tr>
     <tr>
       <th>actual_value</th>
-      <td><p>Actual value.</p></td>
+      <td><p>vector of actual values of the same length as
+<code>quantile</code>/<code>value</code> or a scalar</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Intended to be used with <code><a href='evaluate_predictions.html'>evaluate_predictions()</a></code>, it expects three arguments
+of the same length, finds the location of the point forecast, and returns
+the absolute error.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

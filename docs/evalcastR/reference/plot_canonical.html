@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot interval width — plot_width • evalcast</title>
+<title>A canonical function for creating plots within evalcast — plot_canonical • evalcast</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Plot interval width — plot_width" />
-<meta property="og:description" content="Plot interval width" />
+<meta property="og:title" content="A canonical function for creating plots within evalcast — plot_canonical" />
+<meta property="og:description" content="A canonical function for creating plots within evalcast" />
 
 
 
@@ -123,56 +123,114 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot interval width</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/plot_width.R'><code>R/plot_width.R</code></a></small>
-    <div class="hidden name"><code>plot_width.Rd</code></div>
+    <h1>A canonical function for creating plots within evalcast</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/plot_canonical.R'><code>R/plot_canonical.R</code></a></small>
+    <div class="hidden name"><code>plot_canonical.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Plot interval width</p>
+    <p>A canonical function for creating plots within evalcast</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plot_width</span><span class='op'>(</span>
-  <span class='va'>cards</span>,
-  levels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.7</span>, <span class='fl'>0.9</span><span class='op'>)</span>,
-  grp_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forecaster"</span>, <span class='st'>"forecast_date"</span>, <span class='st'>"ahead"</span><span class='op'>)</span>,
-  avg_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"geo_value"</span><span class='op'>)</span>,
-  legend_position <span class='op'>=</span> <span class='st'>"bottom"</span>
+    <pre class="usage"><span class='fu'>plot_canonical</span><span class='op'>(</span>
+  <span class='va'>df</span>,
+  <span class='va'>x</span>,
+  <span class='va'>y</span>,
+  aggr <span class='op'>=</span> <span class='va'>mean</span>,
+  dots <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  lines <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  group_vars <span class='op'>=</span> <span class='st'>"forecaster"</span>,
+  facet_rows <span class='op'>=</span> <span class='cn'>NULL</span>,
+  facet_cols <span class='op'>=</span> <span class='cn'>NULL</span>,
+  base_forecaster <span class='op'>=</span> <span class='cn'>NULL</span>,
+  scale_before_aggr <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  title <span class='op'>=</span> <span class='fu'>waiver</span><span class='op'>(</span><span class='op'>)</span>,
+  subtitle <span class='op'>=</span> <span class='fu'>waiver</span><span class='op'>(</span><span class='op'>)</span>,
+  xlab <span class='op'>=</span> <span class='fu'>waiver</span><span class='op'>(</span><span class='op'>)</span>,
+  ylab <span class='op'>=</span> <span class='fu'>waiver</span><span class='op'>(</span><span class='op'>)</span>,
+  legend_position <span class='op'>=</span> <span class='st'>"bottom"</span>,
+  legend_title <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>cards</th>
-      <td><p>scorecards or predictions cards (or a data frame with columns
-<code>quantile</code>, <code>value</code> and any grouping vars and averaging vars)</p></td>
+      <th>df</th>
+      <td><p>dataframe containing the data to plot</p></td>
     </tr>
     <tr>
-      <th>levels</th>
-      <td><p>Quantile levels for the summary of interval width, to be
-plotted. For example, <code>levels = c(0.5, 0.7, 0.9)</code>, the default, plots the
-median, 70% and 90% quantiles of interval widths.</p></td>
+      <th>x</th>
+      <td><p>Name of the variable in <code>df</code> to be used for the x-axis</p></td>
     </tr>
     <tr>
-      <th>grp_vars</th>
-      <td><p>variables over which to compare widths The first
-determines the color of the lines while the rest will be faceted over</p></td>
+      <th>y</th>
+      <td><p>name of the variable in <code>df</code> to be used for the y-axis</p></td>
     </tr>
     <tr>
-      <th>avg_vars</th>
-      <td><p>variables over which we compute quantiles.</p></td>
+      <th>aggr</th>
+      <td><p>function to use to aggregate data over <code>group_vars</code></p></td>
+    </tr>
+    <tr>
+      <th>dots</th>
+      <td><p>when set to TRUE, a dot layer is included in the plot</p></td>
+    </tr>
+    <tr>
+      <th>lines</th>
+      <td><p>when set to TRUE, a line layer is included in the plot</p></td>
+    </tr>
+    <tr>
+      <th>group_vars</th>
+      <td><p>The set of variable names in <code>df</code> which to aggregate over.
+"forecaster" by default.</p></td>
+    </tr>
+    <tr>
+      <th>facet_rows</th>
+      <td><p>A variable name to facet data over. Creates a
+separate row of plots for each value of specified variable. Can be used
+with <code>facet_cols</code> to create a grid of plots.</p></td>
+    </tr>
+    <tr>
+      <th>facet_cols</th>
+      <td><p>Same as <code>facet_rows</code>, but with columns.</p></td>
+    </tr>
+    <tr>
+      <th>base_forecaster</th>
+      <td><p>If set, scales the y-value for all forecasters by
+the corresponding values of the <code>base_forecaster</code></p></td>
+    </tr>
+    <tr>
+      <th>scale_before_aggr</th>
+      <td><p>If TRUE, scales results by the
+<code>base_forecaster</code> before aggregating by the <code>aggr</code> function. FALSE by
+default.</p></td>
+    </tr>
+    <tr>
+      <th>title</th>
+      <td><p>title of the plot, if set</p></td>
+    </tr>
+    <tr>
+      <th>subtitle</th>
+      <td><p>subtitle of the plot, if set</p></td>
+    </tr>
+    <tr>
+      <th>xlab</th>
+      <td><p>x-axis label, if set</p></td>
+    </tr>
+    <tr>
+      <th>ylab</th>
+      <td><p>y-axis label, if set</p></td>
     </tr>
     <tr>
       <th>legend_position</th>
-      <td><p>Legend position, the default being "bottom".</p></td>
+      <td><p>where to position the legend ("bottom" by default)</p></td>
+    </tr>
+    <tr>
+      <th>legend_title</th>
+      <td><p>title of the legend, if set</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Interval width does not depend on the actual outcome, so this
-function can be called on predictions cards in addition to score cards.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

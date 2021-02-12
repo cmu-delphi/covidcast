@@ -161,4 +161,3 @@ get_predictions_single_date <- function(forecaster,
                                           incidence_period, ahead)$end,
       incidence_period = incidence_period) 
 }
-

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot interval width — plot_width • evalcast</title>
+<title>Retrieve actual results for provided forecasts — get_actuals • evalcast</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Plot interval width — plot_width" />
-<meta property="og:description" content="Plot interval width" />
+<meta property="og:title" content="Retrieve actual results for provided forecasts — get_actuals" />
+<meta property="og:description" content="Retrieve actual results for provided forecasts" />
 
 
 
@@ -123,56 +123,45 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot interval width</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/plot_width.R'><code>R/plot_width.R</code></a></small>
-    <div class="hidden name"><code>plot_width.Rd</code></div>
+    <h1>Retrieve actual results for provided forecasts</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/evaluate-predictions.R'><code>R/evaluate-predictions.R</code></a></small>
+    <div class="hidden name"><code>get_actuals.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Plot interval width</p>
+    <p>Retrieve actual results for provided forecasts</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plot_width</span><span class='op'>(</span>
-  <span class='va'>cards</span>,
-  levels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.7</span>, <span class='fl'>0.9</span><span class='op'>)</span>,
-  grp_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forecaster"</span>, <span class='st'>"forecast_date"</span>, <span class='st'>"ahead"</span><span class='op'>)</span>,
-  avg_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"geo_value"</span><span class='op'>)</span>,
-  legend_position <span class='op'>=</span> <span class='st'>"bottom"</span>
+    <pre class="usage"><span class='fu'>get_actuals</span><span class='op'>(</span>
+  <span class='va'>predictions_cards</span>,
+  geo_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"county"</span>, <span class='st'>"hrr"</span>, <span class='st'>"msa"</span>, <span class='st'>"dma"</span>, <span class='st'>"state"</span><span class='op'>)</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>cards</th>
-      <td><p>scorecards or predictions cards (or a data frame with columns
-<code>quantile</code>, <code>value</code> and any grouping vars and averaging vars)</p></td>
+      <th>predictions_cards</th>
+      <td><p>tibble of predictions
+that are all for the same prediction task, meaning they are for the same
+response, incidence period and geo_type. Forecasts may be for a
+different forecast date or forecaster.
+A predictions card may be created by the function
+<code><a href='get_predictions.html'>get_predictions()</a></code>, downloaded with <code><a href='get_covidhub_predictions.html'>get_covidhub_predictions()</a></code> or
+possibly created manually.</p></td>
     </tr>
     <tr>
-      <th>levels</th>
-      <td><p>Quantile levels for the summary of interval width, to be
-plotted. For example, <code>levels = c(0.5, 0.7, 0.9)</code>, the default, plots the
-median, 70% and 90% quantiles of interval widths.</p></td>
-    </tr>
-    <tr>
-      <th>grp_vars</th>
-      <td><p>variables over which to compare widths The first
-determines the color of the lines while the rest will be faceted over</p></td>
-    </tr>
-    <tr>
-      <th>avg_vars</th>
-      <td><p>variables over which we compute quantiles.</p></td>
-    </tr>
-    <tr>
-      <th>legend_position</th>
-      <td><p>Legend position, the default being "bottom".</p></td>
+      <th>geo_type</th>
+      <td><p>String indicating geographical type, one of "county", "dma",
+"hrr", "msa", or "state".</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Interval width does not depend on the actual outcome, so this
-function can be called on predictions cards in addition to score cards.</p>
+    <p>'predictions_cards' with an added column <code>actual</code>, which represents
+the observed value on the date. The <code>quantile</code> and <code>value</code> columns are
+dropped, as the actual value does not depend on the quantile predictions.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -42,12 +42,11 @@
 <meta property="og:title" content="Create a data frame of score cards — evaluate_predictions" />
 <meta property="og:description" content="Performs backtesting, through the following steps:
 Takes a list of predictions cards (as created by
-get_predictions()). These should be from a single forecaster, each card
-corresponding to a different forecast date.
+get_predictions()).
 Downloads from the COVIDcast API the latest available data to compute
 what actually occurred (summing the response over the incidence period).
 Computes various user-specified error measures.
-The result is a list of &quot;score cards&quot;, where each list element corresponds to
+The result is a data frame of &quot;score cards&quot;, where each row corresponds to
 a distinct ahead value. A score card is a data frame in which each row
 corresponds to a location-day pair, and the columns give the values of the
 error measures (along with other information including the forecast
@@ -91,7 +90,7 @@ distributions and the actual response values)." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -117,7 +116,7 @@ distributions and the actual response values)." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/cmu-delphi/covidcast/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -135,19 +134,18 @@ distributions and the actual response values)." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Create a data frame of score cards</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/evaluate.R'><code>R/evaluate.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/evaluate-predictions.R'><code>R/evaluate-predictions.R</code></a></small>
     <div class="hidden name"><code>evaluate_predictions.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>Performs backtesting, through the following steps:</p><ol>
 <li><p>Takes a list of predictions cards (as created by
-<code><a href='get_predictions.html'>get_predictions()</a></code>). These should be from a single forecaster, each card
-corresponding to a different forecast date.</p></li>
+<code><a href='get_predictions.html'>get_predictions()</a></code>).</p></li>
 <li><p>Downloads from the COVIDcast API the latest available data to compute
 what actually occurred (summing the response over the incidence period).</p></li>
 <li><p>Computes various user-specified error measures.</p></li>
-</ol><p>The result is a list of "score cards", where each list element corresponds to
+</ol><p>The result is a data frame of "score cards", where each row corresponds to
 a distinct ahead value. A score card is a data frame in which each row
 corresponds to a location-day pair, and the columns give the values of the
 error measures (along with other information including the forecast
@@ -160,7 +158,8 @@ distributions and the actual response values).</p>
     <span class='fu'><a href='interval_coverage.html'>interval_coverage</a></span><span class='op'>(</span>coverage <span class='op'>=</span> <span class='fl'>0.8</span><span class='op'>)</span><span class='op'>)</span>,
   backfill_buffer <span class='op'>=</span> <span class='fl'>10</span>,
   side_truth <span class='op'>=</span> <span class='cn'>NULL</span>,
-  grp_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forecaster"</span>, <span class='st'>"forecast_date"</span>, <span class='st'>"ahead"</span>, <span class='st'>"geo_value"</span><span class='op'>)</span>
+  grp_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forecaster"</span>, <span class='st'>"forecast_date"</span>, <span class='st'>"ahead"</span>, <span class='st'>"geo_value"</span><span class='op'>)</span>,
+  geo_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"county"</span>, <span class='st'>"hrr"</span>, <span class='st'>"msa"</span>, <span class='st'>"dma"</span>, <span class='st'>"state"</span><span class='op'>)</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -170,7 +169,7 @@ distributions and the actual response values).</p>
       <th>predictions_cards</th>
       <td><p>tibble of predictions
 that are all for the same prediction task, meaning they are for the same
-response, incidence period, ahead, and geo type. Forecasts may be for a
+response, incidence period,and geo type. Forecasts may be for a
 different forecast date or forecaster.
 A predictions card may be created by the function
 <code><a href='get_predictions.html'>get_predictions()</a></code>, downloaded with <code><a href='get_covidhub_predictions.html'>get_covidhub_predictions()</a></code> or
@@ -180,7 +179,8 @@ possibly created manually.</p></td>
       <th>err_measures</th>
       <td><p>Named list of one or more functions, where each function
 takes a data frame with three columns <code>quantile</code>, <code>value</code> and <code>actual</code>
-(i.e., observed) returns a scalar measure of error.</p></td>
+(i.e., observed) returns a scalar measure of error. Null or an empty list
+may be provided if scoring is not desired.</p></td>
     </tr>
     <tr>
       <th>backfill_buffer</th>
@@ -202,6 +202,11 @@ the observed data should be named <code>actual</code></p></td>
 such that the combination gives a unique (quantile) prediction. Ignored if
 <code>predictions_cards</code> is of the type returned by <code><a href='get_covidhub_predictions.html'>get_covidhub_predictions()</a></code>
 or <code><a href='get_predictions.html'>get_predictions()</a></code> (class is <code>predictions_cards</code>)</p></td>
+    </tr>
+    <tr>
+      <th>geo_type</th>
+      <td><p>String indicating geographical type, one of "county", "dma",
+"hrr", "msa", or "state".</p></td>
     </tr>
     </table>
 

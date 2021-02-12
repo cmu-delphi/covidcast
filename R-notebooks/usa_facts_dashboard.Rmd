@@ -24,11 +24,11 @@ df_counties = covidcast_signal(params$source,
 ```
 
 ```{r, fig.width = 10, fig.height = 5}
-plot_28_day_unique(df_counties, "counties")
+plot_unique_geo_types_present(df_counties, "counties")
 ```
 
 ```{r, fig.width = 10, fig.height = 8}
-plot_28_day_frequency_county(df_counties)
+plot_data_frequency_choro(df_counties, "county")
 ```
 
 #### Metro Areas
@@ -41,7 +41,7 @@ df_metros = covidcast_signal(params$source,
 ```
 
 ```{r, fig.width = 10, fig.height = 5}
-plot_28_day_unique(df_metros, "metros")
+plot_unique_geo_types_present(df_metros, "metros")
 ```
 
 #### Sample Size
@@ -52,5 +52,5 @@ df_states = covidcast_signal(params$source,
                              start_day = twenty_eight_days_ago,
                              geo_type = "state")
 
-plot_28_day_sample_volume(df_states, "Raw confirmed volume")
+plot_sample_volume(df_states, "Raw confirmed volume")
 ```

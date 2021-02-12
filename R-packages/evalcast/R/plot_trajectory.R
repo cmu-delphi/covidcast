@@ -38,8 +38,10 @@ plot_trajectory <- function(predictions_cards,
                             side_truth = NULL,
                             show_points = TRUE,
                             show_quantiles = TRUE,
-                            geo_type = c("county", "hrr", "msa", "dma", "state"),
+                            geo_type = c("county", "hrr", "msa", "dma", "state",
+                                         "hhs", "nation"),
                             ...) {
+  geo_type = match.arg(geo_type)
   if (!is.null(show_geo_value)) {
     predictions_cards <- predictions_cards %>%
       filter(.data$geo_value %in% show_geo_value)
@@ -127,8 +129,7 @@ setup_plot_trajectory <- function(predictions_cards,
       args$data_source <- predictions_cards$data_source[1]
       args$signal <- predictions_cards$signal[1]
     }
-    geo_type <- geo_type_selector(geo_type, predictions_cards)
-    
+
     ip <- predictions_cards$incidence_period[1]
     assert_that(ip %in% c("epiweek", "day"),
                 msg = paste("When grabbing data from covidcast, the incidence",

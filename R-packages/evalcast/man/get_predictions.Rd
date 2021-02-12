@@ -55,8 +55,9 @@ Sunday or Monday, then \code{ahead = 1} means the epiweek that includes the
 forecast date; if \code{forecast_date} falls on a Tuesday through Saturday, then
 it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahead = 1} means the day after forecast date.}
 
-\item{geo_type}{String indicating geographical type, one of "county", "dma",
-"hrr", "msa", or "state".}
+\item{geo_type}{String indicating geographical type, such as "county", or
+"state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
+for available options.}
 
 \item{geo_values}{Vector or list of locations whose data will be passed to
 \code{forecaster}. The default, "*", fetches all that is available in the API.}

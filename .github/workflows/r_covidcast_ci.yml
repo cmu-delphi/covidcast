@@ -16,13 +16,13 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     defaults:
       run:
         working-directory: R-packages/covidcast/
     strategy:
       matrix:
-        r-version: [3.5]
+        r-version: [3.6]
 
     steps:
       - uses: actions/checkout@v2
@@ -30,8 +30,12 @@ jobs:
         uses: r-lib/actions/setup-r@v1
         with:
           r-version: ${{ matrix.r-version }}
-      - name: Install libcurl
-        run: sudo apt-get install libcurl4-openssl-dev
+      - name: Install linux dependencies  
+        run: |
+            sudo apt-get install libcurl4-openssl-dev
+            sudo apt-get install libudunits2-dev
+            sudo apt-get install libgdal-dev
+            sudo apt-get install libgit2-dev
       - name: Cache R packages
         uses: actions/cache@v2
         with:

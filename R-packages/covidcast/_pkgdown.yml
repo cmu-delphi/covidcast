@@ -18,6 +18,7 @@ articles:
       - plotting-signals
       - correlation-utils
       - multi-signals
+      - external-data
 
 repo:
   url:
@@ -41,12 +42,15 @@ reference:
       - print.covidcast_meta
       - summary.covidcast_signal
       - summary.covidcast_meta
-  - title: Wrangle and correlate multiple signals
-    desc: Calculate correlations, aggregate signals, and move between aggregated data formats
+  - title: Wrangle and correlate signals
+    desc: Calculate correlations, aggregate multiple signals, and move between aggregated data formats
   - contents:
       - covidcast_cor
+      - latest_issue
+      - earliest_issue
       - aggregate_signals
       - covidcast_longer
+      - as.covidcast_signal
   - title: Geographic utilities
     desc: Manipulate geographic IDs like FIPS codes and CBSAs
   - contents:
@@ -60,8 +64,6 @@ reference:
     desc: Get Census reference and geographic data
   - contents:
       - county_census
-      - county_geo
       - msa_census
       - state_census
-      - state_geo
 

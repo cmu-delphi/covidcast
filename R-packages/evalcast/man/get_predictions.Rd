@@ -101,6 +101,7 @@ and geo type (e.g., 1-epiweek-ahead death forecasting at the state level with
 predictions made using the information as of September 14).
 }
 \examples{
+\dontrun{
 baby_predictions = get_predictions(
   baseline_forecaster, "baby",
   tibble::tibble(
@@ -109,5 +110,6 @@ baby_predictions = get_predictions(
     start_day="2020-08-15"), 
   "2020-10-01","epiweek", 1:4, 
   "state", "mi", signal_aggregation="long")
+}
 
 }

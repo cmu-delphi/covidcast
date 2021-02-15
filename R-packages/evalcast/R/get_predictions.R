@@ -34,7 +34,7 @@
 #' @template predictions_cards-template
 #' 
 #'
-#' @examples
+#' @examples \dontrun{
 #' baby_predictions = get_predictions(
 #'   baseline_forecaster, "baby",
 #'   tibble::tibble(
@@ -43,7 +43,8 @@
 #'     start_day="2020-08-15"), 
 #'   "2020-10-01","epiweek", 1:4, 
 #'   "state", "mi", signal_aggregation="long")
-#'
+#' }
+#' 
 #' @export
 get_predictions <- function(forecaster,
                             name_of_forecaster,

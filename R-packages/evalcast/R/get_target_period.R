@@ -3,6 +3,8 @@
 #' @template forecast_date-template
 #' @template incidence_period-template
 #' @template ahead-template
+#' 
+#' @export
 get_target_period <- function(forecast_date, incidence_period, ahead) {
   # This function gives the start and end dates of the target period,
   # based on the system described in the COVIDHub rules here:

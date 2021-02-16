@@ -16,6 +16,7 @@ get_predictions(
   apply_corrections = NULL,
   signal_aggregation = c("list", "wide", "long"),
   signal_aggregation_dt = NULL,
+  as_of_override = function(forecast_date) forecast_date,
   ...
 )
 }
@@ -79,8 +80,17 @@ request "wide" or "long". See \code{\link[covidcast:covidcast_signals]{covidcast
 \code{\link[covidcast:aggregate_signals]{covidcast::aggregate_signals()}} can perform leading and lagging for you.
 See that documentation for more details.}
 
-\item{...}{Additional named arguments to be passed to \code{forecaster()} and
-\code{apply_corrections()}}
+\item{as_of_override}{by default, the \code{as_of} date of data downloaded from
+covidcast is loaded with \code{as_of = forecast_date}. This means that data
+is "rewound" to days in the past. Any data revisions made since, would
+not have been present at that time, and would not be available to the
+forecaster. It's likely, for example, that no data would actually exist
+for the forecast date on the forecast date (there is some latency between
+the time signals are reported and the dates for which they are reported).
+You can override this functionality, though we strongly advise you do so
+with care, by passing a function of a single forecast_date here.}
+
+\item{...}{Additional named arguments to be passed to \code{forecaster()}}
 }
 \value{
 Long data frame of forecasts with a class of \code{predictions_cards}.

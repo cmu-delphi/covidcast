@@ -29,8 +29,16 @@
 #' @param signal_aggregation_dt for any data format, 
 #'   [covidcast::aggregate_signals()] can perform leading and lagging for you.
 #'   See that documentation for more details.
-#' @param ... Additional named arguments to be passed to `forecaster()` and 
-#'   `apply_corrections()`
+#' @param as_of_override by default, the `as_of` date of data downloaded from
+#'   covidcast is loaded with `as_of = forecast_date`. This means that data
+#'   is "rewound" to days in the past. Any data revisions made since, would
+#'   not have been present at that time, and would not be available to the
+#'   forecaster. It's likely, for example, that no data would actually exist
+#'   for the forecast date on the forecast date (there is some latency between
+#'   the time signals are reported and the dates for which they are reported).
+#'   You can override this functionality, though we strongly advise you do so
+#'   with care, by passing a function of a single forecast_date here.
+#' @param ... Additional named arguments to be passed to `forecaster()` 
 #' @template predictions_cards-template
 #' 
 #'
@@ -57,6 +65,7 @@ get_predictions <- function(forecaster,
                             apply_corrections = NULL,
                             signal_aggregation = c("list", "wide", "long"),
                             signal_aggregation_dt = NULL,
+                            as_of_override = function(forecast_date) forecast_date,
                             ...) {
   assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
   signal_aggregation = match.arg(signal_aggregation, c("list", "wide", "long"))
@@ -74,7 +83,8 @@ get_predictions <- function(forecaster,
                  geo_values = geo_values,
                  apply_corrections = apply_corrections,
                  signal_aggregation = signal_aggregation,
-                 signal_aggregation_dt = signal_aggregation_dt),
+                 signal_aggregation_dt = signal_aggregation_dt,
+                 as_of_override = as_of_override),
                  params))) %>%
     bind_rows()
 
@@ -96,6 +106,7 @@ get_predictions_single_date <- function(forecaster,
                                         apply_corrections,
                                         signal_aggregation,
                                         signal_aggregation_dt,
+                                        as_of_override,
                                         ...) {
   # see get_predictions() for descriptions of the arguments
 
@@ -120,7 +131,7 @@ get_predictions_single_date <- function(forecaster,
                          signal = signals$signal,
                          start_day = signals$start_day,
                          end_day = forecast_date,
-                         as_of = forecast_date,
+                         as_of = as_of_override(forecast_date),
                          geo_type = geo_type,
                          geo_values = geo_values_dl,
                          signal_aggregation = signal_aggregation,

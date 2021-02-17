@@ -149,7 +149,7 @@ get_predictions_single_date <- function(forecaster,
     
   
   
-  if(!is.null(apply_corrections)) df <- apply_corrections(df, ...)
+  if(!is.null(apply_corrections)) df <- apply_corrections(df)
   
 
   out <- forecaster(df,

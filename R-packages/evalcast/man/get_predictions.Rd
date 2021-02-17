@@ -67,8 +67,7 @@ for available options.}
 to the signals. Input is a data frame or list as returned as
 \code{df <- covidcast::download_signals()}.
 The returned object should be of the type expected by your forecaster.
-This function will be called as \code{apply_corrections(df, ...)} using any
-named arguments passed in \code{...} to \code{get_predictions()}.}
+This function will be called as \code{apply_corrections(df)}.}
 
 \item{signal_aggregation}{this and the next argument control the type of
 data your forecaster expects to receive from covidcast. By default,
@@ -88,7 +87,8 @@ forecaster. It's likely, for example, that no data would actually exist
 for the forecast date on the forecast date (there is some latency between
 the time signals are reported and the dates for which they are reported).
 You can override this functionality, though we strongly advise you do so
-with care, by passing a function of a single forecast_date here.}
+with care, by passing a function of a single forecast_date here. The
+function should return a date.}
 
 \item{...}{Additional named arguments to be passed to \code{forecaster()}}
 }

@@ -37,7 +37,8 @@
 #'   for the forecast date on the forecast date (there is some latency between
 #'   the time signals are reported and the dates for which they are reported).
 #'   You can override this functionality, though we strongly advise you do so
-#'   with care, by passing a function of a single forecast_date here.
+#'   with care, by passing a function of a single forecast_date here. The 
+#'   function should return a date.
 #' @param ... Additional named arguments to be passed to `forecaster()` 
 #' @template predictions_cards-template
 #' 

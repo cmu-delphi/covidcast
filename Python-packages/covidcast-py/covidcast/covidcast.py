@@ -100,9 +100,9 @@ def signal(data_source: str,
       with ``time_value`` of June 3 will only be included in the results if its
       data was issued or updated on June 6. If ``None``, the default, return the
       most recently issued data regardless of its lag.
-    :returns: A Pandas data frame with matching data. Each row is one
-      observation on one day in one geographic location. Contains the following
-      columns:
+    :returns: A Pandas data frame with matching data, or ``None`` if no data is
+      returned. Each row is one observation on one day in one geographic location.
+      Contains the following columns:
 
       ``geo_value``
         Identifies the location, such as a state name or county FIPS code. The
@@ -185,6 +185,8 @@ def signal(data_source: str,
         out["data_source"] = data_source
         out["signal"] = signal
         return out
+    return None
+
 
 def metadata() -> pd.DataFrame:
     """Fetch COVIDcast surveillance stream metadata.

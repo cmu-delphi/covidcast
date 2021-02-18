@@ -5,7 +5,9 @@
 \title{Plot interval coverage}
 \usage{
 plot_coverage(
-  scorecards,
+  predictions_cards,
+  geo_type,
+  backfill_buffer = 10,
   type = c("all", "one"),
   grp_vars = c("forecaster", "forecast_date", "ahead"),
   avg_vars = c("geo_value"),
@@ -14,8 +16,16 @@ plot_coverage(
 )
 }
 \arguments{
-\item{scorecards}{List of different score cards, all on the same forecasting
-task (i.e., same ahead, etc.).}
+\item{predictions_cards}{tibble of predictions
+that are all for the same prediction task, meaning they are for the same
+response, incidence period,and geo type. Forecasts may be for a
+different forecast date or forecaster.
+A predictions card may be created by the function
+\code{\link[=get_predictions]{get_predictions()}}, downloaded with \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}} or
+possibly created manually.}
+
+\item{backfill_buffer}{How many days until response is deemed trustworthy
+enough to be taken as correct?}
 
 \item{type}{One of "all" or "none", indicating whether to show coverage
 across all nominal levels (in which case averaging is performed across

@@ -195,6 +195,7 @@ def signal(data_source: str,
         return out
     return None
 
+
 def metadata() -> pd.DataFrame:
     """Fetch COVIDcast surveillance stream metadata.
 
@@ -328,7 +329,7 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
 
 def _parse_datetimes(date_int: int,
                      time_type: str,
-                     date_format: str= "%Y%m%d") -> Union[pd.Timestamp]:  # annotating nan errors
+                     date_format: str = "%Y%m%d") -> Union[pd.Timestamp]:  # annotating nan errors
     """Convert a date or epiweeks string into timestamp objects.
 
     Datetimes (length 8) are converted to their corresponding date, while epiweeks (length 6)

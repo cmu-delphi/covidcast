@@ -231,6 +231,7 @@ def test__fetch_epidata(mock_covidcast):
     mock_covidcast.return_value = {"message": "success"}  # no epidata
     assert not covidcast._fetch_epidata(None, None, date(2020, 4, 2), date(2020, 4, 1),
                                         None, None, None, None, None)
+
     # not generating full DF since most attributes used
     mock_covidcast.side_effect = [{"result": 1,  # successful API response
                                    "epidata": [{"time_value": 20200622,

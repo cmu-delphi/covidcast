@@ -174,28 +174,17 @@ def signal(data_source: str,
         raise ValueError("end_day must be on or after start_day, but "
                          "start_day = '{start}', end_day = '{end}'".format(
                              start=start_day, end=end_day))
-
-    if isinstance(geo_values, str):
-        # User only provided one, not a list
-        geo_values = [geo_values]
-
-    dfs = [
-        _fetch_single_geo(
-            data_source, signal, start_day, end_day, geo_type, geo_value,
-            as_of, issues, lag)
-        for geo_value in set(geo_values)
-    ]
-
-    try:
-        # pd.concat automatically filters out None
+    dfs = _fetch_epidata(
+        data_source, signal, start_day, end_day, geo_type, geo_values, as_of, issues, lag)
+    if len(dfs) > 0:
         out = pd.concat(dfs)
-    except ValueError:
-        # pd.concat raises ValueError if all of the dfs are None, meaning we
-        # found no data
-        return None
-
-    return out
-
+        out.drop("direction", axis=1, inplace=True)
+        out["time_value"] = pd.to_datetime(out["time_value"], format="%Y%m%d")
+        out["issue"] = pd.to_datetime(out["issue"], format="%Y%m%d")
+        out["geo_type"] = geo_type
+        out["data_source"] = data_source
+        out["signal"] = signal
+        return out
 
 def metadata() -> pd.DataFrame:
     """Fetch COVIDcast surveillance stream metadata.
@@ -378,15 +367,15 @@ def _detect_metadata(data: pd.DataFrame,
     return unique_data_source_vals[0], unique_signal_col_vals[0], unique_geo_type_vals[0]
 
 
-def _fetch_single_geo(data_source: str,
-                      signal: str,  # pylint: disable=W0621
-                      start_day: date,
-                      end_day: date,
-                      geo_type: str,
-                      geo_value: str,
-                      as_of: date,
-                      issues: Union[date, tuple, list],
-                      lag: int) -> Union[pd.DataFrame, None]:
+def _fetch_epidata(data_source: str,
+                   signal: str,  # pylint: disable=W0621
+                   start_day: date,
+                   end_day: date,
+                   geo_type: str,
+                   geo_value: Union[str, Iterable[str]],
+                   as_of: date,
+                   issues: Union[date, tuple, list],
+                   lag: int) -> Union[pd.DataFrame, None]:
     """Fetch data for a single geo.
 
     signal() wraps this to support fetching data over an iterable of
@@ -398,14 +387,10 @@ def _fetch_single_geo(data_source: str,
     """
     as_of_str = _date_to_api_string(as_of) if as_of is not None else None
     issues_strs = _dates_to_api_strings(issues) if issues is not None else None
-
     cur_day = start_day
-
     dfs = []
-
     while cur_day <= end_day:
         day_str = _date_to_api_string(cur_day)
-
         day_data = Epidata.covidcast(data_source, signal, time_type="day",
                                      geo_type=geo_type, time_values=day_str,
                                      geo_value=geo_value, as_of=as_of_str,
@@ -426,20 +411,8 @@ def _fetch_single_geo(data_source: str,
         # since there is no "epidata" in the response.
         if "epidata" in day_data:
             dfs.append(pd.DataFrame.from_dict(day_data["epidata"]))
-
         cur_day += timedelta(1)
-
-    if len(dfs) > 0:
-        out = pd.concat(dfs)
-        out.drop("direction", axis=1, inplace=True)
-        out["time_value"] = pd.to_datetime(out["time_value"], format="%Y%m%d")
-        out["issue"] = pd.to_datetime(out["issue"], format="%Y%m%d")
-        out["geo_type"] = geo_type
-        out["data_source"] = data_source
-        out["signal"] = signal
-        return out
-
-    return None
+    return dfs
 
 
 def _signal_metadata(data_source: str,

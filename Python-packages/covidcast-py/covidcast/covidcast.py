@@ -185,6 +185,8 @@ def signal(data_source: str,
         out["data_source"] = data_source
         out["signal"] = signal
         return out
+    return None
+
 
 def metadata() -> pd.DataFrame:
     """Fetch COVIDcast surveillance stream metadata.

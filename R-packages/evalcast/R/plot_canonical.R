@@ -39,13 +39,13 @@ plot_canonical <- function(df, x, y, aggr = mean, dots = TRUE, lines = TRUE,
   if (!is.null(facet_rows)) {
    non_grouped_facet <- setdiff(facet_rows, group_vars)
    assert_that(length(non_grouped_facet) == 0,
-                msg = paste("Variables must be grouped in order to be faceted:",
+                msg = paste("Variables must be grouped in order to be faceted in rows:",
                             non_grouped_facet))
   }
   if (!is.null(facet_cols)) {
-    non_grouped_facet <- setdiff(facet_rows, group_vars)
+    non_grouped_facet <- setdiff(facet_cols, group_vars)
     assert_that(length(non_grouped_facet) == 0,
-                msg = paste("Variables must be grouped in order to be faceted:",
+                msg = paste("Variables must be grouped in order to be faceted in cols:",
                             non_grouped_facet))
   }
   assert_that(!(scale_before_aggr & is.null(base_forecaster)),

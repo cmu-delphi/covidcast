@@ -1,38 +1,23 @@
 library(lubridate)
 library(evalcast)
 library(dplyr)
+library(stringr)
 
-# TODO: Use `get_covidhub_forecaster_names()` instead of listing forecasters
-create_prediction_cards = function(){
-  start_date = today() - 12 * 7 # last 12 weeks
+create_prediction_cards = function(prediction_cards_filename, weeks_back = NULL,
+                                   forecasters = get_covidhub_forecaster_names(),
+                                   signals = NULL){
   
-  forecasters = c("CMU-TimeSeries",
-                  "CovidAnalytics-DELPHI",
-                  "CU-select",
-                  #   "Google_Harvard-CPF", Excluded for now. Doesn't have quantiles for all forecasts
-                  "GT-DeepCOVID", 
-                  "IEM_MED-CovidProject",
-                  "IowaStateLW-STEM",
-                  "IHME-CurveFit", 
-                  "JHUAPL-Bucky",
-                  "JHU_IDD-CovidSP",
-                  "JHU_UNC_GAS-StatMechPool",
-                  "Karlen-pypm",
-                  "LANL-GrowthRate", 
-                  "LNQ-ens1",
-                  "MOBS-GLEAM_COVID",
-                  "OliverWyman-Navigator", 
-                  "OneQuietNight-ML",
-                  "PandemicCentral-USCounty",
-                  "UCLA-SuEIR",
-                  "UMass-MechBayes",
-                  "UT-Mobility",
-                  "UVA-Ensemble",
-                  "Yu_Group-CLEP",
-                  "YYG-ParamSearch", 
-                  "COVIDhub-ensemble", 
-                  "COVIDhub-baseline")
+  if(is.null(weeks_back)){
+    start_date = as.Date("2018-01-01") # arbitrary pre-pandemic date
+  } else {
+    start_date = today() - 7 * weeks_back
+  }
+  if (is.null(forecasters)){
+    forecasters = get_covidhub_forecaster_names()
+  }
   
+  num_forecasters = length(forecasters)
+  print(str_interp("Getting forecasts for ${num_forecasters} forecasters."))
   # Get all forecast dates for these forecasters from COVID Hub
   forecast_dates = vector("list", length = length(forecasters))
   for (i in 1:length(forecasters)) {
@@ -50,26 +35,25 @@ create_prediction_cards = function(){
   # that case it's no longer a true prediction. We can always restart from scratch
   # by deleting predictions_cards.rds.
   
-  if (file.exists("predictions_cards.rds")) {
-    predictions_cards = readRDS(file = "predictions_cards.rds")
-  }
-  if(exists("predictions_cards")){
+  if (file.exists(prediction_cards_filename)) {
+    print("Reading from existing prediction cards")
+    predictions_cards = readRDS(file = prediction_cards_filename)
     seen_dates = predictions_cards %>% 
       distinct(forecast_date, forecaster)
+    print("Existing prediction cards loaded")
+  }else{
+    print("No prediction cards found, will need to regenerate.")
   }
-  
-  # Now figure out "comparable" forecast dates: making a forecast on a Sunday or a 
-  # Monday of the same epiweek should be comparable.
-  
-  forecast_dates_cmu = forecast_dates[[which(forecasters == "CMU-TimeSeries")]]
   
   # new_dates, as opposed to dates for which we already have data for a forecaster
   new_dates = list()
+  
+  # Now figure out "comparable" forecast dates: making a forecast on a Sunday or a 
+  # Monday of the same epiweek should be comparable...
   for (i in 1:length(forecasters)) {
     given_dates = forecast_dates[[i]]
-    # Only take forecasts from Sunday or Mondays, but only take the Monday one
-    # if both are present
     comparable_forecast_dates = given_dates[wday(given_dates) %in% c(1, 2)]
+    # ...but if forecasts were made on both Sunday and Monday, only take Monday
     comparable_forecast_dates = comparable_forecast_dates[!((comparable_forecast_dates + 1) %in% comparable_forecast_dates)]
     if(exists("seen_dates")){
       if(forecasters[[i]] %in% seen_dates$forecaster){
@@ -85,19 +69,20 @@ create_prediction_cards = function(){
   # Now get new predictions for each forecaster
   
   predictions_cards_list = vector("list", length = length(forecasters))
-  deaths_sig = "deaths_incidence_num"
-  cases_sig = "confirmed_incidence_num"
   for (i in 1:length(forecasters)) {
-    cat(forecasters[i], "...\n")
+    cat(str_interp("${i}/${num_forecasters}:${forecasters[i]} ...\n"))
     if (length(new_dates[[i]] > 0)){
       predictions_cards_list[[i]] = tryCatch({
         get_covidhub_predictions(forecasters[i], 
                                  rev(new_dates[[i]])) %>% 
-          filter(ahead < 5) %>% 
-          filter((nchar(geo_value) == 2 & signal == deaths_sig) |
-                   (nchar(geo_value) == 5 & signal == cases_sig))
+          filter(ahead < 5) %>%
+          filter(nchar(geo_value) %in% c(2, 5))
       },
       error = function(e) cat(e$message))
+      if (!is.null(signals)){
+        predictions_cards_list[[i]] = predictions_cards_list[[i]] %>%
+                                        filter(signal %in% signals)
+      }
     }
   }
   predictions_cards_new = bind_rows(predictions_cards_list)
@@ -109,15 +94,10 @@ create_prediction_cards = function(){
     predictions_cards = predictions_cards_new
   }
   predictions_cards = predictions_cards %>%
-                        filter(forecast_date >= start_date)
-  
-  # Hack: must change the response data source to be USAFacts, as JHU-CSSE data is
-  # currently unstable. **TODO**: we shouldn't require `evaluate_predictions()` to 
-  # have the response match what's in the forecaster. If I train my forecaster on
-  # (say) JHU-CSSE data, then I should be able to evaluate it on USAFacts data. 
-  
-  predictions_cards$data_source = "usa-facts"
+                        filter(forecast_date >= start_date) %>%
+                        filter(!is.na(predictions_cards$target_end_date)) 
+
   saveRDS(predictions_cards,
-          file = "predictions_cards.rds", 
+          file = prediction_cards_filename, 
           compress = "xz")
 }

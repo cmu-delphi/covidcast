@@ -11,6 +11,8 @@ plot_coverage(
   type = c("all", "one"),
   grp_vars = c("forecaster", "forecast_date", "ahead"),
   avg_vars = c("geo_value"),
+  facet_rows = c("forecaster"),
+  facet_cols = c("forecast_date"),
   coverage = 0.8,
   legend_position = "bottom"
 )
@@ -32,11 +34,16 @@ across all nominal levels (in which case averaging is performed across
 \code{avg_vars}) or whether to show it for one specific alpha
 value.}
 
-\item{grp_vars}{variables over which to compare coverage. The first
-determines the color of the lines while the rest will be faceted over}
+\item{grp_vars}{variables over which to compare coverage}
 
 \item{avg_vars}{variables over which we average to determine the proportion
 of coverage. If \code{type = "one"},}
+
+\item{facet_rows}{A variable name to facet data over. Creates a
+separate row of plots for each value of specified variable. Can be used
+with \code{facet_cols} to create a grid of plots.}
+
+\item{facet_cols}{Same as \code{facet_rows}, but with columns.}
 
 \item{coverage}{If \code{type = "one"}, then coverage is the nominal interval
 coverage shown.}

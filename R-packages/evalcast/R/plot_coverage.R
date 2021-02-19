@@ -14,10 +14,13 @@
 #'   across all nominal levels (in which case averaging is performed across
 #'   `avg_vars`) or whether to show it for one specific alpha
 #'   value.
-#' @param grp_vars variables over which to compare coverage. The first 
-#'   determines the color of the lines while the rest will be faceted over
+#' @param grp_vars variables over which to compare coverage
 #' @param avg_vars variables over which we average to determine the proportion
 #'   of coverage. If `type = "one"`, 
+#' @param facet_rows A variable name to facet data over. Creates a
+#'   separate row of plots for each value of specified variable. Can be used
+#'   with `facet_cols` to create a grid of plots.
+#' @param facet_cols Same as `facet_rows`, but with columns.
 #' @param coverage If `type = "one"`, then coverage is the nominal interval 
 #'   coverage shown.
 #' @param legend_position Legend position, the default being "bottom".

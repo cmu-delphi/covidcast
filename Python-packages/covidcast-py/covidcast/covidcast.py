@@ -386,10 +386,10 @@ def _fetch_epidata(data_source: str,
                    as_of: date,
                    issues: Union[date, tuple, list],
                    lag: int) -> Union[pd.DataFrame, None]:
-    """Fetch data for a single geo.
+    """Fetch data from Epidata API.
 
-    signal() wraps this to support fetching data over an iterable of
-    geographies, and stacks the resulting data frames.
+    signal() wraps this to support fetching data over a range of dates
+    and stacks the resulting data frames.
 
     If no data is found, return None, so signal() can easily filter out these
     entries.
@@ -434,10 +434,10 @@ def _async_fetch_epidata(data_source: str,
                          as_of: date,
                          issues: Union[date, tuple, list],
                          lag: int) -> Union[pd.DataFrame, None]:
-    """Fetch data for a single geo asynchronously.
+    """Fetch data from Epidata API asynchronously.
 
-    signal() wraps this to support fetching data over an iterable of
-    geographies, and stacks the resulting data frames.
+    signal() wraps this to support fetching data over a range of dates
+    and stacks the resulting data frames.
 
     If no data is found, return None, so signal() can easily filter out these
     entries.

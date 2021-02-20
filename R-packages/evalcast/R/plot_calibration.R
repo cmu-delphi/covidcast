@@ -1,6 +1,8 @@
 #' Plot calibration curves
 #'
-#' @param scorecard Single score card.
+#' @param predictions_cards Either one predictions_card or several joined
+#'   together using bind_rows().
+#' @template geo_type-template 
 #' @param type One of "wedgeplot" or "traditional".
 #' @param grp_vars variables over which to compare calibration. These
 #'   determines the color of the lines and faceting depending on `type`
@@ -8,7 +10,8 @@
 #' @param legend_position Legend position, the default being "bottom".
 #'
 #' @export
-plot_calibration <- function(scorecard,
+plot_calibration <- function(predictions_cards,
+                             geo_type,
                              type = c("wedgeplot", "traditional"),
                              grp_vars = c("forecaster", "forecast_date", "ahead"),
                              avg_vars = c("geo_value"),
@@ -16,12 +19,35 @@ plot_calibration <- function(scorecard,
   
   type <- match.arg(type)
   
-    
+  scorecard <- left_join(predictions_cards,
+                         get_covidcast_data(predictions_cards,
+                                            backfill_buffer,
+                                            geo_type),
+                         by = c("geo_value",
+                                "forecast_date",
+                                "ahead"))
+
   if (type == "wedgeplot") {
     grps <- grp_processing_for_facets(scorecard, grp_vars, 3, "wedgeplots")
-    ngrps <- length(grps)
-    calib <- compute_calibration(scorecard, grp_vars, avg_vars) %>%
-      setup_wedgeplot()
+    
+    if (length(grps) == 1) {
+      facet_cols <- c(grps[1])
+      facet_rows <- NULL
+    } else if (length(grps) == 2) {
+      facet_cols <- c(grps[2]) 
+      facet_rows <- c(grps[1])
+    } else {
+      facet_rows <- NULL
+      facet_cols <- NULL
+    }
+    
+    facet_layer <- facet_grid(rows = vars(!!!syms(facet_rows)),
+                              cols = vars(!!!syms(facet_cols)))
+    
+    calib <- compute_calibration(predictions_cards,
+                                 geo_type,
+                                 grp_vars,
+                                 avg_vars) %>% setup_wedgeplot()
 
     g <- calib %>%
       ggplot(aes(x = .data$nominal_prob,
@@ -40,43 +66,48 @@ plot_calibration <- function(scorecard,
                            .data$name, .data$ahead)) +
       scale_alpha_continuous(range = c(0.5, 1)) +
       scale_size_continuous(range = c(0.5, 1)) +
-      guides(alpha = FALSE, size = FALSE)
-    if (ngrps == 2L) {
-      g <- g + facet_grid(stats::as.formula(paste(grps, collapse = "~")))
-    }
-    if (ngrps == 1L) {
-      g <- g + facet_wrap(stats::as.formula(paste0("~", grps)))
-    }
+      guides(alpha = FALSE, size = FALSE) + 
+      facet_layer
     
   } else if (type == "traditional") {
     grps <- grp_processing_for_facets(scorecard, grp_vars, 4, 
                                       "traditional calibration plots")
-    ngrps <- length(grps)
-    calib <- compute_calibration(scorecard, grp_vars, avg_vars)
+  
+    if (length(grps) == 2) {
+      facet_cols <- c(grps[2])
+      facet_rows <- NULL
+    } else if (length(grps) == 3) {
+      facet_cols <- c(grps[3]) 
+      facet_rows <- c(grps[2])
+    } else {
+      facet_rows <- NULL
+      facet_cols <- NULL
+    }
+    
+    facet_layer <- facet_grid(rows = vars(!!!syms(facet_rows)),
+                              cols = vars(!!!syms(facet_cols)))
+    color_vars <- setdiff(grp_vars, c(facet_rows, facet_cols))
+    
+    calib <- compute_calibration(predictions_cards,
+                                 geo_type,
+                                 grp_vars,
+                                 avg_vars)
+    
     g <- calib %>%
+      mutate(color = Interaction(!!!syms(color_vars))) %>%
       ggplot(aes(x = .data$nominal_prob, y = .data$prop_below)) +
       geom_abline(slope = 1, intercept = 0) +
       labs(x = "Quantile level",
            y = "Proportion",
            title = sprintf("%s (ahead %s): Calibration", 
-                           .data$name, .data$ahead))
-    if (ngrps == 3L) {
-      g <- g + geom_line(aes(color = !!sym(grps[1]))) +
-        scale_color_viridis_d() +
-        facet_grid(stats::as.formula(paste(grps[2:3], collapse = "~")))
-    }
-    if (ngrps == 2L) {
-      g <- g + geom_line(aes(color = !!sym(grps[1]))) +
-        scale_color_viridis_d() +
-        facet_wrap(stats::as.formula(paste0("~", grps[2])))
-    }
-    if (ngrps == 1L) {
-      g <- g + geom_line(color="orange") + geom_point() + 
-        facet_wrap(stats::as.formula(paste0("~", grps)))
-    }
+                           .data$name, .data$ahead)) +
+     geom_line(aes(color = .data$color, group = .data$color)) +
+     scale_color_viridis_d() +
+     facet_layer 
   }
-  g + xlim(0, 1) + ylim(0, 1) + theme_bw() + 
-    theme(legend.position = legend_position)
+  return(
+    g + xlim(0, 1) + ylim(0, 1) + theme_bw() + 
+    theme(legend.position = legend_position))
 }
 
 #' Preprocessing for wedge calibration plot

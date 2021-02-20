@@ -1,7 +1,8 @@
 #' Compute calibration of a quantile forecaster
 #'
-#' @param score_card tibble containing at least columns actual, quantile, 
+#' @param predictions_cards tibble containing at least columns actual, quantile, 
 #'   value and any grouping or averaging variables named in the next arguments
+#' @template geo_type-template
 #' @param grp_vars character vector of named columns in the score_card at which
 #'   average performance will be returned
 #' @param avg_vars character vector of named columns in the score_card over which
@@ -21,9 +22,18 @@
 #' @export
 #'
 compute_calibration <- function(
-  score_card, 
+  predictions_cards,
+  geo_type,
   grp_vars = c("forecaster", "forecast_date", "ahead"),
   avg_vars = c("geo_value")) {
+  
+  score_card <- left_join(predictions_cards,
+                          get_covidcast_data(predictions_cards,
+                                             backfill_buffer,
+                                             geo_type),
+                          by = c("geo_value",
+                                 "forecast_date",
+                                 "ahead"))
   
   assert_that(all(c(grp_vars, avg_vars, "quantile", "value", "actual") %in%
                     names(score_card)),

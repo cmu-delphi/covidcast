@@ -1,91 +1,96 @@
 
 #' Plot interval coverage
 #'
-#' @param scorecards List of different score cards, all on the same forecasting
-#'   task (i.e., same ahead, etc.).
+#' @param predictions_cards tibble of predictions
+#'   that are all for the same prediction task, meaning they are for the same
+#'   response, incidence period,and geo type. Forecasts may be for a
+#'   different forecast date or forecaster.
+#'   A predictions card may be created by the function
+#'   [get_predictions()], downloaded with [get_covidhub_predictions()] or
+#'   possibly created manually.
+#' @param backfill_buffer How many days until response is deemed trustworthy
+#'   enough to be taken as correct?
 #' @param type One of "all" or "none", indicating whether to show coverage
 #'   across all nominal levels (in which case averaging is performed across
 #'   `avg_vars`) or whether to show it for one specific alpha
 #'   value.
-#' @param grp_vars variables over which to compare coverage. The first 
-#'   determines the color of the lines while the rest will be faceted over
+#' @param grp_vars variables over which to compare coverage
 #' @param avg_vars variables over which we average to determine the proportion
 #'   of coverage. If `type = "one"`, 
+#' @param facet_rows A variable name to facet data over. Creates a
+#'   separate row of plots for each value of specified variable. Can be used
+#'   with `facet_cols` to create a grid of plots.
+#' @param facet_cols Same as `facet_rows`, but with columns.
 #' @param coverage If `type = "one"`, then coverage is the nominal interval 
 #'   coverage shown.
 #' @param legend_position Legend position, the default being "bottom".
 #' 
 #' @export 
-plot_coverage <- function(scorecards, 
+plot_coverage <- function(predictions_cards,
+                          geo_type,
+                          backfill_buffer = 10,
                           type = c("all", "one"), 
                           grp_vars = c("forecaster", "forecast_date", "ahead"),
                           avg_vars = c("geo_value"),
+                          facet_rows = c("forecaster"),
+                          facet_cols = c("forecast_date"),
                           coverage = 0.8, 
                           legend_position = "bottom") {
   type <- match.arg(type)
-  # make sure scorecards are comparable:
+  if (!is.null(facet_rows)) {
+   non_grouped_facet <- setdiff(facet_rows, grp_vars)
+   assert_that(length(non_grouped_facet) == 0,
+                msg = paste("Variables must be grouped in order to be faceted in rows:",
+                            non_grouped_facet))
+  }
+  if (!is.null(facet_cols)) {
+    non_grouped_facet <- setdiff(facet_cols, grp_vars)
+    assert_that(length(non_grouped_facet) == 0,
+                msg = paste("Variables must be grouped in order to be faceted in cols:",
+                            non_grouped_facet))
+  }
+
+  scorecards <- left_join(predictions_cards,
+                          get_covidcast_data(predictions_cards,
+                                             backfill_buffer,
+                                             geo_type),
+                          by = c("geo_value",
+                                 "forecast_date",
+                                 "ahead"))
   
+  # make sure scorecards are comparable:
+  grps <- grp_processing_for_facets(scorecards, grp_vars)
+  cover <- compute_coverage(scorecards, grp_vars, avg_vars)
+
+  facet_layer <- facet_grid(rows = vars(!!!syms(facet_rows)),
+                            cols = vars(!!!syms(facet_cols)))
+  color_vars <- setdiff(grp_vars, c(facet_rows, facet_cols))
+
   if (type == "all") {
-    grps <- grp_processing_for_facets(scorecards, grp_vars, 4, 
-                                      "`all` coverage plots")
-    ngrps <- length(grps)
-    cover <- compute_coverage(scorecards, grp_vars, avg_vars)
-    
     g <- cover %>%
+      mutate(color = Interaction(!!!syms(color_vars))) %>%
       ggplot(aes(x = .data$nominal_prob, y = .data$prop_covered)) +
       geom_abline(slope = 1, intercept = 0) +
       xlim(0, 1) +
       ylim(0, 1) +
       labs(x = "Nominal coverage", y = "Empirical coverage")
-    
-    
-    if (ngrps == 3L) {
-      g <- g + geom_line(aes(color = !!sym(grps[1]))) +
-        scale_color_viridis_d() +
-        facet_grid(stats::as.formula(paste(grps[2:3], collapse = "~")))
-    }
-    if (ngrps == 2L) {
-      g <- g + geom_line(aes(color = !!sym(grps[1]))) +
-        scale_color_viridis_d() +
-        facet_wrap(stats::as.formula(paste0("~", grps[2])))
-    }
-    if (ngrps == 1L) {
-      g <- g + geom_line(aes(color = !!sym(grps)))
-    }
-    if (ngrps == 0L) {
-      g <- g + geom_line(color = "orange") + geom_point(color="orange")
-    }
   } else {
-    grps <- grp_processing_for_facets(scorecards, grp_vars, 5, 
-                                      "`all` coverage plots")
-    ngrps <- length(grps)
-    cover <- compute_coverage(scorecards, grp_vars, avg_vars)
-    
     g <- cover %>%
       filter(.data$nominal_prob == coverage) %>%
       group_by(across(all_of(grp_vars))) %>%
       summarize(prop_covered = mean(.data$prop_covered, na.rm = TRUE)) %>%
+      mutate(color = Interaction(!!!syms(color_vars))) %>%
       ggplot(aes(x = !! sym(grps[1]),
                  y = .data$prop_covered)) +
-      geom_hline(yintercept = 1 - alpha, lty = 2) +
-      labs(x = grps[1], y = "Empirical coverage")
-    if (ngrps > 1L) {
-      g <- g + 
-        geom_line(aes(color = !!sym(grps[2]))) +
-        geom_point(aes(color = !!sym(grps[2]))) +
-        scale_color_viridis_d()
-    }
-    if (ngrps == 4L) {
-      g <- g + facet_grid(stats::as.formula(paste(grps[3:4], collapse = "~")))
-    }
-    if (ngrps == 3L) {
-      g <- g + facet_wrap(stats::as.formula(paste0("~", grps[3])))
-    }
-    if (ngrps == 1L) {
-      g <- g + 
-        geom_line(color = "orange") +
-        geom_point(color = "orange")
-    }
+      geom_hline(yintercept = 1 - coverage, lty = 2) +
+      labs(x = grps[1], y = "Empirical coverage") + 
+      geom_point(aes(color = .data$color, group = .data$color))     
   }
-  g + theme_bw() + theme(legend.position = legend_position)
+  return(
+    g +
+    geom_line(aes(color = .data$color, group = .data$color)) +
+    scale_color_viridis_d() +
+    facet_layer +
+    theme_bw() +
+    theme(legend.position = legend_position))
 }

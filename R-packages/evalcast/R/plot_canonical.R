@@ -94,6 +94,6 @@ plot_canonical <- function(df, x, y, aggr = mean, dots = TRUE, lines = TRUE,
 Interaction <- function(...) {
   params <- list(...)
   if (length(params) == 0) return(NULL)
-  else if (length(params) == 1) return(params[[1]])
+  else if (length(params) == 1) return(as.factor(params[[1]]))
   else return(interaction(...))
 }

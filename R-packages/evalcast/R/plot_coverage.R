@@ -37,8 +37,6 @@ plot_coverage <- function(predictions_cards,
                           coverage = 0.8, 
                           legend_position = "bottom") {
   type <- match.arg(type)
-  print(facet_rows)
-  print(facet_cols)
   if (!is.null(facet_rows)) {
    non_grouped_facet <- setdiff(facet_rows, grp_vars)
    assert_that(length(non_grouped_facet) == 0,
@@ -97,9 +95,9 @@ plot_coverage <- function(predictions_cards,
     theme(legend.position = legend_position))
 }
 
-Interaction <- function(...) {
-  params <- list(...)
-  if (length(params) == 0) return(NULL)
-  else if (length(params) == 1) return(as.factor(params[[1]]))
-  else return(interaction(...))
-}
+# Interaction <- function(...) {
+#   params <- list(...)
+#   if (length(params) == 0) return(NULL)
+#   else if (length(params) == 1) return(as.factor(params[[1]]))
+#   else return(interaction(...))
+# }

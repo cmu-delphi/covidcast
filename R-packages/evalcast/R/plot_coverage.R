@@ -94,10 +94,3 @@ plot_coverage <- function(predictions_cards,
     theme_bw() +
     theme(legend.position = legend_position))
 }
-
-# Interaction <- function(...) {
-#   params <- list(...)
-#   if (length(params) == 0) return(NULL)
-#   else if (length(params) == 1) return(as.factor(params[[1]]))
-#   else return(interaction(...))
-# }

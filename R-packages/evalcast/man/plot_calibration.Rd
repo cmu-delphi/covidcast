@@ -5,7 +5,8 @@
 \title{Plot calibration curves}
 \usage{
 plot_calibration(
-  scorecard,
+  predictions_cards,
+  geo_type,
   type = c("wedgeplot", "traditional"),
   grp_vars = c("forecaster", "forecast_date", "ahead"),
   avg_vars = c("geo_value"),
@@ -13,7 +14,12 @@ plot_calibration(
 )
 }
 \arguments{
-\item{scorecard}{Single score card.}
+\item{predictions_cards}{Either one predictions_card or several joined
+together using bind_rows().}
+
+\item{geo_type}{String indicating geographical type, such as "county", or
+"state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
+for available options.}
 
 \item{type}{One of "wedgeplot" or "traditional".}
 

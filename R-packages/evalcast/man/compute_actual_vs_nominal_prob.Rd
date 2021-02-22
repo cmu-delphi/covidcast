@@ -5,14 +5,19 @@
 \title{Compute calibration of a quantile forecaster}
 \usage{
 compute_actual_vs_nominal_prob(
-  score_card,
+  predictions_cards,
+  geo_type,
   grp_vars = c("forecaster", "forecast_date", "ahead"),
   avg_vars = c("geo_value")
 )
 }
 \arguments{
-\item{score_card}{tibble containing at least columns actual, quantile,
+\item{predictions_cards}{tibble containing at least columns actual, quantile,
 value and any grouping or averaging variables named in the next arguments}
+
+\item{geo_type}{String indicating geographical type, such as "county", or
+"state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
+for available options.}
 
 \item{grp_vars}{character vector of named columns in the score_card at which
 average performance will be returned}

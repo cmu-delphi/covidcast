@@ -1,7 +1,7 @@
-#' Apply time-shifts to the values in a `covidcast_signal` data frame 
+#' Apply time-shifts to the values in a `covidcast_signal` data frame
 #'
 #' Applies time-shifts to the values in a `covidcast_signal` data frame. (Only
-#' the latest issue from each data frame is retained.) 
+#' the latest issue from each data frame is retained.)
 #'
 #' @param x Single `covidcast_signal` data frame, or a list of such data
 #'   frames.
@@ -13,7 +13,7 @@
 #'   vector of shifts or a list of vectors of shifts, this list having the same
 #'   length as `x` (in order to apply, respectively, the same shifts or a
 #'   different set of shifts to each data frame in `x`).
-#' 
+#'
 #' @return When `x` is a data frame, the return value is a column-augmented
 #'   version of `x` with one new column per value of `dt`. The new column names
 #'   reflect the values of `dt`, as in `value+1` and `value-1` for a time shift
@@ -24,20 +24,20 @@
 apply_shifts = function(x, dt) {
   # If we're passed a single covidcast_signal data frame
   if (inherits(x, "covidcast_signal")) return(apply_shifts_one(x, dt))
-  
+
   # If we're passed a list of covidcast_signal data frames
   else if (is.list(x) &&
              all(sapply(x, function(v) {
                inherits(v, "covidcast_signal")
              }))) {
-    # If dt is a vector 
+    # If dt is a vector
     if (!is.list(dt)) dt = rep(list(dt), length(x))
 
     # If dt is a list
     else if (length(dt) != length(x)) {
       stop("If `dt` is a list, it must have the same length as `x`.")
     }
-    
+
     return(mapply(apply_shifts_one, x, dt, SIMPLIFY = FALSE))
   }
 
@@ -54,25 +54,28 @@ apply_shifts_one = function(x, dt) {
   x = latest_issue(x)
   attrs = attributes(x)
   attrs = attrs[!(names(attrs) %in% c("row.names", "names"))]
-  
+
   # Make sure that we have a complete record of dates for each geo_value (fill
   # with NAs as necessary)
   x_all = x %>% dplyr::group_by(geo_value) %>%
     dplyr::summarize(time_value = seq.Date(as.Date(min(time_value)),
                                            as.Date(max(time_value)),
-                                           by = "day")) %>%
+                                           by = "day"),
+                     data_source = data_source[1],
+                     signal = signal[1]) %>%
     dplyr::ungroup()
-  x = dplyr::full_join(x, x_all, by = c("geo_value", "time_value"))
-  
+  x = dplyr::full_join(x, x_all,
+                       by = c("data_source", "signal", "geo_value", "time_value"))
+
   # Group by geo value, sort rows by increasing time
-  x = x %>% dplyr::group_by(geo_value) %>% dplyr::arrange(time_value) 
-  
+  x = x %>% dplyr::group_by(geo_value) %>% dplyr::arrange(time_value)
+
   # Loop over dt, and time shift the value column
   for (n in dt) {
     varname = sprintf("value%+d", n)
     x = x %>% dplyr::mutate(!!varname := shift(value, n))
   }
-  
+
   # Remove value column, restore attributes, and return
   x = dplyr::select(x, -value)
   attributes(x) = c(attributes(x), attrs)
@@ -89,7 +92,7 @@ apply_shifts_one = function(x, dt) {
 #' `signal` are dropped; see details below). See the [multiple signals
 #' vignette](https://cmu-delphi.github.io/covidcast/covidcastR/articles/multi-signals.html)
 #' for examples.
-#' 
+#'
 #' @param x Single `covidcast_signal` data frame, or a list of such data
 #'   frames, such as is returned by `covidcast_signals()`.
 #' @param dt Vector of shifts to apply to the values in the data frame `x`.
@@ -108,11 +111,11 @@ apply_shifts_one = function(x, dt) {
 #'
 #'   The first use case is to apply time-shifts to the values in a given
 #'   `covidcast_signal` object. In this use case, `x` is a `covidcast_signal`
-#'   data frame and `dt` is a vector of shifts. 
+#'   data frame and `dt` is a vector of shifts.
 #'
 #'   The second use case is to bind together, into one data frame, signals that
 #'   are returned by `covidcast_signals()`. In this use case, `x` is a list of
-#'   `covidcast_signal` data frames, and `dt` is `NULL`. 
+#'   `covidcast_signal` data frames, and `dt` is `NULL`.
 #'
 #'   The third use case is a combination of the first two: to bind together
 #'   signals returned by `covidcast_signals()`, and simultaneously, apply
@@ -121,7 +124,7 @@ apply_shifts_one = function(x, dt) {
 #'   apply the same shifts for each signal in `x`, or a list of vector of
 #'   shifts---to apply different shifts for each signal in `x`.
 #'
-#' @return Data frame of aggregated signals in "wide" or "long" form, depending 
+#' @return Data frame of aggregated signals in "wide" or "long" form, depending
 #'   on `format`. In "long" form, an extra column `dt` is appended to indicate
 #'   the value of the time-shift. In "wide" form, only the latest issue of data
 #'   is retained; the returned data frame is formed via full joins of the input
@@ -142,7 +145,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
   if (inherits(x, "covidcast_signal")) {
     # If dt is missing, then set it to 0
     if (is.null(dt)) dt = 0
-    
+
     # If dt is a list, then throw an error
     if (is.list(dt)) {
       stop("If `x` is a `covidcast_signal` data frame, then `dt` must be a ",
@@ -153,7 +156,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
     x = list(x)
     dt = list(dt)
   }
-  
+
   # If we're passed a list of covidcast_signal data frames
   else if (is.list(x) &&
              all(sapply(x, function(v) {
@@ -161,7 +164,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
              }))) {
     # If dt is missing, then set it to a list of 0s
     if (is.null(dt)) dt = rep(list(0), length(x))
-   
+
     # If dt is a vector, then recycle it into a list
     if (!is.list(dt)) dt = rep(list(dt), length(x))
 
@@ -184,7 +187,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
     meta_list[[i]] = attributes(x[[i]])$metadata
   }
   meta_all = dplyr::bind_rows(meta_list)
-  
+
   # Issue a warning if there's more than one geo type present
   if (length(unique(meta_all$geo_type)) > 1) {
     warn(paste("More than one `geo_type` present. Are you sure you want to",
@@ -194,9 +197,9 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
   # Wide format
   if (format == "wide") {
     x = lapply(x, latest_issue) # Grab only the latest issue in wide form!
-    
+
     # Rename value columns according to data source and signal combos, and drop
-    # a bunch of columns 
+    # a bunch of columns
     for (i in 1:N) {
       src = x[[i]]$data_source[1]
       sig = x[[i]]$signal[1]
@@ -205,7 +208,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
                            dplyr::starts_with("value")) %>%
         dplyr::select(.data$geo_value, .data$time_value, dplyr::starts_with("value"))
     }
-    
+
     # This is the wide data frame that we will eventually return
     y = x[[1]]
 
@@ -224,7 +227,7 @@ aggregate_signals = function(x, dt = NULL, format = c("wide", "long")) {
 
   # Long format
   if (format == "long") {
-    # Pivot time-shifted value columns to long format, add column dt 
+    # Pivot time-shifted value columns to long format, add column dt
     for (i in 1:N) {
       x[[i]] = x[[i]] %>%
         tidyr::pivot_longer(dplyr::starts_with("value"),

@@ -285,3 +285,40 @@ test_that("can aggregate signals with different metadata", {
 
   expect_silent(aggregate_signals(list(foo, baz)))
 })
+
+test_that("aggregated df doesn't clobber data_source or signal", {
+  foo <- structure(data.frame(
+    data_source = "foo",
+    signal = "foo",
+    geo_value = c("pa", "tx", "ri", "ri"),
+    value = 1:4,
+    time_value = as.Date(c("2020-01-01", "2020-01-02", "2020-01-01", "2020-01-03")),
+    issue = as.Date("2020-01-02"),
+    stderr = 0.5,
+    sample_size = 10,
+    lag = 1),
+    metadata = data.frame(data_source = "foo", signal = "foo",
+                          geo_type = "state"),
+    class = c("covidcast_signal", "data.frame"))
+
+  bar <- structure(data.frame(
+    data_source = "bar",
+    signal = "bar",
+    geo_value = c("pa", "tx", "ri"),
+    value = 4:6,
+    time_value = as.Date("2020-01-01"),
+    issue = as.Date("2020-01-02"),
+    stderr = 0.5,
+    sample_size = 10,
+    lag = 1),
+    metadata = data.frame(data_source = "bar", signal = "bar",
+                          geo_type = "state"),
+    class = c("covidcast_signal", "data.frame"))
+
+    agg_long <- aggregate_signals(list(foo, bar), format = "long")
+
+    expect_false(any(is.na(agg_long$data_source)))
+    expect_false(any(is.na(agg_long$signal)))
+
+
+})

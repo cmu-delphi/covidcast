@@ -101,9 +101,9 @@ plot_calibration <- function(predictions_cards,
            y = "Proportion",
            title = sprintf("%s (ahead %s): Calibration", 
                            .data$name, .data$ahead)) +
-     geom_line(aes(color = .data$color, group = .data$color)) +
-     scale_color_viridis_d() +
-     facet_layer 
+      geom_line(aes(color = .data$color, group = .data$color)) +
+      scale_color_viridis_d() +
+      facet_layer 
   }
   return(
     g + xlim(0, 1) + ylim(0, 1) + theme_bw() + 

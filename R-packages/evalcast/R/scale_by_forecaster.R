@@ -47,7 +47,7 @@ scale_by_forecaster <- function(score_card,
     for (var in score_cols){
         base_values <- filter(score_card,
                               .data$forecaster == base_forecaster_name)[[var]]
-        if (any(base_values <= 0)) {
+        if (any(base_values == 0) & !is.na(base_values)) {
             warning("scale_by_forecaster will divide by zero in column ", var)
         }
     }

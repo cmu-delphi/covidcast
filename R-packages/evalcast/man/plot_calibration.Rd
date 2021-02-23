@@ -10,7 +10,8 @@ plot_calibration(
   type = c("wedgeplot", "traditional"),
   grp_vars = c("forecaster", "forecast_date", "ahead"),
   avg_vars = c("geo_value"),
-  legend_position = "bottom"
+  legend_position = "bottom",
+  ...
 )
 }
 \arguments{

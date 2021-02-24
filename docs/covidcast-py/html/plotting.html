@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Plotting Reference &#8212; COVIDcast API client 0.1.3 documentation</title>
+    <title>Plotting Reference &#8212; COVIDcast API client 0.1.4 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -41,7 +41,7 @@ signal and generates a choropleth map, using <a class="reference external" href=
 <a class="reference internal" href="plot_examples.html#plotting-examples"><span class="std std-ref">usage examples</span></a>.</p>
 <dl class="py function">
 <dt id="covidcast.plot">
-<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">time_value</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">plot_type</span><span class="o">=</span><span class="default_value">'choropleth'</span></em>, <em class="sig-param"><span class="n">combine_megacounties</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">covidcast.</span></code><code class="sig-name descname"><span class="pre">plot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'choropleth'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combine_megacounties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given the output data frame of <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a>, plot a choropleth or bubble map.</p>
 <p>Projections used for plotting:</p>
 <ul class="simple">
@@ -91,7 +91,7 @@ Defaults to <cite>True</cite>.</p></li>
 <p>A signal DataFrame can be used to generate an animated choropleth of the signal values over time.</p>
 <dl class="py function">
 <dt id="covidcast.animate">
-<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">animate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">filepath</span></em>, <em class="sig-param"><span class="n">fps</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">dpi</span><span class="o">=</span><span class="default_value">150</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.animate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">covidcast.</span></code><code class="sig-name descname"><span class="pre">animate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.animate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate an animated video file of a signal over time.</p>
 <p>Given a signal DataFrame, generates the choropleth for each day to form an animation of the
 signal. Accepts arguments for video parameters as well as optional plotting arguments.
@@ -124,7 +124,7 @@ Supported output formats are listed in the
 provided if the user desires more control over their plotting.</p>
 <dl class="py function">
 <dt id="covidcast.get_geo_df">
-<code class="sig-prename descclassname">covidcast.</code><code class="sig-name descname">get_geo_df</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">geo_value_col</span><span class="o">=</span><span class="default_value">'geo_value'</span></em>, <em class="sig-param"><span class="n">geo_type_col</span><span class="o">=</span><span class="default_value">'geo_type'</span></em>, <em class="sig-param"><span class="n">join_type</span><span class="o">=</span><span class="default_value">'right'</span></em>, <em class="sig-param"><span class="n">combine_megacounties</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.get_geo_df" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">covidcast.</span></code><code class="sig-name descname"><span class="pre">get_geo_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geo_value_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'geo_value'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geo_type_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'geo_type'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'right'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combine_megacounties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#covidcast.get_geo_df" title="Permalink to this definition">¶</a></dt>
 <dd><p>Augment a <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a> data frame with the shape of each geography.</p>
 <p>This method takes in a pandas DataFrame object and returns a GeoDataFrame
 object from the <a class="reference external" href="https://geopandas.org/">GeoPandas package</a>. The
@@ -258,7 +258,7 @@ WGS84 for HRRs.</p>
       &copy;2020, Delphi research group.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

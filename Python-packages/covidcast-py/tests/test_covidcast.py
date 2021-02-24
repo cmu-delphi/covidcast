@@ -59,7 +59,7 @@ def test_signal(mock_covidcast, mock_metadata):
 
     # test no df output
     mock_covidcast.return_value = {"result": -2,
-                                   "message": "no results fouds"}
+                                   "message": "no results found"}
     assert not covidcast.signal("source", "signal", geo_values=[])
 
     # test incorrect geo
@@ -204,6 +204,34 @@ def test__detect_metadata():
 
 @patch("delphi_epidata.Epidata.covidcast")
 def test__fetch_epidata(mock_covidcast):
+    mock_covidcast.return_value = {"message": "failed"}
+    # test warning when an unknown bad response is received
+    with warnings.catch_warnings(record=True) as w:
+        covidcast._fetch_epidata("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
+                                 "*", None, None, None, None)
+        assert len(w) == 1
+        assert str(w[0].message) == \
+               "Problem obtaining source signal data on 20200402 for geography '*': failed"
+        assert w[0].category is RuntimeWarning
+
+    # test warning when a no data response is received
+    mock_covidcast.return_value = {"message": "no results"}  # no data API response
+    with warnings.catch_warnings(record=True) as w:
+        covidcast._fetch_epidata("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
+                                 "county", None, None, None, None)
+        assert len(w) == 1
+        assert str(w[0].message) == "No source signal data found on 20200402 for geography 'county'"
+        assert w[0].category is NoDataWarning
+
+    # test no epidata yields nothing
+    mock_covidcast.return_value = {"message": "success"}  # no epidata
+    assert not covidcast._fetch_epidata(None, None, date(2020, 4, 1), date(2020, 4, 1),
+                                        None, None, None, None, None)
+    # test end_day < start_day yields nothing
+    mock_covidcast.return_value = {"message": "success"}  # no epidata
+    assert not covidcast._fetch_epidata(None, None, date(2020, 4, 2), date(2020, 4, 1),
+                                        None, None, None, None, None)
+
     # not generating full DF since most attributes used
     mock_covidcast.side_effect = [{"result": 1,  # successful API response
                                    "epidata": [{"time_value": 20200622,
@@ -213,12 +241,7 @@ def test__fetch_epidata(mock_covidcast):
                                   {"result": 1,  # second successful API
                                    "epidata": [{"time_value": 20200821,
                                                 "issue": 20200925}],
-                                   "message": "success"},
-                                  {"message": "failed"},  # unknown failed API response
-                                  {"message": "no results"},  # no data API response
-                                  {"message": "success"},  # no epidata
-                                  {"message": "success"}]
-
+                                   "message": "success"}]
     # test happy path with 2 day range
     response = covidcast._fetch_epidata(
         None, None, date(2020, 4, 2), date(2020, 4, 3), None, None, None, None, None)
@@ -234,32 +257,60 @@ def test__fetch_epidata(mock_covidcast):
     pd.testing.assert_frame_equal(response[0], expected[0])
     pd.testing.assert_frame_equal(response[1], expected[1])
 
+@patch("delphi_epidata.Epidata.async_epidata")
+def test__async_fetch_epidata(mock_async_epidata):
+    mock_async_epidata.return_value = [({"message": "failed"}, {"time_values": 20200402})]
     # test warning when an unknown bad response is received
     with warnings.catch_warnings(record=True) as w:
-        covidcast._fetch_epidata("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
-                                    "*", None, None, None, None)
+        covidcast._async_fetch_epidata("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
+                                       "*", None, None, None, None)
         assert len(w) == 1
         assert str(w[0].message) == \
                "Problem obtaining source signal data on 20200402 for geography '*': failed"
         assert w[0].category is RuntimeWarning
 
     # test warning when a no data response is received
+    mock_async_epidata.return_value = [({"message": "no results"}, {"time_values": 20200402})]  # no data API response
     with warnings.catch_warnings(record=True) as w:
-        covidcast._fetch_epidata("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
-                                    "county", None, None, None, None)
+        covidcast._async_fetch_epidata("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
+                                       "county", None, None, None, None)
         assert len(w) == 1
         assert str(w[0].message) == "No source signal data found on 20200402 for geography 'county'"
         assert w[0].category is NoDataWarning
 
     # test no epidata yields nothing
-    assert not covidcast._fetch_epidata(None, None, date(2020, 4, 1), date(2020, 4, 1),
-                                        None, None, None, None, None)
-
+    mock_async_epidata.return_value = [({"message": "success"}, None)]  # no epidata
+    assert not covidcast._async_fetch_epidata(None, None, date(2020, 4, 1), date(2020, 4, 1),
+                                              None, None, None, None, None)
     # test end_day < start_day yields nothing
-    assert not covidcast._fetch_epidata(None, None, date(2020, 4, 1), date(2020, 4, 1),
-                                        None, None, None, None, None)
+    mock_async_epidata.return_value = [({"message": "success"}, None)]  # no epidata
+    assert not covidcast._async_fetch_epidata(None, None, date(2020, 4, 2), date(2020, 4, 1),
+                                              None, None, None, None, None)
 
-
+    # not generating full DF since most attributes used
+    mock_async_epidata.return_value = [
+        ({"result": 1,  # successful API response
+           "epidata": [{"time_value": 20200622,
+                        "issue": 20200724,
+                        "direction": None}],
+           "message": "success"}, {}),
+        ({"result": 1,  # second successful API
+           "epidata": [{"time_value": 20200821,
+                        "issue": 20200925}],
+           "message": "success"}, {})
+    ]
+    # test happy path with 2 day range
+    response = covidcast._async_fetch_epidata(
+        None, None, date(2020, 4, 2), date(2020, 4, 3), None, None, None, None, None)
+    expected = [pd.DataFrame({"time_value": [20200622],
+                              "issue": [20200724],
+                              "direction": None}),
+                pd.DataFrame({"time_value": [20200821],
+                              "issue": [20200925]}),
+                ]
+    assert len(response) == 2
+    pd.testing.assert_frame_equal(response[0], expected[0])
+    pd.testing.assert_frame_equal(response[1], expected[1])
 
 @patch("covidcast.covidcast.metadata")
 def test__signal_metadata(mock_metadata):

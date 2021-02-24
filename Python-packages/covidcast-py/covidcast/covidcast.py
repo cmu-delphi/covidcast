@@ -16,6 +16,8 @@ Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
 
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state",  "hhs", "nation"}
 
+_ASYNC_CALL = False
+
 
 def signal(data_source: str,
            signal: str,  # pylint: disable=W0621
@@ -174,8 +176,14 @@ def signal(data_source: str,
         raise ValueError("end_day must be on or after start_day, but "
                          "start_day = '{start}', end_day = '{end}'".format(
                              start=start_day, end=end_day))
-    dfs = _fetch_epidata(
-        data_source, signal, start_day, end_day, geo_type, geo_values, as_of, issues, lag)
+    if _ASYNC_CALL:
+        dfs = _async_fetch_epidata(
+            data_source, signal, start_day, end_day, geo_type, geo_values, as_of, issues, lag
+        )
+    else:
+        dfs = _fetch_epidata(
+            data_source, signal, start_day, end_day, geo_type, geo_values, as_of, issues, lag
+        )
     if len(dfs) > 0:
         out = pd.concat(dfs)
         out.drop("direction", axis=1, inplace=True)
@@ -378,10 +386,10 @@ def _fetch_epidata(data_source: str,
                    as_of: date,
                    issues: Union[date, tuple, list],
                    lag: int) -> Union[pd.DataFrame, None]:
-    """Fetch data for a single geo.
+    """Fetch data from Epidata API.
 
-    signal() wraps this to support fetching data over an iterable of
-    geographies, and stacks the resulting data frames.
+    signal() wraps this to support fetching data over a range of dates
+    and stacks the resulting data frames.
 
     If no data is found, return None, so signal() can easily filter out these
     entries.
@@ -414,6 +422,56 @@ def _fetch_epidata(data_source: str,
         if "epidata" in day_data:
             dfs.append(pd.DataFrame.from_dict(day_data["epidata"]))
         cur_day += timedelta(1)
+    return dfs
+
+
+def _async_fetch_epidata(data_source: str,
+                         signal: str,  # pylint: disable=W0621
+                         start_day: date,
+                         end_day: date,
+                         geo_type: str,
+                         geo_value: Union[str, Iterable[str]],
+                         as_of: date,
+                         issues: Union[date, tuple, list],
+                         lag: int) -> Union[pd.DataFrame, None]:
+    """Fetch data from Epidata API asynchronously.
+
+    signal() wraps this to support fetching data over a range of dates
+    and stacks the resulting data frames.
+
+    If no data is found, return None, so signal() can easily filter out these
+    entries.
+    """
+    dfs = []
+    params = []
+    for day in pd.date_range(start_day, end_day):
+        day_param = {
+            "source": "covidcast",
+            "data_source": data_source,
+            "signals": signal,
+            "time_type": "day",
+            "geo_type": geo_type,
+            "geo_value": geo_value,
+            "time_values": _date_to_api_string(day),
+        }
+        if as_of:
+            day_param["as_of"] = _date_to_api_string(as_of)
+        if issues:
+            day_param["issues"] = _dates_to_api_strings(issues)
+        if lag:
+            day_param["lag"] = lag
+        params.append(day_param)
+    output = Epidata.async_epidata(params, batch_size=100)
+    for day_data, params in output:
+        if day_data["message"] == "no results":
+            warnings.warn(f"No {data_source} {signal} data found on {params['time_values']} "
+                          f"for geography '{geo_type}'", NoDataWarning)
+        if day_data["message"] not in {"success", "no results"}:
+            warnings.warn(f"Problem obtaining {data_source} {signal} "
+                          f"data on {params['time_values']} "
+                          f"for geography '{geo_type}': {day_data['message']}", RuntimeWarning)
+        if "epidata" in day_data:
+            dfs.append(pd.DataFrame.from_dict(day_data["epidata"]))
     return dfs
 
 

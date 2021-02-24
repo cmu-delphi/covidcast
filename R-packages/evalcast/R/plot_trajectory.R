@@ -26,6 +26,12 @@
 #' @param show_points do you want points as well as lines
 #' @param show_quantiles do you want to plot the quantiles or just lines
 #' @template geo_type-template
+#' @param nrow the number of rows present in the output plot. Similarly, `ncol`
+#'   adjusts the number of columns. Only one of `nrow` and `ncol` may be set and
+#'   they only have an effect if a plot is actually produced. Additionally,
+#'   If data is present for multiple forecasters, any output plot is faceted, so
+#'   nrow and ncol cannot be set.
+#' @param ncol See `nrow`
 #' @param ... additional arguments passed to [covidcast::covidcast_signal()]
 #'
 #' @return invisibly returns a ggplot object
@@ -40,8 +46,12 @@ plot_trajectory <- function(predictions_cards,
                             show_quantiles = TRUE,
                             geo_type = c("county", "hrr", "msa", "dma", "state",
                                          "hhs", "nation"),
+                            nrow = NULL,
+                            ncol = NULL,
                             ...) {
   geo_type = match.arg(geo_type)
+  assert_that(is.null(nrow) | is.null(ncol),
+              msg = "nrow and ncol cannot both be set")
   if (!is.null(show_geo_value)) {
     predictions_cards <- predictions_cards %>%
       filter(.data$geo_value %in% show_geo_value)
@@ -96,7 +106,8 @@ plot_trajectory <- function(predictions_cards,
         nlevels(pd$quantiles_df$forecaster > 1)) {
       gp + facet_grid(.data$forecaster ~ .data$geo_value, scales = "free_y")
     } else {
-      gp <- gp + facet_wrap(~.data$geo_value, scales = "free_y")
+      gp <- gp + facet_wrap(~.data$geo_value, nrow = nrow, ncol = ncol,
+                            scales = "free_y")
     }
     print(gp)
   } else {

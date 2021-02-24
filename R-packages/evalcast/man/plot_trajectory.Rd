@@ -14,6 +14,8 @@ plot_trajectory(
   show_points = TRUE,
   show_quantiles = TRUE,
   geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation"),
+  nrow = NULL,
+  ncol = NULL,
   ...
 )
 }
@@ -54,6 +56,14 @@ with \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}}. Mu
 \item{geo_type}{String indicating geographical type, such as "county", or
 "state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
 for available options.}
+
+\item{nrow}{the number of rows present in the output plot. Similarly, \code{ncol}
+adjusts the number of columns. Only one of \code{nrow} and \code{ncol} may be set and
+they only have an effect if a plot is actually produced. Additionally,
+If data is present for multiple forecasters, any output plot is faceted, so
+nrow and ncol cannot be set.}
+
+\item{ncol}{See \code{nrow}}
 
 \item{...}{additional arguments passed to \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}}}
 }

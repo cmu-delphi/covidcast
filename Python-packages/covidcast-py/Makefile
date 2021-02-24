@@ -22,7 +22,6 @@ build:
 
 lint:
 	. env/bin/activate; pylint covidcast/ --rcfile .pylintrc
-	. env/bin/activate; mypy covidcast --config-file mypy.ini
 	. env/bin/activate; pydocstyle covidcast/
 
 test:

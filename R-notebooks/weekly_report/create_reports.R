@@ -46,8 +46,12 @@ create_score_cards(prediction_cards_filepath = preds_filename,
                    geo_type = "county",
                    weeks_back = 12)
 render("covidhub_evaluation.Rmd", 
-           params = list(score_file = "score_cards_state_deaths.rds"),
+           params = list(score_file = "score_cards_state_deaths.rds",
+                         highlight_forecasters = c("CMU-TimeSeries", "COVIDhub-baseline", "COVIDhub-ensemble"),
+                         signal = "deaths_incidence_num"),
            output_file = "state_evaluations.html")
 render("covidhub_evaluation.Rmd", 
-           params = list(score_file = "score_cards_county_cases.rds"),
+           params = list(score_file = "score_cards_county_cases.rds",
+                         highlight_forecasters = c("CMU-TimeSeries", "COVIDhub-baseline", "COVIDhub-ensemble"),
+                         signal = "confirmed_incidence_num"),
            output_file = "county_evaluations.html")

@@ -8,6 +8,12 @@ output:
 params:
   score_file: "score_cards_state.rds"
   preds_file: "predictions_cards.rds"
+  main_forecaster: "CMU-TimeSeries"
+  highlight_forecasters: NULL
+  base_forecaster: "COVIDhub-baseline"
+  wedge_forecasters: NULL
+  verbose_wedges: TRUE
+  signal: "deaths_incidence_num"
 ---
 
 ```{r, include = FALSE}
@@ -27,7 +33,7 @@ library(stringr)
 
 ## Select Forecasts
 
-Filter to forecasters that have significant overlap in predictions with CMU-TimeSeries for the last 4 weeks.This is used primarily to ensure we don't include inactive forecasters in the pairwise tournament rankings and that there is enough overlap for pairwise scores to be meaningful.
+Filter to forecasters that have significant overlap in predictions with `r params$main_forecaster` for the last 4 weeks.This is used primarily to ensure we don't include inactive forecasters in the pairwise tournament rankings and that there is enough overlap for pairwise scores to be meaningful.
 
 ```{r}
 if (file.exists(params$score_file)){
@@ -38,15 +44,26 @@ if (file.exists(params$score_file)){
 
 if (file.exists(params$preds_file)){
   predictions = readRDS(params$preds_file)
+  predictions = predictions %>% filter(signal == params$signal)
 } else {
   stop(paste("File not found:", params$preds_file))
 }
 
+highlight_forecasters = params$highlight_forecasters
+if (is.null(highlight_forecasters)){
+  highlight_forecasters = predictions %>% distinct(forecaster)
+}
+if(is.null(params$wedge_forecasters)){
+  wedge_forecasters = params$main_forecaster
+} else {
+  wedge_forecasters = params$wedge_forecasters
+}
+
 score_cards_tourney = score_cards
-score_cards_cmu = score_cards %>% 
-                    filter(forecaster == "CMU-TimeSeries") %>% 
+score_cards_main = score_cards %>% 
+                    filter(forecaster == params$main_forecaster) %>% 
                     distinct(ahead, geo_value, target_end_date)
-score_cards = semi_join(score_cards, score_cards_cmu)
+score_cards = semi_join(score_cards, score_cards_main)
 
 recent_score_by_frcstr = score_cards %>% 
                            filter(target_end_date > today() - 28) %>%
@@ -59,9 +76,9 @@ recent_score_by_frcstr = recent_score_by_frcstr %>%
                            mutate(num_total = num_1 + num_2 + num_3 + num_4) %>%
                            arrange(desc(num_total))
 print(recent_score_by_frcstr, n = Inf)
-cmu_forecasts = recent_score_by_frcstr[recent_score_by_frcstr$forecaster == "CMU-TimeSeries",]$num_total
+main_forecasts = recent_score_by_frcstr[recent_score_by_frcstr$forecaster == params$main_forecaster,]$num_total
 
-active_forecasters = recent_score_by_frcstr[recent_score_by_frcstr$num_total > cmu_forecasts * 0.80,]$forecaster
+active_forecasters = recent_score_by_frcstr[recent_score_by_frcstr$num_total > main_forecasts * 0.80,]$forecaster
 
 # save for pairwise tournament
 score_cards_tourney = score_cards_tourney %>% 
@@ -71,9 +88,6 @@ score_cards_tourney = score_cards_tourney %>%
 Next, filter to forecasters of interest for line plots and find common locations.
 
 ```{r}
-highlight_forecasters = c("CMU-TimeSeries",
-                          "COVIDhub-baseline",
-                          "COVIDhub-ensemble")
 score_cards = score_cards %>% filter(forecaster %in% highlight_forecasters)
 
 # TODO: Use evalcast::intersect_averagers after merging the kill-cards updates
@@ -141,6 +155,7 @@ line_plot = function(df, var = "wis", ylab = var, ylim = NULL, aggr = Mean) {
 line_plot(score_cards, var = "wis", ylab = "Mean WIS") + scale_y_log10() 
 line_plot(score_cards, var = "cov_80", ylab = "Coverage-80", ylim = c(0,1)) +
   geom_hline(yintercept = 0.8)
+line_plot(score_cards, var = "ae", ylab = "Mean AE") + scale_y_log10() 
 ```
 
 ## Scaling by baseline
@@ -176,31 +191,32 @@ scale_df = function(df, var, base_forecaster = "COVIDhub-baseline") {
 Here are now line plots for median scaled WIS. 
 
 ```{r, fig.width = 10, fig.height = 8}
-line_plot(scale_df(score_cards, var = "wis"), var = "scaled", 
+line_plot(scale_df(score_cards, var = "wis", base_forecaster = params$base_forecaster), var = "scaled", 
           ylab = "Median scaled WIS", aggr = Median) + geom_hline(yintercept = 1) 
 ```
 
 ## Wedge plots
 
-To give a fuller view of the coverage of `CMU-TimeSeries` forecasts, we create
+To give a fuller view of the coverage of forecasts, we create
 a wedge plot per ahead:
 
 ```{r, fig.width = 10, fig.height = 10}
-type_chars = nchar(score_cards$geo_value[1])
-cmu_preds = predictions %>% filter(forecaster == "CMU-TimeSeries", 
-                                   nchar(geo_value) == type_chars)
-
-# plot_calibration requires a forecast_date column
-cmu_preds_w_cov = left_join(cmu_preds, score_cards, by = c("ahead", "geo_value", "forecaster", "target_end_date")) %>% 
-  select(ahead, geo_value, quantile, value, forecaster, target_end_date, forecast_date.x, actual)
-colnames(cmu_preds_w_cov)[colnames(cmu_preds_w_cov) == "forecast_date.x"] = "forecast_date"
-
-plot_calibration(cmu_preds_w_cov, grp_vars = c("ahead"), avg_vars = c("geo_value", "forecast_date"), type = "wedgeplot")
-```
-
-Also, a coverage plot by ahead and forecast_date:
-```{r, fig.width = 10, fig.height = 10}
-plot_calibration(cmu_preds_w_cov, grp_vars = c("ahead", "forecast_date"), avg_vars = c("geo_value"), type = "wedgeplot")
+for (forecaster_name in wedge_forecasters){
+  cat(forecaster_name)
+  type_chars = nchar(score_cards$geo_value[1])
+  f_preds = predictions %>% filter(forecaster == forecaster_name, 
+                                     nchar(geo_value) == type_chars)
+  
+  # plot_calibration requires a forecast_date column
+  f_preds_w_cov = left_join(f_preds, score_cards, by = c("ahead", "geo_value", "forecaster", "target_end_date")) %>% 
+    select(ahead, geo_value, quantile, value, forecaster, target_end_date, forecast_date.x, actual)
+  colnames(f_preds_w_cov)[colnames(f_preds_w_cov) == "forecast_date.x"] = "forecast_date"
+  
+  print(plot_calibration(f_preds_w_cov, grp_vars = c("ahead"), avg_vars = c("geo_value", "forecast_date"), type = "wedgeplot"))
+  if(params$verbose_wedges){
+    print(plot_calibration(f_preds_w_cov, grp_vars = c("ahead", "forecast_date"), avg_vars = c("geo_value"), type = "wedgeplot"))
+  }
+}
 ```
 
 ## Pairwise tournament

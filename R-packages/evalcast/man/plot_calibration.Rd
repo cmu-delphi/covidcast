@@ -7,6 +7,7 @@
 plot_calibration(
   predictions_cards,
   geo_type,
+  backfill_buffer = 10,
   type = c("wedgeplot", "traditional"),
   grp_vars = c("forecaster", "forecast_date", "ahead"),
   avg_vars = c("geo_value"),
@@ -22,6 +23,9 @@ together using bind_rows().}
 "state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
 for available options.}
 
+\item{backfill_buffer}{How many days until response is deemed trustworthy
+enough to be taken as correct?}
+
 \item{type}{One of "wedgeplot" or "traditional".}
 
 \item{grp_vars}{variables over which to compare calibration. These
@@ -30,6 +34,8 @@ determines the color of the lines and faceting depending on \code{type}}
 \item{avg_vars}{variables over which we average to determine the calibration.}
 
 \item{legend_position}{Legend position, the default being "bottom".}
+
+\item{...}{other inputs including facet_rows and facet_cols}
 }
 \description{
 Plot calibration curves

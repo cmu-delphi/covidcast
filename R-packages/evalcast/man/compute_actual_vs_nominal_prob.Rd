@@ -7,6 +7,7 @@
 compute_actual_vs_nominal_prob(
   predictions_cards,
   geo_type,
+  backfill_buffer = 10,
   grp_vars = c("forecaster", "forecast_date", "ahead"),
   avg_vars = c("geo_value")
 )
@@ -18,6 +19,9 @@ value and any grouping or averaging variables named in the next arguments}
 \item{geo_type}{String indicating geographical type, such as "county", or
 "state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
 for available options.}
+
+\item{backfill_buffer}{How many days until response is deemed trustworthy
+enough to be taken as correct?}
 
 \item{grp_vars}{character vector of named columns in the score_card at which
 average performance will be returned}

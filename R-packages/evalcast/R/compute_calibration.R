@@ -3,6 +3,8 @@
 #' @param predictions_cards tibble containing at least columns actual, quantile, 
 #'   value and any grouping or averaging variables named in the next arguments
 #' @template geo_type-template
+#' @param backfill_buffer How many days until response is deemed trustworthy
+#'   enough to be taken as correct?
 #' @param grp_vars character vector of named columns in the score_card at which
 #'   average performance will be returned
 #' @param avg_vars character vector of named columns in the score_card over which
@@ -24,13 +26,14 @@
 compute_calibration <- function(
   predictions_cards,
   geo_type,
+  backfill_buffer = 10,
   grp_vars = c("forecaster", "forecast_date", "ahead"),
   avg_vars = c("geo_value")) {
   
   score_card <- left_join(predictions_cards,
                           get_covidcast_data(predictions_cards,
                                              backfill_buffer,
-                                             geo_type),
+                                             geo_type=geo_type),
                           by = c("geo_value",
                                  "forecast_date",
                                  "ahead"))

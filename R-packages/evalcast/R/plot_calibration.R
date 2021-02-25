@@ -2,7 +2,12 @@
 #'
 #' @param predictions_cards Either one predictions_card or several joined
 #'   together using bind_rows().
-#' @template geo_type-template 
+#' @template geo_type-template
+#' @param facet_rows A variable name to facet data over. Creates a
+#'   separate row of plots for each value of specified variable. Can be used
+#'   with `facet_cols` to create a grid of plots.  Should be passed to 
+#'   plot_calibration when customized.
+#' @param facet_cols Same as `facet_rows`, but with columns.
 #' @param backfill_buffer How many days until response is deemed trustworthy
 #'   enough to be taken as correct?
 #' @param type One of "wedgeplot" or "traditional".
@@ -10,16 +15,16 @@
 #'   determines the color of the lines and faceting depending on `type`
 #' @param avg_vars variables over which we average to determine the calibration.
 #' @param legend_position Legend position, the default being "bottom".
-#' @param ... other inputs including facet_rows and facet_cols
 #' @export
 plot_calibration <- function(predictions_cards,
                              geo_type,
+                             facet_rows = NULL,
+                             facet_cols = NULL,
                              backfill_buffer = 10,
                              type = c("wedgeplot", "traditional"),
                              grp_vars = c("forecaster", "forecast_date", "ahead"),
                              avg_vars = c("geo_value"),
-                             legend_position = "bottom",
-                             ...) {
+                             legend_position = "bottom") {
   
   type <- match.arg(type)
 
@@ -30,9 +35,18 @@ plot_calibration <- function(predictions_cards,
                                avg_vars)
   
   if (type == "wedgeplot") {
-    g <- format_wedgeplot(calib, grp_vars, ...)
+    if (is.null(facet_rows) & is.null(facet_cols)) {
+      g <- format_wedgeplot(calib, grp_vars)
+    } else {
+      g <- format_wedgeplot(calib, grp_vars, facet_rows, facet_cols)
+    }
   } else if (type == "traditional") {
-    g <- format_traditional_calib_plot(calib, grp_vars, ...)
+    if (is.null(facet_rows) & is.null(facet_cols)) {
+      g <- format_traditional_calib_plot(calib, grp_vars)
+    } else {
+      g <- format_traditional_calib_plot(
+        calib, grp_vars, facet_rows, facet_cols)
+    }
   }
   
   return(

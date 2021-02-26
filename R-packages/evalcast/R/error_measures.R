@@ -219,7 +219,10 @@ score_func_param_checker <- function(quantiles, values, actual_value, id = ""){
 }
 
 
-is_symmetric <- function(x, tol=1e-8) all(abs(x + rev(x) - 1) < tol)
+is_symmetric <- function(x, tol=1e-8) {
+  x <- sort(x)
+  all(abs(x + rev(x) - 1) < tol)
+}
 
 find_quantile_match <- function(x, q, tol=1e-8) abs(x - q) < tol
 

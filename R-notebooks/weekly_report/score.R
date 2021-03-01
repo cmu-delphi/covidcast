@@ -1,6 +1,7 @@
 library("evalcast")
 library("dplyr")
 library("lubridate")
+library("assertthat")
 
 create_score_cards = function(prediction_cards_filepath,
                               geo_type,
@@ -57,14 +58,6 @@ create_score_cards = function(prediction_cards_filepath,
   } else if (geo_type == "nation"){
     preds_to_eval = preds_to_eval %>%
       filter(geo_value == "us")
-  }
-  if (file.exists(output_file_name)) {
-    score_cards = readRDS(output_file_name)
-  }
-  if(exists("score_cards")){
-    preds_to_eval = anti_join(preds_to_eval, 
-                              score_cards, 
-                              by = c("ahead", "forecaster", "forecast_date"))
   }
   
   #Only score forecasters with atleast 3 forecasts (i.e. more than mean and median)

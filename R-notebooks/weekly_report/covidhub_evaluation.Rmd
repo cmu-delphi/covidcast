@@ -280,9 +280,9 @@ pairwise_tournament = function(df, var, aggr = Mean) {
 ```
 
 ```{r, fig.width = 10, fig.height = 10}
-score_cards_tourney = score_cards_tourney %>% filter(geo_value != "as")
+#score_cards_tourney = score_cards_tourney %>% filter(geo_value != "as")
 theta = pairwise_tournament(score_cards_tourney, var = "wis", aggr = 
-                              function(x) mean(x, trim = 0.01, na.rm = TRUE))
+                              function(x) median(x, na.rm = TRUE))
 ranked_list = rownames(theta$mat)[order(theta$vec1)]
 colors = colorRampPalette(brewer.pal(n = 6, name = "RdBu"))(30)
 ggplot(theta$df, aes(x = factor(Forecaster2, levels = rev(ranked_list)),

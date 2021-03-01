@@ -94,8 +94,8 @@ create_prediction_cards = function(prediction_cards_filename, weeks_back = NULL,
     predictions_cards = predictions_cards_new
   }
   predictions_cards = predictions_cards %>%
-                        filter(forecast_date >= start_date) %>%
-                        filter(!is.na(predictions_cards$target_end_date)) 
+                        filter(forecast_date >= start_date, 
+                               !is.na(target_end_date)) 
 
   saveRDS(predictions_cards,
           file = prediction_cards_filename, 

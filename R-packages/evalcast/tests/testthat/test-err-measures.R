@@ -119,20 +119,20 @@ test_that("wis works, 1 interval and median", {
     summarise(wis = weighted_interval_score(quantile, value, actual)) %>%
     pull()
   
-  # test_data <- data.frame(true_value =   rep(c(1, -15, 22), times = 3),
-  #                         quantile = rep(c(0.25, 0.5, 0.75), each = 3),
-  #                         prediction = c(c(0, 1, 0), c(1, 2, 3), c(2, 2, 3)),
-  #                         model = c("model1"),
-  #                         date = rep(1:3, times = 3))
-  # 
-  # eval <- scoringutils::eval_forecasts(
-  #   test_data,
-  #   interval_score_arguments = list(count_median_twice = FALSE))
-  # exp_wis <- eval$interval_score
-  expected <- c(1/3, 16.5, 19.5)
-    
+  test_data <- data.frame(true_value =   rep(c(1, -15, 22), times = 3),
+                          quantile = rep(c(0.25, 0.5, 0.75), each = 3),
+                          prediction = c(c(0, 1, 0), c(1, 2, 3), c(2, 2, 3)),
+                          model = c("model1"),
+                          date = rep(1:3, times = 3))
+
+  eval <- scoringutils::eval_forecasts(
+    test_data,
+    interval_score_arguments = list(count_median_twice = FALSE))
+  theirs <- eval$interval_score
   
+  expected <- c(1/3, 16.5, 19.5)
   expect_identical(ours, expected)
+  expect_identical(theirs, expected) # will fail if their package changes
 })
 
 
@@ -166,9 +166,9 @@ test_that("wis over/under works, 2 intervals and median", {
                           model = c("model1"),
                           date = rep(1:3, times = 5))
   
-  # eval <- scoringutils::eval_forecasts(
-  #   test_data,
-  #   interval_score_arguments = list(count_median_twice = FALSE))
+  eval <- scoringutils::eval_forecasts(
+    test_data,
+    interval_score_arguments = list(count_median_twice = FALSE))
    
   wis <- test_data %>% group_by(date) %>% 
     summarise(wis = weighted_interval_score(quantile, prediction, true_value)) %>%
@@ -183,6 +183,10 @@ test_that("wis over/under works, 2 intervals and median", {
   expect_identical(wis, c(.36, 15.34, 19.14))
   expect_identical(over, c(0,15,0))
   expect_identical(under, c(0,0,18.6))
+  
+  expect_identical(wis, eval$interval_score)
+  expect_identical(over, eval$overprediction)
+  expect_identical(under, eval$underprediction)
 })
 
 

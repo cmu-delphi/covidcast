@@ -30,12 +30,12 @@ weighted_interval_score <- function(quantile, value, actual_value) {
   # 
   med <- value[find_quantile_match(quantile, 0.5)]
   
-  if (length(med) != 1L) return(NA)
+  if (length(med) > 1L) return(NA)
   
   wis <- 2 * mean(pmax(
     quantile * (actual_value - value),
     (1 - quantile) * (value - actual_value), 
-    na.rm = TRUE)) 
+    na.rm = TRUE))
   
   return(wis)
 }
@@ -99,6 +99,94 @@ interval_coverage <- function(coverage) {
   }
 }
 
+#' Overprediction component of the weighted interval score
+#' 
+#' Requires symmetric quantile forecasts. Roughly, a penalty for predicted 
+#' quantiles smaller than .5 falling above the observed value.
+#'
+#' @param quantile vector of forecasted quantiles
+#' @param value vector of forecasted values
+#' @param actual_value Actual value.
+#' 
+#' @export
+overprediction <- function(quantile, value, actual_value) {
+  score_func_param_checker(quantile, value, actual_value, "overprediction")
+  if (!is_symmetric(quantile)) {
+    warning(paste0("overprediction/underprediction/sharpness require",
+                   "symmetric quantile forecasts. Using NA."))
+    return(NA)
+  }
+  if (all(is.na(actual_value))) return(NA)
+  actual_value <- unique(actual_value)
+  
+  lower <- value[!is.na(quantile) & quantile < .5]
+  med <- value[find_quantile_match(quantile, 0.5)]
+  
+  if (length(med) > 1L) return(NA)
+  m <- ifelse(length(med == 1L),
+              (med - actual_value) * (med > actual_value),
+              NULL)
+  
+    
+  
+  ans <- mean(c(
+    rep((lower - actual_value) * (lower > actual_value), 2), m))
+    
+  
+  return(ans)
+}
+
+
+#' Underprediction component of the weighted interval score
+#' 
+#' Requires symmetric quantile forecasts. Roughly, a penalty for predicted 
+#' quantiles larger than .5 falling under the observed value.
+#'
+#' @param quantile vector of forecasted quantiles
+#' @param value vector of forecasted values
+#' @param actual_value Actual value.
+#' 
+#' @export
+underprediction <- function(quantile, value, actual_value) {
+  score_func_param_checker(quantile, value, actual_value, "underprediction")
+  if (!is_symmetric(quantile)) {
+    warning(paste0("overprediction/underprediction/sharpness require",
+                   "symmetric quantile forecasts. Using NA."))
+    return(NA)
+  }
+  if (all(is.na(actual_value))) return(NA)
+  actual_value <- unique(actual_value)
+  
+  upper <- value[!is.na(quantile) & quantile > .5]
+  med <- value[find_quantile_match(quantile, 0.5)]
+  
+  if (length(med) > 1L) return(NA)
+  m <- ifelse(length(med == 1L),
+              (actual_value - med) * (med < actual_value),
+              NULL)
+  ans <- mean(c(
+    rep((actual_value - upper) * (upper < actual_value),2), m))
+  
+  return(ans)
+}
+#' Sharpness component of the weighted interval score
+#' 
+#' Requires symmetric quantile forecasts. Roughly, a penalty for the w
+#' width of predicted quantiles.
+#'
+#' @param quantile vector of forecasted quantiles
+#' @param value vector of forecasted values
+#' @param actual_value Actual value.
+#' 
+#' @export
+
+sharpness <- function(quantile, value, actual_value) {
+  weighted_interval_score(quantile, value, actual_value) - 
+    overprediction(quantile, value, actual_value) - 
+    underprediction(quantile, value, actual_value)
+}
+
+
 #' Common parameter checks for score functions
 #'
 #' A set of common checks for score functions, meant to identify common causes
@@ -112,7 +200,7 @@ interval_coverage <- function(coverage) {
 #'   error messages (recommended to be the parent function's name)
 score_func_param_checker <- function(quantiles, values, actual_value, id = ""){
   id_str = paste0(id, ": ")
-  if(length(actual_value) > 1){
+  if (length(actual_value) > 1) {
     assert_that(length(actual_value) == length(values),
                 msg = paste0(id_str, 
                              "actual_value must be a scalar or the same length",
@@ -130,7 +218,11 @@ score_func_param_checker <- function(quantiles, values, actual_value, id = ""){
                            "quantiles must be unique."))
 }
 
-is_symmetric <- function(x, tol=1e-8) all(abs(x + rev(x) - 1) < tol)
+
+is_symmetric <- function(x, tol=1e-8) {
+  x <- sort(x)
+  all(abs(x + rev(x) - 1) < tol)
+}
 
 find_quantile_match <- function(x, q, tol=1e-8) abs(x - q) < tol
 

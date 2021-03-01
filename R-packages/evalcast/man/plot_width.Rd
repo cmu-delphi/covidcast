@@ -9,6 +9,8 @@ plot_width(
   levels = c(0.5, 0.7, 0.9),
   grp_vars = c("forecaster", "forecast_date", "ahead"),
   avg_vars = c("geo_value"),
+  facet_rows = "forecast_date",
+  facet_cols = "forecaster",
   legend_position = "bottom"
 )
 }
@@ -24,6 +26,13 @@ median, 70\% and 90\% quantiles of interval widths.}
 determines the color of the lines while the rest will be faceted over}
 
 \item{avg_vars}{variables over which we compute quantiles.}
+
+\item{facet_rows}{A variable name to facet data over. Creates a
+separate row of plots for each value of specified variable. Can be used
+with \code{facet_cols} to create a grid of plots.  Should be passed to
+plot_calibration when customized.}
+
+\item{facet_cols}{Same as \code{facet_rows}, but with columns.}
 
 \item{legend_position}{Legend position, the default being "bottom".}
 }

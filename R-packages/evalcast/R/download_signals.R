@@ -1,3 +1,8 @@
+#' Wrapper around `covidcast::covidcast_signal()` with additional logging.
+#' @param ... arguments to be passed to `covidcast::covidcast_signal()`.
+#' @return `covidcast_signal` data frame.
+#'
+#' @export
 download_signal <- function(...) {
   args <- list(...)
   if (is.null(args$start_day)) {
@@ -25,7 +30,17 @@ download_signal <- function(...) {
   out 
 }
 
-
+#' Wrapper around `covidcast::covidcast_signals()` with additional logging, error checking, and
+#' aggregation.
+#' @param ... arguments to be passed to `covidcast::covidcast_signals()`
+#' @param signal_aggregation format of aggregated data ("wide" or "long").
+#'    See `covidcast::aggregate_signals()`.
+#' @param signal_aggregation_dt vector of shifts to apply to aggregated data
+#'    See `covidcast::aggregate_signals()`.
+#'
+#' @return list of `covidcast_signal` data frames
+#'
+#' @export
 download_signals <- function(..., 
                              signal_aggregation = "long", 
                              signal_aggregation_dt = NULL) {

@@ -1,22 +1,31 @@
 Package: evalcast
 Type: Package
-Title: Evaluation Tools For COVID Forecasters
-Version: 0.1.1
+Title: Tools For Evaluating COVID Forecasters
+Version: 0.2.0
 Authors@R: 
   c(
     person(given = "Jacob",
            family = "Bien",
-           role = c("aut", "cre"),
-           email = "jbien@usc.edu"),
-    person(given = "Alden",
-           family = "Green",
-           role = "aut"),
-    person(given = "Balasubramanian",
-           family = "Narasimhan",
            role = "aut"),
     person(given = "Sarah",
            family = "Colquhoun",
            role = "ctb"),
+    person(given = "Jed",
+           family = "Grabman",
+           role = "aut"),
+    person(given = "Alden",
+           family = "Green",
+           role = "aut"),
+		person(given = "Daniel",
+			     family = "McDonald",
+			     role = c("aut", "cre"),
+			     email = "daniel@stat.ubc.ca"),
+    person(given = "Balasubramanian",
+           family = "Narasimhan",
+           role = "aut"),
+    person(given = "Mike",
+           family = "O'Brien",
+           role = "aut"),
     person(given = "Samyak",
            family = "Rajanala",
            role = "ctb"),
@@ -26,7 +35,10 @@ Authors@R:
     person(given = "Ryan",
            family = "Tibshirani",
            role = "aut"))
-Description: Evaluation tools for probabilistic COVID-19 forecasters. This
+URL: https://cmu-delphi.github.io/covidcast/evalcastR/,
+  https://github.com/cmu-delphi/covidcast 
+BugReports: https://github.com/cmu-delphi/covidcast/issues
+Description: Tools for evaluating probabilistic COVID-19 forecasters. This
     package provides functionality for accurately evaluating forecaster
     performance: crucially, evalcast leverages the covidcast R package's "as of"
     capability, which allows one to get the data that would have been known as
@@ -43,7 +55,10 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-Remotes: github::cmu-delphi/covidcast/R-packages/covidcast@main
+Remotes: cmu-delphi/covidcast/R-packages/covidcast@main,
+  reichlab/zoltr,
+  reichlab/covidHubUtils,
+  epiforecasts/scoringutils
 Imports: 
     assertthat,
     covidcast,
@@ -61,8 +76,14 @@ Imports:
     rvest,
     xml2,
     ggplot2,
-    memoise
+    memoise,
+    zoltr,
+    covidHubUtils,
+    forcats
 Suggests: 
-    testthat
+    testthat,
+    mockr,
+    mockery,
+    scoringutils
 Depends: 
     R (>= 3.5.0)

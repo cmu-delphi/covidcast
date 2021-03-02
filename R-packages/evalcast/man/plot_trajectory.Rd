@@ -2,47 +2,74 @@
 % Please edit documentation in R/plot_trajectory.R
 \name{plot_trajectory}
 \alias{plot_trajectory}
-\title{Produce trajectory plots of forecasts and observed data}
+\title{Plot predictions along with truth}
 \usage{
 plot_trajectory(
-  list_of_predictions_cards,
-  first_day = "2020-07-01",
-  last_day = Sys.Date(),
-  alpha = 0.2,
-  nrow = 6,
-  ncol = 4,
-  page_facet = 1,
-  cutoff = 52
+  predictions_cards,
+  intervals = c(0.5, 0.8, 0.95),
+  plot_it = TRUE,
+  show_geo_value = NULL,
+  show_forecaster = NULL,
+  side_truth = NULL,
+  show_points = TRUE,
+  show_quantiles = TRUE,
+  geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation"),
+  nrow = NULL,
+  ncol = NULL,
+  ...
 )
 }
 \arguments{
-\item{list_of_predictions_cards}{collection of prediction cards as returned
-by \code{get_predictions()}. Supports collections of multiple forecast dates and
-forecasters}
+\item{predictions_cards}{long data frame of forecasts with a class of
+\code{predictions_cards} as created by \code{\link[=get_predictions]{get_predictions()}} or
+\code{\link[=get_zoltar_predictions]{get_zoltar_predictions()}} or \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}}.
+The first 4 columns are the same as those returned by the forecaster. The
+remainder specify the prediction task, 10 columns in total:
+\code{ahead}, \code{geo_value}, \code{quantile}, \code{value}, \code{forecaster}, \code{forecast_date},
+\code{data_source}, \code{signal}, \code{target_end_date}, and \code{incidence_period}. Here
+\code{data_source} and \code{signal} correspond to the response variable only.}
 
-\item{first_day}{the earliest date to display}
+\item{intervals}{vector of confidence intervals to show. More than 3 is ugly
+and will be reduced to the default set.}
 
-\item{last_day}{the latest date to display. Defaults to the most recent data
-available (plus future, if forecasts are past today)}
+\item{plot_it}{should we actually produce the figure. If you have many
+geo_values or forecasters, best not to. Then you can assign the output
+to an object and facet or apply aesthetic specifications to meet your
+own standards.}
 
-\item{alpha}{Displayed ribbons are the 1-alpha coverage results}
+\item{show_geo_value}{a subset of \code{geo_values} in your \code{predictions_cards}.
+Default uses all available. If you only want to see some, this may speed
+up the call.}
+
+\item{show_forecaster}{a subset of \code{forecasters} in your \code{predictions_cards}.
+Default uses all available. If you only want to see some, this may speed
+up the call.}
+
+\item{side_truth}{optional. Use your own truth data rather than downloading
+with \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}}. Must contain columns \code{geo_value},
+\code{value} and \code{target_end_date}}
+
+\item{show_points}{do you want points as well as lines}
+
+\item{show_quantiles}{do you want to plot the quantiles or just lines}
+
+\item{geo_type}{String indicating geographical type, such as "county", or
+"state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
+for available options.}
+
+\item{nrow}{the number of rows present in the output plot. Similarly, \code{ncol}
+adjusts the number of columns. Only one of \code{nrow} and \code{ncol} may be set and
+they only have an effect if a plot is actually produced. Additionally,
+If data is present for multiple forecasters, any output plot is faceted, so
+nrow and ncol cannot be set.}
+
+\item{ncol}{See \code{nrow}}
+
+\item{...}{additional arguments passed to \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}}}
 }
 \value{
-Produces a ggplot object
+invisibly returns a ggplot object
 }
 \description{
-Produce trajectory plots of forecasts and observed data
-}
-\examples{
-sister_preds = get_predictions(
-  baseline_forecaster, "sister",
-  tibble::tibble(data_source="usa-facts", signal = "deaths_incidence_num",
-    start_day=lubridate::ymd("2020-07-01")),
-    lubridate::ymd("2020-09-01"),"epiweek", 1:4, "state", c("mi"))
-baby_preds = get_predictions(
-  baseline_forecaster, "baby",
-  tibble::tibble(data_source="usa-facts", signal = "deaths_incidence_num",
-    start_day=lubridate::ymd("2020-07-01")),
-    lubridate::ymd("2020-09-08"),"epiweek", 1:4, "state", c("mi"))
- plot_trajectory(c(sister_preds, baby_preds), last_day="2020-10-01")
+Plot predictions along with truth
 }

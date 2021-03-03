@@ -26,9 +26,6 @@
 #'   contains previously retrieved predictions. If provided, files will not be
 #'   retrieved from Reichlab for any forecaster / forecast_date combos that are
 #'   present in the file.
-#' @param predictions_cards_filename .RDS file containing existing predictions.
-#'   Alternative to using `predictions_cards` argument and subject to the same
-#'   restrictions.
 #' @param start_date The earliest date for which to retrieve predictions
 #' @param end_date The latest date for which to retrieve predictions
 #' @param date_filtering_function A function which takes a list, where each
@@ -55,13 +52,9 @@ get_covidhub_predictions <- function(
              "deaths_incidence_num",
              "deaths_cumulative_num"),
   predictions_cards = NULL,
-  predictions_cards_filename = NULL,
   start_date = NULL,
   end_date = NULL,
   date_filtering_function = NULL) {
-  assert_that(is.null(predictions_cards) | is.null(predictions_cards_filename),
-              msg = paste("If `predictions_cards` is provided,",
-                      "`predictions_cards_filename` cannot also be specified"))
 
   forecast_dates <- get_forecast_dates(covidhub_forecaster_name,
                                        forecast_dates,
@@ -71,11 +64,6 @@ get_covidhub_predictions <- function(
   # Load known predictions so we don't have to re-ingest / process it. This
   # data could end up out of date if a forecast is retrospectively updated, but
   # in that case it's no longer a true prediction.
-  if (!is.null(predictions_cards_filename)) {
-    assert_that(file.exists(predictions_cards_filename),
-                msg = paste("File not found:", predictions_cards_filename))
-    predictions_cards <- readRDS(file = predictions_cards_filename)
-  }
   if (!is.null(predictions_cards)) {
     seen_dates <- predictions_cards %>%
       distinct(forecast_date, forecaster)
@@ -84,8 +72,9 @@ get_covidhub_predictions <- function(
         seen_forecaster_dates <- seen_dates %>%
           filter(forecaster == covidhub_forecaster_name[[i]]) %>%
           pull(forecast_date)
-        forecast_dates[[i]] <- as_date(setdiff(forecast_dates[[i]],
-                                               seen_forecaster_dates))
+        forecast_dates[[i]] <- lubridate::as_date(setdiff(
+                                                    forecast_dates[[i]],
+                                                    seen_forecaster_dates))
       }
     }
   }
@@ -141,7 +130,7 @@ get_forecast_dates <- function(forecasters,
   forecaster_dates <- vector("list", length = length(forecasters))
   for (i in seq_len(length(forecasters))) {
     forecaster_dates[[i]] <- tryCatch({
-      as_date(get_covidhub_forecast_dates(forecasters[i]))
+      lubridate::as_date(get_covidhub_forecast_dates(forecasters[i]))
     },
     error = function(e) cat(sprintf("%i. %s\n", i, e$message))
     )
@@ -299,7 +288,7 @@ get_covidhub_forecast_dates <- function(forecaster_name) {
 #' @param repo character strinng either "zoltar" indicating the 
 #' [Zoltar](https://zoltardata.com) Forecast Archive or "covid19forecast_repo"
 #' which lists those available at the 
-#' [Reichlab](https://github.com/reichlab/covid19-forecast-hub)
+#' [Reich Lab](https://github.com/reichlab/covid19-forecast-hub)
 #' Github submission repo.
 #'
 #' @return character vector of all available forecasters

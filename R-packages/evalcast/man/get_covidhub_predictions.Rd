@@ -14,7 +14,6 @@ get_covidhub_predictions(
   signal = c("confirmed_incidence_num", "deaths_incidence_num",
     "deaths_cumulative_num"),
   predictions_cards = NULL,
-  predictions_cards_filename = NULL,
   start_date = NULL,
   end_date = NULL,
   date_filtering_function = NULL
@@ -50,10 +49,6 @@ alternatives mentioned above}
 contains previously retrieved predictions. If provided, files will not be
 retrieved from Reichlab for any forecaster / forecast_date combos that are
 present in the file.}
-
-\item{predictions_cards_filename}{.RDS file containing existing predictions.
-Alternative to using \code{predictions_cards} argument and subject to the same
-restrictions.}
 
 \item{start_date}{The earliest date for which to retrieve predictions}
 

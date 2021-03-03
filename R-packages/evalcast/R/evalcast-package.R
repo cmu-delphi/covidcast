@@ -15,6 +15,7 @@
 #' @import readr
 #' @import stringr
 #' @import ggplot2
+#' @import lubridate
 #' @importFrom assertthat assert_that
 #' @importFrom memoise memoise
 NULL

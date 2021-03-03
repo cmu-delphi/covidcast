@@ -26,7 +26,7 @@ NULL
     get_forecaster_predictions <<- memoise::memoise(get_forecaster_predictions)
     msg <- c(
         "Calls to the `evalcast` functions `download_signal()`,",
-        "`get_covidhub_predictions()`, and `get_forecast_predictions` are",
+        "`get_covidhub_predictions()`, and `get_forecast_predictions()` are",
         " memoized in memory by default.",
         "To cache to disk instead use `memoise::cache_filesystem()`. Ex:",
     "",

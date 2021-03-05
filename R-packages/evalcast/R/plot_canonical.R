@@ -60,12 +60,12 @@ plot_canonical <- function(df, x, y, aggr = mean, dots = TRUE, lines = TRUE,
   # Aggregate
   df <- df %>%
     group_by(!!!syms(group_vars), !!sym(x)) %>%
-    drop_na() %>%
+    drop_na(!!sym(x), !!sym(y)) %>%
     summarize(!!y := aggr(!!sym(y)))
 
   # Scale after aggregation, if we need to
   if (!is.null(base_forecaster) && !scale_before_aggr) {
-    df <- scale_by_forecaster(df, y, base_forecaster)
+    df <- scale_by_forecaster(df, y, base_forecaster, id_cols = c(x, group_vars))
   }
 
   # Set up plotting layers

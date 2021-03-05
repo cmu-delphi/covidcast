@@ -26,6 +26,10 @@ A predictions card may be created by the function
 \code{\link[=get_predictions]{get_predictions()}}, downloaded with \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}} or
 possibly created manually.}
 
+\item{geo_type}{String indicating geographical type, such as "county", or
+"state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
+for available options.}
+
 \item{backfill_buffer}{How many days until response is deemed trustworthy
 enough to be taken as correct?}
 

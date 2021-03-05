@@ -8,6 +8,7 @@
 #'   A predictions card may be created by the function
 #'   [get_predictions()], downloaded with [get_covidhub_predictions()] or
 #'   possibly created manually.
+#' @template geo_type-template
 #' @param backfill_buffer How many days until response is deemed trustworthy
 #'   enough to be taken as correct?
 #' @param type One of "all" or "none", indicating whether to show coverage

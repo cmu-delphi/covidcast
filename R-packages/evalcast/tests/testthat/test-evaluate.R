@@ -21,7 +21,7 @@ create_pcard <- function(card) {
   return(card)
 }
 
-test_that("evaluate_predictions evaluates against downloaded data", {
+test_that("evaluate_covid_predictions evaluates against downloaded data", {
   # Mock out the call to `download_signals()`.
   mock_download_signal <- mock(create_fake_downloaded_signal(c("al", "wy"), 5),
                                create_fake_downloaded_signal(c("al", "wy"), 10))
@@ -38,7 +38,7 @@ test_that("evaluate_predictions evaluates against downloaded data", {
       target_end_date = as.Date("2020-01-21"),
       incidence_period = "epiweek"
     ))
-    score_card <- evaluate_predictions(pcard, geo_type = "state")
+    score_card <- evaluate_covid_predictions(pcard, geo_type = "state")
     expect_called(mock_download_signal, 2)
     expect_equal(mock_args(mock_download_signal),
                  list(list(start_day = as.Date("2020-01-05"),
@@ -73,9 +73,9 @@ test_that("evaluate_predictions evaluates against downloaded data", {
   })
 })
 
-test_that("evaluate_predictions fails on non-predictions cards data frames", {
+test_that("evaluate_covid_predictions fails on non-predictions cards data frames", {
   expect_error(
-    evaluate_predictions(
+    evaluate_covid_predictions(
       tibble(
         ahead = 1,
         geo_value = rep(c("al", "wy"), each=3),
@@ -91,7 +91,7 @@ test_that("evaluate_predictions fails on non-predictions cards data frames", {
     "must be of class `predictions_cards`")
 })
 
-test_that("evaluate_predictions evaluates against side truth", {
+test_that("evaluate_predictions evaluates against truth", {
   # Mock out `download_signal` to verify it isn't getting called.
   mock_download_signal <- mock()
   mockr::with_mock(download_signal = mock_download_signal, {
@@ -107,20 +107,19 @@ test_that("evaluate_predictions evaluates against side truth", {
       target_end_date = as.Date("2020-01-21"),
       incidence_period = "epiweek"))
 
-    side_truth <- tibble(
-      forecaster = "a",
+    truth <- tibble(
       forecast_date = as.Date(c("2020-01-02", "2020-01-09")),
       ahead = 1,
       geo_value = c("al", "wy"),
       actual = c(5, 10)
     )
-    score_card <- evaluate_predictions(pcard, side_truth=side_truth)
+    score_card <- evaluate_predictions(pcard, truth=truth)
 
     expect_called(mock_download_signal, 0)
 
     expect_equal(colnames(score_card),
-                  c("forecaster", "forecast_date", "ahead", "geo_value", "data_source", "signal",
-                    "target_end_date", "incidence_period", "actual", "wis", "ae", "coverage_80"))
+                  c("forecaster", "ahead", "geo_value", "forecast_date", "actual", "data_source", "signal",
+                    "target_end_date", "incidence_period", "wis", "ae", "coverage_80"))
     n <- 2
     expect_equal(score_card$ahead, rep(1, n))
     expect_equal(score_card$geo_value, rep(c("al", "wy"), each=n/2))
@@ -153,11 +152,11 @@ test_that("evaluate_predictions uses alternate grouping variables", {
       target_end_date = as.Date("2020-01-21"),
       incidence_period = "epiweek"))
 
-    side_truth <- tibble(
+    truth <- tibble(
       forecaster = c("a", "b"),
       actual = c(5, 10)
     )
-    score_card <- evaluate_predictions(pcard, side_truth=side_truth, grp_vars=c("forecaster"))
+    score_card <- evaluate_predictions(pcard, truth=truth, grp_vars=c("forecaster"))
 
     expect_called(mock_download_signal, 0)
 
@@ -180,7 +179,7 @@ test_that("evaluate_predictions uses alternate grouping variables", {
   })  
 })
 
-test_that("evaluate_predictions backfill_buffer works", {
+test_that("evaluate_covid_predictions backfill_buffer works", {
   # Mock `download_signals()` so we don't call to the covidcast API.
   mock_download_signal <- mock(create_fake_downloaded_signal(c("al", "wy"), 10), cycle=TRUE)
   mockr::with_mock(download_signal = mock_download_signal, {
@@ -198,9 +197,9 @@ test_that("evaluate_predictions backfill_buffer works", {
       target_end_date = as.Date("2020-01-05"),
       incidence_period = "epiweek"
     ))
-    expect_warning(evaluate_predictions(pcard, backfill_buffer = 22),
+    expect_warning(evaluate_covid_predictions(pcard, backfill_buffer = 22),
                    "backfill_buffer")
     # waited long enough should have no warning:
-    expect_warning(evaluate_predictions(pcard, backfill_buffer = 7), NA)
+    expect_warning(evaluate_covid_predictions(pcard, backfill_buffer = 7), NA)
   })
 })

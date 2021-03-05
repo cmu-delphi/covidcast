@@ -2,84 +2,49 @@
 % Please edit documentation in R/evaluate_predictions.R
 \name{evaluate_predictions}
 \alias{evaluate_predictions}
-\title{Create a data frame of score cards}
+\title{Create a score card data frame}
 \usage{
 evaluate_predictions(
   predictions_cards,
+  truth,
   err_measures = list(wis = weighted_interval_score, ae = absolute_error, coverage_80 =
     interval_coverage(coverage = 0.8)),
-  backfill_buffer = 10,
-  side_truth = NULL,
-  grp_vars = c("forecaster", "forecast_date", "ahead", "geo_value"),
-  geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation")
+  grp_vars = c("forecaster", intersect(colnames(predictions_cards), colnames(truth)))
 )
 }
 \arguments{
-\item{predictions_cards}{tibble of predictions
-that are all for the same prediction task, meaning they are for the same
-response, incidence period,and geo type. Forecasts may be for a
-different forecast date or forecaster.
-A predictions card may be created by the function
-\code{\link[=get_predictions]{get_predictions()}}, downloaded with \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}} or
-possibly created manually.}
+\item{predictions_cards}{tibble of quantile forecasts, which contains at
+least \code{quantile} and \code{value} columns, as well as any other prediction task
+identifiers. For covid data, a predictions card may be created by the
+function \code{\link[=get_predictions]{get_predictions()}}, downloaded with \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}}
+or created manually.}
+
+\item{truth}{truth data (observed). This should be a data frame that will be
+joined to \code{predictions_cards} by all available columns. The observed data
+column should be named \code{actual}.}
 
 \item{err_measures}{Named list of one or more functions, where each function
 takes a data frame with three columns \code{quantile}, \code{value} and \code{actual}
-(i.e., observed) returns a scalar measure of error. Null or an empty list
-may be provided if scoring is not desired.}
+(i.e., observed) and returns a scalar measure of error. Null or an empty
+list may be provided if scoring is not desired.}
 
-\item{backfill_buffer}{How many days until response is deemed trustworthy
-enough to be taken as correct? See details for more.}
-
-\item{side_truth}{you can optionally provide your own truth data (observed).
-Adding this column bypasses all checks to get appropriate data as
-reported at the time of the forecast. This column should either be a vector
-the same length as \code{predictions_cards} or a data frame that will be
-joined to \code{predictions_cards} by all available columns. If a data frame,
-the observed data should be named \code{actual}}
-
-\item{grp_vars}{character vector of named columns in the predictions_cards
-such that the combination gives a unique (quantile) prediction. Ignored if
-\code{predictions_cards} is of the type returned by \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}}
-or \code{\link[=get_predictions]{get_predictions()}} (class is \code{predictions_cards})}
-
-\item{geo_type}{String indicating geographical type, such as "county", or
-"state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
-for available options.}
+\item{grp_vars}{character vector of named columns in \code{predictions_cards}
+such that the combination gives a unique (quantile) prediction.}
 }
 \value{
 tibble of "score cards". Contains the same information as the
-\code{predictions_cards()} with additional columns for each err_measure and
-for the truth (named \code{actual}). All the columns may be necessary for
-some types of plotting, but it may be useful to shrink this down
+\code{predictions_cards()} with additional columns for each \code{err_measure} and
+for the truth (named \code{actual}).
 }
 \description{
-Performs backtesting, through the following steps:
+Performs testing, through the following steps:
 \enumerate{
-\item Takes a list of predictions cards (as created by
+\item Takes a prediction card (as created by
 \code{\link[=get_predictions]{get_predictions()}}).
-\item Downloads from the COVIDcast API the latest available data to compute
-what actually occurred (summing the response over the incidence period).
 \item Computes various user-specified error measures.
 }
-The result is a data frame of "score cards", where each row corresponds to
-a distinct ahead value. A score card is a data frame in which each row
-corresponds to a location-day pair, and the columns give the values of the
-error measures (along with other information including the forecast
-distributions and the actual response values).
-}
-\details{
-Backfill refers to the process by which some data sources go back in time
-updating previously reported values. Suppose it is September 14 and we are
-evaluating our predictions for what happened in the previous epiweek
-(September 6 through 12). Although we may be able to calculate a value for
-"actual", we might not trust this value since on September 16, backfill may
-occur changing what is known about the period September 6 through 12.  There are
-two consequences of this phenomenon.  First, running this function on
-different dates may result in different estimates of the error. Second, we
-may not trust the evaluations we get that are too recent.  The parameter
-\code{backfill_buffer} specifies how long of a buffer period we should
-enforce.  This will be dependent on the data source and signal and is left
-to the user to determine.  If backfill is not relevant for the particular
-signal you are predicting, then you can set \code{backfill_buffer} to 0.
+The result is a "score card" data frame, where each row corresponds to
+a prediction-result pair, where the columns define the prediction
+task, give the observed value, and give the calculated values of the provided
+error measures.
 }

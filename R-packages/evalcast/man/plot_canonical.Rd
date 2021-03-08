@@ -6,12 +6,12 @@
 \usage{
 plot_canonical(
   df,
+  x,
+  y,
   facet_rows = NULL,
   facet_cols = NULL,
   legend_position = "bottom",
   grp_vars = "forecaster",
-  x,
-  y,
   aggr = mean,
   dots = TRUE,
   lines = TRUE,
@@ -27,6 +27,10 @@ plot_canonical(
 \arguments{
 \item{df}{dataframe containing the data to plot}
 
+\item{x}{Name of the variable in \code{df} to be used for the x-axis}
+
+\item{y}{name of the variable in \code{df} to be used for the y-axis}
+
 \item{facet_rows}{A variable name to facet data over. Creates a
 separate row of plots for each value of specified variable. Can be used
 with \code{facet_cols} to create a grid of plots.}
@@ -38,11 +42,7 @@ with \code{facet_cols} to create a grid of plots.}
 \item{grp_vars}{The set of variable names in \code{df} which to aggregate over.
 "forecaster" by default.}
 
-\item{x}{Name of the variable in \code{df} to be used for the x-axis}
-
-\item{y}{name of the variable in \code{df} to be used for the y-axis}
-
-\item{aggr}{function to use to aggregate data over \code{group_vars}}
+\item{aggr}{function to use to aggregate data over \code{grp_vars}}
 
 \item{dots}{when set to TRUE, a dot layer is included in the plot}
 

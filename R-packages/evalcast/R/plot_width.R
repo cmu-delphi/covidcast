@@ -103,7 +103,7 @@ compute_width <- function(predictions_cards,
   if(any(is.na(predictions_cards$value))) {
     message("Some quantiles values have NA values; these will be removed for
             the interval width plots.")
-    predictions-cards <- predictions_cards %>% filter(!is.na(.data$value))
+    predictions_cards <- predictions_cards %>% filter(!is.na(.data$value))
   }
   
   predictions_cards <- averaging_checks(

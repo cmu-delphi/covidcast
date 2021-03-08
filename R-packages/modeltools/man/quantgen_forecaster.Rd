@@ -57,7 +57,7 @@ Saturday, then it means the following epiweek.}
 
 \item{n}{Size of the local training window (in days/weeks, depending on
 \code{incidence_period}) to use. For example, if \code{n = 14}, and \code{incidence_period = "day"}, then to make a 1-day-ahead forecast on December 15, we train on
-data from November 1 to November 14.}
+data from December 1 to December 14.}
 
 \item{lags}{Vector of lag values to use as features in the autoregressive
 model. For example, when \code{incidence_period = "day"}, setting \code{lags = c(0, 7, 14)}means we use the current value of each signal (defined by a row of

@@ -5,27 +5,24 @@
 \title{Plot interval width}
 \usage{
 plot_width(
-  cards,
-  levels = c(0.5, 0.7, 0.9),
-  grp_vars = c("forecaster", "forecast_date", "ahead"),
-  avg_vars = c("geo_value"),
+  predictions_cards,
   facet_rows = "forecast_date",
   facet_cols = "forecaster",
-  legend_position = "bottom"
+  legend_position = "bottom",
+  grp_vars = c("forecaster", "forecast_date", "ahead"),
+  avg_vars = c("geo_value"),
+  levels = c(0.5, 0.7, 0.9)
 )
 }
 \arguments{
-\item{cards}{scorecards or predictions cards (or a data frame with columns
-\code{quantile}, \code{value} and any grouping vars and averaging vars)}
-
-\item{levels}{Quantile levels for the summary of interval width, to be
-plotted. For example, \code{levels = c(0.5, 0.7, 0.9)}, the default, plots the
-median, 70\% and 90\% quantiles of interval widths.}
-
-\item{grp_vars}{variables over which to compare widths The first
-determines the color of the lines while the rest will be faceted over}
-
-\item{avg_vars}{variables over which we compute quantiles.}
+\item{predictions_cards}{tibble of predictions
+that are all for the same prediction task, meaning they are for the same
+response, incidence period,and geo type. Forecasts may be for a
+different forecast date or forecaster.
+A predictions card may be created by the function
+\code{\link[=get_predictions]{get_predictions()}}, downloaded with \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}} or
+possibly created manually. Alternatively, any data frame with columns
+\code{quantile}, \code{value} and any grouping vars and averaging vars.}
 
 \item{facet_rows}{A variable name to facet data over. Creates a
 separate row of plots for each value of specified variable. Can be used
@@ -35,6 +32,15 @@ plot_calibration when customized.}
 \item{facet_cols}{Same as \code{facet_rows}, but with columns.}
 
 \item{legend_position}{Legend position, the default being "bottom".}
+
+\item{grp_vars}{variables over which to compare widths The first
+determines the color of the lines while the rest will be faceted over}
+
+\item{avg_vars}{variables over which we compute quantiles.}
+
+\item{levels}{Quantile levels for the summary of interval width, to be
+plotted. For example, \code{levels = c(0.5, 0.7, 0.9)}, the default, plots the
+median, 70\% and 90\% quantiles of interval widths.}
 }
 \description{
 Plot interval width

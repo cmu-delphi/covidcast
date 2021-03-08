@@ -2,30 +2,32 @@
 #'
 #' @param predictions_cards Either one predictions_card or several joined
 #'   together using bind_rows().
-#' @template geo_type-template
 #' @param facet_rows A variable name to facet data over. Creates a
 #'   separate row of plots for each value of specified variable. Can be used
 #'   with `facet_cols` to create a grid of plots.  Should be passed to 
 #'   plot_calibration when customized.
 #' @param facet_cols Same as `facet_rows`, but with columns.
-#' @param backfill_buffer How many days until response is deemed trustworthy
-#'   enough to be taken as correct?
-#' @param type One of "wedgeplot" or "traditional".
+#' @param legend_position Legend position, the default being "bottom".
 #' @param grp_vars variables over which to compare calibration. These
 #'   determines the color of the lines and faceting depending on `type`
 #' @param avg_vars variables over which we average to determine the calibration.
-#' @param legend_position Legend position, the default being "bottom".
+#' @template geo_type-template
+#' @param type One of "wedgeplot" or "traditional"
+#' @param backfill_buffer How many days until response is deemed trustworthy
+#'   enough to be taken as correct?.
 #' @export
 plot_calibration <- function(predictions_cards,
-                             geo_type,
                              facet_rows = NULL,
                              facet_cols = NULL,
-                             backfill_buffer = 10,
-                             type = c("wedgeplot", "traditional"),
+                             legend_position = "bottom",
                              grp_vars = c("forecaster", "forecast_date", "ahead"),
                              avg_vars = c("geo_value"),
-                             legend_position = "bottom") {
+                             geo_type = c("county", "hrr", "msa", "dma", "state",
+                                          "hhs", "nation"),
+                             type = c("wedgeplot", "traditional"),
+                             backfill_buffer = 10) {
   
+  geo_type <- match.arg(geo_type)
   type <- match.arg(type)
 
   calib <- compute_calibration(predictions_cards,

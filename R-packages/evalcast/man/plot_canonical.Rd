@@ -6,26 +6,37 @@
 \usage{
 plot_canonical(
   df,
+  facet_rows = NULL,
+  facet_cols = NULL,
+  legend_position = "bottom",
+  grp_vars = "forecaster",
   x,
   y,
   aggr = mean,
   dots = TRUE,
   lines = TRUE,
-  group_vars = "forecaster",
-  facet_rows = NULL,
-  facet_cols = NULL,
   base_forecaster = NULL,
   scale_before_aggr = FALSE,
   title = waiver(),
   subtitle = waiver(),
   xlab = waiver(),
   ylab = waiver(),
-  legend_position = "bottom",
   legend_title = NULL
 )
 }
 \arguments{
 \item{df}{dataframe containing the data to plot}
+
+\item{facet_rows}{A variable name to facet data over. Creates a
+separate row of plots for each value of specified variable. Can be used
+with \code{facet_cols} to create a grid of plots.}
+
+\item{facet_cols}{Same as \code{facet_rows}, but with columns.}
+
+\item{legend_position}{where to position the legend ("bottom" by default)}
+
+\item{grp_vars}{The set of variable names in \code{df} which to aggregate over.
+"forecaster" by default.}
 
 \item{x}{Name of the variable in \code{df} to be used for the x-axis}
 
@@ -36,15 +47,6 @@ plot_canonical(
 \item{dots}{when set to TRUE, a dot layer is included in the plot}
 
 \item{lines}{when set to TRUE, a line layer is included in the plot}
-
-\item{group_vars}{The set of variable names in \code{df} which to aggregate over.
-"forecaster" by default.}
-
-\item{facet_rows}{A variable name to facet data over. Creates a
-separate row of plots for each value of specified variable. Can be used
-with \code{facet_cols} to create a grid of plots.}
-
-\item{facet_cols}{Same as \code{facet_rows}, but with columns.}
 
 \item{base_forecaster}{If set, scales the y-value for all forecasters by
 the corresponding values of the \code{base_forecaster}}
@@ -60,8 +62,6 @@ default.}
 \item{xlab}{x-axis label, if set}
 
 \item{ylab}{y-axis label, if set}
-
-\item{legend_position}{where to position the legend ("bottom" by default)}
 
 \item{legend_title}{title of the legend, if set}
 }

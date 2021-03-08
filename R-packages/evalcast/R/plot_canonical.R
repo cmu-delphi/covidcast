@@ -1,17 +1,18 @@
 #' A canonical function for creating plots within evalcast
 #'
 #' @param df dataframe containing the data to plot
+#' @param facet_rows A variable name to facet data over. Creates a
+#'   separate row of plots for each value of specified variable. Can be used
+#'   with `facet_cols` to create a grid of plots.
+#' @param facet_cols Same as `facet_rows`, but with columns.
+#' @param legend_position where to position the legend ("bottom" by default)
+#' @param grp_vars The set of variable names in `df` which to aggregate over.
+#'   "forecaster" by default.
 #' @param x Name of the variable in `df` to be used for the x-axis
 #' @param y name of the variable in `df` to be used for the y-axis
 #' @param aggr function to use to aggregate data over `group_vars`
 #' @param dots when set to TRUE, a dot layer is included in the plot
 #' @param lines when set to TRUE, a line layer is included in the plot
-#' @param group_vars The set of variable names in `df` which to aggregate over.
-#'   "forecaster" by default.
-#' @param facet_rows A variable name to facet data over. Creates a
-#'   separate row of plots for each value of specified variable. Can be used
-#'   with `facet_cols` to create a grid of plots.
-#' @param facet_cols Same as `facet_rows`, but with columns.
 #' @param base_forecaster If set, scales the y-value for all forecasters by
 #'   the corresponding values of the `base_forecaster`
 #' @param scale_before_aggr If TRUE, scales results by the
@@ -21,17 +22,20 @@
 #' @param subtitle subtitle of the plot, if set
 #' @param xlab x-axis label, if set
 #' @param ylab y-axis label, if set
-#' @param legend_position where to position the legend ("bottom" by default)
 #' @param legend_title title of the legend, if set
 #' 
 #' @export
-plot_canonical <- function(df, x, y, aggr = mean, dots = TRUE, lines = TRUE,
-                           group_vars = "forecaster", facet_rows = NULL,
-                           facet_cols = NULL, base_forecaster = NULL,
+plot_canonical <- function(df,
+                           facet_rows = NULL,
+                           facet_cols = NULL,
+                           legend_position = "bottom", 
+                           grp_vars = "forecaster",
+                           x, y, aggr = mean, dots = TRUE, lines = TRUE,
+                           base_forecaster = NULL,
                            scale_before_aggr = FALSE,
                            title = waiver(), subtitle = waiver(),
                            xlab = waiver(), ylab  = waiver(),
-                           legend_position = "bottom", legend_title = NULL) {
+                           legend_title = NULL) {
   assert_that("data.frame" %in% class(df),
               msg = "df must be of class data.frame")
   assert_that(dots | lines,

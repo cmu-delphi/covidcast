@@ -6,6 +6,7 @@
 \usage{
 plot_trajectory(
   predictions_cards,
+  geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation"),
   intervals = c(0.5, 0.8, 0.95),
   plot_it = TRUE,
   show_geo_value = NULL,
@@ -13,7 +14,6 @@ plot_trajectory(
   side_truth = NULL,
   show_points = TRUE,
   show_quantiles = TRUE,
-  geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation"),
   nrow = NULL,
   ncol = NULL,
   ...
@@ -28,6 +28,10 @@ remainder specify the prediction task, 10 columns in total:
 \code{ahead}, \code{geo_value}, \code{quantile}, \code{value}, \code{forecaster}, \code{forecast_date},
 \code{data_source}, \code{signal}, \code{target_end_date}, and \code{incidence_period}. Here
 \code{data_source} and \code{signal} correspond to the response variable only.}
+
+\item{geo_type}{String indicating geographical type, such as "county", or
+"state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
+for available options.}
 
 \item{intervals}{vector of confidence intervals to show. More than 3 is ugly
 and will be reduced to the default set.}
@@ -52,10 +56,6 @@ with \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}}. Mu
 \item{show_points}{do you want points as well as lines}
 
 \item{show_quantiles}{do you want to plot the quantiles or just lines}
-
-\item{geo_type}{String indicating geographical type, such as "county", or
-"state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
-for available options.}
 
 \item{nrow}{the number of rows present in the output plot. Similarly, \code{ncol}
 adjusts the number of columns. Only one of \code{nrow} and \code{ncol} may be set and

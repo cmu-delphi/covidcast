@@ -141,13 +141,13 @@ scorecards %>% str()
 We can examine forecaster calibration.
 
 ```{r}
-plot_calibration(predictions, geo_type = "state", type = "wedgeplot")
+plot_calibration(predictions_cards = predictions, geo_type = "state", type = "wedgeplot")
 ```
 
 By default, the proportion is the number of `geo_values` that fall above/below the quantile at each forecast date and ahead, but the grouping and variables to average over can be specified.
 
 ```{r}
-plot_calibration(predictions, 
+plot_calibration(predictions_cards = predictions, 
                  geo_type = "state",
                  grp_vars = "forecaster",
                  facet_cols = "forecaster",
@@ -158,7 +158,7 @@ plot_calibration(predictions,
 We can also examine a more traditional calibration plot:
 
 ```{r}
-plot_calibration(predictions, geo_type = "state", type = "traditional")
+plot_calibration(predictions_cards = predictions, geo_type = "state", type = "traditional")
 ```
 
 
@@ -172,13 +172,13 @@ compute_calibration(predictions, geo_type = "state") %>% setup_wedgeplot()
 We can display the coverage of the interval forecasts:
 
 ```{r}
-plot_coverage(predictions, geo_type = "state")
+plot_coverage(predictions_cards = predictions, geo_type = "state")
 ```
 
 Or the width of the intervals:
 
 ```{r}
-plot_width(predictions)
+plot_width(predictions_cards = predictions)
 ```
 
 Because `score_cards` are just long data frames, custom plots can also be created by using [{ggplot2}](http://ggplot2.tidyverse.org):

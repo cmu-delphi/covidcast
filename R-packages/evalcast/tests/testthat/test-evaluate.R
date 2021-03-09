@@ -91,7 +91,7 @@ test_that("evaluate_covid_predictions fails on non-predictions cards data frames
     "must be of class `predictions_cards`")
 })
 
-test_that("evaluate_predictions evaluates against truth", {
+test_that("evaluate_predictions evaluates against truth_data", {
   # Mock out `download_signal` to verify it isn't getting called.
   mock_download_signal <- mock()
   mockr::with_mock(download_signal = mock_download_signal, {
@@ -107,13 +107,13 @@ test_that("evaluate_predictions evaluates against truth", {
       target_end_date = as.Date("2020-01-21"),
       incidence_period = "epiweek"))
 
-    truth <- tibble(
+    truth_data <- tibble(
       forecast_date = as.Date(c("2020-01-02", "2020-01-09")),
       ahead = 1,
       geo_value = c("al", "wy"),
       actual = c(5, 10)
     )
-    score_card <- evaluate_predictions(pcard, truth=truth)
+    score_card <- evaluate_predictions(pcard, truth_data = truth_data)
 
     expect_called(mock_download_signal, 0)
 
@@ -152,11 +152,12 @@ test_that("evaluate_predictions uses alternate grouping variables", {
       target_end_date = as.Date("2020-01-21"),
       incidence_period = "epiweek"))
 
-    truth <- tibble(
+    truth_data <- tibble(
       forecaster = c("a", "b"),
       actual = c(5, 10)
     )
-    score_card <- evaluate_predictions(pcard, truth=truth, grp_vars=c("forecaster"))
+    score_card <- evaluate_predictions(pcard, truth_data = truth_data,
+                                       grp_vars=c("forecaster"))
 
     expect_called(mock_download_signal, 0)
 

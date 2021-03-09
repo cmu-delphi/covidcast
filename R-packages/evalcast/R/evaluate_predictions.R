@@ -1,9 +1,9 @@
 #' Create a score card data frame
 #'
-#' Performs testing, through the following steps:
+#' Evaluates the performance of a forecaster, through the following steps:
 #' \enumerate{
 #'   \item Takes a prediction card (as created by
-#'   [get_predictions()]). 
+#'   [get_predictions()]).
 #'   \item Computes various user-specified error measures.
 #' }
 #' The result is a "score card" data frame, where each row corresponds to
@@ -20,9 +20,9 @@
 #'   takes a data frame with three columns `quantile`, `value` and `actual`
 #'   (i.e., observed) and returns a scalar measure of error. Null or an empty
 #'   list may be provided if scoring is not desired.
-#' @param truth truth data (observed). This should be a data frame that will be
-#'   joined to `predictions_cards` by all available columns. The observed data
-#'   column should be named `actual`.
+#' @param truth_data truth data (observed). This should be a data frame that
+#'   will be joined to `predictions_cards` by all available columns. The
+#'   observed data column should be named `actual`.
 #' @param grp_vars character vector of named columns in `predictions_cards`
 #'  such that the combination gives a unique (quantile) prediction.
 #'
@@ -33,19 +33,19 @@
 #' @export
 evaluate_predictions <- function(
   predictions_cards,
-  truth,
+  truth_data,
   err_measures = list(wis = weighted_interval_score,
                       ae = absolute_error,
                       coverage_80 = interval_coverage(coverage = 0.8)),
   grp_vars = c("forecaster",
-               intersect(colnames(predictions_cards), colnames(truth)))) {
+               intersect(colnames(predictions_cards), colnames(truth_data)))) {
 
-  assert_that(is.data.frame(truth),
-              msg = paste("In evaluate_predictions: `truth` must be a
+  assert_that(is.data.frame(truth_data),
+              msg = paste("In evaluate_predictions: `truth_data` must be a
                           data frame"))
-  assert_that("actual" %in% names(truth),
-              msg = paste("`truth` must contain a column named `actual`"))
-  predictions_cards <- left_join(predictions_cards, truth)
+  assert_that("actual" %in% names(truth_data),
+              msg = paste("`truth_data` must contain a column named `actual`"))
+  predictions_cards <- left_join(predictions_cards, truth_data)
   if (is.null(err_measures) || length(err_measures) == 0) {
     score_card <- predictions_cards
   } else {
@@ -72,28 +72,28 @@ evaluate_predictions <- function(
 
 #' Create a score card data frame based on covid forecasts
 #'
-#' Performs backtesting, through the following steps:
+#' Evaluates the performance of a covid forecaster, through the following steps:
 #' \enumerate{
 #'   \item Takes a prediction card (as created by
-#'   [get_predictions()]). 
+#'   [get_predictions()]).
 #'   \item Downloads from the COVIDcast API the latest available data to compute
 #'   what actually occurred (summing the response over the incidence period).
 #'   \item Computes various user-specified error measures.
-#' } 
+#' }
 #'   Backfill refers to the process by which some data sources go back in time
-#' updating previously reported values. Suppose it is September 14 and we are 
+#' updating previously reported values. Suppose it is September 14 and we are
 #' evaluating our predictions for what happened in the previous epiweek
 #' (September 6 through 12). Although we may be able to calculate a value for
 #' "actual", we might not trust this value since on September 16, backfill may
-#' occur changing what is known about the period September 6 through 12.  There are
-#' two consequences of this phenomenon.  First, running this function on
+#' occur changing what is known about the period September 6 through 12. There
+#' are two consequences of this phenomenon.  First, running this function on
 #' different dates may result in different estimates of the error. Second, we
 #' may not trust the evaluations we get that are too recent.  The parameter
 #' `backfill_buffer` specifies how long of a buffer period we should
 #' enforce.  This will be dependent on the data source and signal and is left
 #' to the user to determine.  If backfill is not relevant for the particular
 #' signal you are predicting, then you can set `backfill_buffer` to 0.
-#' 
+#'
 #' @param predictions_cards tibble of quantile forecasts, which contains at
 #'   least `quantile` and `value` columns, as well as any other prediction task
 #'   identifiers. Must be of class "predictions_cards". Covid predictions card
@@ -105,17 +105,19 @@ evaluate_predictions <- function(
 #'   may be provided if scoring is not desired.
 #' @param backfill_buffer How many days until response is deemed trustworthy
 #'   enough to be taken as correct? See details for more.
-#' @template geo_type-template 
+#' @template geo_type-template
 evaluate_covid_predictions <- function(predictions_cards,
                                         err_measures = list(wis = weighted_interval_score,
                                                             ae = absolute_error,
                                                             coverage_80 = interval_coverage(coverage = 0.8)),
-                                        backfill_buffer = 10,
-                                        geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation")){
+                                        backfill_buffer = 0,
+                                        geo_type = c("county", "hrr", "msa",
+                                                     "dma", "state", "hhs",
+                                                     "nation")) {
   assert_that("predictions_cards" %in% class(predictions_cards),
               msg = "predictions_cards must be of class `predictions_cards`")
-  geo_type = match.arg(geo_type)
-  grp_vars = c("data_source",
+  geo_type <- match.arg(geo_type)
+  grp_vars <- c("data_source",
                "signal",
                "incidence_period",
                "geo_value",
@@ -126,7 +128,9 @@ evaluate_covid_predictions <- function(predictions_cards,
   predictions_cards <- left_join(predictions_cards,
                                  actual_data,
                                  by = grp_vars)
-  score_card = evaluate_predictions(predictions_cards, actual_data, err_measures)
+  score_card <- evaluate_predictions(predictions_cards,
+                                     actual_data,
+                                     err_measures)
   score_card <- score_card %>%
     relocate(.data$ahead, .data$geo_value, .data$forecaster,
              .data$forecast_date, .data$data_source,

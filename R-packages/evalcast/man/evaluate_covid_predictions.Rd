@@ -8,7 +8,7 @@ evaluate_covid_predictions(
   predictions_cards,
   err_measures = list(wis = weighted_interval_score, ae = absolute_error, coverage_80 =
     interval_coverage(coverage = 0.8)),
-  backfill_buffer = 10,
+  backfill_buffer = 0,
   geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation")
 )
 }
@@ -32,7 +32,7 @@ enough to be taken as correct? See details for more.}
 for available options.}
 }
 \description{
-Performs backtesting, through the following steps:
+Evaluates the performance of a covid forecaster, through the following steps:
 \enumerate{
 \item Takes a prediction card (as created by
 \code{\link[=get_predictions]{get_predictions()}}).
@@ -45,8 +45,8 @@ updating previously reported values. Suppose it is September 14 and we are
 evaluating our predictions for what happened in the previous epiweek
 (September 6 through 12). Although we may be able to calculate a value for
 "actual", we might not trust this value since on September 16, backfill may
-occur changing what is known about the period September 6 through 12.  There are
-two consequences of this phenomenon.  First, running this function on
+occur changing what is known about the period September 6 through 12. There
+are two consequences of this phenomenon.  First, running this function on
 different dates may result in different estimates of the error. Second, we
 may not trust the evaluations we get that are too recent.  The parameter
 \code{backfill_buffer} specifies how long of a buffer period we should

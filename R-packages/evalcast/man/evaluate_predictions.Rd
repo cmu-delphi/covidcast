@@ -6,10 +6,11 @@
 \usage{
 evaluate_predictions(
   predictions_cards,
-  truth,
+  truth_data,
   err_measures = list(wis = weighted_interval_score, ae = absolute_error, coverage_80 =
     interval_coverage(coverage = 0.8)),
-  grp_vars = c("forecaster", intersect(colnames(predictions_cards), colnames(truth)))
+  grp_vars = c("forecaster", intersect(colnames(predictions_cards),
+    colnames(truth_data)))
 )
 }
 \arguments{
@@ -19,9 +20,9 @@ identifiers. For covid data, a predictions card may be created by the
 function \code{\link[=get_predictions]{get_predictions()}}, downloaded with \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}}
 or created manually.}
 
-\item{truth}{truth data (observed). This should be a data frame that will be
-joined to \code{predictions_cards} by all available columns. The observed data
-column should be named \code{actual}.}
+\item{truth_data}{truth data (observed). This should be a data frame that
+will be joined to \code{predictions_cards} by all available columns. The
+observed data column should be named \code{actual}.}
 
 \item{err_measures}{Named list of one or more functions, where each function
 takes a data frame with three columns \code{quantile}, \code{value} and \code{actual}
@@ -37,7 +38,7 @@ tibble of "score cards". Contains the same information as the
 for the truth (named \code{actual}).
 }
 \description{
-Performs testing, through the following steps:
+Evaluates the performance of a forecaster, through the following steps:
 \enumerate{
 \item Takes a prediction card (as created by
 \code{\link[=get_predictions]{get_predictions()}}).

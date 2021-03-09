@@ -29,6 +29,17 @@
 #' 
 #' @return A data frame given by appending a new column to `x` named according
 #'   to the `col_name` argument, containing the function values.
+#'   
+#' @examples \dontrun{
+#' df <- covidcast::covidcast_signal("fb-survey", "smoothed_cli", 
+#'     start_day = "2021-01-01", 
+#'     end_day = "2021-01-31",
+#'     geo_type = "state")
+#'     
+#' # two equivalent ways to compute 7-day trailing averages
+#' slide_by_geo(df, slide_fun = ~ Mean(.x$value), n = 7)
+#' slide_by_geo(df, slide_fun = function(x, ...) Mean(x$value) , n = 7)
+#' }
 #'
 #' @importFrom dplyr %>% arrange group_by group_modify mutate ungroup
 #' @importFrom lubridate days

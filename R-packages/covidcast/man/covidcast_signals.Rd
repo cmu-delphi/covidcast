@@ -9,7 +9,7 @@ covidcast_signals(
   signal,
   start_day = NULL,
   end_day = NULL,
-  geo_type = c("county", "hrr", "msa", "dma", "state"),
+  geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation"),
   geo_values = "*",
   as_of = NULL,
   issues = NULL,
@@ -26,8 +26,8 @@ see the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.
 for a list of available signals.}
 
 \item{start_day}{Query data beginning on this date. Date object, or string in
-the form "YYYY-MM-DD". If \code{start_day} is \code{NULL}, defaults to first day
-data is available for this signal.}
+the form "YYYY-MM-DD". If \code{start_day} is \code{NULL}, defaults to first day data
+is available for this signal.}
 
 \item{end_day}{Query data up to this date, inclusive. Date object or string
 in the form "YYYY-MM-DD". If \code{end_day} is \code{NULL}, defaults to the most
@@ -37,21 +37,22 @@ recent day data is available for this signal.}
 "county" or "state". Defaults to "county". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
 for details on which types are available.}
 
-\item{geo_values}{Which geographies to return. The default, "*", fetches
-all geographies. To fetch specific geographies, specify their IDs as a
-vector or list of strings. See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
+\item{geo_values}{Which geographies to return. The default, "*", fetches all
+geographies. To fetch specific geographies, specify their IDs as a vector
+or list of strings. See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
 for details on how to specify these IDs.}
 
 \item{as_of}{Fetch only data that was available on or before this date,
-provided as a \code{Date} object or string in the form "YYYY-MM-DD". If
-\code{NULL}, the default, return the most recent available data. Note that only
-one of \code{as_of}, \code{issues}, and \code{lag} should be provided; it does not make
-sense to specify more than one.}
+provided as a \code{Date} object or string in the form "YYYY-MM-DD". If \code{NULL},
+the default, return the most recent available data. Note that only one of
+\code{as_of}, \code{issues}, and \code{lag} should be provided; it does not make sense to
+specify more than one. For more on data revisions, see
+"Issue dates and revisions" below.}
 
 \item{issues}{Fetch only data that was published or updated ("issued") on
 these dates. Provided as either a single \code{Date} object (or string in the
-form "YYYY-MM-DD"), indicating a single date to fetch data issued on, or
-a vector specifying two dates, start and end. In this case, return all data
+form "YYYY-MM-DD"), indicating a single date to fetch data issued on, or a
+vector specifying two dates, start and end. In this case, return all data
 issued in this range. There may be multiple rows for each observation,
 indicating several updates to its value. If \code{NULL}, the default, return the
 most recently issued data.}
@@ -82,8 +83,8 @@ be either length 1 or N.
 \examples{
 \dontrun{
 ## Fetch USAFacts confirmed cases and deaths over the same time period
-covidcast_signals("usa-facts", signal=c("confirmed_incidence_num",
-                                        "deaths_incidence_num"),
+covidcast_signals("usa-facts", signal = c("confirmed_incidence_num",
+                                          "deaths_incidence_num"),
                    start_day = "2020-08-15", end_day = "2020-10-01")
 }
 }

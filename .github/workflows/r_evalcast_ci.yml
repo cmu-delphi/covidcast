@@ -39,7 +39,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-r-eval-0-
+          key: ${{ runner.os }}-r-eval-1-
       - name: Install dependencies
         run: |
           install.packages(c("remotes", "rcmdcheck"))

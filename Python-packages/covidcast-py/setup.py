@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="covidcast",
-    version="0.1.1",  # also update in docs/conf.py
+    version="0.1.4",  # also update in docs/conf.py
     author="Alex Reinhart",
     author_email="areinhar@stat.cmu.edu",
     description="Access COVID-19 data through the Delphi COVIDcast API",
@@ -22,14 +22,15 @@ setuptools.setup(
     install_requires=[
         "pandas",
         "requests",
-        "delphi-epidata>=0.0.7",
+        "delphi-epidata>=0.0.11",
         "geopandas",
         "matplotlib",
         "numpy",
         "descartes",
         "imageio-ffmpeg",
         "imageio",
-        "tqdm"
+        "tqdm",
+        "epiweeks"
     ],
     package_data={"covidcast": ["shapefiles/*/*", "geo_mappings/*"]}
 )

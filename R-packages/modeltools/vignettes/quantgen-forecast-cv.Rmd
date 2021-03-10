@@ -1,0 +1,177 @@
+---
+title: 3. Produce and evaluate quantile forecasts
+description: Produce and evaluate quantile forecasts, based on `quantgen` and `evalcast`.
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{3. Produce and evaluate quantile forecasts}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Note that I'm using covidcast from the "r/0.4.0-release" branch, and evalcast
+from the "evalcast-killcards" branch
+
+Also, the code chunk below took a while to run, so I ran it separately and
+saved the results in a file that you can find in the modeltools/vignettes/ 
+subfolder
+
+```{r, eval = FALSE, code = readLines("quantgen-forecast-cv.R")}
+```
+
+Load the data and take a peak at the `evals` tibble
+
+```{r}
+load("quantgen-forecast-cv.rda")
+head(evals)
+```
+
+Some convenient functions for analysis and plotting
+
+```{r, message = FALSE, warning = FALSE}
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
+theme_set(theme_bw())
+
+# Scale error measures, which are columns of df as indicated by vars, based on
+# those of a particular forecaster, given by denom_forecaster; and the argument
+# err_cols identifies which columns of the data frame contain the error metrics
+# (important for pivoting purposes; err_cols can actually be a strict superset 
+# of the error columns, that won't be a problem)
+scale_by_forecaster <- function(df, vars, denom_forecaster, 
+                                err_cols = c("ae", "wis")) {
+  df_list <- map(vars, function(var) {
+    df %>% 
+      select(setdiff(names(df), setdiff(err_cols, var))) %>% 
+      pivot_wider(names_from = "forecaster", 
+                  names_prefix = var, 
+                  values_from = var) %>% 
+      mutate(across(starts_with(var), ~ .x /
+                      !!sym(paste0(var, denom_forecaster)))) %>%
+      pivot_longer(cols = starts_with(var), 
+                   names_to = "forecaster",
+                   values_to = var) %>%
+      mutate(forecaster = substring(forecaster, nchar(var) + 1)) %>%
+      filter(forecaster != denom_forecaster)
+  })
+  return(reduce(df_list, left_join))
+}
+
+# Helpful wrapper on interaction() for our canonical plotting function 
+Interaction = function(...) {
+  params = list(...)
+  if (length(params) == 0) return(NULL) 
+  else if (length(params) == 1) return(params[[1]])
+  else return(interaction(...))
+}
+
+# Produce a "canonical" plot, based on two columns in df specified by x and y.
+# The aggr argument gives the aggregation function used; dots and lines just
+# control what appears on the plot; group_vars gives the variables to group by
+# pre-aggregation (in addition to x); facet_rows gives variables for faceting on
+# rows, and likewise for facet_cols; denom_forecaster what forecaster to use for
+# a relative metric; scale_before_aggr is a Boolean flag indicating the order of
+# operations; all arguments after that are label/legend parameters
+canonical_plot = function(df, x, y, aggr = mean, dots = TRUE, lines = TRUE, 
+                          group_vars = "forecaster", facet_rows = NULL,
+                          facet_cols = NULL, denom_forecaster = NULL, 
+                          scale_before_aggr = FALSE,
+                          title = waiver(), subtitle = waiver(), 
+                          xlab = waiver(), ylab  = waiver(), 
+                          legend_position = "bottom", legend_title = NULL) {
+  # Scale before aggregation, if we need to
+  if (!is.null(denom_forecaster) && scale_before_aggr) {
+    df <- scale_by_forecaster(df, y, denom_forecaster)
+  }
+  
+  # Aggregate
+  df <- df %>% 
+    group_by(!!!syms(group_vars), !!sym(x)) %>% 
+    drop_na() %>%
+    summarize(!!y := aggr(!!sym(y)))
+  
+  # Scale after aggregation, if we need to
+  if (!is.null(denom_forecaster) && !scale_before_aggr) {
+    df <- scale_by_forecaster(df, y, denom_forecaster)
+  }
+  
+  # Set up plotting layers
+  dots_layer <- NULL; line_layer = NULL
+  color_vars <- setdiff(group_vars, c(facet_rows, facet_cols))
+  df <- df %>% mutate(color = Interaction(!!!syms(color_vars)))
+  if (dots) dots_layer <- geom_point(aes(color = color, group = color))
+  if (lines) line_layer <- geom_line(aes(color = color, group = color))
+  facet_layer <- facet_grid(rows = vars(!!!syms(facet_rows)),
+                            cols = vars(!!!syms(facet_cols)))
+  label_layer <- labs(title = title, subtitle = subtitle, 
+                      x = xlab, y = ylab, color = legend_title)
+  theme_layer <- theme(legend.pos = legend_position)
+  
+  # Plot and return
+  ggplot(df, aes(x = !!sym(x), y = !!sym(y))) +  
+    line_layer + dots_layer + facet_layer + label_layer + theme_layer 
+}
+```
+
+Try it out, mean AE and mean WIS
+
+```{r, message = FALSE, warning = FALSE, fig.width = 7, fig.height = 5}
+subtitle = sprintf("Forecasts made over %s to %s",
+                   format(min(forecast_dates), "%B %d"),
+                   format(max(forecast_dates), "%B %d"))
+
+canonical_plot(evals, x = "ahead", y = "ae", aggr = mean, 
+               subtitle = subtitle, xlab = "Days ahead", ylab = "Mean AE") 
+
+canonical_plot(evals, x = "ahead", y = "wis", aggr = mean,
+               subtitle = subtitle, xlab = "Days ahead", ylab = "Mean WIS") 
+```
+
+Let's just focus on WIS from here on, since AE behaves qualitatively similarly.
+Here's relative mean WIS (relative to baseline)
+
+```{r, message = FALSE, warning = FALSE, fig.width = 7, fig.height = 5}
+canonical_plot(evals, x = "ahead", y = "wis", aggr = mean, 
+               denom_forecaster = "Baseline", subtitle = subtitle, 
+               xlab = "Days ahead", ylab = "Relative mean WIS")
+```
+
+Median relative WIS (still relative to baseline; note the reversal in the order
+of operaitons, and median for robustness)
+
+```{r, message = FALSE, warning = FALSE, fig.width = 7, fig.height = 5}
+canonical_plot(evals, x = "ahead", y = "wis", aggr = median,
+               denom = "Baseline", scale_before = TRUE, sub = subtitle, 
+               xlab = "Days ahead", ylab = "Median relative WIS")
+```
+
+Now produce some plots of forecast scores time, i.e., by target end date
+
+```{r, message = FALSE, warning = FALSE, fig.width = 7, fig.height = 5}
+canonical_plot(evals, x = "target_end_date", y = "wis", aggr = mean,
+               dots = FALSE, group_vars = "forecaster", sub = subtitle, 
+               xlab = "Target date", ylab = "Mean WIS")
+
+canonical_plot(evals %>% filter(ahead %in% (1:3 * 7)), 
+               x = "target_end_date", y = "wis", aggr = mean,
+               dots = FALSE, group_vars = c("forecaster", "ahead"), 
+               facet_rows = "ahead", sub = subtitle, 
+               xlab = "Target date", ylab = "Mean WIS")
+
+canonical_plot(evals, x = "target_end_date", y = "wis", aggr = mean,
+               dots = FALSE, group_vars = c("forecaster", "ahead"), 
+               facet_rows = "forecaster", sub = subtitle, 
+               xlab = "Target date", ylab = "Mean WIS",
+               legend_pos = "right", legend_title = "Ahead")
+```
+
+Now of a plot forecast scores broken down by target end date and ahead 
+
+```{r, message = FALSE, warning = FALSE, fig.width = 7, fig.height = 5}
+canonical_plot(evals %>% filter(ahead %in% (1:3 * 7)), 
+               x = "forecaster", y = "wis", aggr = mean, lines = FALSE, 
+               group_vars = c("target_end_date", "ahead"), facet_cols = "ahead",
+               sub = subtitle, xlab = "Forecaster", ylab = "Mean WIS",
+               legend_position = "right", legend_title = "Target date") 
+```

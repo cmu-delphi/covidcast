@@ -13,15 +13,14 @@ output:
       after_body: script.html
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(message=FALSE, warning=FALSE, cache=TRUE, autodep=TRUE,
-                      cache.comments=TRUE)
+```{r, include  =  FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE,
+                      autodep = TRUE, cache.comments = TRUE)
 library(dplyr)
 library(ggplot2)
-library(gridExtra)
 
-col = function(x, color = "#bb0000") {
-  sprintf("<span style='color: %s;'>%s</span>", color, x)
+col  =  function(x, color = "#bb0000") {
+  sprintf("<span style = 'color: %s;'>%s</span>", color, x)
 }
 ```
 
@@ -29,22 +28,21 @@ col = function(x, color = "#bb0000") {
 
 expanded code
 
-```{r, fig.width=7, fig.height=5, class.source="show"}
+```{r, fig.width = 7, fig.height = 5, class.source = "show"}
 plot(iris)
 ```
 
 collapsed code
-```{r, fig.width=7, fig.height=5}
+
+```{r, fig.width = 7, fig.height = 5}
 plot(iris)
 ```
 
 # Thanks
 
-Many thanks to:
-
-- The [whole Delphi team](https://covidcast.cmu.edu/covid19-response-team.html), and various CMU units
-- Google, Facebook, and Amazon Web Services
-- SafeGraph, Quidel, Qualtrics
+- The [whole Delphi team](https://delphi.cmu.edu/about/team/), and various CMU units
+- Google, Facebook, Amazon Web Services
+- Change Healthcare, Quidel, SafeGraph, Qualtrics
 - Centers for Disease Control and Prevention
 
 Go to: <https://covidcast.cmu.edu> ... you'll find everything linked from there!

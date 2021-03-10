@@ -39,8 +39,6 @@ for available options.}
 
 \item{backfill_buffer}{How many days until response is deemed trustworthy
 enough to be taken as correct?.}
-
-\item{legend_position}{Legend position, the default being "bottom".}
 }
 \description{
 Plot calibration curves

@@ -8,7 +8,6 @@
 #'   with `facet_cols` to create a grid of plots.  Should be passed to 
 #'   plot_calibration when customized.
 #' @param facet_cols Same as `facet_rows`, but with columns.
-#' @param legend_position Legend position, the default being "bottom".
 #' @param grp_vars variables over which to compare calibration. These
 #'   determines the color of the lines and faceting depending on `type`
 #' @param avg_vars variables over which we average to determine the calibration.
@@ -42,8 +41,7 @@ plot_calibration <- function(predictions_cards,
     stop("illegal calibration plot type selected.")
   )
   
-  return(
-    g + xlim(0, 1) + ylim(0, 1) + theme_bw())
+  return(g + xlim(0, 1) + ylim(0, 1) + theme_bw())
 }
 
 #' Preprocessing for wedge calibration plot

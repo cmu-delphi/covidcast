@@ -31,7 +31,6 @@ plot_coverage <- function(predictions_cards,
                           coverage = 0.8,
                           facet_rows = c("forecaster"),
                           facet_cols = c("forecast_date"),
-                          legend_position = "bottom",
                           grp_vars = c("forecaster", "forecast_date", "ahead"),
                           avg_vars = c("geo_value"),
                           geo_type = c("county", "hrr", "msa", "dma", "state",
@@ -80,11 +79,11 @@ plot_coverage <- function(predictions_cards,
   }
   return(
     g +
-    geom_line(aes(color = .data$color, group = .data$color)) +
-    scale_color_viridis_d() +
-    facet_layer +
-    theme_bw()
-    )
+      geom_line(aes(color = .data$color, group = .data$color)) +
+      scale_color_viridis_d() +
+      facet_layer +
+      theme_bw()
+  )
 }
 
 test_legal_faceting <- function(facet_rows, facet_cols, grp_vars) {

@@ -10,7 +10,6 @@ plot_coverage(
   coverage = 0.8,
   facet_rows = c("forecaster"),
   facet_cols = c("forecast_date"),
-  legend_position = "bottom",
   grp_vars = c("forecaster", "forecast_date", "ahead"),
   avg_vars = c("geo_value"),
   geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation"),

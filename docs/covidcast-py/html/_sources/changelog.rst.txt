@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v0.1.4, February 24, 2021
+-------------------------
+
+- New feature: :py:func:`covidcast.signal` can now use asynchronous calls. It is primarily for Delphi internal use;
+  please consult with us if you intend to use this feature.
+
 v0.1.3, January 5, 2021
 -------------------------
 

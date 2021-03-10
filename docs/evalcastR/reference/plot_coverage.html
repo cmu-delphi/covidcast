@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -97,9 +97,6 @@
     <li>
       <a href="../articles/intro-evalcast.html">Introduction to evalcast</a>
     </li>
-    <li>
-      <a href="../articles/intro_vignette.html">Introduction to evalcast</a>
-    </li>
   </ul>
 </li>
 <li>
@@ -107,7 +104,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/cmu-delphi/covidcast/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -122,7 +124,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Plot interval coverage</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/plot_coverage.R'><code>R/plot_coverage.R</code></a></small>
     <div class="hidden name"><code>plot_coverage.Rd</code></div>
     </div>
 
@@ -130,12 +132,14 @@
     <p>Plot interval coverage</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plot_coverage</span>(
-  <span class='no'>scorecards</span>,
-  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"one"</span>),
-  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.2</span>,
-  <span class='kw'>legend_position</span> <span class='kw'>=</span> <span class='st'>"bottom"</span>
-)</pre>
+    <pre class="usage"><span class='fu'>plot_coverage</span><span class='op'>(</span>
+  <span class='va'>scorecards</span>,
+  type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"all"</span>, <span class='st'>"one"</span><span class='op'>)</span>,
+  grp_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forecaster"</span>, <span class='st'>"forecast_date"</span>, <span class='st'>"ahead"</span><span class='op'>)</span>,
+  avg_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"geo_value"</span><span class='op'>)</span>,
+  coverage <span class='op'>=</span> <span class='fl'>0.8</span>,
+  legend_position <span class='op'>=</span> <span class='st'>"bottom"</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -149,13 +153,23 @@ task (i.e., same ahead, etc.).</p></td>
       <th>type</th>
       <td><p>One of "all" or "none", indicating whether to show coverage
 across all nominal levels (in which case averaging is performed across
-forecast dates and locations) or whether to show it for one specific alpha
+<code>avg_vars</code>) or whether to show it for one specific alpha
 value.</p></td>
     </tr>
     <tr>
-      <th>alpha</th>
-      <td><p>If <code>type = "one"</code>, then 1-alpha is the nominal interval coverage
-shown.</p></td>
+      <th>grp_vars</th>
+      <td><p>variables over which to compare coverage. The first
+determines the color of the lines while the rest will be faceted over</p></td>
+    </tr>
+    <tr>
+      <th>avg_vars</th>
+      <td><p>variables over which we average to determine the proportion
+of coverage. If <code>type = "one"</code>,</p></td>
+    </tr>
+    <tr>
+      <th>coverage</th>
+      <td><p>If <code>type = "one"</code>, then coverage is the nominal interval
+coverage shown.</p></td>
     </tr>
     <tr>
       <th>legend_position</th>
@@ -175,11 +189,11 @@ shown.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Alden Green, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Jed Grabman, Alden Green, Daniel McDonald, Balasubramanian Narasimhan, Mike O'Brien, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

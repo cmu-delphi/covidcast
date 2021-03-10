@@ -35,7 +35,7 @@
 #' @param n Size of the local training window (in days/weeks, depending on
 #'   `incidence_period`) to use. For example, if `n = 14`, and `incidence_period
 #'   = "day"`, then to make a 1-day-ahead forecast on December 15, we train on
-#'   data from November 1 to November 14.
+#'   data from December 1 to December 14.
 #' @param lags Vector of lag values to use as features in the autoregressive
 #'   model. For example, when `incidence_period = "day"`, setting `lags = c(0,
 #'   7, 14)`means we use the current value of each signal (defined by a row of
@@ -163,6 +163,8 @@ quantgen_forecaster = function(df, forecast_date, signals, incidence_period,
   params$tau = tau
   params$noncross = noncross
 
+  # perform CV if (i) lambda not provided, or (ii) more than one lambda
+  # value provided
   cv = is.null(params$lambda) || length(params$lambda) > 1
   if (cv) {
     train_fun = quantgen::cv_quantile_lasso

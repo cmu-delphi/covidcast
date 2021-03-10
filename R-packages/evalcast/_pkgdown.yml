@@ -10,26 +10,32 @@ home:
       href: https://covidcast.cmu.edu/
 
 reference:
-- title: "Example forecasters"
-- contents:
-  - baseline_forecaster
 - title: "Creating or importing predictions"
 - contents:
-  - get_covidhub_predictions
   - get_predictions
+  - contains("zoltar")
+  - contains("covidhub")
 - title: "Evaluating predictions"
 - contents:
   - evaluate_predictions
   - weighted_interval_score
   - absolute_error
   - interval_coverage
+  - get_actuals
+- title: "Summarizing scorecards or predictions"
+- contents:
+  - starts_with("compute_")
+  - scale_by_forecaster
 - title: "Visualizing performance"
 - contents:
   - starts_with("plot_")
+- title: "Example forecasters"
+- contents:
+  - baseline_forecaster
 - title: "Utilities"
 - contents:
-  - check_valid_forecaster_output
   - get_target_period
-  - get_forecast_dates
-  - filter_predictions
-  
+  - setup_wedgeplot
+  - collapse_cards
+  - averaging_checks
+  - intersect_averagers

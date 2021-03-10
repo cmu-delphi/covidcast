@@ -6,19 +6,20 @@
 \usage{
 plot_calibration(
   predictions_cards,
+  type = c("wedgeplot", "traditional"),
   facet_rows = NULL,
   facet_cols = NULL,
-  legend_position = "bottom",
   grp_vars = c("forecaster", "forecast_date", "ahead"),
   avg_vars = c("geo_value"),
   geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation"),
-  type = c("wedgeplot", "traditional"),
-  backfill_buffer = 10
+  backfill_buffer = 0
 )
 }
 \arguments{
 \item{predictions_cards}{Either one predictions_card or several joined
 together using bind_rows().}
+
+\item{type}{One of "wedgeplot" or "traditional"}
 
 \item{facet_rows}{A variable name to facet data over. Creates a
 separate row of plots for each value of specified variable. Can be used
@@ -26,8 +27,6 @@ with \code{facet_cols} to create a grid of plots.  Should be passed to
 plot_calibration when customized.}
 
 \item{facet_cols}{Same as \code{facet_rows}, but with columns.}
-
-\item{legend_position}{Legend position, the default being "bottom".}
 
 \item{grp_vars}{variables over which to compare calibration. These
 determines the color of the lines and faceting depending on \code{type}}
@@ -38,10 +37,10 @@ determines the color of the lines and faceting depending on \code{type}}
 "state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
 for available options.}
 
-\item{type}{One of "wedgeplot" or "traditional"}
-
 \item{backfill_buffer}{How many days until response is deemed trustworthy
 enough to be taken as correct?.}
+
+\item{legend_position}{Legend position, the default being "bottom".}
 }
 \description{
 Plot calibration curves

@@ -2,6 +2,7 @@
 #'
 #' @param predictions_cards Either one predictions_card or several joined
 #'   together using bind_rows().
+#' @param type One of "wedgeplot" or "traditional"
 #' @param facet_rows A variable name to facet data over. Creates a
 #'   separate row of plots for each value of specified variable. Can be used
 #'   with `facet_cols` to create a grid of plots.  Should be passed to 
@@ -12,20 +13,18 @@
 #'   determines the color of the lines and faceting depending on `type`
 #' @param avg_vars variables over which we average to determine the calibration.
 #' @template geo_type-template
-#' @param type One of "wedgeplot" or "traditional"
 #' @param backfill_buffer How many days until response is deemed trustworthy
 #'   enough to be taken as correct?.
 #' @export
 plot_calibration <- function(predictions_cards,
+                             type = c("wedgeplot", "traditional"),
                              facet_rows = NULL,
                              facet_cols = NULL,
-                             legend_position = "bottom",
                              grp_vars = c("forecaster", "forecast_date", "ahead"),
                              avg_vars = c("geo_value"),
                              geo_type = c("county", "hrr", "msa", "dma", "state",
                                           "hhs", "nation"),
-                             type = c("wedgeplot", "traditional"),
-                             backfill_buffer = 10) {
+                             backfill_buffer = 0) {
   
   geo_type <- match.arg(geo_type)
   type <- match.arg(type)
@@ -36,24 +35,15 @@ plot_calibration <- function(predictions_cards,
                                grp_vars,
                                avg_vars)
   
-  if (type == "wedgeplot") {
-    if (is.null(facet_rows) & is.null(facet_cols)) {
-      g <- format_wedgeplot(calib, grp_vars)
-    } else {
-      g <- format_wedgeplot(calib, grp_vars, facet_rows, facet_cols)
-    }
-  } else if (type == "traditional") {
-    if (is.null(facet_rows) & is.null(facet_cols)) {
-      g <- format_traditional_calib_plot(calib, grp_vars)
-    } else {
-      g <- format_traditional_calib_plot(
-        calib, grp_vars, facet_rows, facet_cols)
-    }
-  }
+  g <- switch (type,
+    wedgeplot = format_wedgeplot(calib, grp_vars, facet_rows, facet_cols),
+    traditional = format_traditional_calib_plot(calib, grp_vars, 
+                                                facet_rows, facet_cols),
+    stop("illegal calibration plot type selected.")
+  )
   
   return(
-    g + xlim(0, 1) + ylim(0, 1) + theme_bw() + 
-    theme(legend.position = legend_position))
+    g + xlim(0, 1) + ylim(0, 1) + theme_bw())
 }
 
 #' Preprocessing for wedge calibration plot
@@ -91,20 +81,10 @@ setup_wedgeplot <- function(calib) {
 #' @return ggplot object
 format_wedgeplot <- function(calib, 
                              grp_vars,
-                             facet_rows = "forecast_date",
-                             facet_cols = "forecaster"){
-  if (!is.null(facet_rows)) {
-    non_grouped_facet <- setdiff(facet_rows, grp_vars)
-    assert_that(length(non_grouped_facet) == 0,
-                msg = paste("Variables must be grouped in order to be faceted in rows:",
-                            non_grouped_facet))
-  }
-  if (!is.null(facet_cols)) {
-    non_grouped_facet <- setdiff(facet_cols, grp_vars)
-    assert_that(length(non_grouped_facet) == 0,
-                msg = paste("Variables must be grouped in order to be faceted in cols:",
-                            non_grouped_facet))
-  }
+                             facet_rows,
+                             facet_cols){
+  
+  test_legal_faceting(facet_rows, facet_cols, grp_vars)
   
   facet_layer <- facet_grid(rows = vars(!!!syms(facet_rows)),
                             cols = vars(!!!syms(facet_cols)))
@@ -146,20 +126,10 @@ format_wedgeplot <- function(calib,
 #' @return ggplot object
 format_traditional_calib_plot <- function(calib, 
                                           grp_vars,
-                                          facet_rows = "ahead",
-                                          facet_cols = "forecaster"){
-  if (!is.null(facet_rows)) {
-    non_grouped_facet <- setdiff(facet_rows, grp_vars)
-    assert_that(length(non_grouped_facet) == 0,
-                msg = paste("Variables must be grouped in order to be faceted in rows:",
-                            non_grouped_facet))
-  }
-  if (!is.null(facet_cols)) {
-    non_grouped_facet <- setdiff(facet_cols, grp_vars)
-    assert_that(length(non_grouped_facet) == 0,
-                msg = paste("Variables must be grouped in order to be faceted in cols:",
-                            non_grouped_facet))
-  }
+                                          facet_rows,
+                                          facet_cols){
+  
+  test_legal_faceting(facet_rows, facet_cols, grp_vars)
   
   facet_layer <- facet_grid(rows = vars(!!!syms(facet_rows)),
                             cols = vars(!!!syms(facet_cols)))

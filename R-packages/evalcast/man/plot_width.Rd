@@ -8,7 +8,6 @@ plot_width(
   predictions_cards,
   facet_rows = "forecast_date",
   facet_cols = "forecaster",
-  legend_position = "bottom",
   grp_vars = c("forecaster", "forecast_date", "ahead"),
   avg_vars = c("geo_value"),
   levels = c(0.5, 0.7, 0.9)
@@ -30,8 +29,6 @@ with \code{facet_cols} to create a grid of plots.  Should be passed to
 plot_calibration when customized.}
 
 \item{facet_cols}{Same as \code{facet_rows}, but with columns.}
-
-\item{legend_position}{Legend position, the default being "bottom".}
 
 \item{grp_vars}{variables over which to compare widths The first
 determines the color of the lines while the rest will be faceted over}

@@ -8,35 +8,37 @@
 #'   A predictions card may be created by the function
 #'   [get_predictions()], downloaded with [get_covidhub_predictions()] or
 #'   possibly created manually.
-#' @template geo_type-template
-#' @param backfill_buffer How many days until response is deemed trustworthy
-#'   enough to be taken as correct?
-#' @param type One of "all" or "none", indicating whether to show coverage
-#'   across all nominal levels (in which case averaging is performed across
-#'   `avg_vars`) or whether to show it for one specific alpha
-#'   value.
-#' @param grp_vars variables over which to compare coverage
-#' @param avg_vars variables over which we average to determine the proportion
-#'   of coverage. If `type = "one"`, 
 #' @param facet_rows A variable name to facet data over. Creates a
 #'   separate row of plots for each value of specified variable. Can be used
 #'   with `facet_cols` to create a grid of plots.
 #' @param facet_cols Same as `facet_rows`, but with columns.
+#' @param legend_position Legend position, the default being "bottom".
+#' @param grp_vars variables over which to compare coverage
+#' @param avg_vars variables over which we average to determine the proportion
+#'   of coverage.
+#' @template geo_type-template
+#' @param type One of "all" or "none", indicating whether to show coverage
+#'   across all nominal levels (in which case averaging is performed across
+#'   `avg_vars`) or whether to show it for one specific alpha
+#'   value.
+#' @param backfill_buffer How many days until response is deemed trustworthy
+#'   enough to be taken as correct?
 #' @param coverage If `type = "one"`, then coverage is the nominal interval 
 #'   coverage shown.
-#' @param legend_position Legend position, the default being "bottom".
 #' 
 #' @export 
 plot_coverage <- function(predictions_cards,
-                          geo_type,
-                          backfill_buffer = 10,
-                          type = c("all", "one"), 
-                          grp_vars = c("forecaster", "forecast_date", "ahead"),
-                          avg_vars = c("geo_value"),
                           facet_rows = c("forecaster"),
                           facet_cols = c("forecast_date"),
-                          coverage = 0.8, 
-                          legend_position = "bottom") {
+                          legend_position = "bottom",
+                          grp_vars = c("forecaster", "forecast_date", "ahead"),
+                          avg_vars = c("geo_value"),
+                          geo_type = c("county", "hrr", "msa", "dma", "state",
+                                       "hhs", "nation"),
+                          type = c("all", "one"), 
+                          backfill_buffer = 10,
+                          coverage = 0.8) {
+  geo_type <- match.arg(geo_type)
   type <- match.arg(type)
   if (!is.null(facet_rows)) {
    non_grouped_facet <- setdiff(facet_rows, grp_vars)

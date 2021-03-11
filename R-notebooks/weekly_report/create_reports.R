@@ -1,7 +1,7 @@
 library(rmarkdown)
 
-source("predictions.R")
 preds_filename = "predictions_cards.rds"
+start_date = today() - 12 * 7
 forecasters = c("CMU-TimeSeries",
                 "CovidAnalytics-DELPHI",
                 "CU-select",
@@ -31,10 +31,27 @@ forecasters = c("CMU-TimeSeries",
 
 signals = c("deaths_incidence_num", "confirmed_incidence_num")
 
-create_prediction_cards(prediction_cards_filename = preds_filename,
-                        weeks_back = 12,
-                        forecasters = forecasters,
-                        signals = signals)
+date_filter <- function(date_list){
+  date_filter_helper <- function(dates){
+    end_week_dates = dates[wday(dates) %in% c(1, 2)]
+    ret_dates = end_week_dates[!(end_week_dates + 1) %in% end_week_dates]
+    return(ret_dates) 
+  }
+  return(lapply(date_list, date_filter_helper))
+}
+
+preds = readRDS(preds_filename)
+preds = preds %>% filter(forecast_date >= start_date)
+
+preds = get_covidhub_predictions(forecasters,
+                               signal = signals,
+                               predictions_cards = preds,
+                               start_date = start_date,
+                               date_filtering_function = date_filter)
+
+saveRDS(predictions_cards,
+        file = prediction_cards_filename, 
+        compress = "xz")
 
 source("score.R")
 create_score_cards(prediction_cards_filepath = preds_filename,

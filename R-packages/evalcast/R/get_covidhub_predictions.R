@@ -1,3 +1,164 @@
+#' Get predictions from forecasters on the COVID Hub
+#'
+#' Simply converts the predictions of forecasters submitting to the [COVID
+#' Hub](https://github.com/reichlab/covid19-forecast-hub/) to the format of a
+#' predictions card, so it can be easily evaluated and compared.
+#'
+#' @param covidhub_forecaster_name A vector of strings indicating the
+#'   forecasters (matching what it is called on the COVID Hub).
+#' @param forecast_dates Vector of Date objects (or strings of the form
+#'   "YYYY-MM-DD") indicating dates on which forecasts will be made. If `NULL`,
+#'   the default, then all currently available forecast dates from the given
+#'   forecaster in the COVID Hub will be used.
+#' @param geo_values vector of character strings containing FIPS codes of
+#'   counties, or lower case state abbreviations (or "us" for national). The
+#'   default "*" fetches all available locations
+#' @param forecast_type "quantile", "point" or both (the default)
+#' @param ahead number of periods ahead for which the forecast is required.
+#'   NULL will fetch all available aheads
+#' @param incidence_period one of "epiweek" or "day". NULL will attempt to
+#'   return both
+#' @param signal this function supports only "confirmed_incidence_num",
+#'   "deaths_incidence_num", and/or "deaths_cumulative_num" (those currently
+#'   forecast by the COVIDhub-ensemble). For other types, use one of the
+#'   alternatives mentioned above
+#' @param predictions_cards An object of class `predicitions_cards` that
+#'   contains previously retrieved predictions. If provided, files will not be
+#'   retrieved from Reichlab for any forecaster / forecast_date combos that are
+#'   present in the file.
+#' @param start_date The earliest date for which to retrieve predictions
+#' @param end_date The latest date for which to retrieve predictions
+#' @param date_filtering_function A function which takes a list, where each
+#'   element is a vector of dates and returns a list where each element is a
+#'   subset of those in the original list. Used for custom filtering of dates
+#'   (e.g. only forecasts from Mondays, where all forecasters made a forecast,
+#'   etc.)
+#' @seealso [get_predictions()]
+#' @seealso [get_zoltar_predictions()]
+#' @template predictions_cards-template
+#' @return For more flexible processing of COVID Hub data, try
+#'   using [zoltr](https://docs.zoltardata.com/zoltr/)
+#'
+#' @export
+
+get_covidhub_predictions <- function(
+  covidhub_forecaster_name = get_covidhub_forecaster_names(),
+  forecast_dates = NULL,
+  geo_values = "*",
+  forecast_type = c("point", "quantile"),
+  ahead = 1:4,
+  incidence_period = c("epiweek", "day"),
+  signal = c("confirmed_incidence_num",
+             "deaths_incidence_num",
+             "deaths_cumulative_num"),
+  predictions_cards = NULL,
+  start_date = NULL,
+  end_date = NULL,
+  date_filtering_function = NULL) {
+  forecast_dates <- as_date(forecast_dates)
+  forecast_dates <- get_forecast_dates(covidhub_forecaster_name,
+                                       forecast_dates,
+                                       start_date,
+                                       end_date,
+                                       date_filtering_function)
+  # Load known predictions so we don't have to re-ingest / process it. This
+  # data could end up out of date if a forecast is retrospectively updated, but
+  # in that case it's no longer a true prediction.
+  if (!is.null(predictions_cards)) {
+    seen_dates <- predictions_cards %>%
+      distinct(forecast_date, forecaster)
+    for (i in seq_len(length(covidhub_forecaster_name))) {
+      if (covidhub_forecaster_name[[i]] %in% seen_dates$forecaster) {
+        seen_forecaster_dates <- seen_dates %>%
+          filter(forecaster == covidhub_forecaster_name[[i]]) %>%
+          pull(forecast_date)
+        forecast_dates[[i]] <- lubridate::as_date(setdiff(
+                                                    forecast_dates[[i]],
+                                                    seen_forecaster_dates))
+      }
+    }
+  }
+
+  predictions_cards_list <- vector("list",
+                                   length = length(covidhub_forecaster_name))
+  for (i in seq_len(length(covidhub_forecaster_name))) {
+    if (length(forecast_dates[[i]] > 0)) {
+      predictions_cards_list[[i]] <- tryCatch({
+        get_forecaster_predictions(covidhub_forecaster_name[i],
+                                   rev(forecast_dates[[i]]),
+                                   geo_values = geo_values,
+                                   forecast_type = forecast_type,
+                                   ahead = ahead,
+                                   incidence_period = incidence_period,
+                                   signal = signal)
+      }, error = function(e) cat(e$message))
+    }
+  }
+  predictions_cards_new <- bind_rows(predictions_cards_list)
+
+  # Combine old and new predictions cards
+  if (is.null(predictions_cards)) {
+    predictions_cards <- predictions_cards_new
+  } else {
+    predictions_cards <- rbind(predictions_cards, predictions_cards_new)
+  }
+  return(predictions_cards)
+}
+
+#' Get forecast dates per forecaster given select filtering criteria
+#'
+#' @param forecasters vector of forecaster names
+#' @param start_date The earliest date for which to retrieve predictions
+#' @param end_date The latest date for which to retrieve predictions
+#' @param date_filtering_function A function which takes a list, where each
+#'   element is a vector of dates and returns a list where each element is a
+#'   subset of those in the original list. Used for custom filtering of dates
+#'   (e.g. only forecasts from Mondays, where all forecasters made a forecast,
+#'   etc.)
+#' @param forecast_dates A vector of date objects. If provided, only dates
+#'   within this set will be returned for each forecaster (subject to all other
+#'   provided criteria)
+#' @return A list of the same length as `forecasters`, where each entry is the
+#'   vector at the same index in `forecast_dates` after being filtered according
+#'   to the provided criteria
+#'
+get_forecast_dates <- function(forecasters,
+                               forecast_dates,
+                               start_date,
+                               end_date,
+                               date_filtering_function) {
+  forecast_dates <- as_date(forecast_dates)
+  forecaster_dates <- vector("list", length = length(forecasters))
+  for (i in seq_len(length(forecasters))) {
+    forecaster_dates[[i]] <- tryCatch({
+      lubridate::as_date(get_covidhub_forecast_dates(forecasters[i]))
+    },
+    error = function(e) cat(sprintf("%i. %s\n", i, e$message))
+    )
+  }
+  if (length(forecast_dates) != 0) {
+    # Intersect acts oddly with dates. If foo = as_date(bar), then foo == bar is
+    # true, but (foo %in% bar) is false and intersect(foo, bar) is an empty
+    # vector. Additionally, intersect returns a numeric object instead of a
+    # date.
+    forecaster_dates <- lapply(forecaster_dates,
+                               function(dates)
+                                 as_date(intersect(dates, forecast_dates)))
+  }
+  if (!is.null(start_date)) {
+    forecaster_dates <- lapply(forecaster_dates,
+                               function(date) date[date >= start_date])
+  }
+  if (!is.null(end_date)) {
+    forecaster_dates <- lapply(forecaster_dates,
+                               function(date) date[date <= end_date])
+  }
+  if (!is.null(date_filtering_function)) {
+    forecaster_dates <- date_filtering_function(forecaster_dates)
+  }
+  return(forecaster_dates)
+}
+
 #' Get predictions from a forecaster on the COVID Hub
 #'
 #' Simply converts the predictions of forecasters submitting to the [COVID
@@ -28,13 +189,11 @@
 #' 
 #' @seealso [get_predictions()]
 #' @seealso [get_zoltar_predictions()]
-#' @return tibble of predictions cards. Only incident predictions are returned.
-#'   For more flexible processing of COVID Hub data, try using 
-#'   [zoltr](https://docs.zoltardata.com/zoltr/)
+#' @return Predictions card. For more flexible processing of COVID Hub data, try
+#'   using [zoltr](https://docs.zoltardata.com/zoltr/)
 #' 
 #' @importFrom readr read_csv
-#' @export
-get_covidhub_predictions <- function(covidhub_forecaster_name,
+get_forecaster_predictions <- function(covidhub_forecaster_name,
                                      forecast_dates = NULL,
                                      geo_values = "*",
                                      forecast_type = c("point","quantile"),
@@ -93,7 +252,7 @@ get_covidhub_predictions <- function(covidhub_forecaster_name,
                                .data$location),
            location = NULL) %>%
     relocate(.data$geo_value, .after = .data$ahead)
-  if (geo_values != "*") {
+  if (!identical(geo_values, "*")) {
     pcards <- filter(pcards, .data$geo_value %in% geo_values)
   }
   if (!is.null(ahead)) {
@@ -135,7 +294,7 @@ get_covidhub_forecast_dates <- function(forecaster_name) {
 #' @param repo character strinng either "zoltar" indicating the 
 #' [Zoltar](https://zoltardata.com) Forecast Archive or "covid19forecast_repo"
 #' which lists those available at the 
-#' [Reichlab](https://github.com/reichlab/covid19-forecast-hub)
+#' [Reich Lab](https://github.com/reichlab/covid19-forecast-hub)
 #' Github submission repo.
 #'
 #' @return character vector of all available forecasters

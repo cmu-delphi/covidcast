@@ -53,22 +53,36 @@ saveRDS(predictions_cards,
         file = prediction_cards_filename, 
         compress = "xz")
 
-source("score.R")
-create_score_cards(prediction_cards_filepath = preds_filename,
-                   signal_name = "deaths_incidence_num",
-                   geo_type = "state",
-                   weeks_back = 12)
-create_score_cards(prediction_cards_filepath = preds_filename,
-                   signal_name = "confirmed_incidence_num",
-                   geo_type = "county",
-                   weeks_back = 12)
+pred_state_deaths = preds %>%
+                      filter(nchar(geo_value) == 2,
+                             geo_value != "us",
+                             signal == "deaths_incidence_num",
+                             target_end_date < today())
+state_scores = evaluate_covid_predictions(pred_state_deaths, geo_type = "state")
+state_scores = state_scores %>% filter(is.na(wis) & !is.na(ae))
+saveRDS(state_scores,
+        "score_cards_state_deaths.rds",
+        compress = "xz")
+
+pred_county_cases = preds %>%
+                      filter(nchar(geo_value) == 5,
+                             signal == "confirmed_incidence_num",
+                             target_end_date < today())
+county_scores = evaluate_covid_predictions(pred_county_cases, geo_type = "county")
+county_scores = county_scores %>% filter(!is.na(wis) & !is.na(ae))
+saveRDS(county_scores,
+        "score_cards_county_cases.rds",
+        compress = "xz")
+
 render("covidhub_evaluation.Rmd", 
            params = list(score_file = "score_cards_state_deaths.rds",
                          highlight_forecasters = c("CMU-TimeSeries", "COVIDhub-baseline", "COVIDhub-ensemble"),
                          signal = "deaths_incidence_num"),
-           output_file = "state_evaluations.html")
+           output_file = "state_evaluations.html",
+           envir = new.env())
 render("covidhub_evaluation.Rmd", 
            params = list(score_file = "score_cards_county_cases.rds",
                          highlight_forecasters = c("CMU-TimeSeries", "COVIDhub-baseline", "COVIDhub-ensemble"),
                          signal = "confirmed_incidence_num"),
-           output_file = "county_evaluations.html")
+           output_file = "county_evaluations.html",
+           envir = new.env())

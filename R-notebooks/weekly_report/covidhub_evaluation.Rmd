@@ -206,15 +206,17 @@ for (forecaster_name in wedge_forecasters){
   type_chars = nchar(score_cards$geo_value[1])
   f_preds = predictions %>% filter(forecaster == forecaster_name, 
                                      nchar(geo_value) == type_chars)
-  
-  # plot_calibration requires a forecast_date column
-  f_preds_w_cov = left_join(f_preds, score_cards, by = c("ahead", "geo_value", "forecaster", "target_end_date")) %>% 
-    select(ahead, geo_value, quantile, value, forecaster, target_end_date, forecast_date.x, actual)
-  colnames(f_preds_w_cov)[colnames(f_preds_w_cov) == "forecast_date.x"] = "forecast_date"
-  
-  print(plot_calibration(f_preds_w_cov, grp_vars = c("ahead"), avg_vars = c("geo_value", "forecast_date"), type = "wedgeplot"))
+  geo_val = f_preds$geo_value[1]
+  if (geo_val == "us"){
+    f_geo_type = "nation"
+  } else if (nchar(geo_val) == 2){
+    f_geo_type = "state"
+  } else {
+    f_geo_type = "county"
+  }
+  print(plot_calibration(f_preds, grp_vars = c("ahead"), avg_vars = c("geo_value", "forecast_date"), type = "wedgeplot", facet_rows = "ahead", geo_type = f_geo_type))
   if(params$verbose_wedges){
-    print(plot_calibration(f_preds_w_cov, grp_vars = c("ahead", "forecast_date"), avg_vars = c("geo_value"), type = "wedgeplot"))
+    print(plot_calibration(f_preds, grp_vars = c("ahead", "forecast_date"), avg_vars = c("geo_value"), type = "wedgeplot", facet_cols = "ahead", facet_rows = "forecast_date", geo_type = f_geo_type))
   }
 }
 ```

@@ -8,6 +8,7 @@
 #'   `ahead`, `geo_value`, `quantile`, `value`, `forecaster`, `forecast_date`,
 #'   `data_source`, `signal`, `target_end_date`, and `incidence_period`. Here
 #'   `data_source` and `signal` correspond to the response variable only.
+#' @template geo_type-template
 #' @param intervals vector of confidence intervals to show. More than 3 is ugly 
 #'   and will be reduced to the default set.
 #' @param plot_it should we actually produce the figure. If you have many 
@@ -25,12 +26,19 @@
 #'   `value` and `target_end_date`
 #' @param show_points do you want points as well as lines
 #' @param show_quantiles do you want to plot the quantiles or just lines
-#' @template geo_type-template
+#' @param nrow the number of rows present in the output plot. Similarly, `ncol`
+#'   adjusts the number of columns. Only one of `nrow` and `ncol` may be set and
+#'   they only have an effect if a plot is actually produced. Additionally,
+#'   If data is present for multiple forecasters, any output plot is faceted, so
+#'   nrow and ncol cannot be set.
+#' @param ncol See `nrow`
 #' @param ... additional arguments passed to [covidcast::covidcast_signal()]
 #'
 #' @return invisibly returns a ggplot object
 #' @export
 plot_trajectory <- function(predictions_cards,
+                            geo_type = c("county", "hrr", "msa", "dma", "state",
+                                         "hhs", "nation"),
                             intervals = c(.5, .8, .95),
                             plot_it = TRUE,
                             show_geo_value = NULL,
@@ -38,8 +46,12 @@ plot_trajectory <- function(predictions_cards,
                             side_truth = NULL,
                             show_points = TRUE,
                             show_quantiles = TRUE,
-                            geo_type = c("county", "hrr", "msa", "dma", "state"),
+                            nrow = NULL,
+                            ncol = NULL,
                             ...) {
+  geo_type <- match.arg(geo_type)
+  assert_that(is.null(nrow) | is.null(ncol),
+              msg = "nrow and ncol cannot both be set")
   if (!is.null(show_geo_value)) {
     predictions_cards <- predictions_cards %>%
       filter(.data$geo_value %in% show_geo_value)
@@ -62,13 +74,14 @@ plot_trajectory <- function(predictions_cards,
     l_quantiles = levels(pd$quantiles_df$interval)
     alp = c(.4, .2, .1)
     for (qq in n_quantiles:1) {
-      g <- g + geom_ribbon(data = pd$quantiles_df %>%
-                             filter(.data$interval == l_quantiles[qq]),
-                           mapping = aes(ymin = .data$lower, 
-                                         ymax = .data$upper,
-                                         group = .data$forecast_date,
-                                         fill = .data$forecaster),
-                           alpha = alp[qq]) 
+      g <- g + 
+        geom_ribbon(data = pd$quantiles_df %>%
+                      filter(.data$interval == l_quantiles[qq]),
+                    mapping = aes(ymin = .data$lower, 
+                                  ymax = .data$upper,
+                                  group = .data$forecast_date,
+                                  fill = .data$forecaster),
+                    alpha = alp[qq]) 
     }
   }
     
@@ -93,7 +106,8 @@ plot_trajectory <- function(predictions_cards,
         nlevels(pd$quantiles_df$forecaster > 1)) {
       gp + facet_grid(.data$forecaster ~ .data$geo_value, scales = "free_y")
     } else {
-      gp <- gp + facet_wrap(~.data$geo_value, scales = "free_y")
+      gp <- gp + facet_wrap(~.data$geo_value, nrow = nrow, ncol = ncol,
+                            scales = "free_y")
     }
     print(gp)
   } else {
@@ -126,8 +140,7 @@ setup_plot_trajectory <- function(predictions_cards,
       args$data_source <- predictions_cards$data_source[1]
       args$signal <- predictions_cards$signal[1]
     }
-    geo_type <- geo_type_selector(geo_type, predictions_cards)
-    
+
     ip <- predictions_cards$incidence_period[1]
     assert_that(ip %in% c("epiweek", "day"),
                 msg = paste("When grabbing data from covidcast, the incidence",

@@ -1,82 +1,47 @@
 #' Plot calibration curves
 #'
-#' @param scorecard Single score card.
-#' @param type One of "wedgeplot" or "traditional".
+#' @param predictions_cards Either one predictions_card or several joined
+#'   together using bind_rows().
+#' @param type One of "wedgeplot" or "traditional"
+#' @param facet_rows A variable name to facet data over. Creates a
+#'   separate row of plots for each value of specified variable. Can be used
+#'   with `facet_cols` to create a grid of plots.  Should be passed to 
+#'   plot_calibration when customized.
+#' @param facet_cols Same as `facet_rows`, but with columns.
 #' @param grp_vars variables over which to compare calibration. These
 #'   determines the color of the lines and faceting depending on `type`
 #' @param avg_vars variables over which we average to determine the calibration.
-#' @param legend_position Legend position, the default being "bottom".
-#'
+#' @template geo_type-template
+#' @param backfill_buffer How many days until response is deemed trustworthy
+#'   enough to be taken as correct?.
 #' @export
-plot_calibration <- function(scorecard,
+plot_calibration <- function(predictions_cards,
                              type = c("wedgeplot", "traditional"),
+                             facet_rows = NULL,
+                             facet_cols = NULL,
                              grp_vars = c("forecaster", "forecast_date", "ahead"),
                              avg_vars = c("geo_value"),
-                             legend_position = "bottom") {
+                             geo_type = c("county", "hrr", "msa", "dma", "state",
+                                          "hhs", "nation"),
+                             backfill_buffer = 0) {
   
+  geo_type <- match.arg(geo_type)
   type <- match.arg(type)
-  
-    
-  if (type == "wedgeplot") {
-    grps <- grp_processing_for_facets(scorecard, grp_vars, 3, "wedgeplots")
-    ngrps <- length(grps)
-    calib <- compute_calibration(scorecard, grp_vars, avg_vars) %>%
-      setup_wedgeplot()
 
-    g <- calib %>%
-      ggplot(aes(x = .data$nominal_prob,
-                 y = .data$proportion,
-                 colour = .data$coverage_type)) +
-      geom_line(aes(alpha = .data$emph, size = .data$emph)) +
-      scale_color_manual(values = c("blue","orange"), name="") +
-      geom_point(aes(alpha = .data$emph, size = .data$emph)) +
-      geom_segment(aes(x = 0, y = 0, xend = 0.5, yend = 0.5), 
-                   size = 0.25, color = "black") +
-      geom_segment(aes(x = 0.5, y = 0.5, xend = 1, yend = 0), 
-                   size = 0.25, color = "black") +
-      labs(x = "Nominal quantile level",
-           y = "Proportion",
-           title = sprintf("%s (ahead = %s): Proportion above/below", 
-                           .data$name, .data$ahead)) +
-      scale_alpha_continuous(range = c(0.5, 1)) +
-      scale_size_continuous(range = c(0.5, 1)) +
-      guides(alpha = FALSE, size = FALSE)
-    if (ngrps == 2L) {
-      g <- g + facet_grid(stats::as.formula(paste(grps, collapse = "~")))
-    }
-    if (ngrps == 1L) {
-      g <- g + facet_wrap(stats::as.formula(paste0("~", grps)))
-    }
-    
-  } else if (type == "traditional") {
-    grps <- grp_processing_for_facets(scorecard, grp_vars, 4, 
-                                      "traditional calibration plots")
-    ngrps <- length(grps)
-    calib <- compute_calibration(scorecard, grp_vars, avg_vars)
-    g <- calib %>%
-      ggplot(aes(x = .data$nominal_prob, y = .data$prop_below)) +
-      geom_abline(slope = 1, intercept = 0) +
-      labs(x = "Quantile level",
-           y = "Proportion",
-           title = sprintf("%s (ahead %s): Calibration", 
-                           .data$name, .data$ahead))
-    if (ngrps == 3L) {
-      g <- g + geom_line(aes(color = !!sym(grps[1]))) +
-        scale_color_viridis_d() +
-        facet_grid(stats::as.formula(paste(grps[2:3], collapse = "~")))
-    }
-    if (ngrps == 2L) {
-      g <- g + geom_line(aes(color = !!sym(grps[1]))) +
-        scale_color_viridis_d() +
-        facet_wrap(stats::as.formula(paste0("~", grps[2])))
-    }
-    if (ngrps == 1L) {
-      g <- g + geom_line(color="orange") + geom_point() + 
-        facet_wrap(stats::as.formula(paste0("~", grps)))
-    }
-  }
-  g + xlim(0, 1) + ylim(0, 1) + theme_bw() + 
-    theme(legend.position = legend_position)
+  calib <- compute_calibration(predictions_cards,
+                               geo_type,
+                               backfill_buffer,
+                               grp_vars,
+                               avg_vars)
+  
+  g <- switch (type,
+    wedgeplot = format_wedgeplot(calib, grp_vars, facet_rows, facet_cols),
+    traditional = format_traditional_calib_plot(calib, grp_vars, 
+                                                facet_rows, facet_cols),
+    stop("illegal calibration plot type selected.")
+  )
+  
+  return(g + xlim(0, 1) + ylim(0, 1) + theme_bw())
 }
 
 #' Preprocessing for wedge calibration plot
@@ -100,93 +65,86 @@ setup_wedgeplot <- function(calib) {
 }
 
 
-#' Plot interval coverage
+#' ggplot formatting for wedge calibration plot.
 #'
-#' @param scorecards List of different score cards, all on the same forecasting
-#'   task (i.e., same ahead, etc.).
-#' @param type One of "all" or "none", indicating whether to show coverage
-#'   across all nominal levels (in which case averaging is performed across
-#'   `avg_vars`) or whether to show it for one specific alpha
-#'   value.
-#' @param grp_vars variables over which to compare coverage. The first 
-#'   determines the color of the lines while the rest will be faceted over
-#' @param avg_vars variables over which we average to determine the proportion
-#'   of coverage. If `type = "one"`, 
-#' @param coverage If `type = "one"`, then coverage is the nominal interval 
-#'   coverage shown.
-#' @param legend_position Legend position, the default being "bottom".
-#' 
-#' @export 
-plot_coverage <- function(scorecards, 
-                          type = c("all", "one"), 
-                          grp_vars = c("forecaster", "forecast_date", "ahead"),
-                          avg_vars = c("geo_value"),
-                          coverage = 0.8, 
-                          legend_position = "bottom") {
-  type <- match.arg(type)
-  # make sure scorecards are comparable:
+#' @param calib the output from [compute_calibration()]
+#' @param grp_vars variables over which to compare calibration. These
+#'   determines the color of the lines and faceting depending on `type`
+#' @param facet_rows A variable name to facet data over. Creates a
+#'   separate row of plots for each value of specified variable. Can be used
+#'   with `facet_cols` to create a grid of plots.  Should be passed to 
+#'   plot_calibration when customized.
+#' @param facet_cols Same as `facet_rows`, but with columns.
+#'
+#' @return ggplot object
+format_wedgeplot <- function(calib, 
+                             grp_vars,
+                             facet_rows,
+                             facet_cols){
   
-  if (type == "all") {
-    grps <- grp_processing_for_facets(scorecards, grp_vars, 4, 
-                                      "`all` coverage plots")
-    ngrps <- length(grps)
-    cover <- compute_coverage(scorecards, grp_vars, avg_vars)
-    
-    g <- cover %>%
-      ggplot(aes(x = .data$nominal_prob, y = .data$prop_covered)) +
-      geom_abline(slope = 1, intercept = 0) +
-      xlim(0, 1) +
-      ylim(0, 1) +
-      labs(x = "Nominal coverage", y = "Empirical coverage")
-    
-    
-    if (ngrps == 3L) {
-      g <- g + geom_line(aes(color = !!sym(grps[1]))) +
-        scale_color_viridis_d() +
-        facet_grid(stats::as.formula(paste(grps[2:3], collapse = "~")))
-    }
-    if (ngrps == 2L) {
-      g <- g + geom_line(aes(color = !!sym(grps[1]))) +
-        scale_color_viridis_d() +
-        facet_wrap(stats::as.formula(paste0("~", grps[2])))
-    }
-    if (ngrps == 1L) {
-      g <- g + geom_line(aes(color = !!sym(grps)))
-    }
-    if (ngrps == 0L) {
-      g <- g + geom_line(color = "orange") + geom_point(color="orange")
-    }
-  } else {
-    grps <- grp_processing_for_facets(scorecards, grp_vars, 5, 
-                                      "`all` coverage plots")
-    ngrps <- length(grps)
-    cover <- compute_coverage(scorecards, grp_vars, avg_vars)
+  test_legal_faceting(facet_rows, facet_cols, grp_vars)
+  
+  facet_layer <- facet_grid(rows = vars(!!!syms(facet_rows)),
+                            cols = vars(!!!syms(facet_cols)))
+  g <- calib %>%
+    setup_wedgeplot() %>%
+    ggplot(aes(x = .data$nominal_prob,
+               y = .data$proportion,
+               colour = .data$coverage_type)) +
+    geom_line(aes(alpha = .data$emph, size = .data$emph)) +
+    scale_color_manual(values = c("blue","orange"), name="") +
+    geom_point(aes(alpha = .data$emph, size = .data$emph)) +
+    geom_segment(aes(x = 0, y = 0, xend = 0.5, yend = 0.5), 
+                 size = 0.25, color = "black") +
+    geom_segment(aes(x = 0.5, y = 0.5, xend = 1, yend = 0), 
+                 size = 0.25, color = "black") +
+    labs(x = "Nominal quantile level",
+         y = "Proportion",
+         title = sprintf("%s (ahead = %s): Proportion above/below", 
+                         .data$name, .data$ahead)) +
+    scale_alpha_continuous(range = c(0.5, 1)) +
+    scale_size_continuous(range = c(0.5, 1)) +
+    guides(alpha = FALSE, size = FALSE) +
+    facet_layer
+  
+  return(g)
+}
 
-    g <- cover %>%
-      filter(.data$nominal_prob == coverage) %>%
-      group_by(across(all_of(grp_vars))) %>%
-      summarize(prop_covered = mean(.data$prop_covered, na.rm = TRUE)) %>%
-      ggplot(aes(x = !! sym(grps[1]),
-                 y = .data$prop_covered)) +
-      geom_hline(yintercept = 1 - alpha, lty = 2) +
-      labs(x = grps[1], y = "Empirical coverage")
-    if (ngrps > 1L) {
-      g <- g + 
-        geom_line(aes(color = !!sym(grps[2]))) +
-        geom_point(aes(color = !!sym(grps[2]))) +
-        scale_color_viridis_d()
-    }
-    if (ngrps == 4L) {
-      g <- g + facet_grid(stats::as.formula(paste(grps[3:4], collapse = "~")))
-    }
-    if (ngrps == 3L) {
-      g <- g + facet_wrap(stats::as.formula(paste0("~", grps[3])))
-    }
-    if (ngrps == 1L) {
-      g <- g + 
-        geom_line(color = "orange") +
-        geom_point(color = "orange")
-    }
-  }
-  g + theme_bw() + theme(legend.position = legend_position)
+#' ggplot formatting for traditional calibration plot.
+#'
+#' @param calib the output from [compute_calibration()]
+#' @param grp_vars variables over which to compare calibration. These
+#'   determines the color of the lines and faceting depending on `type`
+#' @param facet_rows A variable name to facet data over. Creates a
+#'   separate row of plots for each value of specified variable. Can be used
+#'   with `facet_cols` to create a grid of plots.  Should be passed to 
+#'   plot_calibration when customized.
+#' @param facet_cols Same as `facet_rows`, but with columns.
+#'
+#' @return ggplot object
+format_traditional_calib_plot <- function(calib, 
+                                          grp_vars,
+                                          facet_rows,
+                                          facet_cols){
+  
+  test_legal_faceting(facet_rows, facet_cols, grp_vars)
+  
+  facet_layer <- facet_grid(rows = vars(!!!syms(facet_rows)),
+                            cols = vars(!!!syms(facet_cols)))
+  
+  color_vars <- setdiff(grp_vars, c(facet_rows, facet_cols))
+  
+  g <- calib %>%
+    mutate(color = as.factor(Interaction(!!!syms(color_vars)))) %>%
+    ggplot(aes(x = .data$nominal_prob, y = .data$prop_below)) +
+    geom_abline(slope = 1, intercept = 0) +
+    labs(x = "Quantile level",
+         y = "Proportion",
+         title = sprintf("%s (ahead %s): Calibration", 
+                         .data$name, .data$ahead)) +
+    geom_line(aes(color = .data$color, group = .data$color)) +
+    scale_color_viridis_d() +
+    facet_layer 
+  
+  return(g)
 }

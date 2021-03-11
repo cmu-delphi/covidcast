@@ -10,7 +10,7 @@ get_covidhub_forecaster_names(repo = c("zoltar", "covid19forecast_repo"))
 \item{repo}{character strinng either "zoltar" indicating the
 \href{https://zoltardata.com}{Zoltar} Forecast Archive or "covid19forecast_repo"
 which lists those available at the
-\href{https://github.com/reichlab/covid19-forecast-hub}{Reichlab}
+\href{https://github.com/reichlab/covid19-forecast-hub}{Reich Lab}
 Github submission repo.}
 }
 \value{

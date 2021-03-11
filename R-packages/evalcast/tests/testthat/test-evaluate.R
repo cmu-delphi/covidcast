@@ -38,8 +38,7 @@ test_that("evaluate_predictions evaluates against downloaded data", {
       target_end_date = as.Date("2020-01-21"),
       incidence_period = "epiweek"
     ))
-    score_card <- evaluate_predictions(pcard)
-
+    score_card <- evaluate_predictions(pcard, geo_type = "state")
     expect_called(mock_download_signal, 2)
     expect_equal(mock_args(mock_download_signal),
                  list(list(start_day = as.Date("2020-01-05"),

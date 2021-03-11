@@ -1,3 +1,8 @@
+#' Wrapper around `covidcast::covidcast_signal()` with additional logging.
+#' @param ... arguments to be passed to `covidcast::covidcast_signal()`.
+#' @return `covidcast_signal` data frame.
+#'
+#' @export
 download_signal <- function(...) {
   args <- list(...)
   if (is.null(args$start_day)) {
@@ -25,7 +30,17 @@ download_signal <- function(...) {
   out 
 }
 
-
+#' Wrapper around `covidcast::covidcast_signals()` with additional logging, error checking, and
+#' aggregation.
+#' @param ... arguments to be passed to `covidcast::covidcast_signals()`
+#' @param signal_aggregation format of aggregated data ("wide" or "long").
+#'    See `covidcast::aggregate_signals()`.
+#' @param signal_aggregation_dt vector of shifts to apply to aggregated data
+#'    See `covidcast::aggregate_signals()`.
+#'
+#' @return list of `covidcast_signal` data frames
+#'
+#' @export
 download_signals <- function(..., 
                              signal_aggregation = "long", 
                              signal_aggregation_dt = NULL) {
@@ -64,7 +79,17 @@ download_signals <- function(...,
   for (i in seq_along(msg)) message(msg[i])
   
   out <- base::suppressMessages({covidcast_signals(...)})
+  empty_signals <- purrr::map_lgl(out, ~ is.null(.x) || nrow(.x) == 0)
 
+  assert_that(!any(empty_signals),
+              msg = paste("For as_of date", args$as_of,
+                          "there is no data in the covidcast API for signals:\n",
+                          paste(
+                            paste("\t-", args$signal[empty_signals],
+                                  "from data_source",
+                                  args$data_source[empty_signals]),
+                            collapse="\n"))
+             )
   
   if (signal_aggregation != "list") {
     out <- covidcast::aggregate_signals(out, 
@@ -73,4 +98,3 @@ download_signals <- function(...,
   }
   out 
 }
-

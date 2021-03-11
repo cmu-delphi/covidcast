@@ -184,4 +184,3 @@ get_zoltar_forecast_dates <- function(forecaster_name) {
   
   sort(the_forecasts$timezero_date)
 }
-

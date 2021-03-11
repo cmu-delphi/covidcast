@@ -2,22 +2,26 @@
 % Please edit documentation in R/get_covidhub_predictions.R
 \name{get_covidhub_predictions}
 \alias{get_covidhub_predictions}
-\title{Get predictions from a forecaster on the COVID Hub}
+\title{Get predictions from forecasters on the COVID Hub}
 \usage{
 get_covidhub_predictions(
-  covidhub_forecaster_name,
+  covidhub_forecaster_name = get_covidhub_forecaster_names(),
   forecast_dates = NULL,
   geo_values = "*",
   forecast_type = c("point", "quantile"),
   ahead = 1:4,
   incidence_period = c("epiweek", "day"),
   signal = c("confirmed_incidence_num", "deaths_incidence_num",
-    "deaths_cumulative_num")
+    "deaths_cumulative_num"),
+  predictions_cards = NULL,
+  start_date = NULL,
+  end_date = NULL,
+  date_filtering_function = NULL
 )
 }
 \arguments{
-\item{covidhub_forecaster_name}{String indicating of the forecaster
-(matching what it is called on the COVID Hub).}
+\item{covidhub_forecaster_name}{A vector of strings indicating the
+forecasters (matching what it is called on the COVID Hub).}
 
 \item{forecast_dates}{Vector of Date objects (or strings of the form
 "YYYY-MM-DD") indicating dates on which forecasts will be made. If \code{NULL},
@@ -40,6 +44,21 @@ return both}
 "deaths_incidence_num", and/or "deaths_cumulative_num" (those currently
 forecast by the COVIDhub-ensemble). For other types, use one of the
 alternatives mentioned above}
+
+\item{predictions_cards}{An object of class \code{predicitions_cards} that
+contains previously retrieved predictions. If provided, files will not be
+retrieved from Reichlab for any forecaster / forecast_date combos that are
+present in the file.}
+
+\item{start_date}{The earliest date for which to retrieve predictions}
+
+\item{end_date}{The latest date for which to retrieve predictions}
+
+\item{date_filtering_function}{A function which takes a list, where each
+element is a vector of dates and returns a list where each element is a
+subset of those in the original list. Used for custom filtering of dates
+(e.g. only forecasts from Mondays, where all forecasters made a forecast,
+etc.)}
 }
 \value{
 Long data frame of forecasts with a class of \code{predictions_cards}.
@@ -49,9 +68,8 @@ remainder specify the prediction task, 10 columns in total:
 \code{data_source}, \code{signal}, \code{target_end_date}, and \code{incidence_period}. Here
 \code{data_source} and \code{signal} correspond to the response variable only.
 
-tibble of predictions cards. Only incident predictions are returned.
-For more flexible processing of COVID Hub data, try using
-\href{https://docs.zoltardata.com/zoltr/}{zoltr}
+For more flexible processing of COVID Hub data, try
+using \href{https://docs.zoltardata.com/zoltr/}{zoltr}
 }
 \description{
 Simply converts the predictions of forecasters submitting to the \href{https://github.com/reichlab/covid19-forecast-hub/}{COVID Hub} to the format of a

@@ -16,6 +16,7 @@ get_predictions(
   apply_corrections = NULL,
   signal_aggregation = c("list", "wide", "long"),
   signal_aggregation_dt = NULL,
+  as_of_override = function(forecast_date) forecast_date,
   ...
 )
 }
@@ -55,8 +56,9 @@ Sunday or Monday, then \code{ahead = 1} means the epiweek that includes the
 forecast date; if \code{forecast_date} falls on a Tuesday through Saturday, then
 it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahead = 1} means the day after forecast date.}
 
-\item{geo_type}{String indicating geographical type, one of "county", "dma",
-"hrr", "msa", or "state".}
+\item{geo_type}{String indicating geographical type, such as "county", or
+"state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
+for available options.}
 
 \item{geo_values}{Vector or list of locations whose data will be passed to
 \code{forecaster}. The default, "*", fetches all that is available in the API.}
@@ -65,8 +67,7 @@ it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahea
 to the signals. Input is a data frame or list as returned as
 \code{df <- covidcast::download_signals()}.
 The returned object should be of the type expected by your forecaster.
-This function will be called as \code{apply_corrections(df, ...)} using any
-named arguments passed in \code{...} to \code{get_predictions()}.}
+This function will be called as \code{apply_corrections(df)}.}
 
 \item{signal_aggregation}{this and the next argument control the type of
 data your forecaster expects to receive from covidcast. By default,
@@ -78,8 +79,18 @@ request "wide" or "long". See \code{\link[covidcast:covidcast_signals]{covidcast
 \code{\link[covidcast:aggregate_signals]{covidcast::aggregate_signals()}} can perform leading and lagging for you.
 See that documentation for more details.}
 
-\item{...}{Additional named arguments to be passed to \code{forecaster()} and
-\code{apply_corrections()}}
+\item{as_of_override}{by default, the \code{as_of} date of data downloaded from
+covidcast is loaded with \code{as_of = forecast_date}. This means that data
+is "rewound" to days in the past. Any data revisions made since, would
+not have been present at that time, and would not be available to the
+forecaster. It's likely, for example, that no data would actually exist
+for the forecast date on the forecast date (there is some latency between
+the time signals are reported and the dates for which they are reported).
+You can override this functionality, though we strongly advise you do so
+with care, by passing a function of a single forecast_date here. The
+function should return a date.}
+
+\item{...}{Additional named arguments to be passed to \code{forecaster()}}
 }
 \value{
 Long data frame of forecasts with a class of \code{predictions_cards}.
@@ -100,6 +111,7 @@ and geo type (e.g., 1-epiweek-ahead death forecasting at the state level with
 predictions made using the information as of September 14).
 }
 \examples{
+\dontrun{
 baby_predictions = get_predictions(
   baseline_forecaster, "baby",
   tibble::tibble(
@@ -108,5 +120,6 @@ baby_predictions = get_predictions(
     start_day="2020-08-15"), 
   "2020-10-01","epiweek", 1:4, 
   "state", "mi", signal_aggregation="long")
+}
 
 }

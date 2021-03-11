@@ -1,84 +1,100 @@
 #' Plot interval width
 #'
-#' @param cards scorecards or predictions cards (or a data frame with columns
-#'   `quantile`, `value` and any grouping vars and averaging vars)
-#' @param levels Quantile levels for the summary of interval width, to be
-#'   plotted. For example, `levels = c(0.5, 0.7, 0.9)`, the default, plots the
-#'   median, 70% and 90% quantiles of interval widths.
+#' @param predictions_cards tibble of predictions
+#'   that are all for the same prediction task, meaning they are for the same
+#'   response, incidence period,and geo type. Forecasts may be for a
+#'   different forecast date or forecaster.
+#'   A predictions card may be created by the function
+#'   [get_predictions()], downloaded with [get_covidhub_predictions()] or
+#'   possibly created manually. Alternatively, any data frame with columns
+#'   `quantile`, `value` and any grouping vars and averaging vars.
+#' @param facet_rows A variable name to facet data over. Creates a
+#'   separate row of plots for each value of specified variable. Can be used
+#'   with `facet_cols` to create a grid of plots.  Should be passed to 
+#'   plot_calibration when customized.
+#' @param facet_cols Same as `facet_rows`, but with columns.
 #' @param grp_vars variables over which to compare widths The first 
 #'   determines the color of the lines while the rest will be faceted over
 #' @param avg_vars variables over which we compute quantiles.
-#' @param legend_position Legend position, the default being "bottom".
+#' @param levels Quantile levels for the summary of interval width, to be
+#'   plotted. For example, `levels = c(0.5, 0.7, 0.9)`, the default, plots the
+#'   median, 70% and 90% quantiles of interval widths.
 #' 
 #' @details Interval width does not depend on the actual outcome, so this
 #'   function can be called on predictions cards in addition to score cards.
 #' 
 #' @export
-plot_width <- function(cards, 
-                       levels = c(0.5, 0.7, 0.9),
+plot_width <- function(predictions_cards,
+                       facet_rows = "forecast_date",
+                       facet_cols = "forecaster",
                        grp_vars = c("forecaster", "forecast_date", "ahead"),
                        avg_vars = c("geo_value"),
-                       legend_position = "bottom") {
+                       levels = c(0.5, 0.7, 0.9)) {
   
-  grps <- grp_processing_for_facets(cards, grp_vars, 4, "interval width plots")
-  ngrps <- length(grps)
-  cards <- compute_width(cards, levels, grp_vars, avg_vars)
+  test_legal_faceting(facet_rows, facet_cols, grp_vars)
   
-  g <- cards %>%
+  facet_layer <- facet_grid(rows = vars(!!!syms(facet_rows)),
+                            cols = vars(!!!syms(facet_cols)))
+  
+  color_vars <- setdiff(grp_vars, c(facet_rows, facet_cols))
+  
+  predictions_cards <- compute_width(
+    predictions_cards, grp_vars, avg_vars, levels)
+  
+  g <- predictions_cards %>%
+    mutate(color = as.factor(Interaction(!!!syms(color_vars)))) %>%
     ggplot(aes(x = .data$nominal_prob,
                y = .data$width,
                lty = .data$level)) +
     labs(x = "Nominal coverage", y = "Interval width") + 
-    theme_bw() + theme(legend.position = legend_position)
+    geom_line(aes(color = .data$color)) +
+    scale_color_viridis_d() +
+    facet_layer +
+    theme_bw()
     
-  if (ngrps == 3L) {
-    g <- g + geom_line(aes(color = !!sym(grps[1]))) +
-      scale_color_viridis_d() +
-      facet_grid(stats::as.formula(paste(grps[2:3], collapse = "~")))
-  }
-  if (ngrps == 2L) {
-    g <- g + geom_line(aes(color = !!sym(grps[1]))) +
-      scale_color_viridis_d() +
-      facet_wrap(stats::as.formula(paste0("~", grps[2])))
-  }
-  if (ngrps == 1L) {
-    g <- g + geom_line(color="orange") + geom_point() + 
-      facet_wrap(stats::as.formula(paste0("~", grps)))
-  }
-  g
+  return(g)
 }
 
 
 #' Summarize forecast interval widths
 #'
-#' @param cards scorecards or predictions cards (or a data frame with columns
+#' @param predictions_cards predictions cards (or a data frame with columns
 #'   `quantile`, `value` and any grouping vars and averaging vars)
+#' @param grp_vars variables over which to compare widths 
+#' @param avg_vars variables over which we compute quantiles.
 #' @param levels Quantile levels to summarize the interval widths. For example, 
 #'   `levels = c(0.5, 0.7, 0.9)`, the default, computes the
 #'   median, 70% and 90% quantiles of interval widths within each combination
 #'   of `grp_vars` over the `avg_vars`
-#' @param grp_vars variables over which to compare widths 
-#' @param avg_vars variables over which we compute quantiles.
 #'
 #' @return a summarized data frame (by grp_vars)
 #' @export
-compute_width <- function(cards, 
-                          levels = c(0.5, 0.7, 0.9),
+compute_width <- function(predictions_cards,
                           grp_vars = c("forecaster", "forecast_date", "ahead"),
-                          avg_vars = c("geo_value")) {
+                          avg_vars = c("geo_value"),
+                          levels = c(0.5, 0.7, 0.9)) {
   
-  assert_that(all(c(grp_vars, avg_vars, "quantile", "value") %in% names(cards)),
+  assert_that(all(c(grp_vars, avg_vars, "quantile", "value") 
+                  %in% names(predictions_cards)),
               msg = paste("In compute_width: quantile, value,",
                           "grp_vars and avg_vars must be present in the cards.",
                           "See details."))
   # make sure cards are comparable:
-  cards <- intersect_averagers(cards, grp_vars, avg_vars)
-  cards <- cards %>% 
+  predictions_cards <- intersect_averagers(predictions_cards, grp_vars, avg_vars)
+
+  predictions_cards <- predictions_cards %>% 
     filter(!is.na(.data$quantile)) %>%
     select(all_of(grp_vars), all_of(avg_vars),
            .data$quantile, .data$value)
   
-  cards <- averaging_checks(cards, grp_vars, avg_vars) %>%
+  if(any(is.na(predictions_cards$value))) {
+    message("Some quantiles values have NA values; these will be removed for
+            the interval width plots.")
+    predictions_cards <- predictions_cards %>% filter(!is.na(.data$value))
+  }
+  
+  predictions_cards <- averaging_checks(
+      predictions_cards, grp_vars, avg_vars) %>%
     group_by(across(all_of(c(grp_vars,avg_vars)))) %>%
     mutate(rev_value = rev(.data$value)) %>%
     filter(.data$quantile < 0.5) %>%

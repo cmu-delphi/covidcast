@@ -47,17 +47,21 @@ scale_by_forecaster <- function(score_card,
     for (var in score_cols){
         base_values <- filter(score_card,
                               .data$forecaster == base_forecaster_name)[[var]]
-        if (!all(base_values > 0)) {
+        if (any(base_values[!is.na(base_values)] == 0)) {
             warning("scale_by_forecaster will divide by zero in column ", var)
         }
     }
 
     df_list <- map(score_cols, function(var) {
         normalized_card <- score_card %>% 
-            select(c(id_cols, var)) %>% 
+            select(all_of(c(id_cols, var))) %>% 
             pivot_wider(names_from = "forecaster", 
                         names_prefix = var, 
-                        values_from = var) %>% 
+                        values_from = var) %>%
+            # for some reason, we fail to scale cols after the baseline
+            # so we move to the end
+            relocate(!!sym(paste0(var, base_forecaster_name)), 
+                     .after = last_col()) %>% 
             mutate(across(starts_with(var), ~ .x /
                             !!sym(paste0(var, base_forecaster_name)))) %>%
             pivot_longer(cols = starts_with(var), 

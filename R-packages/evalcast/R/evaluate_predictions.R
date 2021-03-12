@@ -223,8 +223,8 @@ get_actuals <- function(predictions_cards,
   assert_that("predictions_cards" %in% class(predictions_cards),
               msg = paste("predictions_cards",
                           "must be of class `predictions_cards`."))
-  actuals <- evaluate_predictions(predictions_cards,
-                                  err_measures = NULL,
-                                  geo_type = geo_type)
+  actuals <- evaluate_covid_predictions(predictions_cards,
+                                        err_measures = NULL,
+                                        geo_type = geo_type)
   return(actuals)
 }

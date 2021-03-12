@@ -19,6 +19,19 @@
 #' @return A data frame given by appending a new column to `x` named according
 #'   to the `col_name` argument, containing the percentage change values. 
 #'
+#' @examples \dontrun{
+#' df <- covidcast::covidcast_signal("fb-survey", "smoothed_cli", 
+#'     start_day = "2021-01-01", 
+#'     end_day = "2021-01-31",
+#'     geo_type = "state")
+#' 
+#' # percentage change between back-to-back weeks (default, as n = 14)
+#' pct_change(df)
+#' 
+#' # percentage change between back-to-back days
+#' pct_change(df, n = 2)
+#' }
+#'
 #' @export
 pct_change = function(x, n = 14, col_name = "pct_change") {
   # Check if n is odd and if so bump it up one

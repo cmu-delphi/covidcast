@@ -49,3 +49,16 @@ grouped by \code{geo_value}. (When multiple issue dates are present, only the
 latest issue is considered.) See the \href{https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html}{getting started guide}
 for examples.
 }
+\examples{
+\dontrun{
+df <- covidcast::covidcast_signal("fb-survey", "smoothed_cli", 
+    start_day = "2021-01-01", 
+    end_day = "2021-01-31",
+    geo_type = "state")
+    
+# two equivalent ways to compute 7-day trailing averages
+slide_by_geo(df, slide_fun = ~ Mean(.x$value), n = 7)
+slide_by_geo(df, slide_fun = function(x, ...) Mean(x$value) , n = 7)
+}
+
+}

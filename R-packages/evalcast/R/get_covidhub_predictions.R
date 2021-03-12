@@ -289,25 +289,37 @@ get_covidhub_forecast_dates <- function(forecaster_name) {
 #' List all COVID forecast models available
 #'
 #' Utility function to list all forecasters submitting COVID-19 forecasts to
-#' the [COVID 19 Forecast Hub](http://covid19forecasthub.org/). 
+#' the [COVID 19 Forecast Hub](http://covid19forecasthub.org/).
 #'
-#' @param repo character strinng either "zoltar" indicating the 
-#' [Zoltar](https://zoltardata.com) Forecast Archive or "covid19forecast_repo"
-#' which lists those available at the 
-#' [Reich Lab](https://github.com/reichlab/covid19-forecast-hub)
-#' Github submission repo.
-#'
-#' @return character vector of all available forecasters
+#' @param repo character string either "zoltar" indicating the
+#'   [Zoltar](https://zoltardata.com) Forecast Archive or "covid19forecast_repo"
+#'   which lists those available at the
+#'   [Reich Lab](https://github.com/reichlab/covid19-forecast-hub)
+#'   Github submission repo.
+#' @param designations vector of character strings representing acceptable
+#'   designation types for models. If `"*"` (the default), models of all
+#'   designations will be returned. See
+#'   [Reich Lab's Documentation](https://github.com/reichlab/covid19-forecast-hub/blob/master/data-processed/METADATA.md#team_model_designation)
+#'   for allowed designations and their meanings.
+#' @return character vector of all available forecasters matching given criteria
 #' @export
 #'
 #'
 get_covidhub_forecaster_names <- function(
-  repo = c("zoltar", "covid19forecast_repo")) {
-  
-  repo <- match.arg(repo, c("zoltar","covid19forecast_repo"))
-  if (repo == "covid19forecast_repo") repo = "remote_hub_repo"
-  
-  covidHubUtils::get_all_models(source = repo)
+  repo = c("zoltar", "covid19forecast_repo"),
+  designations = "*") {
+
+  if (identical(designation, "*")) {
+    repo <- match.arg(repo, c("zoltar", "covid19forecast_repo"))
+    if (repo == "covid19forecast_repo") repo <- "remote_hub_repo"
+    forecaster_names <- covidHubUtils::get_all_models(source = repo)
+  } else {
+    models <- covidHubUtils::get_model_designations(source = "zoltar")
+    forecaster_names <- models %>%
+                         filter(designation %in% designations) %>%
+                         pull(model)
+  }
+  return(forecaster_names)
 }
 
 covidhub_probs <- function() {

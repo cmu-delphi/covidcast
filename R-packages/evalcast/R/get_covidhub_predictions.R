@@ -55,7 +55,7 @@ get_covidhub_predictions <- function(
   start_date = NULL,
   end_date = NULL,
   date_filtering_function = NULL) {
-
+  forecast_dates <- as_date(forecast_dates)
   forecast_dates <- get_forecast_dates(covidhub_forecaster_name,
                                        forecast_dates,
                                        start_date,
@@ -127,6 +127,7 @@ get_forecast_dates <- function(forecasters,
                                start_date,
                                end_date,
                                date_filtering_function) {
+  forecast_dates <- as_date(forecast_dates)
   forecaster_dates <- vector("list", length = length(forecasters))
   for (i in seq_len(length(forecasters))) {
     forecaster_dates[[i]] <- tryCatch({
@@ -135,9 +136,14 @@ get_forecast_dates <- function(forecasters,
     error = function(e) cat(sprintf("%i. %s\n", i, e$message))
     )
   }
-  if (!is.null(forecast_dates)) {
+  if (length(forecast_dates) != 0) {
+    # Intersect acts oddly with dates. If foo = as_date(bar), then foo == bar is
+    # true, but (foo %in% bar) is false and intersect(foo, bar) is an empty
+    # vector. Additionally, intersect returns a numeric object instead of a
+    # date.
     forecaster_dates <- lapply(forecaster_dates,
-                               function(dates) intersect(dates, forecast_dates))
+                               function(dates)
+                                 as_date(intersect(dates, forecast_dates)))
   }
   if (!is.null(start_date)) {
     forecaster_dates <- lapply(forecaster_dates,

@@ -31,6 +31,11 @@ enough to be taken as correct? See details for more.}
 "state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
 for available options.}
 }
+\value{
+tibble of "score cards". Contains the same information as the
+\code{predictions_cards()} with additional columns for each \code{err_measure} and
+for the truth (named \code{actual}).
+}
 \description{
 Evaluates the performance of a covid forecaster, through the following steps:
 \enumerate{

@@ -106,6 +106,11 @@ evaluate_predictions <- function(
 #' @param backfill_buffer How many days until response is deemed trustworthy
 #'   enough to be taken as correct? See details for more.
 #' @template geo_type-template
+#' @return tibble of "score cards". Contains the same information as the
+#'   `predictions_cards()` with additional columns for each `err_measure` and
+#'   for the truth (named `actual`).
+#'
+#' @export
 evaluate_covid_predictions <- function(predictions_cards,
                                         err_measures = list(wis = weighted_interval_score,
                                                             ae = absolute_error,

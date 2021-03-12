@@ -4,12 +4,7 @@
 \alias{format_traditional_calib_plot}
 \title{ggplot formatting for traditional calibration plot.}
 \usage{
-format_traditional_calib_plot(
-  calib,
-  grp_vars,
-  facet_rows = "ahead",
-  facet_cols = "forecaster"
-)
+format_traditional_calib_plot(calib, grp_vars, facet_rows, facet_cols)
 }
 \arguments{
 \item{calib}{the output from \code{\link[=compute_calibration]{compute_calibration()}}}

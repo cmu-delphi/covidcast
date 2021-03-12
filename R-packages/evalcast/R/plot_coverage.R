@@ -8,47 +8,38 @@
 #'   A predictions card may be created by the function
 #'   [get_predictions()], downloaded with [get_covidhub_predictions()] or
 #'   possibly created manually.
-#' @param backfill_buffer How many days until response is deemed trustworthy
-#'   enough to be taken as correct?
-#' @param type One of "all" or "none", indicating whether to show coverage
+#' @param type One of "all" or "one", indicating whether to show coverage
 #'   across all nominal levels (in which case averaging is performed across
 #'   `avg_vars`) or whether to show it for one specific alpha
 #'   value.
-#' @param grp_vars variables over which to compare coverage
-#' @param avg_vars variables over which we average to determine the proportion
-#'   of coverage. If `type = "one"`, 
+#' @param coverage If `type = "one"`, then coverage is the nominal interval 
+#'   coverage shown.
 #' @param facet_rows A variable name to facet data over. Creates a
 #'   separate row of plots for each value of specified variable. Can be used
 #'   with `facet_cols` to create a grid of plots.
 #' @param facet_cols Same as `facet_rows`, but with columns.
-#' @param coverage If `type = "one"`, then coverage is the nominal interval 
-#'   coverage shown.
-#' @param legend_position Legend position, the default being "bottom".
+#' @param grp_vars variables over which to compare coverage
+#' @param avg_vars variables over which we average to determine the proportion
+#'   of coverage.
+#' @template geo_type-template
+#' @param backfill_buffer How many days until response is deemed trustworthy
+#'   enough to be taken as correct?
 #' 
 #' @export 
 plot_coverage <- function(predictions_cards,
-                          geo_type,
-                          backfill_buffer = 10,
-                          type = c("all", "one"), 
-                          grp_vars = c("forecaster", "forecast_date", "ahead"),
-                          avg_vars = c("geo_value"),
+                          type = c("all", "one"),                          
+                          coverage = 0.8,
                           facet_rows = c("forecaster"),
                           facet_cols = c("forecast_date"),
-                          coverage = 0.8, 
-                          legend_position = "bottom") {
+                          grp_vars = c("forecaster", "forecast_date", "ahead"),
+                          avg_vars = c("geo_value"),
+                          geo_type = c("county", "hrr", "msa", "dma", "state",
+                                       "hhs", "nation"),
+                          backfill_buffer = 0) {
+  geo_type <- match.arg(geo_type)
   type <- match.arg(type)
-  if (!is.null(facet_rows)) {
-   non_grouped_facet <- setdiff(facet_rows, grp_vars)
-   assert_that(length(non_grouped_facet) == 0,
-                msg = paste("Variables must be grouped in order to be faceted in rows:",
-                            non_grouped_facet))
-  }
-  if (!is.null(facet_cols)) {
-    non_grouped_facet <- setdiff(facet_cols, grp_vars)
-    assert_that(length(non_grouped_facet) == 0,
-                msg = paste("Variables must be grouped in order to be faceted in cols:",
-                            non_grouped_facet))
-  }
+  
+  test_legal_faceting(facet_rows, facet_cols, grp_vars)
 
   scorecards <- left_join(predictions_cards,
                           get_covidcast_data(predictions_cards,
@@ -88,9 +79,25 @@ plot_coverage <- function(predictions_cards,
   }
   return(
     g +
-    geom_line(aes(color = .data$color, group = .data$color)) +
-    scale_color_viridis_d() +
-    facet_layer +
-    theme_bw() +
-    theme(legend.position = legend_position))
+      geom_line(aes(color = .data$color, group = .data$color)) +
+      scale_color_viridis_d() +
+      facet_layer +
+      theme_bw()
+  )
+}
+
+test_legal_faceting <- function(facet_rows, facet_cols, grp_vars) {
+  if (!is.null(facet_rows)) {
+    non_grouped_facet <- setdiff(facet_rows, grp_vars)
+    assert_that(length(non_grouped_facet) == 0,
+                msg = paste("Variables must be grouped in order to be faceted in rows:",
+                            non_grouped_facet))
+  }
+  if (!is.null(facet_cols)) {
+    non_grouped_facet <- setdiff(facet_cols, grp_vars)
+    assert_that(length(non_grouped_facet) == 0,
+                msg = paste("Variables must be grouped in order to be faceted in cols:",
+                            non_grouped_facet))
+  }
+  invisible(TRUE)
 }

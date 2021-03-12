@@ -106,7 +106,7 @@
 #'   `value`. The `quantile` column gives the probabilities associated with
 #'   quantile forecasts for that location and ahead. 
 #' 
-#' @importFrom dplyr filter select pull summarize between
+#' @importFrom dplyr filter select pull summarize between bind_cols
 #' @importFrom tidyr pivot_longer
 #' @export
 quantgen_forecaster = function(df, forecast_date, signals, incidence_period,
@@ -263,15 +263,13 @@ quantgen_forecaster = function(df, forecast_date, signals, incidence_period,
     
     # Do some wrangling to get it into evalcast "long" format
     colnames(predict_mat) = tau
-    predict_df = as.data.frame(
-      cbind(geo_value = test_geo_value, predict_mat)) %>%
+    predict_df = bind_cols(geo_value = test_geo_value,
+                           predict_mat) %>%
       pivot_longer(cols = -geo_value,
                    names_to = "quantile",
                    values_to = "value") %>%
-      mutate(quantile = as.numeric(quantile),
-             value = as.numeric(value),
-             ahead = a)
-    
+      mutate(ahead = a)
+
     # TODO: allow train_obj to be appended to forecaster's output. This would
     # be nice for post-hoc analysis of the fitted models, etc. Two options for
     # doing so: 1. append as a column to returned df; but this would be a big 

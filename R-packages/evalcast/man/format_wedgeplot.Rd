@@ -4,12 +4,7 @@
 \alias{format_wedgeplot}
 \title{ggplot formatting for wedge calibration plot.}
 \usage{
-format_wedgeplot(
-  calib,
-  grp_vars,
-  facet_rows = "forecast_date",
-  facet_cols = "forecaster"
-)
+format_wedgeplot(calib, grp_vars, facet_rows, facet_cols)
 }
 \arguments{
 \item{calib}{the output from \code{\link[=compute_calibration]{compute_calibration()}}}

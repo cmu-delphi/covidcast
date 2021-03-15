@@ -1,4 +1,5 @@
 library(rmarkdown)
+library(lubridate)
 
 preds_filename = "predictions_cards.rds"
 start_date = today() - 12 * 7
@@ -49,8 +50,8 @@ preds = get_covidhub_predictions(forecasters,
                                start_date = start_date,
                                date_filtering_function = date_filter)
 
-saveRDS(predictions_cards,
-        file = prediction_cards_filename, 
+saveRDS(preds,
+        file = preds_filename, 
         compress = "xz")
 
 pred_state_deaths = preds %>%
@@ -59,7 +60,7 @@ pred_state_deaths = preds %>%
                              signal == "deaths_incidence_num",
                              target_end_date < today())
 state_scores = evaluate_covid_predictions(pred_state_deaths, geo_type = "state")
-state_scores = state_scores %>% filter(is.na(wis) & !is.na(ae))
+state_scores = state_scores %>% filter(!is.na(wis) & !is.na(ae))
 saveRDS(state_scores,
         "score_cards_state_deaths.rds",
         compress = "xz")

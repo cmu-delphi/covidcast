@@ -13,7 +13,6 @@
 #'   with `facet_cols` to create a grid of plots.  Should be passed to 
 #'   plot_calibration when customized.
 #' @param facet_cols Same as `facet_rows`, but with columns.
-#' @param legend_position Legend position, the default being "bottom".
 #' @param grp_vars variables over which to compare widths The first 
 #'   determines the color of the lines while the rest will be faceted over
 #' @param avg_vars variables over which we compute quantiles.
@@ -28,23 +27,11 @@
 plot_width <- function(predictions_cards,
                        facet_rows = "forecast_date",
                        facet_cols = "forecaster",
-                       legend_position = "bottom",
                        grp_vars = c("forecaster", "forecast_date", "ahead"),
                        avg_vars = c("geo_value"),
                        levels = c(0.5, 0.7, 0.9)) {
   
-  if (!is.null(facet_rows)) {
-    non_grouped_facet <- setdiff(facet_rows, grp_vars)
-    assert_that(length(non_grouped_facet) == 0,
-                msg = paste("Variables must be grouped in order to be faceted in rows:",
-                            non_grouped_facet))
-  }
-  if (!is.null(facet_cols)) {
-    non_grouped_facet <- setdiff(facet_cols, grp_vars)
-    assert_that(length(non_grouped_facet) == 0,
-                msg = paste("Variables must be grouped in order to be faceted in cols:",
-                            non_grouped_facet))
-  }
+  test_legal_faceting(facet_rows, facet_cols, grp_vars)
   
   facet_layer <- facet_grid(rows = vars(!!!syms(facet_rows)),
                             cols = vars(!!!syms(facet_cols)))
@@ -63,7 +50,7 @@ plot_width <- function(predictions_cards,
     geom_line(aes(color = .data$color)) +
     scale_color_viridis_d() +
     facet_layer +
-    theme_bw() + theme(legend.position = legend_position)
+    theme_bw()
     
   return(g)
 }

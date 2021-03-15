@@ -10,18 +10,12 @@ plot_canonical(
   y,
   facet_rows = NULL,
   facet_cols = NULL,
-  legend_position = "bottom",
   grp_vars = "forecaster",
   aggr = mean,
   dots = TRUE,
   lines = TRUE,
   base_forecaster = NULL,
-  scale_before_aggr = FALSE,
-  title = waiver(),
-  subtitle = waiver(),
-  xlab = waiver(),
-  ylab = waiver(),
-  legend_title = NULL
+  scale_before_aggr = FALSE
 )
 }
 \arguments{
@@ -36,8 +30,6 @@ separate row of plots for each value of specified variable. Can be used
 with \code{facet_cols} to create a grid of plots.}
 
 \item{facet_cols}{Same as \code{facet_rows}, but with columns.}
-
-\item{legend_position}{where to position the legend ("bottom" by default)}
 
 \item{grp_vars}{The set of variable names in \code{df} which to aggregate over.
 "forecaster" by default.}
@@ -54,16 +46,6 @@ the corresponding values of the \code{base_forecaster}}
 \item{scale_before_aggr}{If TRUE, scales results by the
 \code{base_forecaster} before aggregating by the \code{aggr} function. FALSE by
 default.}
-
-\item{title}{title of the plot, if set}
-
-\item{subtitle}{subtitle of the plot, if set}
-
-\item{xlab}{x-axis label, if set}
-
-\item{ylab}{y-axis label, if set}
-
-\item{legend_title}{title of the legend, if set}
 }
 \description{
 A canonical function for creating plots within evalcast

@@ -6,15 +6,14 @@
 \usage{
 plot_coverage(
   predictions_cards,
+  type = c("all", "one"),
+  coverage = 0.8,
   facet_rows = c("forecaster"),
   facet_cols = c("forecast_date"),
-  legend_position = "bottom",
   grp_vars = c("forecaster", "forecast_date", "ahead"),
   avg_vars = c("geo_value"),
   geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation"),
-  type = c("all", "one"),
-  backfill_buffer = 10,
-  coverage = 0.8
+  backfill_buffer = 0
 )
 }
 \arguments{
@@ -26,13 +25,19 @@ A predictions card may be created by the function
 \code{\link[=get_predictions]{get_predictions()}}, downloaded with \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}} or
 possibly created manually.}
 
+\item{type}{One of "all" or "one", indicating whether to show coverage
+across all nominal levels (in which case averaging is performed across
+\code{avg_vars}) or whether to show it for one specific alpha
+value.}
+
+\item{coverage}{If \code{type = "one"}, then coverage is the nominal interval
+coverage shown.}
+
 \item{facet_rows}{A variable name to facet data over. Creates a
 separate row of plots for each value of specified variable. Can be used
 with \code{facet_cols} to create a grid of plots.}
 
 \item{facet_cols}{Same as \code{facet_rows}, but with columns.}
-
-\item{legend_position}{Legend position, the default being "bottom".}
 
 \item{grp_vars}{variables over which to compare coverage}
 
@@ -43,16 +48,8 @@ of coverage.}
 "state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
 for available options.}
 
-\item{type}{One of "all" or "none", indicating whether to show coverage
-across all nominal levels (in which case averaging is performed across
-\code{avg_vars}) or whether to show it for one specific alpha
-value.}
-
 \item{backfill_buffer}{How many days until response is deemed trustworthy
 enough to be taken as correct?}
-
-\item{coverage}{If \code{type = "one"}, then coverage is the nominal interval
-coverage shown.}
 }
 \description{
 Plot interval coverage

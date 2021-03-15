@@ -90,14 +90,18 @@ test_legal_faceting <- function(facet_rows, facet_cols, grp_vars) {
   if (!is.null(facet_rows)) {
     non_grouped_facet <- setdiff(facet_rows, grp_vars)
     assert_that(length(non_grouped_facet) == 0,
-                msg = paste("Variables must be grouped in order to be faceted in rows:",
-                            non_grouped_facet))
+                msg = paste0(
+                  "Variables must be grouped in order to be faceted in rows: ",
+                  non_grouped_facet, ". Group ", non_grouped_facet,
+                  " or change the value of facet_rows to something in grp_vars."))
   }
   if (!is.null(facet_cols)) {
     non_grouped_facet <- setdiff(facet_cols, grp_vars)
     assert_that(length(non_grouped_facet) == 0,
-                msg = paste("Variables must be grouped in order to be faceted in cols:",
-                            non_grouped_facet))
+                msg = paste0(
+                  "Variables must be grouped in order to be faceted in rows: ",
+                  non_grouped_facet, ". Group ", non_grouped_facet,
+                  " or change the value of facet_cols to something in grp_vars."))
   }
   invisible(TRUE)
 }

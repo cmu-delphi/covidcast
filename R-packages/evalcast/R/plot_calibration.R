@@ -82,6 +82,11 @@ format_wedgeplot <- function(calib,
                              facet_rows,
                              facet_cols){
   
+  if (is.null(facet_rows) && is.null(facet_cols)){
+    facet_rows <- c("forecast_date")
+    facet_cols <- c("forecaster")
+  }
+  
   test_legal_faceting(facet_rows, facet_cols, grp_vars)
   
   facet_layer <- facet_grid(rows = vars(!!!syms(facet_rows)),
@@ -126,6 +131,11 @@ format_traditional_calib_plot <- function(calib,
                                           grp_vars,
                                           facet_rows,
                                           facet_cols){
+  
+  if (is.null(facet_rows) && is.null(facet_cols)){
+    facet_rows <- c("ahead")
+    facet_cols <- c("forecaster")
+  }
   
   test_legal_faceting(facet_rows, facet_cols, grp_vars)
   

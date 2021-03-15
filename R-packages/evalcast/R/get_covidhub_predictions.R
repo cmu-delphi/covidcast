@@ -309,7 +309,7 @@ get_covidhub_forecaster_names <- function(
   repo = c("zoltar", "covid19forecast_repo"),
   designations = "*") {
 
-  if (identical(designation, "*")) {
+  if (identical(designations, "*")) {
     repo <- match.arg(repo, c("zoltar", "covid19forecast_repo"))
     if (repo == "covid19forecast_repo") repo <- "remote_hub_repo"
     forecaster_names <- covidHubUtils::get_all_models(source = repo)

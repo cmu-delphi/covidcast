@@ -76,7 +76,6 @@ Imports:
     rvest,
     xml2,
     ggplot2,
-    memoise,
     zoltr,
     covidHubUtils,
     forcats

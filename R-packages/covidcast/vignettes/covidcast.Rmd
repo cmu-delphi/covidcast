@@ -8,12 +8,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, setup, include=FALSE}
-knitr::opts_chunk$set(
-  comment = '', fig.width = 6, fig.height = 6, fig.path = 'figures/covidcast-'
-)
-```
-
 This package provides access to data frames of values from the [COVIDcast
 API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html). Using the
 `covidcast_signal()` function, you can fetch any data you may be interested in

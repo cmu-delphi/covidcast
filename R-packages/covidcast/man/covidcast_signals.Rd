@@ -17,12 +17,12 @@ covidcast_signals(
 )
 }
 \arguments{
-\item{data_source}{String identifying the data source to query. See the
-\href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{signal documentation}
+\item{data_source}{String identifying the data source to query. See
+https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
 for a list of available data sources.}
 
 \item{signal}{String identifying the signal from that source to query. Again,
-see the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{signal documentation}
+see https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
 for a list of available signals.}
 
 \item{start_day}{Query data beginning on this date. Date object, or string in
@@ -34,12 +34,14 @@ in the form "YYYY-MM-DD". If \code{end_day} is \code{NULL}, defaults to the most
 recent day data is available for this signal.}
 
 \item{geo_type}{The geography type for which to request this data, such as
-"county" or "state". Defaults to "county". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
+"county" or "state". Defaults to "county". See
+https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
 for details on which types are available.}
 
 \item{geo_values}{Which geographies to return. The default, "*", fetches all
 geographies. To fetch specific geographies, specify their IDs as a vector
-or list of strings. See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
+or list of strings. See
+https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
 for details on how to specify these IDs.}
 
 \item{as_of}{Fetch only data that was available on or before this date,
@@ -75,7 +77,8 @@ signals, potentially from multiple data sources.
 \details{
 The argument structure is just as in \code{covidcast_signal()}, except
 the first four arguments \code{data_source}, \code{signal}, \code{start_day}, \code{end_day}
-are permitted to be vectors. The first two arguments \code{data_source}, \code{signal} are
+are permitted to be vectors. The first two arguments \code{data_source},
+'\code{signal} are
 recycled appropriately, in the calls to \code{covidcast_signal()}; see example
 below. The next two arguments \code{start_day}, \code{end_day}, unless \code{NULL}, must
 be either length 1 or N.

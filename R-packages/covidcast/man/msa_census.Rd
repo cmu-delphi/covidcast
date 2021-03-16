@@ -14,9 +14,12 @@ many columns. The most crucial are:
 \item{CBSA}{Core Based Statistical Area code. These are unique identifiers
 used, for example, as the \code{geo_values} argument to \code{covidcast_signal()}
 when requesting data from specific metro areas (with \code{geo_type = 'msa'}).}
+\item{MDIV}{Metropolitan Division code}
+\item{STCOU}{State and county code}
 \item{NAME}{Name or title of the area.}
 \item{LSAD}{Legal/Statistical Area Description, identifying if this is a
 metropolitan or micropolitan area, a metropolitan division, or a county.}
+\item{STATE}{State FIPS code.}
 \item{POPESTIMATE2019}{Estimate of the area's resident population as of
 July 1, 2019.}
 }

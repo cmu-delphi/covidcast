@@ -18,12 +18,12 @@ covidcast_signal(
 )
 }
 \arguments{
-\item{data_source}{String identifying the data source to query. See the
-\href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{signal documentation}
+\item{data_source}{String identifying the data source to query. See
+https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
 for a list of available data sources.}
 
 \item{signal}{String identifying the signal from that source to query. Again,
-see the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{signal documentation}
+see https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
 for a list of available signals.}
 
 \item{start_day}{Query data beginning on this date. Date object, or string in
@@ -35,12 +35,14 @@ in the form "YYYY-MM-DD". If \code{end_day} is \code{NULL}, defaults to the most
 recent day data is available for this signal.}
 
 \item{geo_type}{The geography type for which to request this data, such as
-"county" or "state". Defaults to "county". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
+"county" or "state". Defaults to "county". See
+https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
 for details on which types are available.}
 
 \item{geo_values}{Which geographies to return. The default, "*", fetches all
 geographies. To fetch specific geographies, specify their IDs as a vector
-or list of strings. See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{geographic coding documentation}
+or list of strings. See
+https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
 for details on how to specify these IDs.}
 
 \item{as_of}{Fetch only data that was available on or before this date,
@@ -105,12 +107,11 @@ about the signal contained within; see "Metadata" below for details.
 \description{
 Obtains data for selected date ranges for all geographic regions of the
 United States. Available data sources and signals are documented in the
-\href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{COVIDcast signal documentation}.
+COVIDcast signal documentation.
 Most (but not all) data sources are available at the county level, but the
 API can also return data aggregated to metropolitan statistical areas,
 hospital referral regions, or states, as desired, by using the \code{geo_type}
-argument. View the \href{https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html}{covidcast vignette}
-for detailed example usage.
+argument.
 }
 \details{
 For data on counties, metropolitan statistical areas, and states, this
@@ -158,8 +159,7 @@ Note that the API only tracks the initial value of an estimate and \emph{changes
 to that value. If a value was first issued on June 5th and never updated,
 asking for data issued on June 6th (using \code{issues} or \code{lag}) would \emph{not}
 return that value, though asking for data \code{as_of} June 6th would. See the
-\href{https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html}{covidcast vignette}
-for examples.
+covidcast vignette for examples.
 
 Note also that the API enforces a maximum result row limit; results beyond
 the maximum limit are truncated. This limit is sufficient to fetch

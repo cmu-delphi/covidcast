@@ -38,7 +38,7 @@ signal defined by \code{data_source = "usa-facts"}, \code{signal = "confirmed_in
 Aggregates \code{covidcast_signal} objects into one data frame, in either "wide"
 or "long" format. (In "wide" aggregation, only the latest issue from each
 data frame is retained, and several columns, including \code{data_source} and
-\code{signal} are dropped; see details below). See the \href{https://cmu-delphi.github.io/covidcast/covidcastR/articles/multi-signals.html}{multiple signals vignette}
+\code{signal} are dropped; see details below). See the multiple signals vignette
 for examples.
 }
 \details{

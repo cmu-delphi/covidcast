@@ -157,9 +157,9 @@ test_that("warn on incomplete metadata", {
     class = c("covidcast_signal", "data.frame"),
     metadata = list(geo_type = "state", mean_value = 0, stdev_value = 1)
   )
-  
-  expect_warning(plot(fake_data), NA) 
-  attributes(fake_data)$metadata = list(geo_type = "state", mean_value = 0)
+
+  expect_warning(plot(fake_data), NA)
+  attributes(fake_data)$metadata <- list(geo_type = "state", mean_value = 0)
 
   expect_warning(plot(fake_data),
                  class="covidcast_plot_meta_not_found")

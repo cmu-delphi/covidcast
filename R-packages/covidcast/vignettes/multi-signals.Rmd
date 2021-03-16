@@ -8,12 +8,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, setup, include=FALSE}
-knitr::opts_chunk$set(
-  comment = '', fig.width = 6, fig.height = 6, fig.path = 'figures/multi-'
-)
-```
-
 Various analyses involve working with multiple signals at once. The covidcast
 package provides some helper functions for fetching multiple signals from the
 API, and aggregating them into one data frame for various downstream uses.
@@ -148,10 +142,10 @@ yields the same result as telling `covidcast_cor()` to do the time-shifting
 itself:
 
 ```{r}
-df_cor1 = covidcast_cor(x = aggregate_signals(signals[[1]], dt = -7,
+df_cor1 <- covidcast_cor(x = aggregate_signals(signals[[1]], dt = -7,
                                               format = "long"),
                         y = signals[[2]])
 
-df_cor2 = covidcast_cor(x = signals[[1]], y = signals[[2]], dt_x = -7)
+df_cor2 <- covidcast_cor(x = signals[[1]], y = signals[[2]], dt_x = -7)
 identical(df_cor1, df_cor2)
 ```

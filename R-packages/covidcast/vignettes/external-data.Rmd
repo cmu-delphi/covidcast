@@ -8,6 +8,12 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r, setup, include=FALSE}
+knitr::opts_chunk$set(
+  comment = '', fig.width = 6, fig.height = 6, fig.path = 'figures/external-'
+)
+```
+
 While the COVIDcast Epidata API provides numerous useful COVID data streams, you
 may sometimes find yourself with relevant data from a different source. This
 package provides the tools you need to load such data and use it alongside

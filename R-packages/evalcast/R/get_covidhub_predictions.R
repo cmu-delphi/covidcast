@@ -136,7 +136,7 @@ get_forecast_dates <- function(forecasters,
     error = function(e) cat(sprintf("%i. %s\n", i, e$message))
     )
   }
-  if (!is.null(forecast_dates)) {
+  if (length(forecast_dates) != 0) {
     # Intersect acts oddly with dates. If foo = as_date(bar), then foo == bar is
     # true, but (foo %in% bar) is false and intersect(foo, bar) is an empty
     # vector. Additionally, intersect returns a numeric object instead of a

@@ -31,7 +31,7 @@ apply_shifts <- function(x, dt) {
                inherits(v, "covidcast_signal")
              })))) {
     # If dt is a vector
-    if (!is.list(dt)) { dt <- rep(list(dt), length(x)) }
+    if (!is.list(dt)) { dt <- rep(list(dt), length(x)) }
 
     # If dt is a list
     else if (length(dt) != length(x)) {
@@ -50,6 +50,7 @@ apply_shifts <- function(x, dt) {
 
 # Function to apply shifts for one covidcast_signal data frame
 
+#@
 apply_shifts_one <- function(x, dt) {
   x <- latest_issue(x)
   attrs <- attributes(x)
@@ -57,28 +58,30 @@ apply_shifts_one <- function(x, dt) {
 
   # Make sure that we have a complete record of dates for each geo_value (fill
   # with NAs as necessary)
-  x_all <- x %>% dplyr::group_by(geo_value) %>%
-    dplyr::summarize(time_value = seq.Date(as.Date(min(time_value)),
-                                           as.Date(max(time_value)),
+  x_all <- x %>% dplyr::group_by(.data$geo_value) %>%
+    dplyr::summarize(time_value = seq.Date(as.Date(min(.data$time_value)),
+                                           as.Date(max(.data$time_value)),
                                            by = "day"),
-                     data_source = data_source[1],
-                     signal = signal[1]) %>%
+                     data_source = .data$data_source[1],
+                     signal = .data$signal[1]) %>%
     dplyr::ungroup()
   x <- dplyr::full_join(
     x, x_all, by = c("data_source", "signal", "geo_value", "time_value")
   )
 
   # Group by geo value, sort rows by increasing time
-  x <- x %>% dplyr::group_by(geo_value) %>% dplyr::arrange(time_value)
+  x <- x %>%
+    dplyr::group_by(.data$geo_value) %>%
+    dplyr::arrange(.data$time_value)
 
   # Loop over dt, and time shift the value column
   for (n in dt) {
     varname <- sprintf("value%+d", n)
-    x <- x %>% dplyr::mutate(!!varname := shift(value, n))
+    x <- x %>% dplyr::mutate(!!varname := shift(.data$value, n))
   }
 
   # Remove value column, restore attributes, and return
-  x <- dplyr::select(x, -value)
+  x <- dplyr::select(x, -.data$value)
   attributes(x) <- c(attributes(x), attrs)
   return(x)
 }
@@ -285,9 +288,11 @@ covidcast_longer <- function(x) {
                     sep = "_", extra = "merge")
 
   # Now add dt column, and reorder columns a bit
-  x <- x %>% dplyr::mutate(dt = as.numeric(sub("value", "", dt))) %>%
-    dplyr::relocate(data_source, signal, geo_value, time_value) %>%
-    dplyr::relocate(dt, .before = value)
+  x <- x %>% dplyr::mutate(dt = as.numeric(sub("value", "", .data$dt))) %>%
+    dplyr::relocate(
+      .data$data_source, .data$signal, .data$geo_value, .data$time_value
+    ) %>%
+    dplyr::relocate(.data$dt, .before = .data$value)
 
   # Change class and return
   class(x) <- c("covidcast_signal_long", "data.frame")
@@ -318,7 +323,7 @@ covidcast_wider <- function(x) {
 
   # Now deal with dt column
   x <- x %>%
-    dplyr::group_by(geo_value, time_value) %>%
+    dplyr::group_by(.data$geo_value, .data$time_value) %>%
     tidyr::pivot_wider(names_from = c("dt", "data_source", "signal"),
                        names_prefix = "value:",
                        names_sep = "_",

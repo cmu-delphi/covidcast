@@ -95,7 +95,7 @@ name_to_fips <- function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 
   # Restrict to a particular state, if we're asked to
   if (!is.null(state)) {
-    df <- df %>% dplyr::filter(STNAME == abbr_to_name(toupper(state)))
+    df <- df %>% dplyr::filter(.data$STNAME == abbr_to_name(toupper(state)))
   }
 
   # Now perform the grep-based look up
@@ -110,7 +110,7 @@ name_to_cbsa <- function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all"), state = NULL) {
   # Restrict msa_census to metro areas
   df <- dplyr::filter(
-    covidcast::msa_census, LSAD == "Metropolitan Statistical Area"
+    covidcast::msa_census, .data$LSAD == "Metropolitan Statistical Area"
   )
 
   # Restrict to a particular state, if we're asked to
@@ -169,7 +169,7 @@ cbsa_to_name <- function(code, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
   # Restrict msa_census to metro areas
   df <- dplyr::filter(
-    covidcast::msa_census, LSAD == "Metropolitan Statistical Area"
+    covidcast::msa_census, .data$LSAD == "Metropolitan Statistical Area"
   )
 
   # Now perform the grep-based look up
@@ -204,7 +204,7 @@ cbsa_to_name <- function(code, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 name_to_abbr <- function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
   # First get rid of United States from state_census
-  df <- covidcast::state_census %>% dplyr::filter(STATE > 0)
+  df <- covidcast::state_census %>% dplyr::filter(.data$STATE > 0)
 
   # Now perform the grep-based look up
   grep_lookup(key = name, keys = df$NAME, values = df$ABBR,
@@ -238,7 +238,7 @@ name_to_abbr <- function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 abbr_to_name <- function(abbr, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
   # First get rid of United States from state_census
-  df <- covidcast::state_census %>% dplyr::filter(STATE > 0)
+  df <- covidcast::state_census %>% dplyr::filter(.data$STATE > 0)
 
   # Perform the grep-based look up
   grep_lookup(key = abbr, keys = df$ABBR, values = df$NAME,
@@ -276,8 +276,8 @@ abbr_to_fips <- function(abbr, ignore.case = TRUE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
   # First get rid of United States from state_census, then convert FIPS codes to
   # appropriate character format
-  df <- covidcast::state_census %>% dplyr::filter(STATE > 0) %>%
-    dplyr::mutate(STATE = format_state_fips(STATE))
+  df <- covidcast::state_census %>% dplyr::filter(.data$STATE > 0) %>%
+    dplyr::mutate(STATE = format_state_fips(.data$STATE))
 
   # Now perform the grep-based look up
   grep_lookup(key = abbr, keys = df$ABBR, values = df$STATE,
@@ -320,8 +320,8 @@ fips_to_abbr <- function(code, ignore.case = TRUE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
   # First get rid of United States from state_census, then convert FIPS codes
   # to appropriate character format
-  df <- covidcast::state_census %>% dplyr::filter(STATE > 0) %>%
-    dplyr::mutate(STATE = format_state_fips(STATE))
+  df <- covidcast::state_census %>% dplyr::filter(.data$STATE > 0) %>%
+    dplyr::mutate(STATE = format_state_fips(.data$STATE))
 
   # Now perform the grep-based look up
   grep_lookup(key = code, keys = df$STATE, values = df$ABBR,

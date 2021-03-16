@@ -40,22 +40,26 @@ covidcast_cor <- function(x, y, dt_x = 0, dt_y = 0,
 
   # Make sure that we have a complete record of dates for each geo_value (fill
   # with NAs as necessary)
-  z_all <- z %>% dplyr::group_by(geo_value) %>%
-    dplyr::summarize(time_value = seq.Date(as.Date(min(time_value)),
-                                           as.Date(max(time_value)),
-                                           by = "day")) %>%
-    dplyr::ungroup()
+  z_all <- dplyr::group_by(z, .data$geo_value)
+  z_all <- dplyr::summarize(z_all,
+                            time_value = seq.Date(
+                              as.Date(min(.data$time_value)),
+                              as.Date(max(.data$time_value)),
+                              by = "day")
+                            )
+  z_all <- dplyr::ungroup(z_all)
+
   z <- dplyr::full_join(z, z_all, by = c("geo_value", "time_value"))
 
   # Perform time shifts, then compute appropriate correlations and return
-  z <- dplyr::group_by(z, geo_value)
-  z <- dplyr::arrange(z, time_value)
-  z <- dplyr::mutate(z, value.x = shift(value.x, n = dt_x),
-                     value.y = shift(value.y, n = dt_y))
+  z <- dplyr::group_by(z, .data$geo_value)
+  z <- dplyr::arrange(z, .data$time_value)
+  z <- dplyr::mutate(z, value.x = shift(.data$value.x, n = dt_x),
+                     value.y = shift(.data$value.y, n = dt_y))
   z <- dplyr::ungroup(z, )
   z <- dplyr::group_by(z, dplyr::across(dplyr::all_of(by)))
   z <- dplyr::summarize(z, value = cor(
-    x = value.x, y = value.y, use = use, method = method
+    x = .data$value.x, y = .data$value.y, use = use, method = method
   ))
 
   return(z)

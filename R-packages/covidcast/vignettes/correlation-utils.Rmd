@@ -34,7 +34,7 @@ summary(iprop)
 ```
 
 ```
-A `covidcast_signal` data frame with 550032 rows and 9 columns.
+A `covidcast_signal` dataframe with 550032 rows and 9 columns.
 
 data_source : jhu-csse
 signal      : confirmed_7dav_incidence_prop
@@ -55,7 +55,7 @@ summary(dprop)
 ```
 
 ```
-A `covidcast_signal` data frame with 550032 rows and 9 columns.
+A `covidcast_signal` dataframe with 550032 rows and 9 columns.
 
 data_source : jhu-csse
 signal      : deaths_7dav_incidence_prop

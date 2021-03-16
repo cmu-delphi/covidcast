@@ -1,3 +1,13 @@
+# covidcast 0.4.2
+
+Changes to prepare for release on CRAN.
+
+## Major changes
+
+- Removed extra variables in the metadata tables.
+
+- Storing geographic data as compressed geojson files.
+
 # covidcast 0.4.1
 
 Released January 19, 2021.

@@ -1,10 +1,13 @@
 Package: covidcast
 Type: Package
 Title: Client for Delphi's COVIDcast Epidata API
-Version: 0.4.1
-Date: 2021-01-13
+Version: 0.4.2
+Date: 2021-03-16
 Authors@R: 
   c(
+    person(given = "Taylor",
+           family = "Arnold",
+           role = "aut"),
     person(given = "Jacob",
            family = "Bien",
            role = "aut"),
@@ -46,8 +49,6 @@ Imports:
     ggplot2,
     grDevices,
     httr,
-    jsonlite,
-    maptools,
     MMWRweek,
     purrr,
     rlang,

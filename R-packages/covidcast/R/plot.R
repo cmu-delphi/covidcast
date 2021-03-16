@@ -140,7 +140,7 @@ plot.covidcast_signal <- function(x,
   if (plot_type == "choro" || plot_type == "bubble") {
     if (!is.null(include)) {
       include <- toupper(include)
-      no_match <- which(!(include %in% c(state.abb, "DC")))
+      no_match <- which(!(include %in% c(datasets::state.abb, "DC")))
 
       if (length(no_match) > 0) {
         warn("'include' must only contain US state abbreviations or 'DC'.",
@@ -264,23 +264,20 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
 
   # Make background layer for maps.  For states view this isn't
   # necessary but it just hides in the background
-  map_df <- sf::st_read(system.file(
-    "shapefiles/state/cb_2019_us_state_5m.shp",
-    package = "covidcast"),
-    quiet = TRUE)
+  map_df <- read_geojson_data("state")
   background_crs <- sf::st_crs(map_df)
   map_df$STATEFP <- as.character(map_df$STATEFP)
   map_df <- map_df %>% dplyr::mutate(
-    is_alaska = STATEFP == '02',
-    is_hawaii = STATEFP == '15',
-    is_pr = STATEFP == '72',
-    is_state = as.numeric(STATEFP) < 57)
+    is_alaska = .data$STATEFP == '02',
+    is_hawaii = .data$STATEFP == '15',
+    is_pr = .data$STATEFP == '72',
+    is_state = as.numeric(.data$STATEFP) < 57)
 
   # Set megacounty colors here
   if (attributes(x)$metadata$geo_type == "county") {
     map_df <- map_df %>% dplyr::mutate(
-      color = ifelse(paste0(STATEFP, "000") %in% geo,
-                     col_fun(val[paste0(STATEFP, "000")], alpha = alpha),
+      color = ifelse(paste0(.data$STATEFP, "000") %in% geo,
+                     col_fun(val[paste0(.data$STATEFP, "000")], alpha = alpha),
                      missing_col))
   }
   # Else, just set background to missing color
@@ -289,7 +286,7 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
   }
 
   if (length(include) > 0) {
-    map_df <- map_df %>% dplyr::filter(.$STUSPS %in% include)
+    map_df <- map_df %>% dplyr::filter(.data$STUSPS %in% include)
   }
 
   main_df <- shift_main(map_df)
@@ -306,7 +303,7 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
   geom_args <- list()
   geom_args$color <- border_col
   geom_args$size <- border_size
-  geom_args$mapping <- aes(geometry=geometry)
+  geom_args$mapping <- ggplot2::aes_string(geometry="geometry")
 
   geom_args$fill <- main_col
   geom_args$data <- main_df
@@ -323,80 +320,80 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
 
   # Create the choropleth colors for counties
   if (attributes(x)$metadata$geo_type == "county") {
-    map_df <- sf::st_read(system.file(
-      "shapefiles/county/cb_2019_us_county_5m.shp",
-      package = "covidcast"),
-      quiet = TRUE)
+    map_df <- read_geojson_data("county")
+
     map_df$STATEFP <- as.character(map_df$STATEFP)
     map_df$GEOID <- as.character(map_df$GEOID)
     # Get rid of unobserved counties and megacounties
     # Those are taken care of by background layer
     # Then set color for those observed counties
-    map_df <- map_df %>% dplyr::filter((GEOID %in% geo) & !(COUNTYFP == "000")
+    map_df <- map_df %>% dplyr::filter((.data$GEOID %in% geo) &
+                                       !(.data$COUNTYFP == "000")
       ) %>% dplyr::mutate(
-        is_alaska = STATEFP == '02',
-        is_hawaii = STATEFP == '15',
-        is_pr = STATEFP == '72',
-        is_state = as.numeric(STATEFP) < 57,
-        color = col_fun(val[GEOID]))
+        is_alaska = .data$STATEFP == '02',
+        is_hawaii = .data$STATEFP == '15',
+        is_pr = .data$STATEFP == '72',
+        is_state = as.numeric(.data$STATEFP) < 57,
+        color = col_fun(val[.data$GEOID]))
 
     if (length(include) > 0) {
       map_df <- map_df %>%
-        dplyr::filter(fips_to_abbr(paste0(.$STATEFP, "000")) %in% include)
+        dplyr::filter(fips_to_abbr(paste0(.data$STATEFP, "000")) %in% include)
     }
   }
 
   # Create the choropleth colors for states
   else if (attributes(x)$metadata$geo_type == "state") {
-    map_df <- sf::st_read(system.file(
-      "shapefiles/state/cb_2019_us_state_5m.shp",
-      package = "covidcast"),
-      quiet = TRUE)
+    map_df <- read_geojson_data("state")
+
     background_crs <- sf::st_crs(map_df)
     map_df$STATEFP <- as.character(map_df$STATEFP)
     map_df <- map_df %>% dplyr::mutate(
-      is_alaska = STATEFP == '02',
-      is_hawaii = STATEFP == '15',
-      is_pr = STATEFP == '72',
-      is_state = as.numeric(STATEFP) < 57,
-      color = ifelse(tolower(STUSPS) %in% geo,
-                     col_fun(val[tolower(STUSPS)]),
+      is_alaska = .data$STATEFP == '02',
+      is_hawaii = .data$STATEFP == '15',
+      is_pr = .data$STATEFP == '72',
+      is_state = as.numeric(.data$STATEFP) < 57,
+      color = ifelse(tolower(.data$STUSPS) %in% geo,
+                     col_fun(val[tolower(.data$STUSPS)]),
                      missing_col))
     if (length(include) > 0) {
-      map_df <- map_df %>% dplyr::filter(.$STUSPS %in% include)
+      map_df <- map_df %>% dplyr::filter(.data$STUSPS %in% include)
     }
   }
 
   else if (attributes(x)$metadata$geo_type == "msa") {
-    map_df <- sf::st_read(system.file(
-      "shapefiles/msa/cb_2019_us_cbsa_5m.shp",
-      package = "covidcast"),
-      quiet = TRUE)
+    map_df <- read_geojson_data("msa")
+
 
     # only get metro and not micropolitan areas
     map_df <- map_df %>% dplyr::filter(map_df$LSAD == 'M1')
     if (length(include) > 0) {
       # Last two letters are state abbreviation
       map_df <- map_df %>% dplyr::filter(
-        substr(.$NAME, nchar(.$NAME) - 1, nchar(.$NAME)) %in% include)
+        substr(.data$NAME, nchar(.data$NAME) - 1,
+               nchar(.data$NAME)) %in% include)
     }
     map_df$NAME <- as.character(map_df$NAME)
     map_df <- map_df %>% dplyr::mutate(
-      is_alaska = substr(NAME, nchar(NAME) - 1, nchar(NAME)) == 'AK',
-      is_hawaii = substr(NAME, nchar(NAME) - 1, nchar(NAME)) == 'HI',
-      is_pr = substr(NAME, nchar(NAME) - 1, nchar(NAME)) == 'PR',
-      color = ifelse(GEOID %in% geo, col_fun(val[GEOID]), missing_col)
+      is_alaska = substr(
+        .data$NAME, nchar(.data$NAME) - 1, nchar(.data$NAME)) == 'AK',
+      is_hawaii = substr(
+        .data$NAME, nchar(.data$NAME) - 1, nchar(.data$NAME)) == 'HI',
+      is_pr = substr(
+        .data$NAME, nchar(.data$NAME) - 1, nchar(.data$NAME)) == 'PR',
+      color = ifelse(
+        .data$GEOID %in% geo, col_fun(val[.data$GEOID]), missing_col)
     )
   }
 
   else if (attributes(x)$metadata$geo_type == "hrr") {
-    map_df <- sf::st_read(system.file(
-      "shapefiles/hrr/geo_export_ad86cff5-e5ed-432e-9ec2-2ce8732099ee.shp",
-      package = "covidcast"),
-      quiet = TRUE)
+    map_df <- read_geojson_data("hrr")
+
     if (length(include) > 0) {
       # First two letters are state abbreviation
-      map_df <- map_df %>% dplyr::filter(substr(.$hrr_name, 1, 2) %in% include)
+      map_df <- map_df %>% dplyr::filter(
+        substr(.data$hrr_name, 1, 2) %in% include
+      )
     }
     map_df <- sf::st_transform(map_df, background_crs)
     hrr_shift <- sf::st_geometry(map_df) + c(0, -0.185)
@@ -404,14 +401,15 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
     map_df <- sf::st_set_crs(map_df, background_crs)
     map_df$hrr_name <- as.character(map_df$hrr_name)
     map_df <- map_df %>% dplyr::mutate(
-      is_alaska = substr(hrr_name, 1, 2) == 'AK',
-      is_hawaii = substr(hrr_name, 1, 2) == 'HI',
-      is_pr = substr(hrr_name, 1, 2) == 'PR',
+      is_alaska = substr(.data$hrr_name, 1, 2) == 'AK',
+      is_hawaii = substr(.data$hrr_name, 1, 2) == 'HI',
+      is_pr = substr(.data$hrr_name, 1, 2) == 'PR',
       # use the HRR numbers to index the named val vector -- but convert to
       # character, otherwise the indices will be positional, not using the
       # names.
       color = ifelse(
-        hrr_num %in% geo, col_fun(val[as.character(hrr_num)]), missing_col
+        .data$hrr_num %in% geo,
+        col_fun(val[as.character(.data$hrr_num)]), missing_col
       )
     )
   }
@@ -431,7 +429,7 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
   geom_args <- list()
   geom_args$color <- border_col
   geom_args$size <- border_size
-  geom_args$mapping <- aes(geometry=geometry)
+  geom_args$mapping <- ggplot2::aes_string(geometry="geometry")
   coord_args <- list()
 
   geom_args$fill <- main_col
@@ -452,7 +450,7 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
   if (is.null(breaks)) {
     # Create legend breaks and legend labels, if we need to
     n <- params$legend_n
-    if (is.null(n)) { n <- 8 }
+    if (is.null(n)) { n <- 8 }
     legend_breaks <- seq(range[1], range[2], len = n)
     legend_labels <- round(legend_breaks, legend_digits)
 
@@ -462,7 +460,8 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
 
     # Now the legend layer (hidden + scale)
     hidden_df <- data.frame(x = rep(Inf, n), z = legend_breaks)
-    hidden_layer <- ggplot2::geom_point(aes(x = x, y = x, color = z),
+    hidden_layer <- ggplot2::geom_point(ggplot2::aes_string(
+      x = "x", y = "x", color = "z"),
                                        data = hidden_df, alpha = 0)
     guide <- ggplot2::guide_colorbar(title = NULL, horizontal = TRUE,
                                     barheight = legend_height,
@@ -483,8 +482,10 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
 
     # Now the legend layer (hidden + scale)
     hidden_df <- data.frame(x = rep(Inf, n), z = as.factor(legend_breaks))
-    hidden_layer <- ggplot2::geom_polygon(aes(x = x, y = x, fill = z),
-                                         data = hidden_df, alpha = 0)
+    hidden_layer <- ggplot2::geom_polygon(
+      ggplot2::aes_string(x = "x", y = "x", fill = "z"),
+      data = hidden_df, alpha = 0
+    )
     guide <- ggplot2::guide_legend(title = NULL, horizontal = TRUE, nrow = 1,
                                   keyheight = legend_height,
                                   keywidth = legend_width / n,
@@ -590,65 +591,61 @@ plot_bubble <- function(x, time_value = NULL, include = c(), range = NULL,
   # Grab the values
   given_time_value <- time_value
   df <- x %>%
-    dplyr::filter(time_value == given_time_value) %>%
-    dplyr::select(val = value, geo = geo_value)
+    dplyr::filter(.data$time_value == given_time_value) %>%
+    dplyr::select(val = .data$value, geo = .data$geo_value)
   val <- df$val
   geo <- df$geo
   names(val) <- geo
 
   # Grap the map data frame for counties
   if (attributes(x)$metadata$geo_type == "county") {
-    map_df <- sf::st_read(system.file(
-      "shapefiles/county/cb_2019_us_county_5m.shp",
-      package = "covidcast"),
-      quiet = TRUE)
+    map_df <- read_geojson_data("county")
+
     map_df$STATEFP <- as.character(map_df$STATEFP)
     map_df$GEOID <- as.character(map_df$GEOID)
     # Get rid of megacounties
     # Set color for observed states as white, missing as missing_col
     # Set bubble size for all observed states
     map_df <- map_df %>%
-      dplyr::filter(!(COUNTYFP == "000")) %>%
+      dplyr::filter(!(.data$COUNTYFP == "000")) %>%
       dplyr::mutate(
-        is_alaska = STATEFP == '02',
-        is_hawaii = STATEFP == '15',
-        is_pr = STATEFP == '72',
-        is_state = as.numeric(STATEFP) < 57,
-        back_color = ifelse(GEOID %in% geo, "white", missing_col),
-        bubble_val = ifelse(GEOID %in% geo,
-                            dis_fun(val[GEOID]),
+        is_alaska = .data$STATEFP == '02',
+        is_hawaii = .data$STATEFP == '15',
+        is_pr = .data$STATEFP == '72',
+        is_state = as.numeric(.data$STATEFP) < 57,
+        back_color = ifelse(.data$GEOID %in% geo, "white", missing_col),
+        bubble_val = ifelse(.data$GEOID %in% geo,
+                            dis_fun(val[.data$GEOID]),
                             0))
 
     if (length(include) > 0) {
       map_df <- map_df %>%
-        dplyr::filter(fips_to_abbr(paste0(.$STATEFP, "000")) %in% include)
+        dplyr::filter(fips_to_abbr(paste0(.data$STATEFP, "000")) %in% include)
     }
   }
 
   # Grap the map data frame for states
   else if (attributes(x)$metadata$geo_type == "state") {
-    map_df <- sf::st_read(system.file(
-      "shapefiles/state/cb_2019_us_state_5m.shp",
-      package = "covidcast"),
-      quiet = TRUE)
+    map_df <- read_geojson_data("state")
+
     map_geo <- tolower(map_df$STUSPS)
     background_crs <- sf::st_crs(map_df)
     map_df$STATEFP <- as.character(map_df$STATEFP)
     # Set color for observed states as white, missing as missing_col
     # Set bubble size for all observed states
     map_df <- map_df %>% dplyr::mutate(
-      is_alaska = STATEFP == '02',
-      is_hawaii = STATEFP == '15',
-      is_pr = STATEFP == '72',
-      is_state = as.numeric(STATEFP) < 57,
-      back_color = ifelse(tolower(STUSPS) %in% geo, "white", missing_col),
-      bubble_val = ifelse(tolower(STUSPS) %in% geo,
-                          dis_fun(val[tolower(STUSPS)]),
+      is_alaska = .data$STATEFP == '02',
+      is_hawaii = .data$STATEFP == '15',
+      is_pr = .data$STATEFP == '72',
+      is_state = as.numeric(.data$STATEFP) < 57,
+      back_color = ifelse(tolower(.data$STUSPS) %in% geo, "white", missing_col),
+      bubble_val = ifelse(tolower(.data$STUSPS) %in% geo,
+                          dis_fun(val[tolower(.data$STUSPS)]),
                           NA))
 
     if (length(include) > 0) {
       map_df <- map_df %>%
-        dplyr::filter(.$STUSPS %in% include)
+        dplyr::filter(.data$STUSPS %in% include)
     }
   }
 
@@ -679,7 +676,7 @@ plot_bubble <- function(x, time_value = NULL, include = c(), range = NULL,
   geom_args <- list()
   geom_args$color <- border_col
   geom_args$size <- border_size
-  geom_args$mapping <- aes(geometry=geometry)
+  geom_args$mapping <- ggplot2::aes_string(geometry="geometry")
   geom_args$fill <- main_df$back_color
   geom_args$data <- main_df
   main_layer <- do.call(ggplot2::geom_sf, geom_args)
@@ -707,7 +704,9 @@ plot_bubble <- function(x, time_value = NULL, include = c(), range = NULL,
 
   # Create the bubble layers
   geom_args <- list()
-  geom_args$mapping <- aes(geometry = geometry, size = bubble_val)
+  geom_args$mapping <- ggplot2::aes_string(
+    geometry = "geometry", size = "bubble_val"
+  )
   geom_args$color <- col
   geom_args$alpha <- alpha
   geom_args$na.rm <- TRUE
@@ -758,7 +757,9 @@ plot_line <- function(x, range = NULL, title = NULL, params = list()) {
   if (is.null(stderr_alpha)) stderr_alpha <- 0.5
 
   # Grab the values
-  df <- x %>% dplyr::select(value, time_value, geo_value, stderr)
+  df <- x %>% dplyr::select(
+    .data$value, .data$time_value, .data$geo_value, .data$stderr
+  )
 
   # Set the range, if we need to
   if (is.null(range)) range <- base::range(df$value, na.rm = TRUE)
@@ -773,18 +774,20 @@ plot_line <- function(x, range = NULL, title = NULL, params = list()) {
   # Create lim, line, and ribbon layers
   aes <- ggplot2::aes
   lim_layer <- ggplot2::coord_cartesian(ylim = range)
-  line_layer <- ggplot2::geom_line(aes(y = value, color = geo_value,
-                                      group = geo_value))
+  line_layer <- ggplot2::geom_line(ggplot2::aes_string(
+    y = "value", color = "geo_value", group = "geo_value"
+  ))
   ribbon_layer <- NULL
   if (stderr_bands) {
-    ribbon_layer <- ggplot2::geom_ribbon(aes(ymin = value - stderr,
-                                            ymax = value + stderr,
-                                            fill = geo_value),
-                                        alpha = stderr_alpha)
+    df$ymin <- df$value - df$stderr
+    df$ymax <- df$value + df$stderr
+    ribbon_layer <- ggplot2::geom_ribbon(ggplot2::aes_string(
+      ymin = "ymin", ymax = "ymax", fill = "geo_value"
+    ), alpha = stderr_alpha)
   }
 
   # Put it all together and return
-  return(ggplot2::ggplot(aes(x = time_value), data = df) +
+  return(ggplot2::ggplot(ggplot2::aes_string(x = "time_value"), data = df) +
          line_layer + ribbon_layer + lim_layer + label_layer + theme_layer)
 }
 
@@ -806,7 +809,7 @@ hawaii_crs <- '+proj=aea +lat_1=8 +lat_2=18 +lat_0=13 +lon_0=-157 +x_0=0
 # and rotate/scale them for the plots.
 
 shift_pr <- function(map_df) {
-  pr_df <- map_df %>% dplyr::filter(.$is_pr)
+  pr_df <- map_df %>% dplyr::filter(.data$is_pr)
   pr_df <- sf::st_transform(pr_df, final_crs)
   pr_shift <- sf::st_geometry(pr_df) + c(-0.9e+6, 1e+6)
   pr_df <- sf::st_set_geometry(pr_df, pr_shift)
@@ -823,7 +826,7 @@ shift_pr <- function(map_df) {
 }
 
 shift_alaska <- function(map_df) {
-  alaska_df <- map_df %>% dplyr::filter(.$is_alaska)
+  alaska_df <- map_df %>% dplyr::filter(.data$is_alaska)
   alaska_df <- sf::st_transform(alaska_df, alaska_crs)
   alaska_scale <- sf::st_geometry(alaska_df) * 0.35
   alaska_df <- sf::st_set_geometry(alaska_df, alaska_scale)
@@ -838,7 +841,7 @@ shift_alaska <- function(map_df) {
 }
 
 shift_hawaii <- function(map_df){
-  hawaii_df <- map_df %>% dplyr::filter(.$is_hawaii)
+  hawaii_df <- map_df %>% dplyr::filter(.data$is_hawaii)
   hawaii_df <- sf::st_transform(hawaii_df, hawaii_crs)
   hawaii_shift <- sf::st_geometry(hawaii_df) + c(-1e+6, -2e+6)
   hawaii_df <- sf::st_set_geometry(hawaii_df, hawaii_shift)
@@ -852,12 +855,21 @@ shift_hawaii <- function(map_df){
 
 shift_main <- function(map_df){
   main_df <- map_df %>% dplyr::filter(
-      !.$is_alaska) %>% dplyr::filter(
-        !.$is_hawaii) %>% dplyr::filter(!.$is_pr)
+      !.data$is_alaska) %>% dplyr::filter(
+        !.data$is_hawaii) %>% dplyr::filter(!.data$is_pr)
   # Remove other territories if that attribute is there
   if ("is_state" %in% colnames(main_df)) {
-    main_df <- main_df %>% dplyr::filter(.$is_state)
+    main_df <- main_df %>% dplyr::filter(.data$is_state)
   }
   main_df <- sf::st_transform(main_df, final_crs)
   return(main_df)
+}
+
+read_geojson_data <- function(name) {
+  fpath <- system.file(
+    sprintf("shapefiles/%s.geojson.bz2", name), package = "covidcast"
+  )
+  geojson <- paste(readLines(fpath), collapse = "")
+  map_df <- sf::st_read(dsn = geojson, quiet = TRUE)
+  map_df
 }

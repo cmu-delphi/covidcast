@@ -222,8 +222,8 @@ MAX_RESULTS <- 3649
 #'   [`as.covidcast_signal()`], [`county_census`], [`msa_census`],
 #'   [`state_census`]
 #' @export
-#' @importFrom rlang abort
-#' @importFrom dplyr %>%
+#' @importFrom rlang abort `:=`
+#' @importFrom dplyr `%>%`
 covidcast_signal <- function(data_source, signal,
                              start_day = NULL, end_day = NULL,
                              geo_type = c("county", "hrr", "msa", "dma",
@@ -685,14 +685,14 @@ summary.covidcast_meta <- function(object, ...) {
               length(unique(paste(x$data_source, x$signal)))))
   cat("Summary:\n\n")
   df <- suppressMessages(
-    x %>% dplyr::group_by(data_source, signal) %>%
-    dplyr::summarize(county = ifelse("county" %in% geo_type, "*", ""),
-                     msa = ifelse("msa" %in% geo_type, "*", ""),
-                     dma = ifelse("dma" %in% geo_type, "*", ""),
-                     hrr = ifelse("hrr" %in% geo_type, "*", ""),
-                     state = ifelse("state" %in% geo_type, "*", ""),
-                     hhs = ifelse("hhs" %in% geo_type, "*", ""),
-                     nation = ifelse("nation" %in% geo_type, "*", "")
+    x %>% dplyr::group_by(.data$data_source, .data$signal) %>%
+    dplyr::summarize(county = ifelse("county" %in% .data$geo_type, "*", ""),
+                     msa = ifelse("msa" %in% .data$geo_type, "*", ""),
+                     dma = ifelse("dma" %in% .data$geo_type, "*", ""),
+                     hrr = ifelse("hrr" %in% .data$geo_type, "*", ""),
+                     state = ifelse("state" %in% .data$geo_type, "*", ""),
+                     hhs = ifelse("hhs" %in% .data$geo_type, "*", ""),
+                     nation = ifelse("nation" %in% .data$geo_type, "*", "")
                      ) %>%
     dplyr::ungroup()
   )
@@ -705,9 +705,9 @@ summary.covidcast_meta <- function(object, ...) {
 specific_meta <- function(data_source, signal, geo_type, time_type = "day") {
   meta_info <- covidcast_meta()
   relevant_meta <- meta_info[meta_info$data_source == data_source &
-                              meta_info$signal == signal &
-                              meta_info$geo_type == geo_type &
-                              meta_info$time_type == time_type, ]
+                             meta_info$signal == signal &
+                             meta_info$geo_type == geo_type &
+                             meta_info$time_type == time_type, ]
 
   # If no metadata for source/signal/geo_type combo, still return minimal data.
   # Use maximum observed values of desired geo_type as an upper bound for
@@ -797,8 +797,8 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
       desired_geos <- tolower(unique(geo_value))
 
       returned_geo_array <- response %>%
-        dplyr::select(geo_value, time_value) %>%
-        dplyr::group_by(time_value) %>%
+        dplyr::select(geo_value, .data$time_value) %>%
+        dplyr::group_by(.data$time_value) %>%
         dplyr::summarize(geo_value = list(geo_value))
       returned_time_values <- returned_geo_array$time_value
 

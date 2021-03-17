@@ -73,7 +73,7 @@ signals, potentially from multiple data sources." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
       </span>
     </div>
 
@@ -81,7 +81,7 @@ signals, potentially from multiple data sources." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -119,7 +119,7 @@ signals, potentially from multiple data sources." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -163,14 +163,14 @@ signals, potentially from multiple data sources.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data_source</th>
-      <td><p>String identifying the data source to query. See the
-<a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>signal documentation</a>
+      <td><p>String identifying the data source to query. See
+https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
 for a list of available data sources.</p></td>
     </tr>
     <tr>
       <th>signal</th>
       <td><p>String identifying the signal from that source to query. Again,
-see the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>signal documentation</a>
+see https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
 for a list of available signals.</p></td>
     </tr>
     <tr>
@@ -188,14 +188,16 @@ recent day data is available for this signal.</p></td>
     <tr>
       <th>geo_type</th>
       <td><p>The geography type for which to request this data, such as
-"county" or "state". Defaults to "county". See the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>geographic coding documentation</a>
+"county" or "state". Defaults to "county". See
+https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
 for details on which types are available.</p></td>
     </tr>
     <tr>
       <th>geo_values</th>
       <td><p>Which geographies to return. The default, "*", fetches all
 geographies. To fetch specific geographies, specify their IDs as a vector
-or list of strings. See the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>geographic coding documentation</a>
+or list of strings. See
+https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
 for details on how to specify these IDs.</p></td>
     </tr>
     <tr>
@@ -236,7 +238,8 @@ into a single data frame of either "wide" or "long" format using
 
     <p>The argument structure is just as in <code><a href='covidcast_signal.html'>covidcast_signal()</a></code>, except
 the first four arguments <code>data_source</code>, <code>signal</code>, <code>start_day</code>, <code>end_day</code>
-are permitted to be vectors. The first two arguments <code>data_source</code>, <code>signal</code> are
+are permitted to be vectors. The first two arguments <code>data_source</code>,
+'<code>signal</code> are
 recycled appropriately, in the calls to <code><a href='covidcast_signal.html'>covidcast_signal()</a></code>; see example
 below. The next two arguments <code>start_day</code>, <code>end_day</code>, unless <code>NULL</code>, must
 be either length 1 or N.</p>
@@ -263,7 +266,7 @@ be either length 1 or N.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

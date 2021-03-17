@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
       </span>
     </div>
 
@@ -39,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -77,7 +77,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -91,8 +91,7 @@
 
       
 
-      </header><link href="external-data_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="external-data_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
+      </header><script src="external-data_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>4. Combine external data sources and COVIDcast data</h1>
@@ -111,8 +110,8 @@
 <h2 class="hasAnchor">
 <a href="#loading-the-data" class="anchor"></a>Loading the data</h2>
 <p>We’ve saved a sample of the data in this package to use as an example. Let’s load it and examine a few columns using <code><a href="https://rdrr.io/pkg/knitr/man/kable.html">knitr::kable()</a></code> to print them nicely:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 
 <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"covid-tracking-project-oct-2020.csv"</span>,
                              package <span class="op">=</span> <span class="st">"covidcast"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
@@ -121,7 +120,7 @@
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">date</span>, <span class="va">state</span>, <span class="va">death</span>, <span class="va">deathIncrease</span>, <span class="va">hospitalizedCurrently</span>,
            <span class="va">hospitalizedIncrease</span><span class="op">)</span> <span class="op">%&gt;%</span>
     <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></pre></div>
+    <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">date</th>
@@ -193,8 +192,8 @@
 <code>geo_value</code>: the location, such as state or county, in the same form as returned by <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> (such as two-letter lowercase abbreviations for states and FIPS codes for counties)</li>
 </ul>
 <p>Other columns are preserved unchanged. (In particular, if an <code>issue</code> column is present, it is used as the issue date of each observation. This is important if your data source includes multiple revisions of each observation.) <code><a href="../reference/as.covidcast_signal.html">as.covidcast_signal()</a></code> also needs to know the <code>geo_type</code> (state, in this case) and source/signal name to apply to the data. With a bit of <a href="https://dplyr.tidyverse.org/">dplyr</a> data wrangling, we can do this easily:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/">covidcast</a></span><span class="op">)</span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/">covidcast</a></span><span class="op">)</span>
 
 <span class="va">hospitalized</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span>
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>time_value <span class="op">=</span> <span class="va">date</span>,
@@ -207,7 +206,7 @@
                         signal <span class="op">=</span> <span class="st">"hospitalized_increase"</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">hospitalized</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></pre></div>
+    <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">data_source</th>
@@ -224,7 +223,7 @@
 <td align="left">ak</td>
 <td align="left">2020-10-31</td>
 <td align="right">7</td>
-<td align="left">2021-01-19</td>
+<td align="left">2021-03-17</td>
 </tr>
 <tr class="even">
 <td align="left">covid-tracking</td>
@@ -232,7 +231,7 @@
 <td align="left">al</td>
 <td align="left">2020-10-31</td>
 <td align="right">0</td>
-<td align="left">2021-01-19</td>
+<td align="left">2021-03-17</td>
 </tr>
 <tr class="odd">
 <td align="left">covid-tracking</td>
@@ -240,7 +239,7 @@
 <td align="left">ar</td>
 <td align="left">2020-10-31</td>
 <td align="right">35</td>
-<td align="left">2021-01-19</td>
+<td align="left">2021-03-17</td>
 </tr>
 <tr class="even">
 <td align="left">covid-tracking</td>
@@ -248,7 +247,7 @@
 <td align="left">as</td>
 <td align="left">2020-10-31</td>
 <td align="right">0</td>
-<td align="left">2021-01-19</td>
+<td align="left">2021-03-17</td>
 </tr>
 <tr class="odd">
 <td align="left">covid-tracking</td>
@@ -256,7 +255,7 @@
 <td align="left">az</td>
 <td align="left">2020-10-31</td>
 <td align="right">68</td>
-<td align="left">2021-01-19</td>
+<td align="left">2021-03-17</td>
 </tr>
 <tr class="even">
 <td align="left">covid-tracking</td>
@@ -264,13 +263,13 @@
 <td align="left">ca</td>
 <td align="left">2020-10-31</td>
 <td align="right">0</td>
-<td align="left">2021-01-19</td>
+<td align="left">2021-03-17</td>
 </tr>
 </tbody>
 </table>
 <p>This allows us to make maps using the same functions used for other COVIDcast data:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">hospitalized</span>, plot_type <span class="op">=</span> <span class="st">"choro"</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">hospitalized</span>, plot_type <span class="op">=</span> <span class="st">"choro"</span><span class="op">)</span></code></pre></div>
 <pre><code>## Warning: Metadata for signal mean and standard deviation not available;
 ## defaulting to observed mean and standard deviation to set plot range.</code></pre>
 <p><img src="external-data_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
@@ -279,34 +278,34 @@
 <h2 class="hasAnchor">
 <a href="#analysis-alongside-other-signals" class="anchor"></a>Analysis alongside other signals</h2>
 <p>Now that our data is loaded as a <code>covidcast_signal</code> object, we can use it alongside other signals from the API. For example, let’s examine how new COVID hospitalizations correlate with outpatient doctor visits with deaths during October 2020, where we use death data as reported by the API.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="va">deaths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span><span class="st">"indicator-combination"</span>, <span class="st">"deaths_incidence_prop"</span>,
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">deaths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span><span class="st">"indicator-combination"</span>, <span class="st">"deaths_incidence_prop"</span>,
                            start_day <span class="op">=</span> <span class="st">"2020-10-01"</span>,
                            end_day <span class="op">=</span> <span class="st">"2020-10-31"</span>,
                            geo_type <span class="op">=</span> <span class="st">"state"</span><span class="op">)</span>
 
-<span class="fu"><a href="../reference/covidcast_cor.html">covidcast_cor</a></span><span class="op">(</span><span class="va">deaths</span>, <span class="va">hospitalized</span>, by <span class="op">=</span> <span class="st">"time_value"</span><span class="op">)</span></pre></div>
+<span class="fu"><a href="../reference/covidcast_cor.html">covidcast_cor</a></span><span class="op">(</span><span class="va">deaths</span>, <span class="va">hospitalized</span>, by <span class="op">=</span> <span class="st">"time_value"</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 31 x 2
 ##    time_value   value
 ##    &lt;date&gt;       &lt;dbl&gt;
-##  1 2020-10-01  0.146 
-##  2 2020-10-02  0.240 
-##  3 2020-10-03  0.0772
-##  4 2020-10-04  0.183 
-##  5 2020-10-05 -0.126 
-##  6 2020-10-06  0.160 
-##  7 2020-10-07  0.0513
-##  8 2020-10-08  0.0611
-##  9 2020-10-09  0.0447
-## 10 2020-10-10  0.138 
+##  1 2020-10-01  0.138 
+##  2 2020-10-02  0.246 
+##  3 2020-10-03  0.0697
+##  4 2020-10-04  0.210 
+##  5 2020-10-05 -0.0573
+##  6 2020-10-06  0.134 
+##  7 2020-10-07  0.0552
+##  8 2020-10-08  0.0561
+##  9 2020-10-09  0.0344
+## 10 2020-10-10  0.0905
 ## # … with 21 more rows</code></pre>
 <p>We can also use the tools provided by this package to place both signals into a single data frame for analysis. For example, to build a model that uses hospitalizations and other data to predict deaths, it may be convenient to produce a data frame where each row represents one state on one day, and each column is a variable (such as hospitalization or death). Using <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code>, this is easy:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="va">death_hosp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">deaths</span>, <span class="va">hospitalized</span><span class="op">)</span>,
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">death_hosp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">deaths</span>, <span class="va">hospitalized</span><span class="op">)</span>,
                                 format <span class="op">=</span> <span class="st">"wide"</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">death_hosp</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></pre></div>
+    <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <colgroup>
 <col width="8%">
@@ -322,40 +321,40 @@
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">ks</td>
-<td align="left">2020-10-26</td>
-<td align="right">-0.0343252</td>
-<td align="right">62</td>
-</tr>
-<tr class="even">
-<td align="left">wa</td>
-<td align="left">2020-10-29</td>
-<td align="right">0.1181894</td>
-<td align="right">25</td>
-</tr>
-<tr class="odd">
-<td align="left">mo</td>
-<td align="left">2020-10-19</td>
-<td align="right">-0.5376845</td>
+<td align="left">al</td>
+<td align="left">2020-10-01</td>
+<td align="right">0.0407898</td>
 <td align="right">0</td>
 </tr>
 <tr class="even">
-<td align="left">va</td>
-<td align="left">2020-10-24</td>
-<td align="right">0.4334827</td>
-<td align="right">16</td>
+<td align="left">ca</td>
+<td align="left">2020-10-01</td>
+<td align="right">0.2353702</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
-<td align="left">tx</td>
-<td align="left">2020-10-31</td>
-<td align="right">0.3069401</td>
+<td align="left">co</td>
+<td align="left">2020-10-01</td>
+<td align="right">0.0173649</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">fl</td>
+<td align="left">2020-10-01</td>
+<td align="right">0.5447501</td>
+<td align="right">213</td>
+</tr>
+<tr class="odd">
+<td align="left">il</td>
+<td align="left">2020-10-01</td>
+<td align="right">0.1815051</td>
 <td align="right">0</td>
 </tr>
 <tr class="even">
-<td align="left">ga</td>
-<td align="left">2020-10-29</td>
-<td align="right">0.4332501</td>
-<td align="right">146</td>
+<td align="left">in</td>
+<td align="left">2020-10-01</td>
+<td align="right">0.1485394</td>
+<td align="right">97</td>
 </tr>
 </tbody>
 </table>
@@ -373,7 +372,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

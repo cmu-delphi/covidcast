@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -118,7 +118,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -153,8 +153,18 @@
 whole, plus the District of Columbia and the Puerto Rico Commonwealth).
 Important columns:</p>
 <dl>
-<dt>NAME</dt><dd><p>Name of the state.</p></dd>
-<dt>POPESTIMATE2019</dt><dd><p>Estimate of the state's resident population in 2019.</p></dd>
+<dt>SUMLEV</dt><dd><p>Geographic summary level.</p></dd>
+<dt>REGION</dt><dd><p>Census Region code</p></dd>
+<dt>DIVISION</dt><dd><p>Census Division code</p></dd>
+<dt>STATE</dt><dd><p>State FIPS code</p></dd>
+<dt>NAME</dt><dd><p>Name of the state</p></dd>
+<dt>POPESTIMATE2019</dt><dd><p>Estimate of the state's resident population in
+2019.</p></dd>
+<dt>POPEST18PLUS2019</dt><dd><p>Estimate of the state's resident population in
+2019 that is over 18 years old.</p></dd>
+<dt>PCNT_POPEST18PLUS</dt><dd><p>Estimate of the percent of a state's resident
+population in 2019 that is over 18.</p></dd>
+<dt>ABBR</dt><dd><p>Postal abbreviation of the state</p></dd>
 
 </dl>
 
@@ -177,7 +187,7 @@ Important columns:</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

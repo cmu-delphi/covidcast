@@ -58,14 +58,11 @@ MAX_RESULTS <- 3649
 #'
 #' Obtains data for selected date ranges for all geographic regions of the
 #' United States. Available data sources and signals are documented in the
-#' [COVIDcast signal
-#' documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html).
+#' COVIDcast signal documentation.
 #' Most (but not all) data sources are available at the county level, but the
 #' API can also return data aggregated to metropolitan statistical areas,
 #' hospital referral regions, or states, as desired, by using the `geo_type`
-#' argument. View the [covidcast
-#' vignette](https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html)
-#' for detailed example usage.
+#' argument.
 #'
 #' For data on counties, metropolitan statistical areas, and states, this
 #' package provides the [`county_census`], [`msa_census`], and [`state_census`]
@@ -109,9 +106,7 @@ MAX_RESULTS <- 3649
 #' to that value. If a value was first issued on June 5th and never updated,
 #' asking for data issued on June 6th (using `issues` or `lag`) would *not*
 #' return that value, though asking for data `as_of` June 6th would. See the
-#' [covidcast
-#' vignette](https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html)
-#' for examples.
+#' covidcast vignette for examples.
 #'
 #' Note also that the API enforces a maximum result row limit; results beyond
 #' the maximum limit are truncated. This limit is sufficient to fetch
@@ -122,13 +117,11 @@ MAX_RESULTS <- 3649
 #' issued in this case. To see all results, split your query across multiple
 #' calls with different `issues` arguments.
 #'
-#' @param data_source String identifying the data source to query. See the
-#'   [signal
-#'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)
+#' @param data_source String identifying the data source to query. See
+#'   https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
 #'   for a list of available data sources.
 #' @param signal String identifying the signal from that source to query. Again,
-#'   see the [signal
-#'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)
+#'   see https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
 #'   for a list of available signals.
 #' @param start_day Query data beginning on this date. Date object, or string in
 #'   the form "YYYY-MM-DD". If `start_day` is `NULL`, defaults to first day data
@@ -137,13 +130,13 @@ MAX_RESULTS <- 3649
 #'   in the form "YYYY-MM-DD". If `end_day` is `NULL`, defaults to the most
 #'   recent day data is available for this signal.
 #' @param geo_type The geography type for which to request this data, such as
-#'   "county" or "state". Defaults to "county". See the [geographic coding
-#'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html)
+#'   "county" or "state". Defaults to "county". See
+#'   https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
 #'   for details on which types are available.
 #' @param geo_values Which geographies to return. The default, "*", fetches all
 #'   geographies. To fetch specific geographies, specify their IDs as a vector
-#'   or list of strings. See the [geographic coding
-#'   documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html)
+#'   or list of strings. See
+#'   https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
 #'   for details on how to specify these IDs.
 #' @param as_of Fetch only data that was available on or before this date,
 #'   provided as a `Date` object or string in the form "YYYY-MM-DD". If `NULL`,
@@ -229,12 +222,12 @@ MAX_RESULTS <- 3649
 #'   [`as.covidcast_signal()`], [`county_census`], [`msa_census`],
 #'   [`state_census`]
 #' @export
-#' @importFrom rlang abort
-#' @importFrom dplyr %>%
+#' @importFrom rlang abort `:=`
+#' @importFrom dplyr `%>%`
 covidcast_signal <- function(data_source, signal,
                              start_day = NULL, end_day = NULL,
-                             geo_type = c("county", "hrr", "msa", "dma", "state",
-                                          "hhs", "nation"),
+                             geo_type = c("county", "hrr", "msa", "dma",
+                                          "state", "hhs", "nation"),
                              geo_values = "*",
                              as_of = NULL, issues = NULL, lag = NULL,
                              time_type = c("day", "week")) {
@@ -351,16 +344,25 @@ as.covidcast_signal.covidcast_signal <- function(x, ...) {
 #' @export
 as.covidcast_signal.data.frame <- function(x,
                                            signal = NULL,
-                                           geo_type = c("county", "msa", "hrr", "dma", "state",
-                                                        "hhs", "nation"),
+                                           geo_type = c(
+                                             "county",
+                                             "msa",
+                                             "hrr",
+                                             "dma",
+                                             "state",
+                                             "hhs",
+                                             "nation"
+                                           ),
                                            time_type = c("day", "week"),
                                            data_source = "user",
                                            issue = NULL,
                                            metadata = list(),
                                            ...) {
   if (is.null(signal)) {
-    abort("when `x` is a data frame, signal name must be provided to as.covidcast_signal",
-          class = "covidcast_coerce_signal")
+    abort(paste0(c(
+      "when `x` is a data frame, signal name must",
+      " be provided to as.covidcast_signal"
+    ), collapse = ""), class = "covidcast_coerce_signal")
   }
 
   geo_type <- match.arg(geo_type)
@@ -388,18 +390,24 @@ as.covidcast_signal.data.frame <- function(x,
   }
 
   if (!("time_value" %in% names(x))) {
-    abort("`x` must contain a `time_value` column containing the time of each observation",
-          class = "covidcast_coerce_time_value")
+    abort(paste0(c(
+      "`x` must contain a `time_value` column",
+      " containing the time of each observation"
+    ), collapse = ""), class = "covidcast_coerce_time_value")
   }
 
   if (!("value" %in% names(x))) {
-    abort("`x` must contain a `value` column containing the value of each observation",
-          class = "covidcast_coerce_value")
+    abort(paste0(c(
+      "`x` must contain a `value` column",
+      " containing the value of each observation"
+    ), collapse = ""), class = "covidcast_coerce_value")
   }
 
   if (!("geo_value" %in% names(x))) {
-    abort("`x` must contain a `geo_value` column containing the location of each observation",
-          class = "covidcast_coerce_geo_value")
+    abort(paste0(c(
+      "`x` must contain a `geo_value` column",
+      " containing the location of each observation"
+    ), collapse = ""), class = "covidcast_coerce_geo_value")
   }
 
   # issue is optional; if omitted, use default
@@ -425,16 +433,16 @@ as.covidcast_signal.data.frame <- function(x,
 #'
 #' Prints a brief summary of the data source, signal, and geographic level, and
 #' then prints the underlying data frame, for an object returned by
-#' `covidcast_signal()`. 
+#' `covidcast_signal()`.
 #'
 #' @param x The `covidcast_signal` object.
-#' @param ... Additional arguments passed to `print.data.frame()` to print the 
+#' @param ... Additional arguments passed to `print.data.frame()` to print the
 #'   data.
 #'
 #' @method print covidcast_signal
 #' @export
-print.covidcast_signal = function(x, ...) {
-  cat(sprintf("A `covidcast_signal` data frame with %i rows and %i columns.\n\n",
+print.covidcast_signal <- function(x, ...) {
+  cat(sprintf("A `covidcast_signal` dataframe with %i rows and %i columns.\n\n",
               nrow(x), ncol(x)))
   cat(sprintf("%-12s: %s\n", "data_source", x$data_source[1]))
   cat(sprintf("%-12s: %s\n", "signal", x$signal[1]))
@@ -447,7 +455,7 @@ print.covidcast_signal = function(x, ...) {
 #' @method head covidcast_signal
 #' @importFrom utils head
 #' @export
-head.covidcast_signal = function(x, ...) {
+head.covidcast_signal <- function(x, ...) {
   head(as.data.frame(x), ...)
 }
 
@@ -464,9 +472,9 @@ head.covidcast_signal = function(x, ...) {
 #' @method summary covidcast_signal
 #' @importFrom stats median
 #' @export
-summary.covidcast_signal = function(object, ...) {
+summary.covidcast_signal <- function(object, ...) {
   x <- object
-  cat(sprintf("A `covidcast_signal` data frame with %i rows and %i columns.\n\n",
+  cat(sprintf("A `covidcast_signal` dataframe with %i rows and %i columns.\n\n",
               nrow(x), ncol(x)))
   cat(sprintf("%-12s: %s\n", "data_source", x$data_source[1]))
   cat(sprintf("%-12s: %s\n", "signal", x$signal[1]))
@@ -488,7 +496,8 @@ summary.covidcast_signal = function(object, ...) {
 #'
 #' @details The argument structure is just as in `covidcast_signal()`, except
 #'   the first four arguments `data_source`, `signal`, `start_day`, `end_day`
-#'   are permitted to be vectors. The first two arguments `data_source`, `signal` are
+#'   are permitted to be vectors. The first two arguments `data_source`,
+#'   '`signal` are
 #'   recycled appropriately, in the calls to `covidcast_signal()`; see example
 #'   below. The next two arguments `start_day`, `end_day`, unless `NULL`, must
 #'   be either length 1 or N.
@@ -511,8 +520,15 @@ summary.covidcast_signal = function(object, ...) {
 #' @export
 covidcast_signals <- function(data_source, signal,
                               start_day = NULL, end_day = NULL,
-                              geo_type = c("county", "hrr", "msa", "dma", "state",
-                                           "hhs", "nation"),
+                              geo_type = c(
+                                "county",
+                                "hrr",
+                                "msa",
+                                "dma",
+                                "state",
+                                "hhs",
+                                "nation"
+                              ),
                               geo_values = "*",
                               as_of = NULL, issues = NULL, lag = NULL) {
   N <- max(length(data_source), length(signal))
@@ -575,18 +591,18 @@ covidcast_signals <- function(data_source, signal,
 #'   \item{time_type}{Temporal resolution at which this signal is reported.
 #'   "day", for example, means the signal is reported daily.}
 #'   \item{num_locations}{Number of distinct geographic locations available for
-#'   this signal. For example, if `geo_type` is county, the number of counties
-#'   for which this signal has ever been reported.}
-#'   \item{min_value}{Smallest value that has ever been reported.}
-#'   \item{max_value}{Largest value that has ever been reported.}
-#'   \item{mean_value}{Arithmetic mean of all reported values.}
-#'   \item{stdev_value}{Sample standard deviation of all reported values.}
-#'   \item{max_issue}{Most recent issue date for this signal.}
-#'   \item{min_lag}{Smallest lag from observation to issue, in `time_type` units}
-#'   \item{max_lag}{Largest lag from observation to issue, in `time_type` units}
+#'  this signal. For example, if `geo_type` is county, the number of counties
+#'  for which this signal has ever been reported.}
+#'  \item{min_value}{Smallest value that has ever been reported.}
+#'  \item{max_value}{Largest value that has ever been reported.}
+#'  \item{mean_value}{Arithmetic mean of all reported values.}
+#'  \item{stdev_value}{Sample standard deviation of all reported values.}
+#'  \item{max_issue}{Most recent issue date for this signal.}
+#'  \item{min_lag}{Smallest lag from observation to issue, in `time_type` units}
+#'  \item{max_lag}{Largest lag from observation to issue, in `time_type` units}
 #'
 #' @references COVIDcast API sources and signals documentation:
-#'   \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
+#'  \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 #'
 #' @seealso [summary.covidcast_meta()]
 #'
@@ -630,7 +646,7 @@ covidcast_meta <- function() {
 #'
 #' @method print covidcast_meta
 #' @export
-print.covidcast_meta = function(x, ...) {
+print.covidcast_meta <- function(x, ...) {
   cat(sprintf("A `covidcast_meta` data frame with %i rows and %i columns.\n\n",
               nrow(x), ncol(x)))
   cat(sprintf("%-23s: %s\n", "Number of data sources",
@@ -645,7 +661,7 @@ print.covidcast_meta = function(x, ...) {
 #' @method head covidcast_meta
 #' @importFrom utils head
 #' @export
-head.covidcast_meta = function(x, ...) {
+head.covidcast_meta <- function(x, ...) {
   head(as.data.frame(x), ...)
 }
 
@@ -659,7 +675,7 @@ head.covidcast_meta = function(x, ...) {
 #'
 #' @method summary covidcast_meta
 #' @export
-summary.covidcast_meta = function(object, ...) {
+summary.covidcast_meta <- function(object, ...) {
   x <- object
   cat(sprintf("A `covidcast_meta` data frame with %i rows and %i columns.\n\n",
               nrow(x), ncol(x)))
@@ -669,14 +685,14 @@ summary.covidcast_meta = function(object, ...) {
               length(unique(paste(x$data_source, x$signal)))))
   cat("Summary:\n\n")
   df <- suppressMessages(
-    x %>% dplyr::group_by(data_source, signal) %>%
-    dplyr::summarize(county = ifelse("county" %in% geo_type, "*", ""),
-                     msa = ifelse("msa" %in% geo_type, "*", ""),
-                     dma = ifelse("dma" %in% geo_type, "*", ""),
-                     hrr = ifelse("hrr" %in% geo_type, "*", ""),
-                     state = ifelse("state" %in% geo_type, "*", ""),
-                     hhs = ifelse("hhs" %in% geo_type, "*", ""),
-                     nation = ifelse("nation" %in% geo_type, "*", "")
+    x %>% dplyr::group_by(.data$data_source, .data$signal) %>%
+    dplyr::summarize(county = ifelse("county" %in% .data$geo_type, "*", ""),
+                     msa = ifelse("msa" %in% .data$geo_type, "*", ""),
+                     dma = ifelse("dma" %in% .data$geo_type, "*", ""),
+                     hrr = ifelse("hrr" %in% .data$geo_type, "*", ""),
+                     state = ifelse("state" %in% .data$geo_type, "*", ""),
+                     hhs = ifelse("hhs" %in% .data$geo_type, "*", ""),
+                     nation = ifelse("nation" %in% .data$geo_type, "*", "")
                      ) %>%
     dplyr::ungroup()
   )
@@ -689,9 +705,9 @@ summary.covidcast_meta = function(object, ...) {
 specific_meta <- function(data_source, signal, geo_type, time_type = "day") {
   meta_info <- covidcast_meta()
   relevant_meta <- meta_info[meta_info$data_source == data_source &
-                              meta_info$signal == signal &
-                              meta_info$geo_type == geo_type &
-                              meta_info$time_type == time_type, ]
+                             meta_info$signal == signal &
+                             meta_info$geo_type == geo_type &
+                             meta_info$time_type == time_type, ]
 
   # If no metadata for source/signal/geo_type combo, still return minimal data.
   # Use maximum observed values of desired geo_type as an upper bound for
@@ -781,8 +797,8 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
       desired_geos <- tolower(unique(geo_value))
 
       returned_geo_array <- response %>%
-        dplyr::select(geo_value, time_value) %>%
-        dplyr::group_by(time_value) %>%
+        dplyr::select(geo_value, .data$time_value) %>%
+        dplyr::group_by(.data$time_value) %>%
         dplyr::summarize(geo_value = list(geo_value))
       returned_time_values <- returned_geo_array$time_value
 
@@ -886,7 +902,8 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   )
 
   if (length(params$geo_value) > 1) {
-    params$geo_values <- paste0(params$geo_value, collapse = ",") #convert to string
+    # convert to string
+    params$geo_values <- paste0(params$geo_value, collapse = ",")
     params$geo_value <- NULL
   }
   if (!is.null(as_of)) {
@@ -935,22 +952,24 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
 
 # Helper function to build a list of values and/or ranges
 .list <- function(values) {
-  if(!is.list(values) || ('from' %in% names(values) && 'to' %in% names(values))) {
+  if(!is.list(values) || (
+    'from' %in% names(values) && 'to' %in% names(values))) {
     values <- list(values)
   }
-  return(paste0(sapply(values, .listitem), collapse=','))
+  return(paste0(unlist(lapply(values, .listitem)), collapse=','))
 }
 
 # Helper function to request and parse epidata
 .request <- function(params) {
   # API call. Allow base API URL to be replaced, e.g. to use a staging/testing
   # server when needed.
-  response <- httr::GET(getOption("covidcast.base_url", default = COVIDCAST_BASE_URL),
-                        httr::user_agent("covidcastR"), query = params)
+  response <- httr::GET(
+    getOption("covidcast.base_url", default = COVIDCAST_BASE_URL),
+    httr::user_agent("covidcastR"), query = params)
   if (httr::status_code(response) == 414){
     response <- httr::POST(getOption("covidcast.base_url",
                            default = COVIDCAST_BASE_URL),
-                           httr::user_agent("covidcastR"), 
+                           httr::user_agent("covidcastR"),
                            body = params)
   }
 

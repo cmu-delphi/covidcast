@@ -68,7 +68,7 @@ function as it downloads the data; if you download particularly large amounts of
 data, you may prefer to allow the progress reporting so you know how long to
 wait.
 
-To get a basic summary of the returned data frame: 
+To get a basic summary of the returned data frame:
 
 ```{r}
 summary(cli)
@@ -81,8 +81,8 @@ argument:
 
 ```{r}
 cli <- suppressMessages(
-  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli", 
-                   start_day = "2020-05-01", end_day = "2020-05-07", 
+  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
+                   start_day = "2020-05-01", end_day = "2020-05-07",
                    geo_type = "state")
 )
 knitr::kable(head(cli))
@@ -93,8 +93,8 @@ the FIPS code for Allegheny County, Pennsylvania:
 
 ```{r}
 cli <- suppressMessages(
-  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli", 
-                   start_day = "2020-05-01", end_day = "2020-05-07", 
+  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
+                   start_day = "2020-05-01", end_day = "2020-05-07",
                    geo_type = "county", geo_value = "42003")
 )
 knitr::kable(head(cli))
@@ -187,15 +187,15 @@ meta <- covidcast_meta()
 knitr::kable(head(meta))
 ```
 
-The `covidcast_meta()` documentation describes the columns and their meanings. 
-The metadata data frame can be filtered and sliced as desired to obtain 
-information about signals of interest. To get a basic summary of the metadata: 
+The `covidcast_meta()` documentation describes the columns and their meanings.
+The metadata data frame can be filtered and sliced as desired to obtain
+information about signals of interest. To get a basic summary of the metadata:
 
 ```{r, eval = FALSE}
 summary(meta)
 ```
 
-(We silenced the evaluation because the output of `summary()` here is still 
+(We silenced the evaluation because the output of `summary()` here is still
 quite long.)
 
 ## Tracking issues and updates

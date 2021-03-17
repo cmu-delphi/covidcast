@@ -3,7 +3,7 @@ library(tibble)
 test_that("slide_by_geo works", {
     df <- tibble(
         geo_value = rep(c("a", "b"), each=5),
-        time_value = rep(seq.Date(as.Date("2021-01-01"), as.Date("2021-01-05"), "day"), 2),
+        time_value = seq.Date(as.Date("2021-01-01"), as.Date("2021-01-10"), "day"),
         value = 1:10
     )
     out <- slide_by_geo(df, ~ Sum(.x$value), n = 3, col_name = "summed_value")
@@ -30,6 +30,22 @@ test_that("slide_by_geo works with interleaved geo_values", {
     expect_equal(out$value, 1:10)
     expect_equal(out$summed_value, c(1, 3, 6, 9, 12, 6, 13, 21, 24, 27))
 })
+
+
+test_that("slide_by_geo works with missing time values", {
+    df <- tibble(
+        geo_value = rep(c("a", "b"), each=5),
+        time_value = seq.Date(as.Date("2021-01-01"), as.Date("2021-01-20"), by = 2),
+        value = 1:10
+    )
+    out <- slide_by_geo(df, ~ Sum(.x$value), n = 3, col_name = "summed_value")
+    expect_equal(names(out), c("geo_value", "time_value", "value", "summed_value"))
+    expect_equal(out$geo_value, df$geo_value)
+    expect_equal(out$time_value, df$time_value)
+    expect_equal(out$value, df$value)
+    expect_equal(out$summed_value, c(1, 3, 5, 7, 9, 6, 13, 15, 17, 19))
+})
+
 
 test_that("slide_by_geo overwrites column when specified", {
     df <- tibble(

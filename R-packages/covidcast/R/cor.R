@@ -56,7 +56,7 @@ covidcast_cor <- function(x, y, dt_x = 0, dt_y = 0,
   z <- dplyr::arrange(z, .data$time_value)
   z <- dplyr::mutate(z, value.x = shift(.data$value.x, n = dt_x),
                      value.y = shift(.data$value.y, n = dt_y))
-  z <- dplyr::ungroup(z, )
+  z <- dplyr::ungroup(z)
   z <- dplyr::group_by(z, dplyr::across(dplyr::all_of(by)))
   z <- dplyr::summarize(z, value = cor(
     x = .data$value.x, y = .data$value.y, use = use, method = method

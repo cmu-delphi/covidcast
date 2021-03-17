@@ -3,7 +3,7 @@
 #' Computes correlations between two `covidcast_signal` data frames, allowing
 #' for slicing by geo location, or by time. (Only the latest issue from each
 #' data frame is used for correlations.) See the correlations vignette
-#' for examples.
+#' for examples \code{vignette("correlation-utils", package = "covidcast")}
 #'
 #' @param x,y The `covidcast_signal` data frames to correlate.
 #' @param dt_x,dt_y Time shifts to consider for `x` and `y`, respectively,

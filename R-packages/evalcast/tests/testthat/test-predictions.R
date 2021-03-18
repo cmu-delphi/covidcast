@@ -3,11 +3,11 @@ library(mockery)
 
 # Create a fake result from the covidcast API as returned by the `evalcast::download_signals()`
 # function.
-create_fake_downloaded_signal <- function(geo_value) {
-  tibble(data_source = "jhu-csse",
-         signal =  c("deaths_incidence_num", "confirmed_incidence_num"),
+create_fake_downloaded_signal <- function(data_source, signal, geo_value) {
+  tibble(data_source = data_source,
+         signal = signal,
          geo_value = geo_value,
-         time_value = as.Date("2020-01-01"),
+         time_value = as.Date(c("2020-01-01", "2020-01-02")),
          issue = as.Date("2020-01-02"),
          lag = 1L,
          value = c(1, 2),
@@ -31,10 +31,14 @@ test_that("get_predictions works", {
   # Set up mocks for the following functions:
   # - `evalcast::download_signals()` to avoid dependencies on the covidcast API.
   # - the forecaster to avoid dependencies on its internal prediction algorithm.
-  fake_downloaded_signals <- c(list(create_fake_downloaded_signal("in")),
-                               list(create_fake_downloaded_signal("nc")))
-  mock_download_signals <- do.call(mock, fake_downloaded_signals)
-  mockr::with_mock(download_signals = mock_download_signals, {
+  fake_downloaded_signals <- list(
+    create_fake_downloaded_signal("in", "jhu_csse", "deaths_incidence_num"),
+    create_fake_downloaded_signal("in", "jhu_csse", "confirmed_incidence_num")
+  )
+  mock_download_signal <- mock(fake_downloaded_signals[[1]],
+                               fake_downloaded_signals[[2]],
+                               cycle=TRUE)
+  mockr::with_mock(download_signal = mock_download_signal, {
     mock_forecaster <- mock(create_fake_forecast(3, "in"),
                             create_fake_forecast(3, "nc"))
 
@@ -51,16 +55,16 @@ test_that("get_predictions works", {
                              ahead = 3,
                              geo_type = "state")
 
-    expect_called(mock_download_signals, 2)
+    expect_called(mock_download_signal, 4)
     expect_called(mock_forecaster, 2)
     expect_equal(mock_args(mock_forecaster),
-                 list(list(fake_downloaded_signals[[1]],
+                 list(list(fake_downloaded_signals,
                            as.Date("2020-01-01"),
                            signals,
                            "epiweek",
                            3,
                            "state"),
-                      list(fake_downloaded_signals[[2]],
+                      list(fake_downloaded_signals,
                            as.Date("2020-01-02"),
                            signals,
                            "epiweek",
@@ -82,68 +86,18 @@ test_that("get_predictions works", {
   })
 })
 
-test_that("geo_values argument to get_predictions works", {
-  # Set up mocks for the following functions:
-  # - `evalcast::download_signals()` to avoid dependencies on the covidcast API.
-  # - the forecaster to avoid dependencies on its internal prediction algorithm.
-  fake_downloaded_signals <- list(
-    bind_rows(create_fake_downloaded_signal("nd"),
-              create_fake_downloaded_signal("ia"),
-              create_fake_downloaded_signal("sd")))
-  mock_download_signals <- mock(fake_downloaded_signals)
-  mockr::with_mock(download_signals = mock_download_signals, {
-    mock_forecaster <- mock(bind_rows(
-      create_fake_forecast(3, "nd"),
-      create_fake_forecast(3, "sd")))
-
-    signals <- tibble(data_source = "jhu-csse",
-                      signal = c("deaths_incidence_num", "confirmed_incidence_num"),
-                      start_day = "2020-01-01")
-    forecast_dates <- as.Date(c("2020-01-01"))
-
-    pcard <- get_predictions(mock_forecaster,
-                             name_of_forecaster = "fake",
-                             signals = signals,
-                             forecast_dates = forecast_dates,
-                             incidence_period = "epiweek",
-                             ahead = 3,
-                             geo_type = "state",
-                             geo_values = c("nd", "sd"))
-
-    expect_called(mock_download_signals, 1)
-    expect_called(mock_forecaster, 1)
-    expect_equal(mock_args(mock_forecaster),
-                 list(list(list(bind_rows(create_fake_downloaded_signal("nd"),
-                                          create_fake_downloaded_signal("sd"))),
-                           as.Date("2020-01-01"),
-                           signals,
-                           "epiweek",
-                           3,
-                           "state")))
-    expect_equal(colnames(pcard),
-      c("ahead", "geo_value", "quantile", "value", "forecaster", "forecast_date", "data_source",
-        "signal", "target_end_date", "incidence_period"))
-    n <- 46
-    expect_equal(nrow(pcard), n)
-    expect_equal(pcard$ahead, rep(3, n))
-    expect_equal(pcard$geo_value, rep(c("nd", "sd"), each=n/2))
-    expect_equal(pcard$forecaster, rep("fake", n))
-    expect_equal(pcard$forecast_date, rep(forecast_dates, each=n))
-    expect_equal(pcard$data_source, rep("jhu-csse", n))
-    expect_equal(pcard$signal, rep("deaths_incidence_num", n))
-    expect_equal(pcard$target_end_date, rep(as.Date("2020-01-25"), n))
-    expect_equal(pcard$incidence_period, rep("epiweek", n))
-  })
-})
-
 test_that("get_predictions works when forecaster has additional arguments", {
   # Set up mocks for the following functions:
   # - `evalcast::download_signals()` to avoid dependencies on the covidcast API.
   # - the forecaster to avoid dependencies on its internal prediction algorithm.
-  fake_downloaded_signals <- c(list(create_fake_downloaded_signal("in")),
-                               list(create_fake_downloaded_signal("nc")))
-  mock_download_signals <- do.call(mock, fake_downloaded_signals)
-  mockr::with_mock(download_signals = mock_download_signals, {
+  fake_downloaded_signals <- list(
+    create_fake_downloaded_signal("in", "jhu_csse", "deaths_incidence_num"),
+    create_fake_downloaded_signal("in", "jhu_csse", "confirmed_incidence_num")
+  )
+  mock_download_signal <- mock(fake_downloaded_signals[[1]],
+                               fake_downloaded_signals[[2]],
+                               cycle=TRUE)
+  mockr::with_mock(download_signal = mock_download_signal, {
     mock_forecaster <- mock(create_fake_forecast(3, "in"),
                             create_fake_forecast(3, "nc"))
 
@@ -162,10 +116,10 @@ test_that("get_predictions works when forecaster has additional arguments", {
                              forecaster_arg1 = 1,
                              forecaster_arg2 = "2")
 
-    expect_called(mock_download_signals, 2)
+    expect_called(mock_download_signal, 4)
     expect_called(mock_forecaster, 2)
     expect_equal(mock_args(mock_forecaster),
-                 list(list(fake_downloaded_signals[[1]],
+                 list(list(fake_downloaded_signals,
                            as.Date("2020-01-01"),
                            signals,
                            "epiweek",
@@ -173,7 +127,7 @@ test_that("get_predictions works when forecaster has additional arguments", {
                            "state",
                            forecaster_arg1 = 1,
                            forecaster_arg2 = "2"),
-                      list(fake_downloaded_signals[[2]],
+                      list(fake_downloaded_signals,
                            as.Date("2020-01-02"),
                            signals,
                            "epiweek",
@@ -201,9 +155,12 @@ test_that("no start_day within signals raises warning but works", {
   # Set up mocks for the following functions:
   # - `evalcast::download_signals()` to avoid dependencies on the covidcast API.
   # - the forecaster to avoid dependencies on its internal prediction algorithm.
-  fake_downloaded_signals <- list(create_fake_downloaded_signal("fl"))
-  mock_download_signals <- mock(fake_downloaded_signals)
-  mockr::with_mock(download_signals = mock_download_signals, {
+  fake_downloaded_signals <- list(
+    create_fake_downloaded_signal("fl", "jhu_csse", "deaths_incidence_num"),
+    create_fake_downloaded_signal("fl", "jhu_csse", "confirmed_incidence_num")
+  )
+  mock_download_signal <- do.call(mock, fake_downloaded_signals)
+  mockr::with_mock(download_signal = mock_download_signal, {
     mock_forecaster <- mock(create_fake_forecast(2, "fl"))
 
     signals_no_start_day <- tibble(
@@ -221,7 +178,7 @@ test_that("no start_day within signals raises warning but works", {
                                geo_type = "state"),
       "Unknown or uninitialised column: `start_day`.")
 
-    expect_called(mock_download_signals, 1)
+    expect_called(mock_download_signal, 2)
     expect_called(mock_forecaster, 1)
     expect_equal(mock_args(mock_forecaster),
                  list(list(fake_downloaded_signals,
@@ -250,11 +207,15 @@ test_that("start_day function within signals works", {
   # Set up mocks for the following functions:
   # - `evalcast::download_signals()` to avoid dependencies on the covidcast API.
   # - the forecaster to avoid dependencies on its internal prediction algorithm.
-  fake_downloaded_signals <- c(list(create_fake_downloaded_signal("fl")),
-                               list(create_fake_downloaded_signal("ga")))
-  mock_download_signals <- do.call(mock, fake_downloaded_signals)
+  fake_downloaded_signals <- list(
+    create_fake_downloaded_signal("fl", "jhu_csse", "deaths_incidence_num"),
+    create_fake_downloaded_signal("fl", "jhu_csse", "confirmed_incidence_num")
+  )
+  mock_download_signal <- mock(fake_downloaded_signals[[1]],
+                               fake_downloaded_signals[[2]],
+                               cycle=TRUE)
 
-  mockr::with_mock(download_signals = mock_download_signals, {
+  mockr::with_mock(download_signal = mock_download_signal, {
     mock_forecaster <- mock(create_fake_forecast(2, "fl"),
                             create_fake_forecast(2, "ga"))
 
@@ -273,10 +234,10 @@ test_that("start_day function within signals works", {
                              ahead = 2,
                              geo_type = "state")
 
-    expect_called(mock_download_signals, 2)
+    expect_called(mock_download_signal, 4)
     expect_called(mock_forecaster, 2)
     expect_equal(mock_args(mock_forecaster),
-                 list(list(fake_downloaded_signals[[1]],
+                 list(list(fake_downloaded_signals,
                            as.Date("2020-12-11"),
                            tibble(data_source = "jhu-csse",
                                   signal = c("deaths_incidence_num", "confirmed_incidence_num"),
@@ -284,7 +245,7 @@ test_that("start_day function within signals works", {
                            "epiweek",
                            2,
                            "state"),
-                      list(fake_downloaded_signals[[2]],
+                      list(fake_downloaded_signals,
                            as.Date("2020-12-12"),
                            tibble(data_source = "jhu-csse",
                                   signal = c("deaths_incidence_num", "confirmed_incidence_num"),
@@ -313,10 +274,13 @@ test_that("start_day function and date mix within signals works", {
   # Set up mocks for the following functions:
   # - `evalcast::download_signals()` to avoid dependencies on the covidcast API.
   # - the forecaster to avoid dependencies on its internal prediction algorithm.
-  fake_downloaded_signals <- c(list(create_fake_downloaded_signal("fl")),
-                               list(create_fake_downloaded_signal("ga")))
-  mock_download_signals <- do.call(mock, fake_downloaded_signals)
-  mockr::with_mock(download_signals = mock_download_signals, {
+  fake_downloaded_signals <- list(create_fake_downloaded_signal("fl"),
+                                  create_fake_downloaded_signal("ga"))
+  mock_download_signal <- mock(fake_downloaded_signals[[1]],
+                               fake_downloaded_signals[[2]],
+                               cycle = TRUE)
+
+  mockr::with_mock(download_signal = mock_download_signal, {
     mock_forecaster <- mock(create_fake_forecast(2, "fl"),
                             create_fake_forecast(2, "ga"))
 
@@ -336,20 +300,10 @@ test_that("start_day function and date mix within signals works", {
                              ahead = 2,
                              geo_type = "state")
 
-    print(mock_args(mock_forecaster)[[1]])
-    print(list(fake_downloaded_signals[[1]],
-                           as.Date("2020-12-11"),
-                           tibble(data_source = "jhu-csse",
-                                  signal = c("deaths_incidence_num", "confirmed_incidence_num"),
-                                  start_day = as.Date(c("2020-11-07", "2020-12-01"))),
-                           "epiweek",
-                           2,
-                           "state"))
-
-    expect_called(mock_download_signals, 2)
+    expect_called(mock_download_signal, 4)
     expect_called(mock_forecaster, 2)
     expect_equal(mock_args(mock_forecaster),
-                 list(list(fake_downloaded_signals[[1]],
+                 list(list(fake_downloaded_signals,
                            as.Date("2020-12-11"),
                            tibble(data_source = "jhu-csse",
                                   signal = c("deaths_incidence_num", "confirmed_incidence_num"),
@@ -357,7 +311,7 @@ test_that("start_day function and date mix within signals works", {
                            "epiweek",
                            2,
                            "state"),
-                      list(fake_downloaded_signals[[2]],
+                      list(fake_downloaded_signals,
                            as.Date("2020-12-12"),
                            tibble(data_source = "jhu-csse",
                                   signal = c("deaths_incidence_num", "confirmed_incidence_num"),

@@ -21,14 +21,6 @@
 #' @template geo_type-template
 #' @template geo_values-template
 #' @template apply_corrections-template
-#' @param signal_aggregation this and the next argument control the type of
-#'   data your forecaster expects to receive from covidcast. By default,
-#'   different signals are passed in "list" format. But you may alternatively
-#'   request "wide" or "long". See [covidcast::covidcast_signals()] and 
-#'   [covidcast::aggregate_signals()] for more details.
-#' @param signal_aggregation_dt for any data format, 
-#'   [covidcast::aggregate_signals()] can perform leading and lagging for you.
-#'   See that documentation for more details.
 #' @param as_of_override by default, the `as_of` date of data downloaded from
 #'   covidcast is loaded with `as_of = forecast_date`. This means that data
 #'   is "rewound" to days in the past. Any data revisions made since, would
@@ -37,9 +29,10 @@
 #'   for the forecast date on the forecast date (there is some latency between
 #'   the time signals are reported and the dates for which they are reported).
 #'   You can override this functionality, though we strongly advise you do so
-#'   with care, by passing a function of a single forecast_date here. The 
-#'   function should return a date.
-#' @param ... Additional named arguments to be passed to `forecaster()` 
+#'   with care, by passing a function of the forecast_date or a single date 
+#'   here. The function should return a [Date].
+#' @param forecaster_params a list of additional named arguments to be passed 
+#'   to `forecaster()` 
 #' @template predictions_cards-template
 #' 
 #'

@@ -89,6 +89,8 @@
 #'
 #' @source United States Census Bureau, at
 #'   \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/state/detail/SCPRC-EST2019-18+POP-RES.csv}
+#'   and 
+#'   \url{https://www.census.gov/data/tables/time-series/demo/popest/2010s-total-puerto-rico-municipios.html}
 #'
 #' @seealso [abbr_to_name()], [name_to_abbr()], [abbr_to_fips()], [fips_to_abbr()]
 "state_census"

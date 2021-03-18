@@ -1,13 +1,12 @@
 library(tibble)
 
-
-test_that("make_response works for epiweeks", {
+test_that("add_response_columns works for epiweeks", {
     df <- tibble(
         geo_value = "oh",
         time_value = seq.Date(as.Date("2021-01-01"), as.Date("2021-01-31"), "day"),
         `value-0:my_response` = 1:31
     )
-    out <- make_response(df, "my_response", as.Date("2021-01-30"), "epiweek", 1:2)
+    out <- add_response_columns(df, "my_response", as.Date("2021-01-30"), "epiweek", 1:2)
 
     expect_equal(names(out),
                  c("geo_value", "time_value", "value-0:my_response",
@@ -22,13 +21,13 @@ test_that("make_response works for epiweeks", {
 })
 
 
-test_that("make_response works for days", {
+test_that("add_response_columns works for days", {
     df <- tibble(
         geo_value = "oh",
         time_value = seq.Date(as.Date("2021-01-01"), as.Date("2021-01-31"), "day"),
         `value-0:my_response` = 1:31
     )
-    out <- make_response(df, "my_response", as.Date("2021-01-30"), "day", 1:4)
+    out <- add_response_columns(df, "my_response", as.Date("2021-01-30"), "day", 1:4)
 
     expect_equal(names(out),
                  c("geo_value", "time_value", "value-0:my_response",

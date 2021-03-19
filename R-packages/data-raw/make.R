@@ -1,3 +1,5 @@
+library(tidyverse)
+
 format_fips <- function(fips) { sprintf("%05d", fips) }
 
 # County census data
@@ -7,6 +9,22 @@ county_census$FIPS = format_fips(county_census$STATE * 1000 + county_census$COUN
 # County names are in latin1; convert to UTF-8
 county_census$CTYNAME = iconv(county_census$CTYNAME, "latin1", "UTF-8")
 Encoding(county_census$CTYNAME) = "UTF-8"
+
+# Generate 5 digit fips column and drop unused columns
+county_census = county_census %>% 
+  mutate(
+    FIPS = str_c(str_pad(pull(county_census, STATE), 2, pad = "0"), 
+                 str_pad(pull(county_census, COUNTY), 3, pad = "0"))
+  )
+county_census = county_census %>% select(SUMLEV, REGION, DIVISION, STATE, COUNTY, STNAME, CTYNAME, POPESTIMATE2019, FIPS)
+
+# Add PR and Territories data from local files which were constructed by hand
+# from https://www.census.gov/data/tables/2010/dec/2010-island-areas.html,
+# https://www.census.gov/data/tables/time-series/demo/popest/2010s-total-puerto-rico-municipios.html,
+# and http://datadictionary.naaccr.org/default.aspx?c=11&Version=21#Virgin%20Islands%20of%20the%20United%20States
+load("./county_territories.rda")
+load("./county_pr.rda")
+county_census = rbind(county_census, county_pr, county_territories)
 save(county_census, file = "../covidcast/data/county_census.rda", compress = "bzip2")
 
 # MSA census data
@@ -28,6 +46,10 @@ state_abbr["United States"] = "US"
 state_abbr["District of Columbia"] = "DC"
 state_abbr["Puerto Rico Commonwealth"] = "PR"
 state_census$ABBR = state_abbr
+
+# Add territories data like we did for county_census
+load("./state_territories.rda")
+state_census = rbind(state_census, state_territories)
 save(state_census, file = "../covidcast/data/state_census.rda")
 
 # County geo centroids from usmap

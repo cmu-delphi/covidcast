@@ -125,6 +125,8 @@ plot.covidcast_signal <- function(x,
            class = "covidcast_plot_meta_not_found")
       mean_value <- mean(x$value)
       stdev_value <- sd(x$value)
+      if (stdev_value == 0) { stdev_value <- abs(mean_value) * 0.1 }
+      if (stdev_value == 0) { stdev_value <- 0.001 }
     } else {
       mean_value <- attributes(x)$metadata$mean_value
       stdev_value <- attributes(x)$metadata$stdev_value

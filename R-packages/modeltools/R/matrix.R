@@ -8,7 +8,7 @@
 #'         correspond to `{signal}` `{days}` before `time_value`}
 #'     \item{Response columns}{Columns with names of the form `value+{n}:{response}` whose values
 #'         correspond to `{response}` `{n}` incidence period units after `time_value`.  Since
-#'         columns beginning with "value+" are interpretted as the response rather than a
+#'         columns beginning with "value+" are interpreted as the response rather than a
 #'         covariate, observed data from the same day as `time_value` should be in columns
 #'         `value-0:{signal}` rather than `value+0:{signal}`}
 #'     }

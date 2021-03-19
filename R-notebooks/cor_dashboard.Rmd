@@ -29,7 +29,7 @@ library(ggplot2)
 sources = c("doctor-visits", "fb-survey", "fb-survey", "hospital-admissions", 
             "indicator-combination")
 signals = c("smoothed_adj_cli", "smoothed_cli", "smoothed_hh_cmnty_cli", 
-            "smoothed_adj_covid19", "nmf_day_doc_fbc_fbs_ght")
+            "smoothed_adj_covid19_from_claims", "nmf_day_doc_fbc_fbs_ght")
 names = c("Doctor visits", "Facebook CLI", "Facebook CLI-in-community", 
           "Hospitalizations", "Combo indicator")
 
@@ -139,7 +139,7 @@ We fetch various signals from our API, from April 15 through to the current day.
 sources = c("doctor-visits", "fb-survey", "fb-survey", "ght",
             "hospital-admissions", "indicator-combination")
 signals = c("smoothed_adj_cli", "smoothed_cli", "smoothed_hh_cmnty_cli", 
-            "smoothed_search", "smoothed_adj_covid19", 
+            "smoothed_search", "smoothed_adj_covid19_from_claims", 
             "nmf_day_doc_fbc_fbs_ght")
 names = c("Doctor visits", "Facebook CLI", "Facebook CLI-in-community", 
           "Google trends", "Hospitalizations", "Combo indicator")

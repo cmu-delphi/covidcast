@@ -24,7 +24,7 @@ STATE_CENSUS["STATE"] = STATE_CENSUS["STATE"].str.pad(width=5, fillchar="0", sid
 MSA_CENSUS = MSA_CENSUS.loc[MSA_CENSUS.LSAD == "Metropolitan Statistical Area"]
 
 
-def fips_to_name(code: Union[str, Iterable],
+def fips_to_name(code: Union[str, Iterable[str]],
                  ignore_case: bool = False,
                  fixed: bool = False,
                  ties_method: str = "first") -> list:
@@ -51,7 +51,7 @@ def fips_to_name(code: Union[str, Iterable],
     return _lookup(code, COUNTY_CENSUS.FIPS, COUNTY_CENSUS.CTYNAME, ignore_case, fixed, ties_method)
 
 
-def cbsa_to_name(code: Union[str, Iterable],
+def cbsa_to_name(code: Union[str, Iterable[str]],
                  ignore_case: bool = False,
                  fixed: bool = False,
                  ties_method: str = "first") -> list:
@@ -78,7 +78,7 @@ def cbsa_to_name(code: Union[str, Iterable],
     return _lookup(code, MSA_CENSUS.CBSA, MSA_CENSUS.NAME, ignore_case, fixed, ties_method)
 
 
-def abbr_to_name(abbr: Union[str, Iterable],
+def abbr_to_name(abbr: Union[str, Iterable[str]],
                  ignore_case: bool = False,
                  fixed: bool = False,
                  ties_method: str = "first") -> list:
@@ -105,7 +105,7 @@ def abbr_to_name(abbr: Union[str, Iterable],
     return _lookup(abbr, STATE_CENSUS.ABBR, STATE_CENSUS.NAME, ignore_case, fixed, ties_method)
 
 
-def name_to_abbr(name: Union[str, Iterable],
+def name_to_abbr(name: Union[str, Iterable[str]],
                  ignore_case: bool = False,
                  fixed: bool = False,
                  ties_method: str = "first") -> list:
@@ -133,7 +133,7 @@ def name_to_abbr(name: Union[str, Iterable],
     return _lookup(name, STATE_CENSUS.NAME, STATE_CENSUS.ABBR, ignore_case, fixed, ties_method)
 
 
-def fips_to_abbr(code: Union[str, Iterable],
+def fips_to_abbr(code: Union[str, Iterable[str]],
                  ignore_case: bool = False,
                  fixed: bool = False,
                  ties_method: str = "first") -> list:
@@ -161,7 +161,7 @@ def fips_to_abbr(code: Union[str, Iterable],
     return _lookup(code, STATE_CENSUS.STATE, STATE_CENSUS.ABBR, ignore_case, fixed, ties_method)
 
 
-def name_to_cbsa(name: Union[str, Iterable],
+def name_to_cbsa(name: Union[str, Iterable[str]],
                  ignore_case: bool = False,
                  fixed: bool = False,
                  ties_method: str = "first",
@@ -195,7 +195,7 @@ def name_to_cbsa(name: Union[str, Iterable],
     return _lookup(name, df.NAME, df.CBSA, ignore_case, fixed, ties_method)
 
 
-def abbr_to_fips(code: Union[str, Iterable],
+def abbr_to_fips(code: Union[str, Iterable[str]],
                  ignore_case: bool = False,
                  fixed: bool = False,
                  ties_method: str = "first") -> list:
@@ -223,7 +223,7 @@ def abbr_to_fips(code: Union[str, Iterable],
     return _lookup(code, STATE_CENSUS.ABBR, STATE_CENSUS.STATE, ignore_case, fixed, ties_method)
 
 
-def name_to_fips(name: Union[str, Iterable],
+def name_to_fips(name: Union[str, Iterable[str]],
                  ignore_case: bool = False,
                  fixed: bool = False,
                  ties_method: str = "first",
@@ -257,7 +257,7 @@ def name_to_fips(name: Union[str, Iterable],
     return _lookup(name, df.CTYNAME, df.FIPS, ignore_case, fixed, ties_method)
 
 
-def _lookup(key: Union[str, Iterable],
+def _lookup(key: Union[str, Iterable[str]],
             keys: Iterable,
             values: Iterable,
             ignore_case: bool = False,

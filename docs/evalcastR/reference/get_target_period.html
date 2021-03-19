@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -97,9 +97,6 @@
     <li>
       <a href="../articles/intro-evalcast.html">Introduction to evalcast</a>
     </li>
-    <li>
-      <a href="../articles/intro_vignette.html">Introduction to evalcast</a>
-    </li>
   </ul>
 </li>
 <li>
@@ -107,7 +104,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/cmu-delphi/covidcast/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -122,7 +124,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Get the target period for a forecast date, incidence period and ahead</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/get_target_period.R'><code>R/get_target_period.R</code></a></small>
     <div class="hidden name"><code>get_target_period.Rd</code></div>
     </div>
 
@@ -130,7 +132,7 @@
     <p>Get the target period for a forecast date, incidence period and ahead</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_target_period</span>(<span class='no'>forecast_date</span>, <span class='no'>incidence_period</span>, <span class='no'>ahead</span>)</pre>
+    <pre class="usage"><span class='fu'>get_target_period</span><span class='op'>(</span><span class='va'>forecast_date</span>, <span class='va'>incidence_period</span>, <span class='va'>ahead</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -168,11 +170,11 @@ it is the following epiweek. If <code>incidence_period = "day"</code>, then <cod
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Alden Green, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Jed Grabman, Alden Green, Daniel McDonald, Balasubramanian Narasimhan, Mike O'Brien, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

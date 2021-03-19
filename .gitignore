@@ -6,3 +6,5 @@
 .idea
 covidcast.Rproj
 *.Rcheck
+evalcast.Rproj
+evalcast_*.tar.gz

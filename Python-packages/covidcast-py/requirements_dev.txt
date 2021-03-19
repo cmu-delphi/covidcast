@@ -1,3 +1,7 @@
-wheel
+mypy
+pylint
+pytest
+pydocstyle
 sphinx
 sphinx-autodoc-typehints
+wheel

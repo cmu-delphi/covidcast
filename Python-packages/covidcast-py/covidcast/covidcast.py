@@ -5,14 +5,18 @@ from functools import reduce
 from typing import Union, Iterable, Tuple, List
 
 import pandas as pd
+import numpy as np
 from delphi_epidata import Epidata
+from epiweeks import Week
 
 from .errors import NoDataWarning
 
 # Point API requests to the AWS endpoint
 Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
 
-VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state"}
+VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state",  "hhs", "nation"}
+
+_ASYNC_CALL = False
 
 
 def signal(data_source: str,
@@ -98,9 +102,9 @@ def signal(data_source: str,
       with ``time_value`` of June 3 will only be included in the results if its
       data was issued or updated on June 6. If ``None``, the default, return the
       most recently issued data regardless of its lag.
-    :returns: A Pandas data frame with matching data. Each row is one
-      observation on one day in one geographic location. Contains the following
-      columns:
+    :returns: A Pandas data frame with matching data, or ``None`` if no data is
+      returned. Each row is one observation on one day in one geographic location.
+      Contains the following columns:
 
       ``geo_value``
         Identifies the location, such as a state name or county FIPS code. The
@@ -172,27 +176,24 @@ def signal(data_source: str,
         raise ValueError("end_day must be on or after start_day, but "
                          "start_day = '{start}', end_day = '{end}'".format(
                              start=start_day, end=end_day))
-
-    if isinstance(geo_values, str):
-        # User only provided one, not a list
-        geo_values = [geo_values]
-
-    dfs = [
-        _fetch_single_geo(
-            data_source, signal, start_day, end_day, geo_type, geo_value,
-            as_of, issues, lag)
-        for geo_value in set(geo_values)
-    ]
-
-    try:
-        # pd.concat automatically filters out None
+    if _ASYNC_CALL:
+        dfs = _async_fetch_epidata(
+            data_source, signal, start_day, end_day, geo_type, geo_values, as_of, issues, lag
+        )
+    else:
+        dfs = _fetch_epidata(
+            data_source, signal, start_day, end_day, geo_type, geo_values, as_of, issues, lag
+        )
+    if len(dfs) > 0:
         out = pd.concat(dfs)
-    except ValueError:
-        # pd.concat raises ValueError if all of the dfs are None, meaning we
-        # found no data
-        return None
-
-    return out
+        out.drop("direction", axis=1, inplace=True)
+        out["time_value"] = pd.to_datetime(out["time_value"], format="%Y%m%d")
+        out["issue"] = pd.to_datetime(out["issue"], format="%Y%m%d")
+        out["geo_type"] = geo_type
+        out["data_source"] = data_source
+        out["signal"] = signal
+        return out
+    return None
 
 
 def metadata() -> pd.DataFrame:
@@ -219,15 +220,17 @@ def metadata() -> pd.DataFrame:
 
       ``geo_type``
         Geographic level for which this signal is available, such as county,
-        state, msa, or hrr. Most signals are available at multiple geographic
+        state, msa, hss, hrr, or nation. Most signals are available at multiple geographic
         levels and will hence be listed in multiple rows with their own
         metadata.
 
       ``min_time``
-        First day for which this signal is available.
+        First day for which this signal is available. For weekly signals, will be
+        the first day of the epiweek.
 
       ``max_time``
-        Most recent day for which this signal is available.
+        Most recent day for which this signal is available. For weekly signals, will be
+        the first day of the epiweek.
 
       ``num_locations``
         Number of distinct geographic locations available for this signal. For
@@ -266,8 +269,8 @@ def metadata() -> pd.DataFrame:
                            meta["message"])
 
     meta_df = pd.DataFrame.from_dict(meta["epidata"])
-    meta_df["min_time"] = pd.to_datetime(meta_df["min_time"], format="%Y%m%d")
-    meta_df["max_time"] = pd.to_datetime(meta_df["max_time"], format="%Y%m%d")
+    meta_df["min_time"] = meta_df.apply(lambda x: _parse_datetimes(x.min_time, x.time_type), axis=1)
+    meta_df["max_time"] = meta_df.apply(lambda x: _parse_datetimes(x.max_time, x.time_type), axis=1)
     meta_df["last_update"] = pd.to_datetime(meta_df["last_update"], unit="s")
     return meta_df
 
@@ -324,6 +327,29 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
     return joined_df
 
 
+def _parse_datetimes(date_int: int,
+                     time_type: str,
+                     date_format: str = "%Y%m%d") -> Union[pd.Timestamp]:  # annotating nan errors
+    """Convert a date or epiweeks string into timestamp objects.
+
+    Datetimes (length 8) are converted to their corresponding date, while epiweeks (length 6)
+    are converted to the date of the start of the week. Returns nan otherwise
+
+    Epiweeks use the CDC format.
+
+    :param date_int: Int representation of date.
+    :param date_format: String of the date format to parse.
+    :returns: Timestamp.
+    """
+    date_str = str(date_int)
+    if time_type == "day":
+        return pd.to_datetime(date_str, format=date_format)
+    if time_type == "week":
+        epiwk = Week(int(date_str[:4]), int(date_str[-2:]))
+        return pd.to_datetime(epiwk.startdate())
+    return np.nan
+
+
 def _detect_metadata(data: pd.DataFrame,
                      data_source_col: str = "data_source",
                      signal_col: str = "signal",
@@ -351,19 +377,19 @@ def _detect_metadata(data: pd.DataFrame,
     return unique_data_source_vals[0], unique_signal_col_vals[0], unique_geo_type_vals[0]
 
 
-def _fetch_single_geo(data_source: str,
-                      signal: str,  # pylint: disable=W0621
-                      start_day: date,
-                      end_day: date,
-                      geo_type: str,
-                      geo_value: str,
-                      as_of: date,
-                      issues: Union[date, tuple, list],
-                      lag: int) -> Union[pd.DataFrame, None]:
-    """Fetch data for a single geo.
+def _fetch_epidata(data_source: str,
+                   signal: str,  # pylint: disable=W0621
+                   start_day: date,
+                   end_day: date,
+                   geo_type: str,
+                   geo_value: Union[str, Iterable[str]],
+                   as_of: date,
+                   issues: Union[date, tuple, list],
+                   lag: int) -> Union[pd.DataFrame, None]:
+    """Fetch data from Epidata API.
 
-    signal() wraps this to support fetching data over an iterable of
-    geographies, and stacks the resulting data frames.
+    signal() wraps this to support fetching data over a range of dates
+    and stacks the resulting data frames.
 
     If no data is found, return None, so signal() can easily filter out these
     entries.
@@ -371,14 +397,10 @@ def _fetch_single_geo(data_source: str,
     """
     as_of_str = _date_to_api_string(as_of) if as_of is not None else None
     issues_strs = _dates_to_api_strings(issues) if issues is not None else None
-
     cur_day = start_day
-
     dfs = []
-
     while cur_day <= end_day:
         day_str = _date_to_api_string(cur_day)
-
         day_data = Epidata.covidcast(data_source, signal, time_type="day",
                                      geo_type=geo_type, time_values=day_str,
                                      geo_value=geo_value, as_of=as_of_str,
@@ -399,20 +421,58 @@ def _fetch_single_geo(data_source: str,
         # since there is no "epidata" in the response.
         if "epidata" in day_data:
             dfs.append(pd.DataFrame.from_dict(day_data["epidata"]))
-
         cur_day += timedelta(1)
+    return dfs
 
-    if len(dfs) > 0:
-        out = pd.concat(dfs)
-        out.drop("direction", axis=1, inplace=True)
-        out["time_value"] = pd.to_datetime(out["time_value"], format="%Y%m%d")
-        out["issue"] = pd.to_datetime(out["issue"], format="%Y%m%d")
-        out["geo_type"] = geo_type
-        out["data_source"] = data_source
-        out["signal"] = signal
-        return out
 
-    return None
+def _async_fetch_epidata(data_source: str,
+                         signal: str,  # pylint: disable=W0621
+                         start_day: date,
+                         end_day: date,
+                         geo_type: str,
+                         geo_value: Union[str, Iterable[str]],
+                         as_of: date,
+                         issues: Union[date, tuple, list],
+                         lag: int) -> Union[pd.DataFrame, None]:
+    """Fetch data from Epidata API asynchronously.
+
+    signal() wraps this to support fetching data over a range of dates
+    and stacks the resulting data frames.
+
+    If no data is found, return None, so signal() can easily filter out these
+    entries.
+    """
+    dfs = []
+    params = []
+    for day in pd.date_range(start_day, end_day):
+        day_param = {
+            "source": "covidcast",
+            "data_source": data_source,
+            "signals": signal,
+            "time_type": "day",
+            "geo_type": geo_type,
+            "geo_value": geo_value,
+            "time_values": _date_to_api_string(day),
+        }
+        if as_of:
+            day_param["as_of"] = _date_to_api_string(as_of)
+        if issues:
+            day_param["issues"] = _dates_to_api_strings(issues)
+        if lag:
+            day_param["lag"] = lag
+        params.append(day_param)
+    output = Epidata.async_epidata(params, batch_size=100)
+    for day_data, params in output:
+        if day_data["message"] == "no results":
+            warnings.warn(f"No {data_source} {signal} data found on {params['time_values']} "
+                          f"for geography '{geo_type}'", NoDataWarning)
+        if day_data["message"] not in {"success", "no results"}:
+            warnings.warn(f"Problem obtaining {data_source} {signal} "
+                          f"data on {params['time_values']} "
+                          f"for geography '{geo_type}': {day_data['message']}", RuntimeWarning)
+        if "epidata" in day_data:
+            dfs.append(pd.DataFrame.from_dict(day_data["epidata"]))
+    return dfs
 
 
 def _signal_metadata(data_source: str,

@@ -11,10 +11,9 @@ get_predictions(
   forecast_dates,
   incidence_period = c("epiweek", "day"),
   apply_corrections = function(signals) signals,
-  response_geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation"),
   response_data_source = signals_to_use$data_source[1],
   response_data_signal = signals_to_use$signal[1],
-  forecaster_params = list()
+  forecaster_args = list()
 )
 }
 \arguments{
@@ -26,7 +25,9 @@ ahead. If your forecaster produces point forecasts, then set \code{quantile=NA}.
 The first argument must be the list of signals returned by a call to the COVIDcast.
 The forecaster will also receive a single \code{forecast_date} as a named argument.
 Any additional named arguments can be passed via the \code{forecaster_params}
-argument below.}
+argument below.
+
+Thus, the forecaster should have a signature like \code{forecaster(data, forecast_date,...)}}
 
 \item{name_of_forecaster}{String indicating name of the forecaster.}
 
@@ -91,16 +92,10 @@ same as the first row in the \code{signals_to_use} tibble.}
 This is used mainly for downstream evaluation. By default, this will be the
 same as the first row in the \code{signals_to_use} tibble.}
 
-\item{forecaster_params}{a list of additional named arguments to be passed
+\item{forecaster_args}{a list of additional named arguments to be passed
 to \code{forecaster()}. A common use case would be to pass the period ahead
 (e.g. predict 1 day, 2 days, ..., k days ahead). Note that \code{ahead} is a
 required component of the forecaster output (see above).}
-
-\item{ahead}{Vector of (one or more) integers. How many epiweeks/days ahead
-are you forecasting? If \code{incidence_period = "epiweek"} and forecast_date is
-Sunday or Monday, then \code{ahead = 1} means the epiweek that includes the
-forecast date; if \code{forecast_date} falls on a Tuesday through Saturday, then
-it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahead = 1} means the day after forecast date.}
 }
 \value{
 Long data frame of forecasts with a class of \code{predictions_cards}.
@@ -125,12 +120,17 @@ predictions made using the information as of September 14).
 baby_predictions = get_predictions(
   baseline_forecaster, "baby",
   tibble::tibble(
-    data_source=c("jhu-csse", "usa-facts"),
-    signal = c("deaths_incidence_num","confirmed_incidence_num"),
-    start_day="2020-08-15"
-    geo_values = "mi"), 
+    data_source="jhu-csse",
+    signal ="deaths_incidence_num",
+    start_day="2020-08-15",
+    geo_values = "mi",
+    geo_type = "state"), 
   forecast_dates = "2020-10-01",
-  response_geo_type = "state")
+  incidence_period = "epiweek",
+  forecaster_args = list(
+    incidence_period = "epiweek",
+    ahead = 1:4
+  ))
 }
 
 }

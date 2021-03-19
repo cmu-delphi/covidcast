@@ -18,10 +18,11 @@
 #'   The forecaster will also receive a single `forecast_date` as a named argument.
 #'   Any additional named arguments can be passed via the `forecaster_params`
 #'   argument below.
+#'   
+#'   Thus, the forecaster should have a signature like `forecaster(data, forecast_date,...)`
 #' @param name_of_forecaster String indicating name of the forecaster.
 #' @template signals-template
 #' @template forecast_dates-template
-#' @template ahead-template
 #' @template incidence_period-template
 #' @template apply_corrections-template
 #' @param response_data_source String indicating the `data_source` of the response.
@@ -30,10 +31,11 @@
 #' @param response_data_signal String indicating the `signal` of the response.
 #'   This is used mainly for downstream evaluation. By default, this will be the 
 #'   same as the first row in the `signals_to_use` tibble.
-#' @param forecaster_params a list of additional named arguments to be passed 
+#' @param forecaster_args a list of additional named arguments to be passed 
 #'   to `forecaster()`. A common use case would be to pass the period ahead
 #'   (e.g. predict 1 day, 2 days, ..., k days ahead). Note that `ahead` is a 
 #'   required component of the forecaster output (see above).
+#'
 #' @template predictions_cards-template
 #' 
 #'
@@ -41,12 +43,17 @@
 #' baby_predictions = get_predictions(
 #'   baseline_forecaster, "baby",
 #'   tibble::tibble(
-#'     data_source=c("jhu-csse", "usa-facts"),
-#'     signal = c("deaths_incidence_num","confirmed_incidence_num"),
-#'     start_day="2020-08-15"
-#'     geo_values = "mi"), 
+#'     data_source="jhu-csse",
+#'     signal ="deaths_incidence_num",
+#'     start_day="2020-08-15",
+#'     geo_values = "mi",
+#'     geo_type = "state"), 
 #'   forecast_dates = "2020-10-01",
-#'   response_geo_type = "state")
+#'   incidence_period = "epiweek",
+#'   forecaster_args = list(
+#'     incidence_period = "epiweek",
+#'     ahead = 1:4
+#'   ))
 #' }
 #' 
 #' @export
@@ -56,12 +63,12 @@ get_predictions <- function(forecaster,
                             forecast_dates,
                             incidence_period = c("epiweek","day"),
                             apply_corrections = function(signals) signals,
-                            response_geo_type = c("county", "hrr", "msa", "dma",
-                                                  "state", "hhs", "nation"),
                             response_data_source = signals_to_use$data_source[1],
                             response_data_signal = signals_to_use$signal[1],
-                            forecaster_params = list()) {
+                            forecaster_args = list()) {
   assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
+  
+  
   out <- forecast_dates %>%
     map(~ do.call(
           get_predictions_single_date,
@@ -69,7 +76,7 @@ get_predictions <- function(forecaster,
                signals = signals_to_use,
                forecast_date = .x,
                apply_corrections = apply_corrections,
-               forecaster_params = forecaster_params)
+               forecaster_args = forecaster_args)
           )
         ) %>%
     bind_rows()
@@ -98,13 +105,11 @@ get_predictions_single_date <- function(forecaster,
                                         signals,
                                         forecast_date,
                                         apply_corrections,
-                                        forecaster_params) {
-  # see get_predictions() for descriptions of the arguments
+                                        forecaster_args) {
 
   forecast_date <- lubridate::ymd(forecast_date)
-  # compute the start_day from the forecast_date, if we need to
   signals <- signal_listcols(signals, forecast_date)
-
+  
   df_list <- signals %>%
     pmap(function(...) {
       sig <- list(...)
@@ -117,22 +122,21 @@ get_predictions_single_date <- function(forecaster,
         geo_type = sig$geo_type,
         geo_values = sig$geo_values)
     })
-
+  
   # Downloaded data postprocessing
   if(!is.null(apply_corrections)) df_list <- apply_corrections(df_list)
 
-  out <- forecaster(df_list,
-                    forecast_date,
-                    signals,
-                    incidence_period,
-                    ahead,
-                    geo_type,
-                    ...)
+  df_arg <- formalArgs(forecaster)[1] # grab name of first arg to forecaster
+  forecaster_args$forecast_date = forecast_date
+  forecaster_args[[df_arg]] <- df_list # pass in the data named to the right arg
+  
+  out <- do.call(forecaster, forecaster_args)
   assert_that(all(c("ahead", "geo_value", "quantile", "value") %in% names(out)),
               msg = paste("Your forecaster must return a data frame with",
                           "(at least) the columnns `ahead`, `geo_value`,",
                           "`quantile`, and `value`."))
-  # make a predictions card for each ahead
+  
+  # make a predictions card
   out$forecast_date = forecast_date
   return(out)
 }

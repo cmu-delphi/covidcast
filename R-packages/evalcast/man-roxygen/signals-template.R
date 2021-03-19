@@ -41,4 +41,3 @@
 #'   with care, by passing a function of the forecast_date or a single date 
 #'   here. The function should return a [Date].
 #'   
-#'   

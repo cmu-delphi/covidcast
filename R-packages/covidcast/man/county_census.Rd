@@ -35,7 +35,9 @@ Data set on county populations, from the 2019 US Census.
 }
 \references{
 Census Bureau documentation of all columns and their meaning:
-\url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.pdf}
+\url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.pdf},
+\url{https://www.census.gov/data/tables/time-series/demo/popest/2010s-total-puerto-rico-municipios.html},
+and \url{https://www.census.gov/data/tables/2010/dec/2010-island-areas.html}
 }
 \seealso{
 \code{\link[=fips_to_name]{fips_to_name()}}, \code{\link[=name_to_fips]{name_to_fips()}}

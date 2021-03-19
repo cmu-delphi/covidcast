@@ -13,26 +13,27 @@
 #'   `geo_value`, `quantile`, and `value`. The `quantile` column gives the
 #'   probabilities associated with quantile forecasts for that location and
 #'   ahead. If your forecaster produces point forecasts, then set `quantile=NA`.
+#'   
+#'   The first argument must be the list of signals returned by a call to the COVIDcast. 
+#'   The forecaster will also receive a single `forecast_date` as a named argument.
+#'   Any additional named arguments can be passed via the `forecaster_params`
+#'   argument below.
 #' @param name_of_forecaster String indicating name of the forecaster.
 #' @template signals-template
 #' @template forecast_dates-template
-#' @template incidence_period-template
 #' @template ahead-template
-#' @template geo_type-template
-#' @template geo_values-template
+#' @template incidence_period-template
 #' @template apply_corrections-template
-#' @param as_of_override by default, the `as_of` date of data downloaded from
-#'   covidcast is loaded with `as_of = forecast_date`. This means that data
-#'   is "rewound" to days in the past. Any data revisions made since, would
-#'   not have been present at that time, and would not be available to the
-#'   forecaster. It's likely, for example, that no data would actually exist
-#'   for the forecast date on the forecast date (there is some latency between
-#'   the time signals are reported and the dates for which they are reported).
-#'   You can override this functionality, though we strongly advise you do so
-#'   with care, by passing a function of the forecast_date or a single date 
-#'   here. The function should return a [Date].
+#' @param response_data_source String indicating the `data_source` of the response.
+#'   This is used mainly for downstream evaluation. By default, this will be the 
+#'   same as the first row in the `signals_to_use` tibble.
+#' @param response_data_signal String indicating the `signal` of the response.
+#'   This is used mainly for downstream evaluation. By default, this will be the 
+#'   same as the first row in the `signals_to_use` tibble.
 #' @param forecaster_params a list of additional named arguments to be passed 
-#'   to `forecaster()` 
+#'   to `forecaster()`. A common use case would be to pass the period ahead
+#'   (e.g. predict 1 day, 2 days, ..., k days ahead). Note that `ahead` is a 
+#'   required component of the forecaster output (see above).
 #' @template predictions_cards-template
 #' 
 #'
@@ -42,74 +43,67 @@
 #'   tibble::tibble(
 #'     data_source=c("jhu-csse", "usa-facts"),
 #'     signal = c("deaths_incidence_num","confirmed_incidence_num"),
-#'     start_day="2020-08-15"), 
-#'   "2020-10-01","epiweek", 1:4, 
-#'   "state", "mi", signal_aggregation="long")
+#'     start_day="2020-08-15"
+#'     geo_values = "mi"), 
+#'   forecast_dates = "2020-10-01",
+#'   response_geo_type = "state")
 #' }
 #' 
 #' @export
 get_predictions <- function(forecaster,
                             name_of_forecaster,
-                            signals,
+                            signals_to_use,
                             forecast_dates,
-                            incidence_period,
-                            ahead,
-                            geo_type,
-                            apply_corrections = NULL,
-                            signal_aggregation = c("list", "wide", "long"),
-                            signal_aggregation_dt = NULL,
-                            as_of_override = function(forecast_date) forecast_date,
-                            ...) {
+                            incidence_period = c("epiweek","day"),
+                            apply_corrections = function(signals) signals,
+                            response_geo_type = c("county", "hrr", "msa", "dma",
+                                                  "state", "hhs", "nation"),
+                            response_data_source = signals_to_use$data_source[1],
+                            response_data_signal = signals_to_use$signal[1],
+                            forecaster_params = list()) {
   assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
-  signal_aggregation = match.arg(signal_aggregation, c("list", "wide", "long"))
-  params <- list(...)
   out <- forecast_dates %>%
     map(~ do.call(
           get_predictions_single_date,
-          c(list(forecaster = forecaster,
-                 name_of_forecaster = name_of_forecaster,
-                 signals = signals,
-                 forecast_date = .x,
-                 incidence_period = incidence_period,
-                 ahead = ahead,
-                 geo_type = geo_type,
-                 apply_corrections = apply_corrections,
-                 signal_aggregation = signal_aggregation,
-                 signal_aggregation_dt = signal_aggregation_dt,
-                 as_of_override = as_of_override),
-                 params))) %>%
+          list(forecaster = forecaster,
+               signals = signals_to_use,
+               forecast_date = .x,
+               apply_corrections = apply_corrections,
+               forecaster_params = forecaster_params)
+          )
+        ) %>%
     bind_rows()
 
   # for some reason, `value` gets named and ends up in attr
   names(out$value) = NULL 
+  out <- out %>% 
+    mutate(
+      forecaster = name_of_forecaster,
+      data_source = response_data_source,
+      signal = response_data_signal,
+      target_end_date = get_target_period(
+        .data$forecast_date, 
+        incidence_period, 
+        .data$ahead)$end,
+      incidence_period = incidence_period
+      )
+  out %>% relocate(.data$forecaster, .before = .data$forecast_date)
+  
   class(out) <- c("predictions_cards", class(out))
   out
 }
 
 
 get_predictions_single_date <- function(forecaster,
-                                        name_of_forecaster,
                                         signals,
                                         forecast_date,
-                                        incidence_period,
-                                        ahead,
-                                        geo_type,
                                         apply_corrections,
-                                        signal_aggregation,
-                                        signal_aggregation_dt,
-                                        as_of_override,
-                                        ...) {
+                                        forecaster_params) {
   # see get_predictions() for descriptions of the arguments
 
   forecast_date <- lubridate::ymd(forecast_date)
   # compute the start_day from the forecast_date, if we need to
-  if (!is.null(signals$start_day) && is.list(signals$start_day)) {
-    for (i in 1:length(signals$start_day)) {
-      if (is.function(signals$start_day[[i]])) {
-        signals$start_day <- signals$start_day[[i]](forecast_date)
-      }
-    }
-  }
+  signals <- signal_listcols(signals, forecast_date)
 
   df_list <- signals %>%
     pmap(function(...) {
@@ -119,15 +113,12 @@ get_predictions_single_date <- function(forecaster,
         signal = sig$signal,
         start_day = sig$start_day,
         end_day = forecast_date,
-        as_of = as_of_override(forecast_date),
-        geo_type = geo_type,
-        geo_values = "*")
+        as_of = sig$as_of,
+        geo_type = sig$geo_type,
+        geo_values = sig$geo_values)
     })
 
   # Downloaded data postprocessing
-  if (signal_aggregation != "list") {
-    covidcast::aggregate_signals(df_list, signal_aggregation_dt, signal_aggregation)
-  }
   if(!is.null(apply_corrections)) df_list <- apply_corrections(df_list)
 
   out <- forecaster(df_list,
@@ -142,13 +133,6 @@ get_predictions_single_date <- function(forecaster,
                           "(at least) the columnns `ahead`, `geo_value`,",
                           "`quantile`, and `value`."))
   # make a predictions card for each ahead
-  out %>% 
-    mutate(
-      forecaster = name_of_forecaster,
-      forecast_date = forecast_date,
-      data_source = signals$data_source[1],
-      signal = signals$signal[1],
-      target_end_date = get_target_period(forecast_date, 
-                                          incidence_period, ahead)$end,
-      incidence_period = incidence_period) 
+  out$forecast_date = forecast_date
+  return(out)
 }

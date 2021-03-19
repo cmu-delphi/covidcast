@@ -17,9 +17,6 @@
 #' @template signals-template
 #' @template forecast_dates-template
 #' @template incidence_period-template
-#' @template ahead-template
-#' @template geo_type-template
-#' @template geo_values-template
 #' @template apply_corrections-template
 #' @param signal_aggregation this and the next argument control the type of
 #'   data your forecaster expects to receive from covidcast. By default,
@@ -39,7 +36,7 @@
 #'   You can override this functionality, though we strongly advise you do so
 #'   with care, by passing a function of a single forecast_date here. The 
 #'   function should return a date.
-#' @param ... Additional named arguments to be passed to `forecaster()` 
+#' @param forecaster_args List of forecaster-specific arguments to pass to `forecaster()` 
 #' @template predictions_cards-template
 #' 
 #'
@@ -49,9 +46,9 @@
 #'   tibble::tibble(
 #'     data_source=c("jhu-csse", "usa-facts"),
 #'     signal = c("deaths_incidence_num","confirmed_incidence_num"),
-#'     start_day="2020-08-15"), 
-#'   "2020-10-01","epiweek", 1:4, 
-#'   "state", "mi", signal_aggregation="long")
+#'     start_day="2020-08-15",
+#'     geo_type = "state"), 
+#'   "2020-10-01","epiweek", signal_aggregation="long")
 #' }
 #' 
 #' @export
@@ -60,16 +57,13 @@ get_predictions <- function(forecaster,
                             signals,
                             forecast_dates,
                             incidence_period,
-                            ahead,
-                            geo_type,
                             apply_corrections = NULL,
                             signal_aggregation = c("list", "wide", "long"),
                             signal_aggregation_dt = NULL,
                             as_of_override = function(forecast_date) forecast_date,
-                            ...) {
+                            forecaster_args = list()) {
   assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
   signal_aggregation = match.arg(signal_aggregation, c("list", "wide", "long"))
-  params <- list(...)
   out <- forecast_dates %>%
     map(~ do.call(
           get_predictions_single_date,
@@ -78,13 +72,11 @@ get_predictions <- function(forecaster,
                  signals = signals,
                  forecast_date = .x,
                  incidence_period = incidence_period,
-                 ahead = ahead,
-                 geo_type = geo_type,
                  apply_corrections = apply_corrections,
                  signal_aggregation = signal_aggregation,
                  signal_aggregation_dt = signal_aggregation_dt,
-                 as_of_override = as_of_override),
-                 params))) %>%
+                 as_of_override = as_of_override,
+                 forecaster_args = forecaster_args)))) %>%
     bind_rows()
 
   # for some reason, `value` gets named and ends up in attr
@@ -99,18 +91,20 @@ get_predictions_single_date <- function(forecaster,
                                         signals,
                                         forecast_date,
                                         incidence_period,
-                                        ahead,
-                                        geo_type,
                                         apply_corrections,
                                         signal_aggregation,
                                         signal_aggregation_dt,
                                         as_of_override,
-                                        ...) {
+                                        forecaster_args) {
   # see get_predictions() for descriptions of the arguments
 
   forecast_date <- lubridate::ymd(forecast_date)
+  # make sure we have something in the start_day column
+  if (!("start_day" %in% names(signals))) {
+    signals$start_day <- NULL
+  }
   # compute the start_day from the forecast_date, if we need to
-  if (!is.null(signals$start_day) && is.list(signals$start_day)) {
+  else if (is.list(signals$start_day)) {
     for (i in 1:length(signals$start_day)) {
       if (is.function(signals$start_day[[i]])) {
         signals$start_day <- signals$start_day[[i]](forecast_date)
@@ -127,7 +121,7 @@ get_predictions_single_date <- function(forecaster,
         start_day = sig$start_day,
         end_day = forecast_date,
         as_of = as_of_override(forecast_date),
-        geo_type = geo_type,
+        geo_type = sig$geo_type,
         geo_values = "*")
     })
 
@@ -139,11 +133,7 @@ get_predictions_single_date <- function(forecaster,
 
   out <- forecaster(df_list,
                     forecast_date,
-                    signals,
-                    incidence_period,
-                    ahead,
-                    geo_type,
-                    ...)
+                    forecaster_args)
   assert_that(all(c("ahead", "geo_value", "quantile", "value") %in% names(out)),
               msg = paste("Your forecaster must return a data frame with",
                           "(at least) the columnns `ahead`, `geo_value`,",
@@ -157,5 +147,5 @@ get_predictions_single_date <- function(forecaster,
       signal = signals$signal[1],
       target_end_date = get_target_period(forecast_date, 
                                           incidence_period, ahead)$end,
-      incidence_period = incidence_period) 
+      incidence_period = incidence_period)
 }

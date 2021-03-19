@@ -2,15 +2,38 @@
 % Please edit documentation in R/get_covidhub_predictions.R
 \name{get_forecast_dates}
 \alias{get_forecast_dates}
-\title{Get available forecast dates for a forecaster on the COVID Hub}
+\title{Get forecast dates per forecaster given select filtering criteria}
 \usage{
-get_forecast_dates(covid_hub_forecaster_name)
+get_forecast_dates(
+  forecasters,
+  forecast_dates,
+  start_date,
+  end_date,
+  date_filtering_function
+)
 }
 \arguments{
-\item{covid_hub_forecaster_name}{String indicating of the forecaster
-(matching what it is called on the COVID Hub).}
+\item{forecasters}{vector of forecaster names}
+
+\item{forecast_dates}{A vector of date objects. If provided, only dates
+within this set will be returned for each forecaster (subject to all other
+provided criteria)}
+
+\item{start_date}{The earliest date for which to retrieve predictions}
+
+\item{end_date}{The latest date for which to retrieve predictions}
+
+\item{date_filtering_function}{A function which takes a list, where each
+element is a vector of dates and returns a list where each element is a
+subset of those in the original list. Used for custom filtering of dates
+(e.g. only forecasts from Mondays, where all forecasters made a forecast,
+etc.)}
+}
+\value{
+A list of the same length as \code{forecasters}, where each entry is the
+vector at the same index in \code{forecast_dates} after being filtered according
+to the provided criteria
 }
 \description{
-Retrieves the forecast dates that a forecaster submitted to
-the \href{https://github.com/reichlab/covid19-forecast-hub/}{COVID Hub}.
+Get forecast dates per forecaster given select filtering criteria
 }

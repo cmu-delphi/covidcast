@@ -43,7 +43,7 @@ be vectors. See the `covidcast_signals()` documentation for details.
 ## Aggregating signals, wide format
 
 To aggregate multiple signals together, we can use the `aggregate_signals()`
-function, which acceps a list of `covidcast_signal` objects, as returned by
+function, which accepts a list of `covidcast_signal` objects, as returned by
 `covidcast_signals()`. With all arguments set to their default values,
 `aggregate_signals()` returns a data frame in "wide" format: 
 
@@ -87,7 +87,8 @@ aggregate_signals(signals[[1]], dt = c(-1, 0, 1)) %>%
 
 ## Aggregating signals, long format
 
-We can also use `aggregate_signals()` in "long" format: 
+We can also use `aggregate_signals()` in "long" format, with one observation
+per row:
 
 ```{r}
 aggregate_signals(signals, format = "long") %>% 

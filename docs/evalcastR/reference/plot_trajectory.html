@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Produce trajectory plots of forecasts and observed data — plot_trajectory • evalcast</title>
+<title>Plot predictions along with truth — plot_trajectory • evalcast</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Produce trajectory plots of forecasts and observed data — plot_trajectory" />
-<meta property="og:description" content="Produce trajectory plots of forecasts and observed data" />
+<meta property="og:title" content="Plot predictions along with truth — plot_trajectory" />
+<meta property="og:description" content="Plot predictions along with truth" />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -97,9 +97,6 @@
     <li>
       <a href="../articles/intro-evalcast.html">Introduction to evalcast</a>
     </li>
-    <li>
-      <a href="../articles/intro_vignette.html">Introduction to evalcast</a>
-    </li>
   </ul>
 </li>
 <li>
@@ -107,7 +104,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/cmu-delphi/covidcast/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -121,60 +123,95 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Produce trajectory plots of forecasts and observed data</h1>
-    
+    <h1>Plot predictions along with truth</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/plot_trajectory.R'><code>R/plot_trajectory.R</code></a></small>
     <div class="hidden name"><code>plot_trajectory.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Produce trajectory plots of forecasts and observed data</p>
+    <p>Plot predictions along with truth</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plot_trajectory</span>(
-  <span class='no'>list_of_predictions_cards</span>,
-  <span class='kw'>first_day</span> <span class='kw'>=</span> <span class='st'>"2020-07-01"</span>,
-  <span class='kw'>last_day</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.Date</a></span>(),
-  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.2</span>
-)</pre>
+    <pre class="usage"><span class='fu'>plot_trajectory</span><span class='op'>(</span>
+  <span class='va'>predictions_cards</span>,
+  intervals <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.8</span>, <span class='fl'>0.95</span><span class='op'>)</span>,
+  plot_it <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  show_geo_value <span class='op'>=</span> <span class='cn'>NULL</span>,
+  show_forecaster <span class='op'>=</span> <span class='cn'>NULL</span>,
+  side_truth <span class='op'>=</span> <span class='cn'>NULL</span>,
+  show_points <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  show_quantiles <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  geo_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"county"</span>, <span class='st'>"hrr"</span>, <span class='st'>"msa"</span>, <span class='st'>"dma"</span>, <span class='st'>"state"</span><span class='op'>)</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>list_of_predictions_cards</th>
-      <td><p>collection of prediction cards as returned
-by <code><a href='get_predictions.html'>get_predictions()</a></code>. Supports collections of multiple forecast dates and
-forecasters</p></td>
+      <th>predictions_cards</th>
+      <td><p>long data frame of forecasts with a class of
+<code>predictions_cards</code> as created by <code><a href='get_predictions.html'>get_predictions()</a></code> or
+<code><a href='get_zoltar_predictions.html'>get_zoltar_predictions()</a></code> or <code><a href='get_covidhub_predictions.html'>get_covidhub_predictions()</a></code>.
+The first 4 columns are the same as those returned by the forecaster. The
+remainder specify the prediction task, 10 columns in total:
+<code>ahead</code>, <code>geo_value</code>, <code>quantile</code>, <code>value</code>, <code>forecaster</code>, <code>forecast_date</code>,
+<code>data_source</code>, <code>signal</code>, <code>target_end_date</code>, and <code>incidence_period</code>. Here
+<code>data_source</code> and <code>signal</code> correspond to the response variable only.</p></td>
     </tr>
     <tr>
-      <th>first_day</th>
-      <td><p>the earliest date to display</p></td>
+      <th>intervals</th>
+      <td><p>vector of confidence intervals to show. More than 3 is ugly
+and will be reduced to the default set.</p></td>
     </tr>
     <tr>
-      <th>last_day</th>
-      <td><p>the latest date to display. Defaults to the most recent data
-available (plus future, if forecasts are past today)</p></td>
+      <th>plot_it</th>
+      <td><p>should we actually produce the figure. If you have many
+geo_values or forecasters, best not to. Then you can assign the output
+to an object and facet or apply aesthetic specifications to meet your
+own standards.</p></td>
     </tr>
     <tr>
-      <th>alpha</th>
-      <td><p>Displayed ribbons are the 1-alpha coverage results</p></td>
+      <th>show_geo_value</th>
+      <td><p>a subset of <code>geo_values</code> in your <code>predictions_cards</code>.
+Default uses all available. If you only want to see some, this may speed
+up the call.</p></td>
+    </tr>
+    <tr>
+      <th>show_forecaster</th>
+      <td><p>a subset of <code>forecasters</code> in your <code>predictions_cards</code>.
+Default uses all available. If you only want to see some, this may speed
+up the call.</p></td>
+    </tr>
+    <tr>
+      <th>side_truth</th>
+      <td><p>optional. Use your own truth data rather than downloading
+with <code><a href='https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html'>covidcast::covidcast_signal()</a></code>. Must contain columns <code>geo_value</code>,
+<code>value</code> and <code>target_end_date</code></p></td>
+    </tr>
+    <tr>
+      <th>show_points</th>
+      <td><p>do you want points as well as lines</p></td>
+    </tr>
+    <tr>
+      <th>show_quantiles</th>
+      <td><p>do you want to plot the quantiles or just lines</p></td>
+    </tr>
+    <tr>
+      <th>geo_type</th>
+      <td><p>String indicating geographical type, one of "county", "dma",
+"hrr", "msa", or "state".</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>additional arguments passed to <code><a href='https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html'>covidcast::covidcast_signal()</a></code></p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Produces a ggplot object</p>
+    <p>invisibly returns a ggplot object</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>sister_preds</span> <span class='kw'>=</span> <span class='fu'><a href='get_predictions.html'>get_predictions</a></span>(
-  <span class='no'>baseline_forecaster</span>, <span class='st'>"sister"</span>,
-  <span class='kw pkg'>tibble</span><span class='kw ns'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></span>(<span class='kw'>data_source</span><span class='kw'>=</span><span class='st'>"usa-facts"</span>, <span class='kw'>signal</span> <span class='kw'>=</span> <span class='st'>"deaths_incidence_num"</span>,
-    <span class='kw'>start_day</span><span class='kw'>=</span><span class='kw pkg'>lubridate</span><span class='kw ns'>::</span><span class='fu'><a href='http://lubridate.tidyverse.org/reference/ymd.html'>ymd</a></span>(<span class='st'>"2020-07-01"</span>)),
-    <span class='kw pkg'>lubridate</span><span class='kw ns'>::</span><span class='fu'><a href='http://lubridate.tidyverse.org/reference/ymd.html'>ymd</a></span>(<span class='st'>"2020-09-01"</span>),<span class='st'>"epiweek"</span>, <span class='fl'>1</span>:<span class='fl'>4</span>, <span class='st'>"state"</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"mi"</span>))</div><div class='output co'>#&gt; <span class='message'>Downloading deaths_incidence_num from covidcast for period from 2020-07-01 to 2020-09-01.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Fetching deaths_incidence_num from usa-facts for 2020-09-01 in geography 'mi': no results</span></div><div class='input'><span class='no'>baby_preds</span> <span class='kw'>=</span> <span class='fu'><a href='get_predictions.html'>get_predictions</a></span>(
-  <span class='no'>baseline_forecaster</span>, <span class='st'>"baby"</span>,
-  <span class='kw pkg'>tibble</span><span class='kw ns'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></span>(<span class='kw'>data_source</span><span class='kw'>=</span><span class='st'>"usa-facts"</span>, <span class='kw'>signal</span> <span class='kw'>=</span> <span class='st'>"deaths_incidence_num"</span>,
-    <span class='kw'>start_day</span><span class='kw'>=</span><span class='kw pkg'>lubridate</span><span class='kw ns'>::</span><span class='fu'><a href='http://lubridate.tidyverse.org/reference/ymd.html'>ymd</a></span>(<span class='st'>"2020-07-01"</span>)),
-    <span class='kw pkg'>lubridate</span><span class='kw ns'>::</span><span class='fu'><a href='http://lubridate.tidyverse.org/reference/ymd.html'>ymd</a></span>(<span class='st'>"2020-09-08"</span>),<span class='st'>"epiweek"</span>, <span class='fl'>1</span>:<span class='fl'>4</span>, <span class='st'>"state"</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"mi"</span>))</div><div class='output co'>#&gt; <span class='message'>Downloading deaths_incidence_num from covidcast for period from 2020-07-01 to 2020-09-08.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Fetching deaths_incidence_num from usa-facts for 2020-09-08 in geography 'mi': no results</span></div><div class='input'> <span class='fu'>plot_trajectory</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>sister_preds</span>, <span class='no'>baby_preds</span>), <span class='kw'>last_day</span><span class='kw'>=</span><span class='st'>"2020-10-01"</span>)</div><div class='output co'>#&gt; <span class='message'>Downloading deaths_incidence_num from covidcast for period from 2020-07-05 to 2020-09-26.</span></div><div class='output co'>#&gt; <span class='error'>Error: Column `forecast_date` not found in `.data`</span></div><div class='img'><img src='plot_trajectory-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -186,11 +223,11 @@ available (plus future, if forecasts are past today)</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Alden Green, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Jed Grabman, Alden Green, Daniel McDonald, Balasubramanian Narasimhan, Mike O'Brien, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

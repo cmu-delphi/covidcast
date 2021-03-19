@@ -2,13 +2,16 @@
 % Please edit documentation in R/download_signals.R
 \name{download_signal}
 \alias{download_signal}
-\title{Download signal from covidcast}
+\title{Wrapper around \code{covidcast::covidcast_signal()} with additional logging.}
 \usage{
 download_signal(...)
 }
 \arguments{
-\item{...}{Arguments that are passed to \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}}.}
+\item{...}{arguments to be passed to \code{covidcast::covidcast_signal()}.}
+}
+\value{
+\code{covidcast_signal} data frame.
 }
 \description{
-This is a simple wrapper to \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}} that is less verbose.
+Wrapper around \code{covidcast::covidcast_signal()} with additional logging.
 }

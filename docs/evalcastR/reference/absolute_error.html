@@ -40,8 +40,7 @@
 
 
 <meta property="og:title" content="Compute absolute error — absolute_error" />
-<meta property="og:description" content="Computes absolute error between the actual value and the median of the
-forecast distribution." />
+<meta property="og:description" content="Absolute error of a forecaster" />
 
 
 
@@ -73,7 +72,7 @@ forecast distribution." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -81,7 +80,7 @@ forecast distribution." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -98,9 +97,6 @@ forecast distribution." />
     <li>
       <a href="../articles/intro-evalcast.html">Introduction to evalcast</a>
     </li>
-    <li>
-      <a href="../articles/intro_vignette.html">Introduction to evalcast</a>
-    </li>
   </ul>
 </li>
 <li>
@@ -108,7 +104,12 @@ forecast distribution." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/cmu-delphi/covidcast/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -123,30 +124,39 @@ forecast distribution." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Compute absolute error</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/error_measures.R'><code>R/error_measures.R</code></a></small>
     <div class="hidden name"><code>absolute_error.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Computes absolute error between the actual value and the median of the
-forecast distribution.</p>
+    <p>Absolute error of a forecaster</p>
     </div>
 
-    <pre class="usage"><span class='fu'>absolute_error</span>(<span class='no'>quantile_forecasts</span>, <span class='no'>actual_value</span>)</pre>
+    <pre class="usage"><span class='fu'>absolute_error</span><span class='op'>(</span><span class='va'>quantile</span>, <span class='va'>value</span>, <span class='va'>actual_value</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>quantile_forecasts</th>
-      <td><p>Tibble of quantile forecasts.</p></td>
+      <th>quantile</th>
+      <td><p>vector of forecasted quantiles</p></td>
+    </tr>
+    <tr>
+      <th>value</th>
+      <td><p>vector of forecasted values</p></td>
     </tr>
     <tr>
       <th>actual_value</th>
-      <td><p>Actual value.</p></td>
+      <td><p>vector of actual values of the same length as
+<code>quantile</code>/<code>value</code> or a scalar</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Intended to be used with <code><a href='evaluate_predictions.html'>evaluate_predictions()</a></code>, it expects three arguments
+of the same length, finds the location of the point forecast, and returns
+the absolute error.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -159,11 +169,11 @@ forecast distribution.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Alden Green, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Jed Grabman, Alden Green, Daniel McDonald, Balasubramanian Narasimhan, Mike O'Brien, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -1,49 +1,51 @@
-#' Fetch only the latest issue for each observation in a data frame
+#' Fetch the latest or earliest issue for each observation
 #'
-#' Since `covidcast_signal()` can, with the right options, return multiple
-#' issues for a single observation in a single geo, we may want only the most
-#' recent for plotting, mapping, or other purposes.
+#' The data returned from `covidcast_signal()` or `covidcast_signals()` can, if
+#' called with the `issues` argument, contain multiple issues for a single
+#' observation in a single location. These functions filter the data frame to
+#' contain only the earliest issue or only the latest issue.
 #'
-#' @param df A `covidcast_signal` data frame
-#' @return The same `covidcast_signal` data frame, but with only the latest
-#'     issue of every observation
+#' @param df A `covidcast_signal` or `covidcast_signal_long` data frame, such as
+#'   returned from `covidcast_signal()` or the "long" format of
+#'   `aggregate_signals()`.
+#' @return A data frame in the same form, but with only the earliest or latest
+#'   issue of every observation. Note that these functions sort the data frame
+#'   as part of their filtering, so the output data frame rows may be in a
+#'   different order.
 #' @importFrom rlang .data
-#' @keywords internal
+#' @export
 latest_issue <- function(df) {
-  # Save the attributes, since grouping overwrites them
-  attrs <- attributes(df)
-  attrs <- attrs[!(names(attrs) %in% c("row.names", "names"))]
-
-  df <- df %>%
-    dplyr::arrange(dplyr::desc(.data$issue)) %>%
-    dplyr::distinct(.data$geo_value, .data$time_value,
-                    .keep_all = TRUE)
-
-  attributes(df) <- c(attributes(df), attrs)
-
-  return(df)
+  return(first_or_last_issue(df, TRUE))
 }
 
-#' Fetch only the earliest issue for each observation in a data frame
-#'
-#' Since `covidcast_signal()` can, with the right options, return multiple
-#' issues for a single observation in a single geo, we may want only the most
-#' recent for plotting, mapping, or other purposes.
-#'
-#' @param df A `covidcast_signal` data frame
-#' @return The same `covidcast_signal` data frame, but with only the earliest
-#'     issue of every observation
-#' @importFrom rlang .data
-#' @keywords internal
+#' @rdname latest_issue
+#' @export
 earliest_issue <- function(df) {
-  # Save the attributes, since grouping overwrites them
+  return(first_or_last_issue(df, FALSE))
+}
+
+# Helper to do either first or last issue.
+first_or_last_issue <- function(df, latest) {
+  if (!inherits(df, c("covidcast_signal", "covidcast_signal_long"))) {
+    stop("`df` must be a `covidcast_signal` or `covidcast_signal_long` data frame")
+  }
+
+  # Save the attributes, such as metadata, since dplyr drops them
   attrs <- attributes(df)
   attrs <- attrs[!(names(attrs) %in% c("row.names", "names"))]
 
+  issue_sort <- function(df) {
+    if (latest) {
+      dplyr::arrange(df, dplyr::desc(.data$issue))
+    } else {
+      dplyr::arrange(df, .data$issue)
+    }
+  }
+
   df <- df %>%
-    dplyr::arrange(.data$issue) %>%
-    dplyr::distinct(.data$geo_value, .data$time_value,
-                    .keep_all = TRUE)
+    issue_sort() %>%
+    dplyr::distinct(.data$data_source, .data$signal, .data$geo_value,
+                    .data$time_value, .keep_all = TRUE)
 
   attributes(df) <- c(attributes(df), attrs)
 
@@ -326,16 +328,32 @@ fips_to_abbr = function(code, ignore.case = TRUE, perl = FALSE, fixed = FALSE,
 grep_lookup = function(key, keys, values, ignore.case = FALSE, perl = FALSE,
                        fixed = FALSE,  ties_method = c("first", "all")) {
   ties_method = match.arg(ties_method)
-  res = vector("list", length(key))
-  for (i in 1:length(key)) {
-    ind = grep(key[i], keys, ignore.case = ignore.case, perl = perl,
+
+  # Only do grep lookup for unique keys, to keep the look sort. It's a common
+  # use case to, say, call fips_to_name on a covidcast_signal data frame over
+  # many days of data with many repeat observations of the same locations.
+  unique_key <- unique(key)
+
+  res = vector("list", length(unique_key))
+  for (i in seq_along(unique_key)) {
+    ind = grep(unique_key[i], keys, ignore.case = ignore.case, perl = perl,
                fixed = fixed)
-    if (length(ind) == 0) { res[[i]] = NA; names(res[[i]]) = key[i] }
-    else {  res[[i]] = values[ind]; names(res[[i]]) = keys[ind] }
+    if (length(ind) == 0) {
+      res[[i]] = NA
+      names(res[[i]]) = unique_key[i]
+    } else {
+      res[[i]] = values[ind]
+      names(res[[i]]) = keys[ind]
+    }
   }
 
+  # Restore to original length, including duplicate keys.
+  res <- res[match(key, unique_key)]
+
   # If they ask for all matches, then return the list
-  if (ties_method == "all") return(res)
+  if (ties_method == "all") {
+    return(res)
+  }
 
   # Otherwise, format into a vector, and warn if needed
   if (length(unlist(res)) > length(key)) {

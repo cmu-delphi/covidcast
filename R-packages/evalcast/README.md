@@ -31,6 +31,6 @@ online](https://cmu-delphi.github.io/covidcast/evalcast/index.html).
 ## Getting started
 
 To get started using this package, view the Getting Started guide at
-`vignette("covidcast")`.
+`vignette("intro-evalcast")`.
 
 It may also help to try using the `baseline_forecaster()`

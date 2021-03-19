@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Evaluation Tools For COVID Forecasters • evalcast</title>
+<title>Tools For Evaluating COVID Forecasters • evalcast</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><meta property="og:title" content="Evaluation Tools For COVID Forecasters">
-<meta property="og:description" content='Evaluation tools for probabilistic COVID-19 forecasters. This
+<script src="pkgdown.js"></script><meta property="og:title" content="Tools For Evaluating COVID Forecasters">
+<meta property="og:description" content='Tools for evaluating probabilistic COVID-19 forecasters. This
     package provides functionality for accurately evaluating forecaster
     performance: crucially, evalcast leverages the covidcast R packages "as of"
     capability, which allows one to get the data that would have been known as
@@ -42,7 +42,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -50,7 +50,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -67,16 +67,20 @@
 <li>
       <a href="articles/intro-evalcast.html">Introduction to evalcast</a>
     </li>
-    <li>
-      <a href="articles/intro_vignette.html">Introduction to evalcast</a>
-    </li>
   </ul>
 </li>
 <li>
   <a href="news/index.html">Changelog</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/cmu-delphi/covidcast/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -96,8 +100,9 @@
 <h2 class="hasAnchor">
 <a href="#installing" class="anchor"></a>Installing</h2>
 <p>This package is not on CRAN yet, so it can be installed using the <a href="https://cran.r-project.org/package=remotes"><code>remotes</code></a> package:</p>
-<div class="sourceCode" id="cb1"><pre class="r"><span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"cmu-delphi/covidcast"</span>, <span class="kw">ref</span> <span class="kw">=</span> <span class="st">"main"</span>,
-                         <span class="kw">subdir</span> <span class="kw">=</span> <span class="st">"R-packages/evalcast"</span>)</pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"cmu-delphi/covidcast"</span>, ref <span class="op">=</span> <span class="st">"main"</span>,
+                         subdir <span class="op">=</span> <span class="st">"R-packages/evalcast"</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="documentation" class="section level2">
 <h2 class="hasAnchor">
@@ -107,7 +112,7 @@
 <div id="getting-started" class="section level2">
 <h2 class="hasAnchor">
 <a href="#getting-started" class="anchor"></a>Getting started</h2>
-<p>To get started using this package, view the Getting Started guide at <code>vignette("covidcast")</code>.</p>
+<p>To get started using this package, view the Getting Started guide at <code><a href="articles/intro-evalcast.html">vignette("intro-evalcast")</a></code>.</p>
 <p>It may also help to try using the <code><a href="reference/baseline_forecaster.html">baseline_forecaster()</a></code></p>
 </div>
 </div>
@@ -117,6 +122,10 @@
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
+<li>Browse source code at <br><a href="https://github.com/cmu-delphi/covidcast/">https://​github.com/​cmu-delphi/​covidcast/​</a>
+</li>
+<li>Report a bug at <br><a href="https://github.com/cmu-delphi/covidcast/issues">https://​github.com/​cmu-delphi/​covidcast/​issues</a>
+</li>
 <li>Get the COVIDcast API client at <br><a href="https://cmu-delphi.github.io/covidcast/covidcastR/">https://​cmu-delphi.github.io/​covidcast/​covidcastR/​</a>
 </li>
 <li>View the COVIDcast map at <br><a href="https://covidcast.cmu.edu/">https://​covidcast.cmu.edu/​</a>
@@ -134,9 +143,12 @@
 <div class="developers">
 <h2>Developers</h2>
 <ul class="list-unstyled">
-<li>Jacob Bien <br><small class="roles"> Author, maintainer </small>  </li>
+<li>Jacob Bien <br><small class="roles"> Author </small>  </li>
+<li>Jed Grabman <br><small class="roles"> Author </small>  </li>
 <li>Alden Green <br><small class="roles"> Author </small>  </li>
+<li>Daniel McDonald <br><small class="roles"> Author, maintainer </small>  </li>
 <li>Balasubramanian Narasimhan <br><small class="roles"> Author </small>  </li>
+<li>Mike O'Brien <br><small class="roles"> Author </small>  </li>
 <li>Ryan Tibshirani <br><small class="roles"> Author </small>  </li>
 <li><a href="authors.html">All authors...</a></li>
 </ul>
@@ -147,11 +159,11 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Jacob Bien, Alden Green, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Jed Grabman, Alden Green, Daniel McDonald, Balasubramanian Narasimhan, Mike O'Brien, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

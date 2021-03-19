@@ -1,0 +1,617 @@
+---
+title: "Delphi's COVIDcast Project: <br> An Ecosystem for Tracking and Forecasting the Pandemic"
+author: Ryan Tibshirani <br> Statistics and Machine Learning <br> Carnegie Mellon University 
+date: "<br> ![](delphi.png) ![](cmu.png) <br><br> January 27, 2021"
+footer: "Get the slides at: cmu-delphi.github.io/covidcast/talks/google/talk.html"
+output: 
+  slidy_presentation:
+    theme: cerulean
+    highlight: tango
+    css: style.css
+    includes: 
+      after_body: script.html
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE, 
+                      autodep = TRUE, cache.comments = TRUE)
+library(dplyr)
+library(purrr)
+library(tidyr)
+library(ggplot2)
+library(gridExtra)
+library(directlabels)
+
+col = function(x, color = "#bb0000") {
+  sprintf("<span style='color: %s;'>%s</span>", color, x)
+}
+```
+
+# Delphi Then
+
+- In 2012, we formed [Delphi](https://delphi.cmu.edu) to "develop the theory and practice of epidemic forecasting, and its role in decision-making"
+- Participated in annual CDC flu forecasting challenges since 2013, earned top place in several 
+- Awarded `r col("CDC's National Center of Excellence")` for flu forecasting in 2019 
+- Published open code and data, including numerous influenza surveillance streams 
+
+# Delphi Now
+
+- We've gone from 7 members to over 50, to support the US COVID-19 response
+- Added many smart folks from CMU, but also Stanford, UC Davis, USC, Google
+- Beyond (before?) forecasting: we've been focusing, now more than ever, on `r col("data")`
+- *This problem is so hard that our best weapon is a diversity of data sources*
+
+# COVIDcast Indicators
+
+![](covidcast_indicators.svg)
+
+# What Is This Used For?
+
+- Forecasting, e.g.
+    * Case incidence: for vaccine trial site selection
+    * Hospitalizations: for planning and preparedness 
+- Nowcasting, e.g.,
+    * Situational awareness: testing and resource allocation
+    * Decision-making: re-opening criteria, school closures
+ - General epidemiological research, e.g.,
+    * What behaviors are linked to spread?
+    * What symptoms are linked to cases?
+
+# COVIDcast Ecosystem
+
+![](covidcast_overview.svg)
+    
+# This Talk
+
+I can't cover all of this! This will be a very nontechnical talk, focused on providing a basic understanding of the data and our project overall. (Please ask about `r col("forecasting")`, `r col("nowcasting")`, or anything else, during the Q & A!) Outline:
+
+1. Demo of COVIDcast API and indicators
+2. COVID-19 survey and medical claims data
+3. Wrapping up, looking towards the future
+
+`r col("Reproducible talk:")` all code included. <https://cmu-delphi.github.io/covidcast/talks/google/talk.html>
+
+# Example: Deaths
+
+How many COVID-19 deaths have been reported per day, in my state, since March 1?
+
+```{r, fig.width = 8, fig.height = 5.5}
+library(covidcast)
+start_day = "2020-03-01"
+end_day = "2021-01-24"
+deaths = covidcast_signal(data_source = "usa-facts", 
+                          signal = "deaths_7dav_incidence_num", 
+                          start_day = start_day, end_day = end_day,
+                          geo_type = "state", geo_values = "pa")
+
+plot(deaths, plot_type = "line", 
+     title = "New COVID-19 deaths in PA (7-day average)") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  theme(legend.position = "none")
+```
+
+# Example: Hospitalizations
+
+What percentage of daily hospital admissions are due to COVID-19 in PA, NY, TX?
+
+```{r, fig.width = 8, fig.height = 5.5}
+hosp = covidcast_signal(data_source = "hospital-admissions", 
+                        signal = "smoothed_adj_covid19_from_claims",
+                        start_day = start_day, end_day = end_day,
+                        geo_type = "state", geo_values = c("pa", "ny", "tx"))
+
+plot(hosp, plot_type = "line", 
+     title = "% of hospital admissions due to COVID-19") + 
+  geom_dl(aes(y = value, color = geo_value, label = toupper(geo_value)), 
+          method = "last.bumpup") +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  theme(legend.position = "none")
+```
+
+# Example: New Cases 
+
+What does the current COVID-19 incident case rate look like, nationwide?
+
+```{r, fig.width = 9, fig.height = 7}
+cases = covidcast_signal(data_source = "usa-facts", 
+                         signal = "confirmed_7dav_incidence_prop",
+                         start_day = end_day, end_day = end_day)
+
+plot(cases, title = "New COVID-19 cases per 100,000 people",  
+     choro_params = list(subtitle = format.Date(end_day, "%B %d %Y"), 
+                         legend_n = 6), range = c(0, 100))
+```
+
+# Example: Total Cases
+
+What does the current COVID-19 cumulative case rate look like, nationwide?
+
+```{r, fig.width = 9, fig.height = 7}
+cases = covidcast_signal(data_source = "usa-facts", 
+                         signal = "confirmed_cumulative_prop",
+                         start_day = end_day, end_day = end_day)
+
+plot(cases, title = "Total COVID-19 cases per 100,000 people", 
+     choro_params = list(subtitle = format.Date(end_day, "%B %d %Y"), 
+                         legend_n = 6), range = c(0, 1e4))
+```
+
+# Example: Doctor's Visits
+
+How do some cities compare in terms of doctor's visits due to COVID-like illness?
+
+```{r, fig.width = 8, fig.height = 6}
+dv = covidcast_signal(data_source = "doctor-visits", 
+                      signal = "smoothed_adj_cli", 
+                      start_day = start_day, end_day = end_day,
+                      geo_type = "msa", 
+                      geo_values = name_to_cbsa(c("Miami", "New York", 
+                                                  "Pittsburgh", "San Antonio")))
+
+plot(dv, plot_type = "line", 
+     title = "% of doctor's visits due to COVID-like illness") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  scale_color_hue(labels = cbsa_to_name(unique(dv$geo_value)))
+```
+
+# Example: Symptoms
+
+How do my county and my friend's county compare in terms of COVID symptoms?
+
+```{r, fig.width = 8, fig.height = 6}
+sympt = covidcast_signal(data_source = "fb-survey", 
+                         signal = "smoothed_hh_cmnty_cli",
+                         start_day = "2020-04-16", end_day = end_day,
+                         geo_values = c(name_to_fips("Allegheny"),
+                                        name_to_fips("Fulton", 
+                                                     state = "GA")))
+
+plot(sympt, plot_type = "line", 
+     title = "% of people who know somebody with COVID symptoms") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  scale_color_hue(labels = fips_to_name(unique(sympt$geo_value)))
+```
+
+# Example: Mask Use
+
+How do some states compare in terms of self-reported mask useage?
+
+```{r, fig.width = 8, fig.height = 5.5}
+mask = covidcast_signal(data_source = "fb-survey", 
+                        signal = "smoothed_wwearing_mask",
+                        start_day = "2020-09-15", end_day = end_day,
+                        geo_type = "state", 
+                        geo_values = c("dc", "ma", "ny",
+                                       "wy", "sd", "id"))
+
+plot(mask, plot_type = "line", 
+     title = "% of people who wear masks in public most/all the time") +
+  geom_dl(aes(y = value, color = geo_value, label = toupper(geo_value)), 
+          method = "last.bumpup") +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  theme(legend.position = "none")
+```
+
+# Example: Vaccine Acceptance
+
+If a COVID-19 vaccine were offered to you today, would you definitely or probably get vaccinated?
+
+```{r, fig.width = 9, fig.height = 7}
+vaccine = covidcast_signal(data_source = "fb-survey",
+                           signal = "smoothed_waccept_covid_vaccine",
+                           end_day, end_day, geo_type = "state")
+
+plot(vaccine, title = "% of people who would accept COVID-19 vaccine",  
+     choro_col = c("#D9F0C2", "#BFE6B5", "#5585B1", "#1F589F"),
+     choro_params = list(subtitle = format.Date(end_day, "%B %d %Y"),
+                         legend_n = 6), range = c(55, 95))
+```
+
+
+# Data Revisions 
+
+By default the API returns the most recent data, but we also provide access to all previous versions of the data. Why would we need this? Because many data sources are subject to `r col("revisions:")`
+
+- Case and death counts frequently corrected/adjusted by authorities
+- Medical claims data can take weeks to be submitted and/or processed
+- Testing/lab data can be backlogged for a variety of reasons, etc.
+
+This presents a challenge to modelers: e.g., we have to learn how to forecast based on the `r col("data we'd have at the time")`, not updates that would arrive later. To accommodate, we log revisions even when the original data source does not!
+
+# Example: Backfill 
+
+The last two weeks of August in CA ...
+
+```{r, fig.width = 8, fig.height = 5}
+# Let's get the data that was available as of 09/22, for the end of August in CA
+dv = covidcast_signal(data_source = "doctor-visits", 
+                      signal = "smoothed_adj_cli",
+                      start_day = "2020-08-15", end_day = "2020-08-31",
+                      geo_type = "state", geo_values = "ca",
+                      as_of = "2020-09-21")
+
+# Plot the time series curve
+xlim = c(as.Date("2020-08-15"), as.Date("2020-09-21"))
+ylim = c(3.83, 5.92)
+ggplot(dv, aes(x = time_value, y = value)) + 
+  geom_line() +
+  coord_cartesian(xlim = xlim, ylim = ylim) +
+  geom_vline(aes(xintercept = as.Date("2020-09-21")), lty = 2) +
+  labs(color = "as of", x = "Date", y = "% doctor's visits due to CLI in CA") +
+  theme_bw() + theme(legend.position = "bottom")
+```
+
+# Example: Backfill (Cont.)
+
+The last two weeks of August in CA ...
+
+```{r, fig.width = 8, fig.height = 5}
+# Now loop over a bunhch of "as of" dates, fetch data from the API for each one
+as_ofs = seq(as.Date("2020-09-01"), as.Date("2020-09-21"), by = "week")
+dv_as_of = map_dfr(as_ofs, function(as_of) {
+  covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
+                   start_day = "2020-08-15", end_day = "2020-08-31", 
+                   geo_type = "state", geo_values = "ca", as_of = as_of)
+})
+
+# Plot the time series curve "as of" September 1
+dv_as_of %>% 
+  filter(issue == as.Date("2020-09-01")) %>% 
+  ggplot(aes(x = time_value, y = value)) + 
+  geom_line(aes(color = factor(issue))) + 
+  coord_cartesian(xlim = xlim, ylim = ylim) +
+  geom_vline(aes(color = factor(issue), xintercept = issue), lty = 2) +
+  labs(color = "as of", x = "Date", y = "% doctor's visits due to CLI in CA") +
+  geom_line(data = dv, aes(x = time_value, y = value)) +
+  geom_vline(aes(xintercept = as.Date("2020-09-21")), lty = 2) +
+  theme_bw() + theme(legend.position = "none")
+```
+
+# Example: Backfill (Cont.)
+
+The last two weeks of August in CA ...
+
+```{r, fig.width = 8, fig.height = 5}
+dv_as_of %>% 
+  ggplot(aes(x = time_value, y = value)) + 
+  geom_line(aes(color = factor(issue))) + 
+  coord_cartesian(xlim = xlim, ylim = ylim) +
+  geom_vline(aes(color = factor(issue), xintercept = issue), lty = 2) +
+  labs(color = "as of", x = "Date", y = "% doctor's visits due to CLI in CA") +
+  geom_line(data = dv, aes(x = time_value, y = value)) +
+  geom_vline(aes(xintercept = as.Date("2020-09-21")), lty = 2) +
+  theme_bw() + theme(legend.position = "none")
+```
+
+# Massive COVID-19 Survey
+
+Through recruitment partnership with Facebook, we survey over `r col("50,000 people daily")` (and over 16 million since it began in April), in the US
+
+- We construct numerous (over 20) daily, county-level indicators from the survey
+- Several are motivated by relevance to forecasting and nowcasting. For example: `r col("% CLI")` = percentage of people with COVID-like illness, or `r col("% CLI-in-community")` = percentage of people who know someone with CLI
+- Many others are motivated by broader perspective in public health: understanding how the pandemic is `r col("affecting people")` (topics include mental health, social contacts, and behavior, broken down by various demographics)
+
+A [parallel, international effort](https://covidmap.umd.edu/) by the University of Maryland reaches 100+ countries in 55 languages. Raw response data is freely available to researchers who sign a [data use agreement](https://dataforgood.fb.com/docs/covid-19-symptom-survey-request-for-data-access/)
+
+# Medical Insurance Claims
+
+Through partnership with Change Healthcare and others, we compute daily, county-level aggregate statistics from medical insurance claims covering over `r col("half of the US population")`
+
+- We construct various outpatient and inpatient signals, using rules based on ICD-10 codes 
+- For example: `r col("% CLI-in-doctor-visits")` = 100 * (COVID-like + Flu-like + Mixed - Flu) / Total
+- Available at about 3-5 day latency, with huge backfill tendency (substantial for several weeks out)
+- Exhibit puzzling spatial bias ... % CLI-in-doctor-visits not directly comparable across the US
+
+Despite challenges, these data have enormous potential for nowcasting: completely parallel data stream not subject to same issues as public health reporting 
+
+<!--(limited testing capacity, reporting artifacts, retroactive re-definitions, misleading/misinterpreted aggregation rules)-->
+
+# Wrapping Up
+
+Delphi's COVIDcast ecosystem has many parts:
+
+1. Unique relationships with partners in tech and healthcare granting us access to data on pandemic activity
+2. Code and infrastructure to build `r col("COVID-19 indicators")`, continuously-updated and geographically-comprehensive
+3. A historical database of all indicators, including `r col("revision tracking")`
+4. A [public API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html) (and [R](https://cmu-delphi.github.io/covidcast/covidcastR/) and [Python](https://cmu-delphi.github.io/covidcast/covidcast-py/html/) packages) serving new indicators daily 
+5. [Interactive maps and graphics](https://covidcast.cmu.edu) to display our indicators
+6. Nowcasting and forecasting work building on the indicators
+
+In this pandemic, it'll take an entire community to find answers to all the important questions. Please join ours!
+
+# Towards the Future
+
+An important lesson learned:
+
+<br>
+
+*In an emergency, the systems you would want to use are the ones that are already up and running.*
+
+<br>
+
+The end of the pandemic is not the finish line. Let's take everything we've gained and build a `r col("permanent, nationally-coordinated effort on epidemic tracking and forecasting")`, and grow this technology to be as universally accepted and useful as weather forecasting is today
+
+# Thanks
+
+- The [whole Delphi team](https://delphi.cmu.edu/about/team/), and various CMU units
+- Google, Facebook, Amazon Web Services
+- Change Healthcare, Quidel, SafeGraph, Qualtrics
+- Centers for Disease Control and Prevention
+
+For more, visit <https://covidcast.cmu.edu> (you'll find everything linked from there)
+
+<br>
+
+![Delphi](delphi.png) ![Carnegie Mellon University](cmu.png)
+
+# `r col("Appendix", "white")` {.bigger} 
+
+<div style='text-align: center; padding: 225px 0px'> 
+**Appendix** </div>
+
+# COVIDcast API 
+
+The COVIDcast API is based on HTTP GET queries and returns data in JSON form. The base URL is https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast 
+
+| Parameter | Description | Examples |
+| :-- | :-- | :-- |
+| `data_source` | data source | `doctor-visits` or `fb-survey` |
+| `signal` | signal derived from data source | `smoothed_cli` or `smoothed_adj_cli` |
+| `time_type` | temporal resolution of the signal | `day` or `week` |
+| `geo_type` | spatial resolution of the signal | `county`, `hrr`, `msa`, or `state` |
+| `time_values` | time units over which events happened | `20200406` or `20200406-20200410` |
+| `geo_value` | location codes, depending on `geo_type` | `*` for all, or `pa` for Pennsylvania |
+
+# As Of, Issues, Lag
+
+By default the API returns the most recent data for each `time_value`. We also provide access to all previous versions of the data, using the following optional parameters:
+
+| Parameter | To get data ... | Examples |
+| :-- | :-- | :-- |
+| `as_of` | as if we queried the API on a particular date | `20200406` |
+| `issues` | published at a particular date or date range | `20200406` or `20200406-20200410` |
+| `lag` | published a certain number of time units after events occured | `1` or `3` |
+
+# R and Python Packages
+
+We also provide [R](https://cmu-delphi.github.io/covidcast/covidcastR/) and [Python](https://cmu-delphi.github.io/covidcast/covidcast-py/html/) packages for API access. Highlights: 
+
+- Easy API querying:
+    * Same specification structure (many default parameters) 
+    * Full support for data revisions (as of, issues, lag)
+- Basic signal processing:
+    * Correlations sliced by location, or by time
+    * Data wrangling: preparing signals for analysis
+- Plotting functionality:
+    * Choropleth and bubble maps 
+    * Time series plots 
+
+(Have an idea? File an issue or contribute a PR on our [public GitHub repo](https://github.com/cmu-delphi/covidcast))
+
+# List of Currently Available Indicators 
+
+```{r, R.options = list(width = 85)}
+meta = covidcast_meta() %>%
+  group_by(data_source, signal) %>%
+  summarize(county = ifelse("county" %in% geo_type, "*", ""),
+            msa = ifelse("msa" %in% geo_type, "*", ""),
+            dma = ifelse("dma" %in% geo_type, "*", ""),
+            hrr = ifelse("hrr" %in% geo_type, "*", ""),
+            state = ifelse("state" %in% geo_type, "*", ""),
+            nation = ifelse("nation" %in% geo_type, "*", "")) %>%
+  mutate(signal = ifelse(nchar(signal) <= 25, signal,
+                         paste0(substr(signal, 1, 22), "..."))) %>%
+  as.data.frame() %>%
+  print(right = FALSE, row.names = FALSE)
+```
+
+# Other Ways To Explore the Indicators
+
+- [Indicator dashboard](https://covidcast.cmu.edu)
+- [Export data tool](https://covidcast.cmu.edu/export/) 
+- [API documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html) 
+    
+<img src="covidcast_dashboard.png" width="750px">
+
+# Other Ways To Explore the Survey 
+
+- [Survey dashboard](https://covidcast.cmu.edu/survey-results/)
+- [Survey documentation](https://cmu-delphi.github.io/delphi-epidata/symptom-survey/) 
+- [Access the microdata](https://dataforgood.fb.com/docs/covid-19-symptom-survey-request-for-data-access/) 
+
+<img src="survey_dashboard.png" width="750px">
+
+# Why % CLI-in-Community? 
+
+Why ask a proxy question (have people report on others)? Check out its Spearman correlations to COVID-19 case rates:
+
+```{r, fig.width = 7, fig.height = 5}
+# Fetch Facebook % CLI signal, % CLI-in-community signal and confirmed case
+# incidence proportions
+start_day = "2020-04-15"
+end_day = "2021-01-24"
+sympt1 = covidcast_signal("fb-survey", "smoothed_cli", 
+                          start_day, end_day)
+sympt2 = covidcast_signal("fb-survey", "smoothed_hh_cmnty_cli", 
+                          start_day, end_day)
+cases = covidcast_signal("usa-facts", "confirmed_7dav_incidence_prop", 
+                         start_day, end_day)
+
+# Consider only counties with at least 500 cumulative cases so far
+case_num = 500
+geo_values = covidcast_signal("usa-facts", "confirmed_cumulative_num",
+                              max(cases$time), max(cases$time)) %>%
+  filter(value >= case_num) %>% pull(geo_value)
+sympt1_act = sympt1 %>% filter(geo_value %in% geo_values)
+sympt2_act = sympt2 %>% filter(geo_value %in% geo_values)
+cases_act = cases %>% filter(geo_value %in% geo_values)
+
+# Compute correlations, per time, over all counties
+df_cor1 = covidcast_cor(sympt1_act, cases_act, by = "time_value", 
+                        method = "spearman")
+df_cor2 = covidcast_cor(sympt2_act, cases_act, by = "time_value", 
+                        method = "spearman")
+
+# Stack rowwise into one data frame
+df_cor = rbind(df_cor1, df_cor2)
+df_cor$signal = c(rep("% CLI", nrow(df_cor1)), 
+                  rep("% CLI-in-community", nrow(df_cor2)))
+
+# Then plot correlations over time 
+ggplot(df_cor, aes(x = time_value, y = value)) + 
+  geom_line(aes(color = signal)) +
+  labs(title = "Correlation between survey signals and case rates (by time)",
+       subtitle = sprintf("Over all counties with at least %i cumulative cases",
+                          case_num), x = "Date", y = "Correlation") +
+    theme_bw() + theme(legend.pos = "bottom", legend.title = element_blank())
+```
+
+# An Early Indicator?
+
+As motivation, let's take a look at case counts in Miami-Dade, right around the second wave:
+
+```{r, fig.width = 7, fig.height = 5}
+# Fetch Facebook % CLI-in-community signal and confirmed case incidence numbers
+# from June 1 to July 15
+start_day = "2020-06-01"
+end_day = "2020-07-15"
+sympt = covidcast_signal("fb-survey", "smoothed_hh_cmnty_cli", 
+                         start_day, end_day)
+cases = covidcast_signal("usa-facts", "confirmed_7dav_incidence_num",
+                         start_day, end_day)
+
+# Function to transform from one range to another
+trans = function(x, from_range, to_range) {
+  (x - from_range[1]) / (from_range[2] - from_range[1]) *
+    (to_range[2] - to_range[1]) + to_range[1]
+}
+
+# Function to produce a plot comparing the signals for one county
+ggplot_colors = c("#FC4E07", "#00AFBB", "#E7B800")
+plot_one = function(geo_value, df1, df2, lab1, lab2, title = NULL, 
+                    xlab = NULL, ylab1 = NULL, ylab2 = NULL) {
+  # Filter down the signal data frames
+  given_geo_value = geo_value
+  df1 = df1 %>% filter(geo_value == given_geo_value)
+  df2 = df2 %>% filter(geo_value == given_geo_value)
+  
+  # Compute ranges of the two signals
+  range1 = df2 %>% select("value") %>% range(na.rm = TRUE)
+  range2 = df1 %>% select("value") %>% range(na.rm = TRUE)
+  
+  # Convenience functions for our two signal ranges
+  trans12 = function(x) trans(x, range1, range2)
+  trans21 = function(x) trans(x, range2, range1)
+  
+  # Find state name, find abbreviation, then set title
+  state_name = fips_to_name(paste0(substr(geo_value, 1, 2), "000"))
+  state_abbr = name_to_abbr(state_name)
+  title = paste0(fips_to_name(geo_value), ", ", state_abbr)
+  
+  # Transform the combined signal to the incidence range, then stack
+  # these rowwise into one data frame
+  df = select(rbind(df1 %>% mutate_at("value", trans21),
+                    df2), c("time_value", "value"))
+  df$signal = c(rep(lab1, nrow(df1)), rep(lab2, nrow(df2)))
+  
+  # Finally, plot both signals
+  return(ggplot(df, aes(x = time_value, y = value)) +
+           geom_line(aes(color = signal)) +
+           scale_color_manual(values = ggplot_colors[1:2]) +
+           scale_y_continuous(name = ylab1, limits = range1,
+                              sec.axis = sec_axis(trans = trans12,
+                                                  name = ylab2)) +
+           labs(title = title, x = xlab) + theme_bw() +
+           theme(legend.pos = "bottom", legend.title = element_blank()))
+}
+
+# Produce a plot for Miami-Dade, and add vertical lines
+plot_one(name_to_fips("Miami-Dade"), df1 = sympt, df2 = cases, 
+         lab1 = "% CLI-in-community", lab2 = "New COVID-19 cases", 
+         xlab = "Date", ylab1 = "New COVID-19 cases",
+         ylab2 = "% of people who know someone with CLI") +
+  geom_vline(xintercept = as.numeric(as.Date("2020-06-19")),
+             linetype = 2, size = 1, color = ggplot_colors[1]) +
+  geom_vline(xintercept = as.numeric(as.Date("2020-06-25")),
+             linetype = 2, size = 1, color = ggplot_colors[2])
+```
+
+# An Early Indicator? (Cont.) 
+
+Let's look again, now at Allegheny County, right around the third wave:
+
+```{r, fig.width = 7, fig.height = 5}
+start_day = "2020-10-15"
+end_day = "2020-12-01"
+sympt = covidcast_signal("fb-survey", "smoothed_hh_cmnty_cli", 
+                         start_day, end_day)
+cases = covidcast_signal("usa-facts", "confirmed_7dav_incidence_num",
+                         start_day, end_day)
+
+# Produce a plot for Allegheny County, and add vertical lines
+plot_one(name_to_fips("Allegheny"), df1 = sympt, df2 = cases,
+         lab1 = "% CLI-in-community", lab2 = "New COVID-19 cases", 
+         xlab = "Date", ylab1 = "New COVID-19 cases",
+         ylab2 = "% of people who know someone with CLI") +
+  geom_vline(xintercept = as.numeric(as.Date("2020-10-30")),
+             linetype = 2, size = 1, color = ggplot_colors[1]) +
+  geom_vline(xintercept = as.numeric(as.Date("2020-11-06")),
+             linetype = 2, size = 1, color = ggplot_colors[2])
+```
+
+# Forecasting Demo
+
+Notational setup: for location $\ell$ and time $t$, let
+
+- $Y_{\ell,t}$ denote the COVID-19 case incidence rate
+- $X_{\ell,t}$ the % CLI-in-community signal
+
+To predict case rates $d$ days ahead, consider two `r col("simple autoregressive models:")`
+$$
+\begin{align*}
+\mathrm{Quantile}_\tau(Y_{\ell,t+d} \,|\, \{Y_s,X_s:s\leq t\}) &=
+\alpha_\tau + \sum_{j=0}^2 \beta_{\tau,j} Y_{\ell,t-7j} \\
+\mathrm{Quantile}_\tau(Y_{\ell,t+d} \,|\, \{Y_s,X_s:s\leq t\}) &=
+\alpha_\tau + \sum_{j=0}^2 \beta_{\tau,j} Y_{\ell,t-7j} + 
+\sum_{j=0}^2 \beta_{\tau,j} X_{\ell,t-7j}\\
+\end{align*}
+$$
+
+# Forecasting Demo (Cont.)
+
+- Fit models using quantile regression at levels 0.01, 0.025, 0.05, 0.1, ... 0.9, 0.95, 0.975, 0.99
+- For each forecast date, train on most recent 21 days of data (to account for `r col("nonstationarity")`)
+- Use noncrossing constraints (enforce noncrossing of quantiles at both training and test points)
+- Recast quantiles as prediction intervals $(\ell_i,u_i)$, $i=0,\ldots,k$. Given a forecast distribution $F$, with:
+$$
+\ell_i = F^{-1}(\alpha_i/2), \; u_i = F^{-1}(1-\alpha_i/2), \; i=0,\ldots,k 
+$$
+and target $y$, we score forecasts using weighted interval score or WIS: 
+$$
+\mathrm{WIS}(P,y) = \frac{1}{2(k+1)} \sum_{i=0}^k \Big[\alpha_i(u_i-\ell_i) + 2 \cdot \mathrm{dist}(y,[\ell_i,u_i])\Big]
+$$
+This is a negatively oriented (lower is better) scoring rule, combining coverage and sharpness
+
+# Forecasting Demo (Cont.)
+
+Results from state-level forecasts made over early July 1 to August 15 (from [modeltools vignette](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/quantgen-forecast-cv.html)):
+
+```{r, fig.width = 7, fig.height = 5}
+# http://github.com/cmu-delphi/covidcast/blob/main/R-packages/modeltools/vignettes/quantgen-forecast.rda
+load("quantgen-forecast.rda")
+
+# Compute and plot scaled mean WIS as function of number of days ahead
+evals %>%
+  group_by(forecaster, ahead) %>%
+  summarize(wis = mean(wis, na.rm = TRUE)) %>%
+  pivot_wider(names_from = "forecaster", values_from = "wis") %>%
+  mutate(QAR3 = QAR3 / Baseline, `QAR3 + CLI3` = `QAR3 + CLI3`/ Baseline) %>%
+  select(-Baseline) %>%
+  pivot_longer(cols = -ahead, names_to = "forecaster", values_to = "wis") %>%
+  ggplot(aes(x = ahead, y = wis)) +  
+  geom_line(aes(color = forecaster)) + 
+  geom_point(aes(color = forecaster)) +
+  scale_color_manual(values = ggplot_colors[2:1]) +
+  labs(x = "Number of days ahead", y = "Scaled mean WIS") +
+  theme_bw() + theme(legend.pos = "bottom", legend.title = element_blank())
+```

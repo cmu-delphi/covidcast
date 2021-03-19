@@ -4,41 +4,25 @@
 \alias{fips_to_abbr}
 \title{Get state abbreviations from FIPS codes}
 \usage{
-fips_to_abbr(
-  code,
-  ignore.case = TRUE,
-  perl = FALSE,
-  fixed = FALSE,
-  ties_method = c("first", "all")
-)
+fips_to_abbr(code)
 }
 \arguments{
-\item{code}{Vector of FIPS codes to look up; codes can have either two digits
-(as in "42") or five digits (as in "42000"), either is allowed.}
-
-\item{ignore.case, perl, fixed}{Arguments to pass to \code{grep()}, with the same
-defaults as in the latter function. Hence, by default, regular expressions
-are used; to match against a fixed string (no regular expressions), set
-\code{fixed = TRUE}.}
-
-\item{ties_method}{If "first", then only the first match for each code is
-returned. If "all", then all matches for each code are returned.}
+\item{code}{Vector of FIPS codes to look up; will match the first two digits
+of the code. Note that these are treated as strings; the number
+1 will not match "01".}
 }
 \value{
-A vector of state abbreviations if \code{ties_method} equals "first", and
-a list of state abbreviations otherwise.
+A vector of state abbreviations.
 }
 \description{
 Look up state abbreviations by FIPS codes (including District of Columbia and
-Puerto Rico); this function is based on \code{grep()}, and hence allows for
-regular expressions.
+Puerto Rico). Will match the first two digits of the input codes, so should
+work for 5-digit county codes, or even longer tract and census block FIPS
+codes.
 }
 \examples{
 fips_to_abbr("42000")
 fips_to_abbr(c("42", "72", "11"))
-
-# Note that fips_to_name() works for state names too:
-fips_to_name("42000")
 
 }
 \seealso{

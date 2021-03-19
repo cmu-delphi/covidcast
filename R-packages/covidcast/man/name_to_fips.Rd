@@ -60,5 +60,5 @@ name_to_fips(c("Allegheny", "Miami", "New "), ties_method = "all")
 
 }
 \seealso{
-\code{\link[=fips_to_name]{fips_to_name()}}, \code{\link[=cbsa_to_name]{cbsa_to_name()}}
+\code{\link[=state_fips_to_name]{state_fips_to_name()}}, \code{\link[=cbsa_to_name]{cbsa_to_name()}}
 }

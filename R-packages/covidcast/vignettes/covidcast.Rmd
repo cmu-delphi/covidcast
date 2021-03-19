@@ -167,10 +167,11 @@ query.
 
 You may also want to convert FIPS codes or CBSA IDs back to well-known names,
 for instance to report in tables or graphics. The package provides inverse
-mappings `fips_to_name()` and `cbsa_to_name()` that work in the analogous way:
+mappings `county_fips_to_name()` and `cbsa_to_name()` that work in the
+analogous way:
 
 ```{r}
-fips_to_name("42003")
+county_fips_to_name("42003")
 cbsa_to_name("38300")
 ```
 

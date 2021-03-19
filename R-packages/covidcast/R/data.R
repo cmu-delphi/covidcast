@@ -28,7 +28,7 @@
 #' @source United States Census Bureau, at
 #'   \url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.csv}
 #'
-#' @seealso [fips_to_name()], [name_to_fips()]
+#' @seealso [county_fips_to_name()], [name_to_fips()]
 "county_census"
 
 #' Metro area population data

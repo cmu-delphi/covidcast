@@ -40,6 +40,6 @@ Census Bureau documentation of all columns and their meaning:
 and \url{https://www.census.gov/data/tables/2010/dec/2010-island-areas.html}
 }
 \seealso{
-\code{\link[=fips_to_name]{fips_to_name()}}, \code{\link[=name_to_fips]{name_to_fips()}}
+\code{\link[=county_fips_to_name]{county_fips_to_name()}}, \code{\link[=name_to_fips]{name_to_fips()}}
 }
 \keyword{datasets}

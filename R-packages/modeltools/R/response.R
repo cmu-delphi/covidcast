@@ -3,10 +3,10 @@ library(assertthat)
 #' Compute the corresponding observed response values for a set of signals.
 #'
 #' The response for an observed data point at time `t` is defined as the mean of observed values on
-#' days `t + s` and `t + e` multiplied by `e - s`, where `s` and `e` are the number of days between
-#' `forecast_date` and the start and end, respectively, of the next full `incidence_period`.  We
-#' choose to take the mean and multiply by the incidence period length rather than simply sum the
-#' observed values in order to avoid treating missing values as 0.
+#' days `t + s` through `t + e` (inclusive) multiplied by `e - s`, where `s` and `e` are the number
+#' of days from `forecast_date` and the start and end, respectively, of the next full
+#' `incidence_period`.  We choose to take the mean and multiply by the incidence period length
+#' rather than simply sum the observed values in order to avoid treating missing values as 0.
 #'
 #' @param signals Wide data frame of signals.  We expect the following columns:
 #'     \itemize{

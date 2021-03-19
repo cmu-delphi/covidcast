@@ -55,7 +55,6 @@ get_predictions <- function(forecaster,
                             incidence_period,
                             ahead,
                             geo_type,
-                            geo_values = "*",
                             apply_corrections = NULL,
                             signal_aggregation = c("list", "wide", "long"),
                             signal_aggregation_dt = NULL,
@@ -74,7 +73,6 @@ get_predictions <- function(forecaster,
                  incidence_period = incidence_period,
                  ahead = ahead,
                  geo_type = geo_type,
-                 geo_values = geo_values,
                  apply_corrections = apply_corrections,
                  signal_aggregation = signal_aggregation,
                  signal_aggregation_dt = signal_aggregation_dt,
@@ -96,7 +94,6 @@ get_predictions_single_date <- function(forecaster,
                                         incidence_period,
                                         ahead,
                                         geo_type,
-                                        geo_values,
                                         apply_corrections,
                                         signal_aggregation,
                                         signal_aggregation_dt,
@@ -113,39 +110,27 @@ get_predictions_single_date <- function(forecaster,
       }
     }
   }
-  # get data that would have been available as of forecast_date
-  # API has trouble with too many individual calls, 30 seemed safe
-  # (imagining ~50 states). So bigger, just grab everything and then filter
-  if(length(geo_values) > 30) {
-    geo_values_dl <- "*"
-  } else {
-    geo_values_dl <- unique(geo_values)
-  }
-  df <- download_signals(data_source = signals$data_source,
-                         signal = signals$signal,
-                         start_day = signals$start_day,
-                         end_day = forecast_date,
-                         as_of = as_of_override(forecast_date),
-                         geo_type = geo_type,
-                         geo_values = geo_values_dl,
-                         signal_aggregation = signal_aggregation,
-                         signal_aggregation_dt = signal_aggregation_dt)
 
-  # Dump out any extra geo_values we don't want.
-  if (any(geo_values != "*")) {
-    if (signal_aggregation == "list") {
-      df <- map(df, ~filter(.x, .data$geo_value %in% geo_values))  
-    } else {
-      df <- filter(df, .data$geo_value %in% geo_values)
-    }
-  }
-    
-  
-  
-  if(!is.null(apply_corrections)) df <- apply_corrections(df)
-  
+  df_list <- signals %>%
+    pmap(function(...) {
+      sig <- list(...)
+      download_signal(
+        data_source = sig$data_source,
+        signal = sig$signal,
+        start_day = sig$start_day,
+        end_day = forecast_date,
+        as_of = as_of_override(forecast_date),
+        geo_type = geo_type,
+        geo_values = "*")
+    })
 
-  out <- forecaster(df,
+  # Downloaded data postprocessing
+  if (signal_aggregation != "list") {
+    covidcast::aggregate_signals(df_list, signal_aggregation_dt, signal_aggregation)
+  }
+  if(!is.null(apply_corrections)) df_list <- apply_corrections(df_list)
+
+  out <- forecaster(df_list,
                     forecast_date,
                     signals,
                     incidence_period,

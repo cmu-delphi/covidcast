@@ -12,7 +12,6 @@ get_predictions(
   incidence_period,
   ahead,
   geo_type,
-  geo_values = "*",
   apply_corrections = NULL,
   signal_aggregation = c("list", "wide", "long"),
   signal_aggregation_dt = NULL,
@@ -60,9 +59,6 @@ it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahea
 "state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
 for available options.}
 
-\item{geo_values}{Vector or list of locations whose data will be passed to
-\code{forecaster}. The default, "*", fetches all that is available in the API.}
-
 \item{apply_corrections}{an optional function that applies data corrections
 to the signals. Input is a data frame or list as returned as
 \code{df <- covidcast::download_signals()}.
@@ -91,6 +87,9 @@ with care, by passing a function of a single forecast_date here. The
 function should return a date.}
 
 \item{...}{Additional named arguments to be passed to \code{forecaster()}}
+
+\item{geo_values}{Vector or list of locations whose data will be passed to
+\code{forecaster}. The default, "*", fetches all that is available in the API.}
 }
 \value{
 Long data frame of forecasts with a class of \code{predictions_cards}.

@@ -84,6 +84,12 @@ format_wedgeplot <- function(calib,
   
   test_legal_faceting(facet_rows, facet_cols, grp_vars)
   
+  non_faceted_grps <- setdiff(grp_vars, c(facet_rows, facet_cols))
+  
+  assert_that(length(non_faceted_grps) == 0,
+              msg = paste("All grp_vars need to be faceted for wedgeplots:",
+                          non_faceted_grps))
+  
   facet_layer <- facet_grid(rows = vars(!!!syms(facet_rows)),
                             cols = vars(!!!syms(facet_cols)))
   g <- calib %>%

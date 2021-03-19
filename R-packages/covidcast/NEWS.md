@@ -8,6 +8,9 @@ Changes to prepare for release on CRAN.
 
 - Storing geographic data as compressed geojson files.
 
+- Split `fips_to_name` into two functions: `state_fips_to_name` and
+  `county_fips_to_name` to make the behavior more consistent.
+
 # covidcast 0.4.1
 
 Released January 19, 2021.
@@ -108,7 +111,7 @@ Released July 26, 2020.
 
 ## Major changes
 
-- **Name change:** The package is now called covidcast, not covidcastR. If 
+- **Name change:** The package is now called covidcast, not covidcastR. If
   already installed, users should remove covidcastR using `remove.packages()`
   and then install covidcast using the instructions in
   `vignette("covidcast")`.

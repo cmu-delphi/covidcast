@@ -1,0 +1,24 @@
+citHeader("To cite the covidcast package in publications use:")
+
+year <- sub("-.*", "", meta$Date)
+note <- sprintf("R package version %s", meta$Version)
+
+bibentry(bibtype = "Manual",
+         title = "{covidcast}: Client for Delphi's COVIDcast Epidata API",
+         author = c(person(given = "Taylor", family = "Arnold"),
+                    person(given = "Jacob", family = "Bien"),
+                    person(given = "Logan", family = "Brooks"),
+                    person(given = "Sarah", family = "Colquhoun"),
+                    person(given = "David", family = "Farrow"),
+                    person(given = "Jed", family = "Grabman"),
+                    person(given = "Pedrito", family = "Maynard-Zhang"),
+                    person(given = "Alex", family = "Reinhart"),
+                    person(given = "Ryan", family = "Tibshirani")),
+         year = year,
+         note = note,
+         url = "https://CRAN.R-project.org/package=nlme")
+
+citFooter(paste0(
+  c("For information about citing the datasets provided by the API, see: ",
+    "https://cmu-delphi.github.io/delphi-epidata/api/covidcast_licensing.html"
+    )))

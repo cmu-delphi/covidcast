@@ -26,7 +26,9 @@ population in 2019 that is over 18.}
 }
 \source{
 United States Census Bureau, at
-\url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/state/detail/SCPRC-EST2019-18+POP-RES.csv}
+\url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.pdf},
+\url{https://www.census.gov/data/tables/time-series/demo/popest/2010s-total-puerto-rico-municipios.html},
+and \url{https://www.census.gov/data/tables/2010/dec/2010-island-areas.html}
 }
 \usage{
 state_census

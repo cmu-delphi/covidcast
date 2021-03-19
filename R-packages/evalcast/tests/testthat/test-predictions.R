@@ -3,7 +3,7 @@ library(mockery)
 
 # Create a fake result from the covidcast API as returned by the `evalcast::download_signals()`
 # function.
-create_fake_downloaded_signal <- function(data_source, signal, geo_value) {
+create_fake_downloaded_signal <- function(geo_value, data_source, signal) {
   tibble(data_source = data_source,
          signal = signal,
          geo_value = geo_value,
@@ -44,7 +44,7 @@ test_that("get_predictions works", {
 
     signals <- tibble(data_source = "jhu-csse",
                       signal = c("deaths_incidence_num", "confirmed_incidence_num"),
-                      start_day = "2020-01-01")
+                      start_day = as.Date("2020-01-01"))
     forecast_dates <- as.Date(c("2020-01-01", "2020-01-02"))
 
     pcard <- get_predictions(mock_forecaster,
@@ -56,6 +56,36 @@ test_that("get_predictions works", {
                              geo_type = "state")
 
     expect_called(mock_download_signal, 4)
+    expect_equal(mock_args(mock_download_signal),
+                 list(list(data_source = "jhu-csse",
+                           signal = "deaths_incidence_num",
+                           start_day = as.Date("2020-01-01"),
+                           end_day = as.Date("2020-01-01"),
+                           as_of = as.Date("2020-01-01"),
+                           geo_type = "state",
+                           geo_values = "*"),
+                      list(data_source = "jhu-csse",
+                           signal = "confirmed_incidence_num",
+                           start_day = as.Date("2020-01-01"),
+                           end_day = as.Date("2020-01-01"),
+                           as_of = as.Date("2020-01-01"),
+                           geo_type = "state",
+                           geo_values = "*"),
+                      list(data_source = "jhu-csse",
+                           signal = "deaths_incidence_num",
+                           start_day = as.Date("2020-01-01"),
+                           end_day = as.Date("2020-01-02"),
+                           as_of = as.Date("2020-01-02"),
+                           geo_type = "state",
+                           geo_values = "*"),
+                      list(data_source = "jhu-csse",
+                           signal = "confirmed_incidence_num",
+                           start_day = as.Date("2020-01-01"),
+                           end_day = as.Date("2020-01-02"),
+                           as_of = as.Date("2020-01-02"),
+                           geo_type = "state",
+                           geo_values = "*"))
+    )
     expect_called(mock_forecaster, 2)
     expect_equal(mock_args(mock_forecaster),
                  list(list(fake_downloaded_signals,

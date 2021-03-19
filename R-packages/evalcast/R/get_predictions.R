@@ -118,18 +118,18 @@ get_predictions_single_date <- function(forecaster,
     }
   }
 
-  df_list <- list()
-  for (i in 1:nrow(signals)) {
-    sig <- signals[i, ]
-    df_list[[i]] <- download_signal(
-      data_source = sig$data_source,
-      signal = sig$signal,
-      start_day = sig$start_day,
-      end_day = forecast_date,
-      as_of = as_of_override(forecast_date),
-      geo_type = geo_type,
-      geo_values = "*")
-  }
+  df_list <- signals %>%
+    pmap(function(...) {
+      sig <- list(...)
+      download_signal(
+        data_source = sig$data_source,
+        signal = sig$signal,
+        start_day = sig$start_day,
+        end_day = forecast_date,
+        as_of = as_of_override(forecast_date),
+        geo_type = geo_type,
+        geo_values = "*")
+    })
 
   # Downloaded data postprocessing
   if (signal_aggregation != "list") {

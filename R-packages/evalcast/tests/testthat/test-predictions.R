@@ -17,7 +17,7 @@ create_fake_downloaded_signal <- function(geo_value, data_source, signal) {
 
 # Create a fake forecast output with arbitrary predictions for each quantile.
 create_fake_forecast <- function(ahead, geo_value) {
-  quantiles <- c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99)
+  quantiles <- covidhub_probs()
   ahead_list <- c(ahead)
   tibble(
     ahead = rep(ahead_list, each=length(quantiles)),

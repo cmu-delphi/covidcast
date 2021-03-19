@@ -7,12 +7,12 @@
 get_predictions(
   forecaster,
   name_of_forecaster,
-  signals_to_use,
+  signals,
   forecast_dates,
   incidence_period = c("epiweek", "day"),
   apply_corrections = function(signals) signals,
-  response_data_source = signals_to_use$data_source[1],
-  response_data_signal = signals_to_use$signal[1],
+  response_data_source = signals$data_source[1],
+  response_data_signal = signals$signal[1],
   forecaster_args = list()
 )
 }
@@ -31,7 +31,7 @@ Thus, the forecaster should have a signature like \code{forecaster(data, forecas
 
 \item{name_of_forecaster}{String indicating name of the forecaster.}
 
-\item{signals_to_use}{Tibble with mandatory columns \code{data_source} and \code{signal} that
+\item{signals}{Tibble with mandatory columns \code{data_source} and \code{signal} that
 specifies which variables from the COVIDcast API will be used by \code{forecaster}. Each
 row of \code{signals} represents a separate signal, and first row is taken to be
 the response. If using \code{incidence_period = "epiweek"}, the response should
@@ -86,11 +86,11 @@ This function will be called as \code{apply_corrections(df)}.}
 
 \item{response_data_source}{String indicating the \code{data_source} of the response.
 This is used mainly for downstream evaluation. By default, this will be the
-same as the first row in the \code{signals_to_use} tibble.}
+same as the first row in the \code{signals} tibble.}
 
 \item{response_data_signal}{String indicating the \code{signal} of the response.
 This is used mainly for downstream evaluation. By default, this will be the
-same as the first row in the \code{signals_to_use} tibble.}
+same as the first row in the \code{signals} tibble.}
 
 \item{forecaster_args}{a list of additional named arguments to be passed
 to \code{forecaster()}. A common use case would be to pass the period ahead

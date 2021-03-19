@@ -27,10 +27,10 @@
 #' @template apply_corrections-template
 #' @param response_data_source String indicating the `data_source` of the response.
 #'   This is used mainly for downstream evaluation. By default, this will be the 
-#'   same as the first row in the `signals_to_use` tibble.
+#'   same as the first row in the `signals` tibble.
 #' @param response_data_signal String indicating the `signal` of the response.
 #'   This is used mainly for downstream evaluation. By default, this will be the 
-#'   same as the first row in the `signals_to_use` tibble.
+#'   same as the first row in the `signals` tibble.
 #' @param forecaster_args a list of additional named arguments to be passed 
 #'   to `forecaster()`. A common use case would be to pass the period ahead
 #'   (e.g. predict 1 day, 2 days, ..., k days ahead). Note that `ahead` is a 
@@ -59,13 +59,14 @@
 #' @export
 get_predictions <- function(forecaster,
                             name_of_forecaster,
-                            signals_to_use,
+                            signals,
                             forecast_dates,
                             incidence_period = c("epiweek","day"),
                             apply_corrections = function(signals) signals,
-                            response_data_source = signals_to_use$data_source[1],
-                            response_data_signal = signals_to_use$signal[1],
+                            response_data_source = signals$data_source[1],
+                            response_data_signal = signals$signal[1],
                             forecaster_args = list()) {
+  
   assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
   
   
@@ -73,7 +74,7 @@ get_predictions <- function(forecaster,
     map(~ do.call(
           get_predictions_single_date,
           list(forecaster = forecaster,
-               signals = signals_to_use,
+               signals = signals,
                forecast_date = .x,
                apply_corrections = apply_corrections,
                forecaster_args = forecaster_args)
@@ -93,8 +94,8 @@ get_predictions <- function(forecaster,
         incidence_period, 
         .data$ahead)$end,
       incidence_period = incidence_period
-      )
-  out %>% relocate(.data$forecaster, .before = .data$forecast_date)
+      ) %>% 
+    relocate(.data$forecaster, .before = .data$forecast_date)
   
   class(out) <- c("predictions_cards", class(out))
   out
@@ -126,7 +127,7 @@ get_predictions_single_date <- function(forecaster,
   # Downloaded data postprocessing
   if(!is.null(apply_corrections)) df_list <- apply_corrections(df_list)
 
-  df_arg <- formalArgs(forecaster)[1] # grab name of first arg to forecaster
+  df_arg <- methods::formalArgs(forecaster)[1] # grab name of first arg to forecaster
   forecaster_args$forecast_date = forecast_date
   forecaster_args[[df_arg]] <- df_list # pass in the data named to the right arg
   

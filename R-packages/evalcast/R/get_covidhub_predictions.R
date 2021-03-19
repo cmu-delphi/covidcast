@@ -66,12 +66,12 @@ get_covidhub_predictions <- function(
   # in that case it's no longer a true prediction.
   if (!is.null(predictions_cards)) {
     seen_dates <- predictions_cards %>%
-      distinct(forecast_date, forecaster)
+      distinct(.data$forecast_date, .data$forecaster)
     for (i in seq_len(length(covidhub_forecaster_name))) {
       if (covidhub_forecaster_name[[i]] %in% seen_dates$forecaster) {
         seen_forecaster_dates <- seen_dates %>%
-          filter(forecaster == covidhub_forecaster_name[[i]]) %>%
-          pull(forecast_date)
+          filter(.data$forecaster == covidhub_forecaster_name[[i]]) %>%
+          pull(.data$forecast_date)
         forecast_dates[[i]] <- lubridate::as_date(setdiff(
                                                     forecast_dates[[i]],
                                                     seen_forecaster_dates))
@@ -194,15 +194,15 @@ get_forecast_dates <- function(forecasters,
 #' 
 #' @importFrom readr read_csv
 get_forecaster_predictions <- function(covidhub_forecaster_name,
-                                     forecast_dates = NULL,
-                                     geo_values = "*",
-                                     forecast_type = c("point","quantile"),
-                                     ahead = 1:4,
-                                     incidence_period = c("epiweek", "day"),
-                                     signal = c("confirmed_incidence_num",
-                                                "deaths_incidence_num",
-                                                "deaths_cumulative_num")
-                                     ) {
+                                       forecast_dates = NULL,
+                                       geo_values = "*",
+                                       forecast_type = c("point","quantile"),
+                                       ahead = 1:4,
+                                       incidence_period = c("epiweek", "day"),
+                                       signal = c("confirmed_incidence_num",
+                                                  "deaths_incidence_num",
+                                                  "deaths_cumulative_num")
+) {
   url <- "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed"
   pcards <- list()
   if (is.null(forecast_dates))
@@ -235,7 +235,7 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
              response = case_when(.data$response == "death" ~ "deaths", 
                                   .data$response == "case" ~ "confirmed",
                                   TRUE ~ "drop",),
-             signal = paste(response, inc, "num", sep="_"),
+             signal = paste(.data$response, .data$inc, "num", sep="_"),
              data_source = if_else(.data$response=="drop", "drop", "jhu-csse"),
              ahead = as.integer(.data$ahead)) %>%
       filter(.data$response != "drop", .data$type %in% forecast_type,
@@ -316,12 +316,34 @@ get_covidhub_forecaster_names <- function(
   } else {
     models <- covidHubUtils::get_model_designations(source = "zoltar")
     forecaster_names <- models %>%
-                         filter(designation %in% designations) %>%
-                         pull(model)
+                         filter(.data$designation %in% designations) %>%
+                         pull(.data$model)
   }
   return(forecaster_names)
 }
 
-covidhub_probs <- function() {
-  c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99)
+
+
+
+#' Vector of quantiles used for submission to the COVID 19 Forecast Hub
+#' 
+#' See the [Forecast Hub Documentation](https://github.com/reichlab/covid19-forecast-hub/blob/master/data-processed/README.md#quantile)
+#' for more details.
+#'
+#' @param type defaults to the "standard" set of 23 quantiles. Setting 
+#'   `type = "inc_case"` will return a set of 7 quantiles used for incident
+#'   cases.
+#'
+#' @return a numeric vector
+#' @export
+#'
+#' @examples
+#' covidhub_probs()
+covidhub_probs <- function(type = c("standard", "inc_case")) {
+  type = match.arg(type)
+  switch(type,
+         standard = c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99),
+         inc_case = c(0.025, 0.100, 0.250, 0.500, 0.750, 0.900, 0.975),
+         c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99)
+  )
 }

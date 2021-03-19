@@ -1,4 +1,4 @@
-#' @param signals_to_use Tibble with mandatory columns `data_source` and `signal` that 
+#' @param signals Tibble with mandatory columns `data_source` and `signal` that 
 #'   specifies which variables from the COVIDcast API will be used by `forecaster`. Each
 #'   row of `signals` represents a separate signal, and first row is taken to be
 #'   the response. If using `incidence_period = "epiweek"`, the response should

@@ -87,12 +87,14 @@ test_that("get_predictions works", {
     )
     expect_called(mock_forecaster, 2)
     expect_equal(mock_args(mock_forecaster),
-                 list(list(fake_downloaded_signals,
-                           as.Date("2020-01-01"),
-                           list()),
-                      list(fake_downloaded_signals,
-                           as.Date("2020-01-02"),
-                           list())))
+                 list(
+                   list(
+                     forecast_date = as.Date("2020-01-01"),
+                     `...` = fake_downloaded_signals),
+                   list(
+                     forecast_date = as.Date("2020-01-02"),
+                     `...` = fake_downloaded_signals)
+                 ))
     expect_equal(colnames(pcard),
       c("ahead", "geo_value", "quantile", "value", "forecaster", "forecast_date", "data_source",
         "signal", "target_end_date", "incidence_period"))
@@ -139,12 +141,17 @@ test_that("get_predictions works when forecaster has additional arguments", {
     expect_called(mock_download_signal, 4)
     expect_called(mock_forecaster, 2)
     expect_equal(mock_args(mock_forecaster),
-                 list(list(fake_downloaded_signals,
-                           as.Date("2020-01-01"),
-                           list(a = 1, b = "2")),
-                      list(fake_downloaded_signals,
-                           as.Date("2020-01-02"),
-                           list(a = 1, b = "2"))))
+                 list(
+                   list(
+                     a = 1, b = "2",
+                     forecast_date = as.Date("2020-01-01"),
+                     `...` = fake_downloaded_signals
+                     ),
+                   list(
+                     a = 1, b = "2",
+                     forecast_date = as.Date("2020-01-02"),
+                     `...` = fake_downloaded_signals
+                     )))
     expect_equal(colnames(pcard),
       c("ahead", "geo_value", "quantile", "value", "forecaster", "forecast_date", "data_source",
         "signal", "target_end_date", "incidence_period"))
@@ -204,9 +211,10 @@ test_that("no start_day within signals works", {
     )
     expect_called(mock_forecaster, 1)
     expect_equal(mock_args(mock_forecaster),
-                 list(list(fake_downloaded_signals,
-                           as.Date("2020-01-01"),
-                           list())))
+                 list(list(
+                   forecast_date = as.Date("2020-01-01"),
+                   `...` = fake_downloaded_signals
+                   )))
     expect_equal(colnames(pcard),
       c("ahead", "geo_value", "quantile", "value", "forecaster", "forecast_date", "data_source",
         "signal", "target_end_date", "incidence_period"))
@@ -286,12 +294,14 @@ test_that("start_day function within signals works", {
     )
     expect_called(mock_forecaster, 2)
     expect_equal(mock_args(mock_forecaster),
-                 list(list(fake_downloaded_signals,
-                           as.Date("2020-12-11"),
-                           list()),
-                      list(fake_downloaded_signals,
-                           as.Date("2020-12-12"),
-                           list())))
+                 list(list(
+                   forecast_date = as.Date("2020-12-11"),
+                   `...` = fake_downloaded_signals
+                 ),
+                 list(
+                   forecast_date = as.Date("2020-12-12"),
+                   `...` = fake_downloaded_signals
+                 )))
     expect_equal(colnames(pcard),
       c("ahead", "geo_value", "quantile", "value", "forecaster", "forecast_date", "data_source",
         "signal", "target_end_date", "incidence_period"))

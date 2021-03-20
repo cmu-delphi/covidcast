@@ -17,12 +17,12 @@ add_response_columns(
 \itemize{
 \item{\code{geo_value}}{Strings of geographic locations.}
 \item{\code{time_value}}{Dates of training data.}
-\item{Covariate columns}{Columns with names of the form \code{value-{days}:{signal}} whose values
-correspond to \code{{signal}} \code{{days}} before \code{time_value}}
+\item{Covariate columns}{Columns with names of the form \code{value-{days}:{signal}} or
+\verb{value+0:\{signal\} whose values correspond to }{signal}\verb{}{days}\code{before}time_value`}
 }}
 
 \item{response_name}{Name of response signal.  The value of the response variable on a single
-day should be located in column \code{value-0:{response_name}} of \code{signals}.}
+day should be located in column \code{value+0:{response_name}} of \code{signals}.}
 
 \item{forecast_date}{Date on which the forecast will be made}
 
@@ -32,12 +32,12 @@ day should be located in column \code{value-0:{response_name}} of \code{signals}
 }
 \value{
 Data frame of signals equal to \code{signals} with \code{length(ahead)} additional columns with
-names \code{value+{a}:{response_name}} corresponding to the response variable at ahead \code{a}.
+names \code{response+{a}:{response_name}} corresponding to the response variable at ahead \code{a}.
 }
 \description{
 The response for an observed data point at time \code{t} is defined as the mean of observed values on
-days \code{t + s} and \code{t + e} multiplied by \code{e - s}, where \code{s} and \code{e} are the number of days between
-\code{forecast_date} and the start and end, respectively, of the next full \code{incidence_period}.  We
-choose to take the mean and multiply by the incidence period length rather than simply sum the
-observed values in order to avoid treating missing values as 0.
+days \code{t + s} through \code{t + e} (inclusive) multiplied by \code{e - s}, where \code{s} and \code{e} are the number
+of days from \code{forecast_date} to the start and end, respectively, of the next full
+\code{incidence_period}.  We choose to take the mean and multiply by the incidence period length
+rather than simply sum the observed values in order to avoid treating missing values as 0.
 }

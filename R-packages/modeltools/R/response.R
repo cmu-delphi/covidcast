@@ -12,17 +12,17 @@ library(assertthat)
 #'     \itemize{
 #'     \item{`geo_value`}{Strings of geographic locations.}
 #'     \item{`time_value`}{Dates of training data.}
-#'     \item{Covariate columns}{Columns with names of the form `value-{days}:{signal}` whose values
-#'         correspond to `{signal}` `{days}` before `time_value`}
+#'     \item{Covariate columns}{Columns with names of the form `value-{days}:{signal}` or
+#'         `value+0:{signal} whose values correspond to `{signal}` `{days}` before `time_value`}
 #'     }
 #' @param response_name Name of response signal.  The value of the response variable on a single
-#'     day should be located in column `value-0:{response_name}` of `signals`.
+#'     day should be located in column `value+0:{response_name}` of `signals`.
 #' @param forecast_date Date on which the forecast will be made
 #' @param incidence_period Time period over which the response should be summed.
 #' @param ahead integer or vector of integer ahead values
 #'
 #' @return Data frame of signals equal to `signals` with `length(ahead)` additional columns with
-#'     names `value+{a}:{response_name}` corresponding to the response variable at ahead `a`. 
+#'     names `response+{a}:{response_name}` corresponding to the response variable at ahead `a`. 
 #'
 #' @export
 add_response_columns <- function(signals,
@@ -35,10 +35,10 @@ add_response_columns <- function(signals,
         target_period <- as.list(get_target_period(forecast_date, incidence_period, a)[1, ])
         window_size <- as.numeric(target_period$end - target_period$start) + 1
         out_df <- slide_by_geo(out_df,
-                               ~ Mean(window_size * .x[[paste0("value-0:", response_name)]]),
+                               ~ Mean(window_size * .x[[paste0("value+0:", response_name)]]),
                                n = window_size,
                                shift = as.numeric(target_period$end - forecast_date),
-                               col_name = paste0("value+", a, ":", response_name))
+                               col_name = paste0("response+", a, ":", response_name))
     }
     return(out_df)
 }

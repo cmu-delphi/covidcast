@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -133,23 +133,38 @@
     </div>
 
     <pre class="usage"><span class='fu'>plot_calibration</span><span class='op'>(</span>
-  <span class='va'>scorecard</span>,
+  <span class='va'>predictions_cards</span>,
   type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"wedgeplot"</span>, <span class='st'>"traditional"</span><span class='op'>)</span>,
+  facet_rows <span class='op'>=</span> <span class='cn'>NULL</span>,
+  facet_cols <span class='op'>=</span> <span class='cn'>NULL</span>,
   grp_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forecaster"</span>, <span class='st'>"forecast_date"</span>, <span class='st'>"ahead"</span><span class='op'>)</span>,
   avg_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"geo_value"</span><span class='op'>)</span>,
-  legend_position <span class='op'>=</span> <span class='st'>"bottom"</span>
+  geo_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"county"</span>, <span class='st'>"hrr"</span>, <span class='st'>"msa"</span>, <span class='st'>"dma"</span>, <span class='st'>"state"</span>, <span class='st'>"hhs"</span>, <span class='st'>"nation"</span><span class='op'>)</span>,
+  backfill_buffer <span class='op'>=</span> <span class='fl'>0</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>scorecard</th>
-      <td><p>Single score card.</p></td>
+      <th>predictions_cards</th>
+      <td><p>Either one predictions_card or several joined
+together using bind_rows().</p></td>
     </tr>
     <tr>
       <th>type</th>
-      <td><p>One of "wedgeplot" or "traditional".</p></td>
+      <td><p>One of "wedgeplot" or "traditional"</p></td>
+    </tr>
+    <tr>
+      <th>facet_rows</th>
+      <td><p>A variable name to facet data over. Creates a
+separate row of plots for each value of specified variable. Can be used
+with <code>facet_cols</code> to create a grid of plots.  Should be passed to
+plot_calibration when customized.</p></td>
+    </tr>
+    <tr>
+      <th>facet_cols</th>
+      <td><p>Same as <code>facet_rows</code>, but with columns.</p></td>
     </tr>
     <tr>
       <th>grp_vars</th>
@@ -161,8 +176,15 @@ determines the color of the lines and faceting depending on <code>type</code></p
       <td><p>variables over which we average to determine the calibration.</p></td>
     </tr>
     <tr>
-      <th>legend_position</th>
-      <td><p>Legend position, the default being "bottom".</p></td>
+      <th>geo_type</th>
+      <td><p>String indicating geographical type, such as "county", or
+"state". See the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>COVIDcast Geographic Coding documentation</a>
+for available options.</p></td>
+    </tr>
+    <tr>
+      <th>backfill_buffer</th>
+      <td><p>How many days until response is deemed trustworthy
+enough to be taken as correct?.</p></td>
     </tr>
     </table>
 
@@ -178,7 +200,7 @@ determines the color of the lines and faceting depending on <code>type</code></p
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Jed Grabman, Alden Green, Daniel McDonald, Balasubramanian Narasimhan, Mike O'Brien, Ryan Tibshirani.</p>
+  <p>Developed by Jacob Bien, Daniel McDonald, Mike O'Brien, Jed Grabman, Sarah Colquhoun, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

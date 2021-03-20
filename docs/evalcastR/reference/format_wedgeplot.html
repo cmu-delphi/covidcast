@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get forecast dates per forecaster given select filtering criteria — get_forecast_dates • evalcast</title>
+<title>ggplot formatting for wedge calibration plot. — format_wedgeplot • evalcast</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Get forecast dates per forecaster given select filtering criteria — get_forecast_dates" />
-<meta property="og:description" content="Get forecast dates per forecaster given select filtering criteria" />
+<meta property="og:title" content="ggplot formatting for wedge calibration plot. — format_wedgeplot" />
+<meta property="og:description" content="ggplot formatting for wedge calibration plot." />
 
 
 
@@ -123,59 +123,45 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get forecast dates per forecaster given select filtering criteria</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/get_covidhub_predictions.R'><code>R/get_covidhub_predictions.R</code></a></small>
-    <div class="hidden name"><code>get_forecast_dates.Rd</code></div>
+    <h1>ggplot formatting for wedge calibration plot.</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/plot_calibration.R'><code>R/plot_calibration.R</code></a></small>
+    <div class="hidden name"><code>format_wedgeplot.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Get forecast dates per forecaster given select filtering criteria</p>
+    <p>ggplot formatting for wedge calibration plot.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_forecast_dates</span><span class='op'>(</span>
-  <span class='va'>forecasters</span>,
-  <span class='va'>forecast_dates</span>,
-  <span class='va'>start_date</span>,
-  <span class='va'>end_date</span>,
-  <span class='va'>date_filtering_function</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>format_wedgeplot</span><span class='op'>(</span><span class='va'>calib</span>, <span class='va'>grp_vars</span>, <span class='va'>facet_rows</span>, <span class='va'>facet_cols</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>forecasters</th>
-      <td><p>vector of forecaster names</p></td>
+      <th>calib</th>
+      <td><p>the output from <code><a href='compute_calibration.html'>compute_calibration()</a></code></p></td>
     </tr>
     <tr>
-      <th>forecast_dates</th>
-      <td><p>A vector of date objects. If provided, only dates
-within this set will be returned for each forecaster (subject to all other
-provided criteria)</p></td>
+      <th>grp_vars</th>
+      <td><p>variables over which to compare calibration. These
+determines the color of the lines and faceting depending on <code>type</code></p></td>
     </tr>
     <tr>
-      <th>start_date</th>
-      <td><p>The earliest date for which to retrieve predictions</p></td>
+      <th>facet_rows</th>
+      <td><p>A variable name to facet data over. Creates a
+separate row of plots for each value of specified variable. Can be used
+with <code>facet_cols</code> to create a grid of plots.  Should be passed to
+plot_calibration when customized.</p></td>
     </tr>
     <tr>
-      <th>end_date</th>
-      <td><p>The latest date for which to retrieve predictions</p></td>
-    </tr>
-    <tr>
-      <th>date_filtering_function</th>
-      <td><p>A function which takes a list, where each
-element is a vector of dates and returns a list where each element is a
-subset of those in the original list. Used for custom filtering of dates
-(e.g. only forecasts from Mondays, where all forecasters made a forecast,
-etc.)</p></td>
+      <th>facet_cols</th>
+      <td><p>Same as <code>facet_rows</code>, but with columns.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list of the same length as <code>forecasters</code>, where each entry is the
-vector at the same index in <code>forecast_dates</code> after being filtered according
-to the provided criteria</p>
+    <p>ggplot object</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

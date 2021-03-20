@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get forecast dates per forecaster given select filtering criteria — get_forecast_dates • evalcast</title>
+<title>Overprediction component of the weighted interval score — overprediction • evalcast</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Get forecast dates per forecaster given select filtering criteria — get_forecast_dates" />
-<meta property="og:description" content="Get forecast dates per forecaster given select filtering criteria" />
+<meta property="og:title" content="Overprediction component of the weighted interval score — overprediction" />
+<meta property="og:description" content="Requires symmetric quantile forecasts. Roughly, a penalty for predicted
+quantiles smaller than .5 falling above the observed value." />
 
 
 
@@ -123,59 +124,35 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get forecast dates per forecaster given select filtering criteria</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/get_covidhub_predictions.R'><code>R/get_covidhub_predictions.R</code></a></small>
-    <div class="hidden name"><code>get_forecast_dates.Rd</code></div>
+    <h1>Overprediction component of the weighted interval score</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/error_measures.R'><code>R/error_measures.R</code></a></small>
+    <div class="hidden name"><code>overprediction.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Get forecast dates per forecaster given select filtering criteria</p>
+    <p>Requires symmetric quantile forecasts. Roughly, a penalty for predicted
+quantiles smaller than .5 falling above the observed value.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_forecast_dates</span><span class='op'>(</span>
-  <span class='va'>forecasters</span>,
-  <span class='va'>forecast_dates</span>,
-  <span class='va'>start_date</span>,
-  <span class='va'>end_date</span>,
-  <span class='va'>date_filtering_function</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>overprediction</span><span class='op'>(</span><span class='va'>quantile</span>, <span class='va'>value</span>, <span class='va'>actual_value</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>forecasters</th>
-      <td><p>vector of forecaster names</p></td>
+      <th>quantile</th>
+      <td><p>vector of forecasted quantiles</p></td>
     </tr>
     <tr>
-      <th>forecast_dates</th>
-      <td><p>A vector of date objects. If provided, only dates
-within this set will be returned for each forecaster (subject to all other
-provided criteria)</p></td>
+      <th>value</th>
+      <td><p>vector of forecasted values</p></td>
     </tr>
     <tr>
-      <th>start_date</th>
-      <td><p>The earliest date for which to retrieve predictions</p></td>
-    </tr>
-    <tr>
-      <th>end_date</th>
-      <td><p>The latest date for which to retrieve predictions</p></td>
-    </tr>
-    <tr>
-      <th>date_filtering_function</th>
-      <td><p>A function which takes a list, where each
-element is a vector of dates and returns a list where each element is a
-subset of those in the original list. Used for custom filtering of dates
-(e.g. only forecasts from Mondays, where all forecasters made a forecast,
-etc.)</p></td>
+      <th>actual_value</th>
+      <td><p>Actual value.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>A list of the same length as <code>forecasters</code>, where each entry is the
-vector at the same index in <code>forecast_dates</code> after being filtered according
-to the provided criteria</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

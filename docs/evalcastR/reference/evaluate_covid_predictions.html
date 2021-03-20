@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute calibration of a quantile forecaster — compute_actual_vs_nominal_prob • evalcast</title>
+<title>Create a score card data frame based on covid forecasts — evaluate_covid_predictions • evalcast</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,26 @@
 
 
 
-<meta property="og:title" content="Compute calibration of a quantile forecaster — compute_actual_vs_nominal_prob" />
-<meta property="og:description" content="Compute calibration of a quantile forecaster" />
+<meta property="og:title" content="Create a score card data frame based on covid forecasts — evaluate_covid_predictions" />
+<meta property="og:description" content="Evaluates the performance of a covid forecaster, through the following steps:
+Takes a prediction card (as created by
+get_predictions()).
+Downloads from the COVIDcast API the latest available data to compute
+what actually occurred (summing the response over the incidence period).
+Computes various user-specified error measures.
+Backfill refers to the process by which some data sources go back in time
+updating previously reported values. Suppose it is September 14 and we are
+evaluating our predictions for what happened in the previous epiweek
+(September 6 through 12). Although we may be able to calculate a value for
+&quot;actual&quot;, we might not trust this value since on September 16, backfill may
+occur changing what is known about the period September 6 through 12. There
+are two consequences of this phenomenon.  First, running this function on
+different dates may result in different estimates of the error. Second, we
+may not trust the evaluations we get that are too recent.  The parameter
+backfill_buffer specifies how long of a buffer period we should
+enforce.  This will be dependent on the data source and signal and is left
+to the user to determine.  If backfill is not relevant for the particular
+signal you are predicting, then you can set backfill_buffer to 0." />
 
 
 
@@ -123,21 +141,39 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute calibration of a quantile forecaster</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/compute_calibration.R'><code>R/compute_calibration.R</code></a></small>
-    <div class="hidden name"><code>compute_actual_vs_nominal_prob.Rd</code></div>
+    <h1>Create a score card data frame based on covid forecasts</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/evaluate_predictions.R'><code>R/evaluate_predictions.R</code></a></small>
+    <div class="hidden name"><code>evaluate_covid_predictions.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compute calibration of a quantile forecaster</p>
+    <p>Evaluates the performance of a covid forecaster, through the following steps:</p><ol>
+<li><p>Takes a prediction card (as created by
+<code><a href='get_predictions.html'>get_predictions()</a></code>).</p></li>
+<li><p>Downloads from the COVIDcast API the latest available data to compute
+what actually occurred (summing the response over the incidence period).</p></li>
+<li><p>Computes various user-specified error measures.</p></li>
+</ol><p>Backfill refers to the process by which some data sources go back in time
+updating previously reported values. Suppose it is September 14 and we are
+evaluating our predictions for what happened in the previous epiweek
+(September 6 through 12). Although we may be able to calculate a value for
+"actual", we might not trust this value since on September 16, backfill may
+occur changing what is known about the period September 6 through 12. There
+are two consequences of this phenomenon.  First, running this function on
+different dates may result in different estimates of the error. Second, we
+may not trust the evaluations we get that are too recent.  The parameter
+<code>backfill_buffer</code> specifies how long of a buffer period we should
+enforce.  This will be dependent on the data source and signal and is left
+to the user to determine.  If backfill is not relevant for the particular
+signal you are predicting, then you can set <code>backfill_buffer</code> to 0.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>compute_actual_vs_nominal_prob</span><span class='op'>(</span>
+    <pre class="usage"><span class='fu'>evaluate_covid_predictions</span><span class='op'>(</span>
   <span class='va'>predictions_cards</span>,
-  <span class='va'>geo_type</span>,
-  backfill_buffer <span class='op'>=</span> <span class='fl'>10</span>,
-  grp_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forecaster"</span>, <span class='st'>"forecast_date"</span>, <span class='st'>"ahead"</span><span class='op'>)</span>,
-  avg_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"geo_value"</span><span class='op'>)</span>
+  err_measures <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>wis <span class='op'>=</span> <span class='va'>weighted_interval_score</span>, ae <span class='op'>=</span> <span class='va'>absolute_error</span>, coverage_80 <span class='op'>=</span>
+    <span class='fu'><a href='interval_coverage.html'>interval_coverage</a></span><span class='op'>(</span>coverage <span class='op'>=</span> <span class='fl'>0.8</span><span class='op'>)</span><span class='op'>)</span>,
+  backfill_buffer <span class='op'>=</span> <span class='fl'>0</span>,
+  geo_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"county"</span>, <span class='st'>"hrr"</span>, <span class='st'>"msa"</span>, <span class='st'>"dma"</span>, <span class='st'>"state"</span>, <span class='st'>"hhs"</span>, <span class='st'>"nation"</span><span class='op'>)</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -145,8 +181,23 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>predictions_cards</th>
-      <td><p>tibble containing at least columns actual, quantile,
-value and any grouping or averaging variables named in the next arguments</p></td>
+      <td><p>tibble of quantile forecasts, which contains at
+least <code>quantile</code> and <code>value</code> columns, as well as any other prediction task
+identifiers. Must be of class "predictions_cards". Covid predictions card
+may be created by the function <code><a href='get_predictions.html'>get_predictions()</a></code>, downloaded with
+<code><a href='get_covidhub_predictions.html'>get_covidhub_predictions()</a></code> or potentially created manually.</p></td>
+    </tr>
+    <tr>
+      <th>err_measures</th>
+      <td><p>Named list of one or more functions, where each function
+takes a data frame with three columns <code>quantile</code>, <code>value</code> and <code>actual</code>
+(i.e., observed) returns a scalar measure of error. Null or an empty list
+may be provided if scoring is not desired.</p></td>
+    </tr>
+    <tr>
+      <th>backfill_buffer</th>
+      <td><p>How many days until response is deemed trustworthy
+enough to be taken as correct? See details for more.</p></td>
     </tr>
     <tr>
       <th>geo_type</th>
@@ -154,37 +205,13 @@ value and any grouping or averaging variables named in the next arguments</p></t
 "state". See the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>COVIDcast Geographic Coding documentation</a>
 for available options.</p></td>
     </tr>
-    <tr>
-      <th>backfill_buffer</th>
-      <td><p>How many days until response is deemed trustworthy
-enough to be taken as correct?</p></td>
-    </tr>
-    <tr>
-      <th>grp_vars</th>
-      <td><p>character vector of named columns in the score_card at which
-average performance will be returned</p></td>
-    </tr>
-    <tr>
-      <th>avg_vars</th>
-      <td><p>character vector of named columns in the score_card over which
-averaging performance will be computed</p></td>
-    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A tibble containing grp_vars, nominal_prob (the claimed interval
-coverage), prop_below (the proportion of actual values falling below
-the forecast quantile) and prop_above (the proportion of
-actual values falling above the forecast quantile). All
-proportions are calculated for each available probability at each
-combination of grouping variables by averaging over any variables listed
-in avg_vars.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Note that no checks are performed to ensure that averaging variables
-all contain the same predicted quantiles. avg_vars and grp_vars must
-have an empty intersection.</p>
+    <p>tibble of "score cards". Contains the same information as the
+<code>predictions_cards()</code> with additional columns for each <code>err_measure</code> and
+for the truth (named <code>actual</code>).</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

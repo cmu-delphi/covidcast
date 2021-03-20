@@ -4,13 +4,10 @@
 #'     \itemize{
 #'     \item{`geo_value`}{Strings of geographic locations.}
 #'     \item{`time_value`}{Dates of training data.}
-#'     \item{Covariate columns}{Columns with names of the form `value-{days}:{signal}` whose values
-#'         correspond to `{signal}` `{days}` before `time_value`}
-#'     \item{Response columns}{Columns with names of the form `value+{n}:{response}` whose values
-#'         correspond to `{response}` `{n}` incidence period units after `time_value`.  Since
-#'         columns beginning with "value+" are interpreted as the response rather than a
-#'         covariate, observed data from the same day as `time_value` should be in columns
-#'         `value-0:{signal}` rather than `value+0:{signal}`}
+#'     \item{Covariate columns}{Columns with names of the form `value-{days}:{signal}` or
+#'         `value+0:{signal} whose values correspond to `{signal}` `{days}` before `time_value`}
+#'     \item{Response columns}{Columns with names of the form `response+{n}:{response}` whose values
+#'         correspond to `{response}` `{n}` incidence period units after `time_value`.}
 #'     }
 #'     A data frame in this format can be made using `covidcast::aggregate_signals()`.
 #' @param ahead Number of incidence period units (i.e., epiweeks, days, etc.) ahead to forecast
@@ -24,7 +21,7 @@
 #'         `value-{days}:{signal}` columns in `lagged_df`.  The training data consists of the
 #'         latest date `d` such that there is an observed response at time `d + ahead` and all data
 #'         from the `training_window_size` days prior to it.}
-#'     \item{`train_y`}{Vector of response data from the `value+{ahead}:{response}` column of
+#'     \item{`train_y`}{Vector of response data from the `response+{ahead}:{response}` column of
 #'         `lagged_df` corresponding to the rows of `train_x`.}
 #'     \item{`predict_x`}{Matrix of prediction data in the same format as `train_x`.  The
 #'         prediction data contains the most recent `training_window_size` days.}
@@ -42,7 +39,7 @@ create_train_and_predict_matrices <- function(lagged_df, ahead, training_window_
 
     # Find the last possible date of training data   
     response_end_date <- lagged_df %>%
-        select(time_value, tidyselect::starts_with(sprintf("value+%i:", ahead))) %>%
+        select(time_value, tidyselect::starts_with(sprintf("response+%i:", ahead))) %>%
         tidyr::drop_na() %>%
         summarize(max(time_value)) %>%
         pull()
@@ -59,7 +56,7 @@ create_train_and_predict_matrices <- function(lagged_df, ahead, training_window_
         filter(between(time_value,
                        train_end_date - training_window_size + 1,
                        train_end_date)) %>%
-        select(tidyselect::starts_with(sprintf("value+%i:", ahead))) %>%
+        select(tidyselect::starts_with(sprintf("response+%i:", ahead))) %>%
         pull()
 
     # Prediction matrices

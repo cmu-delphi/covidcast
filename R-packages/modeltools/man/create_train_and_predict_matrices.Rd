@@ -11,15 +11,8 @@ create_train_and_predict_matrices(lagged_df, ahead, training_window_size)
 \itemize{
 \item{\code{geo_value}}{Strings of geographic locations.}
 \item{\code{time_value}}{Dates of training data.}
-\item{Covariate columns}{Columns with names of the form \code{value-{days}:{signal}} whose values
-correspond to \code{{signal}} \code{{days}} before \code{time_value}}
-\item{Response columns}{Columns with names of the form \code{value+{n}:{response}} whose values
-correspond to \code{{response}} \code{{n}} incidence period units after \code{time_value}.  Since
-columns beginning with "value+" are interpretted as the response rather than a
-covariate, observed data from the same day as \code{time_value} should be in columns
-\code{value-0:{signal}} rather than \code{value+0:{signal}}}
-}
-A data frame in this format can be made using \code{covidcast::aggregate_signals()}.}
+\item{Covariate columns}{Columns with names of the form \code{value-{days}:{signal}} or
+\verb{value+0:\{signal\} whose values correspond to }{signal}\verb{}{days}\code{before}time_value\verb{\} \\item\{Response columns\}\{Columns with names of the form }response+{n}:{response}\verb{whose values correspond to}{response}\verb{}{n}\verb{incidence period units after}time_value\verb{.\} \} A data frame in this format can be made using }covidcast::aggregate_signals()`.}
 
 \item{ahead}{Number of incidence period units (i.e., epiweeks, days, etc.) ahead to forecast}
 
@@ -34,7 +27,7 @@ Named list with entries:
 \code{value-{days}:{signal}} columns in \code{lagged_df}.  The training data consists of the
 latest date \code{d} such that there is an observed response at time \code{d + ahead} and all data
 from the \code{training_window_size} days prior to it.}
-\item{\code{train_y}}{Vector of response data from the \code{value+{ahead}:{response}} column of
+\item{\code{train_y}}{Vector of response data from the \code{response+{ahead}:{response}} column of
 \code{lagged_df} corresponding to the rows of \code{train_x}.}
 \item{\code{predict_x}}{Matrix of prediction data in the same format as \code{train_x}.  The
 prediction data contains the most recent \code{training_window_size} days.}

@@ -39,3 +39,4 @@ reference:
   - collapse_cards
   - averaging_checks
   - intersect_averagers
+  - contains("_epiweek")

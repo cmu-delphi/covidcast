@@ -18,14 +18,6 @@
 #' @template forecast_dates-template
 #' @template incidence_period-template
 #' @template apply_corrections-template
-#' @param signal_aggregation this and the next argument control the type of
-#'   data your forecaster expects to receive from covidcast. By default,
-#'   different signals are passed in "list" format. But you may alternatively
-#'   request "wide" or "long". See [covidcast::covidcast_signals()] and 
-#'   [covidcast::aggregate_signals()] for more details.
-#' @param signal_aggregation_dt for any data format, 
-#'   [covidcast::aggregate_signals()] can perform leading and lagging for you.
-#'   See that documentation for more details.
 #' @param as_of_override by default, the `as_of` date of data downloaded from
 #'   covidcast is loaded with `as_of = forecast_date`. This means that data
 #'   is "rewound" to days in the past. Any data revisions made since, would

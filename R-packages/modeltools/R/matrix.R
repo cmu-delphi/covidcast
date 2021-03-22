@@ -1,4 +1,4 @@
-#' Create a training and prediction matrices for a given ahead.
+#' Create training and testing data matrices and a training response vector for a given ahead.
 #'
 #' @param lagged_df Data frame of lagged data.  It should have the following columns:
 #'     \itemize{
@@ -9,7 +9,8 @@
 #'     \item{Response columns}{Columns with names of the form `response+{n}:{response}` whose values
 #'         correspond to `{response}` `{n}` incidence period units after `time_value`.}
 #'     }
-#'     A data frame in this format can be made using `covidcast::aggregate_signals()`.
+#'     A data frame in this format can be made using `covidcast::aggregate_signals()` and
+#'     `modeltools::get_response_columns()`.
 #' @param ahead Number of incidence period units (i.e., epiweeks, days, etc.) ahead to forecast
 #' @param training_window_size Size of the local training window in days to use. For example, if
 #'     `training_window_size = 14`, then to make a 1-day-ahead forecast on December 15, we train on
@@ -19,14 +20,31 @@
 #'     \itemize{
 #'     \item{`train_x`}{Matrix of training data whose columns correspond to the
 #'         `value-{days}:{signal}` columns in `lagged_df`.  The training data consists of the
-#'         latest date `d` such that there is an observed response at time `d + ahead` and all data
-#'         from the `training_window_size` days prior to it.}
+#'         latest date `d` such that there is an observed response at time `d + ahead *
+#'         incidence_period`, plus all data from the `training_window_size` days prior to it.}
 #'     \item{`train_y`}{Vector of response data from the `response+{ahead}:{response}` column of
 #'         `lagged_df` corresponding to the rows of `train_x`.}
 #'     \item{`predict_x`}{Matrix of prediction data in the same format as `train_x`.  The
 #'         prediction data contains the most recent `training_window_size` days.}
 #'     \item{`predict_geo_values`}{Vector of `geo_values` corresponding to the rows of `predict_x`.}
 #'     }
+#'
+#' @examples \dontrun{
+#' create_train_and_predict_matrices(
+#'   tibble(
+#'     geo_value = rep(c("az", "wv"), 5),
+#'     time_value = rep(
+#'       as.Date(c("2021-01-25", "2021-01-26", "2021-01-27", "2021-01-28", "2021-01-29")),
+#'       each = 2),
+#'     `value-2:signal_1` = seq(-3, 6),
+#'     `value-1:signal_1` = seq(-1, 8),
+#'     `value+0:signal_1` = seq(1, 10),
+#'     `response+2:signal_1` = c(seq(5, 10), rep(NA, 4))
+#'   ),
+#'   ahead = 2,
+#'   training_window_size = 1)
+#' )
+#' }
 #'
 #' @importFrom tibble tibble
 #'

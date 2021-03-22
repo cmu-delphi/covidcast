@@ -2,7 +2,7 @@
 % Please edit documentation in R/matrix.R
 \name{create_train_and_predict_matrices}
 \alias{create_train_and_predict_matrices}
-\title{Create a training and prediction matrices for a given ahead.}
+\title{Create training and testing data matrices and a training response vector for a given ahead.}
 \usage{
 create_train_and_predict_matrices(lagged_df, ahead, training_window_size)
 }
@@ -12,7 +12,7 @@ create_train_and_predict_matrices(lagged_df, ahead, training_window_size)
 \item{\code{geo_value}}{Strings of geographic locations.}
 \item{\code{time_value}}{Dates of training data.}
 \item{Covariate columns}{Columns with names of the form \code{value-{days}:{signal}} or
-\verb{value+0:\{signal\} whose values correspond to }{signal}\verb{}{days}\code{before}time_value\verb{\} \\item\{Response columns\}\{Columns with names of the form }response+{n}:{response}\verb{whose values correspond to}{response}\verb{}{n}\verb{incidence period units after}time_value\verb{.\} \} A data frame in this format can be made using }covidcast::aggregate_signals()`.}
+\verb{value+0:\{signal\} whose values correspond to }{signal}\verb{}{days}\code{before}time_value\verb{\} \\item\{Response columns\}\{Columns with names of the form }response+{n}:{response}\verb{whose values correspond to}{response}\verb{}{n}\verb{incidence period units after}time_value\verb{.\} \} A data frame in this format can be made using }covidcast::aggregate_signals()\code{and}modeltools::get_response_columns()`.}
 
 \item{ahead}{Number of incidence period units (i.e., epiweeks, days, etc.) ahead to forecast}
 
@@ -25,8 +25,7 @@ Named list with entries:
 \itemize{
 \item{\code{train_x}}{Matrix of training data whose columns correspond to the
 \code{value-{days}:{signal}} columns in \code{lagged_df}.  The training data consists of the
-latest date \code{d} such that there is an observed response at time \code{d + ahead} and all data
-from the \code{training_window_size} days prior to it.}
+latest date \code{d} such that there is an observed response at time \code{d + ahead * incidence_period}, plus all data from the \code{training_window_size} days prior to it.}
 \item{\code{train_y}}{Vector of response data from the \code{response+{ahead}:{response}} column of
 \code{lagged_df} corresponding to the rows of \code{train_x}.}
 \item{\code{predict_x}}{Matrix of prediction data in the same format as \code{train_x}.  The
@@ -35,5 +34,24 @@ prediction data contains the most recent \code{training_window_size} days.}
 }
 }
 \description{
-Create a training and prediction matrices for a given ahead.
+Create training and testing data matrices and a training response vector for a given ahead.
+}
+\examples{
+\dontrun{
+create_train_and_predict_matrices(
+  tibble(
+    geo_value = rep(c("az", "wv"), 5),
+    time_value = rep(
+      as.Date(c("2021-01-25", "2021-01-26", "2021-01-27", "2021-01-28", "2021-01-29")),
+      each = 2),
+    `value-2:signal_1` = seq(-3, 6),
+    `value-1:signal_1` = seq(-1, 8),
+    `value+0:signal_1` = seq(1, 10),
+    `response+2:signal_1` = c(seq(5, 10), rep(NA, 4))
+  ),
+  ahead = 2,
+  training_window_size = 1)
+)
+}
+
 }

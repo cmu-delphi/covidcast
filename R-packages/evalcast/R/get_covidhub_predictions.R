@@ -192,7 +192,7 @@ get_forecast_dates <- function(forecasters,
 #' @return Predictions card. For more flexible processing of COVID Hub data, try
 #'   using [zoltr](https://docs.zoltardata.com/zoltr/)
 #' 
-#' @importFrom readr read_csv
+#' @importFrom data.table fread
 get_forecaster_predictions <- function(covidhub_forecaster_name,
                                      forecast_dates = NULL,
                                      geo_values = "*",

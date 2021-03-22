@@ -214,16 +214,17 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
                         covidhub_forecaster_name,
                         forecast_date,
                         covidhub_forecaster_name)
-    pred <- read_csv(filename,
-                     col_types = cols(
-                       location = col_character(),
-                       forecast_date = col_date(format = ""),
-                       quantile = col_double(),
-                       value = col_double(),
-                       target = col_character(),
-                       target_end_date = col_date(format = ""),
-                       type = col_character()
-                     ))
+    pred <- fread(filename,
+                  colClasses = c(location = "character",
+                                 forecast_date = "Date",
+                                 quantile = "double",
+                                 value = "double",
+                                 target = "character",
+                                 target_end_date = "Date",
+                                 type = "character"),
+                  na.strings = c("\"NA\"", "NA"),
+                  data.table = FALSE,
+                  showProgress = FALSE)
     pcards[[forecast_date]] <- pred %>%
       separate(.data$target,
                into = c("ahead", "incidence_period", NA, "inc", "response"),

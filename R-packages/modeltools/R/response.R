@@ -1,5 +1,3 @@
-library(assertthat)
-
 #' Compute the corresponding observed response values for a set of signals.
 #'
 #' The response for an observed data point at time `t` is defined as the mean of observed values on
@@ -38,6 +36,8 @@ library(assertthat)
 #'   1:2 
 #' )
 #' }
+#'
+#' @importFrom assertthat assert_that
 #'
 #' @export
 add_response_columns <- function(signals,

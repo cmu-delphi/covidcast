@@ -215,16 +215,19 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
                         forecast_date,
                         covidhub_forecaster_name)
     pred <- fread(filename,
+                  na.strings = c("\"NA\"", "NA"),
                   colClasses = c(location = "character",
-                                 forecast_date = "Date",
                                  quantile = "double",
                                  value = "double",
                                  target = "character",
-                                 target_end_date = "Date",
                                  type = "character"),
-                  na.strings = c("\"NA\"", "NA"),
                   data.table = FALSE,
                   showProgress = FALSE)
+    # Specifying the date conversion after significantly speeds up loading 
+    # (~3x faster) for some reason
+    pred$target_end_date = as.Date(pred$target_end_date)
+    pred$forecast_date = as.Date(pred$forecast_date)
+    
     pcards[[forecast_date]] <- pred %>%
       separate(.data$target,
                into = c("ahead", "incidence_period", NA, "inc", "response"),

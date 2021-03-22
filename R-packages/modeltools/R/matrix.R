@@ -20,8 +20,8 @@
 #'     \itemize{
 #'     \item{`train_x`}{Matrix of training data whose columns correspond to the
 #'         `value-{days}:{signal}` columns in `lagged_df`.  The training data consists of the
-#'         latest date `d` such that there is an observed response at time `d + ahead *
-#'         incidence_period`, plus all data from the `training_window_size` days prior to it.}
+#'         latest date with an non-null response, plus all data from the `training_window_size`
+#'         days prior to it.}
 #'     \item{`train_y`}{Vector of response data from the `response+{ahead}:{response}` column of
 #'         `lagged_df` corresponding to the rows of `train_x`.}
 #'     \item{`predict_x`}{Matrix of prediction data in the same format as `train_x`.  The
@@ -53,7 +53,7 @@ create_train_and_predict_matrices <- function(lagged_df, ahead, training_window_
     out <- list()
 
     train_df <- lagged_df %>%
-        select(geo_value, time_value, tidyselect::matches("^value(\\+0|-)"))
+        select(geo_value, time_value, tidyselect::starts_with("value"))
 
     # Find the last possible date of training data   
     response_end_date <- lagged_df %>%
@@ -80,7 +80,7 @@ create_train_and_predict_matrices <- function(lagged_df, ahead, training_window_
     # Prediction matrices
     out$predict_x <- lagged_df %>%
         filter(time_value == max(time_value)) %>%
-        select(tidyselect::matches("^value(\\+0|-)")) %>%
+        select(tidyselect::starts_with("value")) %>%
         as.matrix()
     out$predict_geo_values <- lagged_df %>%
         filter(time_value == max(time_value)) %>%

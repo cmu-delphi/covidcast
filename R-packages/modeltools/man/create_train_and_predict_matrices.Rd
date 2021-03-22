@@ -25,7 +25,8 @@ Named list with entries:
 \itemize{
 \item{\code{train_x}}{Matrix of training data whose columns correspond to the
 \code{value-{days}:{signal}} columns in \code{lagged_df}.  The training data consists of the
-latest date \code{d} such that there is an observed response at time \code{d + ahead * incidence_period}, plus all data from the \code{training_window_size} days prior to it.}
+latest date with an non-null response, plus all data from the \code{training_window_size}
+days prior to it.}
 \item{\code{train_y}}{Vector of response data from the \code{response+{ahead}:{response}} column of
 \code{lagged_df} corresponding to the rows of \code{train_x}.}
 \item{\code{predict_x}}{Matrix of prediction data in the same format as \code{train_x}.  The

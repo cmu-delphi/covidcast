@@ -47,10 +47,18 @@
 #' }
 #'
 #' @importFrom tibble tibble
+#' @importFrom assertthat assert_that
 #'
 #' @export 
 create_train_and_predict_matrices <- function(lagged_df, ahead, training_window_size) {
     out <- list()
+
+    # make sure the response columns are unique
+    responses_at_ahead <- lagged_df %>%
+        select(tidyselect::starts_with(sprintf("response+%i:", ahead))) %>%
+        ncol()
+    assert_that(responses_at_ahead == 1,
+                msg=paste("multiple responses at ahead =",ahead))
 
     train_df <- lagged_df %>%
         select(geo_value, time_value, tidyselect::starts_with("value"))

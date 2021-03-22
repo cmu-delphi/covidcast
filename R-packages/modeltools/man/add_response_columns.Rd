@@ -41,3 +41,19 @@ of days from \code{forecast_date} to the start and end, respectively, of the nex
 \code{incidence_period}.  We choose to take the mean and multiply by the incidence period length
 rather than simply sum the observed values in order to avoid treating missing values as 0.
 }
+\examples{
+\dontrun{
+add_response_columns(
+  tibble(
+    geo_value = "mi"
+    time_value = seq.Date(as.Date("2020-07-01"), as.Date("2020-07-14"), "day"),
+    `value+0:sig` = 1:14
+  ),
+  "sig",
+  as.Date("2020-07-15"),
+  "epiweek",
+  1:2 
+)
+}
+
+}

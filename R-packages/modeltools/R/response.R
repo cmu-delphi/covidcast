@@ -24,6 +24,21 @@ library(assertthat)
 #' @return Data frame of signals equal to `signals` with `length(ahead)` additional columns with
 #'     names `response+{a}:{response_name}` corresponding to the response variable at ahead `a`. 
 #'
+#' @examples
+#' \dontrun{
+#' add_response_columns(
+#'   tibble(
+#'     geo_value = "mi"
+#'     time_value = seq.Date(as.Date("2020-07-01"), as.Date("2020-07-14"), "day"),
+#'     `value+0:sig` = 1:14
+#'   ),
+#'   "sig",
+#'   as.Date("2020-07-15"),
+#'   "epiweek",
+#'   1:2 
+#' )
+#' }
+#'
 #' @export
 add_response_columns <- function(signals,
                                  response_name,

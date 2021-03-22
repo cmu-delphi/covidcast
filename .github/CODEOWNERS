@@ -9,7 +9,7 @@
 /R-packages/evalcast/ @jacobbien @dajmcdon
 
 # modeltools R package
-/R-packages/modeltools/ @huisaddison
+/R-packages/modeltools/ @huisaddison @dajmcdon
 
 # covidcast Python package
 /Python-packages/covidcast-py/ @chinandrew @capnrefsmmat

@@ -1,7 +1,11 @@
-#' @param signals Tibble with mandatory columns `data_source` and `signal` that 
-#'   specifies which variables from the COVIDcast API will be used by `forecaster`. Each
+#' @param signals Tibble with mandatory columns `data_source` and `signal` and 
+#'   optional columns `start_day`, `as_of`, `geo_typ`, `geo_values`. 
+#'   
+#'   `data_source` and `signal` specify which variables from the COVIDcast API 
+#'   will be used by `forecaster`. Each
 #'   row of `signals` represents a separate signal, and first row is taken to be
-#'   the response. If using `incidence_period = "epiweek"`, the response should
+#'   the response unless explicitly overridden. 
+#'   If using `incidence_period = "epiweek"`, the response should
 #'   be something for which summing daily values over an epiweek makes sense
 #'   (e.g., counts or proportions but not log(counts) or log(proportions)).
 #'   Available data sources and signals are documented in the [COVIDcast signal
@@ -20,12 +24,10 @@
 #'   
 #'   You may also include a `geo_type` column, a `geo_values` column and/or an
 #'   `as_of` column. 
-#'   
 #'   The first two should contain a string. If unspecified, these will have
 #'   the same defaults as `covidcast::covidcast_signal()`, namely 
 #'   `geo_type = "county"` and `geo_values = "*"`.
-#'   These arguments allow you to override 
-#'   to download different data than
+#'   These arguments allow you to download different data than
 #'   what you're actually trying to predict, say using state-level data to 
 #'   predict national outcomes. 
 #'   

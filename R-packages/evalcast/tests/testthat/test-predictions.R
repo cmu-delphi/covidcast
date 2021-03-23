@@ -90,10 +90,10 @@ test_that("get_predictions works", {
                  list(
                    list(
                      forecast_date = as.Date("2020-01-01"),
-                     `...` = fake_downloaded_signals),
+                     df_list = fake_downloaded_signals),
                    list(
                      forecast_date = as.Date("2020-01-02"),
-                     `...` = fake_downloaded_signals)
+                     df_list = fake_downloaded_signals)
                  ))
     expect_equal(colnames(pcard),
       c("ahead", "geo_value", "quantile", "value", "forecaster", "forecast_date", "data_source",
@@ -145,12 +145,12 @@ test_that("get_predictions works when forecaster has additional arguments", {
                    list(
                      a = 1, b = "2",
                      forecast_date = as.Date("2020-01-01"),
-                     `...` = fake_downloaded_signals
+                     df_list = fake_downloaded_signals
                      ),
                    list(
                      a = 1, b = "2",
                      forecast_date = as.Date("2020-01-02"),
-                     `...` = fake_downloaded_signals
+                     df_list = fake_downloaded_signals
                      )))
     expect_equal(colnames(pcard),
       c("ahead", "geo_value", "quantile", "value", "forecaster", "forecast_date", "data_source",
@@ -213,7 +213,7 @@ test_that("no start_day within signals works", {
     expect_equal(mock_args(mock_forecaster),
                  list(list(
                    forecast_date = as.Date("2020-01-01"),
-                   `...` = fake_downloaded_signals
+                   df_list = fake_downloaded_signals
                    )))
     expect_equal(colnames(pcard),
       c("ahead", "geo_value", "quantile", "value", "forecaster", "forecast_date", "data_source",
@@ -296,11 +296,11 @@ test_that("start_day function within signals works", {
     expect_equal(mock_args(mock_forecaster),
                  list(list(
                    forecast_date = as.Date("2020-12-11"),
-                   `...` = fake_downloaded_signals
+                   df_list = fake_downloaded_signals
                  ),
                  list(
                    forecast_date = as.Date("2020-12-12"),
-                   `...` = fake_downloaded_signals
+                   df_list = fake_downloaded_signals
                  )))
     expect_equal(colnames(pcard),
       c("ahead", "geo_value", "quantile", "value", "forecaster", "forecast_date", "data_source",

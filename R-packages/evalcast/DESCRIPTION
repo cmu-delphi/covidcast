@@ -78,7 +78,8 @@ Imports:
     ggplot2,
     zoltr,
     covidHubUtils,
-    forcats
+    forcats,
+    data.table
 Suggests: 
     testthat,
     mockr,

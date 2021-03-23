@@ -192,7 +192,7 @@ get_forecast_dates <- function(forecasters,
 #' @return Predictions card. For more flexible processing of COVID Hub data, try
 #'   using [zoltr](https://docs.zoltardata.com/zoltr/)
 #' 
-#' @importFrom readr read_csv
+#' @importFrom data.table fread
 get_forecaster_predictions <- function(covidhub_forecaster_name,
                                      forecast_dates = NULL,
                                      geo_values = "*",
@@ -214,16 +214,20 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
                         covidhub_forecaster_name,
                         forecast_date,
                         covidhub_forecaster_name)
-    pred <- read_csv(filename,
-                     col_types = cols(
-                       location = col_character(),
-                       forecast_date = col_date(format = ""),
-                       quantile = col_double(),
-                       value = col_double(),
-                       target = col_character(),
-                       target_end_date = col_date(format = ""),
-                       type = col_character()
-                     ))
+    pred <- fread(filename,
+                  na.strings = c("\"NA\"", "NA"),
+                  colClasses = c(location = "character",
+                                 quantile = "double",
+                                 value = "double",
+                                 target = "character",
+                                 type = "character"),
+                  data.table = FALSE,
+                  showProgress = FALSE)
+    # Specifying the date conversion after significantly speeds up loading 
+    # (~3x faster) for some reason
+    pred$target_end_date = as.Date(pred$target_end_date)
+    pred$forecast_date = as.Date(pred$forecast_date)
+    
     pcards[[forecast_date]] <- pred %>%
       separate(.data$target,
                into = c("ahead", "incidence_period", NA, "inc", "response"),

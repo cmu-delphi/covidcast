@@ -19,7 +19,8 @@ RoxygenNote: 7.1.1
 Remotes:
     github::cmu-delphi/covidcast/R-packages/covidcast@main,
     github::cmu-delphi/covidcast/R-packages/evalcast@main
-Imports: 
+Imports:
+    assertthat,
     covidcast,
     dplyr,
     evalcast,

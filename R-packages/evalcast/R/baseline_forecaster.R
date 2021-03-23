@@ -5,7 +5,7 @@
 #' augments a flat-line point prediction with a forecast distribution around
 #' this point based on quantiles of symmetrized week-to-week residuals.
 #'
-#' @param df Data frame of the format that is returned by
+#' @param df_list list of data of the format that is returned by
 #'   [covidcast::covidcast_signal()] or [covidcast::covidcast_signals()].  
 #' @template forecast_date-template
 #' @template incidence_period-template
@@ -21,7 +21,7 @@
 #'   (same as the median in this case).
 #'
 #' @export
-baseline_forecaster <- function(df,
+baseline_forecaster <- function(df_list,
                                 forecast_date,
                                 incidence_period = c("epiweek", "day"),
                                 ahead = 1:4,
@@ -33,11 +33,11 @@ baseline_forecaster <- function(df,
   dat <- list()
   s <- ifelse(symmetrize, -1, NA)
   
-  if (class(df)[1] == "list") df <- df[[1]]
+  if (class(df_list)[1] == "list") df_list <- df_list[[1]]
   
   for (a in seq_along(ahead)) {
     # recall the first row of signals is the response
-    dat[[a]] <- df %>%
+    dat[[a]] <- df_list %>%
       group_by(.data$geo_value) %>%
       arrange(.data$time_value) %>%
       mutate(summed = zoo::rollsum(.data$value, 

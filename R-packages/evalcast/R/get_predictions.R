@@ -14,15 +14,16 @@
 #'   probabilities associated with quantile forecasts for that location and
 #'   ahead. If your forecaster produces point forecasts, then set `quantile=NA`.
 #'   
-#'   The first argument to `forecaster` must be named `df_list`. It will be 
+#'   One argument to `forecaster` must be named `df_list`. It will be 
 #'   populated with the list of historical data returned by a call 
 #'   to COVIDcast. The list will be the same length as the number of rows in 
 #'   the `signals` tibble (see below).
 #'   The forecaster will also receive a single `forecast_date` as a named argument.
-#'   Any additional named arguments can be passed via the `forecaster_params`
+#'   Any additional named arguments can be passed via the `forecaster_args`
 #'   argument below.
 #'   
-#'   Thus, the forecaster should have a signature like `forecaster(data, forecast_date,...)`
+#'   Thus, the forecaster should have a signature like 
+#'   `forecaster(df_list = data, forecast_data = forecast_date, ...)`
 #' @param name_of_forecaster String indicating name of the forecaster.
 #' @template signals-template
 #' @template forecast_dates-template

@@ -1,3 +1,19 @@
+#' Simple example forecaster that forecasts confirmed cases.
+#'
+#' @param df_list List of downloaded covidcast signals
+#' @param forecast_date Date from which the forecast should be made.
+#'
+#' preds <- evalcast::get_predictions(modeltools::example_forecaster,
+#'                                    "example",
+#'                                    tibble(
+#'                                      data_source = "jhu-csse",
+#'                                      signal = "confirmed_incidence_num",
+#'                                      geo_type = "state",
+#'                                      start_date = as.Date("2021-01-01"),
+#'                                    ),
+#'                                    as.Date("2021-03-01"),
+#'                                    "epiweek")
+#'
 #' @export
 example_forecaster <- function(df_list, forecast_date) {
     ahead <- 1:4

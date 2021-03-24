@@ -32,7 +32,7 @@ example_forecaster <- function(df_list, forecast_date) {
         mats <- create_train_and_predict_matrices(covariates_with_response, a, 14)
         model <- quantgen::quantile_lasso(mats$train_x, mats$train_y, quantiles, lambda = 0)
         predictions <- quantgen:::predict.quantile_genlasso(model, mats$predict_x)
-        print(predictions)
+
         colnames(predictions) <- quantiles
         predict_df <- bind_cols(geo_value = mats$predict_geo_values,
                                 predictions) %>%

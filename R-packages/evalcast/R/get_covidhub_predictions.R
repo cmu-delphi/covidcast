@@ -33,11 +33,15 @@
 #'   subset of those in the original list. Used for custom filtering of dates
 #'   (e.g. only forecasts from Mondays, where all forecasters made a forecast,
 #'   etc.)
+#' @param verbose If TRUE, prints additional details about progress. FALSE by
+#'   default.
 #' @seealso [get_predictions()]
 #' @seealso [get_zoltar_predictions()]
 #' @template predictions_cards-template
 #' @return For more flexible processing of COVID Hub data, try
 #'   using [zoltr](https://docs.zoltardata.com/zoltr/)
+#'
+#' @importFrom stringr str_interp
 #'
 #' @export
 
@@ -54,7 +58,8 @@ get_covidhub_predictions <- function(
   predictions_cards = NULL,
   start_date = NULL,
   end_date = NULL,
-  date_filtering_function = NULL) {
+  date_filtering_function = NULL,
+  verbose = FALSE) {
   forecast_dates <- as_date(forecast_dates)
   forecast_dates <- get_forecast_dates(covidhub_forecaster_name,
                                        forecast_dates,
@@ -78,10 +83,17 @@ get_covidhub_predictions <- function(
       }
     }
   }
-
+  
+  num_forecasters = length(covidhub_forecaster_name)
   predictions_cards_list <- vector("list",
-                                   length = length(covidhub_forecaster_name))
+                                   length = num_forecasters)
+  if (verbose){
+    cat(str_interp("Getting forecasts for ${num_forecasters} forecasters.\n")) 
+  }
   for (i in seq_len(length(covidhub_forecaster_name))) {
+    if (verbose){
+      cat(str_interp("${i}/${num_forecasters}: ${forecasters[i]}...\n"))
+    }
     if (length(forecast_dates[[i]] > 0)) {
       predictions_cards_list[[i]] <- tryCatch({
         get_forecaster_predictions(covidhub_forecaster_name[i],

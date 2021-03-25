@@ -4,12 +4,28 @@
 \alias{example_forecaster}
 \title{Simple example forecaster that forecasts confirmed cases.}
 \usage{
-example_forecaster(df_list, forecast_date)
+example_forecaster(
+  df_list,
+  forecast_date,
+  ahead = 1:4,
+  training_window_size = 14,
+  lags = seq(0, -1 * training_window_size, -7),
+  quantiles = modeltools::covidhub_probs
+)
 }
 \arguments{
-\item{df_list}{List of downloaded covidcast signals}
+\item{df_list}{List of downloaded covidcast signals.}
 
-\item{forecast_date}{Date from which the forecast should be made.
+\item{forecast_date}{Date from which the forecast should be made.}
+
+\item{ahead}{Vector of epiweeks ahead to predict.}
+
+\item{training_window_size}{Number of days prior to \code{forecast_date} to use for training.}
+
+\item{lags}{Vector of lags or list of vectors of lags to apply to \code{df_list}.  See documentation
+of \code{dt} argument to \code{covidcast::aggregate_signals()} for details.}
+
+\item{quantiles}{Vector of quantile values at which to predict
 
 preds <- evalcast::get_predictions(modeltools::example_forecaster,
 "example",

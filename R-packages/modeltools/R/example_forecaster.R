@@ -19,7 +19,7 @@
 #'                                    as.Date("2021-03-01"),
 #'                                    "epiweek")
 #'
-#' @importFrom dplyr mutate bind_cols, bind_rows
+#' @importFrom dplyr mutate bind_cols bind_rows
 #' @importFrom tidyr pivot_longer
 #'
 #' @export

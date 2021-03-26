@@ -5,37 +5,20 @@
 \title{Baseline forecaster}
 \usage{
 baseline_forecaster(
-  df,
+  df_list,
   forecast_date,
-  signals,
   incidence_period = c("epiweek", "day"),
-  ahead,
-  geo_type,
+  ahead = 1:4,
   symmetrize = TRUE
 )
 }
 \arguments{
-\item{df}{Data frame of the format that is returned by
+\item{df_list}{list of data of the format that is returned by
 \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}} or \code{\link[covidcast:covidcast_signals]{covidcast::covidcast_signals()}}.}
 
 \item{forecast_date}{Date object or string of the form "YYYY-MM-DD",
 indicating date on which forecasts will be made about some period (e.g.,
 epiweek). For example, if \code{forecast_date = "2020-05-11"}, \code{incidence_period = "day"}, and \code{ahead = 3}, then, we'd be making forecasts for "2020-05-14".}
-
-\item{signals}{Tibble specifying which variables from the COVIDcast API will be downloaded and passed along to \code{forecaster}.
-Each row of \code{signals} represents a separate variable to be downloaded.  Available data
-sources, signals, and geo resolutions are documented in the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{COVIDcast signal documentation}.
-We expect the tibble to have the following columns:
-\enumerate{
-\item \code{data_source}:  name of the source of the signal
-\item \code{signal}:  name of the signal
-\item \code{geo_type}:  geo resolution at which to pull the data
-\item \code{start_day} (optional):  date on which to start downloading the signal.  Can be
-represented as a Date, string in "YYYY-MM-DD" format, or as a function of a Date or
-string.  The latter is useful when the start date should be computed dynamically from
-the forecast date (e.g., when \code{forecaster} only trains on the most recent 4 weeks of
-data).
-}}
 
 \item{incidence_period}{String indicating the incidence period, either
 "epiweek" or "day".}
@@ -45,10 +28,6 @@ are you forecasting? If \code{incidence_period = "epiweek"} and forecast_date is
 Sunday or Monday, then \code{ahead = 1} means the epiweek that includes the
 forecast date; if \code{forecast_date} falls on a Tuesday through Saturday, then
 it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahead = 1} means the day after forecast date.}
-
-\item{geo_type}{String indicating geographical type, such as "county", or
-"state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
-for available options.}
 
 \item{symmetrize}{Should symmetrized residuals be used, or unsymmetrized
 (raw) residuals? Default is \code{TRUE}, which results in the flat-line point

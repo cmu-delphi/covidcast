@@ -33,11 +33,15 @@
 #'   subset of those in the original list. Used for custom filtering of dates
 #'   (e.g. only forecasts from Mondays, where all forecasters made a forecast,
 #'   etc.)
+#' @param verbose If TRUE, prints additional details about progress. FALSE by
+#'   default.
 #' @seealso [get_predictions()]
 #' @seealso [get_zoltar_predictions()]
 #' @template predictions_cards-template
 #' @return For more flexible processing of COVID Hub data, try
 #'   using [zoltr](https://docs.zoltardata.com/zoltr/)
+#'
+#' @importFrom stringr str_interp
 #'
 #' @export
 
@@ -54,7 +58,8 @@ get_covidhub_predictions <- function(
   predictions_cards = NULL,
   start_date = NULL,
   end_date = NULL,
-  date_filtering_function = NULL) {
+  date_filtering_function = NULL,
+  verbose = FALSE) {
   forecast_dates <- as_date(forecast_dates)
   forecast_dates <- get_forecast_dates(covidhub_forecaster_name,
                                        forecast_dates,
@@ -66,22 +71,29 @@ get_covidhub_predictions <- function(
   # in that case it's no longer a true prediction.
   if (!is.null(predictions_cards)) {
     seen_dates <- predictions_cards %>%
-      distinct(forecast_date, forecaster)
+      distinct(.data$forecast_date, .data$forecaster)
     for (i in seq_len(length(covidhub_forecaster_name))) {
       if (covidhub_forecaster_name[[i]] %in% seen_dates$forecaster) {
         seen_forecaster_dates <- seen_dates %>%
-          filter(forecaster == covidhub_forecaster_name[[i]]) %>%
-          pull(forecast_date)
+          filter(.data$forecaster == covidhub_forecaster_name[[i]]) %>%
+          pull(.data$forecast_date)
         forecast_dates[[i]] <- lubridate::as_date(setdiff(
                                                     forecast_dates[[i]],
                                                     seen_forecaster_dates))
       }
     }
   }
-
+  
+  num_forecasters = length(covidhub_forecaster_name)
   predictions_cards_list <- vector("list",
-                                   length = length(covidhub_forecaster_name))
+                                   length = num_forecasters)
+  if (verbose){
+    cat(str_interp("Getting forecasts for ${num_forecasters} forecasters.\n")) 
+  }
   for (i in seq_len(length(covidhub_forecaster_name))) {
+    if (verbose){
+      cat(str_interp("${i}/${num_forecasters}: ${forecasters[i]}...\n"))
+    }
     if (length(forecast_dates[[i]] > 0)) {
       predictions_cards_list[[i]] <- tryCatch({
         get_forecaster_predictions(covidhub_forecaster_name[i],
@@ -192,17 +204,17 @@ get_forecast_dates <- function(forecasters,
 #' @return Predictions card. For more flexible processing of COVID Hub data, try
 #'   using [zoltr](https://docs.zoltardata.com/zoltr/)
 #' 
-#' @importFrom readr read_csv
+#' @importFrom data.table fread
 get_forecaster_predictions <- function(covidhub_forecaster_name,
-                                     forecast_dates = NULL,
-                                     geo_values = "*",
-                                     forecast_type = c("point","quantile"),
-                                     ahead = 1:4,
-                                     incidence_period = c("epiweek", "day"),
-                                     signal = c("confirmed_incidence_num",
-                                                "deaths_incidence_num",
-                                                "deaths_cumulative_num")
-                                     ) {
+                                       forecast_dates = NULL,
+                                       geo_values = "*",
+                                       forecast_type = c("point","quantile"),
+                                       ahead = 1:4,
+                                       incidence_period = c("epiweek", "day"),
+                                       signal = c("confirmed_incidence_num",
+                                                  "deaths_incidence_num",
+                                                  "deaths_cumulative_num")
+) {
   url <- "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed"
   pcards <- list()
   if (is.null(forecast_dates))
@@ -214,16 +226,20 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
                         covidhub_forecaster_name,
                         forecast_date,
                         covidhub_forecaster_name)
-    pred <- read_csv(filename,
-                     col_types = cols(
-                       location = col_character(),
-                       forecast_date = col_date(format = ""),
-                       quantile = col_double(),
-                       value = col_double(),
-                       target = col_character(),
-                       target_end_date = col_date(format = ""),
-                       type = col_character()
-                     ))
+    pred <- fread(filename,
+                  na.strings = c("\"NA\"", "NA"),
+                  colClasses = c(location = "character",
+                                 quantile = "double",
+                                 value = "double",
+                                 target = "character",
+                                 type = "character"),
+                  data.table = FALSE,
+                  showProgress = FALSE)
+    # Specifying the date conversion after significantly speeds up loading 
+    # (~3x faster) for some reason
+    pred$target_end_date = as.Date(pred$target_end_date)
+    pred$forecast_date = as.Date(pred$forecast_date)
+    
     pcards[[forecast_date]] <- pred %>%
       separate(.data$target,
                into = c("ahead", "incidence_period", NA, "inc", "response"),
@@ -235,7 +251,7 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
              response = case_when(.data$response == "death" ~ "deaths", 
                                   .data$response == "case" ~ "confirmed",
                                   TRUE ~ "drop",),
-             signal = paste(response, inc, "num", sep="_"),
+             signal = paste(.data$response, .data$inc, "num", sep="_"),
              data_source = if_else(.data$response=="drop", "drop", "jhu-csse"),
              ahead = as.integer(.data$ahead)) %>%
       filter(.data$response != "drop", .data$type %in% forecast_type,
@@ -316,12 +332,33 @@ get_covidhub_forecaster_names <- function(
   } else {
     models <- covidHubUtils::get_model_designations(source = "zoltar")
     forecaster_names <- models %>%
-                         filter(designation %in% designations) %>%
-                         pull(model)
+                         filter(.data$designation %in% designations) %>%
+                         pull(.data$model)
   }
   return(forecaster_names)
 }
 
-covidhub_probs <- function() {
-  c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99)
+
+
+
+#' Vector of quantiles used for submission to the COVID 19 Forecast Hub
+#' 
+#' See the [Forecast Hub Documentation](https://github.com/reichlab/covid19-forecast-hub/blob/master/data-processed/README.md#quantile)
+#' for more details.
+#'
+#' @param type defaults to the "standard" set of 23 quantiles. Setting 
+#'   `type = "inc_case"` will return a set of 7 quantiles used for incident
+#'   cases.
+#'
+#' @return a numeric vector
+#' @export
+#'
+#' @examples
+#' covidhub_probs()
+covidhub_probs <- function(type = c("standard", "inc_case")) {
+  type = match.arg(type)
+  switch(type,
+         standard = c(0.01, 0.025, seq(0.05, 0.95, by = 0.05), 0.975, 0.99),
+         inc_case = c(0.025, 0.100, 0.250, 0.500, 0.750, 0.900, 0.975)
+  )
 }

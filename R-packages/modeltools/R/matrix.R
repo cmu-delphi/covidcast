@@ -27,6 +27,7 @@
 #'     \item{`predict_x`}{Matrix of prediction data in the same format as `train_x`.  The
 #'         prediction data contains the most recent `training_window_size` days.}
 #'     \item{`predict_geo_values`}{Vector of `geo_values` corresponding to the rows of `predict_x`.}
+#'     \item{`train_end_date`}{latest `time_value` used in the training period}
 #'     }
 #'
 #' @examples \dontrun{
@@ -49,7 +50,7 @@
 #' @importFrom tibble tibble
 #' @importFrom assertthat assert_that
 #'
-#' @export 
+#' @export
 create_train_and_predict_matrices <- function(lagged_df, ahead, training_window_size) {
     out <- list()
 
@@ -63,7 +64,7 @@ create_train_and_predict_matrices <- function(lagged_df, ahead, training_window_
     train_df <- lagged_df %>%
         select(geo_value, time_value, tidyselect::starts_with("value"))
 
-    # Find the last possible date of training data   
+    # Find the last possible date of training data
     response_end_date <- lagged_df %>%
         select(time_value, tidyselect::starts_with(sprintf("response+%i:", ahead))) %>%
         tidyr::drop_na() %>%
@@ -93,6 +94,7 @@ create_train_and_predict_matrices <- function(lagged_df, ahead, training_window_
     out$predict_geo_values <- lagged_df %>%
         filter(time_value == max(time_value)) %>%
         select(geo_value) %>% pull()
+    out$train_end_date <- train_end_date
 
     return(out)
 }

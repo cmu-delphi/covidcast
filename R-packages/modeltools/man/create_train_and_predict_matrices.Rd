@@ -32,6 +32,7 @@ days prior to it.}
 \item{\code{predict_x}}{Matrix of prediction data in the same format as \code{train_x}.  The
 prediction data contains the most recent \code{training_window_size} days.}
 \item{\code{predict_geo_values}}{Vector of \code{geo_values} corresponding to the rows of \code{predict_x}.}
+\item{\code{train_end_date}}{latest \code{time_value} used in the training period}
 }
 }
 \description{

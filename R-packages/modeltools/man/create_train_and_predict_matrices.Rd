@@ -53,7 +53,6 @@ create_train_and_predict_matrices(
   ),
   ahead = 2,
   training_window_size = 1)
-)
 }
 
 }

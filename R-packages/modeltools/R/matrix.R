@@ -44,7 +44,6 @@
 #'   ),
 #'   ahead = 2,
 #'   training_window_size = 1)
-#' )
 #' }
 #'
 #' @importFrom tibble tibble

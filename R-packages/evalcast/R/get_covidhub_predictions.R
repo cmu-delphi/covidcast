@@ -92,7 +92,7 @@ get_covidhub_predictions <- function(
   }
   for (i in seq_len(length(covidhub_forecaster_name))) {
     if (verbose){
-      cat(str_interp("${i}/${num_forecasters}: ${forecasters[i]}...\n"))
+      cat(str_interp("${i}/${num_forecasters}: ${covidhub_forecaster_name[i]}...\n"))
     }
     if (length(forecast_dates[[i]] > 0)) {
       predictions_cards_list[[i]] <- tryCatch({

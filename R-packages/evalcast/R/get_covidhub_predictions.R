@@ -72,7 +72,7 @@ get_covidhub_predictions <- function(
   if (!is.null(predictions_cards)) {
     seen_dates <- predictions_cards %>%
       distinct(forecast_date, forecaster)
-    for (i in seq_len(length(covidhub_forecaster_name))) {
+    for (i in seq_along(covidhub_forecaster_name)) {
       if (covidhub_forecaster_name[[i]] %in% seen_dates$forecaster) {
         seen_forecaster_dates <- seen_dates %>%
           filter(forecaster == covidhub_forecaster_name[[i]]) %>%

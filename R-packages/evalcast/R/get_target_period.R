@@ -37,3 +37,29 @@ get_target_period <- function(forecast_date, incidence_period, ahead) {
   tibble(start = sunday_of_ew_frcst_date + week_ahead * 7,
          end = sunday_of_ew_frcst_date + (week_ahead + 1) * 7 - 1)
 }
+
+
+#' Compute forecast target date in days
+#'
+#' This function is most useful for converting a forecast date and an ahead
+#' specification from epiweek to days. It allows days as well. 
+#'
+#' @template forecast_date-template
+#' @template incidence_period-template
+#' @template ahead-template
+#' 
+#' @seealso [get_target_period()]
+#'
+#' @export
+#' 
+#' @examples 
+#' fd <- "2021-03-22" # a monday
+#' get_target_ahead(fd, "epiweek", 1) # forecast the following Saturday
+#' get_target_ahead("2021-03-23", "epiweek", 1) # forecast the Saturday after next
+#' get_target_ahead(fd, "day", 1) # forecast tomorrow
+get_target_ahead <- function(forecast_date, incidence_period, ahead) {
+  forecast_date <- lubridate::ymd(forecast_date)
+  ed <- get_target_period(forecast_date, incidence_period, ahead)$end
+  return(as.numeric(ed - forecast_date))
+}
+

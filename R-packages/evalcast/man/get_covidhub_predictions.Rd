@@ -16,7 +16,8 @@ get_covidhub_predictions(
   predictions_cards = NULL,
   start_date = NULL,
   end_date = NULL,
-  date_filtering_function = NULL
+  date_filtering_function = NULL,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -59,6 +60,9 @@ element is a vector of dates and returns a list where each element is a
 subset of those in the original list. Used for custom filtering of dates
 (e.g. only forecasts from Mondays, where all forecasters made a forecast,
 etc.)}
+
+\item{verbose}{If TRUE, prints additional details about progress. FALSE by
+default.}
 }
 \value{
 Long data frame of forecasts with a class of \code{predictions_cards}.

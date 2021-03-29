@@ -90,7 +90,7 @@ get_covidhub_predictions <- function(
   if (verbose){
     cat(str_interp("Getting forecasts for ${num_forecasters} forecasters.\n")) 
   }
-  for (i in seq_len(length(covidhub_forecaster_name))) {
+  for (i in seq_along(covidhub_forecaster_name)) {
     if (verbose){
       cat(str_interp("${i}/${num_forecasters}: ${covidhub_forecaster_name[i]}...\n"))
     }

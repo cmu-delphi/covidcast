@@ -25,3 +25,29 @@ grp_processing_for_facets <- function(cards,
                    "your scorecard or try writing your own version."))
   return(grps)
 }
+
+
+test_legal_faceting <- function(facet_rows, facet_cols, grp_vars) {
+  if (!is.null(facet_rows)) {
+    non_grouped_facet <- setdiff(facet_rows, grp_vars)
+    assert_that(length(non_grouped_facet) == 0,
+                msg = paste("Variables must be grouped in order to be faceted in rows:",
+                            non_grouped_facet))
+  }
+  if (!is.null(facet_cols)) {
+    non_grouped_facet <- setdiff(facet_cols, grp_vars)
+    assert_that(length(non_grouped_facet) == 0,
+                msg = paste("Variables must be grouped in order to be faceted in cols:",
+                            non_grouped_facet))
+  }
+  invisible(TRUE)
+}
+
+# Helpful wrapper on interaction() for our plotting functions
+Interaction <- function(...) {
+  params <- list(...)
+  if (length(params) == 0) return(NULL)
+  else if (length(params) == 1) return(as.factor(params[[1]]))
+  else return(interaction(...))
+}
+

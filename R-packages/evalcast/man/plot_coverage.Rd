@@ -48,7 +48,7 @@ of coverage.}
 "state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
 for available options.}
 
-\item{backfill_buffer}{How many days until response is deemed trustworthy
+\item{backfill_buffer}{Howf many days until response is deemed trustworthy
 enough to be taken as correct?}
 }
 \description{

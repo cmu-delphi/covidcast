@@ -22,7 +22,7 @@
 #' @param avg_vars variables over which we average to determine the proportion
 #'   of coverage.
 #' @template geo_type-template
-#' @param backfill_buffer Howf many days until response is deemed trustworthy
+#' @param backfill_buffer How many days until response is deemed trustworthy
 #'   enough to be taken as correct?
 #' 
 #' @export 
@@ -84,10 +84,13 @@ plot_coverage <- function(predictions_cards,
 #' Compute observed coverage from a quantile forecaster
 #'
 #' @template predictions_cards-template
+#' @template geo_type-template
 #' @param grp_vars character vector of named columns in the score_card at which
 #'   average performance will be returned
 #' @param avg_vars character vector of named columns in the score_card over which
 #'   averaging performance will be computed
+#' @param backfill_buffer How many days until response is deemed trustworthy
+#'   enough to be taken as correct?
 #'   
 #' @details Checks __are__ performed to ensure that averaging variables
 #'   all contain the same confidence intervals though these may vary over

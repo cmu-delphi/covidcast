@@ -139,10 +139,11 @@ test_that("wis works, 1 interval and median", {
 
 test_that("over/under prediction work, 1 interval and median", {
   
-  test_data <- data.frame(actual =   rep(c(1, -15, 22), times = 3),
-                          quantile = rep(c(0.25, 0.5, 0.75), each = 3),
-                          value = c(c(0, 1, 0), c(1, 2, 3), c(2, 2, 3)),
-                          loc = rep(letters[1:3], times = 3))
+  test_data <- data.frame(actual =   rep(c(1, -15, 22), times = 4),
+                          quantile = rep(c(0.25, 0.5, 0.75, NA), each = 3),
+                          value = c(c(0, 1, 0), c(1, 2, 3),
+                                    c(2, 2, 3), c(0.9, 2.1, 3.1)),
+                          loc = rep(letters[1:3], times = 4))
   
   over <- test_data %>% group_by(loc) %>% 
     summarise(over = overprediction(quantile, value, actual)) %>%
@@ -153,18 +154,20 @@ test_that("over/under prediction work, 1 interval and median", {
     pull()
   
   expect_identical(over, c(0, 16 + 1/3, 0))
-  expect_identical(under, c(0,0,19))
+  expect_identical(under, c(0, 0, 19))
   
 })
 
 test_that("wis over/under works, 2 intervals and median", {
   
-  test_data <- data.frame(true_value =   rep(c(1, -15, 22), times = 5),
-                          quantile = rep(c(0.1, 0.25, 0.5, 0.75, 0.9), each = 3),
+  test_data <- data.frame(true_value =   rep(c(1, -15, 22), times = 6),
+                          quantile = rep(c(0.1, 0.25, 0.5, 0.75, 0.9, NA),
+                                         each = 3),
                           prediction = c(c(-1, -2, -2), c(0, 1, 0), c(1, 2, 3),
-                                         c(2, 2, 3), c(3, 4, 4)),
+                                         c(2, 2, 3), c(3, 4, 4),
+                                         c(0.9, 1.9, 2.9)),
                           model = c("model1"),
-                          date = rep(1:3, times = 5))
+                          date = rep(1:3, times = 6))
   
   eval <- scoringutils::eval_forecasts(
     test_data,

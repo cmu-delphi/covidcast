@@ -83,7 +83,13 @@ plot_coverage <- function(predictions_cards,
 
 #' Compute observed coverage from a quantile forecaster
 #'
-#' @template predictions_cards-template
+#' @param predictions_cards tibble of predictions
+#'   that are all for the same prediction task, meaning they are for the same
+#'   response, incidence period,and geo type. Forecasts may be for a
+#'   different forecast date or forecaster.
+#'   A predictions card may be created by the function
+#'   [get_predictions()], downloaded with [get_covidhub_predictions()] or
+#'   possibly created manually.
 #' @template geo_type-template
 #' @param grp_vars character vector of named columns in the score_card at which
 #'   average performance will be returned

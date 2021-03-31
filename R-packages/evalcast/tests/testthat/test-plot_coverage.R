@@ -15,6 +15,10 @@ library(mockery)
 # https://github.com/r-lib/vdiffr/issues/71
 context("plot_coverage")
 
+# Get fake predictions_cards for use in tests
+fake_predictions_cards <- readRDS(
+  test_path('data/fake_plot_predictions_cards.rds'))
+
 # Create a fake result from the covidcast API as returned by the `evalcast::download_signals()`
 # function.
 create_fake_downloaded_signal <- function(geo_value, value, date_string) {
@@ -78,10 +82,6 @@ test_that("plot_coverage custom facets type all", {
   
 })
 
-
-# Get fake predictions_cards for use in tests
-fake_predictions_cards <- readRDS(
-  test_path('data/fake_plot_predictions_cards.rds'))
 
 test_that("compute_coverage default grps and avg", {
   # Mock out the call to `download_signals()`.

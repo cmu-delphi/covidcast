@@ -13,6 +13,14 @@ compute_coverage(
 )
 }
 \arguments{
+\item{predictions_cards}{tibble of predictions
+that are all for the same prediction task, meaning they are for the same
+response, incidence period,and geo type. Forecasts may be for a
+different forecast date or forecaster.
+A predictions card may be created by the function
+\code{\link[=get_predictions]{get_predictions()}}, downloaded with \code{\link[=get_covidhub_predictions]{get_covidhub_predictions()}} or
+possibly created manually.}
+
 \item{geo_type}{String indicating geographical type, such as "county", or
 "state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
 for available options.}
@@ -27,13 +35,6 @@ averaging performance will be computed}
 enough to be taken as correct?}
 }
 \value{
-Long data frame of forecasts with a class of \code{predictions_cards}.
-The first 4 columns are the same as those returned by the forecaster. The
-remainder specify the prediction task, 10 columns in total:
-\code{ahead}, \code{geo_value}, \code{quantile}, \code{value}, \code{forecaster}, \code{forecast_date},
-\code{data_source}, \code{signal}, \code{target_end_date}, and \code{incidence_period}. Here
-\code{data_source} and \code{signal} correspond to the response variable only.
-
 A tibble containing grp_vars, nominal_prob (the claimed interval
 coverage), prop_below (the proportion of actual values falling below
 the lower end of the confidence interval), prop_above (the proportion of

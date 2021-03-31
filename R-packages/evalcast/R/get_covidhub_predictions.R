@@ -72,7 +72,7 @@ get_covidhub_predictions <- function(
   if (!is.null(predictions_cards)) {
     seen_dates <- predictions_cards %>%
       distinct(.data$forecast_date, .data$forecaster)
-    for (i in seq_len(length(covidhub_forecaster_name))) {
+    for (i in seq_along(covidhub_forecaster_name)) {
       if (covidhub_forecaster_name[[i]] %in% seen_dates$forecaster) {
         seen_forecaster_dates <- seen_dates %>%
           filter(.data$forecaster == covidhub_forecaster_name[[i]]) %>%
@@ -90,9 +90,9 @@ get_covidhub_predictions <- function(
   if (verbose){
     cat(str_interp("Getting forecasts for ${num_forecasters} forecasters.\n")) 
   }
-  for (i in seq_len(length(covidhub_forecaster_name))) {
+  for (i in seq_along(covidhub_forecaster_name)) {
     if (verbose){
-      cat(str_interp("${i}/${num_forecasters}: ${forecasters[i]}...\n"))
+      cat(str_interp("${i}/${num_forecasters}: ${covidhub_forecaster_name[i]}...\n"))
     }
     if (length(forecast_dates[[i]] > 0)) {
       predictions_cards_list[[i]] <- tryCatch({

@@ -7,12 +7,17 @@
 create_train_and_predict_matrices(lagged_df, ahead, training_window_size)
 }
 \arguments{
-\item{lagged_df}{Data frame of lagged data.  It should have the following columns:
+\item{lagged_df}{Data frame of lagged data. It should have the following columns:
 \itemize{
-\item{\code{geo_value}}{Strings of geographic locations.}
-\item{\code{time_value}}{Dates of training data.}
-\item{Covariate columns}{Columns with names of the form \code{value-{days}:{signal}} or
-\verb{value+0:\{signal\} whose values correspond to }{signal}\verb{}{days}\code{before}time_value\verb{\} \\item\{Response columns\}\{Columns with names of the form }response+{n}:{response}\verb{whose values correspond to}{response}\verb{}{n}\verb{incidence period units after}time_value\verb{.\} \} A data frame in this format can be made using }covidcast::aggregate_signals()\code{and}modeltools::get_response_columns()`.}
+\item \code{geo_value}: Strings of geographic locations.
+\item \code{time_value}: Dates of training data.
+\item Covariate columns: Columns with names of the form \code{value-{days}:{signal}} or
+\code{value+0:{signal}} whose values correspond to \code{{signal}} \code{{days}} before \code{time_value}.
+\item Response columns: Columns with names of the form \code{response+{n}:{response}} whose values
+correspond to \code{{response}} \code{{n}} incidence period units after \code{time_value}.
+}
+A data frame in this format can be made using \code{covidcast::aggregate_signals()} and
+\code{modeltools::get_response_columns()}.}
 
 \item{ahead}{Number of incidence period units (i.e., epiweeks, days, etc.) ahead to forecast}
 
@@ -23,16 +28,16 @@ data from December 1 to December 14.}
 \value{
 Named list with entries:
 \itemize{
-\item{\code{train_x}}{Matrix of training data whose columns correspond to the
+\item \code{train_x}: Matrix of training data whose columns correspond to the
 \code{value-{days}:{signal}} columns in \code{lagged_df}.  The training data consists of the
 latest date with an non-null response, plus all data from the \code{training_window_size}
-days prior to it.}
-\item{\code{train_y}}{Vector of response data from the \code{response+{ahead}:{response}} column of
-\code{lagged_df} corresponding to the rows of \code{train_x}.}
-\item{\code{predict_x}}{Matrix of prediction data in the same format as \code{train_x}.  The
-prediction data contains the most recent \code{training_window_size} days.}
-\item{\code{predict_geo_values}}{Vector of \code{geo_values} corresponding to the rows of \code{predict_x}.}
-\item{\code{train_end_date}}{latest \code{time_value} used in the training period}
+days prior to it.
+\item \code{train_y}: Vector of response data from the \code{response+{ahead}:{response}} column of
+\code{lagged_df} corresponding to the rows of \code{train_x}.
+\item \code{predict_x}: Matrix of prediction data in the same format as \code{train_x}.  The
+prediction data contains the most recent \code{training_window_size} days.
+\item \code{predict_geo_values}: Vector of \code{geo_values} corresponding to the rows of \code{predict_x}.
+\item \code{train_end_date}: Latest \code{time_value} used in the training period.
 }
 }
 \description{

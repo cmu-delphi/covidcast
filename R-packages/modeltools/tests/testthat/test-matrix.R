@@ -18,7 +18,8 @@ test_that("training and prediction matrices are created", {
 
     out <- create_train_and_predict_matrices(df, 2, 1)
 
-    expect_equal(names(out), c("train_x", "train_y", "predict_x", "predict_geo_values"))
+    expect_equal(names(out), c("train_x", "train_y", "predict_x", 
+                               "predict_geo_values", "train_end_date"))
     expect_equal(out$train_x,
                  as.matrix(tibble(
                     `value-2:signal_1` = c(1, 2),

@@ -2,7 +2,7 @@
 % Please edit documentation in R/matrix.R
 \name{create_train_and_predict_matrices}
 \alias{create_train_and_predict_matrices}
-\title{Create training and testing data matrices and a training response vector for a given ahead.}
+\title{Create training and test data matrices and a training response for given aheads.}
 \usage{
 create_train_and_predict_matrices(lagged_df, ahead, training_window_size)
 }
@@ -19,7 +19,10 @@ correspond to \code{{response}} \code{{n}} incidence period units after \code{ti
 A data frame in this format can be made using \code{covidcast::aggregate_signals()} and
 \code{modeltools::get_response_columns()}.}
 
-\item{ahead}{Number of incidence period units (i.e., epiweeks, days, etc.) ahead to forecast}
+\item{ahead}{Number of incidence period units (i.e., epiweeks, days, etc.) ahead to forecast.
+Can be a single positive integer or a vector of positive integers. Note that
+for each \code{{a}} in \code{ahead}, the column \code{response+{a}:{response}} should be
+present in \code{lagged_df}.}
 
 \item{training_window_size}{Size of the local training window in days to use. For example, if
 \code{training_window_size = 14}, then to make a 1-day-ahead forecast on December 15, we train on
@@ -41,7 +44,8 @@ prediction data contains the most recent \code{training_window_size} days.
 }
 }
 \description{
-Create training and testing data matrices and a training response vector for a given ahead.
+Create training and test data matrices and training response for a set of
+given aheads. Works for both single ahead values and a vector of ahead values.
 }
 \examples{
 \dontrun{

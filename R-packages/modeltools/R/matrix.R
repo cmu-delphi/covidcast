@@ -1,4 +1,7 @@
-#' Create training and testing data matrices and a training response vector for a given ahead.
+#' Create training and test data matrices and a training response for given aheads.
+#' 
+#' Create training and test data matrices and training response for a set of
+#' given aheads. Works for both single ahead values and a vector of ahead values.
 #'
 #' @param lagged_df Data frame of lagged data. It should have the following columns:
 #'     \itemize{
@@ -11,7 +14,10 @@
 #'     }
 #'     A data frame in this format can be made using `covidcast::aggregate_signals()` and
 #'     `modeltools::get_response_columns()`.
-#' @param ahead Number of incidence period units (i.e., epiweeks, days, etc.) ahead to forecast
+#' @param ahead Number of incidence period units (i.e., epiweeks, days, etc.) ahead to forecast.
+#' Can be a single positive integer or a vector of positive integers. Note that 
+#' for each `{a}` in `ahead`, the column `response+{a}:{response}` should be
+#' present in `lagged_df`.
 #' @param training_window_size Size of the local training window in days to use. For example, if
 #'     `training_window_size = 14`, then to make a 1-day-ahead forecast on December 15, we train on
 #'     data from December 1 to December 14.
@@ -51,49 +57,59 @@
 #'
 #' @export
 create_train_and_predict_matrices <- function(lagged_df, ahead, training_window_size) {
-    out <- list()
-
-    # make sure the response columns are unique
-    responses_at_ahead <- lagged_df %>%
-        select(tidyselect::starts_with(sprintf("response+%i:", ahead))) %>%
-        ncol()
-    assert_that(responses_at_ahead == 1,
-                msg=paste("multiple responses at ahead =",ahead))
-
-    train_df <- lagged_df %>%
-        select(geo_value, time_value, tidyselect::starts_with("value"))
-
-    # Find the last possible date of training data
-    response_end_date <- lagged_df %>%
-        select(time_value, tidyselect::starts_with(sprintf("response+%i:", ahead))) %>%
-        tidyr::drop_na() %>%
-        summarize(max(time_value)) %>%
-        pull()
-    train_end_date <- min(max(lagged_df$time_value), response_end_date)
-
-    # Training matrices
-    out$train_x <- train_df %>%
-        filter(between(time_value,
-                       train_end_date - training_window_size + 1,
-                       train_end_date)) %>%
-        select(-c(geo_value, time_value)) %>%
-        as.matrix()
-    out$train_y <- lagged_df %>%
-        filter(between(time_value,
-                       train_end_date - training_window_size + 1,
-                       train_end_date)) %>%
-        select(tidyselect::starts_with(sprintf("response+%i:", ahead))) %>%
-        pull()
-
-    # Prediction matrices
-    out$predict_x <- lagged_df %>%
-        filter(time_value == max(time_value)) %>%
-        select(tidyselect::starts_with("value")) %>%
-        as.matrix()
-    out$predict_geo_values <- lagged_df %>%
-        filter(time_value == max(time_value)) %>%
-        select(geo_value) %>% pull()
-    out$train_end_date <- train_end_date
-
-    return(out)
+    all_out <- list()
+    
+    for (a in ahead) {
+        out <- list()  # matrices corresponding to ahead+a
+        
+        # make sure the response columns are unique
+        responses_at_ahead <- lagged_df %>%
+            select(tidyselect::starts_with(sprintf("response+%i:", a))) %>%
+            ncol()
+        assert_that(responses_at_ahead == 1,
+                    msg = paste("multiple responses at ahead =", a))
+        
+        train_df <- lagged_df %>%
+            select(geo_value, time_value, tidyselect::starts_with("value"))
+        
+        # Find the last possible date of training data
+        response_end_date <- lagged_df %>%
+            select(time_value, tidyselect::starts_with(sprintf("response+%i:", a))) %>%
+            tidyr::drop_na() %>%
+            summarize(max(time_value)) %>%
+            pull()
+        train_end_date <- min(max(lagged_df$time_value), response_end_date)
+        
+        # Training matrices
+        out$train_x <- train_df %>%
+            filter(between(time_value,
+                           train_end_date - training_window_size + 1,
+                           train_end_date)) %>%
+            select(-c(geo_value, time_value)) %>%
+            as.matrix()
+        out$train_y <- lagged_df %>%
+            filter(between(time_value,
+                           train_end_date - training_window_size + 1,
+                           train_end_date)) %>%
+            select(tidyselect::starts_with(sprintf("response+%i:", a))) %>%
+            pull()
+        
+        # Prediction matrices
+        out$predict_x <- lagged_df %>%
+            filter(time_value == max(time_value)) %>%
+            select(tidyselect::starts_with("value")) %>%
+            as.matrix()
+        out$predict_geo_values <- lagged_df %>%
+            filter(time_value == max(time_value)) %>%
+            select(geo_value) %>% pull()
+        out$train_end_date <- train_end_date
+        
+        all_out[[paste0("ahead+", a)]] <- out
+    }
+    
+    if (length(ahead) == 1) {
+        return(all_out[[1]])
+    } else {
+        return(all_out)
+    }
 }

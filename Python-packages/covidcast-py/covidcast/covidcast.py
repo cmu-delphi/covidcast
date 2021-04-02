@@ -184,8 +184,6 @@ def signal(data_source: str,
         dfs = _fetch_epidata(
             data_source, signal, start_day, end_day, geo_type, geo_values, as_of, issues, lag
         )
-    print(dfs)
-    print(len(dfs))
     if len(dfs) > 0:
         out = pd.concat(dfs)
         out.drop("direction", axis=1, inplace=True)
@@ -422,7 +420,6 @@ def _fetch_epidata(data_source: str,
         # data in our results. In the no-data case, skip this day entirely,
         # since there is no "epidata" in the response.
         if day_data.get("epidata"):
-            print(day_data)
             dfs.append(pd.DataFrame.from_dict(day_data["epidata"]))
         cur_day += timedelta(1)
     return dfs

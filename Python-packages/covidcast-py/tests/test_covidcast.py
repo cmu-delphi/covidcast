@@ -58,7 +58,8 @@ def test_signal(mock_covidcast, mock_metadata):
     assert sort_df(response).equals(sort_df(expected))
 
     # test no df output
-    mock_covidcast.return_value = {"result": -2,
+    mock_covidcast.return_value = {"epidata": [],
+                                   "result": -2,
                                    "message": "no results found"}
     assert not covidcast.signal("source", "signal", geo_values=[])
 

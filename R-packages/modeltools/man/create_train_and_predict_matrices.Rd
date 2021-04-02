@@ -4,7 +4,12 @@
 \alias{create_train_and_predict_matrices}
 \title{Create training and test data matrices and a training response for given aheads.}
 \usage{
-create_train_and_predict_matrices(lagged_df, ahead, training_window_size)
+create_train_and_predict_matrices(
+  lagged_df,
+  ahead,
+  training_window_size,
+  aheads_separate = TRUE
+)
 }
 \arguments{
 \item{lagged_df}{Data frame of lagged data. It should have the following columns:
@@ -27,9 +32,12 @@ present in \code{lagged_df}.}
 \item{training_window_size}{Size of the local training window in days to use. For example, if
 \code{training_window_size = 14}, then to make a 1-day-ahead forecast on December 15, we train on
 data from December 1 to December 14.}
+
+\item{aheads_separate}{If \code{length(ahead) > 1}, should there be separate
+data matrices and responses for each ahead? Default is \code{TRUE}.}
 }
 \value{
-Named list with entries:
+For a single ahead value, named list with entries:
 \itemize{
 \item \code{train_x}: Matrix of training data whose columns correspond to the
 \code{value-{days}:{signal}} columns in \code{lagged_df}.  The training data consists of the
@@ -42,10 +50,17 @@ prediction data contains the most recent \code{training_window_size} days.
 \item \code{predict_geo_values}: Vector of \code{geo_values} corresponding to the rows of \code{predict_x}.
 \item \code{train_end_date}: Latest \code{time_value} used in the training period.
 }
+For multiple ahead values and \code{aheads_separate = TRUE}, a list having
+the same length as \code{ahead}, with each element being a named list as above.
+For multiple ahead values and \code{ahead_separate = FALSE}, a named list as
+above, except \code{train_y} is a matrix of responses rather than a vector.
 }
 \description{
 Create training and test data matrices and training response for a set of
 given aheads. Works for both single ahead values and a vector of ahead values.
+For multiple ahead values, the function has the ability to return separate
+data matrices and responses for each ahead, or a single data matrix and
+response matrix for all aheads at once.
 }
 \examples{
 \dontrun{

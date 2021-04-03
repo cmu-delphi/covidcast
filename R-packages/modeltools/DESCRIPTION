@@ -18,7 +18,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Remotes:
     cmu-delphi/covidcast/R-packages/covidcast@main,
-    cmu-delphi/covidcast/R-packages/evalcast@main
+    cmu-delphi/covidcast/R-packages/evalcast@main,
     ryantibs/quantgen/R-package/quantgen@master,
 Imports:
     assertthat,

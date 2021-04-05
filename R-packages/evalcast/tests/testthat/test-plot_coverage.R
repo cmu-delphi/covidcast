@@ -1,4 +1,3 @@
-library(testthat)
 library(vdiffr)
 library(dplyr)
 library(mockr)

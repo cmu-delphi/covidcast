@@ -19,8 +19,9 @@ test_that("training and prediction matrices are created", {
     out <- create_train_and_predict_matrices(df, ahead = 2, 
                                              training_window_size = 1)
 
-    expect_equal(names(out), c("train_x", "train_y", "predict_x", 
-                               "predict_geo_values", "train_end_date"))
+    expect_equal(names(out), c("train_x", "train_y", "train_geo_values",
+                               "train_time_values", "train_end_date",
+                               "predict_x", "predict_geo_values", "predict_time_value"))
     expect_equal(out$train_x,
                  as.matrix(tibble(
                     `value-2:signal_1` = c(1, 2),
@@ -31,6 +32,9 @@ test_that("training and prediction matrices are created", {
                     `value+0:signal_2` = c(15, 16)))
     )
     expect_equal(out$train_y, c(19, 20))
+    expect_equal(out$train_geo_values, c("az", "wv"))
+    expect_equal(out$train_time_values, rep(as.Date("2021-01-27"), 2))
+    expect_equal(out$train_end_date, as.Date("2021-01-27"))
     expect_equal(out$predict_x,
                  as.matrix(tibble(
                     `value-2:signal_1` = c(5, 6),
@@ -41,6 +45,7 @@ test_that("training and prediction matrices are created", {
                     `value+0:signal_2` = c(19, 20)))
     )
     expect_equal(out$predict_geo_values, c("az", "wv"))
+    expect_equal(out$predict_time_value, as.Date("2021-01-29"))
 })
 
 test_that("training and prediction matrices for multiple aheads (separate)", {
@@ -89,8 +94,9 @@ test_that("training and prediction matrices for multiple aheads (together)", {
                                              training_window_size = 1,
                                              aheads_separate = FALSE)
     
-    expect_equal(names(out), c("train_x", "train_y", "predict_x", 
-                               "predict_geo_values", "train_end_date"))
+    expect_equal(names(out), c("train_x", "train_y", "train_geo_values",
+                               "train_time_values", "train_end_date",
+                               "predict_x", "predict_geo_values", "predict_time_value"))
     expect_equal(out$train_x,
                  as.matrix(tibble(
                      `value-2:signal_1` = c(1, 2, 3, 4),
@@ -105,6 +111,10 @@ test_that("training and prediction matrices for multiple aheads (together)", {
                      `response+1:signal_2` = c(17, 18, 19, 20),
                      `response+2:signal_2` = c(19, 20, NA, NA)))
     )
+    expect_equal(out$train_geo_values, rep(c("az", "wv"), 2))
+    expect_equal(out$train_time_values, 
+                 rep(as.Date(c("2021-01-27", "2021-01-28")), each = 2))
+    expect_equal(out$train_end_date, as.Date("2021-01-28"))
     expect_equal(out$predict_x,
                  as.matrix(tibble(
                      `value-2:signal_1` = c(5, 6),
@@ -115,6 +125,7 @@ test_that("training and prediction matrices for multiple aheads (together)", {
                      `value+0:signal_2` = c(19, 20)))
     )
     expect_equal(out$predict_geo_values, c("az", "wv"))
+    expect_equal(out$predict_time_value, as.Date("2021-01-29"))
 })
 
 test_that("fails with multiple responses", {

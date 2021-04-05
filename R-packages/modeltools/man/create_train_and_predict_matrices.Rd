@@ -24,10 +24,10 @@ correspond to \code{{response}} \code{{n}} incidence period units after \code{ti
 A data frame in this format can be made using \code{covidcast::aggregate_signals()} and
 \code{modeltools::get_response_columns()}.}
 
-\item{ahead}{Number of incidence period units (i.e., epiweeks, days, etc.) ahead to forecast.
-Can be a single positive integer or a vector of positive integers. Note that
-for each \code{{a}} in \code{ahead}, the column \code{response+{a}:{response}} should be
-present in \code{lagged_df}.}
+\item{ahead}{Number of incidence period units (i.e., epiweeks, days, etc.)
+ahead to forecast. Can be a single positive integer or a vector of
+positive integers. Note that for each \code{{a}} in \code{ahead}, the column
+\code{response+{a}:{response}} should be present in \code{lagged_df}.}
 
 \item{training_window_size}{Size of the local training window in days to use. For example, if
 \code{training_window_size = 14}, then to make a 1-day-ahead forecast on December 15, we train on
@@ -45,10 +45,15 @@ latest date with an non-null response, plus all data from the \code{training_win
 days prior to it.
 \item \code{train_y}: Vector of response data from the \code{response+{ahead}:{response}} column of
 \code{lagged_df} corresponding to the rows of \code{train_x}.
+\item \code{train_geo_values}: Vector of geo values corresponding to the rows
+of \code{train_x}.
+\item \code{train_time_values}: Vector of time values corresponding to the rows
+of \code{train_x}.
+\item \code{train_end_date}: Latest \code{time_value} used in the training period.
 \item \code{predict_x}: Matrix of prediction data in the same format as \code{train_x}.  The
 prediction data contains the most recent \code{training_window_size} days.
 \item \code{predict_geo_values}: Vector of \code{geo_values} corresponding to the rows of \code{predict_x}.
-\item \code{train_end_date}: Latest \code{time_value} used in the training period.
+\item \code{predict_time_value}: Time value corresponding to \code{predict_x}.
 }
 For multiple ahead values and \code{aheads_separate = TRUE}, a list having
 the same length as \code{ahead}, with each element being a named list as above.

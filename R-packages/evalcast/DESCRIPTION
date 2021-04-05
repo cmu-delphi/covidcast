@@ -9,7 +9,7 @@ Authors@R:
            role = "aut"),
     person(given = "Sarah",
            family = "Colquhoun",
-           role = "ctb"),
+           role = "aut"),
     person(given = "Jed",
            family = "Grabman",
            role = "aut"),
@@ -84,6 +84,7 @@ Suggests:
     testthat,
     mockr,
     mockery,
-    scoringutils
+    scoringutils,
+    vdiffr
 Depends: 
     R (>= 3.5.0)

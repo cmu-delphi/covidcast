@@ -72,11 +72,3 @@ plot_canonical <- function(df, x, y,
   ggplot(df, aes(x = !!sym(x), y = !!sym(y))) +
     line_layer + dots_layer + facet_layer + theme_layer
 }
-
-# Helpful wrapper on interaction() for our canonical plotting function
-Interaction <- function(...) {
-  params <- list(...)
-  if (length(params) == 0) return(NULL)
-  else if (length(params) == 1) return(as.factor(params[[1]]))
-  else return(interaction(...))
-}

@@ -68,7 +68,8 @@
 #'
 #' @importFrom tibble tibble
 #' @importFrom assertthat assert_that
-#' @importFrom purrr map2
+#' @importFrom lubridate as_date
+#' @importFrom purrr map_dbl map2
 #'
 #' @export
 create_train_and_predict_matrices <- function(lagged_df, ahead, training_window_size,
@@ -95,12 +96,13 @@ create_train_and_predict_matrices <- function(lagged_df, ahead, training_window_
     all_out <- list()
     
     if (aheads_separate) {
-        train_end_dates <- Reduce(c, lapply(ahead, 
-                                            function(a) get_train_end_date(lagged_df, a)))
+        train_end_dates <- ahead %>%
+            purrr::map_dbl(~ get_train_end_date(lagged_df, .x)) %>%
+            lubridate::as_date()
         
         all_out <- purrr::map2(ahead, train_end_dates,
-                              ~ create_train_matrices(lagged_df, .x, training_window_size,
-                                                      .y))
+                              ~ create_train_matrices(
+                                  lagged_df, .x, training_window_size, .y))
     } else {  # ahead_separate = FALSE: We want a single training data matrix and 
               # a matrix of training responses containing all the aheads
         # Need to recompute training_window_size 

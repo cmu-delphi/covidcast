@@ -2,41 +2,70 @@
 % Please edit documentation in R/matrix.R
 \name{create_train_and_predict_matrices}
 \alias{create_train_and_predict_matrices}
-\title{Create training and testing data matrices and a training response vector for a given ahead.}
+\title{Create training and test data matrices and a training response for given aheads.}
 \usage{
-create_train_and_predict_matrices(lagged_df, ahead, training_window_size)
+create_train_and_predict_matrices(
+  lagged_df,
+  ahead,
+  training_window_size,
+  aheads_separate = TRUE
+)
 }
 \arguments{
-\item{lagged_df}{Data frame of lagged data.  It should have the following columns:
+\item{lagged_df}{Data frame of lagged data. It should have the following columns:
 \itemize{
-\item{\code{geo_value}}{Strings of geographic locations.}
-\item{\code{time_value}}{Dates of training data.}
-\item{Covariate columns}{Columns with names of the form \code{value-{days}:{signal}} or
-\verb{value+0:\{signal\} whose values correspond to }{signal}\verb{}{days}\code{before}time_value\verb{\} \\item\{Response columns\}\{Columns with names of the form }response+{n}:{response}\verb{whose values correspond to}{response}\verb{}{n}\verb{incidence period units after}time_value\verb{.\} \} A data frame in this format can be made using }covidcast::aggregate_signals()\code{and}modeltools::get_response_columns()`.}
+\item \code{geo_value}: Strings of geographic locations.
+\item \code{time_value}: Dates of training data.
+\item Covariate columns: Columns with names of the form \code{value-{days}:{signal}} or
+\code{value+0:{signal}} whose values correspond to \code{{signal}} \code{{days}} before \code{time_value}.
+\item Response columns: Columns with names of the form \code{response+{n}:{response}} whose values
+correspond to \code{{response}} \code{{n}} incidence period units after \code{time_value}.
+}
+A data frame in this format can be made using \code{covidcast::aggregate_signals()} and
+\code{modeltools::get_response_columns()}.}
 
-\item{ahead}{Number of incidence period units (i.e., epiweeks, days, etc.) ahead to forecast}
+\item{ahead}{Number of incidence period units (i.e., epiweeks, days, etc.)
+ahead to forecast. Can be a single positive integer or a vector of
+positive integers. Note that for each \code{{a}} in \code{ahead}, the column
+\code{response+{a}:{response}} should be present in \code{lagged_df}.}
 
 \item{training_window_size}{Size of the local training window in days to use. For example, if
 \code{training_window_size = 14}, then to make a 1-day-ahead forecast on December 15, we train on
 data from December 1 to December 14.}
+
+\item{aheads_separate}{If \code{length(ahead) > 1}, should there be separate
+data matrices and responses for each ahead? Default is \code{TRUE}.}
 }
 \value{
-Named list with entries:
+For a single ahead value, named list with entries:
 \itemize{
-\item{\code{train_x}}{Matrix of training data whose columns correspond to the
+\item \code{train_x}: Matrix of training data whose columns correspond to the
 \code{value-{days}:{signal}} columns in \code{lagged_df}.  The training data consists of the
 latest date with an non-null response, plus all data from the \code{training_window_size}
-days prior to it.}
-\item{\code{train_y}}{Vector of response data from the \code{response+{ahead}:{response}} column of
-\code{lagged_df} corresponding to the rows of \code{train_x}.}
-\item{\code{predict_x}}{Matrix of prediction data in the same format as \code{train_x}.  The
-prediction data contains the most recent \code{training_window_size} days.}
-\item{\code{predict_geo_values}}{Vector of \code{geo_values} corresponding to the rows of \code{predict_x}.}
-\item{\code{train_end_date}}{latest \code{time_value} used in the training period}
+days prior to it.
+\item \code{train_y}: Vector of response data from the \code{response+{ahead}:{response}} column of
+\code{lagged_df} corresponding to the rows of \code{train_x}.
+\item \code{train_geo_values}: Vector of geo values corresponding to the rows
+of \code{train_x}.
+\item \code{train_time_values}: Vector of time values corresponding to the rows
+of \code{train_x}.
+\item \code{train_end_date}: Latest \code{time_value} used in the training period.
+\item \code{predict_x}: Matrix of prediction data in the same format as \code{train_x}.  The
+prediction data contains the most recent \code{training_window_size} days.
+\item \code{predict_geo_values}: Vector of \code{geo_values} corresponding to the rows of \code{predict_x}.
+\item \code{predict_time_value}: Time value corresponding to \code{predict_x}.
 }
+For multiple ahead values and \code{aheads_separate = TRUE}, a list having
+the same length as \code{ahead}, with each element being a named list as above.
+For multiple ahead values and \code{ahead_separate = FALSE}, a named list as
+above, except \code{train_y} is a matrix of responses rather than a vector.
 }
 \description{
-Create training and testing data matrices and a training response vector for a given ahead.
+Create training and test data matrices and training response for a set of
+given aheads. Works for both single ahead values and a vector of ahead values.
+For multiple ahead values, the function has the ability to return separate
+data matrices and responses for each ahead, or a single data matrix and
+response matrix for all aheads at once.
 }
 \examples{
 \dontrun{

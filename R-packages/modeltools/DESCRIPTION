@@ -26,6 +26,7 @@ Imports:
     dplyr,
     evalcast,
     genlasso,
+    purrr,
     slider,
     tidyselect,
     tidyr,

@@ -291,8 +291,8 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
     Each signal's time value can be shifted for analysis on lagged signals using the ``dt``
     argument, which takes a list of integer days to lag each signal's date. Lagging a signal by +1
     day means that all the dates get shifted backward by 1 day (e.g. Jan 2 becomes Jan 1). For
-    example, if you wanted to see how cases affect deaths in the future, you could lag the deaths
-    by +20 since the Jan 20 value becomes Jan 1.
+    example, if you wanted to see how cases affect deaths 20 days in the future, you could lag the deaths
+    by +20, causing the Jan 20 value to become Jan 1.
 
     :param signals: List of DataFrames to join.
     :param dt: List of lags in days for each of the input DataFrames in ``signals``.

@@ -1,6 +1,13 @@
 Changelog
 =========
 
+
+v0.1.5, TODO
+------------
+- When using :py:func:`covidcast.aggregate_signals`, the parity of the ``dt`` argument has been flipped, so positive values
+  now correspond to lags instead of leads. See the function documentation for more information.
+
+
 v0.1.4, February 24, 2021
 -------------------------
 

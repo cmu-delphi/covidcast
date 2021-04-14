@@ -290,7 +290,9 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
 
     Each signal's time value can be shifted for analysis on lagged signals using the ``dt``
     argument, which takes a list of integer days to lag each signal's date. Lagging a signal by +1
-    day means that all the dates get shifted forward by 1 day (e.g. Jan 1 becomes Jan 2).
+    day means that all the dates get shifted backward by 1 day (e.g. Jan 2 becomes Jan 1). For
+    example, if you wanted to see how cases affect deaths in the future, you could lag the deaths
+    by +20 since the Jan 20 value becomes Jan 1.
 
     :param signals: List of DataFrames to join.
     :param dt: List of lags in days for each of the input DataFrames in ``signals``.
@@ -315,7 +317,7 @@ def aggregate_signals(signals: list, dt: list = None, join_type: str = "outer") 
             raise ValueError("Multiple geo_types detected. "
                              "All signals must have the same geo_type to be aggregated.")
 
-        df_c["time_value"] = [day + timedelta(lag) for day in df_c["time_value"]]  # lag dates
+        df_c["time_value"] = [day + timedelta(-lag) for day in df_c["time_value"]]  # lag dates
         df_c.drop(["signal", "data_source", "geo_type"], axis=1, inplace=True)
         df_c.rename(
             columns={j: f"{source}_{sig_type}_{i}_{j}" for j in df_c.columns if j not in join_cols},

@@ -123,28 +123,27 @@ def test_aggregate_signals():
          "data_source": ["z", "z", "z", "z"]})
     # test 3 signals from 3 sources with outer join
     expected1 = pd.DataFrame(
-        {"geo_value": ["a", "b", "c", "d", "a", "b", "c", "d", "b"],
-         "time_value": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1),
-                        date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 2),
-                        date(2020, 1, 3)],
-         "x_i_0_value": [2, 4, 6, np.nan, 8, np.nan, np.nan, np.nan, np.nan],
-         "y_j_1_value": [1, 3, 5, 7, np.nan, np.nan, np.nan, np.nan, np.nan],
-         "y_j_1_extra_col": ["0", "0", "0", "0", np.nan, np.nan, np.nan, np.nan, np.nan],
-         "z_k_2_value": [np.nan, np.nan, np.nan, np.nan, np.nan, 0.5, 1.5, 2.5, 3.5],
-         "geo_type": ["state"]*9})
+        {"geo_value": ["b", "c", "d", "a", "b", "c", "d", "a"],
+         "time_value": [date(2019, 12, 31), date(2019, 12, 31), date(2019, 12, 31), date(2020, 1, 1),
+                        date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2)],
+         "x_i_0_value": [np.nan, np.nan, np.nan, 2, 4, 6, np.nan, 8],
+         "y_j_1_value": [np.nan, np.nan, np.nan, 1, 3, 5, 7, np.nan],
+         "y_j_1_extra_col": [np.nan, np.nan, np.nan, "0", "0", "0", "0", np.nan],
+         "z_k_2_value": [0.5, 1.5, 2.5, np.nan, 3.5, np.nan, np.nan, np.nan],
+         "geo_type": ["state"]*8})
     assert covidcast.aggregate_signals(
         [test_input1, test_input2, test_input3], dt=[0, 0, 1]).equals(expected1)
 
-    # test 3 signals from 3 sources with inner join has no intersection
+    # test far signals with inner join has no intersection
     assert covidcast.aggregate_signals(
-        [test_input1, test_input3], dt=[0, 1], join_type="inner").empty
+        [test_input1, test_input3], dt=[0, 3], join_type="inner").empty
 
     # test 2 signals from same source (one lagged) with inner join
     expected2 = pd.DataFrame(
         {"geo_value": ["a"],
-         "time_value": [date(2020, 1, 2)],
-         "x_i_0_value": [8],
-         "x_i_1_value": [2],
+         "time_value": [date(2020, 1, 1)],
+         "x_i_0_value": [2],
+         "x_i_1_value": [8],
          "geo_type": ["state"]})
     assert covidcast.aggregate_signals(
         [test_input1, test_input1], dt=[0, 1], join_type="inner").equals(expected2)
@@ -152,10 +151,10 @@ def test_aggregate_signals():
     # test same signal twice with a lag
     expected3 = pd.DataFrame(
         {"geo_value": ["a", "b", "c", "a", "b", "c", "a"],
-         "time_value": [date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2),
-                        date(2020, 1, 2), date(2020, 1, 2), date(2020, 1, 3)],
-         "x_i_0_value": [2, 4, 6, 8, np.nan, np.nan, np.nan],
-         "x_i_1_value": [np.nan, np.nan, np.nan, 2, 4, 6, 8],
+         "time_value": [date(2019, 12, 31), date(2019, 12, 31), date(2019, 12, 31), date(2020, 1, 1),
+                        date(2020, 1, 1), date(2020, 1, 1), date(2020, 1, 2)],
+         "x_i_0_value": [np.nan, np.nan, np.nan, 2, 4, 6, 8],
+         "x_i_1_value": [2, 4, 6, 8, np.nan, np.nan, np.nan],
          "geo_type": ["state"]*7})
 
     assert covidcast.aggregate_signals([test_input1, test_input1], dt=[0, 1]).equals(expected3)

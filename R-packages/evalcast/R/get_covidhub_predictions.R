@@ -35,6 +35,7 @@
 #'   etc.)
 #' @param verbose If TRUE, prints additional details about progress. FALSE by
 #'   default.
+#' @param ... Additional named arguments. Intended for expert users only.
 #' @seealso [get_predictions()]
 #' @seealso [get_zoltar_predictions()]
 #' @template predictions_cards-template
@@ -59,7 +60,9 @@ get_covidhub_predictions <- function(
   start_date = NULL,
   end_date = NULL,
   date_filtering_function = NULL,
-  verbose = FALSE) {
+  verbose = FALSE,
+  ...) {
+  extra_args <- list(...)
   forecast_dates <- as_date(forecast_dates)
   forecast_dates <- get_forecast_dates(covidhub_forecaster_name,
                                        forecast_dates,
@@ -90,19 +93,24 @@ get_covidhub_predictions <- function(
   if (verbose){
     cat(str_interp("Getting forecasts for ${num_forecasters} forecasters.\n")) 
   }
+  if ("use_disk" %in% names(extra_args) && extra_args$use_disk) {
+    get_forecaster_preds_fn <- get_forecaster_predictions_alt
+  } else {
+    get_forecaster_preds_fn <- get_forecaster_predictions
+  }
   for (i in seq_along(covidhub_forecaster_name)) {
     if (verbose){
       cat(str_interp("${i}/${num_forecasters}: ${covidhub_forecaster_name[i]}...\n"))
     }
     if (length(forecast_dates[[i]] > 0)) {
       predictions_cards_list[[i]] <- tryCatch({
-        get_forecaster_predictions(covidhub_forecaster_name[i],
-                                   rev(forecast_dates[[i]]),
-                                   geo_values = geo_values,
-                                   forecast_type = forecast_type,
-                                   ahead = ahead,
-                                   incidence_period = incidence_period,
-                                   signal = signal)
+        get_forecaster_preds_fn(covidhub_forecaster_name[i],
+                                rev(forecast_dates[[i]]),
+                                geo_values = geo_values,
+                                forecast_type = forecast_type,
+                                ahead = ahead,
+                                incidence_period = incidence_period,
+                                signal = signal)
       }, error = function(e) cat(e$message))
     }
   }
@@ -263,6 +271,129 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
                .data$incidence_period)
   }
   pcards <- bind_rows(pcards) %>%
+    mutate(geo_value = if_else(nchar(.data$location)==2,
+                               fips_2_abbr(.data$location),
+                               .data$location),
+           location = NULL) %>%
+    relocate(.data$geo_value, .after = .data$ahead)
+  if (!identical(geo_values, "*")) {
+    pcards <- filter(pcards, .data$geo_value %in% geo_values)
+  }
+  if (!is.null(ahead)) {
+    pcards <- filter(pcards, .data$ahead %in% !!ahead)
+  }
+  pcards <- filter(pcards, .data$signal %in% !!signal)
+  class(pcards) = c("predictions_cards", class(pcards))
+  pcards
+}
+
+#' Get predictions from a forecaster on the COVID Hub (Alternate version)
+#'
+#' Similar to get_forecast_predictions(), but downloads CSVs to disk to process
+#' them in a more memory-efficient manner. Stores the CSVs into folder "./data".
+#'
+#'
+#' @param covidhub_forecaster_name String indicating of the forecaster
+#'   (matching what it is called on the COVID Hub).
+#' @param forecast_dates Vector of Date objects (or strings of the form
+#'   "YYYY-MM-DD") indicating dates on which forecasts will be made. If `NULL`,
+#'   the default, then all currently available forecast dates from the given
+#'   forecaster in the COVID Hub will be used.
+#' @param geo_values vector of character strings containing FIPS codes of
+#'   counties, or lower case state abbreviations (or "us" for national). The
+#'   default "*" fetches all available locations
+#' @param forecast_type "quantile", "point" or both (the default)
+#' @param ahead number of periods ahead for which the forecast is required.
+#'   NULL will fetch all available aheads
+#' @param incidence_period one of "epiweek" or "day". NULL will attempt to 
+#'   return both
+#' @param signal this function supports only "confirmed_incidence_num",
+#'   "deaths_incidence_num", and/or "deaths_cumulative_num" (those currently
+#'   forecast by the COVIDhub-ensemble). For other types, use one of the 
+#'   alternatives mentioned above
+#'   
+#' @template predictions_cards-template
+#' 
+#' @seealso [get_predictions()]
+#' @seealso [get_zoltar_predictions()]
+#' @return Predictions card. For more flexible processing of COVID Hub data, try
+#'   using [zoltr](https://docs.zoltardata.com/zoltr/)
+#' 
+#' @importFrom arrow open_dataset schema date32 string float64
+#' @importFrom utils download.file
+get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
+                                           forecast_dates = NULL,
+                                           geo_values = "*",
+                                           forecast_type = c("point","quantile"),
+                                           ahead = 1:4,
+                                           incidence_period = c("epiweek", "day"),
+                                           signal = c("confirmed_incidence_num",
+                                                      "deaths_incidence_num",
+                                                      "deaths_cumulative_num")
+) {
+  url <- "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed"
+  if (is.null(forecast_dates))
+    forecast_dates <- get_covidhub_forecast_dates(covidhub_forecaster_name)
+  forecast_dates <- as.character(forecast_dates)
+
+  # Download files to disk first
+  # File layout is data/<covidhub_forecaster_name>/<forecast_date>/data.csv
+  for (forecast_date in forecast_dates) {
+    output_dir <- file.path("data", covidhub_forecaster_name, forecast_date)
+    output_file <- file.path("data", covidhub_forecaster_name, forecast_date, "data.csv")
+    filename <- sprintf("%s/%s/%s-%s.csv",
+                        url,
+                        covidhub_forecaster_name,
+                        forecast_date,
+                        covidhub_forecaster_name)
+
+    dir.create(output_dir, recursive = TRUE)
+    download.file(filename, output_file, mode = "w", quiet = TRUE)
+  }
+
+  sch <- schema(forecast_date=date32(),
+                target=string(),
+                target_end_date=date32(),
+                location=string(),
+                type=string(),
+                quantile=float64(),
+                value=float64())
+
+  ds <- open_dataset(file.path("data", covidhub_forecaster_name),
+                     format = "csv", schema = sch)
+
+  # Create all derived columns from target first to join later
+  # Works with just the distinct values of target for efficiency
+  target_separated <- ds %>%
+    select(.data$target) %>%
+    collect() %>%
+    distinct() %>%
+    separate(.data$target,
+             into = c("ahead", "incidence_period", NA, "inc", "response"),
+             remove = FALSE, sep = " ") %>%
+    mutate(incidence_period = if_else(.data$incidence_period == "wk", "epiweek","day"),
+           inc = if_else(.data$inc == "inc", "incidence", "cumulative"),
+           response = case_when(.data$response == "death" ~ "deaths", 
+                                .data$response == "case" ~ "confirmed",
+                                TRUE ~ "drop",),
+           signal = paste(.data$response, .data$inc, "num", sep="_"),
+           data_source = if_else(.data$response=="drop", "drop", "jhu-csse"),
+           ahead = as.integer(.data$ahead))
+
+  pcards <- ds %>%
+      collect() %>%
+      left_join(target_separated, by = "target") %>%
+      select(-.data$target) %>%
+      mutate(forecaster = covidhub_forecaster_name) %>%
+      filter(.data$response != "drop", .data$type %in% forecast_type,
+             .data$incidence_period %in% incidence_period,
+             .data$signal %in% signal) %>%
+      select(.data$ahead, .data$location, .data$quantile, .data$value,
+               .data$forecaster, .data$forecast_date, .data$data_source,
+               .data$signal, .data$target_end_date, 
+               .data$incidence_period)
+
+  pcards <- pcards %>%
     mutate(geo_value = if_else(nchar(.data$location)==2,
                                fips_2_abbr(.data$location),
                                .data$location),

@@ -79,7 +79,8 @@ Imports:
     zoltr,
     covidHubUtils,
     forcats,
-    data.table
+    data.table,
+    arrow
 Suggests: 
     testthat,
     mockr,

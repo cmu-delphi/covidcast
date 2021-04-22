@@ -407,6 +407,10 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
   }
   pcards <- filter(pcards, .data$signal %in% !!signal)
   class(pcards) = c("predictions_cards", class(pcards))
+  
+  # Cleanup, delete downloaded CSVs from disk
+  unlink(file.path("data", covidhub_forecaster_name), recursive = TRUE)
+  
   pcards
 }
 

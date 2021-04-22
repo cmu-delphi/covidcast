@@ -351,13 +351,13 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
     download.file(filename, output_file, mode = "w", quiet = TRUE)
   }
 
-  sch <- schema(forecast_date=date32(),
+  sch <- schema(forecast_date=string(),
                 target=string(),
-                target_end_date=date32(),
+                target_end_date=string(),
                 location=string(),
                 type=string(),
-                quantile=float64(),
-                value=float64())
+                quantile=string(),
+                value=string())
 
   ds <- open_dataset(file.path("data", covidhub_forecaster_name),
                      format = "csv", schema = sch)
@@ -384,7 +384,11 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
       collect() %>%
       left_join(target_separated, by = "target") %>%
       select(-.data$target) %>%
-      mutate(forecaster = covidhub_forecaster_name) %>%
+      mutate(forecaster = covidhub_forecaster_name,
+             forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
+             target_end_date = as.Date(target_end_date, format = "%Y-%m-%d"),
+             quantile = as.double(quantile),
+             value = as.double(value)) %>%
       filter(.data$response != "drop", .data$type %in% forecast_type,
              .data$incidence_period %in% incidence_period,
              .data$signal %in% signal) %>%

@@ -331,6 +331,7 @@ def test__signal_metadata(mock_metadata):
 def test__date_to_api_string():
     # since the function just wraps strftime, this is just to ensure the format doesn't change
     assert covidcast._date_to_api_string(date(2020, 4, 2)) == "20200402"
+    assert covidcast._date_to_api_string(date(2020, 4, 2), time_type="week") == "202014"
 
 
 def test__dates_to_api_strings():
@@ -338,3 +339,6 @@ def test__dates_to_api_strings():
     assert covidcast._dates_to_api_strings(date(2020, 4, 2)) == "20200402"
     assert covidcast._dates_to_api_strings([date(2020, 4, 2),
                                             date(2020, 5, 2)]) == "20200402-20200502"
+    assert covidcast._dates_to_api_strings(date(2020, 4, 2), time_type="week") == "202014"
+    assert covidcast._dates_to_api_strings([date(2020, 4, 2),
+                                            date(2020, 5, 2)], time_type="week") == "202014-202018"

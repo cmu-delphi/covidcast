@@ -319,7 +319,7 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
 #' @return Predictions card. For more flexible processing of COVID Hub data, try
 #'   using [zoltr](https://docs.zoltardata.com/zoltr/)
 #' 
-#' @importFrom arrow open_dataset schema date32 string float64
+#' @importFrom arrow open_dataset schema string
 #' @importFrom utils download.file
 get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
                                            forecast_dates = NULL,
@@ -351,13 +351,13 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
     download.file(filename, output_file, mode = "w", quiet = TRUE)
   }
 
-  sch <- schema(forecast_date=date32(),
+  sch <- schema(forecast_date=string(),
                 target=string(),
-                target_end_date=date32(),
+                target_end_date=string(),
                 location=string(),
                 type=string(),
-                quantile=float64(),
-                value=float64())
+                quantile=string(),
+                value=string())
 
   ds <- open_dataset(file.path("data", covidhub_forecaster_name),
                      format = "csv", schema = sch)
@@ -384,7 +384,15 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
       collect() %>%
       left_join(target_separated, by = "target") %>%
       select(-.data$target) %>%
-      mutate(forecaster = covidhub_forecaster_name) %>%
+      mutate(forecaster = covidhub_forecaster_name,
+             forecast_date = lubridate::ymd(forecast_date),
+             target_end_date = lubridate::ymd(target_end_date),
+             quantile = as.double(quantile),
+             value = as.double(value)) %>%
+      relocate(.data$ahead, .data$location, .data$quantile, .data$value,
+               .data$forecaster, .data$forecast_date, .data$data_source,
+               .data$signal, .data$target_end_date, 
+               .data$incidence_period) %>%
       filter(.data$response != "drop", .data$type %in% forecast_type,
              .data$incidence_period %in% incidence_period,
              .data$signal %in% signal) %>%

@@ -319,7 +319,7 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
 #' @return Predictions card. For more flexible processing of COVID Hub data, try
 #'   using [zoltr](https://docs.zoltardata.com/zoltr/)
 #' 
-#' @importFrom arrow open_dataset schema date32 string float64
+#' @importFrom arrow open_dataset schema string
 #' @importFrom utils download.file
 get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
                                            forecast_dates = NULL,
@@ -385,10 +385,14 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
       left_join(target_separated, by = "target") %>%
       select(-.data$target) %>%
       mutate(forecaster = covidhub_forecaster_name,
-             forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-             target_end_date = as.Date(target_end_date, format = "%Y-%m-%d"),
+             forecast_date = lubridate::ymd(forecast_date),
+             target_end_date = lubridate::ymd(target_end_date),
              quantile = as.double(quantile),
              value = as.double(value)) %>%
+      relocate(.data$ahead, .data$location, .data$quantile, .data$value,
+               .data$forecaster, .data$forecast_date, .data$data_source,
+               .data$signal, .data$target_end_date, 
+               .data$incidence_period) %>%
       filter(.data$response != "drop", .data$type %in% forecast_type,
              .data$incidence_period %in% incidence_period,
              .data$signal %in% signal) %>%

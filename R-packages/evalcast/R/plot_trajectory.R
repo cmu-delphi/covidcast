@@ -167,7 +167,11 @@ setup_plot_trajectory <- function(predictions_cards,
                  shift_day_to_preceding_xxxday(max(.data$time_value), 7)) %>%
         dplyr::select(.data$geo_value, .data$time_value, .data$value) %>%
         sum_to_epiweek() %>%
-        rename(target_end_date = .data$time_value)
+        dplyr::rename(target_end_date = .data$time_value)
+    } else {
+      truth_data <- truth_data %>%
+        dplyr::select(.data$geo_value, .data$time_value, .data$value) %>%
+        dplyr::rename(target_end_date = .data$time_value)
     }
   }
   

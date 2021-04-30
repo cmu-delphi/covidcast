@@ -29,9 +29,8 @@
 #'
 #' @section Getting started:
 #'
-#' We recommend the Getting Started vignette, which includes numerous examples
-#' and is provided online here:
-#' <https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html>
+#' We recommend browsing the vignettes, which includes numerous examples:
+#' `browseVignettes(package = "covidcast")`.
 #'
 #' See also `covidcast_signal()` for details on how to obtain COVIDcast data as
 #' a data frame.
@@ -105,8 +104,8 @@ MAX_RESULTS <- 3649
 #' Note that the API only tracks the initial value of an estimate and *changes*
 #' to that value. If a value was first issued on June 5th and never updated,
 #' asking for data issued on June 6th (using `issues` or `lag`) would *not*
-#' return that value, though asking for data `as_of` June 6th would. See the
-#' covidcast vignette for examples.
+#' return that value, though asking for data `as_of` June 6th would. See
+#' `vignette("covidcast")` for examples.
 #'
 #' Note also that the API enforces a maximum result row limit; results beyond
 #' the maximum limit are truncated. This limit is sufficient to fetch
@@ -118,10 +117,10 @@ MAX_RESULTS <- 3649
 #' calls with different `issues` arguments.
 #'
 #' @param data_source String identifying the data source to query. See
-#'   https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
+#'   <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html>
 #'   for a list of available data sources.
 #' @param signal String identifying the signal from that source to query. Again,
-#'   see https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
+#'   see <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html>
 #'   for a list of available signals.
 #' @param start_day Query data beginning on this date. Date object, or string in
 #'   the form "YYYY-MM-DD". If `start_day` is `NULL`, defaults to first day data
@@ -131,12 +130,12 @@ MAX_RESULTS <- 3649
 #'   recent day data is available for this signal.
 #' @param geo_type The geography type for which to request this data, such as
 #'   "county" or "state". Defaults to "county". See
-#'   https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
+#'   <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html>
 #'   for details on which types are available.
 #' @param geo_values Which geographies to return. The default, "*", fetches all
 #'   geographies. To fetch specific geographies, specify their IDs as a vector
 #'   or list of strings. See
-#'   https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
+#'   <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html>
 #'   for details on how to specify these IDs.
 #' @param as_of Fetch only data that was available on or before this date,
 #'   provided as a `Date` object or string in the form "YYYY-MM-DD". If `NULL`,
@@ -199,7 +198,7 @@ MAX_RESULTS <- 3649
 #' Documentation of all COVIDcast sources and signals:
 #' \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 #'
-#' COVIDcast public map: \url{https://covidcast.cmu.edu/}
+#' COVIDcast public dashboard: \url{https://delphi.cmu.edu/covidcast/}
 #'
 #' @examples \dontrun{
 #' ## Fetch all counties from 2020-05-10 to the most recent available data

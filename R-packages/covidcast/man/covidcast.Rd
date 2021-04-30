@@ -38,9 +38,8 @@ problems with the data.
 \section{Getting started}{
 
 
-We recommend the Getting Started vignette, which includes numerous examples
-and is provided online here:
-\url{https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html}
+We recommend browsing the vignettes, which includes numerous examples:
+\code{browseVignettes(package = "covidcast")}.
 
 See also \code{covidcast_signal()} for details on how to obtain COVIDcast data as
 a data frame.

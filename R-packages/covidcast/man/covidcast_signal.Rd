@@ -19,11 +19,11 @@ covidcast_signal(
 }
 \arguments{
 \item{data_source}{String identifying the data source to query. See
-https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
+\url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 for a list of available data sources.}
 
 \item{signal}{String identifying the signal from that source to query. Again,
-see https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
+see \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 for a list of available signals.}
 
 \item{start_day}{Query data beginning on this date. Date object, or string in
@@ -36,13 +36,13 @@ recent day data is available for this signal.}
 
 \item{geo_type}{The geography type for which to request this data, such as
 "county" or "state". Defaults to "county". See
-https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
+\url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}
 for details on which types are available.}
 
 \item{geo_values}{Which geographies to return. The default, "*", fetches all
 geographies. To fetch specific geographies, specify their IDs as a vector
 or list of strings. See
-https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
+\url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}
 for details on how to specify these IDs.}
 
 \item{as_of}{Fetch only data that was available on or before this date,
@@ -158,8 +158,8 @@ may get an error or confusing results.
 Note that the API only tracks the initial value of an estimate and \emph{changes}
 to that value. If a value was first issued on June 5th and never updated,
 asking for data issued on June 6th (using \code{issues} or \code{lag}) would \emph{not}
-return that value, though asking for data \code{as_of} June 6th would. See the
-covidcast vignette for examples.
+return that value, though asking for data \code{as_of} June 6th would. See
+\code{vignette("covidcast")} for examples.
 
 Note also that the API enforces a maximum result row limit; results beyond
 the maximum limit are truncated. This limit is sufficient to fetch
@@ -197,7 +197,7 @@ COVIDcast API documentation:
 Documentation of all COVIDcast sources and signals:
 \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 
-COVIDcast public map: \url{https://covidcast.cmu.edu/}
+COVIDcast public dashboard: \url{https://delphi.cmu.edu/covidcast/}
 }
 \seealso{
 \code{\link[=plot.covidcast_signal]{plot.covidcast_signal()}}, \code{\link[=covidcast_signals]{covidcast_signals()}},

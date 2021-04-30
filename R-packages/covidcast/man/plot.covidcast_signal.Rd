@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.R
 \name{plot.covidcast_signal}
 \alias{plot.covidcast_signal}
-\title{Plot \code{covidcast_signal} object}
+\title{Plot \code{covidcast_signal} object as choropleths, bubbles, or time series}
 \usage{
 \method{plot}{covidcast_signal}(
   x,
@@ -80,8 +80,7 @@ unused.}
 Several plot types are provided, including choropleth plots (maps), bubble
 plots, and time series plots showing the change of signals over time, for a
 data frame returned by \code{covidcast_signal()}. (Only the latest issue from the
-data frame is used for plotting.) See the plotting
-vignette for examples.
+data frame is used for plotting.) See \code{vignette("plotting-signals", package = "covidcast")} for examples.
 }
 \details{
 The following named arguments are supported through the lists

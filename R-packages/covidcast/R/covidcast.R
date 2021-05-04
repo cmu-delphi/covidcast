@@ -29,7 +29,7 @@
 #'
 #' @section Getting started:
 #'
-#' We recommend browsing the vignettes, which includes numerous examples:
+#' We recommend browsing the vignettes, which include numerous examples:
 #' `browseVignettes(package = "covidcast")`.
 #'
 #' See also `covidcast_signal()` for details on how to obtain COVIDcast data as
@@ -499,11 +499,12 @@ summary.covidcast_signal <- function(object, ...) {
 #'
 #' @details The argument structure is just as in `covidcast_signal()`, except
 #'   the first four arguments `data_source`, `signal`, `start_day`, `end_day`
-#'   are permitted to be vectors. The first two arguments `data_source`,
-#'   '`signal` are
-#'   recycled appropriately, in the calls to `covidcast_signal()`; see example
-#'   below. The next two arguments `start_day`, `end_day`, unless `NULL`, must
-#'   be either length 1 or N.
+#'   are permitted to be vectors. The first two arguments `data_source` and
+#'   `signal` are recycled appropriately in the calls to `covidcast_signal()`;
+#'   see example below. The next two arguments `start_day`, `end_day`, unless
+#'   `NULL`, must be either length 1 or N.
+#'
+#' See `vignette("multi-signals")` for additional examples.
 #'
 #' @return A list of `covidcast_signal` data frames, of length `N =
 #'     max(length(data_source), length(signal))`. This list can be aggregated

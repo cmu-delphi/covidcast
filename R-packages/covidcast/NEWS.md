@@ -1,6 +1,6 @@
 # covidcast 0.4.2
 
-Changes to prepare for release on CRAN.
+Changes to prepare for release on CRAN. Released May 4, 2021.
 
 ## Major changes
 

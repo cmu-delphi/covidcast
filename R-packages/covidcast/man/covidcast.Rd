@@ -38,7 +38,7 @@ problems with the data.
 \section{Getting started}{
 
 
-We recommend browsing the vignettes, which includes numerous examples:
+We recommend browsing the vignettes, which include numerous examples:
 \code{browseVignettes(package = "covidcast")}.
 
 See also \code{covidcast_signal()} for details on how to obtain COVIDcast data as

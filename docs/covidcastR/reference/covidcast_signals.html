@@ -81,7 +81,7 @@ signals, potentially from multiple data sources." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -119,7 +119,7 @@ signals, potentially from multiple data sources." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast">
-    <span class="fab fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -164,13 +164,13 @@ signals, potentially from multiple data sources.</p>
     <tr>
       <th>data_source</th>
       <td><p>String identifying the data source to query. See
-https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
+<a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html</a>
 for a list of available data sources.</p></td>
     </tr>
     <tr>
       <th>signal</th>
       <td><p>String identifying the signal from that source to query. Again,
-see https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
+see <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html</a>
 for a list of available signals.</p></td>
     </tr>
     <tr>
@@ -189,7 +189,7 @@ recent day data is available for this signal.</p></td>
       <th>geo_type</th>
       <td><p>The geography type for which to request this data, such as
 "county" or "state". Defaults to "county". See
-https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
+<a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html</a>
 for details on which types are available.</p></td>
     </tr>
     <tr>
@@ -197,7 +197,7 @@ for details on which types are available.</p></td>
       <td><p>Which geographies to return. The default, "*", fetches all
 geographies. To fetch specific geographies, specify their IDs as a vector
 or list of strings. See
-https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
+<a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html</a>
 for details on how to specify these IDs.</p></td>
     </tr>
     <tr>
@@ -238,11 +238,11 @@ into a single data frame of either "wide" or "long" format using
 
     <p>The argument structure is just as in <code><a href='covidcast_signal.html'>covidcast_signal()</a></code>, except
 the first four arguments <code>data_source</code>, <code>signal</code>, <code>start_day</code>, <code>end_day</code>
-are permitted to be vectors. The first two arguments <code>data_source</code>,
-'<code>signal</code> are
-recycled appropriately, in the calls to <code><a href='covidcast_signal.html'>covidcast_signal()</a></code>; see example
-below. The next two arguments <code>start_day</code>, <code>end_day</code>, unless <code>NULL</code>, must
-be either length 1 or N.</p>
+are permitted to be vectors. The first two arguments <code>data_source</code> and
+<code>signal</code> are recycled appropriately in the calls to <code><a href='covidcast_signal.html'>covidcast_signal()</a></code>;
+see example below. The next two arguments <code>start_day</code>, <code>end_day</code>, unless
+<code>NULL</code>, must be either length 1 or N.</p>
+<p>See <code><a href='../articles/multi-signals.html'>vignette("multi-signals")</a></code> for additional examples.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='covidcast_signal.html'>covidcast_signal()</a></code>, <code><a href='aggregate_signals.html'>aggregate_signals()</a></code></p></div>

@@ -79,7 +79,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -117,7 +117,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast">
-    <span class="fab fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -145,6 +145,7 @@
 <ol>
 <li>Run the unit tests with <code><a href="https://devtools.r-lib.org//reference/test.html">devtools::test()</a></code> and ensure they pass.</li>
 <li>If you have added any new features (new functions, new options, etc.), add a brief description to <code>NEWS.md</code> to the next listed version number. Also ensure that new functions or datasets are listed in the reference in <code>_pkgdown.yml</code> so they appear in a good place in the documentation website.</li>
+<li>Some of the vignettes take too long to re-build on CRAN, so they have been precompiled. They are stored with a file name “.Rmd.orig” and converted into an “.Rmd” that has no running R code. These should be rebuilt to test changes when updating the package, which can be done with the script precompile.R found in the vignette directory.</li>
 <li>If you changed any documentation, rebuild the documentation with <code><a href="https://devtools.r-lib.org//reference/document.html">devtools::document()</a></code> and then <code><a href="https://pkgdown.r-lib.org/reference/build_site.html">pkgdown::build_site()</a></code>. (This can be slow, because our vignettes take a long time to build.)</li>
 <li>Submit the pull request, setting the base branch to <code>r-pkg-devel</code>, and see if the CI can also successfully run the tests.</li>
 </ol>
@@ -166,8 +167,8 @@
 <a href="#using-data-files-in-tests" class="anchor"></a>Using data files in tests</h3>
 <p>Unit tests should not depend on being able to load data from the COVIDcast API, since that data is subject to change. It is preferable to either use toy examples or to store static datasets to be loaded and used.</p>
 <p>Small static datasets can be kept in <code>tests/testthat/data/</code> in RDS form (using <code>saveRDS</code> and <code>loadRDS</code>). The <code><a href="https://testthat.r-lib.org/reference/test_path.html">testthat::test_path</a></code> function locates files relative to the <code>tests/testthat/</code> directory regardless of your current working directory, so for example you can use</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">foo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span><span class="op">(</span><span class="fu">test_path</span><span class="op">(</span><span class="st">"data/foo.rds"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="va">foo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span><span class="op">(</span><span class="fu">test_path</span><span class="op">(</span><span class="st">"data/foo.rds"</span><span class="op">)</span><span class="op">)</span></pre></div>
 <p>to load <code>tests/testthat/data/foo.rds</code>.</p>
 </div>
 </div>

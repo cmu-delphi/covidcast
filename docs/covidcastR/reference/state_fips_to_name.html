@@ -6,8 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Convert data from an external source into a form compatible with
-covidcast_signal. — as.covidcast_signal • covidcast</title>
+<title>Get state, county or metropolitan area names from FIPS or CBSA codes — state_fips_to_name • covidcast</title>
 
 
 <!-- jquery -->
@@ -40,12 +39,10 @@ covidcast_signal. — as.covidcast_signal • covidcast</title>
 
 
 
-<meta property="og:title" content="Convert data from an external source into a form compatible with
-covidcast_signal. — as.covidcast_signal" />
-<meta property="og:description" content="Several methods are provided to convert common objects (such as data frames)
-into covidcast_signal objects, which can be used with the various
-covidcast_signal methods (such as plot.covidcast_signal() or
-covidcast_cor()). See vignette(&quot;external-data&quot;) for examples." />
+<meta property="og:title" content="Get state, county or metropolitan area names from FIPS or CBSA codes — state_fips_to_name" />
+<meta property="og:description" content="Look up county or metropolitan area names by FIPS or CBSA codes. Looking up
+FIPS code is done with the first 2 numbers (state) or 5 numbers (county) and
+therefore can be called with longer FIPS codes." />
 
 
 
@@ -140,103 +137,52 @@ covidcast_cor()). See vignette(&quot;external-data&quot;) for examples." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Convert data from an external source into a form compatible with
-<code>covidcast_signal</code>.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/main/R-packages/covidcast/R/covidcast.R'><code>R/covidcast.R</code></a></small>
-    <div class="hidden name"><code>as.covidcast_signal.Rd</code></div>
+    <h1>Get state, county or metropolitan area names from FIPS or CBSA codes</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/main/R-packages/covidcast/R/utils.R'><code>R/utils.R</code></a></small>
+    <div class="hidden name"><code>state_fips_to_name.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Several methods are provided to convert common objects (such as data frames)
-into <code>covidcast_signal</code> objects, which can be used with the various
-<code>covidcast_signal</code> methods (such as <code><a href='plot.covidcast_signal.html'>plot.covidcast_signal()</a></code> or
-<code><a href='covidcast_cor.html'>covidcast_cor()</a></code>). See <code><a href='../articles/external-data.html'>vignette("external-data")</a></code> for examples.</p>
+    <p>Look up county or metropolitan area names by FIPS or CBSA codes. Looking up
+FIPS code is done with the first 2 numbers (state) or 5 numbers (county) and
+therefore can be called with longer FIPS codes.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>as.covidcast_signal</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>state_fips_to_name</span><span class='op'>(</span><span class='va'>code</span><span class='op'>)</span>
 
-<span class='co'># S3 method for covidcast_signal</span>
-<span class='fu'>as.covidcast_signal</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>county_fips_to_name</span><span class='op'>(</span><span class='va'>code</span><span class='op'>)</span>
 
-<span class='co'># S3 method for data.frame</span>
-<span class='fu'>as.covidcast_signal</span><span class='op'>(</span>
-  <span class='va'>x</span>,
-  signal <span class='op'>=</span> <span class='cn'>NULL</span>,
-  geo_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"county"</span>, <span class='st'>"msa"</span>, <span class='st'>"hrr"</span>, <span class='st'>"dma"</span>, <span class='st'>"state"</span>, <span class='st'>"hhs"</span>, <span class='st'>"nation"</span><span class='op'>)</span>,
-  time_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"day"</span>, <span class='st'>"week"</span><span class='op'>)</span>,
-  data_source <span class='op'>=</span> <span class='st'>"user"</span>,
-  issue <span class='op'>=</span> <span class='cn'>NULL</span>,
-  metadata <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span></pre>
+<span class='fu'>cbsa_to_name</span><span class='op'>(</span><span class='va'>code</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>Object to be converted. See Methods section below for details on
-formatting of each input type.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Additional arguments passed to methods.</p></td>
-    </tr>
-    <tr>
-      <th>signal</th>
-      <td><p>The signal name to use for this data.</p></td>
-    </tr>
-    <tr>
-      <th>geo_type</th>
-      <td><p>The geography type stored in this object.</p></td>
-    </tr>
-    <tr>
-      <th>time_type</th>
-      <td><p>The time resolution stored in this object. If "day", the
-default, each observation covers one day. If "week", each time value is
-assumed to be the start date of the epiweek (MMWR week) that the data
-represents.</p></td>
-    </tr>
-    <tr>
-      <th>data_source</th>
-      <td><p>The name of the data source to use as a label for this
-data.</p></td>
-    </tr>
-    <tr>
-      <th>issue</th>
-      <td><p>Issue date to use for this data, if not present in <code>x</code>, as a
-<code>Date</code> object. If no issue date is present in <code>x</code> and <code>issue</code> is <code>NULL</code>,
-today's date will be used.</p></td>
-    </tr>
-    <tr>
-      <th>metadata</th>
-      <td><p>List of metadata to attach to the <code>covidcast_signal</code> object.
-See the "Metadata" section of <code><a href='covidcast_signal.html'>covidcast_signal()</a></code>. All objects will have
-<code>geo_type</code>, <code>data_source</code>, and <code>signal</code> columns included in their metadata;
-named entries in this list are added as additional columns.</p></td>
+      <th>code</th>
+      <td><p>Vector of FIPS or CBSA codes to look up.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>covidcast_signal</code> object; see <code><a href='covidcast_signal.html'>covidcast_signal()</a></code> for documentation
-of fields and structure.</p>
-    <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
-
-    
-<ul>
-<li><p><code>covidcast_signal</code>: Simply returns the <code>covidcast_signal</code> object
-unchanged.</p></li>
-<li><p><code>data.frame</code>: The input data frame <code>x</code> must contain the
-columns <code>time_value</code>, <code>value</code>, and <code>geo_value</code>. If an <code>issue</code> column is
-present in <code>x</code>, it will be used as the issue date for each observation; if
-not, the <code>issue</code> argument will be used. Other columns will be preserved
-as-is.</p></li>
-</ul>
+    <p>A vector of state, county or metro names.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='covidcast_signal.html'>covidcast_signal()</a></code></p></div>
+    <div class='dont-index'><p><code><a href='name_to_fips.html'>name_to_fips()</a></code>, <code><a href='name_to_fips.html'>name_to_cbsa()</a></code></p></div>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>state_fips_to_name</span><span class='op'>(</span><span class='st'>"42"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;             42 
+#&gt; "Pennsylvania" </div><div class='input'><span class='fu'>state_fips_to_name</span><span class='op'>(</span><span class='st'>"42003"</span><span class='op'>)</span> <span class='co'># same as previous</span>
+</div><div class='output co'>#&gt;             42 
+#&gt; "Pennsylvania" </div><div class='input'><span class='fu'>county_fips_to_name</span><span class='op'>(</span><span class='st'>"42003"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;              42003 
+#&gt; "Allegheny County" </div><div class='input'><span class='fu'>county_fips_to_name</span><span class='op'>(</span><span class='st'>"42000"</span><span class='op'>)</span> <span class='co'># the county "000" returns the state name</span>
+</div><div class='output co'>#&gt;          42000 
+#&gt; "Pennsylvania" </div><div class='input'><span class='fu'>cbsa_to_name</span><span class='op'>(</span><span class='st'>"38300"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;            38300 
+#&gt; "Pittsburgh, PA" </div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

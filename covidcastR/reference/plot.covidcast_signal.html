@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot covidcast_signal object — plot.covidcast_signal • covidcast</title>
+<title>Plot covidcast_signal object as choropleths, bubbles, or time series — plot.covidcast_signal • covidcast</title>
 
 
 <!-- jquery -->
@@ -39,12 +39,11 @@
 
 
 
-<meta property="og:title" content="Plot covidcast_signal object — plot.covidcast_signal" />
+<meta property="og:title" content="Plot covidcast_signal object as choropleths, bubbles, or time series — plot.covidcast_signal" />
 <meta property="og:description" content="Several plot types are provided, including choropleth plots (maps), bubble
 plots, and time series plots showing the change of signals over time, for a
 data frame returned by covidcast_signal(). (Only the latest issue from the
-data frame is used for plotting.) See the plotting vignette
-for examples." />
+data frame is used for plotting.) See vignette(&quot;plotting-signals&quot;, package = &quot;covidcast&quot;) for examples." />
 
 
 
@@ -76,7 +75,7 @@ for examples." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
       </span>
     </div>
 
@@ -139,7 +138,7 @@ for examples." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot <code>covidcast_signal</code> object</h1>
+    <h1>Plot <code>covidcast_signal</code> object as choropleths, bubbles, or time series</h1>
     <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/main/R-packages/covidcast/R/plot.R'><code>R/plot.R</code></a></small>
     <div class="hidden name"><code>plot.covidcast_signal.Rd</code></div>
     </div>
@@ -148,8 +147,7 @@ for examples." />
     <p>Several plot types are provided, including choropleth plots (maps), bubble
 plots, and time series plots showing the change of signals over time, for a
 data frame returned by <code><a href='covidcast_signal.html'>covidcast_signal()</a></code>. (Only the latest issue from the
-data frame is used for plotting.) See the <a href='https://cmu-delphi.github.io/covidcast/covidcastR/articles/plotting-signals.html'>plotting vignette</a>
-for examples.</p>
+data frame is used for plotting.) See <code><a href='../articles/plotting-signals.html'>vignette("plotting-signals", package = "covidcast")</a></code> for examples.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for covidcast_signal</span>
@@ -187,10 +185,10 @@ The default is "choro".</p></td>
     </tr>
     <tr>
       <th>time_value</th>
-      <td><p>Date object (or string in the form "YYYY-MM-DD")
-specifying the day to map, for choropleth and bubble maps. If <code>NULL</code>, the
-default, then the last date in <code>x</code> is used for the maps. Time series plots
-always include all available time values in <code>x</code>.</p></td>
+      <td><p>Date object (or string in the form "YYYY-MM-DD") specifying
+the day to map, for choropleth and bubble maps. If <code>NULL</code>, the default,
+then the last date in <code>x</code> is used for the maps. Time series plots always
+include all available time values in <code>x</code>.</p></td>
     </tr>
     <tr>
       <th>include</th>
@@ -214,7 +212,7 @@ the given time period.</p></td>
       <th>choro_col</th>
       <td><p>Vector of colors, as specified in hex code, to use for the
 choropleth color scale. Can be arbitrary in length. Default is similar to
-that from covidcast.cmu.edu.</p></td>
+that from <a href='https://delphi.cmu.edu/covidcast/'>https://delphi.cmu.edu/covidcast/</a>.</p></td>
     </tr>
     <tr>
       <th>alpha</th>
@@ -253,6 +251,10 @@ unused.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A <code>ggplot</code> object that can be customized and styled using standard
+ggplot2 functions.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The following named arguments are supported through the lists
@@ -307,7 +309,7 @@ effectively drawn as bubbles of zero size)?</p></dd>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

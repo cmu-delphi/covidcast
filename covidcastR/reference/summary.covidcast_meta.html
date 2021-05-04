@@ -40,7 +40,9 @@
 
 
 <meta property="og:title" content="Summarize covidcast_meta object — summary.covidcast_meta" />
-<meta property="og:description" content="Prints a tabular summary of the object returned by covidcast_meta()." />
+<meta property="og:description" content="Prints a tabular summary of the object returned by covidcast_meta(),
+containing each source and signal and a summary of the geographic levels it
+is available at." />
 
 
 
@@ -72,7 +74,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
       </span>
     </div>
 
@@ -141,7 +143,9 @@
     </div>
 
     <div class="ref-description">
-    <p>Prints a tabular summary of the object returned by <code><a href='covidcast_meta.html'>covidcast_meta()</a></code>.</p>
+    <p>Prints a tabular summary of the object returned by <code><a href='covidcast_meta.html'>covidcast_meta()</a></code>,
+containing each source and signal and a summary of the geographic levels it
+is available at.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for covidcast_meta</span>
@@ -161,6 +165,27 @@ Currently unused.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A data frame with one row per unique signal in the metadata, with
+the following columns:</p>
+<dt>data_source</dt><dd><p>Data source name</p></dd>
+<dt>signal</dt><dd><p>Signal name</p></dd>
+<dt>county</dt><dd><p>"*" if this signal is available at the county level, <code>""</code>
+otherwise</p></dd>
+<dt>msa</dt><dd><p><code>"*"</code> if this signal is available at the Metropolitan Statistical
+Area level, <code>""</code> otherwise</p></dd>
+<dt>dma</dt><dd><p><code>"*"</code> if this signal is available at the Designated Marketing Area
+level, <code>""</code> otherwise</p></dd>
+<dt>hrr</dt><dd><p><code>"*"</code> if this signal is available at the Hospital Referral Region
+level, <code>""</code> otherwise</p></dd>
+<dt>state</dt><dd><p><code>"*"</code> if this signal is available at the state level, <code>""</code>
+otherwise</p></dd>
+<dt>hhs</dt><dd><p><code>"*"</code> if this signal is available at the Health and Human Services
+region level, <code>""</code> otherwise</p></dd>
+<dt>nation</dt><dd><p><code>"*"</code> if this signal is available at the national level, <code>""</code>
+otherwise</p></dd>
+
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -173,7 +198,7 @@ Currently unused.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

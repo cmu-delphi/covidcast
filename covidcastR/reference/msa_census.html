@@ -75,7 +75,7 @@ areas." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
       </span>
     </div>
 
@@ -163,9 +163,12 @@ many columns. The most crucial are:</p>
 <dt>CBSA</dt><dd><p>Core Based Statistical Area code. These are unique identifiers
 used, for example, as the <code>geo_values</code> argument to <code><a href='covidcast_signal.html'>covidcast_signal()</a></code>
 when requesting data from specific metro areas (with <code>geo_type = 'msa'</code>).</p></dd>
+<dt>MDIV</dt><dd><p>Metropolitan Division code</p></dd>
+<dt>STCOU</dt><dd><p>State and county code</p></dd>
 <dt>NAME</dt><dd><p>Name or title of the area.</p></dd>
 <dt>LSAD</dt><dd><p>Legal/Statistical Area Description, identifying if this is a
 metropolitan or micropolitan area, a metropolitan division, or a county.</p></dd>
+<dt>STATE</dt><dd><p>State FIPS code.</p></dd>
 <dt>POPESTIMATE2019</dt><dd><p>Estimate of the area's resident population as of
 July 1, 2019.</p></dd>
 
@@ -181,7 +184,7 @@ July 1, 2019.</p></dd>
 <a href='https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.pdf'>https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/metro/totals/cbsa-est2019-alldata.pdf</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='fips_to_name.html'>cbsa_to_name()</a></code>, <code><a href='name_to_fips.html'>name_to_cbsa()</a></code></p></div>
+    <div class='dont-index'><p><code><a href='state_fips_to_name.html'>cbsa_to_name()</a></code>, <code><a href='name_to_fips.html'>name_to_cbsa()</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -194,7 +197,7 @@ July 1, 2019.</p></dd>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

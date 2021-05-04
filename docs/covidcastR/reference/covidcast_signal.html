@@ -86,7 +86,7 @@ argument." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -124,7 +124,7 @@ argument." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast">
-    <span class="fab fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -175,13 +175,13 @@ argument.</p>
     <tr>
       <th>data_source</th>
       <td><p>String identifying the data source to query. See
-https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
+<a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html</a>
 for a list of available data sources.</p></td>
     </tr>
     <tr>
       <th>signal</th>
       <td><p>String identifying the signal from that source to query. Again,
-see https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
+see <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html</a>
 for a list of available signals.</p></td>
     </tr>
     <tr>
@@ -200,7 +200,7 @@ recent day data is available for this signal.</p></td>
       <th>geo_type</th>
       <td><p>The geography type for which to request this data, such as
 "county" or "state". Defaults to "county". See
-https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
+<a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html</a>
 for details on which types are available.</p></td>
     </tr>
     <tr>
@@ -208,7 +208,7 @@ for details on which types are available.</p></td>
       <td><p>Which geographies to return. The default, "*", fetches all
 geographies. To fetch specific geographies, specify their IDs as a vector
 or list of strings. See
-https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
+<a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html</a>
 for details on how to specify these IDs.</p></td>
     </tr>
     <tr>
@@ -324,8 +324,8 @@ may get an error or confusing results.</p>
 <p>Note that the API only tracks the initial value of an estimate and <em>changes</em>
 to that value. If a value was first issued on June 5th and never updated,
 asking for data issued on June 6th (using <code>issues</code> or <code>lag</code>) would <em>not</em>
-return that value, though asking for data <code>as_of</code> June 6th would. See the
-covidcast vignette for examples.</p>
+return that value, though asking for data <code>as_of</code> June 6th would. See
+<code><a href='../articles/covidcast.html'>vignette("covidcast")</a></code> for examples.</p>
 <p>Note also that the API enforces a maximum result row limit; results beyond
 the maximum limit are truncated. This limit is sufficient to fetch
 observations in all counties in the United States on one day. This client
@@ -340,7 +340,7 @@ calls with different <code>issues</code> arguments.</p>
 <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html</a></p>
 <p>Documentation of all COVIDcast sources and signals:
 <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html</a></p>
-<p>COVIDcast public map: <a href='https://covidcast.cmu.edu/'>https://covidcast.cmu.edu/</a></p>
+<p>COVIDcast public dashboard: <a href='https://delphi.cmu.edu/covidcast/'>https://delphi.cmu.edu/covidcast/</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='plot.covidcast_signal.html'>plot.covidcast_signal()</a></code>, <code><a href='covidcast_signals.html'>covidcast_signals()</a></code>,

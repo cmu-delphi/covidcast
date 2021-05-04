@@ -12,6 +12,28 @@
 \item{...}{Additional arguments, for compatibility with \code{summary()}.
 Currently unused.}
 }
+\value{
+A data frame with one row per unique signal in the metadata, with
+the following columns:
+\item{data_source}{Data source name}
+\item{signal}{Signal name}
+\item{county}{"*" if this signal is available at the county level, \code{""}
+otherwise}
+\item{msa}{\code{"*"} if this signal is available at the Metropolitan Statistical
+Area level, \code{""} otherwise}
+\item{dma}{\code{"*"} if this signal is available at the Designated Marketing Area
+level, \code{""} otherwise}
+\item{hrr}{\code{"*"} if this signal is available at the Hospital Referral Region
+level, \code{""} otherwise}
+\item{state}{\code{"*"} if this signal is available at the state level, \code{""}
+otherwise}
+\item{hhs}{\code{"*"} if this signal is available at the Health and Human Services
+region level, \code{""} otherwise}
+\item{nation}{\code{"*"} if this signal is available at the national level, \code{""}
+otherwise}
+}
 \description{
-Prints a tabular summary of the object returned by \code{covidcast_meta()}.
+Prints a tabular summary of the object returned by \code{covidcast_meta()},
+containing each source and signal and a summary of the geographic levels it
+is available at.
 }

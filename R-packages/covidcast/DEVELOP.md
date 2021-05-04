@@ -17,10 +17,15 @@ A short checklist for submitting pull requests:
    brief description to `NEWS.md` to the next listed version number. Also ensure
    that new functions or datasets are listed in the reference in `_pkgdown.yml`
    so they appear in a good place in the documentation website.
-3. If you changed any documentation, rebuild the documentation with
+3. Some of the vignettes take too long to re-build on CRAN, so they have been
+   precompiled. They are stored with a file name ".Rmd.orig" and converted into
+   an ".Rmd" that has no running R code. These should be rebuilt to test changes
+   when updating the package, which can be done with the script precompile.R
+   found in the vignette directory.
+4. If you changed any documentation, rebuild the documentation with
    `devtools::document()` and then `pkgdown::build_site()`. (This can be slow,
    because our vignettes take a long time to build.)
-4. Submit the pull request, setting the base branch to `r-pkg-devel`, and see if
+5. Submit the pull request, setting the base branch to `r-pkg-devel`, and see if
    the CI can also successfully run the tests.
 
 ## Unit tests

@@ -18,23 +18,12 @@ functions.
 
 ## Installing
 
-This package is not on CRAN yet, so it can be installed using the
-[`devtools`](https://cran.r-project.org/package=devtools) package:
+This package is [available on
+CRAN](https://cran.r-project.org/package=covidcast), so the easiest way to
+install it is simply
 
-```{r, eval = FALSE}
-devtools::install_github("cmu-delphi/covidcast", ref = "main",
-                         subdir = "R-packages/covidcast")
-```
-
-Building the vignettes, such as this Getting Started guide, takes a substantial
-amount of time. They are not included in the package by default. If you wish to
-include vignettes, use this modified command:
-
-```{r, eval = FALSE}
-devtools::install_github("cmu-delphi/covidcast", ref = "main",
-                         subdir = "R-packages/covidcast",
-                         build_vignettes = TRUE,
-                         dependencies = TRUE)
+```r
+install.packages("covidcast")
 ```
 
 ## Basic examples
@@ -68,7 +57,7 @@ function as it downloads the data; if you download particularly large amounts of
 data, you may prefer to allow the progress reporting so you know how long to
 wait.
 
-To get a basic summary of the returned data frame: 
+To get a basic summary of the returned data frame:
 
 ```{r}
 summary(cli)
@@ -81,8 +70,8 @@ argument:
 
 ```{r}
 cli <- suppressMessages(
-  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli", 
-                   start_day = "2020-05-01", end_day = "2020-05-07", 
+  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
+                   start_day = "2020-05-01", end_day = "2020-05-07",
                    geo_type = "state")
 )
 knitr::kable(head(cli))
@@ -93,8 +82,8 @@ the FIPS code for Allegheny County, Pennsylvania:
 
 ```{r}
 cli <- suppressMessages(
-  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli", 
-                   start_day = "2020-05-01", end_day = "2020-05-07", 
+  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
+                   start_day = "2020-05-01", end_day = "2020-05-07",
                    geo_type = "county", geo_value = "42003")
 )
 knitr::kable(head(cli))
@@ -117,10 +106,10 @@ For more details and examples, including choropleth and bubble maps, see
 ### Finding signals of interest
 
 Above we used data from [Delphi's symptom
-surveys](https://covidcast.cmu.edu/surveys.html), but the COVIDcast API includes
-numerous data streams: medical claims data, cases and deaths, mobility, and many
-others; new signals are added regularly. This can make it a challenge to find
-the data stream that you are most interested in.
+surveys](https://delphi.cmu.edu/covidcast/surveys/), but the COVIDcast API
+includes numerous data streams: medical claims data, cases and deaths, mobility,
+and many others; new signals are added regularly. This can make it a challenge
+to find the data stream that you are most interested in.
 
 The [COVIDcast Data Sources and Signals
 documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)
@@ -167,10 +156,11 @@ query.
 
 You may also want to convert FIPS codes or CBSA IDs back to well-known names,
 for instance to report in tables or graphics. The package provides inverse
-mappings `fips_to_name()` and `cbsa_to_name()` that work in the analogous way:
+mappings `county_fips_to_name()` and `cbsa_to_name()` that work in the
+analogous way:
 
 ```{r}
-fips_to_name("42003")
+county_fips_to_name("42003")
 cbsa_to_name("38300")
 ```
 
@@ -187,15 +177,15 @@ meta <- covidcast_meta()
 knitr::kable(head(meta))
 ```
 
-The `covidcast_meta()` documentation describes the columns and their meanings. 
-The metadata data frame can be filtered and sliced as desired to obtain 
-information about signals of interest. To get a basic summary of the metadata: 
+The `covidcast_meta()` documentation describes the columns and their meanings.
+The metadata data frame can be filtered and sliced as desired to obtain
+information about signals of interest. To get a basic summary of the metadata:
 
 ```{r, eval = FALSE}
 summary(meta)
 ```
 
-(We silenced the evaluation because the output of `summary()` here is still 
+(We silenced the evaluation because the output of `summary()` here is still
 quite long.)
 
 ## Tracking issues and updates

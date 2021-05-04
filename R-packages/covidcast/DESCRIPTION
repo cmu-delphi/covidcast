@@ -1,10 +1,13 @@
 Package: covidcast
 Type: Package
-Title: Client for Delphi's COVIDcast Epidata API
-Version: 0.4.1
-Date: 2021-01-13
+Title: Client for Delphi's 'COVIDcast Epidata' API
+Version: 0.4.3
+Date: 2021-04-30
 Authors@R: 
   c(
+    person(given = "Taylor",
+           family = "Arnold",
+           role = "aut"),
     person(given = "Jacob",
            family = "Bien",
            role = "aut"),
@@ -26,16 +29,22 @@ Authors@R:
     person(given = "Alex",
            family = "Reinhart",
            role = c("aut", "cre"),
-           email = "areinhar@stat.cmu.edu"),
+           email = "areinhar@stat.cmu.edu",
+           comment = c(ORCID = "0000-0002-6658-514X")),
     person(given = "Ryan",
            family = "Tibshirani",
            role = "aut"))
 URL: https://cmu-delphi.github.io/covidcast/covidcastR/,
     https://github.com/cmu-delphi/covidcast 
 BugReports: https://github.com/cmu-delphi/covidcast/issues
-Description: Tools for Delphi's COVIDcast Epidata API: data access (for Delphi's
-    COVID-19 indicators), maps and time series plotting, and basic signal
-    processing.
+Description: Tools for Delphi's 'COVIDcast Epidata' API: data access, maps and
+    time series plotting, and basic signal processing. The API includes a
+    collection of numerous indicators relevant to the COVID-19 pandemic in the
+    United States, including official reports, de-identified aggregated medical
+    claims data, large-scale surveys of symptoms and public behavior, and
+    mobility data, typically updated daily and at the county level. All data
+    sources are documented at
+    <https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html>.
 Depends: R (>= 3.5.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -46,8 +55,6 @@ Imports:
     ggplot2,
     grDevices,
     httr,
-    jsonlite,
-    maptools,
     MMWRweek,
     purrr,
     rlang,

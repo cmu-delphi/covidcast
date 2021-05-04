@@ -6,16 +6,21 @@
 \title{County census population data}
 \format{
 A data frame with 3193 rows, one for each county (along with the 50
-states and DC). There are many columns. The most crucial are:
+states and DC). Columns include:
 
 \describe{
+\item{SUMLEV}{Geographic summary level. Either 40 (state) or 50 (county).}
+\item{REGION}{Census Region code}
+\item{DIVISION}{Census Division code}
+\item{STATE}{State FIPS code.}
+\item{COUNTY}{County FIPS}
+\item{STNAME}{Name of the state in which this county belongs.}
+\item{CTYNAME}{County name, to help find counties by name.}
+\item{POPESTIMATE2019}{Estimate of the county's resident population as of
+July 1, 2019.}
 \item{FIPS}{Five-digit county FIPS codes. These are unique identifiers
 used, for example, as the \code{geo_values} argument to \code{covidcast_signal()} to
 request data from a specific county.}
-\item{CTYNAME}{County name, to help find counties by name.}
-\item{STNAME}{Name of the state in which this county belongs.}
-\item{POPESTIMATE2019}{Estimate of the county's resident population as of
-July 1, 2019.}
 }
 }
 \source{
@@ -30,9 +35,11 @@ Data set on county populations, from the 2019 US Census.
 }
 \references{
 Census Bureau documentation of all columns and their meaning:
-\url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.pdf}
+\url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.pdf},
+\url{https://www.census.gov/data/tables/time-series/demo/popest/2010s-total-puerto-rico-municipios.html},
+and \url{https://www.census.gov/data/tables/2010/dec/2010-island-areas.html}
 }
 \seealso{
-\code{\link[=fips_to_name]{fips_to_name()}}, \code{\link[=name_to_fips]{name_to_fips()}}
+\code{\link[=county_fips_to_name]{county_fips_to_name()}}, \code{\link[=name_to_fips]{name_to_fips()}}
 }
 \keyword{datasets}

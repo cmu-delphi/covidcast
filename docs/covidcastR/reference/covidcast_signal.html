@@ -46,8 +46,7 @@ COVIDcast signal documentation.
 Most (but not all) data sources are available at the county level, but the
 API can also return data aggregated to metropolitan statistical areas,
 hospital referral regions, or states, as desired, by using the geo_type
-argument. View the covidcast vignette
-for detailed example usage." />
+argument." />
 
 
 
@@ -79,7 +78,7 @@ for detailed example usage." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
       </span>
     </div>
 
@@ -150,12 +149,11 @@ for detailed example usage." />
     <div class="ref-description">
     <p>Obtains data for selected date ranges for all geographic regions of the
 United States. Available data sources and signals are documented in the
-<a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>COVIDcast signal documentation</a>.
+COVIDcast signal documentation.
 Most (but not all) data sources are available at the county level, but the
 API can also return data aggregated to metropolitan statistical areas,
 hospital referral regions, or states, as desired, by using the <code>geo_type</code>
-argument. View the <a href='https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html'>covidcast vignette</a>
-for detailed example usage.</p>
+argument.</p>
     </div>
 
     <pre class="usage"><span class='fu'>covidcast_signal</span><span class='op'>(</span>
@@ -176,14 +174,14 @@ for detailed example usage.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data_source</th>
-      <td><p>String identifying the data source to query. See the
-<a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>signal documentation</a>
+      <td><p>String identifying the data source to query. See
+<a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html</a>
 for a list of available data sources.</p></td>
     </tr>
     <tr>
       <th>signal</th>
       <td><p>String identifying the signal from that source to query. Again,
-see the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>signal documentation</a>
+see <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html</a>
 for a list of available signals.</p></td>
     </tr>
     <tr>
@@ -201,14 +199,16 @@ recent day data is available for this signal.</p></td>
     <tr>
       <th>geo_type</th>
       <td><p>The geography type for which to request this data, such as
-"county" or "state". Defaults to "county". See the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>geographic coding documentation</a>
+"county" or "state". Defaults to "county". See
+<a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html</a>
 for details on which types are available.</p></td>
     </tr>
     <tr>
       <th>geo_values</th>
       <td><p>Which geographies to return. The default, "*", fetches all
 geographies. To fetch specific geographies, specify their IDs as a vector
-or list of strings. See the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>geographic coding documentation</a>
+or list of strings. See
+<a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html</a>
 for details on how to specify these IDs.</p></td>
     </tr>
     <tr>
@@ -324,9 +324,8 @@ may get an error or confusing results.</p>
 <p>Note that the API only tracks the initial value of an estimate and <em>changes</em>
 to that value. If a value was first issued on June 5th and never updated,
 asking for data issued on June 6th (using <code>issues</code> or <code>lag</code>) would <em>not</em>
-return that value, though asking for data <code>as_of</code> June 6th would. See the
-<a href='https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html'>covidcast vignette</a>
-for examples.</p>
+return that value, though asking for data <code>as_of</code> June 6th would. See
+<code><a href='../articles/covidcast.html'>vignette("covidcast")</a></code> for examples.</p>
 <p>Note also that the API enforces a maximum result row limit; results beyond
 the maximum limit are truncated. This limit is sufficient to fetch
 observations in all counties in the United States on one day. This client
@@ -341,7 +340,7 @@ calls with different <code>issues</code> arguments.</p>
 <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html</a></p>
 <p>Documentation of all COVIDcast sources and signals:
 <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html</a></p>
-<p>COVIDcast public map: <a href='https://covidcast.cmu.edu/'>https://covidcast.cmu.edu/</a></p>
+<p>COVIDcast public dashboard: <a href='https://delphi.cmu.edu/covidcast/'>https://delphi.cmu.edu/covidcast/</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='plot.covidcast_signal.html'>plot.covidcast_signal()</a></code>, <code><a href='covidcast_signals.html'>covidcast_signals()</a></code>,
@@ -378,7 +377,7 @@ calls with different <code>issues</code> arguments.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

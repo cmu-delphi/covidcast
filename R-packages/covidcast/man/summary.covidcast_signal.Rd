@@ -12,6 +12,9 @@
 \item{...}{Additional arguments, for compatibility with \code{summary()}.
 Currently unused.}
 }
+\value{
+No return value; called only to print summary statistics.
+}
 \description{
 Prints a variety of summary statistics about the underlying data, such as
 median values, the date range included, sample sizes, and so on, for an

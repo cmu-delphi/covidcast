@@ -30,10 +30,10 @@ mapped or plotted.}
 a choropleth map, bubble map, or line (time series) graph, respectively.
 The default is "choro".}
 
-\item{time_value}{Date object (or string in the form "YYYY-MM-DD")
-specifying the day to map, for choropleth and bubble maps. If \code{NULL}, the
-default, then the last date in \code{x} is used for the maps. Time series plots
-always include all available time values in \code{x}.}
+\item{time_value}{Date object (or string in the form "YYYY-MM-DD") specifying
+the day to map, for choropleth and bubble maps. If \code{NULL}, the default,
+then the last date in \code{x} is used for the maps. Time series plots always
+include all available time values in \code{x}.}
 
 \item{include}{Vector of state abbreviations (case insensitive, so "pa" and
 "PA" both denote Pennsylvania) indicating which states to include in the
@@ -51,7 +51,7 @@ the given time period.}
 
 \item{choro_col}{Vector of colors, as specified in hex code, to use for the
 choropleth color scale. Can be arbitrary in length. Default is similar to
-that from covidcast.cmu.edu.}
+that from \url{https://delphi.cmu.edu/covidcast/}.}
 
 \item{alpha}{Number between 0 and 1, indicating the transparency level to be
 used in the maps. For choropleth maps, this determines the transparency
@@ -75,6 +75,10 @@ the different plot types, for further customization. See details below.}
 
 \item{...}{Additional arguments, for compatibility with \code{plot()}. Currently
 unused.}
+}
+\value{
+A \code{ggplot} object that can be customized and styled using standard
+ggplot2 functions.
 }
 \description{
 Several plot types are provided, including choropleth plots (maps), bubble

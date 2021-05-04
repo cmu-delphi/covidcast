@@ -49,6 +49,10 @@ See the "Metadata" section of \code{covidcast_signal()}. All objects will have
 \code{geo_type}, \code{data_source}, and \code{signal} columns included in their metadata;
 named entries in this list are added as additional columns.}
 }
+\value{
+\code{covidcast_signal} object; see \code{covidcast_signal()} for documentation
+of fields and structure.
+}
 \description{
 Several methods are provided to convert common objects (such as data frames)
 into \code{covidcast_signal} objects, which can be used with the various

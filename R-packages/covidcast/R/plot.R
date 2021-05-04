@@ -12,10 +12,10 @@
 #' @param plot_type One of "choro", "bubble", "line" indicating whether to plot
 #'   a choropleth map, bubble map, or line (time series) graph, respectively.
 #'   The default is "choro".
-#' @param time_value Date object (or string in the form "YYYY-MM-DD")
-#'   specifying the day to map, for choropleth and bubble maps. If `NULL`, the
-#'   default, then the last date in `x` is used for the maps. Time series plots
-#'   always include all available time values in `x`.
+#' @param time_value Date object (or string in the form "YYYY-MM-DD") specifying
+#'   the day to map, for choropleth and bubble maps. If `NULL`, the default,
+#'   then the last date in `x` is used for the maps. Time series plots always
+#'   include all available time values in `x`.
 #' @param include Vector of state abbreviations (case insensitive, so "pa" and
 #'   "PA" both denote Pennsylvania) indicating which states to include in the
 #'   choropleth and bubble maps. Default is `c()`, which is interpreted to mean
@@ -30,7 +30,7 @@
 #'   the given time period.
 #' @param choro_col Vector of colors, as specified in hex code, to use for the
 #'   choropleth color scale. Can be arbitrary in length. Default is similar to
-#'   that from covidcast.cmu.edu.
+#'   that from <https://delphi.cmu.edu/covidcast/>.
 #' @param alpha Number between 0 and 1, indicating the transparency level to be
 #'   used in the maps. For choropleth maps, this determines the transparency
 #'   level for the mega counties. For bubble maps, this determines the
@@ -48,6 +48,8 @@
 #'   the different plot types, for further customization. See details below.
 #' @param ... Additional arguments, for compatibility with `plot()`. Currently
 #'   unused.
+#' @return A `ggplot` object that can be customized and styled using standard
+#'   ggplot2 functions.
 #'
 #' @details The following named arguments are supported through the lists
 #'   `choro_params`, `bubble_params`, and `line_params`.

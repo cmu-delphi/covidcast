@@ -12,6 +12,9 @@
 \item{...}{Additional arguments passed to \code{print.data.frame()} to print the
 data.}
 }
+\value{
+The \code{covidcast_signal} object, unchanged.
+}
 \description{
 Prints a brief summary of the data source, signal, and geographic level, and
 then prints the underlying data frame, for an object returned by

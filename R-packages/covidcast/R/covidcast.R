@@ -320,6 +320,8 @@ covidcast_signal <- function(data_source, signal,
 #'   `geo_type`, `data_source`, and `signal` columns included in their metadata;
 #'   named entries in this list are added as additional columns.
 #' @param ... Additional arguments passed to methods.
+#' @return `covidcast_signal` object; see `covidcast_signal()` for documentation
+#'   of fields and structure.
 #' @seealso [`covidcast_signal()`]
 #' @export
 as.covidcast_signal <- function(x, ...) {
@@ -437,6 +439,7 @@ as.covidcast_signal.data.frame <- function(x,
 #' @param x The `covidcast_signal` object.
 #' @param ... Additional arguments passed to `print.data.frame()` to print the
 #'   data.
+#' @return The `covidcast_signal` object, unchanged.
 #'
 #' @method print covidcast_signal
 #' @export
@@ -467,6 +470,7 @@ head.covidcast_signal <- function(x, ...) {
 #' @param object The `covidcast_signal` object.
 #' @param ... Additional arguments, for compatibility with `summary()`.
 #'   Currently unused.
+#' @return No return value; called only to print summary statistics.
 #'
 #' @method summary covidcast_signal
 #' @importFrom stats median
@@ -642,6 +646,7 @@ covidcast_meta <- function() {
 #' @param x The `covidcast_meta` object.
 #' @param ... Additional arguments passed to `print.data.frame()` to print the
 #'   data.
+#' @return The `covidcast_meta` object, unchanged.
 #'
 #' @method print covidcast_meta
 #' @export
@@ -666,11 +671,31 @@ head.covidcast_meta <- function(x, ...) {
 
 #' Summarize `covidcast_meta` object
 #'
-#' Prints a tabular summary of the object returned by `covidcast_meta()`.
+#' Prints a tabular summary of the object returned by `covidcast_meta()`,
+#' containing each source and signal and a summary of the geographic levels it
+#' is available at.
 #'
 #' @param object The `covidcast_meta` object.
 #' @param ... Additional arguments, for compatibility with `summary()`.
 #'   Currently unused.
+#' @return A data frame with one row per unique signal in the metadata, with
+#'   the following columns:
+#' \item{data_source}{Data source name}
+#' \item{signal}{Signal name}
+#' \item{county}{"*" if this signal is available at the county level, `""`
+#' otherwise}
+#' \item{msa}{`"*"` if this signal is available at the Metropolitan Statistical
+#' Area level, `""` otherwise}
+#' \item{dma}{`"*"` if this signal is available at the Designated Marketing Area
+#' level, `""` otherwise}
+#' \item{hrr}{`"*"` if this signal is available at the Hospital Referral Region
+#' level, `""` otherwise}
+#' \item{state}{`"*"` if this signal is available at the state level, `""`
+#' otherwise}
+#' \item{hhs}{`"*"` if this signal is available at the Health and Human Services
+#' region level, `""` otherwise}
+#' \item{nation}{`"*"` if this signal is available at the national level, `""`
+#' otherwise}
 #'
 #' @method summary covidcast_meta
 #' @export

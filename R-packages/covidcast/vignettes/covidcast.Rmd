@@ -16,6 +16,16 @@ data is provided as a simple data frame, you can also wrangle it into whatever
 form you need to conduct your desired analyses using other packages and
 functions.
 
+## Installing
+
+This package is [available on
+CRAN](https://cran.r-project.org/package=covidcast), so the easiest way to
+install it is simply
+
+```r
+install.packages("covidcast")
+```
+
 ## Basic examples
 
 To obtain smoothed estimates of COVID-like illness from our Facebook survey for

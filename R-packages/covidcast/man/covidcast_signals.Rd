@@ -77,11 +77,12 @@ signals, potentially from multiple data sources.
 \details{
 The argument structure is just as in \code{covidcast_signal()}, except
 the first four arguments \code{data_source}, \code{signal}, \code{start_day}, \code{end_day}
-are permitted to be vectors. The first two arguments \code{data_source},
-'\code{signal} are
-recycled appropriately, in the calls to \code{covidcast_signal()}; see example
-below. The next two arguments \code{start_day}, \code{end_day}, unless \code{NULL}, must
-be either length 1 or N.
+are permitted to be vectors. The first two arguments \code{data_source} and
+\code{signal} are recycled appropriately in the calls to \code{covidcast_signal()};
+see example below. The next two arguments \code{start_day}, \code{end_day}, unless
+\code{NULL}, must be either length 1 or N.
+
+See \code{vignette("multi-signals")} for additional examples.
 }
 \examples{
 \dontrun{

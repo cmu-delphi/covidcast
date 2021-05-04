@@ -1,10 +1,10 @@
-#' Plot `covidcast_signal` object
+#' Plot `covidcast_signal` object as choropleths, bubbles, or time series
 #'
 #' Several plot types are provided, including choropleth plots (maps), bubble
 #' plots, and time series plots showing the change of signals over time, for a
 #' data frame returned by `covidcast_signal()`. (Only the latest issue from the
-#' data frame is used for plotting.) See the plotting
-#' vignette for examples.
+#' data frame is used for plotting.) See `vignette("plotting-signals", package =
+#' "covidcast")` for examples.
 #'
 #' @param x The `covidcast_signal` object to map or plot. If the object contains
 #'   multiple issues of the same observation, only the most recent issue is
@@ -12,10 +12,10 @@
 #' @param plot_type One of "choro", "bubble", "line" indicating whether to plot
 #'   a choropleth map, bubble map, or line (time series) graph, respectively.
 #'   The default is "choro".
-#' @param time_value Date object (or string in the form "YYYY-MM-DD")
-#'   specifying the day to map, for choropleth and bubble maps. If `NULL`, the
-#'   default, then the last date in `x` is used for the maps. Time series plots
-#'   always include all available time values in `x`.
+#' @param time_value Date object (or string in the form "YYYY-MM-DD") specifying
+#'   the day to map, for choropleth and bubble maps. If `NULL`, the default,
+#'   then the last date in `x` is used for the maps. Time series plots always
+#'   include all available time values in `x`.
 #' @param include Vector of state abbreviations (case insensitive, so "pa" and
 #'   "PA" both denote Pennsylvania) indicating which states to include in the
 #'   choropleth and bubble maps. Default is `c()`, which is interpreted to mean
@@ -30,7 +30,7 @@
 #'   the given time period.
 #' @param choro_col Vector of colors, as specified in hex code, to use for the
 #'   choropleth color scale. Can be arbitrary in length. Default is similar to
-#'   that from covidcast.cmu.edu.
+#'   that from <https://delphi.cmu.edu/covidcast/>.
 #' @param alpha Number between 0 and 1, indicating the transparency level to be
 #'   used in the maps. For choropleth maps, this determines the transparency
 #'   level for the mega counties. For bubble maps, this determines the
@@ -48,6 +48,8 @@
 #'   the different plot types, for further customization. See details below.
 #' @param ... Additional arguments, for compatibility with `plot()`. Currently
 #'   unused.
+#' @return A `ggplot` object that can be customized and styled using standard
+#'   ggplot2 functions.
 #'
 #' @details The following named arguments are supported through the lists
 #'   `choro_params`, `bubble_params`, and `line_params`.

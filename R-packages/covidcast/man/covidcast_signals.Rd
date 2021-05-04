@@ -18,11 +18,11 @@ covidcast_signals(
 }
 \arguments{
 \item{data_source}{String identifying the data source to query. See
-https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
+\url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 for a list of available data sources.}
 
 \item{signal}{String identifying the signal from that source to query. Again,
-see https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html
+see \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}
 for a list of available signals.}
 
 \item{start_day}{Query data beginning on this date. Date object, or string in
@@ -35,13 +35,13 @@ recent day data is available for this signal.}
 
 \item{geo_type}{The geography type for which to request this data, such as
 "county" or "state". Defaults to "county". See
-https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
+\url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}
 for details on which types are available.}
 
 \item{geo_values}{Which geographies to return. The default, "*", fetches all
 geographies. To fetch specific geographies, specify their IDs as a vector
 or list of strings. See
-https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html
+\url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}
 for details on how to specify these IDs.}
 
 \item{as_of}{Fetch only data that was available on or before this date,

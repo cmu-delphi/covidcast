@@ -93,8 +93,8 @@ apply_shifts_one <- function(x, dt) {
 #' Aggregates `covidcast_signal` objects into one data frame, in either "wide"
 #' or "long" format. (In "wide" aggregation, only the latest issue from each
 #' data frame is retained, and several columns, including `data_source` and
-#' `signal` are dropped; see details below). See the multiple signals vignette
-#' for examples.
+#' `signal` are dropped; see details below). See `vignette("multi-signals",
+#' package = "covidcast")` for examples.
 #'
 #' @param x Single `covidcast_signal` data frame, or a list of such data
 #'   frames, such as is returned by `covidcast_signals()`.

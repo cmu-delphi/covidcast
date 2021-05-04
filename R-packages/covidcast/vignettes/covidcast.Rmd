@@ -16,27 +16,6 @@ data is provided as a simple data frame, you can also wrangle it into whatever
 form you need to conduct your desired analyses using other packages and
 functions.
 
-## Installing
-
-This package is not on CRAN yet, so it can be installed using the
-[`devtools`](https://cran.r-project.org/package=devtools) package:
-
-```{r, eval = FALSE}
-devtools::install_github("cmu-delphi/covidcast", ref = "main",
-                         subdir = "R-packages/covidcast")
-```
-
-Building the vignettes, such as this Getting Started guide, takes a substantial
-amount of time. They are not included in the package by default. If you wish to
-include vignettes, use this modified command:
-
-```{r, eval = FALSE}
-devtools::install_github("cmu-delphi/covidcast", ref = "main",
-                         subdir = "R-packages/covidcast",
-                         build_vignettes = TRUE,
-                         dependencies = TRUE)
-```
-
 ## Basic examples
 
 To obtain smoothed estimates of COVID-like illness from our Facebook survey for
@@ -117,10 +96,10 @@ For more details and examples, including choropleth and bubble maps, see
 ### Finding signals of interest
 
 Above we used data from [Delphi's symptom
-surveys](https://covidcast.cmu.edu/surveys.html), but the COVIDcast API includes
-numerous data streams: medical claims data, cases and deaths, mobility, and many
-others; new signals are added regularly. This can make it a challenge to find
-the data stream that you are most interested in.
+surveys](https://delphi.cmu.edu/covidcast/surveys/), but the COVIDcast API
+includes numerous data streams: medical claims data, cases and deaths, mobility,
+and many others; new signals are added regularly. This can make it a challenge
+to find the data stream that you are most interested in.
 
 The [COVIDcast Data Sources and Signals
 documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)

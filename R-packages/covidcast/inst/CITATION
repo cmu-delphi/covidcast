@@ -16,7 +16,8 @@ bibentry(bibtype = "Manual",
                     person(given = "Ryan", family = "Tibshirani")),
          year = year,
          note = note,
-         url = "https://cmu-delphi.github.io/covidcast/covidcastR/")
+         url = "https://cmu-delphi.github.io/covidcast/covidcastR/",
+         key = "covidcast")
 
 citFooter(paste0(
   c("For information about citing the datasets provided by the API, see: ",

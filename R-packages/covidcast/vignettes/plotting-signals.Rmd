@@ -54,10 +54,10 @@ plot(comb)
 ```
 
 The color scheme is automatically chosen to be similar to that used on the
-online [COVIDcast mapping tool](https://covidcast.cmu.edu). Also, by default,
-this map shows the most recent day of data available in the data frame. One can
-choose the day and also choose the color scales, transparency level for mega
-counties, and title:
+online [COVIDcast mapping tool](https://delphi.cmu.edu/covidcast/). Also, by
+default, this map shows the most recent day of data available in the data frame.
+One can choose the day and also choose the color scales, transparency level for
+mega counties, and title:
 
 ```{r}
 plot(comb, time_value = "2020-07-04", choro_col = cm.colors(10), alpha = 0.4,

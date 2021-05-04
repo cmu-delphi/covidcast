@@ -96,10 +96,10 @@ For more details and examples, including choropleth and bubble maps, see
 ### Finding signals of interest
 
 Above we used data from [Delphi's symptom
-surveys](https://covidcast.cmu.edu/surveys.html), but the COVIDcast API includes
-numerous data streams: medical claims data, cases and deaths, mobility, and many
-others; new signals are added regularly. This can make it a challenge to find
-the data stream that you are most interested in.
+surveys](https://delphi.cmu.edu/covidcast/surveys/), but the COVIDcast API
+includes numerous data streams: medical claims data, cases and deaths, mobility,
+and many others; new signals are added regularly. This can make it a challenge
+to find the data stream that you are most interested in.
 
 The [COVIDcast Data Sources and Signals
 documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)

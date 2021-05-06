@@ -1,5 +1,6 @@
 library(ggplot2)
 library(sf)
+library(rmapshaper)
 library(dplyr)
 
 simplify_shape <- function(shp_obj, crs, plot_name = NULL)
@@ -19,9 +20,7 @@ simplify_shape <- function(shp_obj, crs, plot_name = NULL)
   }
 
   # Simplify and validate
-  shp_simple <- st_simplify(
-    shp_simple, preserveTopology = TRUE, dTolerance = 10000
-  )
+  shp_simple <- rmapshaper::ms_simplify(shp_simple, keep = 0.05)
   shp_simple <- st_make_valid(shp_simple)
 
   # Plot to verify
@@ -64,10 +63,23 @@ save_shp <- function(shp_obj, map_name)
 
 # Run the functions above for the four geographies; Note, the projection is not
 # great for the U.S. territories, but appears to work OK for simplification
-for (map_name in c("msa", "state", "hrr"))
+for (map_name in c("msa", "state", "hrr", "county"))
 {
   # Simplfy shapes using U.S. centered Albers (CRS => 5070)
   shp_obj <- read_sf(file.path("geo", map_name))
   shp_simple <- simplify_shape(shp_obj, 5070, map_name)
   save_shp(shp_simple, map_name)
+}
+
+# If you want to test a single state, you can do that here:
+if (FALSE)
+{
+  map_name <- "county"
+  fname <- sprintf("%s.geojson.bz2", map_name)
+  oname <- file.path("../covidcast/inst/shapefiles", fname)
+  geojson <- paste(readLines(oname), collapse = "")
+  map_df <- sf::st_read(dsn = geojson, quiet = TRUE)
+
+  map_df %>% filter(STATEFP == 26) %>%
+    ggplot() + geom_sf() + theme_void()
 }

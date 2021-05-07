@@ -3,15 +3,15 @@
 #' Computes correlations between two `covidcast_signal` data frames, allowing
 #' for slicing by geo location, or by time. (Only the latest issue from each
 #' data frame is used for correlations.) See the correlations vignette
-#' for examples: `vignette("correlation-utils", package = "covidcast")`
+#' for examples: `vignette("correlation-utils", package = "covidcast")`.
 #'
 #' @param x,y The `covidcast_signal` data frames to correlate.
-#' @param dt_x,dt_y Time shifts to consider for `x` and `y`, respectively,
-#'   before computing correlations. Negative shifts translate into in a lag
-#'   value and positive shifts into a lead value; for example, if `dt = -1`,
-#'   then the new value on June 2 is the original value on June 1; if `dt = 1`,
-#'   then the new value on June 2 is the original value on June 3; if `dt = 0`,
-#'   then the values are left as is. Default is 0 for both `dt_x` and `dt_y`.
+#' @param dt_x,dt_y Time shifts (in days) to consider for `x` and `y`,
+#'   respectively, before computing correlations. Default is 0. Negative shifts
+#'   translate into in a lag value and positive shifts into a lead value; for
+#'   example, setting `dt_y = 2` results in values of `y` being shifted earlier
+#'   (leading) by 2 days before correlation, so values of `x` are correlated
+#'   with values of `y` from two days later.
 #' @param by If "geo_value", then correlations are computed for each geo
 #'   location, over all time. Each correlation is measured between two time
 #'   series at the same location. If "time_value", then correlations are
@@ -21,8 +21,33 @@
 #'   default for `use` (different than `cor()`) and "pearson" the default for
 #'   `method` (same as `cor()`).
 #'
-#' @return A data frame with first column `geo_value` or `time_value` (depending
-#'   on `by`), and second column `value`, which gives the correlation.
+#' @return A data frame with first column `geo_value` or `time_value` (matching
+#'   `by`), and second column `value`, which gives the correlation.
+#'
+#' @examples
+#' \dontrun{
+#' # For all these examples, let x and y be two signals measured at the county
+#' # level over several months.
+#'
+#' ## `by = "geo_value"`
+#' # Correlate each county's time series together, returning one correlation per
+#' # county:
+#' covidcast_cor(x, y, by = "geo_value")
+#'
+#' # Correlate x in each county with values of y 14 days later
+#' covidcast_cor(x, y, dt_y = 14, by = "geo_value")
+#'
+#' # Equivalently, x can be shifted -14 days:
+#' covidcast_cor(x, y, dt_x = -14, by = "geo_value")
+#'
+#' ## `by = "time_value"`
+#' # For each date, correlate x's values in every county against y's values in
+#' # the same counties. Returns one correlation per date:
+#' covidcast_cor(x, y, by = "time_value")
+#'
+#' # Correlate x values across counties against y values 7 days later
+#' covidcast_cor(x, y, dt_y = 7, by = "time_value")
+#' }
 #'
 #' @importFrom stats cor
 #' @export

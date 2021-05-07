@@ -10,7 +10,8 @@ vignette: >
 
 ```{r, setup, include=FALSE}
 knitr::opts_chunk$set(
-  comment = '', fig.width = 6, fig.height = 6, fig.path = 'figures/corr-'
+  comment = "", fig.width = 6, fig.height = 6, fig.path = "figures/corr-",
+  fig.cap = ""
 )
 ```
 
@@ -18,8 +19,9 @@ The covidcast package provides some simple utilities for exploring the
 correlations between two signals, over space or time, which may be helpful for
 simple analyses and explorations of data.
 
-For these examples, we'll load confirmed case and death rates, and restrict our
-analysis to counties with at least 500 total cases by August 15th.
+For these examples, we'll load confirmed case and death rates per 100,000
+population, and restrict our analysis to counties with at least 500 total cases
+by August 15th.
 
 ```{r, message = FALSE}
 library(covidcast)
@@ -28,30 +30,27 @@ library(dplyr)
 start_day <- "2020-03-01"
 end_day <- "2020-08-15"
 
-iprop <- suppressMessages(
-  covidcast_signal(data_source = "jhu-csse",
-                   signal = "confirmed_7dav_incidence_prop",
-                   start_day = start_day, end_day = end_day)
-)
-summary(iprop)
+iprop <- covidcast_signal(
+  data_source = "jhu-csse",
+  signal = "confirmed_7dav_incidence_prop",
+  start_day = start_day, end_day = end_day)
 
-dprop <- suppressMessages(
-  covidcast_signal(data_source = "jhu-csse",
-                   signal = "deaths_7dav_incidence_prop",
-                   start_day = start_day, end_day = end_day)
-)
-summary(dprop)
+dprop <- covidcast_signal(
+  data_source = "jhu-csse",
+  signal = "deaths_7dav_incidence_prop",
+  start_day = start_day, end_day = end_day)
 
 # Restrict attention to "active" counties with at least 500 total cases
 case_num <- 500
-geo_values <- suppressMessages(
-  covidcast_signal(data_source = "jhu-csse",
-                   signal = "confirmed_cumulative_num",
-                   start_day = end_day, end_day = end_day) %>%
-  filter(value >= case_num) %>% pull(geo_value)
-)
-iprop_act <- iprop %>% filter(geo_value %in% geo_values)
-dprop_act <- dprop %>% filter(geo_value %in% geo_values)
+geo_values <- covidcast_signal(
+  data_source = "jhu-csse",
+  signal = "confirmed_cumulative_num",
+  start_day = end_day, end_day = end_day) %>%
+  filter(value >= case_num) %>%
+  pull(geo_value)
+
+cases <- iprop %>% filter(geo_value %in% geo_values)
+deaths <- dprop %>% filter(geo_value %in% geo_values)
 ```
 
 ## Correlations sliced by time
@@ -69,7 +68,7 @@ by setting `by = "time_value"`:
 library(ggplot2)
 
 # Compute correlation per time, over all counties
-df_cor <- covidcast_cor(iprop_act, dprop_act, by = "time_value")
+df_cor <- covidcast_cor(cases, deaths, by = "time_value")
 
 # Plot the correlation time series
 ggplot(df_cor, aes(x = time_value, y = value)) + geom_line() +
@@ -95,16 +94,16 @@ We might also be interested in how case rates associate with death rates in the
 *future*. Using the `dt_x` parameter in `covidcast_cor()`, we can lag case rates
 back any number of days we want, before calculating correlations.
 
-Here we set `dt_x = -10`. This means that `iprop_act` will be lagged by 10 days,
+Here we set `dt_x = -10`. This means that `cases` will be lagged by 10 days,
 meaning that cases on June 1st will be correlated with deaths on June 11th. (It
 might help to think of it this way: deaths on a certain day will be correlated
 with cases with an offset of -10 days.)
 
 ```{r, warning = FALSE}
 # Use Spearman correlation, with case rates and 10-day lagged case rates
-df_cor1 <- covidcast_cor(iprop_act, dprop_act, by = "time_value",
+df_cor1 <- covidcast_cor(cases, deaths, by = "time_value",
                          method = "spearman")
-df_cor2 <- covidcast_cor(iprop_act, dprop_act, by = "time_value", dt_x = -10,
+df_cor2 <- covidcast_cor(cases, deaths, by = "time_value", dt_x = -10,
                          method = "spearman")
 
 # Stack rowwise into one data frame, then plot time series
@@ -133,8 +132,8 @@ both for observations at the same time and for 10-day lagged case rates:
 
 ```{r, warning = FALSE}
 # Compute correlation per county, over all times
-df_cor1 <- covidcast_cor(iprop_act, dprop_act, by = "geo_value")
-df_cor2 <- covidcast_cor(iprop_act, dprop_act, by = "geo_value", dt_x = -10)
+df_cor1 <- covidcast_cor(cases, deaths, by = "geo_value")
+df_cor2 <- covidcast_cor(cases, deaths, by = "geo_value", dt_x = -10)
 
 # Stack rowwise into one data frame, then plot densities
 df_cor <- rbind(df_cor1, df_cor2)
@@ -173,8 +172,8 @@ this:
 # Loop over values for dt, and compute correlations per county
 dt_vec <- -(0:15)
 df_list <- vector("list", length(dt_vec))
-for (i in 1:length(dt_vec)) {
-  df_list[[i]] <- covidcast_cor(iprop_act, dprop_act, dt_x = dt_vec[i],
+for (i in seq_along(dt_vec)) {
+  df_list[[i]] <- covidcast_cor(cases, deaths, dt_x = dt_vec[i],
                                by = "geo_value")
   df_list[[i]]$dt <- dt_vec[i]
 }
@@ -184,7 +183,9 @@ df <- do.call(rbind, df_list)
 df %>%
   group_by(dt) %>%
   summarize(median = median(value, na.rm = TRUE), .groups = "drop_last") %>%
-  ggplot(aes(x = dt, y = median)) + geom_line() + geom_point() +
+  ggplot(aes(x = dt, y = median)) +
+  geom_line() +
+  geom_point() +
   labs(title = "Median correlation between case and death rates",
        x = "dt", y = "Correlation") +
   theme(legend.position = "bottom", legend.title = element_blank())

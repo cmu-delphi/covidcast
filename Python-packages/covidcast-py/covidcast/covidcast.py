@@ -431,7 +431,7 @@ def _fetch_epidata(data_source: str,
         # In the too-much-data case, we continue to try putting the truncated
         # data in our results. In the no-data case, skip this day entirely,
         # since there is no "epidata" in the response.
-        if "epidata" in day_data:
+        if day_data.get("epidata"):
             dfs.append(pd.DataFrame.from_dict(day_data["epidata"]))
         cur_day += timedelta(1) if time_type == "day" else timedelta(7)
     return dfs
@@ -484,7 +484,7 @@ def _async_fetch_epidata(data_source: str,
             warnings.warn(f"Problem obtaining {data_source} {signal} "
                           f"data on {params['time_values']} "
                           f"for geography '{geo_type}': {day_data['message']}", RuntimeWarning)
-        if "epidata" in day_data:
+        if day_data.get("epidata"):
             dfs.append(pd.DataFrame.from_dict(day_data["epidata"]))
     return dfs
 

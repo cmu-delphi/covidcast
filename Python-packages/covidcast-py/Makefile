@@ -1,4 +1,4 @@
-.PHONY = venv, install-ci, install, build, lint, test, clean
+.PHONY: venv install-ci install build lint test clean
 
 
 venv:

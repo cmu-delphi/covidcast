@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v0.1.5, May 11, 2021
+--------------------
+
+- New feature: :py:func:`covidcast.signal` now supports fetching signals using
+  ``time_type="week"`` (when available from the Epidata API).
+- Bug fix: Better detection of API error conditions when queries fail.
+
 v0.1.4, February 24, 2021
 -------------------------
 

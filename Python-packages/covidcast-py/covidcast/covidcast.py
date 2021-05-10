@@ -77,11 +77,11 @@ def signal(data_source: str,
       such as ``"smoothed_cli"``.
     :param start_day: Query data beginning on this date. Provided as a
       ``datetime.date`` object. If ``start_day`` is ``None``, defaults to the
-      first day data is available for this signal. If time_type == "week", then
+      first day data is available for this signal. If ``time_type == "week"``, then
       this is rounded to the epiweek containing the day (i.e. the previous Sunday).
     :param end_day: Query data up to this date, inclusive. Provided as a
       ``datetime.date`` object. If ``end_day`` is ``None``, defaults to the most
-      recent day data is available for this signal. If time_type == "week", then
+      recent day data is available for this signal. If ``time_type == "week"``, then
       this is rounded to the epiweek containing the day (i.e. the previous Sunday).
     :param geo_type: The geography type for which to request this data, such as
       ``"county"`` or ``"state"``. Available types are described in the
@@ -92,7 +92,7 @@ def signal(data_source: str,
       ...) of strings.
     :param as_of: Fetch only data that was available on or before this date,
       provided as a ``datetime.date`` object. If ``None``, the default, return
-      the most recent available data. If time_type == "week", then
+      the most recent available data. If ``time_type == "week"``, then
       this is rounded to the epiweek containing the day (i.e. the previous Sunday).
     :param issues: Fetch only data that was published or updated ("issued") on
       these dates. Provided as either a single ``datetime.date`` object,
@@ -100,7 +100,7 @@ def signal(data_source: str,
       specifying (start, end) dates. In this case, return all data issued in
       this range. There may be multiple rows for each observation, indicating
       several updates to its value. If ``None``, the default, return the most
-      recently issued data. If time_type == "week", then these are rounded to
+      recently issued data. If ``time_type == "week"``, then these are rounded to
       the epiweek containing the day (i.e. the previous Sunday).
     :param lag: Integer. If, for example, ``lag=3``, fetch only data that was
       published or updated exactly 3 days after the date. For example, a row
@@ -127,7 +127,7 @@ def signal(data_source: str,
       ``time_value``
         Contains a `pandas Timestamp object
         <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_
-        identifying the date this estimate is for. For data with `time_type = "week"`, this
+        identifying the date this estimate is for. For data with ``time_type = "week"``, this
         is the first day of the corresponding epiweek.
 
       ``issue``

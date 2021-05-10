@@ -17,11 +17,11 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'COVIDcast API client'
-copyright = '2020, Delphi research group'
+copyright = '2021, Delphi research group'
 author = 'Delphi research group'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.4'
+release = '0.1.5'
 
 
 # -- General configuration ---------------------------------------------------
@@ -59,7 +59,7 @@ html_static_path = ["videos"]
 html_theme_options = {
     "extra_nav_links": {
         "Delphi group": "https://delphi.cmu.edu/",
-        "COVIDcast maps": "https://covidcast.cmu.edu/",
+        "COVIDcast maps": "https://delphi.cmu.edu/covidcast/",
         "COVIDcast API": "https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html"
     }
 }

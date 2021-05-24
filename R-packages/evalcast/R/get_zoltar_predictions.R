@@ -22,8 +22,8 @@
 #' @param incidence_period one of "epiweek" or "day". NULL will attempt to fetch
 #'   both
 #' @param signal this function supports only "confirmed_incidence_num",
-#'   "deaths_incidence_num", and/or "deaths_cumulative_num" (those currently)
-#'   forecast by the COVIDhub-ensemble). For other types, use one of the 
+#'   "deaths_incidence_num", "deaths_cumulative_num", and/or
+#'   "confirmed_admissions_covid_1d". For other types, use one of the 
 #'   alternatives mentioned above
 #' @param as_of only forecasts available as of this date will be retrieved.
 #'   Default (NULL) is effectively as of today
@@ -41,7 +41,8 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
                                    incidence_period = c("epiweek", "day"),
                                    signal = c("confirmed_incidence_num",
                                               "deaths_incidence_num",
-                                              "deaths_cumulative_num"),
+                                              "deaths_cumulative_num",
+                                              "confirmed_admissions_covid_1d"),
                                    as_of = NULL){
   if (is.null(geo_values) || geo_values == "*"){
     geo_values <- NULL
@@ -58,9 +59,11 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
   } else {
     sig <- match.arg(signal, c("confirmed_incidence_num", 
                                "deaths_incidence_num",
-                               "deaths_cumulative_num"), TRUE)
-    cd <- ifelse(substr(sig, 1, 1)=="c", "case", "death")
-    ic <- ifelse(str_extract(sig,"(?<=_)[ci]") == "c", "cum", "inc")
+                               "deaths_cumulative_num",
+                               "confirmed_admissions_covid_1d"), TRUE)
+    cd <- ifelse(startsWith(sig, "deaths"), "death",
+                 ifelse(sig == "confirmed_incidence_num", "case", "hosp"))
+    ic <- ifelse(str_detect(sig, "cum"), "cum", "inc")
     incidence_period <- match.arg(incidence_period, c("epiweek","day"))
     dw <- ifelse(incidence_period == "epiweek", "wk", "day")
     targets <- paste(dw, "ahead", ic, cd)
@@ -117,11 +120,18 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
       .data$incidence_period == "wk", "epiweek","day"),
       ahead = as.numeric(.data$ahead),
       inc = if_else(.data$inc == "inc", "incidence", "cumulative"),
-      response = case_when(.data$response == "death" ~ "deaths", 
+      response = case_when(.data$response == "death" ~ "deaths",
                            .data$response == "case" ~ "confirmed",
-                           TRUE ~ "drop",),
-      signal = paste(.data$response, .data$inc, "num", sep="_"),
-      data_source = if_else(.data$response == "drop", "drop", "jhu-csse"),
+                           .data$response == "hosp" ~ "hosp",
+                           TRUE ~ "drop"),
+      data_source = case_when(.data$response == "deaths" ~ "jhu-csse",
+                              .data$response == "confirmed" ~ "jhu-csse",
+                              .data$response == "hosp" ~ "hhs",
+                              TRUE ~ "drop"),
+      signal = case_when(
+        .data$data_source == "jhu-csse" ~ paste(.data$response, .data$inc, "num", sep="_"),
+        .data$data_source == "hhs" & .data$inc == "incidence" ~ "confirmed_admissions_covid_1d",
+        TRUE ~ "drop"),
       forecast_date = lubridate::ymd(.data$forecast_date),
       target_end_date = .data$forecast_date + .data$ahead)
   epw <- forecasts$incidence_period == "epiweek"
@@ -129,7 +139,7 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
     forecasts$forecast_date[epw], "epiweek", forecasts$ahead[epw])$end
   
   forecasts <- forecasts %>%
-    filter(.data$response != "hosp") %>%
+    filter(.data$response != "drop") %>%
     select(.data$ahead, .data$geo_value, .data$quantile, .data$value,
                   .data$forecaster, .data$forecast_date, .data$data_source,
                   .data$signal, .data$target_end_date, 

@@ -19,8 +19,8 @@
 #' @param incidence_period one of "epiweek" or "day". NULL will attempt to
 #'   return both
 #' @param signal this function supports only "confirmed_incidence_num",
-#'   "deaths_incidence_num", and/or "deaths_cumulative_num" (those currently
-#'   forecast by the COVIDhub-ensemble). For other types, use one of the
+#'   "deaths_incidence_num", "deaths_cumulative_num", and/or
+#'   "confirmed_admissions_covid_1d". For other types, use one of the
 #'   alternatives mentioned above
 #' @param predictions_cards An object of class `predicitions_cards` that
 #'   contains previously retrieved predictions. If provided, files will not be
@@ -55,7 +55,8 @@ get_covidhub_predictions <- function(
   incidence_period = c("epiweek", "day"),
   signal = c("confirmed_incidence_num",
              "deaths_incidence_num",
-             "deaths_cumulative_num"),
+             "deaths_cumulative_num",
+             "confirmed_admissions_covid_1d"),
   predictions_cards = NULL,
   start_date = NULL,
   end_date = NULL,
@@ -86,12 +87,12 @@ get_covidhub_predictions <- function(
       }
     }
   }
-  
+
   num_forecasters = length(covidhub_forecaster_name)
   predictions_cards_list <- vector("list",
                                    length = num_forecasters)
   if (verbose){
-    cat(str_interp("Getting forecasts for ${num_forecasters} forecasters.\n")) 
+    cat(str_interp("Getting forecasts for ${num_forecasters} forecasters.\n"))
   }
   if ("use_disk" %in% names(extra_args) && extra_args$use_disk) {
     get_forecaster_preds_fn <- get_forecaster_predictions_alt
@@ -198,20 +199,20 @@ get_forecast_dates <- function(forecasters,
 #' @param forecast_type "quantile", "point" or both (the default)
 #' @param ahead number of periods ahead for which the forecast is required.
 #'   NULL will fetch all available aheads
-#' @param incidence_period one of "epiweek" or "day". NULL will attempt to 
+#' @param incidence_period one of "epiweek" or "day". NULL will attempt to
 #'   return both
 #' @param signal this function supports only "confirmed_incidence_num",
-#'   "deaths_incidence_num", and/or "deaths_cumulative_num" (those currently
-#'   forecast by the COVIDhub-ensemble). For other types, use one of the 
+#'   "deaths_incidence_num", "deaths_cumulative_num", and/or
+#'   "confirmed_admissions_covid_1d". For other types, use one of the
 #'   alternatives mentioned above
-#'   
+#'
 #' @template predictions_cards-template
-#' 
+#'
 #' @seealso [get_predictions()]
 #' @seealso [get_zoltar_predictions()]
 #' @return Predictions card. For more flexible processing of COVID Hub data, try
 #'   using [zoltr](https://docs.zoltardata.com/zoltr/)
-#' 
+#'
 #' @importFrom data.table fread
 get_forecaster_predictions <- function(covidhub_forecaster_name,
                                        forecast_dates = NULL,
@@ -221,7 +222,8 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
                                        incidence_period = c("epiweek", "day"),
                                        signal = c("confirmed_incidence_num",
                                                   "deaths_incidence_num",
-                                                  "deaths_cumulative_num")
+                                                  "deaths_cumulative_num",
+                                                  "confirmed_admissions_covid_1d")
 ) {
   url <- "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed"
   pcards <- list()
@@ -243,31 +245,38 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
                                  type = "character"),
                   data.table = FALSE,
                   showProgress = FALSE)
-    # Specifying the date conversion after significantly speeds up loading 
+    # Specifying the date conversion after significantly speeds up loading
     # (~3x faster) for some reason
     pred$target_end_date = as.Date(pred$target_end_date)
     pred$forecast_date = as.Date(pred$forecast_date)
-    
+
     pcards[[forecast_date]] <- pred %>%
       separate(.data$target,
                into = c("ahead", "incidence_period", NA, "inc", "response"),
                remove = TRUE) %>%
-      mutate(forecaster = covidhub_forecaster_name, 
+      mutate(forecaster = covidhub_forecaster_name,
              incidence_period = if_else(
                .data$incidence_period == "wk", "epiweek","day"),
              inc = if_else(.data$inc == "inc", "incidence", "cumulative"),
-             response = case_when(.data$response == "death" ~ "deaths", 
+             response = case_when(.data$response == "death" ~ "deaths",
                                   .data$response == "case" ~ "confirmed",
-                                  TRUE ~ "drop",),
-             signal = paste(.data$response, .data$inc, "num", sep="_"),
-             data_source = if_else(.data$response=="drop", "drop", "jhu-csse"),
+                                  .data$response == "hosp" ~ "hosp",
+                                  TRUE ~ "drop"),
+             data_source = case_when(.data$response == "deaths" ~ "jhu-csse",
+                                  .data$response == "confirmed" ~ "jhu-csse",
+                                  .data$response == "hosp" ~ "hhs",
+                                  TRUE ~ "drop"),
+             signal = case_when(
+               .data$data_source == "jhu-csse" ~ paste(.data$response, .data$inc, "num", sep="_"),
+               .data$data_source == "hhs" & .data$inc == "incidence" ~ "confirmed_admissions_covid_1d",
+               TRUE ~ "drop"),
              ahead = as.integer(.data$ahead)) %>%
       filter(.data$response != "drop", .data$type %in% forecast_type,
              .data$incidence_period %in% incidence_period,
              .data$signal %in% signal) %>%
       select(.data$ahead, .data$location, .data$quantile, .data$value,
                .data$forecaster, .data$forecast_date, .data$data_source,
-               .data$signal, .data$target_end_date, 
+               .data$signal, .data$target_end_date,
                .data$incidence_period)
   }
   pcards <- bind_rows(pcards) %>%
@@ -305,20 +314,20 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
 #' @param forecast_type "quantile", "point" or both (the default)
 #' @param ahead number of periods ahead for which the forecast is required.
 #'   NULL will fetch all available aheads
-#' @param incidence_period one of "epiweek" or "day". NULL will attempt to 
+#' @param incidence_period one of "epiweek" or "day". NULL will attempt to
 #'   return both
 #' @param signal this function supports only "confirmed_incidence_num",
-#'   "deaths_incidence_num", and/or "deaths_cumulative_num" (those currently
-#'   forecast by the COVIDhub-ensemble). For other types, use one of the 
+#'   "deaths_incidence_num", "deaths_cumulative_num", and/or
+#'   "confirmed_admissions_covid_1d". For other types, use one of the
 #'   alternatives mentioned above
-#'   
+#'
 #' @template predictions_cards-template
-#' 
+#'
 #' @seealso [get_predictions()]
 #' @seealso [get_zoltar_predictions()]
 #' @return Predictions card. For more flexible processing of COVID Hub data, try
 #'   using [zoltr](https://docs.zoltardata.com/zoltr/)
-#' 
+#'
 #' @importFrom arrow open_dataset schema string
 #' @importFrom utils download.file
 get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
@@ -329,7 +338,8 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
                                            incidence_period = c("epiweek", "day"),
                                            signal = c("confirmed_incidence_num",
                                                       "deaths_incidence_num",
-                                                      "deaths_cumulative_num")
+                                                      "deaths_cumulative_num",
+                                                      "confirmed_admissions_covid_1d")
 ) {
   url <- "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed"
   if (is.null(forecast_dates))
@@ -373,11 +383,18 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
              remove = FALSE, sep = " ") %>%
     mutate(incidence_period = if_else(.data$incidence_period == "wk", "epiweek","day"),
            inc = if_else(.data$inc == "inc", "incidence", "cumulative"),
-           response = case_when(.data$response == "death" ~ "deaths", 
+           response = case_when(.data$response == "death" ~ "deaths",
                                 .data$response == "case" ~ "confirmed",
-                                TRUE ~ "drop",),
-           signal = paste(.data$response, .data$inc, "num", sep="_"),
-           data_source = if_else(.data$response=="drop", "drop", "jhu-csse"),
+                                .data$response == "hosp" ~ "hosp",
+                                TRUE ~ "drop"),
+           data_source = case_when(.data$response == "deaths" ~ "jhu-csse",
+                                   .data$response == "confirmed" ~ "jhu-csse",
+                                   .data$response == "hosp" ~ "hhs",
+                                   TRUE ~ "drop"),
+           signal = case_when(
+             .data$data_source == "jhu-csse" ~ paste(.data$response, .data$inc, "num", sep="_"),
+             .data$data_source == "hhs" & .data$inc == "incidence" ~ "confirmed_admissions_covid_1d",
+             TRUE ~ "drop"),
            ahead = as.integer(.data$ahead))
 
   pcards <- ds %>%
@@ -391,14 +408,14 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
              value = as.double(value)) %>%
       relocate(.data$ahead, .data$location, .data$quantile, .data$value,
                .data$forecaster, .data$forecast_date, .data$data_source,
-               .data$signal, .data$target_end_date, 
+               .data$signal, .data$target_end_date,
                .data$incidence_period) %>%
       filter(.data$response != "drop", .data$type %in% forecast_type,
              .data$incidence_period %in% incidence_period,
              .data$signal %in% signal) %>%
       select(.data$ahead, .data$location, .data$quantile, .data$value,
                .data$forecaster, .data$forecast_date, .data$data_source,
-               .data$signal, .data$target_end_date, 
+               .data$signal, .data$target_end_date,
                .data$incidence_period)
 
   pcards <- pcards %>%
@@ -415,23 +432,23 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
   }
   pcards <- filter(pcards, .data$signal %in% !!signal)
   class(pcards) = c("predictions_cards", class(pcards))
-  
+
   # Cleanup, delete downloaded CSVs from disk
   unlink(file.path("data", covidhub_forecaster_name), recursive = TRUE)
-  
+
   pcards
 }
 
 #' Get available forecast dates for a forecaster on the COVID Hub
 #'
 #' Retrieves the forecast dates that a forecaster submitted to
-#' the [COVID Hub](https://github.com/reichlab/covid19-forecast-hub/). 
+#' the [COVID Hub](https://github.com/reichlab/covid19-forecast-hub/).
 #'
 #' @param forecaster_name String indicating of the forecaster
 #'   (matching what it is called on the COVID Hub).
-#'   
+#'
 #' @return vector of forecast dates
-#' 
+#'
 #' @export
 get_covidhub_forecast_dates <- function(forecaster_name) {
   url <- "https://github.com/reichlab/covid19-forecast-hub/tree/master/data-processed/"
@@ -485,11 +502,11 @@ get_covidhub_forecaster_names <- function(
 
 
 #' Vector of quantiles used for submission to the COVID 19 Forecast Hub
-#' 
+#'
 #' See the [Forecast Hub Documentation](https://github.com/reichlab/covid19-forecast-hub/blob/master/data-processed/README.md#quantile)
 #' for more details.
 #'
-#' @param type defaults to the "standard" set of 23 quantiles. Setting 
+#' @param type defaults to the "standard" set of 23 quantiles. Setting
 #'   `type = "inc_case"` will return a set of 7 quantiles used for incident
 #'   cases.
 #'

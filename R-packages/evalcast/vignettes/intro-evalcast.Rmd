@@ -10,7 +10,7 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   echo = TRUE, message = FALSE, warning = FALSE,
-  collapse = TRUE,
+  collapse = TRUE, cache=TRUE,
   comment = "#>"
 )
 ```
@@ -33,9 +33,9 @@ library(dplyr)
 library(magrittr)
 library(ggplot2)
 signals <- tibble(data_source = "jhu-csse", 
-                  signal = c("deaths_incidence_num", 
-                             "confirmed_incidence_num"), 
-                  start_day = "2020-06-15")
+                  signal = "deaths_incidence_num", 
+                  start_day = "2020-06-15",
+                  geo_type = "state")
 signals
 ```
 
@@ -67,9 +67,10 @@ predictions_cards <- get_predictions(baseline_forecaster,
                                      signals = signals,
                                      forecast_dates = forecast_dates_dec,
                                      incidence_period = "epiweek",
-                                     ahead = 3,
-                                     signal_aggregation = "long",
-                                     geo_type = "state")
+                                     forecaster_args = list(
+                                       ahead = 3
+                                     )
+)
 
 predictions <- bind_rows(predictions_cards, predictions_cards_cmu, predictions_cards_ens)
 
@@ -78,7 +79,7 @@ predictions <- bind_rows(predictions_cards, predictions_cards_cmu, predictions_c
 `get_predictions()` and `get_covidhub_predictions()` return a long data frame with one row for each `(forecast date, ahead, geo_value, quantile)` combination.
 
 ```{r}
-predictions_cards_cmu
+head(predictions_cards_cmu, n=25)
 ```
 
 
@@ -116,9 +117,7 @@ We may now create scorecards for each forecaster's predictions or for a filtered
 
 ```{r}
 scorecards <- evaluate_covid_predictions(
-  bind_rows(predictions_cards, 
-            predictions_cards_cmu, 
-            predictions_cards_ens),
+  predictions,
   err_measures = err_measures,
   backfill_buffer = 10,
   geo_type = "state"
@@ -142,7 +141,7 @@ scorecards
 We can examine forecaster calibration.
 
 ```{r}
-plot_calibration(predictions_cards = predictions, geo_type = "state", type = "wedgeplot")
+plot_calibration(predictions_cards = predictions, geo_type = "state", type = "wedgeplot", facet_rows = "forecaster", facet_cols = c("ahead", "forecast_date"))
 ```
 
 By default, the proportion is the number of `geo_values` that fall above/below the quantile at each forecast date and ahead, but the grouping and variables to average over can be specified.
@@ -203,7 +202,4 @@ While the above describes incident forecasting, the same `evalcast` functions ca
 - For example, for `k`-day-ahead cumulative forecasting, choose a cumulative signal from `covidcast` (e.g., `deaths_cumulative_num`), set `incidence_period = "day"` and `ahead = k`.
 
 - For example, for `k`-week-ahead cumulative epiweek forecasting, do the same as above but with `ahead = 7 * k`.
-
-
-
 

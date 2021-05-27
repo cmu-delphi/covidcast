@@ -50,16 +50,13 @@ filter_predictions <- function(predictions,
                                incidence_period,
                                signal) {
   # Filter does not use variables in global environment when variable names is
-  # the same as a column name, so do a workaround.
-  forecast_type <- enquo(forecast_type)
-  incidence_period <- enquo(incidence_period)
-  signal <- enquo(signal)
-  
+  # the same as a column name, so force lists of allowed values to be evaluated
+  # first.
   predictions %>%
     filter(.data$response != "drop",
-           .data$type %in% (!!forecast_type),
-           .data$incidence_period %in% (!!incidence_period),
-           .data$signal %in% (!!signal))
+           .data$type %in% {{ forecast_type }},
+           .data$incidence_period %in% {{ incidence_period }},
+           .data$signal %in% {{ signal }})
 }
 
 #' Select and reorder desired columns for the pcard format

@@ -251,40 +251,13 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
     pred$forecast_date = as.Date(pred$forecast_date)
 
     pcards[[forecast_date]] <- pred %>%
-      separate(.data$target,
-               into = c("ahead", "incidence_period", NA, "inc", "response"),
-               remove = TRUE) %>%
-      mutate(forecaster = covidhub_forecaster_name,
-             incidence_period = if_else(
-               .data$incidence_period == "wk", "epiweek","day"),
-             inc = if_else(.data$inc == "inc", "incidence", "cumulative"),
-             response = case_when(.data$response == "death" ~ "deaths",
-                                  .data$response == "case" ~ "confirmed",
-                                  .data$response == "hosp" ~ "hosp",
-                                  TRUE ~ "drop"),
-             data_source = case_when(.data$response == "deaths" ~ "jhu-csse",
-                                  .data$response == "confirmed" ~ "jhu-csse",
-                                  .data$response == "hosp" ~ "hhs",
-                                  TRUE ~ "drop"),
-             signal = case_when(
-               .data$data_source == "jhu-csse" ~ paste(.data$response, .data$inc, "num", sep="_"),
-               .data$data_source == "hhs" & .data$inc == "incidence" ~ "confirmed_admissions_covid_1d",
-               TRUE ~ "drop"),
-             ahead = as.integer(.data$ahead)) %>%
-      filter(.data$response != "drop", .data$type %in% forecast_type,
-             .data$incidence_period %in% incidence_period,
-             .data$signal %in% signal) %>%
-      select(.data$ahead, .data$location, .data$quantile, .data$value,
-               .data$forecaster, .data$forecast_date, .data$data_source,
-               .data$signal, .data$target_end_date,
-               .data$incidence_period)
+      process_target(remove = TRUE) %>%
+      mutate(forecaster = covidhub_forecaster_name) %>%
+      filter_predictions(forecast_type, incidence_period, signal) %>%
+      select_pcard_cols()
   }
   pcards <- bind_rows(pcards) %>%
-    mutate(geo_value = if_else(nchar(.data$location)==2,
-                               fips_2_abbr(.data$location),
-                               .data$location),
-           location = NULL) %>%
-    relocate(.data$geo_value, .after = .data$ahead)
+    location_2_geo_value()
   if (!identical(geo_values, "*")) {
     pcards <- filter(pcards, .data$geo_value %in% geo_values)
   }
@@ -345,7 +318,6 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
   if (is.null(forecast_dates))
     forecast_dates <- get_covidhub_forecast_dates(covidhub_forecaster_name)
   forecast_dates <- as.character(forecast_dates)
-
   # Download files to disk first
   # File layout is data/<covidhub_forecaster_name>/<forecast_date>/data.csv
   for (forecast_date in forecast_dates) {
@@ -378,24 +350,7 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
     select(.data$target) %>%
     collect() %>%
     distinct() %>%
-    separate(.data$target,
-             into = c("ahead", "incidence_period", NA, "inc", "response"),
-             remove = FALSE, sep = " ") %>%
-    mutate(incidence_period = if_else(.data$incidence_period == "wk", "epiweek","day"),
-           inc = if_else(.data$inc == "inc", "incidence", "cumulative"),
-           response = case_when(.data$response == "death" ~ "deaths",
-                                .data$response == "case" ~ "confirmed",
-                                .data$response == "hosp" ~ "hosp",
-                                TRUE ~ "drop"),
-           data_source = case_when(.data$response == "deaths" ~ "jhu-csse",
-                                   .data$response == "confirmed" ~ "jhu-csse",
-                                   .data$response == "hosp" ~ "hhs",
-                                   TRUE ~ "drop"),
-           signal = case_when(
-             .data$data_source == "jhu-csse" ~ paste(.data$response, .data$inc, "num", sep="_"),
-             .data$data_source == "hhs" & .data$inc == "incidence" ~ "confirmed_admissions_covid_1d",
-             TRUE ~ "drop"),
-           ahead = as.integer(.data$ahead))
+    process_target(remove = FALSE)
 
   pcards <- ds %>%
       collect() %>%
@@ -406,24 +361,11 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
              target_end_date = lubridate::ymd(target_end_date),
              quantile = as.double(quantile),
              value = as.double(value)) %>%
-      relocate(.data$ahead, .data$location, .data$quantile, .data$value,
-               .data$forecaster, .data$forecast_date, .data$data_source,
-               .data$signal, .data$target_end_date,
-               .data$incidence_period) %>%
-      filter(.data$response != "drop", .data$type %in% forecast_type,
-             .data$incidence_period %in% incidence_period,
-             .data$signal %in% signal) %>%
-      select(.data$ahead, .data$location, .data$quantile, .data$value,
-               .data$forecaster, .data$forecast_date, .data$data_source,
-               .data$signal, .data$target_end_date,
-               .data$incidence_period)
+      filter_predictions(forecast_type, incidence_period, signal) %>%
+      select_pcard_cols()
 
   pcards <- pcards %>%
-    mutate(geo_value = if_else(nchar(.data$location)==2,
-                               fips_2_abbr(.data$location),
-                               .data$location),
-           location = NULL) %>%
-    relocate(.data$geo_value, .after = .data$ahead)
+    location_2_geo_value()
   if (!identical(geo_values, "*")) {
     pcards <- filter(pcards, .data$geo_value %in% geo_values)
   }

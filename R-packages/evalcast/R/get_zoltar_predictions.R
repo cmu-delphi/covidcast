@@ -112,27 +112,9 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
     select(.data$model, .data$timezero, .data$unit, 
                   .data$target, .data$quantile, .data$value) %>%
     rename(forecaster = .data$model, forecast_date = .data$timezero,
-           geo_value = .data$unit) %>%
-    separate(.data$target,
-             into = c("ahead", "incidence_period", NA, "inc", "response"),
-             remove = TRUE) %>%
-    mutate(incidence_period = if_else(
-      .data$incidence_period == "wk", "epiweek","day"),
-      ahead = as.numeric(.data$ahead),
-      inc = if_else(.data$inc == "inc", "incidence", "cumulative"),
-      response = case_when(.data$response == "death" ~ "deaths",
-                           .data$response == "case" ~ "confirmed",
-                           .data$response == "hosp" ~ "hosp",
-                           TRUE ~ "drop"),
-      data_source = case_when(.data$response == "deaths" ~ "jhu-csse",
-                              .data$response == "confirmed" ~ "jhu-csse",
-                              .data$response == "hosp" ~ "hhs",
-                              TRUE ~ "drop"),
-      signal = case_when(
-        .data$data_source == "jhu-csse" ~ paste(.data$response, .data$inc, "num", sep="_"),
-        .data$data_source == "hhs" & .data$inc == "incidence" ~ "confirmed_admissions_covid_1d",
-        TRUE ~ "drop"),
-      forecast_date = lubridate::ymd(.data$forecast_date),
+           location = .data$unit) %>%
+    process_target(remove = TRUE) %>% 
+    mutate(forecast_date = lubridate::ymd(.data$forecast_date),
       target_end_date = .data$forecast_date + .data$ahead)
   epw <- forecasts$incidence_period == "epiweek"
   forecasts$target_end_date[epw] <- get_target_period(
@@ -140,15 +122,8 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
   
   forecasts <- forecasts %>%
     filter(.data$response != "drop") %>%
-    select(.data$ahead, .data$geo_value, .data$quantile, .data$value,
-                  .data$forecaster, .data$forecast_date, .data$data_source,
-                  .data$signal, .data$target_end_date, 
-                  .data$incidence_period) %>%
-    mutate(geo_value = if_else(
-      nchar(.data$geo_value) == 2,
-      fips_2_abbr(.data$geo_value),
-      tolower(.data$geo_value)))
-  
+    select_pcard_cols() %>%
+    location_2_geo_value(default_process_fn = tolower)
   if (is.null(signal) && !is.null(ahead)) {
     forecasts <- filter(forecasts, .data$ahead %in% !!ahead)
   }

@@ -1,6 +1,7 @@
 ---
 title: 3. Produce and evaluate quantile forecasts
-description: Produce and evaluate quantile forecasts, based on `quantgen` and `evalcast`.
+description: Produce and evaluate quantile forecasts, based on `quantgen` and 
+  `evalcast`.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{3. Produce and evaluate quantile forecasts}
@@ -8,11 +9,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Note that I'm using covidcast from the "r/0.4.0-release" branch, and evalcast
-from the "evalcast-killcards" branch
+Note that I'm using covidcast from the `r/0.4.0-release` branch, and evalcast
+from the `evalcast-killcards` branch
 
 Also, the code chunk below took a while to run, so I ran it separately and
-saved the results in a file that you can find in the modeltools/vignettes/ 
+saved the results in a file that you can find in the `modeltools/vignettes/` 
 subfolder
 
 ```{r, eval = FALSE, code = readLines("quantgen-forecast-cv.R")}

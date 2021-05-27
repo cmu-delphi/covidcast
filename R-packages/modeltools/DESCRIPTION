@@ -18,7 +18,8 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Remotes:
     github::cmu-delphi/covidcast/R-packages/covidcast@main,
-    github::cmu-delphi/covidcast/R-packages/evalcast@main
+    github::cmu-delphi/covidcast/R-packages/evalcast@evalcast-killcards
+Depends: R (>= 4.1.0)
 Imports: 
     covidcast,
     dplyr,

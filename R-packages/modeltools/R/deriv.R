@@ -76,31 +76,34 @@
 #'   to the `col_name` argument, containing the estimated derivative values. 
 #'
 #' @export
-estimate_deriv = function(x, method = c("lin", "ss", "tf"), n = 14,
-                          col_name = "deriv", keep_obj = FALSE, deriv = 1,
-                          ...) {  
+estimate_deriv <- function(x, method = c("lin", "ss", "tf"), n = 14,
+                           col_name = "deriv", keep_obj = FALSE, deriv = 1,
+                           ...) {  
   # Define the slider function
-  method = match.arg(method)
-  slide_fun = switch(method,
-                     "lin" = linear_reg_deriv,
-                     "ss" = smooth_spline_deriv,
-                     "tf" = trend_filter_deriv)
+  method <- match.arg(method)
+  slide_fun <- switch(method,
+                      "lin" = linear_reg_deriv,
+                      "ss" = smooth_spline_deriv,
+                      "tf" = trendfilter_deriv)
   
   # Check the derivative order
-  if (!(deriv == 1 || deriv == 2)) {
+  if ( !(deriv == 1 || deriv == 2) ){
     stop("`deriv` must be either 1 or 2.")
   }
 
   # Slide the derivative function
-  x = slide_by_geo(x, slide_fun, n, col_name = "temp", col_type = "list",
-                   keep_obj = keep_obj, deriv = deriv, ...)
+  x <- slide_by_geo(x, slide_fun, n, col_name = "temp", col_type = "list",
+                    keep_obj = keep_obj, deriv = deriv, ...)
 
   # Grab the derivative result
-  x = x %>% rowwise() %>% mutate(!!col_name := temp$result)
+  x <- x %>% 
+    rowwise() %>% 
+    mutate(!!col_name := temp$result)
 
   # Grab the derivative object, if we're asked to
-  if (keep_obj) {
-    x = x %>% rowwise() %>%
+  if ( keep_obj ){
+    x <- x %>% 
+      rowwise() %>%
       mutate(!!paste0(col_name, "_obj") := list(temp$object))
   }
   
@@ -112,96 +115,102 @@ estimate_deriv = function(x, method = c("lin", "ss", "tf"), n = 14,
 #' @importFrom stats lsfit coef
 #' @importFrom tidyr drop_na
 #' @noRd
-linear_reg_deriv = function(x, ...) {
-  params = list(...)
-  params[[1]] = NULL # dplyr::group_modify() includes the group here
+linear_reg_deriv <- function(x, ...){
+  params <- list(...)
+  params[[1]] <- NULL # dplyr::group_modify() includes the group here
 
   # If derivative order is 2, then return trivial result
-  if (params$deriv == 2) return(list(object = NULL, result = 0))
+  if ( params$deriv == 2 ) return(list(object = NULL, result = 0))
   
-  keep_obj = params$keep_obj
-  params$keep_obj = NULL
-  params$deriv = NULL
-  x = x %>% select(time_value, value) %>% drop_na()
-  params$x = as.numeric(x$time_value)
-  params$y = x$value
+  keep_obj <- params$keep_obj
+  params$keep_obj <- NULL
+  params$deriv <- NULL
+  x <- x %>% 
+    select(time_value, value) %>% 
+    drop_na()
+  params$x <- as.numeric(x$time_value)
+  params$y <- x$value
   
   return(tryCatch(suppressWarnings(suppressMessages({
-    object = do.call(lsfit, params)
-    result = End(coef(object))
-    if (!keep_obj) object = NULL # For memory sake
+    object <- do.call(lsfit, params)
+    result <- End(coef(object))
+    if ( !keep_obj ) object <- NULL # For memory sake
     list(object = object, result = result)
   })),
-  error = function(e) list(object = NA, result = NA)))
+  error <- function(e) list(object = NA, result = NA)))
 }
 
 #' Compute derivatives function via smoothing spline
 #' @importFrom stats smooth.spline predict
 #' @noRd
-smooth_spline_deriv = function(x, ...) {
-  params = list(...)
-  params[[1]] = NULL # dplyr::group_modify() includes the group here
+smooth_spline_deriv <- function(x, ...){
+  params <- list(...)
+  params[[1]] <- NULL # dplyr::group_modify() includes the group here
 
-  keep_obj = params$keep_obj
-  deriv = params$deriv
-  params$keep_obj = NULL
-  params$deriv = NULL
-  x = x %>% select(time_value, value) %>% drop_na()
-  params$x = as.numeric(x$time_value)
-  params$y = x$value
+  keep_obj <- params$keep_obj
+  deriv <- params$deriv
+  params$keep_obj <- NULL
+  params$deriv <- NULL
+  x <- x %>% 
+    select(time_value, value) %>% 
+    drop_na()
+  params$x <- as.numeric(x$time_value)
+  params$y <- x$value
   
   return(tryCatch(suppressWarnings(suppressMessages({
-    object = do.call(smooth.spline, params)
-    result = predict(object, x = End(params$x), deriv = deriv)$y
-    if (!keep_obj) object = NULL # For memory sake
+    object <- do.call(smooth.spline, params)
+    result <- predict(object, x = End(params$x), deriv = deriv)$y
+    if ( !keep_obj ) object <- NULL # For memory sake
     list(object = object, result = result)
   })),
-  error = function(e) list(object = NA, result = NA)))
+  error <- function(e) list(object = NA, result = NA)))
 }
 
 #' Compute derivatives function via trend filtering
 #' @importFrom genlasso trendfilter cv.trendfilter coef.genlasso
 #' @noRd
-trend_filter_deriv = function(data, ...) {
-  params = list(...)
-  params[[1]] = NULL # dplyr::group_modify() includes the group here
+trendfilter_deriv <- function(data, ...) {
+  params <- list(...)
+  params[[1]] <- NULL # dplyr::group_modify() includes the group here
   
-  keep_obj = params$keep_obj
-  deriv = params$deriv
-  params$keep_obj = NULL
-  params$deriv = NULL
+  keep_obj <- params$keep_obj
+  deriv <- params$deriv
+  params$keep_obj <- NULL
+  params$deriv <- NULL
   
-  cv = params$cv
-  ord = params$ord
-  maxsteps = params$maxsteps
-  k = params$k
-  df = params$df
+  cv <- params$cv
+  ord <- params$ord
+  maxsteps <- params$maxsteps
+  k <- params$k
+  df <- params$df
 
-  if (is.null(cv)) cv = FALSE
-  if (is.null(ord)) ord = 2
-  if (is.null(maxsteps)) maxsteps = 100
-  if (is.null(k)) k = 5
-  if (is.null(df)) df = ifelse(cv, "1se", 8)
+  if ( is.null(cv) ) cv <- FALSE
+  if ( is.null(ord) ) ord <- 2
+  if ( is.null(maxsteps) ) maxsteps <- 100
+  if ( is.null(k) ) k <- 5
+  if ( is.null(df) ) df <- ifelse(cv, "1se", 8)
   
-  data = data %>% select(time_value, value) %>% drop_na()
-  x = as.numeric(data$time_value)
-  y = data$value
+  data <- data %>% 
+    select(time_value, value) %>% 
+    drop_na()
+  x <- as.numeric(data$time_value)
+  y <- data$value
 
   return(tryCatch(suppressWarnings(suppressMessages({
-    object = trendfilter(y = y, pos = x, ord = ord, max = maxsteps)
-    if (cv) {
-      cv_object = quiet(cv.trendfilter(object, k = k, mode = "df"))
-      df = ifelse(df == "1se", cv_object$df.1se, cv_object$df.min)
+    object <- trendfilter(y = y, pos = x, ord = ord, max = maxsteps)
+    if ( cv ){
+      cv_object <- quiet(cv.trendfilter(object, k = k, mode = "df"))
+      df <- ifelse(df == "1se", cv_object$df.1se, cv_object$df.min)
     }
-    else cv_object = NULL
+    else cv_object <- NULL
     
-    beta = coef.genlasso(object, df = df)$beta
-    beta = approx(x, beta, Min(x):Max(x))$y # TODO use poly interpolation 
-    result = End(diff(beta, diff = deriv))
+    beta <- coef.genlasso(object, df = df)$beta
+    beta <- approx(x, beta, Min(x):Max(x))$y # TODO use poly interpolation 
+    result <- End(diff(beta, diff = deriv))
     
-    if (!keep_obj) { object = NULL; cv_object = NULL } # For memory sake
+    if ( !keep_obj ){ object <- NULL; cv_object <- NULL } # For memory sake
     list(object = list(trendfilter = object, cv.trendfilter = cv_object),
          result = result)
   })),
-  error = function(e) list(object = NA, result = NA)))
+  error <- function(e) list(object = NA, result = NA)))
 }

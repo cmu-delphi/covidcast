@@ -59,8 +59,8 @@ but reasonably mark times of upswing in the underlying signal.
 library(ggplot2)
 library(gridExtra)
 
-state = "fl"
-threshold = 0.25
+state <- "fl"
+threshold <- 0.25
 
 p1 <- ggplot(case_rates %>% filter(geo_value == state),
              aes(x = time_value, y = value)) +
@@ -68,7 +68,7 @@ p1 <- ggplot(case_rates %>% filter(geo_value == state),
   geom_point(data = case_rates %>% 
                filter(geo_value == state, deriv >= threshold),
              aes(x = time_value, y = value), color = "red") + 
-  labs(x = "Date", y = "Cases per 100,00 people") 
+  labs(x = "Date", y = "Cases per 100,000 people") 
 
 p2 <- ggplot(case_rates %>% filter(geo_value == state),
              aes(x = time_value, y = deriv)) +
@@ -109,7 +109,7 @@ p1 <- ggplot(case_rates %>% filter(geo_value == state),
   geom_point(data = case_rates %>% 
                filter(geo_value == state, deriv_ss2 >= threshold),
              aes(x = time_value, y = value), color = "blue", shape = 21) +
-  labs(x = "Date", y = "Cases per 100,00 people") 
+  labs(x = "Date", y = "Cases per 100,000 people") 
 
 p2 <- ggplot(case_rates %>% filter(geo_value == state), 
              aes(x = time_value)) +
@@ -121,11 +121,12 @@ p2 <- ggplot(case_rates %>% filter(geo_value == state),
 grid.arrange(p1, p2, nrow = 1)
 ```
 
-The estimated derivates---in red for the smoothing spline with a fixed degrees 
-of freedom of 8, and in blue for that tuned by cross-validation---appear less
-smooth than those above, from linear regression. Using cross-validation offers
-more adaptivity to the time-varying level of smoothness, as is apparent from 
-comparing the red and blue derivative estimates in October and November. 
+The estimated derivatives --- in red for the smoothing spline with a fixed 
+degrees of freedom of 8, and in blue for that tuned by cross-validation ---
+appear less smooth than those above, from linear regression. Using 
+cross-validation offers more adaptivity to the time-varying level of smoothness, 
+as is apparent from comparing the red and blue derivative estimates in October 
+and November. 
 
 ## Estimating derivatives via trend filtering 
 
@@ -154,7 +155,7 @@ p1 <- ggplot(case_rates_state, aes(x = time_value, y = value)) +
              aes(x = time_value, y = value), color = "red") + 
   geom_point(data = case_rates_state %>% filter(deriv_tf2 >= threshold),
              aes(x = time_value, y = value), color = "blue", shape = 21) +
-  labs(x = "Date", y = "Cases per 100,00 people") 
+  labs(x = "Date", y = "Cases per 100,000 people") 
 
 p2 <- ggplot(case_rates_state, aes(x = time_value)) +
   geom_line(aes(y = deriv_tf1), color = "red") + 
@@ -165,7 +166,7 @@ p2 <- ggplot(case_rates_state, aes(x = time_value)) +
 grid.arrange(p1, p2, nrow = 1)
 ```
 
-The estimated derivates now appear a bit smoother than the last ones, from the 
+The estimated derivatives now appear a bit smoother than the last ones, from the 
 smoothing spline methods. Again, using cross-validation offers a noticeable 
 improvement in adapting to to the time-varying level of smoothness, as is very 
 clear from the differences between red and blue derivative estimates in October 

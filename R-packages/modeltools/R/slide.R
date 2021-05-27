@@ -30,32 +30,38 @@
 #' @return A data frame given by appending a new column to `x` named according
 #'   to the `col_name` argument, containing the function values.
 #'
+#' @export slide_by_geo
+
+
 #' @importFrom dplyr %>% arrange group_by group_modify mutate ungroup
 #' @importFrom lubridate days
-#' @export
-slide_by_geo = function(x, slide_fun, n = 14, col_name = "slide_value",
-                        col_type = c("dbl", "int", "lgl", "chr", "list"), ...) {
+slide_by_geo <- function(x, slide_fun, n = 14, col_name = "slide_value",
+                         col_type = c("dbl", "int", "lgl", "chr", "list"), ...)
+  {
+  
   # Check we have the minimal columns we need
-  if (!all(c("geo_value", "time_value") %in% colnames(x))) {
+  if ( !all(c("geo_value", "time_value") %in% colnames(x)) ){
     stop("`x` must have columns 'geo_value' and 'time_value'.")
   }
   # x = covidcast:::latest_issue(x) # TODO is this needed?
 
   # Which slide_index function?
-  col_type = match.arg(col_type)
-  slide_index_zzz = switch(col_type,
-                           "dbl" = slider::slide_index_dbl,
-                           "int" = slider::slide_index_int,
-                           "lgl" = slider::slide_index_lgl,
-                           "chr" = slider::slide_index_chr,
-                           "list" = slider::slide_index)
+  col_type <- match.arg(col_type)
+  slide_index_zzz <- switch(col_type,
+                            "dbl" = slider::slide_index_dbl,
+                            "int" = slider::slide_index_int,
+                            "lgl" = slider::slide_index_lgl,
+                            "chr" = slider::slide_index_chr,
+                            "list" = slider::slide_index
+                            )
 
   # Slide over a single geo value
-  slide_one_geo = function(.data_group, slide_fun, n, col_name, ...) {
-    slide_values = slide_index_zzz(.x = .data_group,
-                                   .i = .data_group$time_value,
-                                   .f = slide_fun, ..., 
-                                   .before = days(n-1))
+  slide_one_geo <- function(.data_group, slide_fun, n, col_name, ...){
+    slide_values <- slide_index_zzz(.x = .data_group,
+                                    .i = .data_group$time_value,
+                                    .f = slide_fun, ..., 
+                                    .before = days(n-1)
+                                    )
     return(mutate(.data_group, !!col_name := slide_values))
   }
   

@@ -10,9 +10,10 @@ vignette: >
 
 A basic way of assessing growth in a signal is to look at its percentage change
 over two neighboring time windows. We investigate this in the current vignette,
-using the `pct_change()` function in the `modeltools` package. As in the getting
-started guide, we focus on state-level COVID-19 case rates from the USAFacts 
-data source, smoothed via 7-day trailing averages, from June to mid November. 
+using the `pct_change()` function in the `modeltools` package. As in the 
+[Getting started guide](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html), 
+we focus on state-level COVID-19 case rates from the USA-Facts data source, 
+smoothed via 7-day trailing averages, from June 2020 to mid-November 2020. 
 
 ```{r}
 library(covidcast)
@@ -60,7 +61,7 @@ these values alongside the signal itself.
 library(ggplot2)
 library(gridExtra)
 
-state = "fl"
+state <- "fl"
 
 p1 <- ggplot(case_rates %>% filter(geo_value == state),
              aes(x = time_value, y = value)) +
@@ -97,7 +98,7 @@ case_rates %>%
 p1 <- ggplot(case_rates %>% filter(geo_value == state),
              aes(x = time_value, y = value)) +
   geom_line() + 
-  labs(x = "Date", y = "Cases per 100,00 people") 
+  labs(x = "Date", y = "Cases per 100,000 people") 
 
 p2 <- ggplot(case_rates %>% filter(geo_value == state),
              aes(x = time_value)) +

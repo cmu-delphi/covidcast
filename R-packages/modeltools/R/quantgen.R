@@ -109,7 +109,7 @@
 #' @importFrom dplyr filter select pull summarize between bind_cols
 #' @importFrom tidyr pivot_longer
 #' @export
-quantgen_forecaster = function(df, forecast_date, signals, incidence_period,
+quantgen_forecaster <- function(df, forecast_date, signals, incidence_period,
                                ahead, geo_type,
                                n = 4 * ifelse(incidence_period == "day", 7, 1),
                                lags = 0, tau = modeltools::covidhub_probs,

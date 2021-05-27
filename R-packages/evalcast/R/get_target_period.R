@@ -14,6 +14,8 @@ get_target_period <- function(forecast_date, incidence_period, ahead) {
   #  forecast_date: can be a vector of dates
   #  incidence_period: one of "epiweek" or "day"
   #  ahead: how many epiweeks/days ahead are you forecasting?
+  if ( length(forecast_date) == 0 ) { return(tibble(start = Date(), end = Date())) }
+  
   forecast_date <- lubridate::ymd(forecast_date)
   if (incidence_period == "day")
     return(tibble(start = forecast_date + ahead, end = forecast_date + ahead))

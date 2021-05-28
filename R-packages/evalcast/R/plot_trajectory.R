@@ -79,7 +79,7 @@ plot_trajectory <- function(predictions_cards,
                       filter(.data$interval == l_quantiles[qq]),
                     mapping = aes(ymin = .data$lower, 
                                   ymax = .data$upper,
-                                  group = .data$forecast_date,
+                                  group = interaction(.data$forecast_date, .data$forecaster),
                                   fill = .data$forecaster),
                     alpha = alp[qq]) 
     }
@@ -89,14 +89,14 @@ plot_trajectory <- function(predictions_cards,
     geom_line(aes(y = .data$value)) +
     geom_line(data = pd$points_df, 
               mapping = aes(y = .data$value, 
-                            group = .data$forecast_date, 
+                            group = interaction(.data$forecast_date, .data$forecaster),
                             color = .data$forecaster))
   if (show_points) {
     g <- g + 
       geom_point(aes(y = .data$value)) +
       geom_point(data = pd$points_df, 
                  mapping = aes(y = .data$value, 
-                               group = .data$forecast_date, 
+                               group = interaction(.data$forecast_date, .data$forecaster),
                                color = .data$forecaster))
   }
   

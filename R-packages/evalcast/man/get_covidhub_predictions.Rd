@@ -12,7 +12,7 @@ get_covidhub_predictions(
   ahead = 1:4,
   incidence_period = c("epiweek", "day"),
   signal = c("confirmed_incidence_num", "deaths_incidence_num",
-    "deaths_cumulative_num"),
+    "deaths_cumulative_num", "confirmed_admissions_covid_1d"),
   predictions_cards = NULL,
   start_date = NULL,
   end_date = NULL,
@@ -43,8 +43,8 @@ NULL will fetch all available aheads}
 return both}
 
 \item{signal}{this function supports only "confirmed_incidence_num",
-"deaths_incidence_num", and/or "deaths_cumulative_num" (those currently
-forecast by the COVIDhub-ensemble). For other types, use one of the
+"deaths_incidence_num", "deaths_cumulative_num", and/or
+"confirmed_admissions_covid_1d". For other types, use one of the
 alternatives mentioned above}
 
 \item{predictions_cards}{An object of class \code{predicitions_cards} that

@@ -4,7 +4,7 @@ description: Produce and evaluate quantile forecasts, based on `quantgen` and
   `evalcast`.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{3. Produce and evaluate quantile forecasts}
+  %\VignetteIndexEntry{3. Produce and evaluate quantile forecasts of signals}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,7 +14,7 @@ Note that I'm using `covidcast` from the `r/0.4.0-release` branch, and
 
 Also, the code chunk below took a while to run, so I ran it separately and
 saved the results in a file that you can find in the `modeltools/vignettes/`
-subfolder.
+sub-folder.
 
 ```{r, eval = FALSE, code = readLines("quantgen-forecast.R")}
 ```

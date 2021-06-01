@@ -12,7 +12,7 @@
 
 
 
-<title>Get started with modeltools</title>
+<title>Getting started with modeltools</title>
 
 <script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
 // v0.0.1
@@ -332,211 +332,838 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Get started with <code>modeltools</code></h1>
+<h1 class="title toc-ignore">Getting started with <code>modeltools</code></h1>
 
 
 
-<p>This package provides tools for building COVID-19 models, with a focus on forecasting and hotspot prediction models. It is designed to be used in conjunction with the <code>covidcast</code> and <code>evalcast</code> packages.</p>
+<p>This package provides tools for building COVID-19 statistical models, with an emphasis on short-term forecasting and hotspot prediction. It is designed to be used in conjunction with the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/"><code>covidcast</code></a> and <a href="https://cmu-delphi.github.io/covidcast/evalcastR/"><code>evalcast</code></a> packages, which are also developed and maintained by the <a href="https://delphi.cmu.edu">Delphi Group</a> at Carnegie Mellon University.</p>
 <div id="installing" class="section level2">
 <h2>Installing</h2>
-<p>This package is not on CRAN yet, so it can be installed using the <a href="https://cran.r-project.org/package=devtools"><code>devtools</code></a> package:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;cmu-delphi/covidcast&quot;</span>, <span class="dt">ref =</span> <span class="st">&quot;main&quot;</span>,</span>
+<blockquote>
+<p><strong>This package is not on CRAN. There is a package named <code>modeltools</code> on CRAN, but it is entirely unrelated to this one.</strong></p>
+</blockquote>
+<p>This package is available on the <a href="https://github.com/cmu-delphi">CMU Delphi Group GitHub page</a> and can be installed using the <a href="https://cran.r-project.org/package=devtools"><code>devtools</code></a> package, as follows:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="dt">repo =</span> <span class="st">&quot;cmu-delphi/covidcast&quot;</span>, <span class="dt">ref =</span> <span class="st">&quot;main&quot;</span>,</span>
 <span id="cb1-2"><a href="#cb1-2"></a>                         <span class="dt">subdir =</span> <span class="st">&quot;R-packages/modeltools&quot;</span>)</span></code></pre></div>
-<p>Building the vignettes, such as this getting started guide, takes a significant amount of time. They are not included in the package by default. If you want to include vignettes, then use this modified command:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;cmu-delphi/covidcast&quot;</span>, <span class="dt">ref =</span> <span class="st">&quot;main&quot;</span>,</span>
+<p>Building the package’s vignettes, such as this <em>Getting started guide</em>, takes a significant amount of time. So, by default, the vignettes are not included with the downloaded package. If you wish to include the vignettes, then use the following installation command instead:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="dt">repo =</span> <span class="st">&quot;cmu-delphi/covidcast&quot;</span>, <span class="dt">ref =</span> <span class="st">&quot;main&quot;</span>,</span>
 <span id="cb2-2"><a href="#cb2-2"></a>                         <span class="dt">subdir =</span> <span class="st">&quot;R-packages/modeltools&quot;</span>,</span>
 <span id="cb2-3"><a href="#cb2-3"></a>                         <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>, <span class="dt">dependencies =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
-<p>For this getting started vignette, we’ll fetch COVID-19 case rates, both raw and smoothed via 7-day trailing averages, from the USAFacts data source. We’ll look at data at the state level for four states, between the start of June and mid November.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">library</span>(covidcast)</span></code></pre></div>
-<pre><code>## We encourage COVIDcast API users to register on our mailing list:
-## https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api
-## We&#39;ll send announcements about new data sources, package updates,
-## server maintenance, and new features.</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>start_day &lt;-<span class="st"> &quot;2020-06-01&quot;</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a>end_day &lt;-<span class="st"> &quot;2020-11-15&quot;</span></span>
-<span id="cb5-3"><a href="#cb5-3"></a>geo_values &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;ca&quot;</span>, <span class="st">&quot;fl&quot;</span>, <span class="st">&quot;ny&quot;</span>, <span class="st">&quot;tx&quot;</span>)</span>
-<span id="cb5-4"><a href="#cb5-4"></a></span>
-<span id="cb5-5"><a href="#cb5-5"></a>signals &lt;-<span class="st"> </span><span class="kw">suppressMessages</span>(</span>
-<span id="cb5-6"><a href="#cb5-6"></a>  <span class="kw">covidcast_signals</span>(<span class="dt">data_source =</span> <span class="st">&quot;usa-facts&quot;</span>, </span>
-<span id="cb5-7"><a href="#cb5-7"></a>                    <span class="dt">signal =</span> <span class="kw">c</span>(<span class="st">&quot;confirmed_incidence_prop&quot;</span>,</span>
-<span id="cb5-8"><a href="#cb5-8"></a>                               <span class="st">&quot;confirmed_7dav_incidence_prop&quot;</span>),</span>
-<span id="cb5-9"><a href="#cb5-9"></a>                    <span class="dt">start_day =</span> start_day, <span class="dt">end_day =</span> end_day, </span>
-<span id="cb5-10"><a href="#cb5-10"></a>                    <span class="dt">geo_type =</span> <span class="st">&quot;state&quot;</span>, <span class="dt">geo_values =</span> geo_values))</span>
-<span id="cb5-11"><a href="#cb5-11"></a></span>
-<span id="cb5-12"><a href="#cb5-12"></a><span class="kw">summary</span>(signals[[<span class="dv">1</span>]])</span></code></pre></div>
-<pre><code>## A `covidcast_signal` dataframe with 672 rows and 9 columns.
-## 
-## data_source : usa-facts
-## signal      : confirmed_incidence_prop
-## geo_type    : state
-## 
-## first date                          : 2020-06-01
-## last date                           : 2020-11-15
-## median number of geo_values per day : 4</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">summary</span>(signals[[<span class="dv">2</span>]])</span></code></pre></div>
-<pre><code>## A `covidcast_signal` dataframe with 672 rows and 9 columns.
-## 
-## data_source : usa-facts
-## signal      : confirmed_7dav_incidence_prop
-## geo_type    : state
-## 
-## first date                          : 2020-06-01
-## last date                           : 2020-11-15
-## median number of geo_values per day : 4</code></pre>
+<p>For this <em>Getting started</em> vignette, we’ll fetch COVID-19 case rates, both raw and smoothed via 7-day trailing averages, from the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">Delphi API</a>. These particular signals are provided by the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html"><em>USAFacts</em></a> data source. Here, we’ll download the signals at the state level for four states, and over the time window of June 1, 2020 to November 15, 2020.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">library</span>(covidcast)</span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a>start_day &lt;-<span class="st"> &quot;2020-06-01&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a>end_day &lt;-<span class="st"> &quot;2020-11-15&quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>geo_values &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;ca&quot;</span>, <span class="st">&quot;fl&quot;</span>, <span class="st">&quot;ny&quot;</span>, <span class="st">&quot;tx&quot;</span>)</span>
+<span id="cb3-6"><a href="#cb3-6"></a></span>
+<span id="cb3-7"><a href="#cb3-7"></a>signals &lt;-<span class="st"> </span><span class="kw">covidcast_signals</span>(<span class="dt">data_source =</span> <span class="st">&quot;usa-facts&quot;</span>,</span>
+<span id="cb3-8"><a href="#cb3-8"></a>                             <span class="dt">signal =</span> <span class="kw">c</span>(<span class="st">&quot;confirmed_incidence_prop&quot;</span>,</span>
+<span id="cb3-9"><a href="#cb3-9"></a>                                        <span class="st">&quot;confirmed_7dav_incidence_prop&quot;</span>),</span>
+<span id="cb3-10"><a href="#cb3-10"></a>                             <span class="dt">start_day =</span> start_day,</span>
+<span id="cb3-11"><a href="#cb3-11"></a>                             <span class="dt">end_day =</span> end_day,</span>
+<span id="cb3-12"><a href="#cb3-12"></a>                             <span class="dt">geo_type =</span> <span class="st">&quot;state&quot;</span>, </span>
+<span id="cb3-13"><a href="#cb3-13"></a>                             <span class="dt">geo_values =</span> geo_values)</span></code></pre></div>
+<p>By default, the <code>covidcast_signals()</code> function returns the specified signals as a list of <code>covidcast_signal</code> data frames, with one data frame for each signal. So, in this case, <code>signals</code> is a list of two <code>covidcast_signal</code> data frames.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">summary</span>(signals[[<span class="dv">1</span>]])</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="co">## A `covidcast_signal` dataframe with 672 rows and 9 columns.</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co">## </span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">## data_source : usa-facts</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="co">## signal      : confirmed_incidence_prop</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="co">## geo_type    : state</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">## </span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co">## first date                          : 2020-06-01</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co">## last date                           : 2020-11-15</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co">## median number of geo_values per day : 4</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="kw">summary</span>(signals[[<span class="dv">2</span>]])</span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co">## A `covidcast_signal` dataframe with 672 rows and 9 columns.</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="co">## </span></span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="co">## data_source : usa-facts</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co">## signal      : confirmed_7dav_incidence_prop</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a><span class="co">## geo_type    : state</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="co">## </span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="co">## first date                          : 2020-06-01</span></span>
+<span id="cb4-20"><a href="#cb4-20"></a><span class="co">## last date                           : 2020-11-15</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a><span class="co">## median number of geo_values per day : 4</span></span></code></pre></div>
 </div>
 <div id="slide-with-a-formula" class="section level2">
 <h2>Slide with a formula</h2>
-<p>One of the most basic tools in the <code>modeltools</code> package is <code>slide_by_geo()</code>, which is based on the family of functions provided by the <code>slider</code> package. In <code>modeltools</code>, to “slide” means to apply the function or formula over a trailing window of <code>n</code> days of data, grouped by <code>geo_value</code>. Many other functions in the package, such as <code>pct_change()</code> and <code>estimate_deriv()</code>, use <code>slide_by_geo()</code> as their workhorse.</p>
+<p>One of the most basic tools in the <code>modeltools</code> package is the <code>slide_by_geo()</code> function which is based on the family of functions provided by the <code>slider</code> package. In <code>modeltools</code>, to <em>slide</em> means, for each <code>geo_value</code>, to apply the function or formula over a trailing window of <code>n</code> days of data. Many other functions in the package, such as <code>pct_change()</code> and <code>estimate_deriv()</code>, use <code>slide_by_geo()</code> as their workhorse.</p>
 <p>For example, to apply a 7-day trailing average to the raw values in the first <code>covidcast_signal</code> data frame, we can specify a formula via the <code>slide_fun</code> argument of <code>slide_by_geo()</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">library</span>(modeltools)</span>
-<span id="cb9-2"><a href="#cb9-2"></a><span class="kw">library</span>(dplyr)</span>
-<span id="cb9-3"><a href="#cb9-3"></a></span>
-<span id="cb9-4"><a href="#cb9-4"></a><span class="kw">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="dt">slide_fun =</span> <span class="op">~</span><span class="st"> </span><span class="kw">Mean</span>(.x<span class="op">$</span>value), <span class="dt">n =</span> <span class="dv">7</span>) <span class="op">%&gt;%</span></span>
-<span id="cb9-5"><a href="#cb9-5"></a><span class="st">  </span><span class="kw">select</span>(geo_value, time_value, value, slide_value) <span class="op">%&gt;%</span></span>
-<span id="cb9-6"><a href="#cb9-6"></a><span class="st">  </span><span class="kw">arrange</span>(geo_value) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb9-7"><a href="#cb9-7"></a><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>)</span></code></pre></div>
-<pre><code>## # A tibble: 10 x 4
-##    geo_value time_value value slide_value
-##    &lt;chr&gt;     &lt;date&gt;     &lt;dbl&gt;       &lt;dbl&gt;
-##  1 ca        2020-06-01  6.34        6.34
-##  2 ca        2020-06-02  5.86        6.10
-##  3 ca        2020-06-03  5.88        6.03
-##  4 ca        2020-06-04  7.97        6.51
-##  5 ca        2020-06-05  8.40        6.89
-##  6 ca        2020-06-06  6.71        6.86
-##  7 ca        2020-06-07  6.03        6.74
-##  8 ca        2020-06-08  6.42        6.75
-##  9 ca        2020-06-09  7.54        6.99
-## 10 ca        2020-06-10  7.27        7.19</code></pre>
-<p>The formula specified via <code>slide_fun</code> has access to all columns present in the original <code>covidcast_signal</code> data frame, and must refer to them with the prefix <code>.x$</code>. Here the function <code>Mean()</code> is a simple wrapper around <code>mean()</code> that omits <code>NA</code> values by default (provided by the <code>modeltools</code> package).</p>
-<p>Notice that <code>slide_by_geo()</code> returns a data frame with a new column appended that contains the results (from sliding the formula), named “slide_value” by default. We can instead specify a name up front using the <code>col_name</code> argument:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="dt">slide_fun =</span> <span class="op">~</span><span class="st"> </span><span class="kw">Mean</span>(.x<span class="op">$</span>value), <span class="dt">n =</span> <span class="dv">7</span>, </span>
-<span id="cb11-2"><a href="#cb11-2"></a>             <span class="dt">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="op">%&gt;%</span></span>
-<span id="cb11-3"><a href="#cb11-3"></a><span class="st">  </span><span class="kw">select</span>(geo_value, time_value, value, <span class="st">`</span><span class="dt">7dav</span><span class="st">`</span>) <span class="op">%&gt;%</span></span>
-<span id="cb11-4"><a href="#cb11-4"></a><span class="st">  </span><span class="kw">arrange</span>(geo_value) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb11-5"><a href="#cb11-5"></a><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>)</span></code></pre></div>
-<pre><code>## # A tibble: 10 x 4
-##    geo_value time_value value `7dav`
-##    &lt;chr&gt;     &lt;date&gt;     &lt;dbl&gt;  &lt;dbl&gt;
-##  1 ca        2020-06-01  6.34   6.34
-##  2 ca        2020-06-02  5.86   6.10
-##  3 ca        2020-06-03  5.88   6.03
-##  4 ca        2020-06-04  7.97   6.51
-##  5 ca        2020-06-05  8.40   6.89
-##  6 ca        2020-06-06  6.71   6.86
-##  7 ca        2020-06-07  6.03   6.74
-##  8 ca        2020-06-08  6.42   6.75
-##  9 ca        2020-06-09  7.54   6.99
-## 10 ca        2020-06-10  7.27   7.19</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">library</span>(modeltools)</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="kw">library</span>(dplyr)</span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="kw">library</span>(knitr)</span>
+<span id="cb5-4"><a href="#cb5-4"></a></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="kw">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="dt">slide_fun =</span> <span class="op">~</span><span class="st"> </span><span class="kw">Mean</span>(.x<span class="op">$</span>value), <span class="dt">n =</span> <span class="dv">7</span>) <span class="op">%&gt;%</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="st">  </span><span class="kw">select</span>(geo_value, time_value, value, slide_value) <span class="op">%&gt;%</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="st">  </span><span class="kw">arrange</span>(geo_value) <span class="op">%&gt;%</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>) <span class="op">%&gt;%</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="st">  </span><span class="kw">kable</span>(<span class="dt">format =</span> <span class="st">&quot;html&quot;</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+geo_value
+</th>
+<th style="text-align:left;">
+time_value
+</th>
+<th style="text-align:right;">
+value
+</th>
+<th style="text-align:right;">
+slide_value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-01
+</td>
+<td style="text-align:right;">
+6.337
+</td>
+<td style="text-align:right;">
+6.337
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-02
+</td>
+<td style="text-align:right;">
+5.856
+</td>
+<td style="text-align:right;">
+6.097
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-03
+</td>
+<td style="text-align:right;">
+5.884
+</td>
+<td style="text-align:right;">
+6.026
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-04
+</td>
+<td style="text-align:right;">
+7.970
+</td>
+<td style="text-align:right;">
+6.512
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-05
+</td>
+<td style="text-align:right;">
+8.397
+</td>
+<td style="text-align:right;">
+6.889
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-06
+</td>
+<td style="text-align:right;">
+6.712
+</td>
+<td style="text-align:right;">
+6.859
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-07
+</td>
+<td style="text-align:right;">
+6.031
+</td>
+<td style="text-align:right;">
+6.741
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-08
+</td>
+<td style="text-align:right;">
+6.418
+</td>
+<td style="text-align:right;">
+6.753
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-09
+</td>
+<td style="text-align:right;">
+7.539
+</td>
+<td style="text-align:right;">
+6.993
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-10
+</td>
+<td style="text-align:right;">
+7.271
+</td>
+<td style="text-align:right;">
+7.191
+</td>
+</tr>
+</tbody>
+</table>
+<p>The formula specified by <code>slide_fun</code> has access to all columns present in the original <code>covidcast_signal</code> data frame, and must refer to them with the prefix <code>.x$</code>. Here the function <code>Mean()</code> is a simple wrapper around <code>mean()</code> that omits <code>NA</code> values by default (provided by the <code>modeltools</code> package).</p>
+<p>Notice that the above <code>slide_by_geo()</code> call returns a data frame with a new column appended that contains the results of the sliding operation specified by <code>slide_fun</code>. This column is named “slide_value” by default, but alternative namings can be used by passing a string to the <code>col_name</code> argument in the original <code>slide_by_geo()</code> call. For example:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="dt">slide_fun =</span> <span class="op">~</span><span class="st"> </span><span class="kw">Mean</span>(.x<span class="op">$</span>value), <span class="dt">n =</span> <span class="dv">7</span>, </span>
+<span id="cb6-2"><a href="#cb6-2"></a>             <span class="dt">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="op">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="st">  </span><span class="kw">select</span>(geo_value, time_value, value, <span class="st">`</span><span class="dt">7dav</span><span class="st">`</span>) <span class="op">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="st">  </span><span class="kw">arrange</span>(geo_value) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>) <span class="op">%&gt;%</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="st">  </span><span class="kw">kable</span>(<span class="dt">format =</span> <span class="st">&quot;html&quot;</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+geo_value
+</th>
+<th style="text-align:left;">
+time_value
+</th>
+<th style="text-align:right;">
+value
+</th>
+<th style="text-align:right;">
+7dav
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-01
+</td>
+<td style="text-align:right;">
+6.337
+</td>
+<td style="text-align:right;">
+6.337
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-02
+</td>
+<td style="text-align:right;">
+5.856
+</td>
+<td style="text-align:right;">
+6.097
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-03
+</td>
+<td style="text-align:right;">
+5.884
+</td>
+<td style="text-align:right;">
+6.026
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-04
+</td>
+<td style="text-align:right;">
+7.970
+</td>
+<td style="text-align:right;">
+6.512
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-05
+</td>
+<td style="text-align:right;">
+8.397
+</td>
+<td style="text-align:right;">
+6.889
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-06
+</td>
+<td style="text-align:right;">
+6.712
+</td>
+<td style="text-align:right;">
+6.859
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-07
+</td>
+<td style="text-align:right;">
+6.031
+</td>
+<td style="text-align:right;">
+6.741
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-08
+</td>
+<td style="text-align:right;">
+6.418
+</td>
+<td style="text-align:right;">
+6.753
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-09
+</td>
+<td style="text-align:right;">
+7.539
+</td>
+<td style="text-align:right;">
+6.993
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-10
+</td>
+<td style="text-align:right;">
+7.271
+</td>
+<td style="text-align:right;">
+7.191
+</td>
+</tr>
+</tbody>
+</table>
 <p>As a simple sanity check, we compare the 7-day trailing average computed via <code>slide_by_geo()</code> to the values of the smoothed signal from the API:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="dt">slide_fun =</span> <span class="op">~</span><span class="st"> </span><span class="kw">Mean</span>(.x<span class="op">$</span>value), <span class="dt">n =</span> <span class="dv">7</span>, </span>
-<span id="cb13-2"><a href="#cb13-2"></a>             <span class="dt">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="op">%&gt;%</span></span>
-<span id="cb13-3"><a href="#cb13-3"></a><span class="st">  </span><span class="kw">full_join</span>(signals[[<span class="dv">2</span>]], <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;geo_value&quot;</span>, <span class="st">&quot;time_value&quot;</span>)) <span class="op">%&gt;%</span></span>
-<span id="cb13-4"><a href="#cb13-4"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">difference =</span> <span class="st">`</span><span class="dt">7dav</span><span class="st">`</span> <span class="op">-</span><span class="st"> </span>value.y) <span class="op">%&gt;%</span></span>
-<span id="cb13-5"><a href="#cb13-5"></a><span class="st">  </span><span class="kw">filter</span>(time_value <span class="op">&gt;=</span><span class="st"> &quot;2020-06-07&quot;</span>) <span class="op">%&gt;%</span></span>
-<span id="cb13-6"><a href="#cb13-6"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="kw">max</span>(<span class="kw">abs</span>(difference)))</span></code></pre></div>
-<pre><code>## # A tibble: 1 x 1
-##   `max(abs(difference))`
-##                    &lt;dbl&gt;
-## 1           0.0000000676</code></pre>
-<p>Note that this check would <em>fail</em> before June 7 because the API access to data before June 1, whereas <code>slide_by_geo()</code> does not (when a trailing window of <code>n</code> days isn’t available, <code>slide_by_geo()</code> just applies the function or formula to whatever data is available).</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="dt">slide_fun =</span> <span class="op">~</span><span class="st"> </span><span class="kw">Mean</span>(.x<span class="op">$</span>value), <span class="dt">n =</span> <span class="dv">7</span>, </span>
+<span id="cb7-2"><a href="#cb7-2"></a>             <span class="dt">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="op">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="st">  </span><span class="kw">full_join</span>(signals[[<span class="dv">2</span>]], <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;geo_value&quot;</span>, <span class="st">&quot;time_value&quot;</span>)) <span class="op">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">difference =</span> <span class="st">`</span><span class="dt">7dav</span><span class="st">`</span> <span class="op">-</span><span class="st"> </span>value.y) <span class="op">%&gt;%</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="st">  </span><span class="kw">filter</span>(time_value <span class="op">&gt;=</span><span class="st"> &quot;2020-06-07&quot;</span>) <span class="op">%&gt;%</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="kw">max</span>(<span class="kw">abs</span>(difference))) <span class="op">%&gt;%</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="st">  </span>as.numeric</span></code></pre></div>
+<pre><code>## [1] 6.757779e-08</code></pre>
+<p>Note that this check would <em>fail</em> before June 7 because the API has access to data before June 1, 2020, and can therefore return the trailing 7-day average for all days in the time window June 1, 2020 to November 15, 2020. While, on the other hand, since we are only providing <code>slide_by_geo()</code> with daily COVID-19 case rates beginning on June 1, the trailing 7-day average computed by <code>slide_by_geo()</code> is not actually an average of 7 days of data until June 7, 2020. When a trailing window of <code>n</code> days isn’t available, <code>slide_by_geo()</code> just applies the function or formula to whatever data is available.</p>
 </div>
 <div id="slide-with-a-function" class="section level2">
 <h2>Slide with a function</h2>
-<p>We can also pass a function for the <code>slide_fun</code> argument in <code>slide_by_geo()</code>. In this case, the passed function must have the following argument structure: <code>x</code>, a data frame the same column names as the original data frame; followed by any number of named additional arguments; and ending with <code>...</code>, to capture general additional arguments. Recreating the last example of a 7-day trailing average:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="kw">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="dt">slide_fun =</span> <span class="cf">function</span>(x, ...) <span class="kw">Mean</span>(x<span class="op">$</span>value), <span class="dt">n =</span> <span class="dv">7</span>,</span>
-<span id="cb15-2"><a href="#cb15-2"></a>             <span class="dt">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="op">%&gt;%</span></span>
-<span id="cb15-3"><a href="#cb15-3"></a><span class="st">  </span><span class="kw">select</span>(geo_value, time_value, value, <span class="st">`</span><span class="dt">7dav</span><span class="st">`</span>) <span class="op">%&gt;%</span></span>
-<span id="cb15-4"><a href="#cb15-4"></a><span class="st">  </span><span class="kw">arrange</span>(geo_value) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb15-5"><a href="#cb15-5"></a><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>)</span></code></pre></div>
-<pre><code>## # A tibble: 10 x 4
-##    geo_value time_value value `7dav`
-##    &lt;chr&gt;     &lt;date&gt;     &lt;dbl&gt;  &lt;dbl&gt;
-##  1 ca        2020-06-01  6.34   6.34
-##  2 ca        2020-06-02  5.86   6.10
-##  3 ca        2020-06-03  5.88   6.03
-##  4 ca        2020-06-04  7.97   6.51
-##  5 ca        2020-06-05  8.40   6.89
-##  6 ca        2020-06-06  6.71   6.86
-##  7 ca        2020-06-07  6.03   6.74
-##  8 ca        2020-06-08  6.42   6.75
-##  9 ca        2020-06-09  7.54   6.99
-## 10 ca        2020-06-10  7.27   7.19</code></pre>
+<p>We can also pass a function to the <code>slide_fun</code> argument in <code>slide_by_geo()</code>. In this case, the passed function must have the following argument structure: <code>x</code>, a data frame with the same column names as the data frame passed to <code>slide_by_geo()</code>; followed by any number of named additional arguments; and ending with <code>...</code>, to allow for general additional arguments. Recreating the last example of a 7-day trailing average:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="dt">slide_fun =</span> <span class="cf">function</span>(x, ...) <span class="kw">Mean</span>(x<span class="op">$</span>value), <span class="dt">n =</span> <span class="dv">7</span>,</span>
+<span id="cb9-2"><a href="#cb9-2"></a>             <span class="dt">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="op">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="st">  </span><span class="kw">select</span>(geo_value, time_value, value, <span class="st">`</span><span class="dt">7dav</span><span class="st">`</span>) <span class="op">%&gt;%</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="st">  </span><span class="kw">arrange</span>(geo_value) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>) <span class="op">%&gt;%</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a><span class="st">  </span><span class="kw">kable</span>(<span class="dt">format =</span> <span class="st">&quot;html&quot;</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+geo_value
+</th>
+<th style="text-align:left;">
+time_value
+</th>
+<th style="text-align:right;">
+value
+</th>
+<th style="text-align:right;">
+7dav
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-01
+</td>
+<td style="text-align:right;">
+6.337
+</td>
+<td style="text-align:right;">
+6.337
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-02
+</td>
+<td style="text-align:right;">
+5.856
+</td>
+<td style="text-align:right;">
+6.097
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-03
+</td>
+<td style="text-align:right;">
+5.884
+</td>
+<td style="text-align:right;">
+6.026
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-04
+</td>
+<td style="text-align:right;">
+7.970
+</td>
+<td style="text-align:right;">
+6.512
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-05
+</td>
+<td style="text-align:right;">
+8.397
+</td>
+<td style="text-align:right;">
+6.889
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-06
+</td>
+<td style="text-align:right;">
+6.712
+</td>
+<td style="text-align:right;">
+6.859
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-07
+</td>
+<td style="text-align:right;">
+6.031
+</td>
+<td style="text-align:right;">
+6.741
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-08
+</td>
+<td style="text-align:right;">
+6.418
+</td>
+<td style="text-align:right;">
+6.753
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-09
+</td>
+<td style="text-align:right;">
+7.539
+</td>
+<td style="text-align:right;">
+6.993
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-10
+</td>
+<td style="text-align:right;">
+7.271
+</td>
+<td style="text-align:right;">
+7.191
+</td>
+</tr>
+</tbody>
+</table>
 <p>As a more sophisticated example, here we show how to <em>sensorize</em> the doctor visits signal. The sensor values are defined by the predicted values from a local (in time) regression of past case rates (response) on past doctor visits (covariate).</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># Regression for doctor visits sensorization</span></span>
-<span id="cb17-2"><a href="#cb17-2"></a>dv_regression =<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">m =</span> <span class="dv">3</span>, ...) {</span>
-<span id="cb17-3"><a href="#cb17-3"></a>  n =<span class="st"> </span><span class="kw">nrow</span>(x)</span>
-<span id="cb17-4"><a href="#cb17-4"></a>  <span class="cf">if</span> (n <span class="op">&lt;=</span><span class="st"> </span>m<span class="op">+</span><span class="dv">1</span>) <span class="kw">return</span>(<span class="ot">NA</span>) <span class="co"># Take care of trivial case</span></span>
-<span id="cb17-5"><a href="#cb17-5"></a>  </span>
-<span id="cb17-6"><a href="#cb17-6"></a>  <span class="kw">return</span>(<span class="kw">tryCatch</span>(<span class="kw">suppressWarnings</span>(<span class="kw">suppressMessages</span>({</span>
-<span id="cb17-7"><a href="#cb17-7"></a>    <span class="co"># Fit a regression, leaving out the last m days of data</span></span>
-<span id="cb17-8"><a href="#cb17-8"></a>    lm_obj =<span class="st"> </span><span class="kw">lm</span>(value.y <span class="op">~</span><span class="st"> </span>value.x, <span class="dt">data =</span> x[<span class="dv">1</span><span class="op">:</span>(n<span class="op">-</span>m<span class="op">+</span><span class="dv">1</span>), ])</span>
-<span id="cb17-9"><a href="#cb17-9"></a>    </span>
-<span id="cb17-10"><a href="#cb17-10"></a>    <span class="co"># Form prediction for the last day of data, and return</span></span>
-<span id="cb17-11"><a href="#cb17-11"></a>    <span class="kw">predict</span>(lm_obj, <span class="dt">newdata =</span> x[n, ])</span>
-<span id="cb17-12"><a href="#cb17-12"></a>  })),</span>
-<span id="cb17-13"><a href="#cb17-13"></a>  <span class="dt">error =</span> <span class="cf">function</span>(e) <span class="kw">return</span>(<span class="ot">NA</span>)))</span>
-<span id="cb17-14"><a href="#cb17-14"></a>}</span>
-<span id="cb17-15"><a href="#cb17-15"></a></span>
-<span id="cb17-16"><a href="#cb17-16"></a><span class="co"># Fetch doctor visits signal and join it to case rates</span></span>
-<span id="cb17-17"><a href="#cb17-17"></a>joined =<span class="st"> </span><span class="kw">suppressMessages</span>(</span>
-<span id="cb17-18"><a href="#cb17-18"></a>  <span class="kw">covidcast_signal</span>(<span class="dt">data_source =</span> <span class="st">&quot;doctor-visits&quot;</span>, </span>
-<span id="cb17-19"><a href="#cb17-19"></a>                   <span class="dt">signal =</span> <span class="st">&quot;smoothed_adj_cli&quot;</span>, </span>
-<span id="cb17-20"><a href="#cb17-20"></a>                   <span class="dt">start_day =</span> start_day, <span class="dt">end_day =</span> end_day, </span>
-<span id="cb17-21"><a href="#cb17-21"></a>                   <span class="dt">geo_type =</span> <span class="st">&quot;state&quot;</span>, <span class="dt">geo_values =</span> geo_values)) <span class="op">%&gt;%</span></span>
-<span id="cb17-22"><a href="#cb17-22"></a><span class="st">  </span><span class="kw">full_join</span>(signals[[<span class="dv">2</span>]], <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;geo_value&quot;</span>, <span class="st">&quot;time_value&quot;</span>))</span>
-<span id="cb17-23"><a href="#cb17-23"></a> </span>
-<span id="cb17-24"><a href="#cb17-24"></a><span class="co"># Perform sensorization for each state; use the last n = 56 days (8 weeks) of </span></span>
-<span id="cb17-25"><a href="#cb17-25"></a><span class="co"># data, minus the last m = 3 days, for the regression</span></span>
-<span id="cb17-26"><a href="#cb17-26"></a><span class="kw">slide_by_geo</span>(joined, <span class="dt">slide_fun =</span> dv_regression, <span class="dt">n =</span> <span class="dv">56</span>, <span class="dt">m =</span> <span class="dv">3</span>, </span>
-<span id="cb17-27"><a href="#cb17-27"></a>             <span class="dt">col_name =</span> <span class="st">&quot;sensor&quot;</span>) <span class="op">%&gt;%</span></span>
-<span id="cb17-28"><a href="#cb17-28"></a><span class="st">  </span><span class="kw">select</span>(geo_value, time_value, value.x, value.y, sensor) <span class="op">%&gt;%</span></span>
-<span id="cb17-29"><a href="#cb17-29"></a><span class="st">  </span><span class="kw">arrange</span>(geo_value) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb17-30"><a href="#cb17-30"></a><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>)</span></code></pre></div>
-<pre><code>## # A tibble: 10 x 5
-##    geo_value time_value value.x value.y sensor
-##    &lt;chr&gt;     &lt;date&gt;       &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;
-##  1 ca        2020-06-01    2.75    6.70  NA   
-##  2 ca        2020-06-02    2.59    6.39  NA   
-##  3 ca        2020-06-03    2.48    6.50  NA   
-##  4 ca        2020-06-04    2.41    6.86  NA   
-##  5 ca        2020-06-05    2.57    7.11   6.50
-##  6 ca        2020-06-06    2.63    6.81   6.59
-##  7 ca        2020-06-07    2.73    6.74   6.68
-##  8 ca        2020-06-08    3.04    6.75   6.68
-##  9 ca        2020-06-09    2.97    6.99   6.71
-## 10 ca        2020-06-10    2.99    7.19   6.74</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Regression for doctor visits sensorization</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a>dv_regression &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">m =</span> <span class="dv">3</span>, ...) {</span>
+<span id="cb10-3"><a href="#cb10-3"></a>  n &lt;-<span class="st"> </span><span class="kw">nrow</span>(x)</span>
+<span id="cb10-4"><a href="#cb10-4"></a>  <span class="cf">if</span> ( n <span class="op">&lt;=</span><span class="st"> </span>m<span class="op">+</span><span class="dv">1</span> ) <span class="kw">return</span>(<span class="ot">NA</span>) <span class="co"># Take care of trivial case</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a>  </span>
+<span id="cb10-6"><a href="#cb10-6"></a>  <span class="kw">return</span>(<span class="kw">tryCatch</span>(<span class="kw">suppressWarnings</span>(<span class="kw">suppressMessages</span>({</span>
+<span id="cb10-7"><a href="#cb10-7"></a>    <span class="co"># Fit a regression, leaving out the last m days of data</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a>    lm_obj &lt;-<span class="st"> </span><span class="kw">lm</span>(value.y <span class="op">~</span><span class="st"> </span>value.x, <span class="dt">data =</span> x[<span class="dv">1</span><span class="op">:</span>(n<span class="op">-</span>m<span class="op">+</span><span class="dv">1</span>), ])</span>
+<span id="cb10-9"><a href="#cb10-9"></a>    </span>
+<span id="cb10-10"><a href="#cb10-10"></a>    <span class="co"># Form prediction for the last day of data, and return</span></span>
+<span id="cb10-11"><a href="#cb10-11"></a>    <span class="kw">predict</span>(lm_obj, <span class="dt">newdata =</span> x[n, ])</span>
+<span id="cb10-12"><a href="#cb10-12"></a>  })),</span>
+<span id="cb10-13"><a href="#cb10-13"></a>  <span class="dt">error =</span> <span class="cf">function</span>(e) <span class="kw">return</span>(<span class="ot">NA</span>)))</span>
+<span id="cb10-14"><a href="#cb10-14"></a>}</span>
+<span id="cb10-15"><a href="#cb10-15"></a></span>
+<span id="cb10-16"><a href="#cb10-16"></a><span class="co"># Fetch doctor visits signal and join it to case rates</span></span>
+<span id="cb10-17"><a href="#cb10-17"></a>joined &lt;-<span class="st"> </span><span class="kw">covidcast_signal</span>(<span class="dt">data_source =</span> <span class="st">&quot;doctor-visits&quot;</span>,</span>
+<span id="cb10-18"><a href="#cb10-18"></a>                           <span class="dt">signal =</span> <span class="st">&quot;smoothed_adj_cli&quot;</span>,</span>
+<span id="cb10-19"><a href="#cb10-19"></a>                           <span class="dt">start_day =</span> start_day, </span>
+<span id="cb10-20"><a href="#cb10-20"></a>                           <span class="dt">end_day =</span> end_day,</span>
+<span id="cb10-21"><a href="#cb10-21"></a>                           <span class="dt">geo_type =</span> <span class="st">&quot;state&quot;</span>, </span>
+<span id="cb10-22"><a href="#cb10-22"></a>                           <span class="dt">geo_values =</span> geo_values) <span class="op">%&gt;%</span></span>
+<span id="cb10-23"><a href="#cb10-23"></a><span class="st">  </span><span class="kw">full_join</span>(signals[[<span class="dv">2</span>]], <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;geo_value&quot;</span>, <span class="st">&quot;time_value&quot;</span>))</span>
+<span id="cb10-24"><a href="#cb10-24"></a> </span>
+<span id="cb10-25"><a href="#cb10-25"></a><span class="co"># Perform sensorization for each state; use the last n = 56 days (8 weeks) of </span></span>
+<span id="cb10-26"><a href="#cb10-26"></a><span class="co"># data, minus the last m = 3 days, for the regression</span></span>
+<span id="cb10-27"><a href="#cb10-27"></a><span class="kw">slide_by_geo</span>(joined, <span class="dt">slide_fun =</span> dv_regression, <span class="dt">n =</span> <span class="dv">56</span>, <span class="dt">m =</span> <span class="dv">3</span>, </span>
+<span id="cb10-28"><a href="#cb10-28"></a>             <span class="dt">col_name =</span> <span class="st">&quot;sensor&quot;</span>) <span class="op">%&gt;%</span></span>
+<span id="cb10-29"><a href="#cb10-29"></a><span class="st">  </span><span class="kw">select</span>(geo_value, time_value, value.x, value.y, sensor) <span class="op">%&gt;%</span></span>
+<span id="cb10-30"><a href="#cb10-30"></a><span class="st">  </span><span class="kw">arrange</span>(geo_value) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-31"><a href="#cb10-31"></a><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>) <span class="op">%&gt;%</span></span>
+<span id="cb10-32"><a href="#cb10-32"></a><span class="st">  </span><span class="kw">kable</span>(<span class="dt">format =</span> <span class="st">&quot;html&quot;</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+geo_value
+</th>
+<th style="text-align:left;">
+time_value
+</th>
+<th style="text-align:right;">
+value.x
+</th>
+<th style="text-align:right;">
+value.y
+</th>
+<th style="text-align:right;">
+sensor
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-01
+</td>
+<td style="text-align:right;">
+2.754
+</td>
+<td style="text-align:right;">
+6.701
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-02
+</td>
+<td style="text-align:right;">
+2.589
+</td>
+<td style="text-align:right;">
+6.389
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-03
+</td>
+<td style="text-align:right;">
+2.480
+</td>
+<td style="text-align:right;">
+6.497
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-04
+</td>
+<td style="text-align:right;">
+2.412
+</td>
+<td style="text-align:right;">
+6.863
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-05
+</td>
+<td style="text-align:right;">
+2.571
+</td>
+<td style="text-align:right;">
+7.109
+</td>
+<td style="text-align:right;">
+6.498
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-06
+</td>
+<td style="text-align:right;">
+2.630
+</td>
+<td style="text-align:right;">
+6.808
+</td>
+<td style="text-align:right;">
+6.594
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-07
+</td>
+<td style="text-align:right;">
+2.726
+</td>
+<td style="text-align:right;">
+6.741
+</td>
+<td style="text-align:right;">
+6.682
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-08
+</td>
+<td style="text-align:right;">
+3.045
+</td>
+<td style="text-align:right;">
+6.753
+</td>
+<td style="text-align:right;">
+6.683
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-09
+</td>
+<td style="text-align:right;">
+2.969
+</td>
+<td style="text-align:right;">
+6.993
+</td>
+<td style="text-align:right;">
+6.709
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-10
+</td>
+<td style="text-align:right;">
+2.985
+</td>
+<td style="text-align:right;">
+7.191
+</td>
+<td style="text-align:right;">
+6.738
+</td>
+</tr>
+</tbody>
+</table>
 <p>Above, the first 4 elements are <code>NA</code> because of insufficient training data (we need at least 2 training samples for simple linear regression, and we omit the last 3 days of data).</p>
 </div>
 <div id="returning-complex-objects" class="section level2">
 <h2>Returning complex objects</h2>
 <p>As a final example, we show how to use <code>slide_by_geo()</code> to output more complex objects. We amend the last example so that <code>dv_regression()</code> returns both the predicted value (sensor) and the fitted linear model object. In order to use this with <code>slide_by_geo()</code>, we need to set the <code>col_type</code> argument to be “list”:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>dv_regression =<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">m =</span> <span class="dv">3</span>, ...) {</span>
-<span id="cb19-2"><a href="#cb19-2"></a>  n =<span class="st"> </span><span class="kw">nrow</span>(x)</span>
-<span id="cb19-3"><a href="#cb19-3"></a>  <span class="cf">if</span> (n <span class="op">&lt;=</span><span class="st"> </span>m<span class="op">+</span><span class="dv">1</span>) <span class="kw">return</span>(<span class="kw">list</span>(<span class="dt">lm_obj =</span> <span class="ot">NA</span>, <span class="dt">sensor =</span> <span class="ot">NA</span>)) <span class="co"># Trivial case</span></span>
-<span id="cb19-4"><a href="#cb19-4"></a>  </span>
-<span id="cb19-5"><a href="#cb19-5"></a>  <span class="kw">return</span>(<span class="kw">tryCatch</span>(<span class="kw">suppressWarnings</span>(<span class="kw">suppressMessages</span>({</span>
-<span id="cb19-6"><a href="#cb19-6"></a>    <span class="co"># Fit a regression, leaving out the last days of data</span></span>
-<span id="cb19-7"><a href="#cb19-7"></a>    n =<span class="st"> </span><span class="kw">nrow</span>(x)</span>
-<span id="cb19-8"><a href="#cb19-8"></a>    lm_obj =<span class="st"> </span><span class="kw">lm</span>(value.y <span class="op">~</span><span class="st"> </span>value.x, <span class="dt">data =</span> x[<span class="dv">1</span><span class="op">:</span>(n<span class="op">-</span>m<span class="op">+</span><span class="dv">1</span>), ])</span>
-<span id="cb19-9"><a href="#cb19-9"></a>    </span>
-<span id="cb19-10"><a href="#cb19-10"></a>    <span class="co"># Form prediction for the last day of data</span></span>
-<span id="cb19-11"><a href="#cb19-11"></a>    sensor =<span class="st"> </span><span class="kw">predict</span>(lm_obj, <span class="dt">newdata =</span> x[n, ])</span>
-<span id="cb19-12"><a href="#cb19-12"></a>    </span>
-<span id="cb19-13"><a href="#cb19-13"></a>    <span class="co"># Return the fitted lm object and prediction</span></span>
-<span id="cb19-14"><a href="#cb19-14"></a>    <span class="kw">list</span>(<span class="dt">lm_obj =</span> lm_obj, <span class="dt">sensor =</span> sensor)</span>
-<span id="cb19-15"><a href="#cb19-15"></a>  })),</span>
-<span id="cb19-16"><a href="#cb19-16"></a>  <span class="dt">error =</span> <span class="cf">function</span>(e) <span class="kw">return</span>(<span class="kw">list</span>(<span class="dt">lm_obj =</span> <span class="ot">NA</span>, <span class="dt">sensor =</span> <span class="ot">NA</span>))))</span>
-<span id="cb19-17"><a href="#cb19-17"></a>}</span>
-<span id="cb19-18"><a href="#cb19-18"></a></span>
-<span id="cb19-19"><a href="#cb19-19"></a>joined &lt;-<span class="st"> </span><span class="kw">slide_by_geo</span>(joined, <span class="dt">slide_fun =</span> dv_regression, <span class="dt">n =</span> <span class="dv">56</span>, <span class="dt">m =</span> <span class="dv">3</span>, </span>
-<span id="cb19-20"><a href="#cb19-20"></a>                       <span class="dt">col_name =</span> <span class="st">&quot;sensor_obj&quot;</span>, <span class="dt">col_type =</span> <span class="st">&quot;list&quot;</span>)</span>
-<span id="cb19-21"><a href="#cb19-21"></a></span>
-<span id="cb19-22"><a href="#cb19-22"></a><span class="kw">class</span>(joined<span class="op">$</span>sensor_obj)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>dv_regression &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">m =</span> <span class="dv">3</span>, ...){</span>
+<span id="cb11-2"><a href="#cb11-2"></a>  n &lt;-<span class="st"> </span><span class="kw">nrow</span>(x)</span>
+<span id="cb11-3"><a href="#cb11-3"></a>  <span class="cf">if</span> ( n <span class="op">&lt;=</span><span class="st"> </span>m<span class="op">+</span><span class="dv">1</span> ) <span class="kw">return</span>(<span class="kw">list</span>(<span class="dt">lm_obj =</span> <span class="ot">NA</span>, <span class="dt">sensor =</span> <span class="ot">NA</span>)) <span class="co"># Trivial case</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a>  </span>
+<span id="cb11-5"><a href="#cb11-5"></a>  <span class="kw">return</span>(<span class="kw">tryCatch</span>(<span class="kw">suppressWarnings</span>(<span class="kw">suppressMessages</span>({</span>
+<span id="cb11-6"><a href="#cb11-6"></a>    <span class="co"># Fit a regression, leaving out the last days of data</span></span>
+<span id="cb11-7"><a href="#cb11-7"></a>    n &lt;-<span class="st"> </span><span class="kw">nrow</span>(x)</span>
+<span id="cb11-8"><a href="#cb11-8"></a>    lm_obj &lt;-<span class="st"> </span><span class="kw">lm</span>(value.y <span class="op">~</span><span class="st"> </span>value.x, <span class="dt">data =</span> x[<span class="dv">1</span><span class="op">:</span>(n<span class="op">-</span>m<span class="op">+</span><span class="dv">1</span>), ])</span>
+<span id="cb11-9"><a href="#cb11-9"></a>    </span>
+<span id="cb11-10"><a href="#cb11-10"></a>    <span class="co"># Form prediction for the last day of data</span></span>
+<span id="cb11-11"><a href="#cb11-11"></a>    sensor &lt;-<span class="st"> </span><span class="kw">predict</span>(lm_obj, <span class="dt">newdata =</span> x[n, ])</span>
+<span id="cb11-12"><a href="#cb11-12"></a>    </span>
+<span id="cb11-13"><a href="#cb11-13"></a>    <span class="co"># Return the fitted lm object and prediction</span></span>
+<span id="cb11-14"><a href="#cb11-14"></a>    <span class="kw">list</span>(<span class="dt">lm_obj =</span> lm_obj, <span class="dt">sensor =</span> sensor)</span>
+<span id="cb11-15"><a href="#cb11-15"></a>  })),</span>
+<span id="cb11-16"><a href="#cb11-16"></a>  <span class="dt">error =</span> <span class="cf">function</span>(e) <span class="kw">return</span>(<span class="kw">list</span>(<span class="dt">lm_obj =</span> <span class="ot">NA</span>, <span class="dt">sensor =</span> <span class="ot">NA</span>))))</span>
+<span id="cb11-17"><a href="#cb11-17"></a>}</span>
+<span id="cb11-18"><a href="#cb11-18"></a></span>
+<span id="cb11-19"><a href="#cb11-19"></a>joined &lt;-<span class="st"> </span><span class="kw">slide_by_geo</span>(joined, <span class="dt">slide_fun =</span> dv_regression, <span class="dt">n =</span> <span class="dv">56</span>, <span class="dt">m =</span> <span class="dv">3</span>, </span>
+<span id="cb11-20"><a href="#cb11-20"></a>                       <span class="dt">col_name =</span> <span class="st">&quot;sensor_obj&quot;</span>, <span class="dt">col_type =</span> <span class="st">&quot;list&quot;</span>)</span>
+<span id="cb11-21"><a href="#cb11-21"></a></span>
+<span id="cb11-22"><a href="#cb11-22"></a><span class="kw">class</span>(joined<span class="op">$</span>sensor_obj)</span></code></pre></div>
 <pre><code>## [1] &quot;list&quot;</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="kw">names</span>(joined<span class="op">$</span>sensor_obj[[<span class="dv">5</span>]]) <span class="co"># The first 4 are lists filled with NAs</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">names</span>(joined<span class="op">$</span>sensor_obj[[<span class="dv">5</span>]]) <span class="co"># The first 4 are lists filled with NAs</span></span></code></pre></div>
 <pre><code>## [1] &quot;lm_obj&quot; &quot;sensor&quot;</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>joined<span class="op">$</span>sensor_obj[[<span class="dv">5</span>]]<span class="op">$</span>lm_obj</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>joined<span class="op">$</span>sensor_obj[[<span class="dv">5</span>]]<span class="op">$</span>lm_obj</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = value.y ~ value.x, data = x[1:(n - m + 1), ])
@@ -544,44 +1171,214 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## Coefficients:
 ## (Intercept)      value.x  
 ##      4.3362       0.8409</code></pre>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>joined<span class="op">$</span>sensor_obj[[<span class="dv">5</span>]]<span class="op">$</span>sensor</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>joined<span class="op">$</span>sensor_obj[[<span class="dv">5</span>]]<span class="op">$</span>sensor</span></code></pre></div>
 <pre><code>##        1 
 ## 6.498118</code></pre>
 <p>This allows for post-inspection of the sensor models, which may be helpful for diagnostic purposes. Note the way in which we structure the return argument in <code>dv_regression()</code> in its failure cases: it is always a list with the same named arguments. This helps keep the post-inspection code just a bit more simple (it is already a hairy enough, to protect against extracting coefficients from <code>NA</code> objects).</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a>joined <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb27-2"><a href="#cb27-2"></a><span class="st">  </span><span class="kw">rowwise</span>() <span class="op">%&gt;%</span></span>
-<span id="cb27-3"><a href="#cb27-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sensor =</span> sensor_obj<span class="op">$</span>sensor, </span>
-<span id="cb27-4"><a href="#cb27-4"></a>         <span class="dt">intercept =</span> <span class="kw">ifelse</span>(<span class="kw">isTRUE</span>(<span class="kw">is.na</span>(sensor_obj<span class="op">$</span>lm_obj)), <span class="ot">NA</span>,</span>
-<span id="cb27-5"><a href="#cb27-5"></a>                            <span class="kw">coef</span>(sensor_obj<span class="op">$</span>lm_obj)[<span class="dv">1</span>]),</span>
-<span id="cb27-6"><a href="#cb27-6"></a>         <span class="dt">slope =</span> <span class="kw">ifelse</span>(<span class="kw">isTRUE</span>(<span class="kw">is.na</span>(sensor_obj<span class="op">$</span>lm_obj)), <span class="ot">NA</span>, </span>
-<span id="cb27-7"><a href="#cb27-7"></a>                        <span class="kw">coef</span>(sensor_obj<span class="op">$</span>lm_obj)[<span class="dv">2</span>])) <span class="op">%&gt;%</span></span>
-<span id="cb27-8"><a href="#cb27-8"></a><span class="st">  </span><span class="kw">select</span>(geo_value, time_value, sensor, intercept, slope) <span class="op">%&gt;%</span></span>
-<span id="cb27-9"><a href="#cb27-9"></a><span class="st">  </span><span class="kw">arrange</span>(geo_value) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb27-10"><a href="#cb27-10"></a><span class="st">  </span><span class="kw">head</span>(<span class="dv">20</span>)</span></code></pre></div>
-<pre><code>## # A tibble: 20 x 5
-## # Rowwise: 
-##    geo_value time_value sensor intercept   slope
-##    &lt;chr&gt;     &lt;date&gt;      &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
-##  1 ca        2020-06-01  NA        NA    NA     
-##  2 ca        2020-06-02  NA        NA    NA     
-##  3 ca        2020-06-03  NA        NA    NA     
-##  4 ca        2020-06-04  NA        NA    NA     
-##  5 ca        2020-06-05   6.50      4.34  0.841 
-##  6 ca        2020-06-06   6.59      7.27 -0.256 
-##  7 ca        2020-06-07   6.68      7.18 -0.181 
-##  8 ca        2020-06-08   6.68      6.97 -0.0937
-##  9 ca        2020-06-09   6.71      6.87 -0.0535
-## 10 ca        2020-06-10   6.74      6.69  0.0159
-## 11 ca        2020-06-11   6.83      6.18  0.218 
-## 12 ca        2020-06-12   6.92      5.61  0.442 
-## 13 ca        2020-06-13   7.01      5.12  0.633 
-## 14 ca        2020-06-14   7.14      4.64  0.820 
-## 15 ca        2020-06-15   7.50      4.07  1.04  
-## 16 ca        2020-06-16   7.66      3.52  1.25  
-## 17 ca        2020-06-17   7.79      3.18  1.38  
-## 18 ca        2020-06-18   7.99      2.87  1.49  
-## 19 ca        2020-06-19   8.43      2.25  1.72  
-## 20 ca        2020-06-20   8.67      1.84  1.87</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>joined <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb19-2"><a href="#cb19-2"></a><span class="st">  </span><span class="kw">rowwise</span>() <span class="op">%&gt;%</span></span>
+<span id="cb19-3"><a href="#cb19-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sensor =</span> sensor_obj<span class="op">$</span>sensor, </span>
+<span id="cb19-4"><a href="#cb19-4"></a>         <span class="dt">intercept =</span> <span class="kw">ifelse</span>(<span class="kw">isTRUE</span>(<span class="kw">is.na</span>(sensor_obj<span class="op">$</span>lm_obj)), <span class="ot">NA</span>,</span>
+<span id="cb19-5"><a href="#cb19-5"></a>                            <span class="kw">coef</span>(sensor_obj<span class="op">$</span>lm_obj)[<span class="dv">1</span>]),</span>
+<span id="cb19-6"><a href="#cb19-6"></a>         <span class="dt">slope =</span> <span class="kw">ifelse</span>(<span class="kw">isTRUE</span>(<span class="kw">is.na</span>(sensor_obj<span class="op">$</span>lm_obj)), <span class="ot">NA</span>, </span>
+<span id="cb19-7"><a href="#cb19-7"></a>                        <span class="kw">coef</span>(sensor_obj<span class="op">$</span>lm_obj)[<span class="dv">2</span>])) <span class="op">%&gt;%</span></span>
+<span id="cb19-8"><a href="#cb19-8"></a><span class="st">  </span><span class="kw">select</span>(geo_value, time_value, sensor, intercept, slope) <span class="op">%&gt;%</span></span>
+<span id="cb19-9"><a href="#cb19-9"></a><span class="st">  </span><span class="kw">arrange</span>(geo_value) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb19-10"><a href="#cb19-10"></a><span class="st">  </span><span class="kw">head</span>(<span class="dt">n =</span> <span class="dv">10</span>) <span class="op">%&gt;%</span></span>
+<span id="cb19-11"><a href="#cb19-11"></a><span class="st">  </span><span class="kw">kable</span>(<span class="dt">format =</span> <span class="st">&quot;html&quot;</span>, <span class="dt">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+geo_value
+</th>
+<th style="text-align:left;">
+time_value
+</th>
+<th style="text-align:right;">
+sensor
+</th>
+<th style="text-align:right;">
+intercept
+</th>
+<th style="text-align:right;">
+slope
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-01
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-02
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-03
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-04
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-05
+</td>
+<td style="text-align:right;">
+6.498
+</td>
+<td style="text-align:right;">
+4.336
+</td>
+<td style="text-align:right;">
+0.841
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-06
+</td>
+<td style="text-align:right;">
+6.594
+</td>
+<td style="text-align:right;">
+7.267
+</td>
+<td style="text-align:right;">
+-0.256
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-07
+</td>
+<td style="text-align:right;">
+6.682
+</td>
+<td style="text-align:right;">
+7.175
+</td>
+<td style="text-align:right;">
+-0.181
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-08
+</td>
+<td style="text-align:right;">
+6.683
+</td>
+<td style="text-align:right;">
+6.969
+</td>
+<td style="text-align:right;">
+-0.094
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-09
+</td>
+<td style="text-align:right;">
+6.709
+</td>
+<td style="text-align:right;">
+6.868
+</td>
+<td style="text-align:right;">
+-0.053
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-10
+</td>
+<td style="text-align:right;">
+6.738
+</td>
+<td style="text-align:right;">
+6.690
+</td>
+<td style="text-align:right;">
+0.016
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 
 

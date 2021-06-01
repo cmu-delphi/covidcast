@@ -30,4 +30,4 @@ Imports:
     tidyr,
     knitr,
     rmarkdown
-VignetteBuilder: knitr
+VignetteBuilder: rmarkdown

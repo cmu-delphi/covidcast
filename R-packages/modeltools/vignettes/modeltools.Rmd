@@ -3,7 +3,7 @@ title: Getting started with `modeltools`
 description: An introductory tutorial with examples.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting started with modeltools}
+  %\VignetteIndexEntry{Getting started with `modeltools`}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

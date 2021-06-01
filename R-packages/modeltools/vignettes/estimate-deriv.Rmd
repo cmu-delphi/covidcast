@@ -171,27 +171,3 @@ smoothing spline methods. Again, using cross-validation offers a noticeable
 improvement in adapting to to the time-varying level of smoothness, as is very 
 clear from the differences between red and blue derivative estimates in October 
 and November. 
-
-## Post-hoc inspection
-
-In the call to `estimate_deriv()`, we can set `keep_obj = TRUE` to keep around a
-second column with the fitted model objects. For example, here, we can look at 
-the p-values associated with the estimated slopes from `lsfit()`. 
-
-```{r}
-case_rates <- estimate_deriv(case_rates, method = "lin", n = 14, 
-                             keep_obj = TRUE)
-
-class(case_rates$deriv_obj)
-ls.print(case_rates$deriv_obj[[7]])
-         
-case_rates <- case_rates %>%
-  rowwise() %>%
-  mutate(p_value = quiet(
-    tryCatch(ls.print(deriv_obj)$coef.table[[1]][2,"Pr(>|t|)"], 
-             error = function(e) NA))) 
-
-case_rates %>% 
-  arrange(geo_value) %>% 
-  select(geo_value, time_value, value, deriv, deriv_obj, p_value)
-```

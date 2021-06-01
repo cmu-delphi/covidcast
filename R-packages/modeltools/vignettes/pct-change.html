@@ -12,7 +12,7 @@
 
 
 
-<title>1. Compute percentage change over time</title>
+<title>1. Compute percentage change of a signal over time</title>
 
 <script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
 // v0.0.1
@@ -332,11 +332,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">1. Compute percentage change over time</h1>
+<h1 class="title toc-ignore">1. Compute percentage change of a signal over time</h1>
 
 
 
-<p>A basic way of assessing growth in a signal is to look at the percentage change in its cumulative value between two adjacent time windows of equal length. We illustrate this in the current vignette using the <code>pct_change()</code> function in the <code>modeltools</code> package. As in the <a href="https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html">Getting started guide</a>, we focus on state-level COVID-19 case rates from the USAFacts data source, smoothed via 7-day trailing averages, from June 2020 through mid-November 2020.</p>
+<p>A simple way of assessing the growth of a signal is to look at the percentage change in its cumulative value between two adjacent time windows of equal length. We illustrate this in the current vignette using the <code>pct_change()</code> function in the <code>modeltools</code> package. As in the <a href="https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html">Getting started guide</a>, we focus on state-level COVID-19 case rates from the USAFacts data source, smoothed via 7-day trailing averages, from June 2020 through mid-November 2020.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(covidcast)</span>
 <span id="cb1-2"><a href="#cb1-2"></a></span>
 <span id="cb1-3"><a href="#cb1-3"></a>start_day &lt;-<span class="st"> &quot;2020-06-01&quot;</span></span>

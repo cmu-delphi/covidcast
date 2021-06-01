@@ -22,24 +22,33 @@ at Carnegie Mellon University.
 CRAN, but it is entirely unrelated to this one.**
 
 This package is available on the [CMU Delphi Group GitHub 
-page](https://github.com/cmu-delphi) and can be installed using the 
-[`devtools`](https://cran.r-project.org/package=devtools) package, as follows:
+page](https://github.com/cmu-delphi) and can be installed using the commands
+below from the [`devtools`](https://cran.r-project.org/package=devtools) 
+package.
+
+### Install without vignettes
+
+Building the `modeltools` vignettes, such as this *Getting started guide*, 
+takes a significant amount of time. So, by default, the vignettes are not 
+included in the downloaded package. The sans vignette package
 
 ```{r, eval = FALSE}
 devtools::install_github(repo = "cmu-delphi/covidcast", ref = "main",
                          subdir = "R-packages/modeltools")
 ```
 
-Building the package's vignettes, such as this *Getting started guide*, takes a 
-significant amount of time. So, by default, the vignettes are not included 
-with the downloaded package. If you wish to include the vignettes, then use 
-the following installation command instead:
+### Install with vignettes
+
+If you wish to include the vignettes, then use the following installation 
+command instead:
 
 ```{r, eval = FALSE}
-devtools::install_github(repo = "cmu-delphi/covidcast", ref = "main",
+devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
                          subdir = "R-packages/modeltools",
                          build_vignettes = TRUE, dependencies = TRUE)
 ```
+
+## Downloading data from the `covidcast` API
 
 For this *Getting started* vignette, we'll fetch COVID-19 case rates, both raw 
 and smoothed via 7-day trailing averages, from the [Delphi 
@@ -144,11 +153,15 @@ applies the function or formula to whatever data is available.
 ## Slide with a function 
 
 We can also pass a function to the `slide_fun` argument in `slide_by_geo()`. In 
-this case, the passed function must have the following argument structure: `x`, 
-a data frame with the same column names as the data frame passed to
+this case, the passed function must have the following argument structure: 
+
+>`x`: a data frame with the same column names as the data frame passed to
 `slide_by_geo()`; followed by any number of named additional arguments; and 
-ending with `...`, to allow for general additional arguments. Recreating the 
-last example of a 7-day trailing average: 
+ending with `...`, to allow for general additional arguments. 
+
+### Example 1
+
+Recreating the last example of a 7-day trailing average: 
 
 ```{r}
 slide_by_geo(signals[[1]], slide_fun = function(x, ...) Mean(x$value), n = 7,
@@ -158,6 +171,9 @@ slide_by_geo(signals[[1]], slide_fun = function(x, ...) Mean(x$value), n = 7,
   head(10) %>%
   kable(format = "html", digits = 3)
 ```
+
+
+### Example 2 
 
 As a more sophisticated example, here we show how to *sensorize* the doctor 
 visits signal. The sensor values are defined by the predicted values from a 
@@ -203,58 +219,4 @@ Above, the first 4 elements are `NA` because of insufficient training data (we
 need at least 2 training samples for simple linear regression, and we omit the 
 last 3 days of data).
 
-## Returning complex objects
-
-As a final example, we show how to use `slide_by_geo()` to output more complex
-objects. We amend the last example so that `dv_regression()` returns both the
-predicted value (sensor) and the fitted linear model object. In order to use 
-this with `slide_by_geo()`, we need to set the `col_type` argument to be "list":
-
-```{r}
-dv_regression <- function(x, m = 3, ...){
-  n <- nrow(x)
-  if ( n <= m+1 ) return(list(lm_obj = NA, sensor = NA)) # Trivial case
-  
-  return(tryCatch(suppressWarnings(suppressMessages({
-    # Fit a regression, leaving out the last days of data
-    n <- nrow(x)
-    lm_obj <- lm(value.y ~ value.x, data = x[1:(n-m+1), ])
-    
-    # Form prediction for the last day of data
-    sensor <- predict(lm_obj, newdata = x[n, ])
-    
-    # Return the fitted lm object and prediction
-    list(lm_obj = lm_obj, sensor = sensor)
-  })),
-  error = function(e) return(list(lm_obj = NA, sensor = NA))))
-}
-
-joined <- slide_by_geo(joined, slide_fun = dv_regression, n = 56, m = 3, 
-                       col_name = "sensor_obj", col_type = "list")
-
-class(joined$sensor_obj)
-names(joined$sensor_obj[[5]]) # The first 4 are lists filled with NAs
-joined$sensor_obj[[5]]$lm_obj
-joined$sensor_obj[[5]]$sensor
-```
-
-This allows for post-inspection of the sensor models, which may be helpful for
-diagnostic purposes. Note the way in which we structure the return argument in 
-`dv_regression()` in its failure cases: it is always a list with the same named
-arguments. This helps keep the post-inspection code just a bit more simple (it
-is already a hairy enough, to protect against extracting coefficients from `NA` 
-objects).
-
-```{r}
-joined %>% 
-  rowwise() %>%
-  mutate(sensor = sensor_obj$sensor, 
-         intercept = ifelse(isTRUE(is.na(sensor_obj$lm_obj)), NA,
-                            coef(sensor_obj$lm_obj)[1]),
-         slope = ifelse(isTRUE(is.na(sensor_obj$lm_obj)), NA, 
-                        coef(sensor_obj$lm_obj)[2])) %>%
-  select(geo_value, time_value, sensor, intercept, slope) %>%
-  arrange(geo_value) %>% 
-  head(n = 10) %>%
-  kable(format = "html", digits = 3)
-```
+We call this a "sensor".

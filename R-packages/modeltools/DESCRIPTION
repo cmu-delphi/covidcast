@@ -19,7 +19,7 @@ RoxygenNote: 7.1.1
 Remotes:
     github::cmu-delphi/covidcast/R-packages/covidcast@main,
     github::cmu-delphi/covidcast/R-packages/evalcast@evalcast-killcards
-Depends: R (>= 4.1.0)
+Depends: R (>= 3.5.0)
 Imports: 
     covidcast,
     dplyr,
@@ -30,4 +30,3 @@ Imports:
     tidyr,
     knitr,
     rmarkdown
-VignetteBuilder: rmarkdown

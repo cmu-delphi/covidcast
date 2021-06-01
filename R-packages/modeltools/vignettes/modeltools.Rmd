@@ -33,7 +33,7 @@ takes a significant amount of time. So, by default, the vignettes are not
 included in the downloaded package. The sans vignette package
 
 ```{r, eval = FALSE}
-devtools::install_github(repo = "cmu-delphi/covidcast", ref = "main",
+devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
                          subdir = "R-packages/modeltools")
 ```
 

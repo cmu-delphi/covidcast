@@ -28,3 +28,4 @@ Imports:
     slider,
     tidyselect,
     tidyr
+VignetteBuilder: knitr

@@ -8,9 +8,10 @@ Authors@R:
            family = "Tibshirani",
            role = c("aut", "cre"),
            email = "ryantibs@cmu.edu"))
-Description: Tools for building COVID-19 models, mainly forecasting and hotspot
-    prediction models. This package is meant to be used in conjuction with the
-    covidcast and evalcast packages.
+Description: Tools for building COVID-19 models, mainly short-term forecasting 
+    and hotspot prediction models. This package is meant to be used in 
+    conjuction with the `covidcast` and `evalcast` packages.
+URL: https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools
 License: MIT
 Encoding: UTF-8
 LazyData: true
@@ -19,7 +20,7 @@ RoxygenNote: 7.1.1
 Remotes:
     github::cmu-delphi/covidcast/R-packages/covidcast@main,
     github::cmu-delphi/covidcast/R-packages/evalcast@evalcast-killcards
-Depends: R (>= 3.5.0)
+Depends: R (>= 4.1.0)
 Imports: 
     covidcast,
     dplyr,
@@ -30,4 +31,4 @@ Imports:
     tidyr,
     knitr,
     rmarkdown
-VignetteBuilder: rmarkdown
+VignetteBuilder: knitr::rmarkdown

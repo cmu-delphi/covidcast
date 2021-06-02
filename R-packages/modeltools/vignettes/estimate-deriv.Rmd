@@ -38,7 +38,7 @@ trailing sample size (number of days) to use in training the given method. Here
 we use `method = "lin"`, the default, which uses the slope from a simple linear 
 regression, and `n = 14`, also the default. 
 
-```{r, message = FALSE}
+```{r}
 library(modeltools)
 library(dplyr)
 

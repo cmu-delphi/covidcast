@@ -28,7 +28,7 @@ Imports:
     genlasso,
     slider,
     tidyselect,
-    tidyr,
-    knitr,
-    rmarkdown
-VignetteBuilder: knitr::rmarkdown
+    tidyr
+Suggests:
+    knitr
+VignetteBuilder: knitr

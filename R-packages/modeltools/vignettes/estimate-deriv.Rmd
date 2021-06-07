@@ -1,6 +1,6 @@
 ---
 title: 2. Estimate derivatives of signals
-description: Estimate derivatives of signal values, using various methodologies.
+description: Estimate derivatives of signal values, using various methods.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{2. Estimate derivatives of signals}
@@ -38,7 +38,7 @@ trailing sample size (number of days) to use in training the given method. Here
 we use `method = "lin"`, the default, which uses the slope from a simple linear 
 regression, and `n = 14`, also the default. 
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 library(modeltools)
 library(dplyr)
 

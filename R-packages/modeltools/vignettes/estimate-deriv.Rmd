@@ -38,8 +38,11 @@ trailing sample size (number of days) to use in training the given method. Here
 we use `method = "lin"`, the default, which uses the slope from a simple linear 
 regression, and `n = 14`, also the default. 
 
-```{r, message = FALSE, warning = FALSE, eval = FALSE}
-case_rates <- estimate_deriv(case_rates, method = "lin", n = 14)
+```{r, message = FALSE, warning = FALSE}
+library(modeltools)
+library(dplyr)
+
+case_rates <- estimate_deriv(case_rates, method = "ss", n = 14)
 
 case_rates %>% 
   arrange(geo_value) %>% 
@@ -53,8 +56,6 @@ estimate exceeds a threshold (arbitrarily chosen) of 0.25. These seem to roughly
 but reasonably mark times of upswing in the underlying signal. 
 
 ```{r, message = FALSE, warning = FALSE, fig.width = 8, fig.height = 4}
-library(modeltools)
-library(dplyr)
 library(ggplot2)
 library(gridExtra)
 

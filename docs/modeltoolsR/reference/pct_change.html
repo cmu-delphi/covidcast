@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute percentage change of values in covidcast_signal data frame — pct_change • modeltools</title>
+<title>Compute percentage change of values in <code>covidcast_signal</code> data frame — pct_change • modeltools</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Compute percentage change of values in covidcast_signal data frame — pct_change" />
+<meta property="og:title" content="Compute percentage change of values in <code>covidcast_signal</code> data frame — pct_change" />
 <meta property="og:description" content="Computes the percentage change of the values in a covidcast_signal data
 frame. (When multiple issue dates are present, only the latest issue is
 considered.)  See the percentage change vignette
@@ -83,7 +83,7 @@ for examples." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -101,13 +101,13 @@ for examples." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/pct-change.html">1. Compute percentage change over time</a>
+      <a href="../articles/pct-change.html">1. Compute percentage change of a signal over time</a>
     </li>
     <li>
       <a href="../articles/estimate-deriv.html">2. Estimate derivatives of signals</a>
     </li>
     <li>
-      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts</a>
+      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of signals</a>
     </li>
   </ul>
 </li>
@@ -115,7 +115,7 @@ for examples." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools">
-    <span class="fab fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -144,7 +144,7 @@ considered.)  See the <a href='https://cmu-delphi.github.io/covidcast/modeltools
 for examples.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>pct_change</span><span class='op'>(</span><span class='va'>x</span>, n <span class='op'>=</span> <span class='fl'>14</span>, col_name <span class='op'>=</span> <span class='st'>"pct_change"</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>pct_change</span>(<span class='no'>x</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>14</span>, <span class='kw'>col_name</span> <span class='kw'>=</span> <span class='st'>"pct_change"</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -155,11 +155,11 @@ for examples.</p>
     </tr>
     <tr>
       <th>n</th>
-      <td><p>Size of the local window (in days) to use (bumped up to the nearest
-even integer, if needed). For example, if <code>n = 10</code>, then to compute the
-percentage change on November 10, we use 100 * (B - A) / A, where A is the
-sum of the values between November 6 and November 10, and A is the sum of
-the values between November 1 and November 5. Default is 14.</p></td>
+      <td><p>Length of the local window (in days) to use (bumped up to the
+nearest even integer, if needed). For example, if <code>n = 10</code>, then to compute
+the percentage change on November 10, we use 100 * (B - A) / A, where A is
+the sum of the values between November 6 and November 10, and A is the sum
+of the values between November 1 and November 5. Default is 14.</p></td>
     </tr>
     <tr>
       <th>col_name</th>
@@ -189,7 +189,7 @@ to the <code>col_name</code> argument, containing the percentage change values.<
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

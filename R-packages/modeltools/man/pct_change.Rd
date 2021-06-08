@@ -9,11 +9,11 @@ pct_change(x, n = 14, col_name = "pct_change")
 \arguments{
 \item{x}{The \code{covidcast_signal} data frame under consideration.}
 
-\item{n}{Size of the local window (in days) to use (bumped up to the nearest
-even integer, if needed). For example, if \code{n = 10}, then to compute the
-percentage change on November 10, we use 100 * (B - A) / A, where A is the
-sum of the values between November 6 and November 10, and A is the sum of
-the values between November 1 and November 5. Default is 14.}
+\item{n}{Length of the local window (in days) to use (bumped up to the
+nearest even integer, if needed). For example, if \code{n = 10}, then to compute
+the percentage change on November 10, we use 100 * (B - A) / A, where A is
+the sum of the values between November 6 and November 10, and A is the sum
+of the values between November 1 and November 5. Default is 14.}
 
 \item{col_name}{String indicating the name of the new column that will
 contain the percentage change values. Default is "pct_change"; note that we

@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1. Compute percentage change over time • modeltools</title>
+<title>1. Compute percentage change of a signal over time • modeltools</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="1. Compute percentage change over time">
+<script src="../pkgdown.js"></script><meta property="og:title" content="1. Compute percentage change of a signal over time">
 <meta property="og:description" content="Compute percentage change of signal values over time.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -57,13 +57,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/pct-change.html">1. Compute percentage change over time</a>
+      <a href="../articles/pct-change.html">1. Compute percentage change of a signal over time</a>
     </li>
     <li>
       <a href="../articles/estimate-deriv.html">2. Estimate derivatives of signals</a>
     </li>
     <li>
-      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts</a>
+      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of signals</a>
     </li>
   </ul>
 </li>
@@ -89,7 +89,7 @@
 <script src="pct-change_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>1. Compute percentage change over time</h1>
+      <h1 data-toc-skip>1. Compute percentage change of a signal over time</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/cmu-delphi/covidcast/blob/main/R-packages/modeltools/vignettes/pct-change.Rmd"><code>vignettes/pct-change.Rmd</code></a></small>
@@ -99,38 +99,40 @@
 
     
     
-<p>A basic way of assessing growth in a signal is to look at its percentage change over two neighboring time windows. We investigate this in the current vignette, using the <code><a href="../reference/pct_change.html">pct_change()</a></code> function in the <code>modeltools</code> package. As in the getting started guide, we focus on state-level COVID-19 case rates from the USAFacts data source, smoothed via 7-day trailing averages, from June to mid November.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">covidcast</span>)</pre></body></html></div>
-<pre><code>## We encourage COVIDcast API users to register on our mailing list:
-## https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api
-## We'll send announcements about new data sources, package updates,
-## server maintenance, and new features.</code></pre>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">start_day</span> <span class="kw">&lt;-</span> <span class="st">"2020-06-01"</span>
+<p>A simple way of assessing the growth of a signal is to look at the percentage change in its cumulative value between two adjacent time windows of equal length. We illustrate this in the current vignette using the <code><a href="../reference/pct_change.html">pct_change()</a></code> function in the <code>modeltools</code> package. As in the <a href="https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html">Getting started guide</a>, we focus on state-level COVID-19 case rates from the USAFacts data source, smoothed via 7-day trailing averages, from June 2020 through mid-November 2020.</p>
+<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">covidcast</span>)
+
+<span class="no">start_day</span> <span class="kw">&lt;-</span> <span class="st">"2020-06-01"</span>
 <span class="no">end_day</span> <span class="kw">&lt;-</span> <span class="st">"2020-11-15"</span>
 <span class="no">geo_values</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"ca"</span>, <span class="st">"fl"</span>, <span class="st">"ny"</span>, <span class="st">"tx"</span>)
 
-<span class="no">case_rates</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(
-  <span class="fu"><a href="https://rdrr.io/pkg/covidcast/man/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"usa-facts"</span>,
-                   <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"confirmed_7dav_incidence_prop"</span>,
-                   <span class="kw">start_day</span> <span class="kw">=</span> <span class="no">start_day</span>, <span class="kw">end_day</span> <span class="kw">=</span> <span class="no">end_day</span>,
-                   <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>, <span class="kw">geo_values</span> <span class="kw">=</span> <span class="no">geo_values</span>))
-
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">case_rates</span>)</pre></body></html></div>
-<pre><code>## A `covidcast_signal` data frame with 672 rows and 9 columns.
-## 
-## data_source : usa-facts
-## signal      : confirmed_7dav_incidence_prop
-## geo_type    : state
-## 
-## first date                          : 2020-06-01
-## last date                           : 2020-11-15
-## median number of geo_values per day : 4</code></pre>
+<span class="no">case_rates</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/covidcast/man/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"usa-facts"</span>,
+                               <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"confirmed_7dav_incidence_prop"</span>,
+                               <span class="kw">start_day</span> <span class="kw">=</span> <span class="no">start_day</span>,
+                               <span class="kw">end_day</span> <span class="kw">=</span> <span class="no">end_day</span>,
+                               <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>,
+                               <span class="kw">geo_values</span> <span class="kw">=</span> <span class="no">geo_values</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">case_rates</span>)
+<span class="co">## A `covidcast_signal` data frame with 672 rows and 9 columns.</span>
+<span class="co">## </span>
+<span class="co">## data_source : usa-facts</span>
+<span class="co">## signal      : confirmed_7dav_incidence_prop</span>
+<span class="co">## geo_type    : state</span>
+<span class="co">## </span>
+<span class="co">## first date                          : 2020-06-01</span>
+<span class="co">## last date                           : 2020-11-15</span>
+<span class="co">## median number of geo_values per day : 4</span></pre></body></html></div>
 <div id="percentage-change" class="section level2">
 <h2 class="hasAnchor">
 <a href="#percentage-change" class="anchor"></a>Percentage change</h2>
-<p>The <code><a href="../reference/pct_change.html">pct_change()</a></code> function operates on a <code>covidcast_signal</code> data frame, and takes an argument <code>n</code>, indicating the size of the local window (in days) to use. For example, if <code>n = 10</code>, then to compute the percentage change on November 10, we use 100 * (B - A) / A, where A is the sum of the values between November 6 and November 10, and A is the sum of the values between November 1 and November 5. The default is <code>n = 14</code>, giving the percentage change between back-to-back weeks.</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">modeltools</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
+<p>The <code><a href="../reference/pct_change.html">pct_change()</a></code> function operates on a <code>covidcast_signal</code> data frame, and takes an argument <code>n</code>, indicating the size of the local window (in days) to use. For example, if <code>n = 10</code>, the percentage change of the signal on November 10 is defined as <span class="math display">\[\frac{B - A}{A}\cdot 100\%,\]</span> where</p>
+<ul>
+<li><p><span class="math inline">\(A\)</span> is the sum of the signal values between November 1 and November 5 (inclusive),</p></li>
+<li><p><span class="math inline">\(B\)</span> is the sum of the signal values between November 6 and November 10 (inclusive).</p></li>
+</ul>
+<p>The default value is <code>n = 14</code>, which corresponds to the percentage change of a signal over back-to-back weeks.</p>
+<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">modeltools</span>)
 
 <span class="no">case_rates</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/pct_change.html">pct_change</a></span>(<span class="no">case_rates</span>, <span class="kw">n</span> <span class="kw">=</span> <span class="fl">14</span>)
 
@@ -164,15 +166,15 @@
 ## 21 ca        2020-06-21  8.94      15.6 
 ## # … with 651 more rows</code></pre>
 <p>We can see that a column <code>pct_change</code> column has been appended to the output data frame, which contains the percentage change values estimates. Next we plot these values alongside the signal itself.</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
+<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">gridExtra</span>)
 
-<span class="no">state</span> <span class="kw">=</span> <span class="st">"fl"</span>
+<span class="no">state</span> <span class="kw">&lt;-</span> <span class="st">"fl"</span>
 
 <span class="no">p1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">case_rates</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">geo_value</span> <span class="kw">==</span> <span class="no">state</span>),
              <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">time_value</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">value</span>)) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">"Date"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"Cases per 100,00 people"</span>)
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">"Date"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"Cases per 100,000 people"</span>)
 
 <span class="no">p2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">case_rates</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">geo_value</span> <span class="kw">==</span> <span class="no">state</span>),
              <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">time_value</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">pct_change</span>)) +
@@ -180,21 +182,20 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">"Date"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"Weekly percentage change"</span>)
 
 <span class="fu"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html">grid.arrange</a></span>(<span class="no">p1</span>, <span class="no">p2</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">1</span>)</pre></body></html></div>
-<p><img src="pct-change_files/figure-html/unnamed-chunk-3-1.png" width="768"></p>
+<p><img src="pct-change_files/figure-html/unnamed-chunk-4-1.png" width="768"></p>
 </div>
 <div id="smoothing-via-7-day-averaging" class="section level2">
 <h2 class="hasAnchor">
 <a href="#smoothing-via-7-day-averaging" class="anchor"></a>Smoothing via 7-day averaging</h2>
-<p>Computing the percentage change between back-to-back days, using <code>n = 2</code>, will generally return a pretty volatile sequence; below we show how to smooth this sequence by post-applying a 7-day trailing average, with a suitable application of <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code>.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">case_rates</span> <span class="kw">&lt;-</span> <span class="no">case_rates</span> <span class="kw">%&gt;%</span>
+<p>Computing the percentage change between back-to-back days (i.e. <code>n = 2</code>), will generally return a pretty volatile sequence; below we show how to smooth this sequence by post-applying a 7-day trailing average, with a suitable application of <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code>.</p>
+<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">case_rates</span> <span class="kw">&lt;-</span> <span class="no">case_rates</span> <span class="kw">%&gt;%</span>
   <span class="fu"><a href="../reference/pct_change.html">pct_change</a></span>(<span class="kw">n</span> <span class="kw">=</span> <span class="fl">2</span>, <span class="kw">col_name</span> <span class="kw">=</span> <span class="st">"pct_change_daily"</span>) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="../reference/slide_by_geo.html">slide_by_geo</a></span>(~ <span class="fu"><a href="../reference/Min.html">Mean</a></span>(<span class="no">.x</span>$<span class="no">pct_change_daily</span>), <span class="kw">n</span> <span class="kw">=</span> <span class="fl">7</span>,
                <span class="kw">col_name</span> <span class="kw">=</span> <span class="st">"pct_change_daily_7dav"</span>)
 
 <span class="no">case_rates</span> <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span>(<span class="no">geo_value</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">geo_value</span>, <span class="no">time_value</span>, <span class="no">value</span>, <span class="no">pct_change_daily</span>,
-         <span class="no">pct_change_daily_7dav</span>) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">geo_value</span>,<span class="no">time_value</span>,<span class="no">value</span>,<span class="no">pct_change_daily</span>,<span class="no">pct_change_daily_7dav</span>) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="kw">n</span> <span class="kw">=</span> <span class="fl">7</span>)</pre></body></html></div>
 <pre><code>## # A tibble: 7 x 5
 ##   geo_value time_value value pct_change_daily pct_change_daily_7dav
@@ -206,10 +207,10 @@
 ## 5 ca        2020-06-05  7.11            3.59                  1.56 
 ## 6 ca        2020-06-06  6.81           -4.24                  0.403
 ## 7 ca        2020-06-07  6.74           -0.977                 0.173</code></pre>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="no">p1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">case_rates</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">geo_value</span> <span class="kw">==</span> <span class="no">state</span>),
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">p1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">case_rates</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">geo_value</span> <span class="kw">==</span> <span class="no">state</span>),
              <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">time_value</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">value</span>)) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">"Date"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"Cases per 100,00 people"</span>)
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">"Date"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"Cases per 100,000 people"</span>)
 
 <span class="no">p2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">case_rates</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">geo_value</span> <span class="kw">==</span> <span class="no">state</span>),
              <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">time_value</span>)) +
@@ -218,7 +219,7 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">"Date"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"Daily percentage change"</span>)
 
 <span class="fu"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html">grid.arrange</a></span>(<span class="no">p1</span>, <span class="no">p2</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">1</span>)</pre></body></html></div>
-<p><img src="pct-change_files/figure-html/unnamed-chunk-4-1.png" width="768"></p>
+<p><img src="pct-change_files/figure-html/unnamed-chunk-5-1.png" width="768"></p>
 </div>
   </div>
 

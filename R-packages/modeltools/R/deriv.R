@@ -78,7 +78,7 @@
 #' @export
 estimate_deriv <- function(x, method = c("lin", "ss", "tf"), n = 14,
                            col_name = "deriv", keep_obj = FALSE, deriv = 1,
-                           ...) {  
+                           ...){  
   # Define the slider function
   method <- match.arg(method)
   slide_fun <- switch(method,

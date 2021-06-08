@@ -42,7 +42,7 @@ regression, and `n = 14`, also the default.
 library(modeltools)
 library(dplyr)
 
-case_rates <- estimate_deriv(case_rates, method = "ss", n = 14)
+case_rates <- estimate_deriv(case_rates, method = "lin", n = 14)
 
 case_rates %>% 
   arrange(geo_value) %>% 

@@ -141,7 +141,9 @@ slide_by_geo(signals[[1]], slide_fun = ~ Mean(.x$value), n = 7) %>%
   select(geo_value, time_value, value, slide_value) %>%
   arrange(geo_value) %>%
   head(10) %>%
-  kable(format = "html", digits = 3)
+  kable(format = "html", digits = 3, 
+        caption = paste("U.S. COVID-19 case rates (7-day trailing average computed by sliding",
+                        "a formula)"))
 ```
 
 The formula specified by `slide_fun` has access to all columns present in the
@@ -160,7 +162,9 @@ slide_by_geo(signals[[1]], slide_fun = ~ Mean(.x$value), n = 7, col_name = "7dav
   select(geo_value, time_value, value, `7dav`) %>%
   arrange(geo_value) %>% 
   head(10) %>%
-  kable(format = "html", digits = 3)
+  kable(format = "html", digits = 3, 
+        caption = paste("U.S. COVID-19 case rates (7-day trailing average computed by sliding",
+                        "a formula)"))
 ```
 
 As a simple sanity check, we compare the 7-day trailing average computed via
@@ -213,7 +217,9 @@ slide_by_geo(signals[[1]], slide_fun = function(x, ...) Mean(x$value), n = 7, co
   select(geo_value, time_value, value, `7dav`) %>%
   arrange(geo_value) %>% 
   head(10) %>%
-  kable(format = "html", digits = 3)
+  kable(format = "html", digits = 3, 
+        caption = paste("U.S. COVID-19 case rates (7-day trailing average computed by sliding",
+                        "a function)"))
 ```
 
 

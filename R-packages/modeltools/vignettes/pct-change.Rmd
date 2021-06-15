@@ -12,8 +12,8 @@ vignette: >
 options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
-A simple way of assessing the growth or decay of a `covidcast` signal is to look 
-at the percentage change in its cumulative value between two adjacent time 
+A simple way of assessing the growth and decay of a `covidcast` signal is to 
+look at the percentage change in its cumulative value between two adjacent time 
 windows of equal length. We illustrate this in the current vignette using the 
 `pct_change()` function from the `modeltools` package. 
 
@@ -120,7 +120,7 @@ Below we plot the weekly percentage change of the smoothed COVID-19 case rates
 fetched above alongside the smoothed COVID-19 case rates themselves. Here, we 
 focus solely on Florida COVID-19 case rates. 
 
-```{r, message = FALSE, warning = FALSE, fig.width = 8, fig.height = 4}
+```{r, message = F, warning = F, fig.width = 8, fig.height = 4, fig.retina = 2, dpi = 85}
 library(ggplot2)
 library(gridExtra)
 
@@ -172,14 +172,15 @@ case_rates %>%
 ### Vizualizing the results
 
 Here we show again the COVID-19 case rates in Florida, but now next to its daily
-percentage change time series (shown in red). As expected, a direct calculation
-of the percentage change in COVID-19 case rates at the daily level yields a 
-highly volatile time series that is almost surely not representative of real 
-variations in the spread of COVID-19 in Florida. The daily percentage change
-post-processed with a 7-day trailing average (shown in blue) is likely a better
-indicator.
+percentage change time series 
+(<span style="color: red;">shown in red</span>). As expected, a direct 
+calculation of the percentage change in COVID-19 case rates at the daily level 
+yields a highly volatile time series that is almost surely not representative of 
+real variations in the spread of COVID-19 in Florida. The daily percentage 
+change post-processed with a 7-day trailing average 
+(<span style="color: blue;">shown in blue</span>) is likely a better indicator.
 
-```{r, message = FALSE, warning = FALSE, fig.width = 8, fig.height = 4.5}
+```{r, message = F, warning = F, fig.width = 8, fig.height = 4.5, fig.retina = 2, dpi = 85}
 p1 <- ggplot(case_rates %>% filter(geo_value == state), aes(x = time_value, y = value)) +
   geom_line() + 
   labs(title = "Florida COVID-19 case rates (smoothed)", 

@@ -1,20 +1,31 @@
 ---
-title: 1. Compute percentage change of a signal over time
-description: Compute percentage change of signal values over time.
+title: 1. Compute the percentage change of a `covidcast` signal over time
+description: Compute the percentage change of `covidcast` signal values over time.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{1. Compute percentage change of a signal over time}
+  %\VignetteIndexEntry{1. Compute percentage change of a `covidcast` signal over time}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-A simple way of assessing the growth of a signal is to look at the percentage 
-change in its cumulative value between two adjacent time windows of equal 
-length. We illustrate this in the current vignette using the `pct_change()` 
-function in the `modeltools` package. As in the 
+```{r, echo = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
+A simple way of assessing the growth or decay of a `covidcast` signal is to look 
+at the percentage change in its cumulative value between two adjacent time 
+windows of equal length. We illustrate this in the current vignette using the 
+`pct_change()` function from the `modeltools` package. 
+
+## Download data from the Delphi API
+
+As in the 
 [Getting started guide](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html), 
-we focus on state-level COVID-19 case rates from the USAFacts data source, 
-smoothed via 7-day trailing averages, from June 2020 through mid-November 2020. 
+we focus on state-level COVID-19 case rates from the 
+[*USAFacts*](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html) 
+data source, smoothed with 7-day trailing averages, from June 1, 2020 to 
+November 15, 2020. The code chunk below fetches these data from the 
+[Delphi API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html).
 
 ```{r message = FALSE}
 library(covidcast)
@@ -31,41 +42,83 @@ case_rates <- covidcast_signal(data_source = "usa-facts",
                                geo_values = geo_values)
 ```
 
-```{r collapse = TRUE}
+```{r, echo = FALSE, eval = FALSE}
 summary(case_rates)
+```
+
+```{r, echo = FALSE, eval = FALSE}
+library(dplyr)
+library(knitr)
+
+case_rates %>%
+  select(data_source, signal, geo_value, time_value, value) %>% 
+  head(5) %>%
+  kable("html", digits = 3, caption = "U.S. COVID-19 case rates (7-day trailing average)")
 ```
 
 ## Percentage change
 
-The `pct_change()` function operates on a `covidcast_signal` data frame, and 
-takes an argument `n`, indicating the size of the local window (in days) to use. 
-For example, if `n = 10`, the percentage change of the signal on November 10 is 
-defined as $$\frac{B - A}{A}\cdot 100\%,$$ where 
+The `pct_change()` function operates on a `covidcast_signal` data frame by 
+taking a *positive, even integer* argument `n` that specifies the length of a 
+trailing time window (in days), calculating a *sliding* percentage change in the
+reported signal values, and then returning the original `covidcast_signal` data 
+frame with a new column appended that contains the calculated percentage change 
+of the `covidcast` signal for each `geo_value`-`time_value` pair in the data
+frame.
 
-* $A$ is the sum of the signal values between November 1 and November 5 
-(inclusive),
 
-* $B$ is the sum of the signal values between November 6 and November 10 
-(inclusive).
+### Definition
 
-The default value is `n = 14`, which corresponds to the percentage change of a
-signal over back-to-back weeks.
+Given a trailing window of length `n`, where $n\in\{2,4,6,\dots\}$, we define
+the $n/2$-day percentage change of a `covidcast` signal on a given date as
+$$\frac{B - A}{A}\cdot 100\%,$$ where
+
+* $A$ is the sum of the `covidcast` signal values over the first $n/2$ days of the 
+trailing window,
+
+* $B$ is the sum of the `covidcast` signal values over the last $n/2$ days of the 
+trailing window.
+
+The default trailing window length is `n = 14`, which corresponds to the 
+percentage change of a `covidcast` signal over back-to-back weeks. We may refer
+to this as *7-day percentage change* or *weekly percentage change*.
+
+
+### Function call 
+
+The percentage change (here, weekly) calculation follows via the following 
+one-line call to `pct_change()`:
 
 ```{r, message = FALSE, warning = FALSE}
-library(dplyr)
 library(modeltools)
 
 case_rates <- pct_change(case_rates, n = 14)
+```
+
+
+Now inspecting the output data frame:
+
+```{r, message = FALSE}
+library(dplyr)
+library(knitr)
 
 case_rates %>% 
   arrange(geo_value) %>% 
   select(geo_value, time_value, value, pct_change) %>%
-  print(n = 21)
+  head(21) %>%
+  kable(format = "html", digits = 3)
 ```
 
-We can see that a column `pct_change` column has been appended to the output 
-data frame, which contains the percentage change values estimates. Next we plot 
-these values alongside the signal itself. 
+We do not allow missing values in the percentage change calculation, so as we
+see above, for each `geo_value`, the calculated `pct_change` is `NA` whenever
+`n` trailing days of the signal are not available.
+
+
+### Vizualizing the results
+
+Below we plot the weekly percentage change of the smoothed COVID-19 case rates 
+fetched above alongside the smoothed COVID-19 case rates themselves. Here, we 
+focus solely on Florida COVID-19 case rates. 
 
 ```{r, message = FALSE, warning = FALSE, fig.width = 8, fig.height = 4}
 library(ggplot2)
@@ -73,47 +126,75 @@ library(gridExtra)
 
 state <- "fl"
 
-p1 <- ggplot(case_rates %>% filter(geo_value == state),
-             aes(x = time_value, y = value)) +
+p1 <- ggplot(case_rates %>% filter(geo_value == state), aes(x = time_value, y = value)) +
   geom_line() +
-  labs(x = "Date", y = "Cases per 100,000 people")
+  labs(title = "Florida COVID-19 case rates (smoothed)",
+       x = "Date", y = "Cases per 100,000 people")
 
-p2 <- ggplot(case_rates %>% filter(geo_value == state),
-             aes(x = time_value, y = pct_change)) +
+p2 <- ggplot(case_rates %>% filter(geo_value == state), aes(x = time_value, y = pct_change)) +
   geom_line() +
-  labs(x = "Date", y = "Weekly percentage change")
+  labs(title = "Weekly percentage change", x = "Date", y = "Weekly percentage change")
 
 grid.arrange(p1, p2, nrow = 1)
 ```
 
-## Smoothing via 7-day averaging
 
-Computing the percentage change between back-to-back days (i.e. `n = 2`), will
-generally return a pretty volatile sequence; below we show how to smooth this
-sequence by post-applying a 7-day trailing average, with a suitable application
-of `slide_by_geo()`.
+## Post-hoc smoothing percentage change time series
 
-```{r, message = FALSE, warning = FALSE, fig.width = 8, fig.height = 4}
+For smaller choices of `n`, the $n/2$-day percentage change of a `covidcast`
+signal can become increasingly volatile. In these cases, post-processing the 
+signal's percentage change times series with a smoother may provide a times 
+series that better reflects the true temporal dynamics of the `covidcast` signal
+at the `n`-day scale.
+
+Here, first we compute the 1-day percentage change (which we will also call
+*daily percentage change*) time series of the state-level COVID-19 case rates
+examined above, and then we post-process each state's percentage change time 
+series with a 7-day trailing average via a suitable application of 
+`slide_by_geo()`.
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyr)
+
 case_rates <- case_rates %>%
   pct_change(n = 2, col_name = "pct_change_daily") %>%
-  slide_by_geo(~ Mean(.x$pct_change_daily), n = 7,
-               col_name = "pct_change_daily_7dav")
+  slide_by_geo(~ Mean(.x$pct_change_daily), n = 7, col_name = "pct_change_daily_7dav")
 
 case_rates %>%
   arrange(geo_value) %>% 
-  select(geo_value,time_value,value,pct_change_daily,pct_change_daily_7dav) %>%
-  head(n = 7)
+  select(geo_value, time_value, value, pct_change_daily, pct_change_daily_7dav) %>%
+  head(n = 7) %>%
+  kable(format = "html", digits = 3)
+```
 
-p1 <- ggplot(case_rates %>% filter(geo_value == state),
-             aes(x = time_value, y = value)) +
+
+
+### Vizualizing the results
+
+Here we show again the COVID-19 case rates in Florida, but now next to its daily
+percentage change time series (shown in red). As expected, a direct calculation
+of the percentage change in COVID-19 case rates at the daily level yields a 
+highly volatile time series that is almost surely not representative of real 
+variations in the spread of COVID-19 in Florida. The daily percentage change
+post-processed with a 7-day trailing average (shown in blue) is likely a better
+indicator.
+
+```{r, message = FALSE, warning = FALSE, fig.width = 8, fig.height = 4.5}
+p1 <- ggplot(case_rates %>% filter(geo_value == state), aes(x = time_value, y = value)) +
   geom_line() + 
-  labs(x = "Date", y = "Cases per 100,000 people") 
+  labs(title = "Florida COVID-19 case rates (smoothed)", 
+       x = "Date", y = "Cases per 100,000 people") + 
+  theme(plot.margin = margin(l = 0.1, t = 0.2, b = 1.6, unit = "cm"))
 
-p2 <- ggplot(case_rates %>% filter(geo_value == state),
-             aes(x = time_value)) +
-  geom_line(aes(y = pct_change_daily), col = "red") + 
-  geom_line(aes(y = pct_change_daily_7dav), col = "blue") + 
-  labs(x = "Date", y = "Daily percentage change") 
+case_rates <- case_rates %>%
+  select(-pct_change) %>%
+  pivot_longer(cols = starts_with("pct"), names_to = "pct_change", values_to = "pct_change_val")
+
+p2 <- ggplot(case_rates %>% filter(geo_value == state), aes(x = time_value)) +
+  geom_line(aes(y = pct_change_val, color = pct_change)) + 
+  scale_color_manual(values=c('red', 'blue')) +
+  labs(x = "Date", y = "Daily percentage change", title = "Daily percentage change") +
+  theme(legend.position = "bottom", legend.title = element_blank())
 
 grid.arrange(p1, p2, nrow = 1)
 ```

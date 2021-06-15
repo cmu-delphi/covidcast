@@ -1,12 +1,16 @@
 ---
-title: 2. Estimate derivatives of signals
-description: Estimate derivatives of signal values, using various methods.
+title: 2. Estimate the derivatives of signals
+description: Estimate the derivatives of signal values, using various methods.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{2. Estimate derivatives of signals}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+```{r, echo = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
 
 In this vignette, we'll take a look at estimating derivatives of signals using
 the `estimate_deriv()` function. We'll again demonstrate this functionality on 

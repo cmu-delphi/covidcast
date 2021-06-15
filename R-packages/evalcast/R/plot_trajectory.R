@@ -32,7 +32,8 @@
 #'   If data is present for multiple forecasters, any output plot is faceted, so
 #'   nrow and ncol cannot be set.
 #' @param ncol See `nrow`
-#' @param ... additional arguments passed to [covidcast::covidcast_signal()]
+#' @param ... additional arguments passed to [covidcast::covidcast_signal()] or
+#'   `as.predictions_cards`
 #'
 #' @return invisibly returns a ggplot object
 #' @export
@@ -50,7 +51,12 @@ plot_trajectory <- function(predictions_cards,
                             ncol = NULL,
                             ...) {
   geo_type <- match.arg(geo_type)
-  assert_that(is.null(nrow) | is.null(ncol),
+  args_list <- list(...)
+  as_pc_names <- names(as.list(args(as.predictions_cards.data.frame)))
+  args_as_pc <- args_list[names(args_list) %in% as_pc_names]
+  args_as_pc$x <- predictions_cards
+  predictions_cards <- do.call(as.predictions_cards, args_as_pc)
+  assert_that(is.null(nrow) || is.null(ncol),
               msg = "nrow and ncol cannot both be set")
   if (!is.null(show_geo_value)) {
     predictions_cards <- predictions_cards %>%
@@ -121,6 +127,7 @@ setup_plot_trajectory <- function(predictions_cards,
                                   geo_type = "county",
                                   ...){
   args <- list(...)
+  ip <- predictions_cards$incidence_period[1]
   max_api_geos <- 30 # threshold for the API. Not really important. Easier
                      # to grab everything if this is big (typical use case)
   ## add check that incidence period and geo_type are all the same, default to
@@ -140,37 +147,29 @@ setup_plot_trajectory <- function(predictions_cards,
       args$data_source <- predictions_cards$data_source[1]
       args$signal <- predictions_cards$signal[1]
     }
-
-    ip <- predictions_cards$incidence_period[1]
+    args$geo_type <- geo_type
     assert_that(ip %in% c("epiweek", "day"),
                 msg = paste("When grabbing data from covidcast, the incidence",
                             "period must be either `epiweek' or `day'."))
-    truth_data <- download_signal(
-      data_source = args$data_source,
-      signal = args$signal,
-      geo_type = geo_type,
-      geo_values = args$geo_values,
-      ...)
+    truth_data <- do.call(download_signal, args)
     if (geo_values != "*" && length(geo_values) > max_api_geos ) {
       truth_data <- filter(truth_data, .data$geo_value %in% geo_values)
     }
     if (ip == "epiweek") {
-      assert_that(
-        min(truth_data$time_value) < max(truth_data$time_value) - 14,
-        msg = paste("For epiweek plots,",
-                    "available truth data should span at least",
-                    "2 weeks."))
-      truth_data <- truth_data %>%
-        filter(.data$time_value >= 
-                 shift_day_to_following_xxxday(min(.data$time_value), 1),
-               .data$time_value <= 
-                 shift_day_to_preceding_xxxday(max(.data$time_value), 7)) %>%
-        dplyr::select(.data$geo_value, .data$time_value, .data$value) %>%
-        sum_to_epiweek() %>%
-        dplyr::rename(target_end_date = .data$time_value)
+      truth_data <- handle_epiweek(truth_data)
     } else {
       truth_data <- truth_data %>%
         dplyr::select(.data$geo_value, .data$time_value, .data$value) %>%
+        dplyr::rename(target_end_date = .data$time_value)
+    }
+  } else { # side_truth is provided
+    stopifnot(c("geo_value", "time_value", "value") %in% names(side_truth))
+    truth_data <- side_truth %>%
+      dplyr::select(.data$geo_value, .data$time_value, .data$value) 
+    if (ip == "epiweek") {
+      truth_data <- handle_epiweek(truth_data)
+    } else {
+      truth_data <- truth_data %>% 
         dplyr::rename(target_end_date = .data$time_value)
     }
   }
@@ -227,8 +226,24 @@ setup_plot_trajectory <- function(predictions_cards,
       select(-.data$quantile)
   }
   
-  if(!is.null(side_truth)) truth_data <- side_truth
   list(truth_df = truth_data, 
        points_df = points_df, 
        quantiles_df = quantiles_df)
+}
+
+handle_epiweek <- function(truth_data) {
+  assert_that(
+    min(truth_data$time_value) < max(truth_data$time_value) - 14,
+    msg = paste("For epiweek plots,",
+                "available truth data should span at least",
+                "2 weeks."))
+  truth_data <- truth_data %>%
+    filter(.data$time_value >= 
+             shift_day_to_following_xxxday(min(.data$time_value), 1),
+           .data$time_value <= 
+             shift_day_to_preceding_xxxday(max(.data$time_value), 7)) %>%
+    dplyr::select(.data$geo_value, .data$time_value, .data$value) %>%
+    sum_to_epiweek() %>%
+    dplyr::rename(target_end_date = .data$time_value)
+  return(truth_data)
 }

@@ -144,3 +144,4 @@ get_predictions_single_date <- function(forecaster,
   out$forecast_date = forecast_date
   return(out)
 }
+

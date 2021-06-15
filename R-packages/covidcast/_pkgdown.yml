@@ -54,7 +54,7 @@ reference:
   - title: Geographic utilities
     desc: Manipulate geographic IDs like FIPS codes and CBSAs
   - contents:
-      - fips_to_name
+      - state_fips_to_name
       - name_to_fips
       - abbr_to_fips
       - abbr_to_name

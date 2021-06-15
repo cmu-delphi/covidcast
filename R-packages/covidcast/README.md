@@ -22,7 +22,17 @@ lists all the data sources and signals available through this API.
 
 ## Installing
 
-This package is not on CRAN yet, so it can be installed using the
+This package is [available on
+CRAN](https://cran.r-project.org/package=covidcast), so the easiest way to
+install it is simply
+
+```r
+install.packages("covidcast")
+```
+
+Then use `vignette("covidcast")` to view the Getting Started guide.
+
+The latest development version can be installed using the
 [`devtools`](https://cran.r-project.org/package=devtools) package:
 
 ```r

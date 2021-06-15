@@ -1,3 +1,9 @@
+# evalcast 0.3.0
+
+- Added pkgdown
+- Lives on `main`
+
+
 # evalcast 0.2.0
 
 - Major overhaul of functionality

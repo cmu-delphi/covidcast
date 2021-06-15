@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute calibration of a quantile forecaster — compute_calibration • evalcast</title>
+<title>Separate fields of target col and create derived fields — process_target • evalcast</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,10 @@
 
 
 
-<meta property="og:title" content="Compute calibration of a quantile forecaster — compute_calibration" />
-<meta property="og:description" content="Compute calibration of a quantile forecaster" />
+<meta property="og:title" content="Separate fields of target col and create derived fields — process_target" />
+<meta property="og:description" content="This function supports only &quot;confirmed_incidence_num&quot;,
+&quot;deaths_incidence_num&quot;, &quot;deaths_cumulative_num&quot;, and/or
+&quot;confirmed_admissions_covid_1d&quot;." />
 
 
 
@@ -123,68 +125,38 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute calibration of a quantile forecaster</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/plot_calibration.R'><code>R/plot_calibration.R</code></a></small>
-    <div class="hidden name"><code>compute_calibration.Rd</code></div>
+    <h1>Separate fields of target col and create derived fields</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/predictions_processing_utils.R'><code>R/predictions_processing_utils.R</code></a></small>
+    <div class="hidden name"><code>process_target.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compute calibration of a quantile forecaster</p>
+    <p>This function supports only "confirmed_incidence_num",
+"deaths_incidence_num", "deaths_cumulative_num", and/or
+"confirmed_admissions_covid_1d".</p>
     </div>
 
-    <pre class="usage"><span class='fu'>compute_calibration</span><span class='op'>(</span>
-  <span class='va'>predictions_cards</span>,
-  <span class='va'>geo_type</span>,
-  backfill_buffer <span class='op'>=</span> <span class='fl'>10</span>,
-  grp_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forecaster"</span>, <span class='st'>"forecast_date"</span>, <span class='st'>"ahead"</span><span class='op'>)</span>,
-  avg_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"geo_value"</span><span class='op'>)</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>process_target</span><span class='op'>(</span><span class='va'>predictions</span>, <span class='va'>remove</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>predictions_cards</th>
-      <td><p>tibble containing at least columns actual, quantile,
-value and any grouping or averaging variables named in the next arguments</p></td>
+      <th>predictions</th>
+      <td><p>Dataframe with <code>target</code> column containing information
+about time period and signal forecast.</p></td>
     </tr>
     <tr>
-      <th>geo_type</th>
-      <td><p>String indicating geographical type, such as "county", or
-"state". See the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>COVIDcast Geographic Coding documentation</a>
-for available options.</p></td>
-    </tr>
-    <tr>
-      <th>backfill_buffer</th>
-      <td><p>How many days until response is deemed trustworthy
-enough to be taken as correct?</p></td>
-    </tr>
-    <tr>
-      <th>grp_vars</th>
-      <td><p>character vector of named columns in the score_card at which
-average performance will be returned</p></td>
-    </tr>
-    <tr>
-      <th>avg_vars</th>
-      <td><p>character vector of named columns in the score_card over which
-averaging performance will be computed</p></td>
+      <th>remove</th>
+      <td><p>If TRUE, remove input <code>target</code> column from output data frame.
+See <code>dplyr::separate</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A tibble containing grp_vars, nominal_prob (the claimed interval
-coverage), prop_below (the proportion of actual values falling below
-the forecast quantile) and prop_above (the proportion of
-actual values falling above the forecast quantile). All
-proportions are calculated for each available probability at each
-combination of grouping variables by averaging over any variables listed
-in avg_vars.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Note that no checks are performed to ensure that averaging variables
-all contain the same predicted quantiles. avg_vars and grp_vars must
-have an empty intersection.</p>
+    <p>predictions dataframe with new <code>ahead</code>, <code>incidence_period</code>, <code>inc</code>,
+<code>response</code>, <code>data_source</code>, and <code>signal</code> fields</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

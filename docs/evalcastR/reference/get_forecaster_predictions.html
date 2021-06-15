@@ -142,7 +142,7 @@ predictions card, so it can be easily evaluated and compared.</p>
   ahead <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>,
   incidence_period <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"epiweek"</span>, <span class='st'>"day"</span><span class='op'>)</span>,
   signal <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"confirmed_incidence_num"</span>, <span class='st'>"deaths_incidence_num"</span>,
-    <span class='st'>"deaths_cumulative_num"</span><span class='op'>)</span>
+    <span class='st'>"deaths_cumulative_num"</span>, <span class='st'>"confirmed_admissions_covid_1d"</span><span class='op'>)</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -183,8 +183,8 @@ return both</p></td>
     <tr>
       <th>signal</th>
       <td><p>this function supports only "confirmed_incidence_num",
-"deaths_incidence_num", and/or "deaths_cumulative_num" (those currently
-forecast by the COVIDhub-ensemble). For other types, use one of the
+"deaths_incidence_num", "deaths_cumulative_num", and/or
+"confirmed_admissions_covid_1d". For other types, use one of the
 alternatives mentioned above</p></td>
     </tr>
     </table>
@@ -215,7 +215,7 @@ using <a href='https://docs.zoltardata.com/zoltr/'>zoltr</a></p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Daniel McDonald, Mike O'Brien, Jed Grabman, Sarah Colquhoun, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
+  <p>Developed by Daniel McDonald, Jacob Bien, Mike O'Brien, Jed Grabman, Sarah Colquhoun, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

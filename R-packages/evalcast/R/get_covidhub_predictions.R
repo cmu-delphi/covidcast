@@ -357,10 +357,10 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
       left_join(target_separated, by = "target") %>%
       select(-.data$target) %>%
       mutate(forecaster = covidhub_forecaster_name,
-             forecast_date = lubridate::ymd(forecast_date),
-             target_end_date = lubridate::ymd(target_end_date),
-             quantile = as.double(quantile),
-             value = as.double(value)) %>%
+             forecast_date = lubridate::ymd(.data$forecast_date),
+             target_end_date = lubridate::ymd(.data$target_end_date),
+             quantile = as.double(.data$quantile),
+             value = as.double(.data$value)) %>%
       filter_predictions(forecast_type, incidence_period, signal) %>%
       select_pcard_cols()
 

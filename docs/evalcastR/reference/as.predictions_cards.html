@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute calibration of a quantile forecaster — compute_calibration • evalcast</title>
+<title>Convert forecasts into a format compatible with all predictions_cards — as.predictions_cards • evalcast</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,10 @@
 
 
 
-<meta property="og:title" content="Compute calibration of a quantile forecaster — compute_calibration" />
-<meta property="og:description" content="Compute calibration of a quantile forecaster" />
+<meta property="og:title" content="Convert forecasts into a format compatible with all predictions_cards — as.predictions_cards" />
+<meta property="og:description" content="Several methods are provided to convert external forecasts given as a
+data.frame into predictions_cards objects compatible with the various
+evaluation and plotting functions." />
 
 
 
@@ -123,68 +125,96 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute calibration of a quantile forecaster</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/plot_calibration.R'><code>R/plot_calibration.R</code></a></small>
-    <div class="hidden name"><code>compute_calibration.Rd</code></div>
+    <h1>Convert forecasts into a format compatible with all <code>predictions_cards</code></h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/predictions_cards.R'><code>R/predictions_cards.R</code></a></small>
+    <div class="hidden name"><code>as.predictions_cards.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compute calibration of a quantile forecaster</p>
+    <p>Several methods are provided to convert external forecasts given as a
+data.frame into <code>predictions_cards</code> objects compatible with the various
+evaluation and plotting functions.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>compute_calibration</span><span class='op'>(</span>
-  <span class='va'>predictions_cards</span>,
-  <span class='va'>geo_type</span>,
-  backfill_buffer <span class='op'>=</span> <span class='fl'>10</span>,
-  grp_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forecaster"</span>, <span class='st'>"forecast_date"</span>, <span class='st'>"ahead"</span><span class='op'>)</span>,
-  avg_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"geo_value"</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>as.predictions_cards</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for predictions_cards</span>
+<span class='fu'>as.predictions_cards</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for data.frame</span>
+<span class='fu'>as.predictions_cards</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  forecaster <span class='op'>=</span> <span class='st'>"forecaster"</span>,
+  forecast_date <span class='op'>=</span> <span class='fu'>lubridate</span><span class='fu'>::</span><span class='fu'><a href='http://lubridate.tidyverse.org/reference/now.html'>today</a></span><span class='op'>(</span><span class='op'>)</span>,
+  incidence_period <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"epiweek"</span>, <span class='st'>"day"</span><span class='op'>)</span>,
+  data_source <span class='op'>=</span> <span class='st'>"data_source"</span>,
+  signal <span class='op'>=</span> <span class='st'>"signal"</span>,
+  target_end_date <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>predictions_cards</th>
-      <td><p>tibble containing at least columns actual, quantile,
-value and any grouping or averaging variables named in the next arguments</p></td>
+      <th>x</th>
+      <td><p>Object to be converted. See Methods section below for details on
+formatting of each input type.</p></td>
     </tr>
     <tr>
-      <th>geo_type</th>
-      <td><p>String indicating geographical type, such as "county", or
-"state". See the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>COVIDcast Geographic Coding documentation</a>
-for available options.</p></td>
+      <th>...</th>
+      <td><p>Additional arguments passed to methods.</p></td>
     </tr>
     <tr>
-      <th>backfill_buffer</th>
-      <td><p>How many days until response is deemed trustworthy
-enough to be taken as correct?</p></td>
+      <th>forecaster</th>
+      <td><p>The name of the forecaster that produced this data.</p></td>
     </tr>
     <tr>
-      <th>grp_vars</th>
-      <td><p>character vector of named columns in the score_card at which
-average performance will be returned</p></td>
+      <th>forecast_date</th>
+      <td><p>Date object or string of the form "YYYY-MM-DD",
+indicating date on which forecasts will be made about some period (e.g.,
+epiweek). For example, if <code>forecast_date = "2020-05-11"</code>, <code>incidence_period = "day"</code>, and <code>ahead = 3</code>, then, we'd be making forecasts for "2020-05-14".</p></td>
     </tr>
     <tr>
-      <th>avg_vars</th>
-      <td><p>character vector of named columns in the score_card over which
-averaging performance will be computed</p></td>
+      <th>incidence_period</th>
+      <td><p>String indicating the incidence period, either
+"epiweek" or "day".</p></td>
+    </tr>
+    <tr>
+      <th>data_source</th>
+      <td><p>The name of the data_source for the forecast target.</p></td>
+    </tr>
+    <tr>
+      <th>signal</th>
+      <td><p>The name of the signal for the forecast target.</p></td>
+    </tr>
+    <tr>
+      <th>target_end_date</th>
+      <td><p>The date the forecast target is observed (combines
+<code>forecast_date</code>, <code>ahead</code>, and <code>incidence_period</code>). This is determined
+automatically if <code>NULL</code> (the default).</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A tibble containing grp_vars, nominal_prob (the claimed interval
-coverage), prop_below (the proportion of actual values falling below
-the forecast quantile) and prop_above (the proportion of
-actual values falling above the forecast quantile). All
-proportions are calculated for each available probability at each
-combination of grouping variables by averaging over any variables listed
-in avg_vars.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <p>Long data frame of forecasts with a class of <code>predictions_cards</code>.
+The first 4 columns are the same as those returned by the forecaster. The
+remainder specify the prediction task, 10 columns in total:
+<code>ahead</code>, <code>geo_value</code>, <code>quantile</code>, <code>value</code>, <code>forecaster</code>, <code>forecast_date</code>,
+<code>data_source</code>, <code>signal</code>, <code>target_end_date</code>, and <code>incidence_period</code>. Here
+<code>data_source</code> and <code>signal</code> correspond to the response variable only.</p>
+    <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
 
-    <p>Note that no checks are performed to ensure that averaging variables
-all contain the same predicted quantiles. avg_vars and grp_vars must
-have an empty intersection.</p>
+    
+<ul>
+<li><p><code>predictions_cards</code>: Simply returns the <code>predictions_cards</code> object
+unchanged.</p></li>
+<li><p><code>data.frame</code>: The input data frame <code>x</code> must contain the
+columns <code>ahead</code>, <code>geo_value</code>, <code>quantile</code> and <code>value</code>. Addional columns
+<code>forecaster</code> <code>forecast_date</code>, <code>incidence_period</code>, <code>data_source</code>,
+<code>signal</code>, and <code>target_end_date</code> will be created if missing.
+Other columns will be preserved as-is.</p></li>
+</ul>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

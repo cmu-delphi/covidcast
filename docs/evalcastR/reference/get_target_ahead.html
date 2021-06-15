@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute calibration of a quantile forecaster — compute_calibration • evalcast</title>
+<title>Compute forecast target date in days — get_target_ahead • evalcast</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Compute calibration of a quantile forecaster — compute_calibration" />
-<meta property="og:description" content="Compute calibration of a quantile forecaster" />
+<meta property="og:title" content="Compute forecast target date in days — get_target_ahead" />
+<meta property="og:description" content="This function is most useful for converting a forecast date and an ahead
+specification from epiweek to days. It allows days as well." />
 
 
 
@@ -123,69 +124,52 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute calibration of a quantile forecaster</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/plot_calibration.R'><code>R/plot_calibration.R</code></a></small>
-    <div class="hidden name"><code>compute_calibration.Rd</code></div>
+    <h1>Compute forecast target date in days</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/get_target_period.R'><code>R/get_target_period.R</code></a></small>
+    <div class="hidden name"><code>get_target_ahead.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compute calibration of a quantile forecaster</p>
+    <p>This function is most useful for converting a forecast date and an ahead
+specification from epiweek to days. It allows days as well.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>compute_calibration</span><span class='op'>(</span>
-  <span class='va'>predictions_cards</span>,
-  <span class='va'>geo_type</span>,
-  backfill_buffer <span class='op'>=</span> <span class='fl'>10</span>,
-  grp_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forecaster"</span>, <span class='st'>"forecast_date"</span>, <span class='st'>"ahead"</span><span class='op'>)</span>,
-  avg_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"geo_value"</span><span class='op'>)</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_target_ahead</span><span class='op'>(</span><span class='va'>forecast_date</span>, <span class='va'>incidence_period</span>, <span class='va'>ahead</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>predictions_cards</th>
-      <td><p>tibble containing at least columns actual, quantile,
-value and any grouping or averaging variables named in the next arguments</p></td>
+      <th>forecast_date</th>
+      <td><p>Date object or string of the form "YYYY-MM-DD",
+indicating date on which forecasts will be made about some period (e.g.,
+epiweek). For example, if <code>forecast_date = "2020-05-11"</code>, <code>incidence_period = "day"</code>, and <code>ahead = 3</code>, then, we'd be making forecasts for "2020-05-14".</p></td>
     </tr>
     <tr>
-      <th>geo_type</th>
-      <td><p>String indicating geographical type, such as "county", or
-"state". See the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html'>COVIDcast Geographic Coding documentation</a>
-for available options.</p></td>
+      <th>incidence_period</th>
+      <td><p>String indicating the incidence period, either
+"epiweek" or "day".</p></td>
     </tr>
     <tr>
-      <th>backfill_buffer</th>
-      <td><p>How many days until response is deemed trustworthy
-enough to be taken as correct?</p></td>
-    </tr>
-    <tr>
-      <th>grp_vars</th>
-      <td><p>character vector of named columns in the score_card at which
-average performance will be returned</p></td>
-    </tr>
-    <tr>
-      <th>avg_vars</th>
-      <td><p>character vector of named columns in the score_card over which
-averaging performance will be computed</p></td>
+      <th>ahead</th>
+      <td><p>Vector of (one or more) integers. How many epiweeks/days ahead
+are you forecasting? If <code>incidence_period = "epiweek"</code> and forecast_date is
+Sunday or Monday, then <code>ahead = 1</code> means the epiweek that includes the
+forecast date; if <code>forecast_date</code> falls on a Tuesday through Saturday, then
+it is the following epiweek. If <code>incidence_period = "day"</code>, then <code>ahead = 1</code> means the day after forecast date.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p>A tibble containing grp_vars, nominal_prob (the claimed interval
-coverage), prop_below (the proportion of actual values falling below
-the forecast quantile) and prop_above (the proportion of
-actual values falling above the forecast quantile). All
-proportions are calculated for each available probability at each
-combination of grouping variables by averaging over any variables listed
-in avg_vars.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <div class='dont-index'><p><code><a href='get_target_period.html'>get_target_period()</a></code></p></div>
 
-    <p>Note that no checks are performed to ensure that averaging variables
-all contain the same predicted quantiles. avg_vars and grp_vars must
-have an empty intersection.</p>
-
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='va'>fd</span> <span class='op'>&lt;-</span> <span class='st'>"2021-03-22"</span> <span class='co'># a monday</span>
+<span class='fu'>get_target_ahead</span><span class='op'>(</span><span class='va'>fd</span>, <span class='st'>"epiweek"</span>, <span class='fl'>1</span><span class='op'>)</span> <span class='co'># forecast the following Saturday</span>
+</div><div class='output co'>#&gt; [1] 5</div><div class='input'><span class='fu'>get_target_ahead</span><span class='op'>(</span><span class='st'>"2021-03-23"</span>, <span class='st'>"epiweek"</span>, <span class='fl'>1</span><span class='op'>)</span> <span class='co'># forecast the Saturday after next</span>
+</div><div class='output co'>#&gt; [1] 11</div><div class='input'><span class='fu'>get_target_ahead</span><span class='op'>(</span><span class='va'>fd</span>, <span class='st'>"day"</span>, <span class='fl'>1</span><span class='op'>)</span> <span class='co'># forecast tomorrow</span>
+</div><div class='output co'>#&gt; [1] 1</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

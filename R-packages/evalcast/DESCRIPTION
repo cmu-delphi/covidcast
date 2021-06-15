@@ -4,13 +4,13 @@ Title: Tools For Evaluating COVID Forecasters
 Version: 0.3.0
 Authors@R: 
   c(
-    person(given = "Jacob",
-           family = "Bien",
-           role = "aut"),
 		person(given = "Daniel",
 			     family = "McDonald",
 			     role = c("aut", "cre"),
 			     email = "daniel@stat.ubc.ca"),
+    person(given = "Jacob",
+           family = "Bien",
+           role = "aut"),
     person(given = "Mike",
            family = "O'Brien",
            role = "aut"),
@@ -55,7 +55,7 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-Remotes: cmu-delphi/covidcast/R-packages/covidcast@main,
+Remotes:
   reichlab/zoltr,
   reichlab/covidHubUtils,
   epiforecasts/scoringutils

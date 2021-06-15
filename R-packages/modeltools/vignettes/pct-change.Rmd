@@ -154,8 +154,6 @@ series with a 7-day trailing average via a suitable application of
 `slide_by_geo()`.
 
 ```{r, message = FALSE, warning = FALSE}
-library(tidyr)
-
 case_rates <- case_rates %>%
   pct_change(n = 2, col_name = "pct_change_daily") %>%
   slide_by_geo(~ Mean(.x$pct_change_daily), n = 7, col_name = "pct_change_daily_7dav")
@@ -181,6 +179,8 @@ change post-processed with a 7-day trailing average
 (<span style="color: blue;">shown in blue</span>) is likely a better indicator.
 
 ```{r, message = F, warning = F, fig.width = 8, fig.height = 4.5, fig.retina = 2, dpi = 85}
+library(tidyr)
+
 p1 <- ggplot(case_rates %>% filter(geo_value == state), aes(x = time_value, y = value)) +
   geom_line() + 
   labs(title = "Florida COVID-19 case rates (smoothed)", 

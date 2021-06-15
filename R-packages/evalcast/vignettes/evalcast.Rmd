@@ -1,5 +1,5 @@
 ---
-title: "Introduction to evalcast"
+title: "evalcast"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to evalcast}

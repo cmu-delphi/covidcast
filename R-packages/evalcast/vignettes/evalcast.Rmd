@@ -2,7 +2,7 @@
 title: "evalcast"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introduction to evalcast}
+  %\VignetteIndexEntry{evalcast}
   %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---

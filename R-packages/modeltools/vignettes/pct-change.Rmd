@@ -106,7 +106,8 @@ case_rates %>%
   arrange(geo_value) %>% 
   select(geo_value, time_value, value, pct_change) %>%
   head(21) %>%
-  kable(format = "html", digits = 3)
+  kable(format = "html", digits = 3, caption = paste("U.S. COVID-19 case rates (with",
+                                                     "weekly percentage change)"))
 ```
 
 We do not allow missing values in the percentage change calculation, so as we
@@ -139,7 +140,7 @@ grid.arrange(p1, p2, nrow = 1)
 ```
 
 
-## Post-hoc smoothing percentage change time series
+## Post-hoc smoothing a percentage change time series
 
 For smaller choices of `n`, the $n/2$-day percentage change of a `covidcast`
 signal can become increasingly volatile. In these cases, post-processing the 
@@ -162,7 +163,9 @@ case_rates %>%
   arrange(geo_value) %>% 
   select(geo_value, time_value, value, pct_change_daily, pct_change_daily_7dav) %>%
   head(n = 7) %>%
-  kable(format = "html", digits = 3)
+  kable(format = "html", digits = 3, caption = paste("U.S. COVID-19 case rates (with",
+                                                     "daily percentage change and",
+                                                     "post-hoc 7-day trailing average)"))
 ```
 
 

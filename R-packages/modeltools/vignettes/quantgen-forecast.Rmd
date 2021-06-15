@@ -23,7 +23,7 @@ sub-folder.
 ```{r, eval = FALSE, code = readLines("quantgen-forecast.R")}
 ```
 
-Load the data and take a peak at the `evals` tibble
+Load the data and take a peek at the `evals` tibble
 
 ```{r}
 load("quantgen-forecast.rda")
@@ -46,7 +46,7 @@ theme_set(theme_bw())
 # of the error columns, that won't be a problem)
 scale_by_forecaster <- function(df, vars, denom_forecaster, 
                                 err_cols = c("ae", "wis")) {
-  df_list <- map(vars, function(var) {
+  df_list <- map(vars, function(var){
     df %>% 
       select(setdiff(names(df), setdiff(err_cols, var))) %>% 
       pivot_wider(names_from = "forecaster", 

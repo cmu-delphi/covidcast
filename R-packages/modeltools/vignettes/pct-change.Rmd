@@ -1,6 +1,7 @@
 ---
 title: 1. Compute the percentage change of a `covidcast` signal over time
-description: Compute the percentage change of `covidcast` signal values over time.
+description: Compute the percentage change of `covidcast` signal values over 
+  time.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{1. Compute percentage change of a `covidcast` signal over time}

@@ -20,6 +20,7 @@ used in conjunction with the
 <tt>R</tt> packages, which are also developed and maintained by the 
 [Delphi Group](https://delphi.cmu.edu) at Carnegie Mellon University. 
 
+
 ## Installing
 
 >**This package is not on CRAN. There is a package named `modeltools` on 
@@ -29,6 +30,7 @@ This package is available on the [Delphi Group GitHub
 page](https://github.com/cmu-delphi) and can be installed using the
 [`devtools`](https://cran.r-project.org/package=devtools) package, as shown
 below.
+
 
 ### Installing without vignettes
 
@@ -42,6 +44,7 @@ devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
                          subdir = "R-packages/modeltools")
 ```
 
+
 ### Installing with vignettes
 
 If you wish to include the vignettes, then use the command below. Installation
@@ -52,6 +55,7 @@ devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
                          subdir = "R-packages/modeltools",
                          build_vignettes = TRUE, dependencies = TRUE)
 ```
+
 
 ## Downloading data from the `covidcast` API
 
@@ -94,7 +98,6 @@ summary(signals[[1]])
 summary(signals[[2]])
 ```
 
-
 Taking a peek at each of the `covidcast_signal` data frames in the list:
 
 ```{r, message = FALSE, warning = FALSE}
@@ -111,6 +114,7 @@ signals[[2]] %>%
   head(5) %>%
   kable("html", digits = 3, caption = "U.S. COVID-19 case rates (7-day trailing average)")
 ```
+
 
 ## Sliding with a formula
 
@@ -194,6 +198,7 @@ only providing `slide_by_geo()` with daily COVID-19 case rates beginning on June
 7-day average until June 7, 2020. When a trailing window of `n` days isn't 
 available, `slide_by_geo()` just applies the function or formula to whatever 
 data is available.
+
 
 ## Sliding with a function 
 

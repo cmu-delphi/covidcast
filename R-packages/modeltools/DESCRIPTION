@@ -8,9 +8,10 @@ Authors@R:
            family = "Tibshirani",
            role = c("aut", "cre"),
            email = "ryantibs@cmu.edu"))
-Description: Tools for building COVID-19 models, mainly short-term forecasting 
-    and hotspot prediction models. This package is meant to be used in 
-    conjuction with the `covidcast` and `evalcast` packages.
+Description: Tools for building COVID-19 statistical models, with an emphasis on
+    short-term forecasting and hotspot prediction. This package is meant to be 
+    used in conjuction with the `covidcast` and `evalcast` packages developed by
+    Carnegie Mellon University's Delphi Lab.
 URL: https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools
 License: MIT
 Encoding: UTF-8

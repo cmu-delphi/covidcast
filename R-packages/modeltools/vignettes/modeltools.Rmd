@@ -84,8 +84,9 @@ By default, the `covidcast_signals()` function returns the specified signals as
 a list of `covidcast_signal` data frames, with one data frame for each signal. 
 So, in this case, `signals` is a list of two `covidcast_signal` data frames ---
 the first being the raw COVID-19 case rates and the second being the COVID-19 
-case rates smoothed by a 7-day trailing average. The `summary()` function can be
-called on each of these `covidcast_signal` data frames as follows:
+case rates after smoothing with a 7-day trailing average. The `summary()` 
+function can be called on each of these `covidcast_signal` data frames as 
+follows:
 
 ```{r collapse = TRUE}
 summary(signals[[1]])
@@ -164,11 +165,11 @@ slide_by_geo(signals[[1]], slide_fun = ~ Mean(.x$value), n = 7, col_name = "7dav
 
 As a simple sanity check, we compare the 7-day trailing average computed via
 `slide_by_geo()` to the values of the smoothed signal from the API to ensure
-that they match (within machine precision). More specifically, the code chunk
+that they match (to machine precision). More specifically, the code chunk
 below computes the maximum absolute difference between the two 7-day averaged 
 signals, over all state-date pairs.
 
-```{r}
+```{r, collapse = TRUE}
 slide_by_geo(signals[[1]], slide_fun = ~ Mean(.x$value), n = 7, col_name = "7dav") %>%
   full_join(signals[[2]], by = c("geo_value", "time_value")) %>%
   mutate(difference = `7dav` - value.y) %>%
@@ -181,14 +182,14 @@ The output of this sanity check confirms `slide_by_geo()` is functioning
 as desired.
 
 **Note:** This sanity check would *fail* without filtering the dates to 
-`>= "2020-06-07"` because the API has access to data before June 1, 2020, and 
-can therefore return the trailing 7-day average
-for all days in the time window June 1, 2020 to November 15, 2020. While,
-on the other hand, since we are only providing `slide_by_geo()` with daily 
-COVID-19 case rates beginning on June 1, the trailing 7-day average computed 
-by `slide_by_geo()` is not actually an average of 7 days of data until June 7,
-2020. When a trailing window of `n` days isn't available, `slide_by_geo()` just 
-applies the function or formula to whatever data is available.
+`>= "2020-06-07"` because the Delphi API has access to data before June 1, 2020,
+and can therefore return the trailing 7-day average for all days in the time 
+window June 1, 2020 to November 15, 2020. On the other hand, since we are
+only providing `slide_by_geo()` with daily COVID-19 case rates beginning on June
+1, 2020, the trailing 7-day average computed by `slide_by_geo()` is not a true 
+7-day average until June 7, 2020. When a trailing window of `n` days isn't 
+available, `slide_by_geo()` just applies the function or formula to whatever 
+data is available.
 
 ## Sliding with a function 
 

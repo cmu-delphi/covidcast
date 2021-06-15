@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -79,7 +79,7 @@
 
       
 
-      </header><script src="intro-evalcast_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="intro-evalcast_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction to evalcast</h1>
@@ -108,15 +108,14 @@
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org">magrittr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 <span class="va">signals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"jhu-csse"</span>, 
-                  signal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"deaths_incidence_num"</span>, 
-                             <span class="st">"confirmed_incidence_num"</span><span class="op">)</span>, 
-                  start_day <span class="op">=</span> <span class="st">"2020-06-15"</span><span class="op">)</span>
+                  signal <span class="op">=</span> <span class="st">"deaths_incidence_num"</span>, 
+                  start_day <span class="op">=</span> <span class="st">"2020-06-15"</span>,
+                  geo_type <span class="op">=</span> <span class="st">"state"</span><span class="op">)</span>
 <span class="va">signals</span>
-<span class="co">#&gt; # A tibble: 2 x 3</span>
-<span class="co">#&gt;   data_source signal                  start_day </span>
-<span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;                   &lt;chr&gt;     </span>
-<span class="co">#&gt; 1 jhu-csse    deaths_incidence_num    2020-06-15</span>
-<span class="co">#&gt; 2 jhu-csse    confirmed_incidence_num 2020-06-15</span></code></pre></div>
+<span class="co">#&gt; # A tibble: 1 x 4</span>
+<span class="co">#&gt;   data_source signal               start_day  geo_type</span>
+<span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;                &lt;chr&gt;      &lt;chr&gt;   </span>
+<span class="co">#&gt; 1 jhu-csse    deaths_incidence_num 2020-06-15 state</span></code></pre></div>
 </div>
 <div id="run-the-forecaster-on-some-dates" class="section level3">
 <h3 class="hasAnchor">
@@ -125,7 +124,7 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cmu-delphi.github.io/covidcast/evalcastR/">evalcast</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/">covidcast</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://lubridate.tidyverse.org">lubridate</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://lubridate.tidyverse.org">lubridate</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 
 <span class="va">forecast_dates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_covidhub_forecast_dates.html">get_covidhub_forecast_dates</a></span><span class="op">(</span><span class="st">"CMU-TimeSeries"</span><span class="op">)</span>
@@ -146,49 +145,99 @@
                                      signals <span class="op">=</span> <span class="va">signals</span>,
                                      forecast_dates <span class="op">=</span> <span class="va">forecast_dates_dec</span>,
                                      incidence_period <span class="op">=</span> <span class="st">"epiweek"</span>,
-                                     ahead <span class="op">=</span> <span class="fl">3</span>,
-                                     signal_aggregation <span class="op">=</span> <span class="st">"long"</span>,
-                                     geo_type <span class="op">=</span> <span class="st">"state"</span><span class="op">)</span>
+                                     forecaster_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+                                       ahead <span class="op">=</span> <span class="fl">3</span>
+                                     <span class="op">)</span>
+<span class="op">)</span>
 
-<span class="va">predictions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html">bind_rows</a></span><span class="op">(</span><span class="va">predictions_cards</span>, <span class="va">predictions_cards_cmu</span>, <span class="va">predictions_cards_ens</span><span class="op">)</span></code></pre></div>
+<span class="va">predictions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html">bind_rows</a></span><span class="op">(</span><span class="va">predictions_cards</span>, <span class="va">predictions_cards_cmu</span>, 
+                         <span class="va">predictions_cards_ens</span><span class="op">)</span></code></pre></div>
 <p><code><a href="../reference/get_predictions.html">get_predictions()</a></code> and <code><a href="../reference/get_covidhub_predictions.html">get_covidhub_predictions()</a></code> return a long data frame with one row for each <code>(forecast date, ahead, geo_value, quantile)</code> combination.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">predictions_cards_cmu</span>
-<span class="co">#&gt; # A tibble: 4,992 x 10</span>
-<span class="co">#&gt;    ahead geo_value quantile value forecaster forecast_date data_source signal</span>
-<span class="co">#&gt;    &lt;int&gt; &lt;chr&gt;        &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;date&gt;        &lt;chr&gt;       &lt;chr&gt; </span>
-<span class="co">#&gt;  1     3 al           0.01    148 CMU-TimeS~ 2020-12-28    jhu-csse    death~</span>
-<span class="co">#&gt;  2     3 al           0.025   184 CMU-TimeS~ 2020-12-28    jhu-csse    death~</span>
-<span class="co">#&gt;  3     3 al           0.05    213 CMU-TimeS~ 2020-12-28    jhu-csse    death~</span>
-<span class="co">#&gt;  4     3 al           0.1     237 CMU-TimeS~ 2020-12-28    jhu-csse    death~</span>
-<span class="co">#&gt;  5     3 al           0.15    253 CMU-TimeS~ 2020-12-28    jhu-csse    death~</span>
-<span class="co">#&gt;  6     3 al           0.2     271 CMU-TimeS~ 2020-12-28    jhu-csse    death~</span>
-<span class="co">#&gt;  7     3 al           0.25    283 CMU-TimeS~ 2020-12-28    jhu-csse    death~</span>
-<span class="co">#&gt;  8     3 al           0.3     296 CMU-TimeS~ 2020-12-28    jhu-csse    death~</span>
-<span class="co">#&gt;  9     3 al           0.35    307 CMU-TimeS~ 2020-12-28    jhu-csse    death~</span>
-<span class="co">#&gt; 10     3 al           0.4     320 CMU-TimeS~ 2020-12-28    jhu-csse    death~</span>
-<span class="co">#&gt; # ... with 4,982 more rows, and 2 more variables: target_end_date &lt;date&gt;,</span>
-<span class="co">#&gt; #   incidence_period &lt;chr&gt;</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">predictions_cards_cmu</span>, n<span class="op">=</span><span class="fl">25</span><span class="op">)</span>
+<span class="co">#&gt;    ahead geo_value quantile value     forecaster forecast_date data_source</span>
+<span class="co">#&gt; 1      3        al    0.010   148 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 2      3        al    0.025   184 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 3      3        al    0.050   213 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 4      3        al    0.100   237 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 5      3        al    0.150   253 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 6      3        al    0.200   271 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 7      3        al    0.250   283 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 8      3        al    0.300   296 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 9      3        al    0.350   307 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 10     3        al    0.400   320 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 11     3        al    0.450   328 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 12     3        al    0.500   339 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 13     3        al    0.550   351 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 14     3        al    0.600   359 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 15     3        al    0.650   370 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 16     3        al    0.700   381 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 17     3        al    0.750   395 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 18     3        al    0.800   410 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 19     3        al    0.850   424 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 20     3        al    0.900   443 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 21     3        al    0.950   477 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 22     3        al    0.975   506 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 23     3        al    0.990   540 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 24     3        ak    0.010     0 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt; 25     3        ak    0.025     0 CMU-TimeSeries    2020-12-28    jhu-csse</span>
+<span class="co">#&gt;                  signal target_end_date incidence_period</span>
+<span class="co">#&gt; 1  deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 2  deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 3  deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 4  deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 5  deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 6  deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 7  deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 8  deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 9  deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 10 deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 11 deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 12 deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 13 deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 14 deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 15 deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 16 deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 17 deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 18 deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 19 deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 20 deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 21 deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 22 deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 23 deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 24 deaths_incidence_num      2021-01-16          epiweek</span>
+<span class="co">#&gt; 25 deaths_incidence_num      2021-01-16          epiweek</span></code></pre></div>
 <p>Let’s look at one location:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">michigan_abr</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/chartr.html">tolower</a></span><span class="op">(</span><span class="fu">covidcast</span><span class="fu">::</span><span class="fu"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/name_to_abbr.html">name_to_abbr</a></span><span class="op">(</span><span class="st">"Michigan"</span><span class="op">)</span><span class="op">)</span> <span class="co"># = "mi"</span>
 <span class="va">predictions_cards_cmu</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="va">michigan_abr</span>, <span class="va">forecast_date</span> <span class="op">==</span> <span class="va">forecast_dates_dec</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">geo_value</span>, <span class="va">quantile</span>, <span class="va">value</span>, <span class="va">forecast_date</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 24 x 4</span>
 <span class="co">#&gt;    geo_value quantile value forecast_date</span>
-<span class="co">#&gt;    &lt;chr&gt;        &lt;dbl&gt; &lt;dbl&gt; &lt;date&gt;       </span>
-<span class="co">#&gt;  1 mi           0.01    370 2020-12-07   </span>
-<span class="co">#&gt;  2 mi           0.025   465 2020-12-07   </span>
-<span class="co">#&gt;  3 mi           0.05    537 2020-12-07   </span>
-<span class="co">#&gt;  4 mi           0.1     650 2020-12-07   </span>
-<span class="co">#&gt;  5 mi           0.15    721 2020-12-07   </span>
-<span class="co">#&gt;  6 mi           0.2     785 2020-12-07   </span>
-<span class="co">#&gt;  7 mi           0.25    840 2020-12-07   </span>
-<span class="co">#&gt;  8 mi           0.3     884 2020-12-07   </span>
-<span class="co">#&gt;  9 mi           0.35    919 2020-12-07   </span>
-<span class="co">#&gt; 10 mi           0.4     951 2020-12-07   </span>
-<span class="co">#&gt; # ... with 14 more rows</span></code></pre></div>
+<span class="co">#&gt; 1         mi    0.010   370    2020-12-07</span>
+<span class="co">#&gt; 2         mi    0.025   465    2020-12-07</span>
+<span class="co">#&gt; 3         mi    0.050   537    2020-12-07</span>
+<span class="co">#&gt; 4         mi    0.100   650    2020-12-07</span>
+<span class="co">#&gt; 5         mi    0.150   721    2020-12-07</span>
+<span class="co">#&gt; 6         mi    0.200   785    2020-12-07</span>
+<span class="co">#&gt; 7         mi    0.250   840    2020-12-07</span>
+<span class="co">#&gt; 8         mi    0.300   884    2020-12-07</span>
+<span class="co">#&gt; 9         mi    0.350   919    2020-12-07</span>
+<span class="co">#&gt; 10        mi    0.400   951    2020-12-07</span>
+<span class="co">#&gt; 11        mi    0.450   985    2020-12-07</span>
+<span class="co">#&gt; 12        mi    0.500  1022    2020-12-07</span>
+<span class="co">#&gt; 13        mi    0.550  1054    2020-12-07</span>
+<span class="co">#&gt; 14        mi    0.600  1085    2020-12-07</span>
+<span class="co">#&gt; 15        mi    0.650  1117    2020-12-07</span>
+<span class="co">#&gt; 16        mi    0.700  1159    2020-12-07</span>
+<span class="co">#&gt; 17        mi    0.750  1204    2020-12-07</span>
+<span class="co">#&gt; 18        mi    0.800  1248    2020-12-07</span>
+<span class="co">#&gt; 19        mi    0.850  1300    2020-12-07</span>
+<span class="co">#&gt; 20        mi    0.900  1363    2020-12-07</span>
+<span class="co">#&gt; 21        mi    0.950  1460    2020-12-07</span>
+<span class="co">#&gt; 22        mi    0.975  1545    2020-12-07</span>
+<span class="co">#&gt; 23        mi    0.990  1656    2020-12-07</span>
+<span class="co">#&gt; 24        mi       NA  1022    2020-12-07</span></code></pre></div>
 <p>Forecasts are generally probabilistic, meaning that they predict a likely distribution of values (defined by quantiles) instead of a single value. For example, on 2020-12-28 the Covidhub ensemble forecaster made the following prediction for how many cases there would be in California 3 week(s) later.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">california_abr</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/chartr.html">tolower</a></span><span class="op">(</span><span class="fu">covidcast</span><span class="fu">::</span><span class="fu"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/name_to_abbr.html">name_to_abbr</a></span><span class="op">(</span><span class="st">"California"</span><span class="op">)</span><span class="op">)</span> <span class="co"># = "ca"</span>
@@ -196,20 +245,31 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="va">california_abr</span>, 
          <span class="va">forecast_date</span> <span class="op">==</span> <span class="va">forecast_dates_dec</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">quantile</span>, <span class="va">value</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 24 x 2</span>
 <span class="co">#&gt;    quantile value</span>
-<span class="co">#&gt;       &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt;  1    0.01    742</span>
-<span class="co">#&gt;  2    0.025   787</span>
-<span class="co">#&gt;  3    0.05    826</span>
-<span class="co">#&gt;  4    0.1     905</span>
-<span class="co">#&gt;  5    0.15    935</span>
-<span class="co">#&gt;  6    0.2     970</span>
-<span class="co">#&gt;  7    0.25   1030</span>
-<span class="co">#&gt;  8    0.3    1051</span>
-<span class="co">#&gt;  9    0.35   1054</span>
-<span class="co">#&gt; 10    0.4    1059</span>
-<span class="co">#&gt; # ... with 14 more rows</span></code></pre></div>
+<span class="co">#&gt; 1     0.010   742</span>
+<span class="co">#&gt; 2     0.025   787</span>
+<span class="co">#&gt; 3     0.050   826</span>
+<span class="co">#&gt; 4     0.100   905</span>
+<span class="co">#&gt; 5     0.150   935</span>
+<span class="co">#&gt; 6     0.200   970</span>
+<span class="co">#&gt; 7     0.250  1030</span>
+<span class="co">#&gt; 8     0.300  1051</span>
+<span class="co">#&gt; 9     0.350  1054</span>
+<span class="co">#&gt; 10    0.400  1059</span>
+<span class="co">#&gt; 11    0.450  1066</span>
+<span class="co">#&gt; 12    0.500  1141</span>
+<span class="co">#&gt; 13    0.550  1164</span>
+<span class="co">#&gt; 14    0.600  1187</span>
+<span class="co">#&gt; 15    0.650  1212</span>
+<span class="co">#&gt; 16    0.700  1238</span>
+<span class="co">#&gt; 17    0.750  1265</span>
+<span class="co">#&gt; 18    0.800  1298</span>
+<span class="co">#&gt; 19    0.850  1336</span>
+<span class="co">#&gt; 20    0.900  1389</span>
+<span class="co">#&gt; 21    0.950  1411</span>
+<span class="co">#&gt; 22    0.975  1478</span>
+<span class="co">#&gt; 23    0.990  1520</span>
+<span class="co">#&gt; 24       NA  1141</span></code></pre></div>
 <p>An <code>NA</code> in the <code>quantile</code> column indicates a point forecast (typically the median or mean).</p>
 </div>
 <div id="evaluate-the-performance-of-a-forecaster" class="section level3">
@@ -223,31 +283,27 @@
 <p>We may now create scorecards for each forecaster’s predictions or for a filtered subset.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">scorecards</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/evaluate_covid_predictions.html">evaluate_covid_predictions</a></span><span class="op">(</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html">bind_rows</a></span><span class="op">(</span><span class="va">predictions_cards</span>, 
-            <span class="va">predictions_cards_cmu</span>, 
-            <span class="va">predictions_cards_ens</span><span class="op">)</span>,
+  <span class="va">predictions</span>,
   err_measures <span class="op">=</span> <span class="va">err_measures</span>,
   backfill_buffer <span class="op">=</span> <span class="fl">10</span>,
   geo_type <span class="op">=</span> <span class="st">"state"</span>
   <span class="op">)</span></code></pre></div>
 <p><code><a href="../reference/evaluate_covid_predictions.html">evaluate_covid_predictions()</a></code> returns a long data frame with one column for each error measure added to the <code>predictions_cards</code> and the <code>quantile</code> and <code>value</code> columns removed and one row for each geo_value/ahead/forecast_date/forecaster combination. If quantile predictions are needed for plotting or other downstream analysis, then use the <code>predictions_cards</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">scorecards</span>
-<span class="co">#&gt; # A tibble: 644 x 12</span>
-<span class="co">#&gt;    ahead geo_value forecaster forecast_date data_source signal target_end_date</span>
-<span class="co">#&gt;    &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;      &lt;date&gt;        &lt;chr&gt;       &lt;chr&gt;  &lt;date&gt;         </span>
-<span class="co">#&gt;  1     3 ak        baseline   2020-12-07    jhu-csse    death~ 2020-12-26     </span>
-<span class="co">#&gt;  2     3 ak        baseline   2020-12-14    jhu-csse    death~ 2021-01-02     </span>
-<span class="co">#&gt;  3     3 ak        baseline   2020-12-21    jhu-csse    death~ 2021-01-09     </span>
-<span class="co">#&gt;  4     3 ak        baseline   2020-12-28    jhu-csse    death~ 2021-01-16     </span>
-<span class="co">#&gt;  5     3 al        baseline   2020-12-07    jhu-csse    death~ 2020-12-26     </span>
-<span class="co">#&gt;  6     3 al        baseline   2020-12-14    jhu-csse    death~ 2021-01-02     </span>
-<span class="co">#&gt;  7     3 al        baseline   2020-12-21    jhu-csse    death~ 2021-01-09     </span>
-<span class="co">#&gt;  8     3 al        baseline   2020-12-28    jhu-csse    death~ 2021-01-16     </span>
-<span class="co">#&gt;  9     3 ar        baseline   2020-12-07    jhu-csse    death~ 2020-12-26     </span>
-<span class="co">#&gt; 10     3 ar        baseline   2020-12-14    jhu-csse    death~ 2021-01-02     </span>
-<span class="co">#&gt; # ... with 634 more rows, and 5 more variables: incidence_period &lt;chr&gt;,</span>
-<span class="co">#&gt; #   actual &lt;int&gt;, wis &lt;dbl&gt;, ae &lt;dbl&gt;, coverage_80 &lt;dbl&gt;</span></code></pre></div>
+<code class="sourceCode R"><span class="va">scorecards</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; score_cards [644 × 12] (S3: score_cards/tbl_df/tbl/data.frame)</span>
+<span class="co">#&gt;  $ ahead           : int [1:644] 3 3 3 3 3 3 3 3 3 3 ...</span>
+<span class="co">#&gt;  $ geo_value       : chr [1:644] "ak" "ak" "ak" "ak" ...</span>
+<span class="co">#&gt;  $ forecaster      : chr [1:644] "baseline" "baseline" "baseline" "baseline" ...</span>
+<span class="co">#&gt;  $ forecast_date   : Date[1:644], format: "2020-12-07" "2020-12-14" ...</span>
+<span class="co">#&gt;  $ data_source     : chr [1:644] "jhu-csse" "jhu-csse" "jhu-csse" "jhu-csse" ...</span>
+<span class="co">#&gt;  $ signal          : chr [1:644] "deaths_incidence_num" "deaths_incidence_num" "deaths_incidence_num" "deaths_incidence_num" ...</span>
+<span class="co">#&gt;  $ target_end_date : Date[1:644], format: "2020-12-26" "2021-01-02" ...</span>
+<span class="co">#&gt;  $ incidence_period: chr [1:644] "epiweek" "epiweek" "epiweek" "epiweek" ...</span>
+<span class="co">#&gt;  $ actual          : num [1:644] 17 15 8 5 296 187 427 820 250 288 ...</span>
+<span class="co">#&gt;  $ wis             : num [1:644] 2.351 12.203 0.978 7.633 13.185 ...</span>
+<span class="co">#&gt;  $ ae              : num [1:644] 4 17 0 12 16 26 140 518 60 3 ...</span>
+<span class="co">#&gt;  $ coverage_80     : num [1:644] 1 0 1 0 1 1 0 0 0 1 ...</span></code></pre></div>
 <p><strong>Technical note:</strong> What does <code>backfill_buffer = 10</code> do? When we evaluate a forecaster in backtesting we are assuming that we know what actually occurred. However, in light of backfill, we may not trust the data for some period of time. The argument <code>backfill_buffer</code> allows us to specify how many days until we believe that the data has “settled down” and is unlikely to be updated further. The choice of this argument will depend on the particular signal you are forecasting.</p>
 </div>
 <div id="plots-of-performance-measures" class="section level3">
@@ -256,11 +312,14 @@
 <p><code>evalcast</code> provides a number of tools to visually assess a forecaster (including comparisons with other forecasters).</p>
 <p>We can examine forecaster calibration.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_calibration.html">plot_calibration</a></span><span class="op">(</span><span class="va">predictions</span>, geo_type <span class="op">=</span> <span class="st">"state"</span>, type <span class="op">=</span> <span class="st">"wedgeplot"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="../reference/plot_calibration.html">plot_calibration</a></span><span class="op">(</span>predictions_cards <span class="op">=</span> <span class="va">predictions</span>, 
+                 geo_type <span class="op">=</span> <span class="st">"state"</span>, type <span class="op">=</span> <span class="st">"wedgeplot"</span>, 
+                 facet_rows <span class="op">=</span> <span class="st">"forecaster"</span>, 
+                 facet_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"ahead"</span>, <span class="st">"forecast_date"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="intro-evalcast_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 <p>By default, the proportion is the number of <code>geo_values</code> that fall above/below the quantile at each forecast date and ahead, but the grouping and variables to average over can be specified.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_calibration.html">plot_calibration</a></span><span class="op">(</span><span class="va">predictions</span>, 
+<code class="sourceCode R"><span class="fu"><a href="../reference/plot_calibration.html">plot_calibration</a></span><span class="op">(</span>predictions_cards <span class="op">=</span> <span class="va">predictions</span>, 
                  geo_type <span class="op">=</span> <span class="st">"state"</span>,
                  grp_vars <span class="op">=</span> <span class="st">"forecaster"</span>,
                  facet_cols <span class="op">=</span> <span class="st">"forecaster"</span>,
@@ -269,18 +328,20 @@
 <p><img src="intro-evalcast_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 <p>We can also examine a more traditional calibration plot:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_calibration.html">plot_calibration</a></span><span class="op">(</span><span class="va">predictions</span>, geo_type <span class="op">=</span> <span class="st">"state"</span>, type <span class="op">=</span> <span class="st">"traditional"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="../reference/plot_calibration.html">plot_calibration</a></span><span class="op">(</span>predictions_cards <span class="op">=</span> <span class="va">predictions</span>, geo_type <span class="op">=</span> <span class="st">"state"</span>, type <span class="op">=</span> <span class="st">"traditional"</span><span class="op">)</span></code></pre></div>
 <p><img src="intro-evalcast_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
 <p>For extra flexibility, you can perform the core calculations using something like:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/compute_calibration.html">compute_calibration</a></span><span class="op">(</span><span class="va">predictions</span>, geo_type <span class="op">=</span> <span class="st">"state"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/setup_wedgeplot.html">setup_wedgeplot</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p>We can display the coverage of the interval forecasts:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_coverage.html">plot_coverage</a></span><span class="op">(</span><span class="va">predictions</span>, geo_type <span class="op">=</span> <span class="st">"state"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="../reference/plot_coverage.html">plot_coverage</a></span><span class="op">(</span>predictions_cards <span class="op">=</span> <span class="va">predictions</span>, 
+              geo_type <span class="op">=</span> <span class="st">"state"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></code></pre></div>
 <p><img src="intro-evalcast_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
 <p>Or the width of the intervals:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_width.html">plot_width</a></span><span class="op">(</span><span class="va">predictions</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="../reference/plot_width.html">plot_width</a></span><span class="op">(</span>predictions_cards <span class="op">=</span> <span class="va">predictions</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> </code></pre></div>
 <p><img src="intro-evalcast_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
 <p>Because <code>score_cards</code> are just long data frames, custom plots can also be created by using <a href="http://ggplot2.tidyverse.org">{ggplot2}</a>:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
@@ -317,7 +378,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Jacob Bien, Jed Grabman, Alden Green, Daniel McDonald, Balasubramanian Narasimhan, Mike O'Brien, Ryan Tibshirani.</p>
+  <p>Developed by Daniel McDonald, Jacob Bien, Mike O'Brien, Jed Grabman, Sarah Colquhoun, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

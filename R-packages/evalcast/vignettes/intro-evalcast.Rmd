@@ -10,7 +10,7 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   echo = TRUE, message = FALSE, warning = FALSE,
-  collapse = TRUE, cache=TRUE,
+  collapse = TRUE, cache=FALSE,
   comment = "#>"
 )
 ```
@@ -72,7 +72,8 @@ predictions_cards <- get_predictions(baseline_forecaster,
                                      )
 )
 
-predictions <- bind_rows(predictions_cards, predictions_cards_cmu, predictions_cards_ens)
+predictions <- bind_rows(predictions_cards, predictions_cards_cmu, 
+                         predictions_cards_ens)
 
 ```
 
@@ -128,7 +129,7 @@ scorecards <- evaluate_covid_predictions(
 `evaluate_covid_predictions()` returns a long data frame with one column for each error measure added to the `predictions_cards` and the `quantile` and `value` columns removed and one row for each geo_value/ahead/forecast_date/forecaster combination. If quantile predictions are needed for plotting or other downstream analysis, then use the `predictions_cards`. 
 
 ```{r}
-scorecards
+scorecards %>% str()
 ```
 
 
@@ -141,7 +142,10 @@ scorecards
 We can examine forecaster calibration.
 
 ```{r}
-plot_calibration(predictions_cards = predictions, geo_type = "state", type = "wedgeplot", facet_rows = "forecaster", facet_cols = c("ahead", "forecast_date"))
+plot_calibration(predictions_cards = predictions, 
+                 geo_type = "state", type = "wedgeplot", 
+                 facet_rows = "forecaster", 
+                 facet_cols = c("ahead", "forecast_date"))
 ```
 
 By default, the proportion is the number of `geo_values` that fall above/below the quantile at each forecast date and ahead, but the grouping and variables to average over can be specified.
@@ -172,13 +176,15 @@ compute_calibration(predictions, geo_type = "state") %>% setup_wedgeplot()
 We can display the coverage of the interval forecasts:
 
 ```{r}
-plot_coverage(predictions_cards = predictions, geo_type = "state")
+plot_coverage(predictions_cards = predictions, 
+              geo_type = "state") + theme(legend.position = "none")
 ```
 
 Or the width of the intervals:
 
 ```{r}
-plot_width(predictions_cards = predictions)
+plot_width(predictions_cards = predictions) + scale_y_log10() +
+  guides(color = "none") 
 ```
 
 Because `score_cards` are just long data frames, custom plots can also be created by using [{ggplot2}](http://ggplot2.tidyverse.org):

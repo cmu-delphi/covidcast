@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -136,20 +136,14 @@
   <span class='va'>df</span>,
   <span class='va'>x</span>,
   <span class='va'>y</span>,
+  facet_rows <span class='op'>=</span> <span class='cn'>NULL</span>,
+  facet_cols <span class='op'>=</span> <span class='cn'>NULL</span>,
+  grp_vars <span class='op'>=</span> <span class='st'>"forecaster"</span>,
   aggr <span class='op'>=</span> <span class='va'>mean</span>,
   dots <span class='op'>=</span> <span class='cn'>TRUE</span>,
   lines <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  group_vars <span class='op'>=</span> <span class='st'>"forecaster"</span>,
-  facet_rows <span class='op'>=</span> <span class='cn'>NULL</span>,
-  facet_cols <span class='op'>=</span> <span class='cn'>NULL</span>,
   base_forecaster <span class='op'>=</span> <span class='cn'>NULL</span>,
-  scale_before_aggr <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  title <span class='op'>=</span> <span class='fu'>waiver</span><span class='op'>(</span><span class='op'>)</span>,
-  subtitle <span class='op'>=</span> <span class='fu'>waiver</span><span class='op'>(</span><span class='op'>)</span>,
-  xlab <span class='op'>=</span> <span class='fu'>waiver</span><span class='op'>(</span><span class='op'>)</span>,
-  ylab <span class='op'>=</span> <span class='fu'>waiver</span><span class='op'>(</span><span class='op'>)</span>,
-  legend_position <span class='op'>=</span> <span class='st'>"bottom"</span>,
-  legend_title <span class='op'>=</span> <span class='cn'>NULL</span>
+  scale_before_aggr <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -168,23 +162,6 @@
       <td><p>name of the variable in <code>df</code> to be used for the y-axis</p></td>
     </tr>
     <tr>
-      <th>aggr</th>
-      <td><p>function to use to aggregate data over <code>group_vars</code></p></td>
-    </tr>
-    <tr>
-      <th>dots</th>
-      <td><p>when set to TRUE, a dot layer is included in the plot</p></td>
-    </tr>
-    <tr>
-      <th>lines</th>
-      <td><p>when set to TRUE, a line layer is included in the plot</p></td>
-    </tr>
-    <tr>
-      <th>group_vars</th>
-      <td><p>The set of variable names in <code>df</code> which to aggregate over.
-"forecaster" by default.</p></td>
-    </tr>
-    <tr>
       <th>facet_rows</th>
       <td><p>A variable name to facet data over. Creates a
 separate row of plots for each value of specified variable. Can be used
@@ -193,6 +170,23 @@ with <code>facet_cols</code> to create a grid of plots.</p></td>
     <tr>
       <th>facet_cols</th>
       <td><p>Same as <code>facet_rows</code>, but with columns.</p></td>
+    </tr>
+    <tr>
+      <th>grp_vars</th>
+      <td><p>The set of variable names in <code>df</code> which to aggregate over.
+"forecaster" by default.</p></td>
+    </tr>
+    <tr>
+      <th>aggr</th>
+      <td><p>function to use to aggregate data over <code>grp_vars</code></p></td>
+    </tr>
+    <tr>
+      <th>dots</th>
+      <td><p>when set to TRUE, a dot layer is included in the plot</p></td>
+    </tr>
+    <tr>
+      <th>lines</th>
+      <td><p>when set to TRUE, a line layer is included in the plot</p></td>
     </tr>
     <tr>
       <th>base_forecaster</th>
@@ -204,30 +198,6 @@ the corresponding values of the <code>base_forecaster</code></p></td>
       <td><p>If TRUE, scales results by the
 <code>base_forecaster</code> before aggregating by the <code>aggr</code> function. FALSE by
 default.</p></td>
-    </tr>
-    <tr>
-      <th>title</th>
-      <td><p>title of the plot, if set</p></td>
-    </tr>
-    <tr>
-      <th>subtitle</th>
-      <td><p>subtitle of the plot, if set</p></td>
-    </tr>
-    <tr>
-      <th>xlab</th>
-      <td><p>x-axis label, if set</p></td>
-    </tr>
-    <tr>
-      <th>ylab</th>
-      <td><p>y-axis label, if set</p></td>
-    </tr>
-    <tr>
-      <th>legend_position</th>
-      <td><p>where to position the legend ("bottom" by default)</p></td>
-    </tr>
-    <tr>
-      <th>legend_title</th>
-      <td><p>title of the legend, if set</p></td>
     </tr>
     </table>
 
@@ -243,7 +213,7 @@ default.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Jed Grabman, Alden Green, Daniel McDonald, Balasubramanian Narasimhan, Mike O'Brien, Ryan Tibshirani.</p>
+  <p>Developed by Daniel McDonald, Jacob Bien, Mike O'Brien, Jed Grabman, Sarah Colquhoun, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

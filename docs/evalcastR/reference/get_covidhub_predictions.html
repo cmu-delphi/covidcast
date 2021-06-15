@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get predictions from a forecaster on the COVID Hub — get_covidhub_predictions • evalcast</title>
+<title>Get predictions from forecasters on the COVID Hub — get_covidhub_predictions • evalcast</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Get predictions from a forecaster on the COVID Hub — get_covidhub_predictions" />
+<meta property="og:title" content="Get predictions from forecasters on the COVID Hub — get_covidhub_predictions" />
 <meta property="og:description" content="Simply converts the predictions of forecasters submitting to the COVID Hub to the format of a
 predictions card, so it can be easily evaluated and compared." />
 
@@ -73,7 +73,7 @@ predictions card, so it can be easily evaluated and compared." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -124,7 +124,7 @@ predictions card, so it can be easily evaluated and compared." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get predictions from a forecaster on the COVID Hub</h1>
+    <h1>Get predictions from forecasters on the COVID Hub</h1>
     <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/get_covidhub_predictions.R'><code>R/get_covidhub_predictions.R</code></a></small>
     <div class="hidden name"><code>get_covidhub_predictions.Rd</code></div>
     </div>
@@ -135,14 +135,20 @@ predictions card, so it can be easily evaluated and compared.</p>
     </div>
 
     <pre class="usage"><span class='fu'>get_covidhub_predictions</span><span class='op'>(</span>
-  <span class='va'>covidhub_forecaster_name</span>,
+  covidhub_forecaster_name <span class='op'>=</span> <span class='fu'><a href='get_covidhub_forecaster_names.html'>get_covidhub_forecaster_names</a></span><span class='op'>(</span><span class='op'>)</span>,
   forecast_dates <span class='op'>=</span> <span class='cn'>NULL</span>,
   geo_values <span class='op'>=</span> <span class='st'>"*"</span>,
   forecast_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"point"</span>, <span class='st'>"quantile"</span><span class='op'>)</span>,
   ahead <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>,
   incidence_period <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"epiweek"</span>, <span class='st'>"day"</span><span class='op'>)</span>,
   signal <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"confirmed_incidence_num"</span>, <span class='st'>"deaths_incidence_num"</span>,
-    <span class='st'>"deaths_cumulative_num"</span><span class='op'>)</span>
+    <span class='st'>"deaths_cumulative_num"</span>, <span class='st'>"confirmed_admissions_covid_1d"</span><span class='op'>)</span>,
+  predictions_cards <span class='op'>=</span> <span class='cn'>NULL</span>,
+  start_date <span class='op'>=</span> <span class='cn'>NULL</span>,
+  end_date <span class='op'>=</span> <span class='cn'>NULL</span>,
+  date_filtering_function <span class='op'>=</span> <span class='cn'>NULL</span>,
+  verbose <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -150,8 +156,8 @@ predictions card, so it can be easily evaluated and compared.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>covidhub_forecaster_name</th>
-      <td><p>String indicating of the forecaster
-(matching what it is called on the COVID Hub).</p></td>
+      <td><p>A vector of strings indicating the
+forecasters (matching what it is called on the COVID Hub).</p></td>
     </tr>
     <tr>
       <th>forecast_dates</th>
@@ -183,9 +189,41 @@ return both</p></td>
     <tr>
       <th>signal</th>
       <td><p>this function supports only "confirmed_incidence_num",
-"deaths_incidence_num", and/or "deaths_cumulative_num" (those currently
-forecast by the COVIDhub-ensemble). For other types, use one of the
+"deaths_incidence_num", "deaths_cumulative_num", and/or
+"confirmed_admissions_covid_1d". For other types, use one of the
 alternatives mentioned above</p></td>
+    </tr>
+    <tr>
+      <th>predictions_cards</th>
+      <td><p>An object of class <code>predicitions_cards</code> that
+contains previously retrieved predictions. If provided, files will not be
+retrieved from Reichlab for any forecaster / forecast_date combos that are
+present in the file.</p></td>
+    </tr>
+    <tr>
+      <th>start_date</th>
+      <td><p>The earliest date for which to retrieve predictions</p></td>
+    </tr>
+    <tr>
+      <th>end_date</th>
+      <td><p>The latest date for which to retrieve predictions</p></td>
+    </tr>
+    <tr>
+      <th>date_filtering_function</th>
+      <td><p>A function which takes a list, where each
+element is a vector of dates and returns a list where each element is a
+subset of those in the original list. Used for custom filtering of dates
+(e.g. only forecasts from Mondays, where all forecasters made a forecast,
+etc.)</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>If TRUE, prints additional details about progress. FALSE by
+default.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Additional named arguments. Intended for expert users only.</p></td>
     </tr>
     </table>
 
@@ -197,9 +235,8 @@ remainder specify the prediction task, 10 columns in total:
 <code>ahead</code>, <code>geo_value</code>, <code>quantile</code>, <code>value</code>, <code>forecaster</code>, <code>forecast_date</code>,
 <code>data_source</code>, <code>signal</code>, <code>target_end_date</code>, and <code>incidence_period</code>. Here
 <code>data_source</code> and <code>signal</code> correspond to the response variable only.</p>
-<p>tibble of predictions cards. Only incident predictions are returned.
-For more flexible processing of COVID Hub data, try using
-<a href='https://docs.zoltardata.com/zoltr/'>zoltr</a></p>
+<p>For more flexible processing of COVID Hub data, try
+using <a href='https://docs.zoltardata.com/zoltr/'>zoltr</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='get_predictions.html'>get_predictions()</a></code></p>
@@ -216,7 +253,7 @@ For more flexible processing of COVID Hub data, try using
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Jed Grabman, Alden Green, Daniel McDonald, Balasubramanian Narasimhan, Mike O'Brien, Ryan Tibshirani.</p>
+  <p>Developed by Daniel McDonald, Jacob Bien, Mike O'Brien, Jed Grabman, Sarah Colquhoun, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

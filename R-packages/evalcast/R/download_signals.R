@@ -2,7 +2,6 @@
 #' @param ... arguments to be passed to `covidcast::covidcast_signal()`.
 #' @return `covidcast_signal` data frame.
 #'
-#' @export
 download_signal <- function(...) {
   args <- list(...)
   if (is.null(args$start_day)) {

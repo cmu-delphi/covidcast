@@ -5,7 +5,7 @@
 \title{Baseline forecaster}
 \usage{
 baseline_forecaster(
-  df,
+  df_list,
   forecast_date,
   incidence_period = c("epiweek", "day"),
   ahead = 1:4,
@@ -13,7 +13,7 @@ baseline_forecaster(
 )
 }
 \arguments{
-\item{df}{Data frame of the format that is returned by
+\item{df_list}{list of data of the format that is returned by
 \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}} or \code{\link[covidcast:covidcast_signals]{covidcast::covidcast_signals()}}.}
 
 \item{forecast_date}{Date object or string of the form "YYYY-MM-DD",

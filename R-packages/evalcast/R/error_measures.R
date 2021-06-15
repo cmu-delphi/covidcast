@@ -219,7 +219,9 @@ is_symmetric <- function(x, tol=1e-8) {
   all(abs(x + rev(x) - 1) < tol)
 }
 
-find_quantile_match <- function(x, q, tol=1e-8) abs(x - q) < tol
+find_quantile_match <- function(quantiles, val_to_match, tol=1e-8){
+  return(abs(quantiles - val_to_match) < tol  & !is.na(quantiles))
+}
 
 
 erm <- function(x, err_measures){

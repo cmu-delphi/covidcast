@@ -65,7 +65,8 @@ nrow and ncol cannot be set.}
 
 \item{ncol}{See \code{nrow}}
 
-\item{...}{additional arguments passed to \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}}}
+\item{...}{additional arguments passed to \code{\link[covidcast:covidcast_signal]{covidcast::covidcast_signal()}} or
+\code{as.predictions_cards}}
 }
 \value{
 invisibly returns a ggplot object

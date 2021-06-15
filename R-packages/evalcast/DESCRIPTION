@@ -79,11 +79,13 @@ Imports:
     zoltr,
     covidHubUtils,
     forcats,
-    methods
+    data.table,
+    arrow
 Suggests: 
     testthat,
     mockr,
     mockery,
-    scoringutils
+    scoringutils,
+    vdiffr
 Depends: 
     R (>= 3.5.0)

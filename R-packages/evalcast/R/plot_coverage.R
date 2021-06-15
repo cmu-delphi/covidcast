@@ -40,21 +40,15 @@ plot_coverage <- function(predictions_cards,
   type <- match.arg(type)
   
   test_legal_faceting(facet_rows, facet_cols, grp_vars)
-
-  scorecards <- left_join(predictions_cards,
-                          get_covidcast_data(predictions_cards,
-                                             backfill_buffer,
-                                             geo_type),
-                          by = c("geo_value",
-                                 "forecast_date",
-                                 "ahead"))
   
   # make sure scorecards are comparable:
-  grps <- grp_processing_for_facets(scorecards, grp_vars)
-  cover <- compute_coverage(scorecards, grp_vars, avg_vars)
+  grps <- grp_processing_for_facets(predictions_cards, grp_vars)
+  
+  cover <- compute_coverage(predictions_cards,
+                            geo_type, grp_vars, avg_vars, backfill_buffer)
 
   facet_layer <- facet_grid(rows = vars(!!!syms(facet_rows)),
-                            cols = vars(!!!syms(facet_cols)))
+                              cols = vars(!!!syms(facet_cols)))
   color_vars <- setdiff(grp_vars, c(facet_rows, facet_cols))
 
   if (type == "all") {
@@ -86,18 +80,90 @@ plot_coverage <- function(predictions_cards,
   )
 }
 
-test_legal_faceting <- function(facet_rows, facet_cols, grp_vars) {
-  if (!is.null(facet_rows)) {
-    non_grouped_facet <- setdiff(facet_rows, grp_vars)
-    assert_that(length(non_grouped_facet) == 0,
-                msg = paste("Variables must be grouped in order to be faceted in rows:",
-                            non_grouped_facet))
-  }
-  if (!is.null(facet_cols)) {
-    non_grouped_facet <- setdiff(facet_cols, grp_vars)
-    assert_that(length(non_grouped_facet) == 0,
-                msg = paste("Variables must be grouped in order to be faceted in cols:",
-                            non_grouped_facet))
-  }
-  invisible(TRUE)
+
+#' Compute observed coverage from a quantile forecaster
+#'
+#' @param predictions_cards tibble of predictions
+#'   that are all for the same prediction task, meaning they are for the same
+#'   response, incidence period,and geo type. Forecasts may be for a
+#'   different forecast date or forecaster.
+#'   A predictions card may be created by the function
+#'   [get_predictions()], downloaded with [get_covidhub_predictions()] or
+#'   possibly created manually.
+#' @template geo_type-template
+#' @param grp_vars character vector of named columns in the score_card at which
+#'   average performance will be returned
+#' @param avg_vars character vector of named columns in the score_card over which
+#'   averaging performance will be computed
+#' @param backfill_buffer How many days until response is deemed trustworthy
+#'   enough to be taken as correct?
+#'   
+#' @details Checks __are__ performed to ensure that averaging variables
+#'   all contain the same confidence intervals though these may vary over
+#'   grouping variables. 
+#'   avg_vars and grp_vars must
+#'   have an empty intersection.
+#'
+#' @return A tibble containing grp_vars, nominal_prob (the claimed interval
+#'   coverage), prop_below (the proportion of actual values falling below
+#'   the lower end of the confidence interval), prop_above (the proportion of
+#'   actual values falling above the upper end of the confidence interval),
+#'   and prop_covered (the proportion falling inside the interval). All 
+#'   proportions are calculated for each available symmetric interval at each
+#'   combination of grouping variables by averaging over any variables listed
+#'   in avg_vars.
+#' @export
+#'
+compute_coverage <- function(
+  predictions_cards,
+  geo_type = c("county", "hrr", "msa", "dma", "state",
+                 "hhs", "nation"),
+  grp_vars = c("forecaster", "forecast_date", "ahead"),
+  avg_vars = c("geo_value"),
+  backfill_buffer = 0) {
+
+  geo_type <- match.arg(geo_type)
+  
+  assert_that(all(c(grp_vars, avg_vars, "quantile", "value") %in%
+                    names(predictions_cards)),
+              msg = paste("In compute_coverage:",
+                          "grp_vars and avg_vars must be present in the predictions_card.",
+                          "See details."))
+  assert_that(is_empty(intersect(grp_vars, avg_vars)),
+              msg = paste("In compute_coverage:",
+                          "grp_vars and avg_vars must have empty intersection.",
+                          "See details."))
+  
+  score_card <- left_join(predictions_cards,
+                          get_covidcast_data(predictions_cards,
+                                             backfill_buffer,
+                                             geo_type),
+                          by = c("geo_value",
+                                 "forecast_date",
+                                 "ahead"))
+  
+  score_card <- intersect_averagers(score_card, grp_vars, avg_vars)
+  score_card <- score_card %>% 
+    filter(!is.na(.data$quantile)) %>%
+    select(all_of(grp_vars), all_of(avg_vars),
+           .data$quantile, .data$value, .data$actual) 
+  
+  score_card <- averaging_checks(score_card, grp_vars, avg_vars)
+  
+  score_card <- score_card %>% 
+    group_by(across(all_of(c(grp_vars,avg_vars)))) %>%
+    mutate(rev_value = rev(.data$value)) %>%
+    filter(.data$quantile < 0.5) %>%
+    mutate(is_below = .data$actual < .data$value,
+           is_above = .data$actual > .data$rev_value,
+           is_covered = !.data$is_below & !.data$is_above,
+           nominal_prob = 1 - 2 * .data$quantile) %>%
+    ungroup() %>%
+    select(all_of(grp_vars), .data$is_above, .data$is_below, .data$is_covered,
+           .data$nominal_prob) %>%
+    group_by(across(all_of(grp_vars)), .data$nominal_prob) %>%
+    summarise(prop_below = mean(.data$is_below, na.rm = TRUE),
+              prop_above = mean(.data$is_above, na.rm = TRUE),
+              prop_covered = mean(.data$is_covered, na.rm = TRUE))
+  return(score_card)
 }

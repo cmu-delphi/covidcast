@@ -22,19 +22,27 @@ get_predictions(
 probabilities associated with quantile forecasts for that location and
 ahead. If your forecaster produces point forecasts, then set \code{quantile=NA}.
 
-The first argument must be the list of signals returned by a call to the COVIDcast.
+One argument to \code{forecaster} must be named \code{df_list}. It will be
+populated with the list of historical data returned by a call
+to COVIDcast. The list will be the same length as the number of rows in
+the \code{signals} tibble (see below).
 The forecaster will also receive a single \code{forecast_date} as a named argument.
-Any additional named arguments can be passed via the \code{forecaster_params}
+Any additional named arguments can be passed via the \code{forecaster_args}
 argument below.
 
-Thus, the forecaster should have a signature like \code{forecaster(data, forecast_date,...)}}
+Thus, the forecaster should have a signature like
+\code{forecaster(df_list = data, forecast_data = forecast_date, ...)}}
 
 \item{name_of_forecaster}{String indicating name of the forecaster.}
 
-\item{signals}{Tibble with mandatory columns \code{data_source} and \code{signal} that
-specifies which variables from the COVIDcast API will be used by \code{forecaster}. Each
+\item{signals}{Tibble with mandatory columns \code{data_source} and \code{signal} and
+optional columns \code{start_day}, \code{as_of}, \code{geo_typ}, \code{geo_values}.
+
+\code{data_source} and \code{signal} specify which variables from the COVIDcast API
+will be used by \code{forecaster}. Each
 row of \code{signals} represents a separate signal, and first row is taken to be
-the response. If using \code{incidence_period = "epiweek"}, the response should
+the response unless explicitly overridden.
+If using \code{incidence_period = "epiweek"}, the response should
 be something for which summing daily values over an epiweek makes sense
 (e.g., counts or proportions but not log(counts) or log(proportions)).
 Available data sources and signals are documented in the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{COVIDcast signal documentation}.
@@ -52,12 +60,10 @@ trains on the most recent 4 weeks of data).
 
 You may also include a \code{geo_type} column, a \code{geo_values} column and/or an
 \code{as_of} column.
-
 The first two should contain a string. If unspecified, these will have
 the same defaults as \code{covidcast::covidcast_signal()}, namely
 \code{geo_type = "county"} and \code{geo_values = "*"}.
-These arguments allow you to override
-to download different data than
+These arguments allow you to download different data than
 what you're actually trying to predict, say using state-level data to
 predict national outcomes.
 
@@ -86,11 +92,11 @@ This function will be called as \code{apply_corrections(df)}.}
 
 \item{response_data_source}{String indicating the \code{data_source} of the response.
 This is used mainly for downstream evaluation. By default, this will be the
-same as the first row in the \code{signals} tibble.}
+same as the \code{data_source} in the first row of the \code{signals} tibble.}
 
 \item{response_data_signal}{String indicating the \code{signal} of the response.
 This is used mainly for downstream evaluation. By default, this will be the
-same as the first row in the \code{signals} tibble.}
+same as the \code{signal} in the first row in the \code{signals} tibble.}
 
 \item{forecaster_args}{a list of additional named arguments to be passed
 to \code{forecaster()}. A common use case would be to pass the period ahead

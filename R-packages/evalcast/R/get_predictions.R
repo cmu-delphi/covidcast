@@ -14,12 +14,16 @@
 #'   probabilities associated with quantile forecasts for that location and
 #'   ahead. If your forecaster produces point forecasts, then set `quantile=NA`.
 #'   
-#'   The first argument must be the list of signals returned by a call to the COVIDcast. 
+#'   One argument to `forecaster` must be named `df_list`. It will be 
+#'   populated with the list of historical data returned by a call 
+#'   to COVIDcast. The list will be the same length as the number of rows in 
+#'   the `signals` tibble (see below).
 #'   The forecaster will also receive a single `forecast_date` as a named argument.
-#'   Any additional named arguments can be passed via the `forecaster_params`
+#'   Any additional named arguments can be passed via the `forecaster_args`
 #'   argument below.
 #'   
-#'   Thus, the forecaster should have a signature like `forecaster(data, forecast_date,...)`
+#'   Thus, the forecaster should have a signature like 
+#'   `forecaster(df_list = data, forecast_data = forecast_date, ...)`
 #' @param name_of_forecaster String indicating name of the forecaster.
 #' @template signals-template
 #' @template forecast_dates-template
@@ -27,10 +31,10 @@
 #' @template apply_corrections-template
 #' @param response_data_source String indicating the `data_source` of the response.
 #'   This is used mainly for downstream evaluation. By default, this will be the 
-#'   same as the first row in the `signals` tibble.
+#'   same as the `data_source` in the first row of the `signals` tibble.
 #' @param response_data_signal String indicating the `signal` of the response.
 #'   This is used mainly for downstream evaluation. By default, this will be the 
-#'   same as the first row in the `signals` tibble.
+#'   same as the `signal` in the first row in the `signals` tibble.
 #' @param forecaster_args a list of additional named arguments to be passed 
 #'   to `forecaster()`. A common use case would be to pass the period ahead
 #'   (e.g. predict 1 day, 2 days, ..., k days ahead). Note that `ahead` is a 
@@ -61,7 +65,7 @@ get_predictions <- function(forecaster,
                             name_of_forecaster,
                             signals,
                             forecast_dates,
-                            incidence_period = c("epiweek","day"),
+                            incidence_period = c("epiweek", "day"),
                             apply_corrections = function(signals) signals,
                             response_data_source = signals$data_source[1],
                             response_data_signal = signals$signal[1],
@@ -127,9 +131,8 @@ get_predictions_single_date <- function(forecaster,
   # Downloaded data postprocessing
   if(!is.null(apply_corrections)) df_list <- apply_corrections(df_list)
 
-  df_arg <- methods::formalArgs(forecaster)[1] # grab name of first arg to forecaster
   forecaster_args$forecast_date = forecast_date
-  forecaster_args[[df_arg]] <- df_list # pass in the data named to the right arg
+  forecaster_args$df_list <- df_list # pass in the data named to the right arg
   
   out <- do.call(forecaster, forecaster_args)
   assert_that(all(c("ahead", "geo_value", "quantile", "value") %in% names(out)),
@@ -141,3 +144,4 @@ get_predictions_single_date <- function(forecaster,
   out$forecast_date = forecast_date
   return(out)
 }
+

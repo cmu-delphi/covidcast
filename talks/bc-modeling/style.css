@@ -1,0 +1,33 @@
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    color: #247 !important;
+}
+
+pre {
+    font-weight: normal !important;
+    border-color: #247 !important;
+    background-color: #f8f8f8 !important;
+}
+
+code {
+    background-color: #f8f8f8 !important;
+    font-family: "Lucida Console", Monaco, monospace;
+}
+
+a {
+    color: #800080 !important;
+    border-bottom: 1px solid #800080;
+}
+
+pre a {
+    border: none;
+}
+
+a:hover {
+    color: #800080 !important;
+    border-bottom: none !important;
+    text-decoration: none !important;
+}
+
+body {
+    background-color: #ffffff !important;
+}

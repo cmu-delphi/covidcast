@@ -1,14 +1,7 @@
-#' Download signal from covidcast
+#' Wrapper around `covidcast::covidcast_signal()` with additional logging.
+#' @param ... arguments to be passed to `covidcast::covidcast_signal()`.
+#' @return `covidcast_signal` data frame.
 #'
-#' This is a simple wrapper to [covidcast::covidcast_signal()] that is less verbose.
-#'
-#' @param ... Arguments that are passed to [covidcast::covidcast_signal()].
-#' @importFrom magrittr %>%
-#' @importFrom rlang .data
-#' @importFrom covidcast covidcast_signal
-#' @importFrom utils data
-#' @importFrom stringr str_glue str_sub
-#' @importFrom dplyr select mutate distinct rename
 download_signal <- function(...) {
   args <- list(...)
   if (is.null(args$start_day)) {
@@ -33,9 +26,5 @@ download_signal <- function(...) {
   message(msg)
   
   out <- base::suppressMessages({covidcast_signal(...)})
-  if (args$geo_type == "state") {
-    out$geo_value = substr(covidcast::abbr_to_fips(out$geo_value), 1, 2)
-  }
-  out %>% rename(location = .data$geo_value)
+  out 
 }
-

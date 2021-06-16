@@ -10,134 +10,138 @@
 #' predictions made using the information as of September 14).
 #'
 #' @param forecaster Function that outputs a tibble with columns `ahead`,
-#'   `location`, `probs`, `quantiles`. The `quantiles` column gives the
-#'   predictive quantiles of the forecast distribution for that location and
-#'   ahead.
+#'   `geo_value`, `quantile`, and `value`. The `quantile` column gives the
+#'   probabilities associated with quantile forecasts for that location and
+#'   ahead. If your forecaster produces point forecasts, then set `quantile=NA`.
+#'   
+#'   One argument to `forecaster` must be named `df_list`. It will be 
+#'   populated with the list of historical data returned by a call 
+#'   to COVIDcast. The list will be the same length as the number of rows in 
+#'   the `signals` tibble (see below).
+#'   The forecaster will also receive a single `forecast_date` as a named argument.
+#'   Any additional named arguments can be passed via the `forecaster_args`
+#'   argument below.
+#'   
+#'   Thus, the forecaster should have a signature like 
+#'   `forecaster(df_list = data, forecast_data = forecast_date, ...)`
 #' @param name_of_forecaster String indicating name of the forecaster.
 #' @template signals-template
 #' @template forecast_dates-template
 #' @template incidence_period-template
-#' @template ahead-template
-#' @template geo_type-template
-#' @template geo_values-template
-#' @param ... Additional arguments to be passed to `forecaster()`.
-#' 
-#' @return List of "predictions cards", with one element per forecast date. Each
-#'   predictions card is a data frame with two columns:
+#' @template apply_corrections-template
+#' @param response_data_source String indicating the `data_source` of the response.
+#'   This is used mainly for downstream evaluation. By default, this will be the 
+#'   same as the `data_source` in the first row of the `signals` tibble.
+#' @param response_data_signal String indicating the `signal` of the response.
+#'   This is used mainly for downstream evaluation. By default, this will be the 
+#'   same as the `signal` in the first row in the `signals` tibble.
+#' @param forecaster_args a list of additional named arguments to be passed 
+#'   to `forecaster()`. A common use case would be to pass the period ahead
+#'   (e.g. predict 1 day, 2 days, ..., k days ahead). Note that `ahead` is a 
+#'   required component of the forecaster output (see above).
 #'
-#' \item{location}{FIPS codes of the locations. For counties, this matches the
-#'   `geo_value` used in the COVIDcast API. However, for states, `location` and
-#'   `geo_value` are slightly different, in that the former is a two-digit FIPS
-#'   code, as in "42", whereas the latter is a state abbreviation, as in "pa".}
-#' \item{forecast_distribution}{List column of tibbles containing the predicted
-#'   quantiles for each location.}
+#' @template predictions_cards-template
 #' 
-#' Each predictions card has attributes that specify the exact forecasting task
-#'   that was being carried out, along with the name of the forecaster.
+#'
+#' @examples \dontrun{
+#' baby_predictions = get_predictions(
+#'   baseline_forecaster, "baby",
+#'   tibble::tibble(
+#'     data_source="jhu-csse",
+#'     signal ="deaths_incidence_num",
+#'     start_day="2020-08-15",
+#'     geo_values = "mi",
+#'     geo_type = "state"), 
+#'   forecast_dates = "2020-10-01",
+#'   incidence_period = "epiweek",
+#'   forecaster_args = list(
+#'     incidence_period = "epiweek",
+#'     ahead = 1:4
+#'   ))
+#' }
 #' 
-#' @importFrom assertthat assert_that
 #' @export
 get_predictions <- function(forecaster,
                             name_of_forecaster,
                             signals,
                             forecast_dates,
-                            incidence_period,
-                            ahead,
-                            geo_type,
-                            geo_values = "*",
-                            ...) {
+                            incidence_period = c("epiweek", "day"),
+                            apply_corrections = function(signals) signals,
+                            response_data_source = signals$data_source[1],
+                            response_data_signal = signals$signal[1],
+                            forecaster_args = list()) {
+  
   assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
-  params <- list(...)
-  forecast_dates %>%
+  
+  
+  out <- forecast_dates %>%
     map(~ do.call(
           get_predictions_single_date,
-          c(list(forecaster = forecaster,
-                 name_of_forecaster = name_of_forecaster,
-                 signals = signals,
-                 forecast_date = .x,
-                 incidence_period = incidence_period,
-                 ahead = ahead,
-                 geo_type = geo_type,
-                 geo_values = geo_values),
-            params))) %>%
-    flatten()
+          list(forecaster = forecaster,
+               signals = signals,
+               forecast_date = .x,
+               apply_corrections = apply_corrections,
+               forecaster_args = forecaster_args)
+          )
+        ) %>%
+    bind_rows()
+
+  # for some reason, `value` gets named and ends up in attr
+  names(out$value) = NULL 
+  out <- out %>% 
+    mutate(
+      forecaster = name_of_forecaster,
+      data_source = response_data_source,
+      signal = response_data_signal,
+      target_end_date = get_target_period(
+        .data$forecast_date, 
+        incidence_period, 
+        .data$ahead)$end,
+      incidence_period = incidence_period
+      ) %>% 
+    relocate(.data$forecaster, .before = .data$forecast_date)
+  
+  class(out) <- c("predictions_cards", class(out))
+  out
 }
 
-#' Get predictions cards for a single date
-#'
-#' @param forecaster Function that outputs a tibble with columns `ahead`,
-#'   `location`, `probs`, `quantiles`. The `quantiles` column gives the
-#'   predictive quantiles of the forecast distribution for that location and
-#'   ahead.
-#' @param name_of_forecaster String indicating name of the forecaster.
-#' @template signals-template
-#' @template forecast_date-template
-#' @template incidence_period-template
-#' @template ahead-template
-#' @template geo_type-template
-#' @template geo_values-template
-#' @param ... Additional arguments to be passed to `forecaster()`.
-#' 
-#' @importFrom stringr str_glue
+
 get_predictions_single_date <- function(forecaster,
-                                        name_of_forecaster,
                                         signals,
                                         forecast_date,
-                                        incidence_period,
-                                        ahead,
-                                        geo_type,
-                                        geo_values,
-                                        ...) {
-  if (length(geo_values) > 1) geo_values <- list(geo_values)
+                                        apply_corrections,
+                                        forecaster_args) {
+
   forecast_date <- lubridate::ymd(forecast_date)
-  # compute the start_day from the forecast_date, if we need to
-  if (!is.null(signals$start_day) && is.list(signals$start_day)) {
-    for (i in 1:length(signals$start_day)) {
-      if (is.function(signals$start_day[[i]])) {
-        signals$start_day <- signals$start_day[[i]](forecast_date)
-      }
-    }
-  }
-  # get data that would have been available as of forecast_date
-  df <- signals %>%
-    pmap_dfr(function(...) {
-      args <- list(...)
-      download_signal(data_source=args$data_source,
-                      signal = args$signal,
-                      start_day = args$start_day,
-                      end_day = forecast_date,
-                      as_of = forecast_date,
-                      geo_type = geo_type,
-                      geo_values = geo_values)
+  signals <- signal_listcols(signals, forecast_date)
+  
+  df_list <- signals %>%
+    pmap(function(...) {
+      sig <- list(...)
+      download_signal(
+        data_source = sig$data_source,
+        signal = sig$signal,
+        start_day = sig$start_day,
+        end_day = forecast_date,
+        as_of = sig$as_of,
+        geo_type = sig$geo_type,
+        geo_values = sig$geo_values)
     })
-  out <- forecaster(df,
-                    forecast_date,
-                    signals,
-                    incidence_period,
-                    ahead,
-                    geo_type,
-                    ...)
-  # make a predictions card for each ahead
-  pcards <- out %>%
-    group_by(location, ahead) %>%
-    group_modify(~ tibble(forecast_distribution = list(.))) %>%
-    ungroup() %>%
-    group_by(ahead) %>%
-    group_map(~ .x) # break into a separate data frame for each ahead
-  for (i in seq_along(ahead)) {
-    attributes(pcards[[i]]) <- c(
-      attributes(pcards[[i]]),
-      list(forecaster = forecaster,
-           name_of_forecaster = name_of_forecaster,
-           signals = signals,
-           forecast_date = forecast_date,
-           incidence_period = incidence_period,
-           ahead = ahead[i],
-           geo_type = geo_type,
-           geo_values = geo_values,
-           from_covidhub = FALSE,
-           forecaster_params = list(...))
-    )
-  }
-  return(pcards)
+  
+  # Downloaded data postprocessing
+  if(!is.null(apply_corrections)) df_list <- apply_corrections(df_list)
+
+  forecaster_args$forecast_date = forecast_date
+  forecaster_args$df_list <- df_list # pass in the data named to the right arg
+  
+  out <- do.call(forecaster, forecaster_args)
+  assert_that(all(c("ahead", "geo_value", "quantile", "value") %in% names(out)),
+              msg = paste("Your forecaster must return a data frame with",
+                          "(at least) the columnns `ahead`, `geo_value`,",
+                          "`quantile`, and `value`."))
+  
+  # make a predictions card
+  out$forecast_date = forecast_date
+  return(out)
 }
+

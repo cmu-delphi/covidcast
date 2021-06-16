@@ -1,118 +1,227 @@
 #' Plot calibration curves
 #'
-#' @param scorecard Single score card.
-#' @param type One of "wedgeplot" or "traditional".
-#' @param alpha Deprecated parameter to be removed soon.
-#' @param legend_position Legend position, the default being "bottom".
-#'
-#' @importFrom rlang .data
-#' @importFrom ggplot2 ggplot aes geom_point geom_abline geom_vline geom_hline labs scale_colour_discrete scale_alpha_continuous scale_size_continuous guides facet_wrap xlim ylim theme_bw theme 
-#' @importFrom dplyr filter mutate recode
-#' @importFrom tidyr pivot_longer
+#' @param predictions_cards Either one predictions_card or several joined
+#'   together using bind_rows().
+#' @param type One of "wedgeplot" or "traditional"
+#' @param facet_rows A variable name to facet data over. Creates a
+#'   separate row of plots for each value of specified variable. Can be used
+#'   with `facet_cols` to create a grid of plots.  Should be passed to 
+#'   plot_calibration when customized.
+#' @param facet_cols Same as `facet_rows`, but with columns.
+#' @param grp_vars variables over which to compare calibration. These
+#'   determines the color of the lines and faceting depending on `type`
+#' @param avg_vars variables over which we average to determine the calibration.
+#' @template geo_type-template
+#' @param backfill_buffer How many days until response is deemed trustworthy
+#'   enough to be taken as correct?.
 #' @export
-plot_calibration <- function(scorecard,
+plot_calibration <- function(predictions_cards,
                              type = c("wedgeplot", "traditional"),
-                             alpha = 0.2,
-                             legend_position = "bottom") {
-  name <- attr(scorecard, "name_of_forecaster")
-  ahead <- attr(scorecard, "ahead")
+                             facet_rows = NULL,
+                             facet_cols = NULL,
+                             grp_vars = c("forecaster", "forecast_date", "ahead"),
+                             avg_vars = c("geo_value"),
+                             geo_type = c("county", "hrr", "msa", "dma", "state",
+                                          "hhs", "nation"),
+                             backfill_buffer = 0) {
+  
+  geo_type <- match.arg(geo_type)
   type <- match.arg(type)
-  if (type == "wedgeplot") {
-    g <- compute_calibration(scorecard) %>%
-      pivot_longer(contains("prop"),
-                   names_to = "coverage_type",
-                   values_to = "proportion") %>%
-      filter(.data$coverage_type != "prop_covered") %>%
-      mutate(emph = ifelse((.data$coverage_type == "prop_above" & .data$nominal_quantile < 0.5) |
-                              (.data$coverage_type == "prop_below" & .data$nominal_quantile >= 0.5), 0.5, 1)) %>%
-      mutate(coverage_type = recode(.data$coverage_type,
-                                    prop_above = "Proportion above",
-                                    prop_below = "Proportion below")) %>%
-      ggplot(aes(x = .data$nominal_quantile,
-                 y = .data$proportion,
-                 colour = .data$coverage_type)) +
-      geom_line(aes(alpha = .data$emph, size = .data$emph)) +
-      geom_point(aes(alpha = .data$emph, size = .data$emph)) +
-      geom_abline(intercept = 0, slope = 1) +
-      geom_abline(intercept = 1, slope = -1) +
-      labs(x = "Nominal quantile level",
-           y = "Proportion",
-           title = sprintf("%s (ahead = %s): Proportion above/below", name, ahead)) +
-      scale_colour_discrete(name = "") +
-      scale_alpha_continuous(range = c(0.5, 1)) +
-      scale_size_continuous(range = c(0.5, 1)) +
-      guides(alpha = FALSE, size = FALSE)
-  } else if (type == "traditional") {
-    calib <- compute_actual_vs_nominal_prob(scorecard)
-    g <- calib %>%
-      ggplot(aes(x = .data$nominal_prob, y = .data$prop_below)) +
-      geom_line(color = "red") +
-      geom_point(color = "red") +
-      geom_abline(slope = 1, intercept = 0) +
-      labs(x = "Quantile level",
-           y = "Proportion",
-           title = sprintf("%s (ahead %s): Calibration", name, ahead))
-  }
-  g +
-    facet_wrap(~ forecast_date) +
-    xlim(0, 1) +
-    ylim(0, 1) +
-    theme_bw() + theme(legend.position = legend_position)
+
+  calib <- compute_calibration(predictions_cards,
+                               geo_type, 
+                               backfill_buffer,
+                               grp_vars,
+                               avg_vars)
+  
+  g <- switch (type,
+    wedgeplot = format_wedgeplot(calib, grp_vars, facet_rows, facet_cols),
+    traditional = format_traditional_calib_plot(calib, grp_vars, 
+                                                facet_rows, facet_cols),
+    stop("illegal calibration plot type selected.")
+  )
+  
+  return(g + xlim(0, 1) + ylim(0, 1) + theme_bw())
 }
 
-#' Plot interval coverage
+#' Preprocessing for wedge calibration plot
 #'
-#' @param scorecards List of different score cards, all on the same forecasting
-#'   task (i.e., same ahead, etc.).
-#' @param type One of "all" or "none", indicating whether to show coverage
-#'   across all nominal levels (in which case averaging is performed across
-#'   forecast dates and locations) or whether to show it for one specific alpha
-#'   value.
-#' @param alpha If `type = "one"`, then 1-alpha is the nominal interval coverage
-#'   shown.
-#' @param legend_position Legend position, the default being "bottom".
-#' 
-#' @importFrom rlang .data set_names
-#' @importFrom purrr map_dfr
-#' @importFrom ggplot2 ggplot geom_abline geom_vline geom_hline labs facet_wrap xlim ylim theme_bw theme 
-#' @export 
-plot_coverage <- function(scorecards, type = c("all", "one"), alpha = 0.2, 
-                          legend_position = "bottom") {
-  type <- match.arg(type)
-  # make sure scorecards are comparable:
-  unique_attr(scorecards, "ahead")
-  unique_attr(scorecards, "as_of")
-  unique_attr(scorecards, "geo_type")
-  unique_attr(scorecards, "incidence_period")
-  unique_attr(scorecards, "backfill_buffer")
-  unique_attr(scorecards, "response")
-  scorecards <- intersect_locations(scorecards)
-  cover <- scorecards %>%
-    set_names(all_attr(scorecards, "name_of_forecaster")) %>%
-    map_dfr(compute_coverage, .id = "forecaster")
-  if (type == "all") {
-    cover %>%
-      ggplot(aes(x = .data$nominal_coverage_prob,
-                 y = .data$prop_covered,
-                 color = .data$forecaster)) +
-      geom_line() +
-      geom_abline(slope = 1, intercept = 0) +
-      facet_wrap(~ .data$forecast_date) +
-      xlim(0, 1) +
-      ylim(0, 1) +
-      labs(x = "Nominal coverage", y = "Empirical coverage") +
-      theme_bw() + theme(legend.position = legend_position)
-  } else {
-    cover %>%
-      filter(.data$nominal_coverage_prob == 1 - alpha) %>%
-      group_by(.data$forecast_date, .data$forecaster) %>%
-      summarize(prop_covered = mean(.data$prop_covered, na.rm = TRUE)) %>%
-      ggplot(aes(x = .data$forecast_date,
-                 y = .data$prop_covered,
-                 color = .data$forecaster)) +
-      geom_point() + geom_line() +
-      geom_hline(yintercept = 1 - alpha, lty = 2) +
-      labs(x = "Forecast date", y = "Empirical coverage") +
-      theme_bw() + theme(legend.position = legend_position)
-  }
+#' @param calib the output from [compute_calibration()]
+#'
+#' @return a data frame
+#' @export
+setup_wedgeplot <- function(calib) {
+  calib %>%
+    pivot_longer(contains("prop"), 
+                 names_to = "coverage_type", 
+                 values_to = "proportion") %>%
+    mutate(emph = ifelse(
+      (.data$coverage_type == "prop_above" & .data$nominal_prob < 0.5) |
+        (.data$coverage_type == "prop_below" & .data$nominal_prob >= 0.5), 
+      0.5, 1)) %>%
+    mutate(coverage_type = recode(.data$coverage_type,
+                                  prop_above = "Proportion above",
+                                  prop_below = "Proportion below"))
 }
+
+
+#' ggplot formatting for wedge calibration plot.
+#'
+#' @param calib the output from [compute_calibration()]
+#' @param grp_vars variables over which to compare calibration. These
+#'   determines the color of the lines and faceting depending on `type`
+#' @param facet_rows A variable name to facet data over. Creates a
+#'   separate row of plots for each value of specified variable. Can be used
+#'   with `facet_cols` to create a grid of plots.  Should be passed to 
+#'   plot_calibration when customized.
+#' @param facet_cols Same as `facet_rows`, but with columns.
+#'
+#' @return ggplot object
+format_wedgeplot <- function(calib, 
+                             grp_vars,
+                             facet_rows,
+                             facet_cols){
+  
+  test_legal_faceting(facet_rows, facet_cols, grp_vars)
+  
+  non_faceted_grps <- setdiff(grp_vars, c(facet_rows, facet_cols))
+  
+  assert_that(length(non_faceted_grps) == 0,
+              msg = paste("All grp_vars need to be faceted for wedgeplots:",
+                          non_faceted_grps))
+  
+  facet_layer <- facet_grid(rows = vars(!!!syms(facet_rows)),
+                            cols = vars(!!!syms(facet_cols)))
+  g <- calib %>%
+    setup_wedgeplot() %>%
+    ggplot(aes(x = .data$nominal_prob,
+               y = .data$proportion,
+               colour = .data$coverage_type)) +
+    geom_line(aes(alpha = .data$emph, size = .data$emph)) +
+    scale_color_manual(values = c("blue","orange"), name="") +
+    geom_point(aes(alpha = .data$emph, size = .data$emph)) +
+    geom_segment(aes(x = 0, y = 0, xend = 0.5, yend = 0.5), 
+                 size = 0.25, color = "black") +
+    geom_segment(aes(x = 0.5, y = 0.5, xend = 1, yend = 0), 
+                 size = 0.25, color = "black") +
+    labs(x = "Nominal quantile level",
+         y = "Proportion",
+         title = sprintf("%s (ahead = %s): Proportion above/below", 
+                         .data$name, .data$ahead)) +
+    scale_alpha_continuous(range = c(0.5, 1)) +
+    scale_size_continuous(range = c(0.5, 1)) +
+    guides(alpha = FALSE, size = FALSE) +
+    facet_layer
+  
+  return(g)
+}
+
+#' ggplot formatting for traditional calibration plot.
+#'
+#' @param calib the output from [compute_calibration()]
+#' @param grp_vars variables over which to compare calibration. These
+#'   determines the color of the lines and faceting depending on `type`
+#' @param facet_rows A variable name to facet data over. Creates a
+#'   separate row of plots for each value of specified variable. Can be used
+#'   with `facet_cols` to create a grid of plots.  Should be passed to 
+#'   plot_calibration when customized.
+#' @param facet_cols Same as `facet_rows`, but with columns.
+#'
+#' @return ggplot object
+format_traditional_calib_plot <- function(calib, 
+                                          grp_vars,
+                                          facet_rows,
+                                          facet_cols){
+  
+  test_legal_faceting(facet_rows, facet_cols, grp_vars)
+  
+  facet_layer <- facet_grid(rows = vars(!!!syms(facet_rows)),
+                            cols = vars(!!!syms(facet_cols)))
+  
+  color_vars <- setdiff(grp_vars, c(facet_rows, facet_cols))
+  
+  g <- calib %>%
+    mutate(color = as.factor(Interaction(!!!syms(color_vars)))) %>%
+    ggplot(aes(x = .data$nominal_prob, y = .data$prop_below)) +
+    geom_abline(slope = 1, intercept = 0) +
+    labs(x = "Quantile level",
+         y = "Proportion",
+         title = sprintf("%s (ahead %s): Calibration", 
+                         .data$name, .data$ahead)) +
+    geom_line(aes(color = .data$color, group = .data$color)) +
+    scale_color_viridis_d() +
+    facet_layer 
+  
+  return(g)
+}
+
+
+#' Compute calibration of a quantile forecaster
+#'
+#' @param predictions_cards tibble containing at least columns actual, quantile, 
+#'   value and any grouping or averaging variables named in the next arguments
+#' @template geo_type-template
+#' @param backfill_buffer How many days until response is deemed trustworthy
+#'   enough to be taken as correct?
+#' @param grp_vars character vector of named columns in the score_card at which
+#'   average performance will be returned
+#' @param avg_vars character vector of named columns in the score_card over which
+#'   averaging performance will be computed
+#'   
+#' @details Note that no checks are performed to ensure that averaging variables
+#'   all contain the same predicted quantiles. avg_vars and grp_vars must
+#'   have an empty intersection.
+#'
+#' @return A tibble containing grp_vars, nominal_prob (the claimed interval
+#'   coverage), prop_below (the proportion of actual values falling below
+#'   the forecast quantile) and prop_above (the proportion of
+#'   actual values falling above the forecast quantile). All 
+#'   proportions are calculated for each available probability at each
+#'   combination of grouping variables by averaging over any variables listed
+#'   in avg_vars.
+#' @export
+#'
+compute_calibration <- function(
+  predictions_cards,
+  geo_type,
+  backfill_buffer = 10,
+  grp_vars = c("forecaster", "forecast_date", "ahead"),
+  avg_vars = c("geo_value")) {
+  
+  score_card <- left_join(predictions_cards,
+                          get_covidcast_data(predictions_cards,
+                                             backfill_buffer,
+                                             geo_type=geo_type),
+                          by = c("geo_value",
+                                 "forecast_date",
+                                 "ahead"))
+  
+  assert_that(all(c(grp_vars, avg_vars, "quantile", "value", "actual") %in%
+                    names(score_card)),
+              msg = paste("In compute_actual_vs_nominal_prob:",
+                          "grp_vars must be present in the score_card.",
+                          "See details."))
+  assert_that(is_empty(intersect(grp_vars, avg_vars)),
+              msg = paste("In compute_actual_vs_nominal_prob:",
+                          "grp_vars and avg_vars must have empty intersection.",
+                          "See details."))
+  score_card <- intersect_averagers(score_card, grp_vars, avg_vars)
+  score_card <- filter(score_card, !is.na(.data$quantile)) %>%
+    select(all_of(grp_vars), all_of(avg_vars),
+           .data$actual, .data$quantile, .data$value)
+  
+  score_card <- averaging_checks(score_card, grp_vars, avg_vars)
+  
+  score_card <- score_card %>% 
+    mutate(below = .data$actual < .data$value,
+           above = .data$actual > .data$value) %>%
+    group_by(across(all_of(grp_vars)), .data$quantile) %>%
+    summarise(prop_below = mean(.data$below, na.rm = TRUE),
+              prop_above = mean(.data$above, na.rm = TRUE)) %>%
+    rename(nominal_prob = .data$quantile)
+  return(score_card)
+}
+
+#' @inherit compute_calibration
+#' @export
+compute_actual_vs_nominal_prob <- compute_calibration

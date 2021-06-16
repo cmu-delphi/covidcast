@@ -2,6 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
-.DS_Store
+*.DS_Store
 .idea
 covidcast.Rproj
+*.Rcheck
+evalcast.Rproj
+evalcast_*.tar.gz

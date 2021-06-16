@@ -9,36 +9,74 @@ get_predictions(
   name_of_forecaster,
   signals,
   forecast_dates,
-  incidence_period,
-  ahead,
-  geo_type,
-  geo_values = "*",
-  ...
+  incidence_period = c("epiweek", "day"),
+  apply_corrections = function(signals) signals,
+  response_data_source = signals$data_source[1],
+  response_data_signal = signals$signal[1],
+  forecaster_args = list()
 )
 }
 \arguments{
 \item{forecaster}{Function that outputs a tibble with columns \code{ahead},
-\code{location}, \code{probs}, \code{quantiles}. The \code{quantiles} column gives the
-predictive quantiles of the forecast distribution for that location and
-ahead.}
+\code{geo_value}, \code{quantile}, and \code{value}. The \code{quantile} column gives the
+probabilities associated with quantile forecasts for that location and
+ahead. If your forecaster produces point forecasts, then set \code{quantile=NA}.
+
+One argument to \code{forecaster} must be named \code{df_list}. It will be
+populated with the list of historical data returned by a call
+to COVIDcast. The list will be the same length as the number of rows in
+the \code{signals} tibble (see below).
+The forecaster will also receive a single \code{forecast_date} as a named argument.
+Any additional named arguments can be passed via the \code{forecaster_args}
+argument below.
+
+Thus, the forecaster should have a signature like
+\code{forecaster(df_list = data, forecast_data = forecast_date, ...)}}
 
 \item{name_of_forecaster}{String indicating name of the forecaster.}
 
-\item{signals}{Tibble with columns \code{data_source} and \code{signal} that specifies
-which variables from the COVIDcast API will be used by \code{forecaster}. Each
+\item{signals}{Tibble with mandatory columns \code{data_source} and \code{signal} and
+optional columns \code{start_day}, \code{as_of}, \code{geo_typ}, \code{geo_values}.
+
+\code{data_source} and \code{signal} specify which variables from the COVIDcast API
+will be used by \code{forecaster}. Each
 row of \code{signals} represents a separate signal, and first row is taken to be
-the response. If using \code{incidence_period = "epiweek"}, the response should
+the response unless explicitly overridden.
+If using \code{incidence_period = "epiweek"}, the response should
 be something for which summing daily values over an epiweek makes sense
 (e.g., counts or proportions but not log(counts) or log(proportions)).
 Available data sources and signals are documented in the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}{COVIDcast signal documentation}.
-An optional column \code{start_day} can also be included. This can be a Date
+A few optional columns are also allowed. If not specified, these will default
+to the values of the similarly named argument.
+
+A column \code{start_day} can be included. This can be a \link{Date}
 object or string in the form "YYYY-MM-DD", indicating the earliest date of
 data needed from that data source. Importantly, \code{start_day} can also be a
 function (represented as a list column) that takes a forecast date and
 returns a start date for model training (again, Date object or string in
 the form "YYYY-MM-DD"). The latter is useful when the start date should be
 computed dynamically from the forecast date (e.g., when \code{forecaster} only
-trains on the most recent 4 weeks of data).}
+trains on the most recent 4 weeks of data).
+
+You may also include a \code{geo_type} column, a \code{geo_values} column and/or an
+\code{as_of} column.
+The first two should contain a string. If unspecified, these will have
+the same defaults as \code{covidcast::covidcast_signal()}, namely
+\code{geo_type = "county"} and \code{geo_values = "*"}.
+These arguments allow you to download different data than
+what you're actually trying to predict, say using state-level data to
+predict national outcomes.
+
+By default, the \code{as_of} date of data downloaded from
+COVIDcast is loaded with \code{as_of = forecast_date}. This means that data
+is "rewound" to days in the past. Any data revisions made since, would
+not have been present at that time, and would not be available to the
+forecaster. It's likely, for example, that no data would actually exist
+for the forecast date on the forecast date (there is some latency between
+the time signals are reported and the dates for which they are reported).
+You can override this functionality, though we strongly advise you do so
+with care, by passing a function of the forecast_date or a single date
+here. The function should return a \link{Date}.}
 
 \item{forecast_dates}{Vector of Date objects (or strings of the form
 "YYYY-MM-DD") indicating dates on which forecasts will be made.}
@@ -46,33 +84,32 @@ trains on the most recent 4 weeks of data).}
 \item{incidence_period}{String indicating the incidence period, either
 "epiweek" or "day".}
 
-\item{ahead}{Vector of (one or more) integers. How many epiweeks/days ahead
-are you forecasting? If \code{incidence_period = "epiweek"} and forecast_date is
-Sunday or Monday, then \code{ahead = 1} means the epiweek that includes the
-forecast date; if \code{forecast_date} falls on a Tuesday through Saturday, then
-it is the following epiweek. If \code{incidence_period = "day"}, then \code{ahead = 1} means the day after forecast date.}
+\item{apply_corrections}{an optional function that applies data corrections
+to the signals. Input is a data frame or list as returned as
+\code{df <- covidcast::download_signals()}.
+The returned object should be of the type expected by your forecaster.
+This function will be called as \code{apply_corrections(df)}.}
 
-\item{geo_type}{String indicating geographical type, one of "county", "dma",
-"hrr", "msa", or "state".}
+\item{response_data_source}{String indicating the \code{data_source} of the response.
+This is used mainly for downstream evaluation. By default, this will be the
+same as the \code{data_source} in the first row of the \code{signals} tibble.}
 
-\item{geo_values}{Vector or list of locations whose data will be passed to
-\code{forecaster}. The default, "*", fetches all that is available in the API.}
+\item{response_data_signal}{String indicating the \code{signal} of the response.
+This is used mainly for downstream evaluation. By default, this will be the
+same as the \code{signal} in the first row in the \code{signals} tibble.}
 
-\item{...}{Additional arguments to be passed to \code{forecaster()}.}
+\item{forecaster_args}{a list of additional named arguments to be passed
+to \code{forecaster()}. A common use case would be to pass the period ahead
+(e.g. predict 1 day, 2 days, ..., k days ahead). Note that \code{ahead} is a
+required component of the forecaster output (see above).}
 }
 \value{
-List of "predictions cards", with one element per forecast date. Each
-predictions card is a data frame with two columns:
-
-\item{location}{FIPS codes of the locations. For counties, this matches the
-\code{geo_value} used in the COVIDcast API. However, for states, \code{location} and
-\code{geo_value} are slightly different, in that the former is a two-digit FIPS
-code, as in "42", whereas the latter is a state abbreviation, as in "pa".}
-\item{forecast_distribution}{List column of tibbles containing the predicted
-quantiles for each location.}
-
-Each predictions card has attributes that specify the exact forecasting task
-that was being carried out, along with the name of the forecaster.
+Long data frame of forecasts with a class of \code{predictions_cards}.
+The first 4 columns are the same as those returned by the forecaster. The
+remainder specify the prediction task, 10 columns in total:
+\code{ahead}, \code{geo_value}, \code{quantile}, \code{value}, \code{forecaster}, \code{forecast_date},
+\code{data_source}, \code{signal}, \code{target_end_date}, and \code{incidence_period}. Here
+\code{data_source} and \code{signal} correspond to the response variable only.
 }
 \description{
 For each of the provided forecast dates, runs a forecaster using the data
@@ -83,4 +120,23 @@ distributions of a given forecaster for a given forecast task. A forecast
 task is specified by the forecast date, ahead, response, incidence period,
 and geo type (e.g., 1-epiweek-ahead death forecasting at the state level with
 predictions made using the information as of September 14).
+}
+\examples{
+\dontrun{
+baby_predictions = get_predictions(
+  baseline_forecaster, "baby",
+  tibble::tibble(
+    data_source="jhu-csse",
+    signal ="deaths_incidence_num",
+    start_day="2020-08-15",
+    geo_values = "mi",
+    geo_type = "state"), 
+  forecast_dates = "2020-10-01",
+  incidence_period = "epiweek",
+  forecaster_args = list(
+    incidence_period = "epiweek",
+    ahead = 1:4
+  ))
+}
+
 }

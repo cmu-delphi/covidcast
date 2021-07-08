@@ -52,6 +52,7 @@ get_target_response <- function(signals,
     if (sum(problem_dates) == length(forecast_dates)) return(empty_actual())
     out <- out[!problem_dates]
     forecast_dates <- forecast_dates[!problem_dates]
+    target_periods <- target_periods[!problem_dates, ]
   }
   names(out) <- forecast_dates
   target_periods$forecast_date = lubridate::ymd(forecast_dates)

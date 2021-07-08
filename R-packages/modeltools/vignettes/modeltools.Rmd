@@ -48,7 +48,7 @@ devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
 ### Installing with vignettes
 
 If you wish to include the vignettes, then use the command below. Installation
-can take up to a couple minutes.
+can take a couple minutes.
 
 ```{r, eval = FALSE}
 devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",

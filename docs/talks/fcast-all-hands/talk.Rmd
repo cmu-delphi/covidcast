@@ -39,24 +39,7 @@ Outline:
 1. How have we done?
 1. Lessons learned and thoughts
 
-`r col("Implemented with", "white")`
 
-`r col("Reproducible talk:", "white")`
-
-
-
-# This Talk
-
-Outline:
-
-1. Background (context, teams, ensembling)
-1. Our process (currently)
-1. How have we done?
-1. Lessons learned and thoughts
-
-Implemented with `{evalcast}` package + `{covidcast}` API
-
-`r col("Reproducible talk:")` all code included
 
 
 
@@ -68,7 +51,7 @@ Implemented with `{evalcast}` package + `{covidcast}` API
 
 # The task
 
-* Every week, submit forecasts to [COVID-19 *Forecast*Hub](https://covid19forecasthub.org)
+* Every week, submit forecasts to [COVID-19 **Forecast**Hub](https://covid19forecasthub.org)
 * We have now submitted 52 such forecasts (first on July 20, 2020)!
 * Originally "State Deaths", added "County Cases" a bit later
 * Hub also collects (now) a few other targets
@@ -460,12 +443,14 @@ fan_plot(ens %>% filter(geo_value == "ut")) + ylab("deaths per epiweek")
 
 # This is really hard
 
+* Only 15 teams beat the baseline (of those submitting over the whole period)
 * The Ensemble is only about 32% better than the baseline (averaged over all tasks)
 * We're about 22% better
-* Over all time, we rank about 5 out of 65 teams
-* Only 15 teams beat the baseline (of those submitting over the whole period)
+* Over all time, we rank about 5 out of 65 teams 
 * For County Cases, we are the best 
 * But the problem is even harder, and we `r col("barely")` beat the baseline
+
+<br><br>
 
 `r col("Important lessons:")`
 
@@ -530,16 +515,17 @@ blah %>%
 * Interpolate different local models 
     - Rob and Elena looked at "smoothing" the direct forecasts. 
     - Try something complicated at 1-week ahead and decrease complexity
-
+* Other models (e.g. the UMASS model) don't have to "see" the response. Maybe helps performance?
 
 # Thanks
 
-- This talk used the AWS scores from our dashboard, would have been impossible otherwise (Jed, Kate, Eu Jing, Nat)
+- This talk used the AWS scores from our dashboard. Would have been impossible otherwise (Jed, Kate, Eu Jing, Nat)
 - Logan and Naras
-- The Forecast (modeling/research/basketball) team 
+- The Forecast (modeling / research / basketball) team  
 
 
 <br>
+
 
 ![Delphi](delphi.png) ![Carnegie Mellon University](cmu.png)
 

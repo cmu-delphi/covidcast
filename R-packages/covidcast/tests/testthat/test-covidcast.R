@@ -44,7 +44,7 @@ library(dplyr)
 
 with_mock_api({
   test_that("covidcast_meta formats result correctly", {
-    # api.php-dd024f.csv
+    # covidcast_meta-0f1bc9.csv
     expect_equal(covidcast_meta(),
                  structure(
                    data.frame(
@@ -77,13 +77,13 @@ test_that("covidcast_meta raises error when API signals one", {
 with_mock_api({
   ## covidcast_signal() tests
   test_that("covidcast_signal warns when requested geo_values are unavailable", {
-    # api.php-3e1dc3.csv
+    # covidcast-c5fe38.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-01", "2020-01-01",
                                     geo_values = c("pa", "tx", "DUCKS")),
                    class = "covidcast_missing_geo_values")
 
     # ...but not when they *are* available.
-    # api.php-f666a2.csv
+    # covidcast-114ddd.csv
     expect_silent(suppressMessages(
       covidcast_signal("foo", "bar", "2020-01-01", "2020-01-01",
                        geo_values = c("pa", "tx"))))
@@ -91,26 +91,26 @@ with_mock_api({
 
   test_that("covidcast_signal warns when requested dates are unavailable", {
     # with geo_values = "*".
-    # api.php-b6e478.csv
+    # covidcast-666130.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-02"),
                    class = "covidcast_fetch_failed")
 
     # and with geo_values = "pa"
-    # api.php-d707dc.csv
+    # covidcast-496c2d.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-02",
                                     geo_values = "pa"),
                    class = "covidcast_fetch_failed")
   })
 
   test_that("covidcast_signal aborts when meta not found", {
-    # api.php-dd024f.csv
+    #  covidcast_meta-0f1bc9.csv
     expect_error(covidcast_signal("foo", "bar-not-found"),
                  class = "covidcast_meta_not_found")
   })
 
   test_that("covidcast_signal works for signals with no meta", {
     # when no meta is available, we must provide start_day and end_day.
-    # api.php-1d9b5c.csv
+    # covidcast-b3e628.csv
     expect_equal(
       covidcast_signal("foo", "bar-not-found",
                        "2020-01-01", "2020-01-01"),
@@ -134,7 +134,7 @@ with_mock_api({
   })
 
   test_that("covidcast_signal stops when end_day < start_day", {
-    # reusing api.php-dd024f.csv for metadata
+    # reusing covidcast_meta-0f1bc9.csv for metadata
     expect_error(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-01"))
   })
 
@@ -146,7 +146,7 @@ with_mock_api({
   })
 
   test_that("covidcast_signal fetches signals with time_type = week", {
-    # api.php-51569e.csv
+    # covidcast-f95d04.csv
     # this covers 5 MMWR weeks, weeks 1-5
     foo <- covidcast_signal("foo", "barweek", "2020-01-01", "2020-02-01",
                             time_type = "week")
@@ -257,6 +257,10 @@ test_that("covidcast_days batches calls to covidcast", {
     2)
   covidcast_returns[[1]]$time_value <- 20101001:20101003
   covidcast_returns[[2]]$time_value <- 20101004:20101006
+
+  # Set the row limit in the package to 3650, to force it to batch these
+  # requests, instead of letting it use the current much larger limit
+  MAX_RESULTS <<- 3650
 
   m <- mock(covidcast_returns[[1]], covidcast_returns[[2]])
   stub(covidcast_days, "covidcast", m)

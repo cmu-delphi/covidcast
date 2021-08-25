@@ -76,34 +76,31 @@
 #'   to the `col_name` argument, containing the estimated derivative values. 
 #'
 #' @export
-estimate_deriv <- function(x, method = c("lin", "ss", "tf"), n = 14,
-                           col_name = "deriv", keep_obj = FALSE, deriv = 1,
-                           ...){  
+estimate_deriv = function(x, method = c("lin", "ss", "tf"), n = 14,
+                          col_name = "deriv", keep_obj = FALSE, deriv = 1,
+                          ...) {  
   # Define the slider function
-  method <- match.arg(method)
-  slide_fun <- switch(method,
-                      "lin" = linear_reg_deriv,
-                      "ss" = smooth_spline_deriv,
-                      "tf" = trendfilter_deriv)
+  method = match.arg(method)
+  slide_fun = switch(method,
+                     "lin" = linear_reg_deriv,
+                     "ss" = smooth_spline_deriv,
+                     "tf" = trend_filter_deriv)
   
   # Check the derivative order
-  if ( !(deriv == 1 || deriv == 2) ){
+  if (!(deriv == 1 || deriv == 2)) {
     stop("`deriv` must be either 1 or 2.")
   }
-
+  
   # Slide the derivative function
-  x <- slide_by_geo(x, slide_fun, n, col_name = "temp", col_type = "list",
-                    keep_obj = keep_obj, deriv = deriv, ...)
-
+  x = slide_by_geo(x, slide_fun, n, col_name = "temp", col_type = "list",
+                   keep_obj = keep_obj, deriv = deriv, ...)
+  
   # Grab the derivative result
-  x <- x %>% 
-    rowwise() %>% 
-    mutate(!!col_name := temp$result)
-
+  x = x %>% rowwise() %>% mutate(!!col_name := temp$result)
+  
   # Grab the derivative object, if we're asked to
-  if ( keep_obj ){
-    x <- x %>% 
-      rowwise() %>%
+  if (keep_obj) {
+    x = x %>% rowwise() %>%
       mutate(!!paste0(col_name, "_obj") := list(temp$object))
   }
   

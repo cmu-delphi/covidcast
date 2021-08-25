@@ -271,7 +271,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a>            </span>
 <span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a><span class="co"># Save everything to file</span></span>
 <span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(<span class="at">list =</span> <span class="fu">ls</span>(), <span class="at">file =</span> <span class="st">&quot;quantgen-forecast.rda&quot;</span>, <span class="at">compress =</span> <span class="st">&quot;xz&quot;</span>)</span></code></pre></div>
-<p>Load the data and take a peak at the <code>evals</code> tibble</p>
+<p>Load the data and take a peek at the <code>evals</code> tibble</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;quantgen-forecast.rda&quot;</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(evals)</span></code></pre></div>
 <pre><code>##   geo_value ahead forecaster forecast_date target_end_date        ae       wis
@@ -295,7 +295,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># of the error columns, that won&#39;t be a problem)</span></span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>scale_by_forecaster <span class="ot">&lt;-</span> <span class="cf">function</span>(df, vars, denom_forecaster, </span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                                <span class="at">err_cols =</span> <span class="fu">c</span>(<span class="st">&quot;ae&quot;</span>, <span class="st">&quot;wis&quot;</span>)) {</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  df_list <span class="ot">&lt;-</span> <span class="fu">map</span>(vars, <span class="cf">function</span>(var) {</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  df_list <span class="ot">&lt;-</span> <span class="fu">map</span>(vars, <span class="cf">function</span>(var){</span>
 <span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    df <span class="sc">%&gt;%</span> </span>
 <span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="fu">setdiff</span>(<span class="fu">names</span>(df), <span class="fu">setdiff</span>(err_cols, var))) <span class="sc">%&gt;%</span> </span>
 <span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">&quot;forecaster&quot;</span>, </span>

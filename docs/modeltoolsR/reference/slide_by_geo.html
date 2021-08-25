@@ -6,8 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Slide a function over values in <code>covidcast_signal</code> data frame, grouped by
-<code>geo_value</code> — slide_by_geo • modeltools</title>
+<title>Slide a function over values in covidcast_signal data frame, grouped by
+geo_value — slide_by_geo • modeltools</title>
 
 
 <!-- jquery -->
@@ -40,8 +40,8 @@
 
 
 
-<meta property="og:title" content="Slide a function over values in <code>covidcast_signal</code> data frame, grouped by
-<code>geo_value</code> — slide_by_geo" />
+<meta property="og:title" content="Slide a function over values in covidcast_signal data frame, grouped by
+geo_value — slide_by_geo" />
 <meta property="og:description" content="Slides a given function over the values in a  covidcast_signal data frame,
 grouped by geo_value. (When multiple issue dates are present, only the
 latest issue is considered.) See the getting started guide
@@ -85,7 +85,7 @@ for examples." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -103,13 +103,13 @@ for examples." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/pct-change.html">1. Compute percentage change of a signal over time</a>
+      <a href="../articles/pct-change.html">1. Compute the percentage change of a `covidcast` signal over time</a>
     </li>
     <li>
-      <a href="../articles/estimate-deriv.html">2. Estimate derivatives of signals</a>
+      <a href="../articles/estimate-deriv.html">2. Estimate the derivatives of a `covidcast` signal</a>
     </li>
     <li>
-      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of signals</a>
+      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of `covidcast` signals</a>
     </li>
   </ul>
 </li>
@@ -117,7 +117,7 @@ for examples." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -147,14 +147,14 @@ latest issue is considered.) See the <a href='https://cmu-delphi.github.io/covid
 for examples.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>slide_by_geo</span>(
-  <span class='no'>x</span>,
-  <span class='no'>slide_fun</span>,
-  <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>14</span>,
-  <span class='kw'>col_name</span> <span class='kw'>=</span> <span class='st'>"slide_value"</span>,
-  <span class='kw'>col_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"dbl"</span>, <span class='st'>"int"</span>, <span class='st'>"lgl"</span>, <span class='st'>"chr"</span>, <span class='st'>"list"</span>),
-  <span class='no'>...</span>
-)</pre>
+    <pre class="usage"><span class='fu'>slide_by_geo</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>slide_fun</span>,
+  n <span class='op'>=</span> <span class='fl'>14</span>,
+  col_name <span class='op'>=</span> <span class='st'>"slide_value"</span>,
+  col_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"dbl"</span>, <span class='st'>"int"</span>, <span class='st'>"lgl"</span>, <span class='st'>"chr"</span>, <span class='st'>"list"</span><span class='op'>)</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -217,7 +217,7 @@ to the <code>col_name</code> argument, containing the function values.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

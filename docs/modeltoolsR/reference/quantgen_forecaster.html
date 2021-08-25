@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Simple quantile autoregressive forecaster based on <code>quantgen</code> — quantgen_forecaster • modeltools</title>
+<title>Simple quantile autoregressive forecaster based on quantgen — quantgen_forecaster • modeltools</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Simple quantile autoregressive forecaster based on <code>quantgen</code> — quantgen_forecaster" />
+<meta property="og:title" content="Simple quantile autoregressive forecaster based on quantgen — quantgen_forecaster" />
 <meta property="og:description" content="A simple quantile autoregressive forecaster based on quantgen, to be used
 with evalcast, via evalcast::get_predictions(). See the quantgen forecast vignette
 for examples." />
@@ -82,7 +82,7 @@ for examples." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -100,13 +100,13 @@ for examples." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/pct-change.html">1. Compute percentage change of a signal over time</a>
+      <a href="../articles/pct-change.html">1. Compute the percentage change of a `covidcast` signal over time</a>
     </li>
     <li>
-      <a href="../articles/estimate-deriv.html">2. Estimate derivatives of signals</a>
+      <a href="../articles/estimate-deriv.html">2. Estimate the derivatives of a `covidcast` signal</a>
     </li>
     <li>
-      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of signals</a>
+      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of `covidcast` signals</a>
     </li>
   </ul>
 </li>
@@ -114,7 +114,7 @@ for examples." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -138,29 +138,29 @@ for examples." />
 
     <div class="ref-description">
     <p>A simple quantile autoregressive forecaster based on <code>quantgen</code>, to be used
-with <code>evalcast</code>, via <code><a href='https://rdrr.io/pkg/evalcast/man/get_predictions.html'>evalcast::get_predictions()</a></code>. See the <a href='https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/quantgen-forecast.html'>quantgen forecast vignette</a>
+with <code>evalcast</code>, via <code><a href='https://cmu-delphi.github.io/covidcast/evalcastR/reference/get_predictions.html'>evalcast::get_predictions()</a></code>. See the <a href='https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/quantgen-forecast.html'>quantgen forecast vignette</a>
 for examples.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>quantgen_forecaster</span>(
-  <span class='no'>df</span>,
-  <span class='no'>forecast_date</span>,
-  <span class='no'>signals</span>,
-  <span class='no'>incidence_period</span>,
-  <span class='no'>ahead</span>,
-  <span class='no'>geo_type</span>,
-  <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>4</span> * <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span>(<span class='no'>incidence_period</span> <span class='kw'>==</span> <span class='st'>"day"</span>, <span class='fl'>7</span>, <span class='fl'>1</span>),
-  <span class='kw'>lags</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>tau</span> <span class='kw'>=</span> <span class='kw pkg'>modeltools</span><span class='kw ns'>::</span><span class='no'><a href='covidhub_probs.html'>covidhub_probs</a></span>,
-  <span class='kw'>transform</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>inv_trans</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>featurize</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>noncross</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>noncross_points</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"test"</span>, <span class='st'>"train"</span>),
-  <span class='kw'>cv_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"forward"</span>, <span class='st'>"random"</span>),
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='no'>...</span>
-)</pre>
+    <pre class="usage"><span class='fu'>quantgen_forecaster</span><span class='op'>(</span>
+  <span class='va'>df</span>,
+  <span class='va'>forecast_date</span>,
+  <span class='va'>signals</span>,
+  <span class='va'>incidence_period</span>,
+  <span class='va'>ahead</span>,
+  <span class='va'>geo_type</span>,
+  n <span class='op'>=</span> <span class='fl'>4</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='va'>incidence_period</span> <span class='op'>==</span> <span class='st'>"day"</span>, <span class='fl'>7</span>, <span class='fl'>1</span><span class='op'>)</span>,
+  lags <span class='op'>=</span> <span class='fl'>0</span>,
+  tau <span class='op'>=</span> <span class='fu'>modeltools</span><span class='fu'>::</span><span class='va'><a href='covidhub_probs.html'>covidhub_probs</a></span>,
+  transform <span class='op'>=</span> <span class='cn'>NULL</span>,
+  inv_trans <span class='op'>=</span> <span class='cn'>NULL</span>,
+  featurize <span class='op'>=</span> <span class='cn'>NULL</span>,
+  noncross <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  noncross_points <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"all"</span>, <span class='st'>"test"</span>, <span class='st'>"train"</span><span class='op'>)</span>,
+  cv_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forward"</span>, <span class='st'>"random"</span><span class='op'>)</span>,
+  verbose <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -168,7 +168,7 @@ for examples.</p>
     <tr>
       <th>df</th>
       <td><p>Data frame of signal values to use for forecasting, of the format
-that is returned by <code><a href='https://rdrr.io/pkg/covidcast/man/covidcast_signals.html'>covidcast::covidcast_signals()</a></code>.</p></td>
+that is returned by <code><a href='https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signals.html'>covidcast::covidcast_signals()</a></code>.</p></td>
     </tr>
     <tr>
       <th>forecast_date</th>
@@ -280,7 +280,7 @@ then predictions are made at the earliest possible forecast date after this
 training period. We march forward one time point at a time and repeat. In
 either case ("random" or "forward"), the loss function used for computing
 validation error is quantile regression loss (read the documentation for
-<code><a href='https://rdrr.io/pkg/quantgen/man/cv_quantile_lasso.html'>quantgen::cv_quantile_lasso()</a></code> for more details); and the final quantile
+<code>quantgen::cv_quantile_lasso()</code> for more details); and the final quantile
 model is refit on the full training set using the validation-optimal tuning
 parameter.</p></td>
     </tr>
@@ -292,12 +292,12 @@ parameter.</p></td>
     <tr>
       <th>...</th>
       <td><p>Additional arguments. Any parameter accepted by
-<code><a href='https://rdrr.io/pkg/quantgen/man/cv_quantile_lasso.html'>quantgen::cv_quantile_lasso()</a></code> (for model training) or by
+<code>quantgen::cv_quantile_lasso()</code> (for model training) or by
 <code>quantgen:::predict.cv_quantile_genlasso()</code> (for model prediction) can be
 passed here. For example, <code>nfolds</code>, for specifying the number of folds used
 in cross-validation, or <code>lambda</code>, for specifying the tuning parameter
 values over which to perform cross-validation (the default allows
-<code><a href='https://rdrr.io/pkg/quantgen/man/cv_quantile_lasso.html'>quantgen::cv_quantile_lasso()</a></code> to set the lambda sequence itself). Note
+<code>quantgen::cv_quantile_lasso()</code> to set the lambda sequence itself). Note
 that fixing a single tuning parameter value (such as <code>lambda = 0</code>)
 effectively disables cross-validation and fits a quantile model at the
 given tuning parameter value (here unregularized quantile autoregression).</p></td>
@@ -325,7 +325,7 @@ quantile forecasts for that location and ahead.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

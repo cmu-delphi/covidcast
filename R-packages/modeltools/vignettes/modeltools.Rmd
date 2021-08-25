@@ -18,7 +18,8 @@ used in conjunction with the
 [`covidcast`](https://cmu-delphi.github.io/covidcast/covidcastR/) and 
 [`evalcast`](https://cmu-delphi.github.io/covidcast/evalcastR/) \
 <tt>R</tt> packages, which are also developed and maintained by the 
-[Delphi Group](https://delphi.cmu.edu) at Carnegie Mellon University. 
+[Delphi research group](https://delphi.cmu.edu) (headquartered at 
+Carnegie Mellon University).
 
 
 ## Installing
@@ -26,7 +27,7 @@ used in conjunction with the
 >**This package is not on CRAN. There is a package named `modeltools` on 
 CRAN, but it is entirely unrelated to this one.**
 
-This package is available on the [Delphi Group GitHub 
+This package is available on the Delphi research group's [GitHub 
 page](https://github.com/cmu-delphi) and can be installed using the
 [`devtools`](https://cran.r-project.org/package=devtools) package, as shown
 below.
@@ -40,8 +41,7 @@ included in the installed package. The vignette-less package can be installed
 with the following command:
 
 ```{r, eval = FALSE}
-devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
-                         subdir = "R-packages/modeltools")
+devtools::install_github(repo = "cmu-delphi/covidcast", subdir = "R-packages/modeltools")
 ```
 
 
@@ -51,8 +51,7 @@ If you wish to include the vignettes, then use the command below. Installation
 can take a couple minutes.
 
 ```{r, eval = FALSE}
-devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
-                         subdir = "R-packages/modeltools",
+devtools::install_github(repo = "cmu-delphi/covidcast", subdir = "R-packages/modeltools",
                          build_vignettes = TRUE, dependencies = TRUE)
 ```
 

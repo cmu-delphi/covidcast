@@ -41,7 +41,8 @@ included in the installed package. The vignette-less package can be installed
 with the following command:
 
 ```{r, eval = FALSE}
-devtools::install_github(repo = "cmu-delphi/covidcast", subdir = "R-packages/modeltools")
+devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
+                         subdir = "R-packages/modeltools")
 ```
 
 
@@ -51,7 +52,8 @@ If you wish to include the vignettes, then use the command below. Installation
 can take a couple minutes.
 
 ```{r, eval = FALSE}
-devtools::install_github(repo = "cmu-delphi/covidcast", subdir = "R-packages/modeltools",
+devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
+                         subdir = "R-packages/modeltools",
                          build_vignettes = TRUE, dependencies = TRUE)
 ```
 

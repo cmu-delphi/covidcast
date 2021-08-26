@@ -26,13 +26,18 @@ sub-folder.
 Load the data and take a peek at the `evals` tibble
 
 ```{r}
+library(dplyr)
+library(knitr)
 load("quantgen-forecast.rda")
-head(evals)
+
+evals %>% 
+  head(5) %>%
+  kable("html", digits = 3, caption = "")
 ```
 
 Some convenient functions for analysis and plotting
 
-```{r, message = FALSE, warning = FALSE}
+```{r, fig.align = "center", message = FALSE, warning = FALSE}
 library(dplyr)
 library(tidyr)
 library(purrr)
@@ -123,7 +128,7 @@ canonical_plot <- function(df, x, y, aggr = mean, dots = TRUE, lines = TRUE,
 
 Try it out, mean AE and mean WIS
 
-```{r, message = FALSE, warning = FALSE, fig.width = 7, fig.height = 5, fig.retina = 2}
+```{r, message = FALSE, warning = FALSE, fig.align = "center", fig.width = 7, fig.height = 5, fig.retina = 2}
 subtitle <- sprintf("Forecasts made over %s to %s",
                     format(min(forecast_dates), "%B %d"),
                     format(max(forecast_dates), "%B %d"))
@@ -138,7 +143,7 @@ canonical_plot(evals, x = "ahead", y = "wis", aggr = mean,
 Let's just focus on WIS from here on, since AE behaves qualitatively similarly.
 Here's relative mean WIS (relative to baseline)
 
-```{r, message = FALSE, warning = FALSE, fig.width = 7, fig.height = 5, fig.retina = 2}
+```{r, message = FALSE, warning = FALSE, fig.align = "center", fig.width = 7, fig.height = 5, fig.retina = 2}
 canonical_plot(evals, x = "ahead", y = "wis", aggr = mean, 
                denom_forecaster = "Baseline", subtitle = subtitle, 
                xlab = "Days ahead", ylab = "Relative mean WIS")
@@ -147,7 +152,7 @@ canonical_plot(evals, x = "ahead", y = "wis", aggr = mean,
 Median relative WIS (still relative to baseline; note the reversal in the order
 of operations, and median for robustness)
 
-```{r, message = FALSE, warning = FALSE, fig.width = 7, fig.height = 5, fig.retina = 2}
+```{r, message = FALSE, warning = FALSE, fig.align = "center", fig.width = 7, fig.height = 5, fig.retina = 2}
 canonical_plot(evals, x = "ahead", y = "wis", aggr = median,
                denom = "Baseline", scale_before = TRUE, sub = subtitle, 
                xlab = "Days ahead", ylab = "Median relative WIS")
@@ -155,7 +160,7 @@ canonical_plot(evals, x = "ahead", y = "wis", aggr = median,
 
 Now produce some plots of forecast scores time, i.e. by target end date
 
-```{r, message = FALSE, warning = FALSE, fig.width = 7, fig.height = 5, fig.retina = 2}
+```{r, message = FALSE, warning = FALSE, fig.align = "center", fig.width = 7, fig.height = 5, fig.retina = 2}
 canonical_plot(evals, x = "target_end_date", y = "wis", aggr = mean,
                dots = FALSE, group_vars = "forecaster", sub = subtitle, 
                xlab = "Target date", ylab = "Mean WIS")
@@ -175,7 +180,7 @@ canonical_plot(evals, x = "target_end_date", y = "wis", aggr = mean,
 
 Now of a plot forecast scores broken down by target end date and ahead 
 
-```{r, message = FALSE, warning = FALSE, fig.width = 7, fig.height = 5, fig.retina = 2}
+```{r, message = FALSE, warning = FALSE, fig.align = "center", fig.width = 7, fig.height = 5, fig.retina = 2}
 canonical_plot(evals %>% filter(ahead %in% (1:3 * 7)), 
                x = "forecaster", y = "wis", aggr = mean, lines = FALSE, 
                group_vars = c("target_end_date", "ahead"), facet_cols = "ahead",

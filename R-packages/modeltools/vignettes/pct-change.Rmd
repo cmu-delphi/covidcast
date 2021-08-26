@@ -1,5 +1,5 @@
 ---
-title: 1. Compute the percentage change of a `covidcast` signal over time
+title: 1. Compute percentage change of a `covidcast` signal over time
 description: Compute the percentage change of `covidcast` signal values over 
   time.
 output: rmarkdown::html_vignette
@@ -30,6 +30,8 @@ November 15, 2020. The code chunk below fetches these data from the
 
 ```{r message = FALSE}
 library(covidcast)
+library(dplyr)
+library(knitr)
 
 start_day <- "2020-06-01"
 end_day <- "2020-11-15"
@@ -43,14 +45,11 @@ case_rates <- covidcast_signal(data_source = "usa-facts",
                                geo_values = geo_values)
 ```
 
-```{r, echo = FALSE, eval = FALSE}
+```{r, collapse = TRUE}
 summary(case_rates)
 ```
 
-```{r, echo = FALSE, eval = FALSE}
-library(dplyr)
-library(knitr)
-
+```{r}
 case_rates %>%
   select(data_source, signal, geo_value, time_value, value) %>% 
   head(5) %>%
@@ -122,7 +121,7 @@ Below we plot the weekly percentage change of the smoothed COVID-19 case rates
 fetched above alongside the smoothed COVID-19 case rates themselves. Here, we 
 focus solely on Florida COVID-19 case rates. 
 
-```{r, message = F, warning = F, fig.width = 8, fig.height = 4, fig.retina = 2, dpi = 85}
+```{r, message = F, warning = F, fig.align = "center", fig.width = 8, fig.height = 4, fig.retina = 2, dpi = 85}
 library(ggplot2)
 library(gridExtra)
 
@@ -182,7 +181,7 @@ real variations in the spread of COVID-19 in Florida. The daily percentage
 change post-processed with a 7-day trailing average 
 (<span style="color: blue;">shown in blue</span>) is likely a better indicator.
 
-```{r, message = F, warning = F, fig.width = 8, fig.height = 4.5, fig.retina = 2, dpi = 85}
+```{r, message = F, warning = F, fig.align = "center", fig.width = 8, fig.height = 4.5, fig.retina = 2, dpi = 85}
 library(tidyr)
 
 p1 <- ggplot(case_rates %>% filter(geo_value == state), aes(x = time_value, y = value)) +

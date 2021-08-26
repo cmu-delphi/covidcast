@@ -39,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -57,13 +57,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/pct-change.html">1. Compute percentage change of a signal over time</a>
+      <a href="../articles/pct-change.html">1. Compute percentage change of a `covidcast` signal over time</a>
     </li>
     <li>
-      <a href="../articles/estimate-deriv.html">2. Estimate derivatives of signals</a>
+      <a href="../articles/estimate-deriv.html">2. Estimate the derivatives of a `covidcast` signal</a>
     </li>
     <li>
-      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of signals</a>
+      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of `covidcast` signals</a>
     </li>
   </ul>
 </li>
@@ -71,7 +71,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -85,8 +85,7 @@
 
       
 
-      </header><script src="modeltools_files/header-attrs-2.5/header-attrs.js"></script><link href="modeltools_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="modeltools_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
+      </header><script src="modeltools_files/header-attrs-2.10/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Get started with <code>modeltools</code>
@@ -100,50 +99,52 @@
 
     
     
-<p>This package provides tools for building COVID-19 statistical models, with an emphasis on short-term forecasting and hotspot prediction. It is designed to be used in conjunction with the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/"><code>covidcast</code></a> and <a href="https://cmu-delphi.github.io/covidcast/evalcastR/"><code>evalcast</code></a> packages, which are also developed and maintained by the <a href="https://delphi.cmu.edu">Delphi Group</a> at Carnegie Mellon University.</p>
+<p>This package provides tools for building COVID-19 statistical models, with an emphasis on short-term forecasting and hotspot prediction. It is designed to be used in conjunction with the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/"><code>covidcast</code></a> and <a href="https://cmu-delphi.github.io/covidcast/evalcastR/"><code>evalcast</code></a><br><tt>R</tt> packages, which are also developed and maintained by the <a href="https://delphi.cmu.edu">Delphi research group</a> (headquartered at Carnegie Mellon University).</p>
 <div id="installing" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installing" class="anchor"></a>Installing</h2>
-<blockquote>
 <p><strong>This package is not on CRAN. There is a package named <code>modeltools</code> on CRAN, but it is entirely unrelated to this one.</strong></p>
-</blockquote>
-<p>This package is available on the <a href="https://github.com/cmu-delphi">CMU Delphi Group GitHub page</a> and can be installed using the commands below from the <a href="https://cran.r-project.org/package=devtools"><code>devtools</code></a> package.</p>
-<div id="install-without-vignettes" class="section level3">
+<p>This package is available on the Delphi research group’s <a href="https://github.com/cmu-delphi">GitHub page</a> and can be installed using the <a href="https://cran.r-project.org/package=devtools"><code>devtools</code></a> package, as shown below.</p>
+<div id="installing-without-vignettes" class="section level3">
 <h3 class="hasAnchor">
-<a href="#install-without-vignettes" class="anchor"></a>Install without vignettes</h3>
-<p>Building the <code>modeltools</code> vignettes, such as this <em>Getting started guide</em>, takes a significant amount of time. So, by default, the vignettes are not included in the downloaded package. The sans vignette package</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span>(<span class="kw">repo</span> <span class="kw">=</span> <span class="st">"cmu-delphi/covidcast"</span>, <span class="kw">ref</span> <span class="kw">=</span> <span class="st">"collin-develop"</span>,
-                         <span class="kw">subdir</span> <span class="kw">=</span> <span class="st">"R-packages/modeltools"</span>)</pre></body></html></div>
+<a href="#installing-without-vignettes" class="anchor"></a>Installing without vignettes</h3>
+<p>Building the <code>modeltools</code> vignettes, such as this <em>Getting started guide</em>, takes a significant amount of time. So, by default, the vignettes are not included in the installed package. The vignette-less package can be installed with the following command:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span>repo <span class="op">=</span> <span class="st">"cmu-delphi/covidcast"</span>, ref <span class="op">=</span> <span class="st">"collin-develop"</span>,
+                         subdir <span class="op">=</span> <span class="st">"R-packages/modeltools"</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="install-with-vignettes" class="section level3">
+<div id="installing-with-vignettes" class="section level3">
 <h3 class="hasAnchor">
-<a href="#install-with-vignettes" class="anchor"></a>Install with vignettes</h3>
-<p>If you wish to include the vignettes, then use the following installation command instead:</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span>(<span class="kw">repo</span> <span class="kw">=</span> <span class="st">"cmu-delphi/covidcast"</span>, <span class="kw">ref</span> <span class="kw">=</span> <span class="st">"collin-develop"</span>,
-                         <span class="kw">subdir</span> <span class="kw">=</span> <span class="st">"R-packages/modeltools"</span>,
-                         <span class="kw">build_vignettes</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">dependencies</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<a href="#installing-with-vignettes" class="anchor"></a>Installing with vignettes</h3>
+<p>If you wish to include the vignettes, then use the command below. Installation can take a couple minutes.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span>repo <span class="op">=</span> <span class="st">"cmu-delphi/covidcast"</span>, ref <span class="op">=</span> <span class="st">"collin-develop"</span>,
+                         subdir <span class="op">=</span> <span class="st">"R-packages/modeltools"</span>,
+                         build_vignettes <span class="op">=</span> <span class="cn">TRUE</span>, dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
 <div id="downloading-data-from-the-covidcast-api" class="section level2">
 <h2 class="hasAnchor">
 <a href="#downloading-data-from-the-covidcast-api" class="anchor"></a>Downloading data from the <code>covidcast</code> API</h2>
-<p>For this <em>Getting started</em> vignette, we’ll fetch COVID-19 case rates, both raw and smoothed via 7-day trailing averages, from the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">Delphi API</a>. These particular signals are provided by the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html"><em>USAFacts</em></a> data source. Here, we’ll download the signals at the state level for four states, and over the time window of June 1, 2020 to November 15, 2020.</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">covidcast</span>)
+<p>For this <em>Getting started</em> vignette, we will fetch U.S. COVID-19 case rates — both raw and smoothed with 7-day trailing averages — from the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">Delphi API</a>. These particular COVID-19 data signals are reported by the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html"><em>USAFacts</em></a> data source and then cloned into the Delphi API. Here, we will download the signals at the state level for four states over the time window June 1, 2020 to November 15, 2020.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/">covidcast</a></span><span class="op">)</span>
 
-<span class="no">start_day</span> <span class="kw">&lt;-</span> <span class="st">"2020-06-01"</span>
-<span class="no">end_day</span> <span class="kw">&lt;-</span> <span class="st">"2020-11-15"</span>
-<span class="no">geo_values</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"ca"</span>, <span class="st">"fl"</span>, <span class="st">"ny"</span>, <span class="st">"tx"</span>)
+<span class="va">start_day</span> <span class="op">&lt;-</span> <span class="st">"2020-06-01"</span>
+<span class="va">end_day</span> <span class="op">&lt;-</span> <span class="st">"2020-11-15"</span>
+<span class="va">geo_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"ca"</span>, <span class="st">"fl"</span>, <span class="st">"ny"</span>, <span class="st">"tx"</span><span class="op">)</span>
 
-<span class="no">signals</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/covidcast/man/covidcast_signals.html">covidcast_signals</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"usa-facts"</span>,
-                             <span class="kw">signal</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"confirmed_incidence_prop"</span>,
-                                        <span class="st">"confirmed_7dav_incidence_prop"</span>),
-                             <span class="kw">start_day</span> <span class="kw">=</span> <span class="no">start_day</span>,
-                             <span class="kw">end_day</span> <span class="kw">=</span> <span class="no">end_day</span>,
-                             <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>,
-                             <span class="kw">geo_values</span> <span class="kw">=</span> <span class="no">geo_values</span>)</pre></body></html></div>
-<p>By default, the <code><a href="https://rdrr.io/pkg/covidcast/man/covidcast_signals.html">covidcast_signals()</a></code> function returns the specified signals as a list of <code>covidcast_signal</code> data frames, with one data frame for each signal. So, in this case, <code>signals</code> is a list of two <code>covidcast_signal</code> data frames.</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">signals</span><span class="kw">[[</span><span class="fl">1</span>]])
-<span class="co">## A `covidcast_signal` data frame with 672 rows and 9 columns.</span>
+<span class="va">signals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signals.html">covidcast_signals</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"usa-facts"</span>,
+                             signal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"confirmed_incidence_prop"</span>,
+                                        <span class="st">"confirmed_7dav_incidence_prop"</span><span class="op">)</span>,
+                             start_day <span class="op">=</span> <span class="va">start_day</span>,
+                             end_day <span class="op">=</span> <span class="va">end_day</span>,
+                             geo_type <span class="op">=</span> <span class="st">"state"</span>, 
+                             geo_values <span class="op">=</span> <span class="va">geo_values</span><span class="op">)</span></code></pre></div>
+<p>By default, the <code><a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signals.html">covidcast_signals()</a></code> function returns the specified signals as a list of <code>covidcast_signal</code> data frames, with one data frame for each signal. So, in this case, <code>signals</code> is a list of two <code>covidcast_signal</code> data frames — the first being the raw COVID-19 case rates and the second being the COVID-19 case rates after smoothing with a 7-day trailing average. The <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> function can be called on each of these <code>covidcast_signal</code> data frames as follows:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
+<span class="co">## A `covidcast_signal` dataframe with 672 rows and 12 columns.</span>
 <span class="co">## </span>
 <span class="co">## data_source : usa-facts</span>
 <span class="co">## signal      : confirmed_incidence_prop</span>
@@ -153,8 +154,8 @@
 <span class="co">## last date                           : 2020-11-15</span>
 <span class="co">## median number of geo_values per day : 4</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">signals</span><span class="kw">[[</span><span class="fl">2</span>]])
-<span class="co">## A `covidcast_signal` data frame with 672 rows and 9 columns.</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
+<span class="co">## A `covidcast_signal` dataframe with 672 rows and 12 columns.</span>
 <span class="co">## </span>
 <span class="co">## data_source : usa-facts</span>
 <span class="co">## signal      : confirmed_7dav_incidence_prop</span>
@@ -162,762 +163,1027 @@
 <span class="co">## </span>
 <span class="co">## first date                          : 2020-06-01</span>
 <span class="co">## last date                           : 2020-11-15</span>
-<span class="co">## median number of geo_values per day : 4</span></pre></body></html></div>
-</div>
-<div id="slide-with-a-formula" class="section level2">
-<h2 class="hasAnchor">
-<a href="#slide-with-a-formula" class="anchor"></a>Slide with a formula</h2>
-<p>One of the most basic tools in the <code>modeltools</code> package is the <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> function which is based on the family of functions provided by the <code>slider</code> package. In <code>modeltools</code>, to <em>slide</em> means, for each <code>geo_value</code>, to apply the function or formula over a trailing window of <code>n</code> days of data. Many other functions in the package, such as <code><a href="../reference/pct_change.html">pct_change()</a></code> and <code><a href="../reference/estimate_deriv.html">estimate_deriv()</a></code>, use <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> as their workhorse.</p>
-<p>For example, to apply a 7-day trailing average to the raw values in the first <code>covidcast_signal</code> data frame, we can specify a formula via the <code>slide_fun</code> argument of <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code>:</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">modeltools</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">knitr</span>)
+<span class="co">## median number of geo_values per day : 4</span></code></pre></div>
+<p>Taking a peek at each of the <code>covidcast_signal</code> data frames in the list:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span>
 
-<span class="fu"><a href="../reference/slide_by_geo.html">slide_by_geo</a></span>(<span class="no">signals</span><span class="kw">[[</span><span class="fl">1</span>]], <span class="kw">slide_fun</span> <span class="kw">=</span> ~ <span class="fu"><a href="../reference/Min.html">Mean</a></span>(<span class="no">.x</span>$<span class="no">value</span>), <span class="kw">n</span> <span class="kw">=</span> <span class="fl">7</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">geo_value</span>, <span class="no">time_value</span>, <span class="no">value</span>, <span class="no">slide_value</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span>(<span class="no">geo_value</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="fl">10</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span>(<span class="kw">format</span> <span class="kw">=</span> <span class="st">"html"</span>, <span class="kw">digits</span> <span class="kw">=</span> <span class="fl">3</span>)</pre></body></html></div>
+<span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">data_source</span>, <span class="va">signal</span>, <span class="va">geo_value</span>, <span class="va">time_value</span>, <span class="va">value</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>format <span class="op">=</span> <span class="st">"html"</span>, digits <span class="op">=</span> <span class="fl">3</span>, align <span class="op">=</span> <span class="st">"c"</span>,
+        caption <span class="op">=</span> <span class="st">"U.S. COVID-19 case rates (raw)"</span><span class="op">)</span></code></pre></div>
 <table class="table">
+<caption>
+U.S. COVID-19 case rates (raw)
+</caption>
 <thead><tr>
-<th style="text-align:left;">
+<th style="text-align:center;">
+data_source
+</th>
+<th style="text-align:center;">
+signal
+</th>
+<th style="text-align:center;">
 geo_value
 </th>
-<th style="text-align:left;">
+<th style="text-align:center;">
 time_value
 </th>
-<th style="text-align:right;">
+<th style="text-align:center;">
 value
 </th>
-<th style="text-align:right;">
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:center;">
+usa-facts
+</td>
+<td style="text-align:center;">
+confirmed_incidence_prop
+</td>
+<td style="text-align:center;">
+ca
+</td>
+<td style="text-align:center;">
+2020-06-01
+</td>
+<td style="text-align:center;">
+6.337
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+usa-facts
+</td>
+<td style="text-align:center;">
+confirmed_incidence_prop
+</td>
+<td style="text-align:center;">
+fl
+</td>
+<td style="text-align:center;">
+2020-06-01
+</td>
+<td style="text-align:center;">
+3.106
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+usa-facts
+</td>
+<td style="text-align:center;">
+confirmed_incidence_prop
+</td>
+<td style="text-align:center;">
+ny
+</td>
+<td style="text-align:center;">
+2020-06-01
+</td>
+<td style="text-align:center;">
+4.837
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+usa-facts
+</td>
+<td style="text-align:center;">
+confirmed_incidence_prop
+</td>
+<td style="text-align:center;">
+tx
+</td>
+<td style="text-align:center;">
+2020-06-01
+</td>
+<td style="text-align:center;">
+2.042
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+usa-facts
+</td>
+<td style="text-align:center;">
+confirmed_incidence_prop
+</td>
+<td style="text-align:center;">
+ca
+</td>
+<td style="text-align:center;">
+2020-06-02
+</td>
+<td style="text-align:center;">
+5.856
+</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">signals</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">data_source</span>, <span class="va">signal</span>, <span class="va">geo_value</span>, <span class="va">time_value</span>, <span class="va">value</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="st">"html"</span>, digits <span class="op">=</span> <span class="fl">3</span>, align <span class="op">=</span> <span class="st">"c"</span>,
+        caption <span class="op">=</span> <span class="st">"U.S. COVID-19 case rates (7-day trailing average)"</span><span class="op">)</span></code></pre></div>
+<table class="table">
+<caption>
+U.S. COVID-19 case rates (7-day trailing average)
+</caption>
+<thead><tr>
+<th style="text-align:center;">
+data_source
+</th>
+<th style="text-align:center;">
+signal
+</th>
+<th style="text-align:center;">
+geo_value
+</th>
+<th style="text-align:center;">
+time_value
+</th>
+<th style="text-align:center;">
+value
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:center;">
+usa-facts
+</td>
+<td style="text-align:center;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:center;">
+ca
+</td>
+<td style="text-align:center;">
+2020-06-01
+</td>
+<td style="text-align:center;">
+6.701
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+usa-facts
+</td>
+<td style="text-align:center;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:center;">
+fl
+</td>
+<td style="text-align:center;">
+2020-06-01
+</td>
+<td style="text-align:center;">
+3.381
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+usa-facts
+</td>
+<td style="text-align:center;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:center;">
+ny
+</td>
+<td style="text-align:center;">
+2020-06-01
+</td>
+<td style="text-align:center;">
+6.570
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+usa-facts
+</td>
+<td style="text-align:center;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:center;">
+tx
+</td>
+<td style="text-align:center;">
+2020-06-01
+</td>
+<td style="text-align:center;">
+4.406
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+usa-facts
+</td>
+<td style="text-align:center;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:center;">
+ca
+</td>
+<td style="text-align:center;">
+2020-06-02
+</td>
+<td style="text-align:center;">
+6.389
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="sliding" class="section level2">
+<h2 class="hasAnchor">
+<a href="#sliding" class="anchor"></a>Sliding</h2>
+<p>One of the most basic tools in the <code>modeltools</code> package is the <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> function which is based on the family of functions provided by the <code>slider</code> package.</p>
+<blockquote>
+<p><strong>Definition: In <code>modeltools</code>, to <em>slide</em> means, for each <code>geo_value</code>, we apply a user-specified function or formula over a trailing window of <code>n</code> days of data.</strong></p>
+</blockquote>
+<p>Many other functions in the package, such as <code><a href="../reference/pct_change.html">pct_change()</a></code> and <code><a href="../reference/estimate_deriv.html">estimate_deriv()</a></code>, use <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> as their workhorse.</p>
+<div id="sliding-with-a-formula" class="section level3">
+<h3 class="hasAnchor">
+<a href="#sliding-with-a-formula" class="anchor"></a>Sliding with a formula</h3>
+<div id="example-1-computing-a-7-day-trailing-average-by-sliding-a-formula-over-the-raw-data" class="section level4">
+<h4 class="hasAnchor">
+<a href="#example-1-computing-a-7-day-trailing-average-by-sliding-a-formula-over-the-raw-data" class="anchor"></a>Example 1: Computing a 7-day trailing average by sliding a formula over the raw data</h4>
+<p>For example, to apply a 7-day trailing average to the raw values in the first <code>covidcast_signal</code> data frame fetched above (i.e. <code>signals[[1]]</code>), we can specify a formula via the <code>slide_fun</code> argument of <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code>:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools">modeltools</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span>
+
+<span class="fu"><a href="../reference/slide_by_geo.html">slide_by_geo</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, slide_fun <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="../reference/Min.html">Mean</a></span><span class="op">(</span><span class="va">.x</span><span class="op">$</span><span class="va">value</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">7</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">geo_value</span>, <span class="va">time_value</span>, <span class="va">value</span>, <span class="va">slide_value</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">geo_value</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>format <span class="op">=</span> <span class="st">"html"</span>, digits <span class="op">=</span> <span class="fl">3</span>, align <span class="op">=</span> <span class="st">"c"</span>,
+        caption <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"U.S. COVID-19 case rates (7-day trailing average computed by sliding"</span>,
+                        <span class="st">"a formula)"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<table class="table">
+<caption>
+U.S. COVID-19 case rates (7-day trailing average computed by sliding a formula)
+</caption>
+<thead><tr>
+<th style="text-align:center;">
+geo_value
+</th>
+<th style="text-align:center;">
+time_value
+</th>
+<th style="text-align:center;">
+value
+</th>
+<th style="text-align:center;">
 slide_value
 </th>
 </tr></thead>
 <tbody>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-01
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.337
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.337
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-02
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 5.856
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.097
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-03
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 5.884
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.026
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-04
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 7.970
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.512
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-05
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 8.397
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.889
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-06
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.712
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.859
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-07
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.031
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.741
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-08
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.418
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.753
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-09
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 7.539
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.993
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-10
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 7.271
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 7.191
 </td>
 </tr>
 </tbody>
 </table>
-<p>The formula specified by <code>slide_fun</code> has access to all columns present in the original <code>covidcast_signal</code> data frame, and must refer to them with the prefix <code>.x$</code>. Here the function <code><a href="../reference/Min.html">Mean()</a></code> is a simple wrapper around <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> that omits <code>NA</code> values by default (provided by the <code>modeltools</code> package).</p>
-<p>Notice that the above <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> call returns a data frame with a new column appended that contains the results of the sliding operation specified by <code>slide_fun</code>. This column is named “slide_value” by default, but alternative namings can be used by passing a string to the <code>col_name</code> argument in the original <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> call. For example:</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="fu"><a href="../reference/slide_by_geo.html">slide_by_geo</a></span>(<span class="no">signals</span><span class="kw">[[</span><span class="fl">1</span>]], <span class="kw">slide_fun</span> <span class="kw">=</span> ~ <span class="fu"><a href="../reference/Min.html">Mean</a></span>(<span class="no">.x</span>$<span class="no">value</span>), <span class="kw">n</span> <span class="kw">=</span> <span class="fl">7</span>,
-             <span class="kw">col_name</span> <span class="kw">=</span> <span class="st">"7dav"</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">geo_value</span>, <span class="no">time_value</span>, <span class="no">value</span>, <span class="no">`7dav`</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span>(<span class="no">geo_value</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="fl">10</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span>(<span class="kw">format</span> <span class="kw">=</span> <span class="st">"html"</span>, <span class="kw">digits</span> <span class="kw">=</span> <span class="fl">3</span>)</pre></body></html></div>
+<p>The formula specified by <code>slide_fun</code> has access to all columns present in the original <code>covidcast_signal</code> data frame, and must be referred to with the prefix <code>.x$</code>. Here, the function <code><a href="../reference/Min.html">Mean()</a></code> is a simple wrapper around <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> that omits <code>NA</code> values by default (provided by the <code>modeltools</code> package).</p>
+<p>Notice that the above <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> call returns a data frame with a new column appended that contains the results of the sliding operation specified by <code>slide_fun</code>. This column is named <code>"slide_value"</code> by default, but alternative namings can be used by passing a string to the <code>col_name</code> argument in the original <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> function call. For example:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/slide_by_geo.html">slide_by_geo</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, slide_fun <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="../reference/Min.html">Mean</a></span><span class="op">(</span><span class="va">.x</span><span class="op">$</span><span class="va">value</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">7</span>, col_name <span class="op">=</span> <span class="st">"7dav"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">geo_value</span>, <span class="va">time_value</span>, <span class="va">value</span>, <span class="va">`7dav`</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">geo_value</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>format <span class="op">=</span> <span class="st">"html"</span>, digits <span class="op">=</span> <span class="fl">3</span>, align <span class="op">=</span> <span class="st">"c"</span>,
+        caption <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"U.S. COVID-19 case rates (7-day trailing average computed by sliding"</span>,
+                        <span class="st">"a formula)"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <table class="table">
+<caption>
+U.S. COVID-19 case rates (7-day trailing average computed by sliding a formula)
+</caption>
 <thead><tr>
-<th style="text-align:left;">
+<th style="text-align:center;">
 geo_value
 </th>
-<th style="text-align:left;">
+<th style="text-align:center;">
 time_value
 </th>
-<th style="text-align:right;">
+<th style="text-align:center;">
 value
 </th>
-<th style="text-align:right;">
+<th style="text-align:center;">
 7dav
 </th>
 </tr></thead>
 <tbody>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-01
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.337
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.337
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-02
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 5.856
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.097
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-03
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 5.884
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.026
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-04
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 7.970
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.512
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-05
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 8.397
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.889
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-06
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.712
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.859
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-07
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.031
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.741
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-08
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.418
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.753
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-09
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 7.539
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.993
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-10
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 7.271
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 7.191
 </td>
 </tr>
 </tbody>
 </table>
-<p>As a simple sanity check, we compare the 7-day trailing average computed via <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> to the values of the smoothed signal from the API:</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="../reference/slide_by_geo.html">slide_by_geo</a></span>(<span class="no">signals</span><span class="kw">[[</span><span class="fl">1</span>]], <span class="kw">slide_fun</span> <span class="kw">=</span> ~ <span class="fu"><a href="../reference/Min.html">Mean</a></span>(<span class="no">.x</span>$<span class="no">value</span>), <span class="kw">n</span> <span class="kw">=</span> <span class="fl">7</span>,
-             <span class="kw">col_name</span> <span class="kw">=</span> <span class="st">"7dav"</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">full_join</a></span>(<span class="no">signals</span><span class="kw">[[</span><span class="fl">2</span>]], <span class="kw">by</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"geo_value"</span>, <span class="st">"time_value"</span>)) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">difference</span> <span class="kw">=</span> <span class="no">`7dav`</span> - <span class="no">value.y</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">time_value</span> <span class="kw">&gt;=</span> <span class="st">"2020-06-07"</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(<span class="no">difference</span>))) <span class="kw">%&gt;%</span>
-  <span class="no">as.numeric</span></pre></body></html></div>
-<pre><code>## [1] 6.757779e-08</code></pre>
-<p>Note that this check would <em>fail</em> before June 7 because the API has access to data before June 1, 2020, and can therefore return the trailing 7-day average for all days in the time window June 1, 2020 to November 15, 2020. While, on the other hand, since we are only providing <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> with daily COVID-19 case rates beginning on June 1, the trailing 7-day average computed by <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> is not actually an average of 7 days of data until June 7, 2020. When a trailing window of <code>n</code> days isn’t available, <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> just applies the function or formula to whatever data is available.</p>
+<p>As a simple sanity check, we compare the 7-day trailing average computed via <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> to the values of the smoothed signal from the API to ensure that they match (to machine precision). More specifically, the code chunk below computes the maximum absolute difference between the two 7-day averaged signals, over all state-date pairs.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/slide_by_geo.html">slide_by_geo</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, slide_fun <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="../reference/Min.html">Mean</a></span><span class="op">(</span><span class="va">.x</span><span class="op">$</span><span class="va">value</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">7</span>, col_name <span class="op">=</span> <span class="st">"7dav"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">full_join</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"geo_value"</span>, <span class="st">"time_value"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>difference <span class="op">=</span> <span class="va">`7dav`</span> <span class="op">-</span> <span class="va">value.y</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">time_value</span> <span class="op">&gt;=</span> <span class="st">"2020-06-07"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">difference</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="va">as.numeric</span>
+<span class="co">## [1] 6.757779e-08</span></code></pre></div>
+<p>The output of this sanity check confirms <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> is functioning as desired.</p>
+<p><strong>Note:</strong> This sanity check would <em>fail</em> without filtering the dates to <code>&gt;= "2020-06-07"</code> because the Delphi API has access to data before June 1, 2020, and can therefore return the trailing 7-day average for all days in the time window June 1, 2020 to November 15, 2020. On the other hand, since we are only providing <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> with daily COVID-19 case rates beginning on June 1, 2020, the trailing 7-day average computed by <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> is not a true 7-day average until June 7, 2020. When a trailing window of <code>n</code> days isn’t available, <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> just applies the function or formula to whatever data is available.</p>
 </div>
-<div id="slide-with-a-function" class="section level2">
-<h2 class="hasAnchor">
-<a href="#slide-with-a-function" class="anchor"></a>Slide with a function</h2>
-<p>We can also pass a function to the <code>slide_fun</code> argument in <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code>. In this case, the passed function must have the following argument structure:</p>
-<blockquote>
-<p><code>x</code>: a data frame with the same column names as the data frame passed to <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code>; followed by any number of named additional arguments; and ending with <code>...</code>, to allow for general additional arguments.</p>
-</blockquote>
-<div id="example-1" class="section level3">
+</div>
+<div id="sliding-with-a-function" class="section level3">
 <h3 class="hasAnchor">
-<a href="#example-1" class="anchor"></a>Example 1</h3>
-<p>Recreating the last example of a 7-day trailing average:</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="fu"><a href="../reference/slide_by_geo.html">slide_by_geo</a></span>(<span class="no">signals</span><span class="kw">[[</span><span class="fl">1</span>]], <span class="kw">slide_fun</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">x</span>, <span class="no">...</span>) <span class="fu"><a href="../reference/Min.html">Mean</a></span>(<span class="no">x</span>$<span class="no">value</span>), <span class="kw">n</span> <span class="kw">=</span> <span class="fl">7</span>,
-             <span class="kw">col_name</span> <span class="kw">=</span> <span class="st">"7dav"</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">geo_value</span>, <span class="no">time_value</span>, <span class="no">value</span>, <span class="no">`7dav`</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span>(<span class="no">geo_value</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="fl">10</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span>(<span class="kw">format</span> <span class="kw">=</span> <span class="st">"html"</span>, <span class="kw">digits</span> <span class="kw">=</span> <span class="fl">3</span>)</pre></body></html></div>
+<a href="#sliding-with-a-function" class="anchor"></a>Sliding with a function</h3>
+<p>We can also pass a function to the <code>slide_fun</code> argument in <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code>. In this case, the passed function must have the following input argument structure:</p>
+<ol style="list-style-type: decimal">
+<li><p><code>x</code> : a data frame with the same column names as the data frame passed to <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code></p></li>
+<li><p>Any number of additional <strong>named</strong> arguments</p></li>
+<li><p>An ellipsis <code>...</code> to allow for any number of additional general arguments</p></li>
+</ol>
+<div id="example-2-computing-a-7-day-trailing-average-by-sliding-a-function-over-the-raw-data" class="section level4">
+<h4 class="hasAnchor">
+<a href="#example-2-computing-a-7-day-trailing-average-by-sliding-a-function-over-the-raw-data" class="anchor"></a>Example 2: Computing a 7-day trailing average by sliding a function over the raw data</h4>
+<p>The code chunk below recreates Example 1, but passes a function to the <code>slide_fun</code> argument instead of a formula.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/slide_by_geo.html">slide_by_geo</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, slide_fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span> <span class="fu"><a href="../reference/Min.html">Mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">value</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">7</span>, col_name <span class="op">=</span> <span class="st">"7dav"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">geo_value</span>, <span class="va">time_value</span>, <span class="va">value</span>, <span class="va">`7dav`</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">geo_value</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>format <span class="op">=</span> <span class="st">"html"</span>, digits <span class="op">=</span> <span class="fl">3</span>, align <span class="op">=</span> <span class="st">"c"</span>,
+        caption <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"U.S. COVID-19 case rates (7-day trailing average computed by sliding"</span>,
+                        <span class="st">"a function)"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <table class="table">
+<caption>
+U.S. COVID-19 case rates (7-day trailing average computed by sliding a function)
+</caption>
 <thead><tr>
-<th style="text-align:left;">
+<th style="text-align:center;">
 geo_value
 </th>
-<th style="text-align:left;">
+<th style="text-align:center;">
 time_value
 </th>
-<th style="text-align:right;">
+<th style="text-align:center;">
 value
 </th>
-<th style="text-align:right;">
+<th style="text-align:center;">
 7dav
 </th>
 </tr></thead>
 <tbody>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-01
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.337
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.337
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-02
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 5.856
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.097
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-03
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 5.884
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.026
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-04
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 7.970
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.512
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-05
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 8.397
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.889
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-06
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.712
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.859
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-07
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.031
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.741
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-08
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.418
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.753
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-09
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 7.539
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.993
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-10
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 7.271
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 7.191
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="example-2" class="section level3">
-<h3 class="hasAnchor">
-<a href="#example-2" class="anchor"></a>Example 2</h3>
+<div id="example-3-advanced" class="section level4">
+<h4 class="hasAnchor">
+<a href="#example-3-advanced" class="anchor"></a>Example 3 (advanced):</h4>
 <p>As a more sophisticated example, here we show how to <em>sensorize</em> the doctor visits signal. The sensor values are defined by the predicted values from a local (in time) regression of past case rates (response) on past doctor visits (covariate).</p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="co"># Regression for doctor visits sensorization</span>
-<span class="no">dv_regression</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>, <span class="no">m</span> <span class="kw">=</span> <span class="fl">3</span>, <span class="no">...</span>) {
-  <span class="no">n</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">x</span>)
-  <span class="kw">if</span> ( <span class="no">n</span> <span class="kw">&lt;=</span> <span class="no">m</span>+<span class="fl">1</span> ) <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="fl">NA</span>) <span class="co"># Take care of trivial case</span>
-
-  <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/conditions.html">tryCatch</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>({
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Regression for doctor visits sensorization</span>
+<span class="va">dv_regression</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">m</span> <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
+  <span class="kw">if</span> <span class="op">(</span> <span class="va">n</span> <span class="op">&lt;=</span> <span class="va">m</span> <span class="op">+</span> <span class="fl">1</span> <span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="cn">NA</span><span class="op">)</span> <span class="co"># Take care of trivial case</span>
+  
+  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html">tryCatch</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span><span class="op">(</span><span class="op">{</span>
     <span class="co"># Fit a regression, leaving out the last m days of data</span>
-    <span class="no">lm_obj</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span>(<span class="no">value.y</span> ~ <span class="no">value.x</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">x</span>[<span class="fl">1</span>:(<span class="no">n</span>-<span class="no">m</span>+<span class="fl">1</span>), ])
-
+    <span class="va">lm_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">value.y</span> <span class="op">~</span> <span class="va">value.x</span>, data <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">n</span><span class="op">-</span><span class="va">m</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span>
+    
     <span class="co"># Form prediction for the last day of data, and return</span>
-    <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span>(<span class="no">lm_obj</span>, <span class="kw">newdata</span> <span class="kw">=</span> <span class="no">x</span>[<span class="no">n</span>, ])
-  })),
-  <span class="kw">error</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">e</span>) <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="fl">NA</span>)))
-}
+    <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">lm_obj</span>, newdata <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="va">n</span>, <span class="op">]</span><span class="op">)</span>
+  <span class="op">}</span><span class="op">)</span><span class="op">)</span>,
+  error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="cn">NA</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="op">}</span>
 
 <span class="co"># Fetch doctor visits signal and join it to case rates</span>
-<span class="no">joined</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/covidcast/man/covidcast_signal.html">covidcast_signal</a></span>(<span class="kw">data_source</span> <span class="kw">=</span> <span class="st">"doctor-visits"</span>,
-                           <span class="kw">signal</span> <span class="kw">=</span> <span class="st">"smoothed_adj_cli"</span>,
-                           <span class="kw">start_day</span> <span class="kw">=</span> <span class="no">start_day</span>,
-                           <span class="kw">end_day</span> <span class="kw">=</span> <span class="no">end_day</span>,
-                           <span class="kw">geo_type</span> <span class="kw">=</span> <span class="st">"state"</span>,
-                           <span class="kw">geo_values</span> <span class="kw">=</span> <span class="no">geo_values</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">full_join</a></span>(<span class="no">signals</span><span class="kw">[[</span><span class="fl">2</span>]], <span class="kw">by</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"geo_value"</span>, <span class="st">"time_value"</span>))
-
+<span class="va">joined</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"doctor-visits"</span>,
+                           signal <span class="op">=</span> <span class="st">"smoothed_adj_cli"</span>,
+                           start_day <span class="op">=</span> <span class="va">start_day</span>, 
+                           end_day <span class="op">=</span> <span class="va">end_day</span>,
+                           geo_type <span class="op">=</span> <span class="st">"state"</span>, 
+                           geo_values <span class="op">=</span> <span class="va">geo_values</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">full_join</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"geo_value"</span>, <span class="st">"time_value"</span><span class="op">)</span><span class="op">)</span>
+ 
 <span class="co"># Perform sensorization for each state; use the last n = 56 days (8 weeks) of </span>
 <span class="co"># data, minus the last m = 3 days, for the regression</span>
-<span class="fu"><a href="../reference/slide_by_geo.html">slide_by_geo</a></span>(<span class="no">joined</span>, <span class="kw">slide_fun</span> <span class="kw">=</span> <span class="no">dv_regression</span>, <span class="kw">n</span> <span class="kw">=</span> <span class="fl">56</span>, <span class="kw">m</span> <span class="kw">=</span> <span class="fl">3</span>,
-             <span class="kw">col_name</span> <span class="kw">=</span> <span class="st">"sensor"</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">geo_value</span>, <span class="no">time_value</span>, <span class="no">value.x</span>, <span class="no">value.y</span>, <span class="no">sensor</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span>(<span class="no">geo_value</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="fl">10</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span>(<span class="kw">format</span> <span class="kw">=</span> <span class="st">"html"</span>, <span class="kw">digits</span> <span class="kw">=</span> <span class="fl">3</span>)</pre></body></html></div>
+<span class="fu"><a href="../reference/slide_by_geo.html">slide_by_geo</a></span><span class="op">(</span><span class="va">joined</span>, slide_fun <span class="op">=</span> <span class="va">dv_regression</span>, n <span class="op">=</span> <span class="fl">56</span>, m <span class="op">=</span> <span class="fl">3</span>, 
+             col_name <span class="op">=</span> <span class="st">"sensor"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">geo_value</span>, <span class="va">time_value</span>, <span class="va">value.x</span>, <span class="va">value.y</span>, <span class="va">sensor</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">geo_value</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>format <span class="op">=</span> <span class="st">"html"</span>, align <span class="op">=</span> <span class="st">"c"</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <thead><tr>
-<th style="text-align:left;">
+<th style="text-align:center;">
 geo_value
 </th>
-<th style="text-align:left;">
+<th style="text-align:center;">
 time_value
 </th>
-<th style="text-align:right;">
+<th style="text-align:center;">
 value.x
 </th>
-<th style="text-align:right;">
+<th style="text-align:center;">
 value.y
 </th>
-<th style="text-align:right;">
+<th style="text-align:center;">
 sensor
 </th>
 </tr></thead>
 <tbody>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-01
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 2.754
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.701
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 NA
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-02
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 2.589
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.389
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 NA
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-03
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 2.480
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.497
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 NA
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-04
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 2.412
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.863
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 NA
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-05
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 2.571
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 7.109
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.498
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-06
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 2.630
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.808
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.594
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-07
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 2.726
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.741
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.682
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-08
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 3.045
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.753
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.683
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-09
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 2.969
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.993
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.709
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:center;">
 ca
 </td>
-<td style="text-align:left;">
+<td style="text-align:center;">
 2020-06-10
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 2.985
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 7.191
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.738
 </td>
 </tr>
 </tbody>
 </table>
 <p>Above, the first 4 elements are <code>NA</code> because of insufficient training data (we need at least 2 training samples for simple linear regression, and we omit the last 3 days of data).</p>
-<p>We call this a “sensor”.</p>
+</div>
 </div>
 </div>
   </div>
@@ -937,7 +1203,7 @@ ca
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

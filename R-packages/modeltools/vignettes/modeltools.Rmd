@@ -24,7 +24,7 @@ Carnegie Mellon University).
 
 ## Installing
 
->**This package is not on CRAN. There is a package named `modeltools` on 
+**This package is not on CRAN. There is a package named `modeltools` on 
 CRAN, but it is entirely unrelated to this one.**
 
 This package is available on the Delphi research group's [GitHub 
@@ -101,23 +101,25 @@ summary(signals[[2]])
 
 Taking a peek at each of the `covidcast_signal` data frames in the list:
 
-```{r, message = FALSE, warning = FALSE}
+```{r, message = FALSE, warning = FALSE, fig.align = 'center'}
 library(dplyr)
 library(knitr)
 
 signals[[1]] %>%
   select(data_source, signal, geo_value, time_value, value) %>% 
   head(5) %>%
-  kable(format = "html", digits = 3, caption = "U.S. COVID-19 case rates (raw)")
+  kable(format = "html", digits = 3, align = "c",
+        caption = "U.S. COVID-19 case rates (raw)")
 
 signals[[2]] %>%
   select(data_source, signal, geo_value, time_value, value) %>% 
   head(5) %>%
-  kable("html", digits = 3, caption = "U.S. COVID-19 case rates (7-day trailing average)")
+  kable("html", digits = 3, align = "c",
+        caption = "U.S. COVID-19 case rates (7-day trailing average)")
 ```
 
 
-## Sliding with a formula
+## Sliding
 
 One of the most basic tools in the `modeltools` package is the `slide_by_geo()`
 function which is based on the family of functions provided by the `slider` 
@@ -131,7 +133,9 @@ Many other functions in the package, such as `pct_change()` and
 `estimate_deriv()`, use `slide_by_geo()` as their workhorse. 
 
 
-### Example 1: Computing a 7-day trailing average by sliding a formula over the raw data
+### Sliding with a formula
+
+#### Example 1: Computing a 7-day trailing average by sliding a formula over the raw data
 
 For example, to apply a 7-day trailing average to the raw values in the first
 `covidcast_signal` data frame fetched above (i.e. `signals[[1]]`), we can 
@@ -146,7 +150,7 @@ slide_by_geo(signals[[1]], slide_fun = ~ Mean(.x$value), n = 7) %>%
   select(geo_value, time_value, value, slide_value) %>%
   arrange(geo_value) %>%
   head(10) %>%
-  kable(format = "html", digits = 3, 
+  kable(format = "html", digits = 3, align = "c",
         caption = paste("U.S. COVID-19 case rates (7-day trailing average computed by sliding",
                         "a formula)"))
 ```
@@ -167,7 +171,7 @@ slide_by_geo(signals[[1]], slide_fun = ~ Mean(.x$value), n = 7, col_name = "7dav
   select(geo_value, time_value, value, `7dav`) %>%
   arrange(geo_value) %>% 
   head(10) %>%
-  kable(format = "html", digits = 3, 
+  kable(format = "html", digits = 3, align = "c",
         caption = paste("U.S. COVID-19 case rates (7-day trailing average computed by sliding",
                         "a formula)"))
 ```
@@ -201,7 +205,7 @@ available, `slide_by_geo()` just applies the function or formula to whatever
 data is available.
 
 
-## Sliding with a function 
+### Sliding with a function 
 
 We can also pass a function to the `slide_fun` argument in `slide_by_geo()`. In 
 this case, the passed function must have the following input argument structure: 
@@ -213,7 +217,7 @@ this case, the passed function must have the following input argument structure:
 
 3. An ellipsis `...` to allow for any number of additional general arguments
 
-### Example 2: Computing a 7-day trailing average by sliding a function over the raw data
+#### Example 2: Computing a 7-day trailing average by sliding a function over the raw data
 
 The code chunk below recreates Example 1, but passes a function to the 
 `slide_fun` argument instead of a formula.
@@ -223,13 +227,13 @@ slide_by_geo(signals[[1]], slide_fun = function(x, ...) Mean(x$value), n = 7, co
   select(geo_value, time_value, value, `7dav`) %>%
   arrange(geo_value) %>% 
   head(10) %>%
-  kable(format = "html", digits = 3, 
+  kable(format = "html", digits = 3, align = "c",
         caption = paste("U.S. COVID-19 case rates (7-day trailing average computed by sliding",
                         "a function)"))
 ```
 
 
-### Example 3 (advanced):
+#### Example 3 (advanced):
 
 As a more sophisticated example, here we show how to *sensorize* the doctor 
 visits signal. The sensor values are defined by the predicted values from a 
@@ -268,7 +272,7 @@ slide_by_geo(joined, slide_fun = dv_regression, n = 56, m = 3,
   select(geo_value, time_value, value.x, value.y, sensor) %>%
   arrange(geo_value) %>% 
   head(10) %>%
-  kable(format = "html", digits = 3)
+  kable(format = "html", align = "c", digits = 3)
 ```
 
 Above, the first 4 elements are `NA` because of insufficient training data (we 

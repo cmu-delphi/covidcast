@@ -105,6 +105,8 @@
 <p>As in the <a href="https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html">Getting started guide</a>, we focus on state-level COVID-19 case rates from the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html"><em>USAFacts</em></a> data source, smoothed with 7-day trailing averages, from June 1, 2020 to November 15, 2020. The code chunk below fetches these data from the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">Delphi API</a>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/">covidcast</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span>
 
 <span class="va">start_day</span> <span class="op">&lt;-</span> <span class="st">"2020-06-01"</span>
 <span class="va">end_day</span> <span class="op">&lt;-</span> <span class="st">"2020-11-15"</span>
@@ -116,6 +118,115 @@
                                end_day <span class="op">=</span> <span class="va">end_day</span>,
                                geo_type <span class="op">=</span> <span class="st">"state"</span>, 
                                geo_values <span class="op">=</span> <span class="va">geo_values</span><span class="op">)</span></code></pre></div>
+<table class="table">
+<caption>
+U.S. COVID-19 case rates (7-day trailing average)
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+data_source
+</th>
+<th style="text-align:left;">
+signal
+</th>
+<th style="text-align:left;">
+geo_value
+</th>
+<th style="text-align:left;">
+time_value
+</th>
+<th style="text-align:right;">
+value
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-01
+</td>
+<td style="text-align:right;">
+6.701
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:left;">
+fl
+</td>
+<td style="text-align:left;">
+2020-06-01
+</td>
+<td style="text-align:right;">
+3.381
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:left;">
+ny
+</td>
+<td style="text-align:left;">
+2020-06-01
+</td>
+<td style="text-align:right;">
+6.570
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:left;">
+tx
+</td>
+<td style="text-align:left;">
+2020-06-01
+</td>
+<td style="text-align:right;">
+4.406
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-02
+</td>
+<td style="text-align:right;">
+6.389
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="percentage-change" class="section level2">
 <h2 class="hasAnchor">
@@ -487,7 +598,7 @@ ca
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Weekly percentage change"</span>, x <span class="op">=</span> <span class="st">"Date"</span>, y <span class="op">=</span> <span class="st">"Weekly percentage change"</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html">grid.arrange</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
-<p><img src="pct-change_files/figure-html/unnamed-chunk-7-1.png" width="680" style="display: block; margin: auto;"></p>
+<p><img src="pct-change_files/figure-html/unnamed-chunk-6-1.png" width="680" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div id="post-hoc-smoothing-a-percentage-change-time-series" class="section level2">
@@ -674,7 +785,7 @@ ca
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html">grid.arrange</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
-<p><img src="pct-change_files/figure-html/unnamed-chunk-9-1.png" width="680" style="display: block; margin: auto;"></p>
+<p><img src="pct-change_files/figure-html/unnamed-chunk-8-1.png" width="680" style="display: block; margin: auto;"></p>
 </div>
 </div>
   </div>

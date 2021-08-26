@@ -45,16 +45,13 @@ case_rates <- covidcast_signal(data_source = "usa-facts",
                                geo_values = geo_values)
 ```
 
-```{r, collapse = TRUE}
-summary(case_rates)
-```
-
-```{r}
+```{r echo = FALSE}
 case_rates %>%
   select(data_source, signal, geo_value, time_value, value) %>% 
   head(5) %>%
   kable("html", digits = 3, caption = "U.S. COVID-19 case rates (7-day trailing average)")
 ```
+
 
 ## Percentage change
 

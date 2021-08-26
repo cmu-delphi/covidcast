@@ -105,6 +105,9 @@
 <p>As in the <a href="https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html">Getting started guide</a> and <a href="https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/pct-change.html">Percentage change vignette</a>, we demonstrate this derivative estimation functionality on smoothed versions of the state-level COVID-19 case rates reported by the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html"><em>USAFacts</em></a> data source from June 1, 2020 to November 15, 2020. The code chunk below fetches these data from the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">Delphi API</a>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/">covidcast</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools">modeltools</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span>
 
 <span class="va">start_day</span> <span class="op">&lt;-</span> <span class="st">"2020-06-01"</span>
 <span class="va">end_day</span> <span class="op">&lt;-</span> <span class="st">"2020-11-15"</span>
@@ -130,11 +133,7 @@
 <a href="#estimating-derivatives-via-linear-regression" class="anchor"></a>Estimating derivatives via linear regression</h3>
 <p>First we illustrate the default method for derivative estimation <code>method = "lin"</code>, which uses the slope from a simple linear regression. Here we also use the default trailing number of days <code>n = 14</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools">modeltools</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span>
-
-<span class="va">case_rates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_deriv.html">estimate_deriv</a></span><span class="op">(</span><span class="va">case_rates</span>, method <span class="op">=</span> <span class="st">"lin"</span>, n <span class="op">=</span> <span class="fl">14</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">case_rates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_deriv.html">estimate_deriv</a></span><span class="op">(</span><span class="va">case_rates</span>, method <span class="op">=</span> <span class="st">"lin"</span>, n <span class="op">=</span> <span class="fl">14</span><span class="op">)</span>
 
 <span class="va">case_rates</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">geo_value</span><span class="op">)</span> <span class="op">%&gt;%</span> 

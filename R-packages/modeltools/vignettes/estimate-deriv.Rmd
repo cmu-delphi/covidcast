@@ -169,7 +169,7 @@ regularization. Since the optimization here takes a while (it's based on
 computing a full solution path for the trend filtering problem, via the 
 `genlasso::trendfilter()` function), we only compute derivatives for Florida.
 
-```{r, fig.align = "center", fig.width = 8, fig.height = 4, fig.retina = 2, dpi = 85}
+```{r, warning = FALSE, fig.align = "center", fig.width = 8, fig.height = 4, fig.retina = 2, dpi = 85}
 case_rates_state <- case_rates %>% filter(geo_value == state)
 
 case_rates_state <- estimate_deriv(case_rates_state, method = "tf", n = 28, 

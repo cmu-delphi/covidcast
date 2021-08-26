@@ -16,7 +16,7 @@ Description: Tools for building COVID-19 statistical models, with an emphasis on
     short-term forecasting and hotspot prediction. This package is meant to be 
     used in conjuction with the `covidcast` and `evalcast` packages developed by
     the Delphi research group headquartered at Carnegie Mellon University.
-URL: https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools
+URL: https://github.com/cmu-delphi/covidcast
 License: MIT
 Encoding: UTF-8
 LazyData: true
@@ -37,3 +37,4 @@ Imports:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+BugReports: https://github.com/cmu-delphi/covidcast/issues

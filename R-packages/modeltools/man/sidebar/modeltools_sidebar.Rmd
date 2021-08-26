@@ -20,3 +20,6 @@ Get the covidcast R package:
 
 Get the evalcast R package:
 [https://cmu-delphi.github.io/covidcast/evalcastR/](https://cmu-delphi.github.io/covidcast/evalcastR/)
+
+### License
+[MIT](https://opensource.org/licenses/mit-license.php)

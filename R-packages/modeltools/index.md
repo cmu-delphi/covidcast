@@ -1,4 +1,4 @@
-# modeltools R package
+# modeltools R package <img src="man/figures/logo.png" align="right" />
 
 Tools for building COVID-19 statistical models, with an emphasis on
 short-term forecasting and hotspot prediction. This package is meant to be 

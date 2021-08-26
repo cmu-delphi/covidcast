@@ -18,7 +18,8 @@ look at the percentage change in its cumulative value between two adjacent time
 windows of equal length. We illustrate this in the current vignette using the 
 `pct_change()` function from the `modeltools` package. 
 
-## Download data from the Delphi API
+
+## Downloading data from the `covidcast` API
 
 As in the 
 [Getting started guide](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html), 

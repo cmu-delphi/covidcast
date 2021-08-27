@@ -1,7 +1,7 @@
 Package: modeltools
 Type: Package
 Title: Tools for Building COVID Forecasters and Related Models 
-Version: 0.1.0
+Version: 0.2.0
 Date: 2021-08-27
 Authors@R:
 	c(
@@ -10,20 +10,33 @@ Authors@R:
            role = c("aut", "cre"),
            email = "ryantibs@cmu.edu",
            comment = c(ORCID = "0000-0002-2158-8304")),
+    person(given = "Addison",
+           family = "Hu",
+           role = "aut"),
     person(given = "Collin",
            family = "Politsch",
-           role = "aut"),
+           role = "ctb"),
     person(given = "Daniel",
            family = "McDonald",
-           role = "aut"),
+           role = "ctb"),
     person(given = "Jacob",
            family = "Bien",
-           role = "aut"))
+           role = "ctb"),
+    person(given = "Jed",
+           family = "Grabman",
+           role = "ctb"),
+    person(given = "Mike",
+           family = "O'Brien",
+           role = "ctb"),
+    person(given = "Kenneth",
+           family = "Tay",
+           role = "ctb"))
 URL: https://github.com/cmu-delphi/covidcast
 Description: Tools for building COVID-19 statistical models, with an emphasis on
     short-term forecasting and hotspot prediction. This package is meant to be 
-    used in conjuction with the `covidcast` and `evalcast` packages developed by
-    the Delphi research group headquartered at Carnegie Mellon University.
+    used in conjuction with the `covidcast` and `evalcast` <tt>R</tt> packages 
+    developed by the Delphi research group headquartered at Carnegie Mellon 
+    University.
 License: MIT
 Encoding: UTF-8
 LazyData: true

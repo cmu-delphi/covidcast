@@ -1,4 +1,6 @@
-#' Compute percentage change of values in `covidcast_signal` data frame
+#' Compute percentage change of values in 
+#' [`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html)
+#' data frame
 #' 
 #' Computes the percentage change of the values in a `covidcast_signal` data
 #' frame. (When multiple issue dates are present, only the latest issue is

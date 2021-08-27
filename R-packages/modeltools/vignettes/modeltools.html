@@ -148,18 +148,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><strong><em>Warning</em>: This package is not on CRAN! An <tt>R</tt> package named <code>modeltools</code> does exist on CRAN, but it is entirely unrelated to this one.</strong></p>
 </blockquote>
 <p>Our package is available on the Delphi research group’s <a href="https://github.com/cmu-delphi">GitHub page</a> and can be installed using the <a href="https://cran.r-project.org/package=devtools"><code>devtools</code></a> package, as shown below.</p>
-<div id="installing-without-vignettes" class="section level3">
-<h3>Installing without vignettes</h3>
-<p>Building the <code>modeltools</code> vignettes, such as this <em>Getting started</em> guide, adds some time to the package installation. So, by default, the vignettes are not included in the installed package. The vignette-less package can be installed with the following command:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="at">repo =</span> <span class="st">&quot;cmu-delphi/covidcast&quot;</span>, <span class="at">ref =</span> <span class="st">&quot;collin-develop&quot;</span>,</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">subdir =</span> <span class="st">&quot;R-packages/modeltools&quot;</span>)</span></code></pre></div>
-</div>
 <div id="installing-with-vignettes" class="section level3">
 <h3>Installing with vignettes</h3>
-<p>If you wish to include the vignettes, then use the command below. Installation can take a couple minutes.</p>
+<p>If you wish to install <code>modeltools</code> with the tutorial vignettes (such as this <em>Getting started</em> guide) included (encouraged), then use the command below.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="at">repo =</span> <span class="st">&quot;cmu-delphi/covidcast&quot;</span>, <span class="at">ref =</span> <span class="st">&quot;collin-develop&quot;</span>,</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">subdir =</span> <span class="st">&quot;R-packages/modeltools&quot;</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">build_vignettes =</span> <span class="cn">TRUE</span>, <span class="at">dependencies =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+</div>
+<div id="installing-without-vignettes" class="section level3">
+<h3>Installing without vignettes</h3>
+<p>Building the <code>modeltools</code> vignettes adds some time to the package installation. If you wish to avoid this, you can install the vignette-less package with the following command:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="at">repo =</span> <span class="st">&quot;cmu-delphi/covidcast&quot;</span>, <span class="at">ref =</span> <span class="st">&quot;collin-develop&quot;</span>,</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">subdir =</span> <span class="st">&quot;R-packages/modeltools&quot;</span>,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">build_vignettes =</span> <span class="cn">TRUE</span>, <span class="at">dependencies =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">subdir =</span> <span class="st">&quot;R-packages/modeltools&quot;</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="downloading-data-from-the-covidcast-api" class="section level2">

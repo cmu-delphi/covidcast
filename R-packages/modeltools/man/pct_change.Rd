@@ -2,7 +2,9 @@
 % Please edit documentation in R/change.R
 \name{pct_change}
 \alias{pct_change}
-\title{Compute percentage change of values in \code{covidcast_signal} data frame}
+\title{Compute percentage change of values in
+\href{https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html}{\code{covidcast_signal}}
+data frame}
 \usage{
 pct_change(x, n = 14, col_name = "pct_change")
 }

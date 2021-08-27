@@ -1,0 +1,37 @@
+citHeader("To cite the modeltools package in publications use:")
+
+year <- sub("-.*", "", meta$Date)
+note <- sprintf("R package version %s", meta$Version)
+
+bibentry(bibtype = "Manual",
+         title = "{modeltools}: Tools for Building COVID Forecasters and Related Models",
+         author = c(person(given = "Ryan",
+			                  family = "Tibshirani",
+           		            role = c("aut", "cre"),
+           		            email = "ryantibs@cmu.edu",
+           		            comment = c(ORCID = "0000-0002-2158-8304")),
+                		person(given = "Addison",
+                       		family = "Hu",
+                       		role = "aut"),
+                		person(given = "Collin",
+                       		family = "Politsch",
+                       		role = "ctb"),
+                		person(given = "Daniel",
+                       		family = "McDonald",
+                       		role = "ctb"),
+                		person(given = "Jacob",
+                       		family = "Bien",
+                       		role = "ctb"),
+                		person(given = "Jed",
+                       		family = "Grabman",
+                       		role = "ctb"),
+                		person(given = "Mike",
+                       		family = "O'Brien",
+                       		role = "ctb"),
+                		person(given = "Kenneth",
+                       		family = "Tay",
+                       		role = "ctb")),
+         year = year,
+         note = note,
+         url = "https://cmu-delphi.github.io/covidcast/modeltoolsR/",
+         key = "modeltools")

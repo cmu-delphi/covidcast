@@ -1,4 +1,4 @@
-#' modeltools: Tools for Building COVID Forecasters and Related Models 
+#' `modeltools`: Tools for Building COVID Forecasters and Related Models 
 #'
 #' The `modeltools` package provides various tools for building COVID-19 models, 
 #' mainly forecasting and hotspot prediction models. It is intended to be used

@@ -1,5 +1,6 @@
-#' Slide a function over values in `covidcast_signal` data frame, grouped by
-#' `geo_value`  
+#' Slide a function over values in 
+#' [`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html)
+#' data frame, grouped by the `geo_value`  
 #'
 #' Slides a given function over the values in a  `covidcast_signal` data frame,
 #' grouped by `geo_value`. (When multiple issue dates are present, only the

@@ -33,28 +33,27 @@ page](https://github.com/cmu-delphi) and can be installed using the
 below.
 
 
-### Installing without vignettes
-
-Building the `modeltools` vignettes, such as this *Getting started* guide, 
-adds some time to the package installation. So, by default, the vignettes are 
-not included in the installed package. The vignette-less package can be 
-installed with the following command:
-
-```{r, eval = FALSE}
-devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
-                         subdir = "R-packages/modeltools")
-```
-
-
 ### Installing with vignettes
 
-If you wish to include the vignettes, then use the command below. Installation
-can take a couple minutes.
+If you wish to install `modeltools` with the tutorial vignettes (such as this 
+*Getting started* guide) included (encouraged), then use the command below.
 
 ```{r, eval = FALSE}
 devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
                          subdir = "R-packages/modeltools",
                          build_vignettes = TRUE, dependencies = TRUE)
+```
+
+
+### Installing without vignettes
+
+Building the `modeltools` vignettes adds some time to the package installation. 
+If you wish to avoid this, you can install the vignette-less package with the 
+following command:
+
+```{r, eval = FALSE}
+devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
+                         subdir = "R-packages/modeltools")
 ```
 
 

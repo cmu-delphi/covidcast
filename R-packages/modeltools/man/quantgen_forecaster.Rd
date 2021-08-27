@@ -2,7 +2,8 @@
 % Please edit documentation in R/quantgen.R
 \name{quantgen_forecaster}
 \alias{quantgen_forecaster}
-\title{Simple quantile autoregressive forecaster based on \code{quantgen}}
+\title{Simple quantile autoregressive forecaster based on
+\href{https://github.com/ryantibs/quantgen}{\code{quantgen}}}
 \usage{
 quantgen_forecaster(
   df,

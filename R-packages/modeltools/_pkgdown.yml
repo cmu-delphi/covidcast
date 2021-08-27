@@ -25,3 +25,28 @@ repo:
     source: https://github.com/cmu-delphi/covidcast/blob/main/R-packages/modeltools/
     issue: https://github.com/cmu-delphi/covidcast/issues
     user: https://github.com/
+
+reference:
+  - title: 
+  - contents:
+      - modeltools
+  - title: Simple forecaster(s)
+  - contents:
+      - quantgen_forecaster
+  - title: Compute temporal changes
+  - contents:
+      - estimate_deriv
+      - pct_change
+  - title: Compute customized sliding operations
+  - contents:
+      - slide_by_geo
+  - title: COVID-19 Forecast Hub data
+  - contents:
+      - covidhub_probs
+  - title: Utilities
+  - contents:
+      - Min
+      - Max
+      - Sum
+      - Mean
+      - Median

@@ -2,8 +2,9 @@
 % Please edit documentation in R/slide.R
 \name{slide_by_geo}
 \alias{slide_by_geo}
-\title{Slide a function over values in \code{covidcast_signal} data frame, grouped by
-\code{geo_value}}
+\title{Slide a function over values in
+\href{https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html}{\code{covidcast_signal}}
+data frame, grouped by the \code{geo_value}}
 \usage{
 slide_by_geo(
   x,

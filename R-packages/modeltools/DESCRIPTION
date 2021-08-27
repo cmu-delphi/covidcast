@@ -15,7 +15,7 @@ Authors@R:
            role = "aut"),
     person(given = "Collin",
            family = "Politsch",
-           role = "ctb"),
+           role = "aut"),
     person(given = "Daniel",
            family = "McDonald",
            role = "ctb"),
@@ -35,8 +35,8 @@ URL: https://github.com/cmu-delphi/covidcast
 Description: Tools for building COVID-19 statistical models, with an emphasis on
     short-term forecasting and hotspot prediction. This package is meant to be 
     used in conjuction with the `covidcast` and `evalcast` <tt>R</tt> packages 
-    developed by the Delphi research group headquartered at Carnegie Mellon 
-    University.
+    that are also developed and maintained by the Delphi research group 
+    headquartered at Carnegie Mellon University.
 License: MIT
 Encoding: UTF-8
 LazyData: true

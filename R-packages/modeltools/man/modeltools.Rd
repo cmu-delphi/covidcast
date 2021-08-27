@@ -3,7 +3,7 @@
 \docType{package}
 \name{modeltools}
 \alias{modeltools}
-\title{modeltools: Tools for Building COVID Forecasters and Related Models}
+\title{\code{modeltools}: Tools for Building COVID Forecasters and Related Models}
 \description{
 The \code{modeltools} package provides various tools for building COVID-19 models,
 mainly forecasting and hotspot prediction models. It is intended to be used

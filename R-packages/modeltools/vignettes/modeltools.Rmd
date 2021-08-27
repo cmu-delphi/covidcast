@@ -24,8 +24,8 @@ Carnegie Mellon University).
 
 ## Installing
 
->**_Warning_: This package is not on CRAN! There is a CRAN package named 
-`modeltools`, but it is entirely unrelated to this one.**
+>**_Warning_: This package is not on CRAN! A package named `modeltools`
+does exist on CRAN, but it is entirely unrelated to this one.**
 
 This package is available on the Delphi research group's [GitHub 
 page](https://github.com/cmu-delphi) and can be installed using the

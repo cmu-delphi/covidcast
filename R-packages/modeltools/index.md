@@ -61,10 +61,5 @@ Get the `evalcast` <tt>R</tt> package: <br/>
 <a href="https://orcid.org/0000-0002-2158-8304" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a></li>
 <li>Addison Hu <br><small class="roles"> Author </small>  </li>
 <li>Collin Politsch <br><small class="roles"> Author </small>  </li>
-<li>Daniel McDonald <br><small class="roles"> Contributor </small>  </li>
-<li>Jacob Bien <br><small class="roles"> Contributor </small>  </li>
-<li>Jed Grabman <br><small class="roles"> Contributor </small>  </li>
-<li>Mike O'Brien <br><small class="roles"> Contributor </small>  </li>
-<li>Kenneth Tay <br><small class="roles"> Contributor </small>  </li>
 <li><a href="../../docs/modeltoolsR/authors.html">All authors...</a></li>
 </ul>

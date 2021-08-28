@@ -113,7 +113,7 @@ see above, for each `geo_value`, the calculated `pct_change` is `NA` whenever
 `n` trailing days of the signal are not available.
 
 
-### Vizualizing the results
+### Visualizing the results
 
 Below we plot the weekly percentage change of the smoothed COVID-19 case rates 
 fetched above alongside the smoothed COVID-19 case rates themselves. Here, we 
@@ -168,7 +168,7 @@ case_rates %>%
 
 
 
-### Vizualizing the results
+### Visualizing the results
 
 Here we show again the COVID-19 case rates in Florida, but now next to its daily
 percentage change time series 

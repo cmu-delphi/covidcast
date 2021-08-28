@@ -6,8 +6,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Slide a function over values in covidcast_signal data frame, grouped by
-geo_value — slide_by_geo • modeltools</title>
+<title>Slide a function over values in
+covidcast_signal
+data frame, grouped by the geo_value — slide_by_geo • modeltools</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -47,8 +48,9 @@ geo_value — slide_by_geo • modeltools</title>
 
 
 
-<meta property="og:title" content="Slide a function over values in covidcast_signal data frame, grouped by
-geo_value — slide_by_geo" />
+<meta property="og:title" content="Slide a function over values in
+covidcast_signal
+data frame, grouped by the geo_value — slide_by_geo" />
 <meta property="og:description" content="Slides a given function over the values in a  covidcast_signal data frame,
 grouped by geo_value. (When multiple issue dates are present, only the
 latest issue is considered.) See the getting started guide
@@ -85,7 +87,7 @@ for examples." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">modeltools</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -103,8 +105,23 @@ for examples." />
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li>
-  <a href="../articles/index.html">Articles</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/pct-change.html">1. Compute percentage change of a covidcast signal over time</a>
+    </li>
+    <li>
+      <a href="../articles/estimate-deriv.html">2. Estimate the derivatives of a covidcast signal</a>
+    </li>
+    <li>
+      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of covidcast signals</a>
+    </li>
+  </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -127,8 +144,9 @@ for examples." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Slide a function over values in <code>covidcast_signal</code> data frame, grouped by
-<code>geo_value</code></h1>
+    <h1>Slide a function over values in
+<a href='https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html'><code>covidcast_signal</code></a>
+data frame, grouped by the <code>geo_value</code></h1>
     <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/main/R-packages/modeltools/R/slide.R'><code>R/slide.R</code></a></small>
     <div class="hidden name"><code>slide_by_geo.Rd</code></div>
     </div>
@@ -206,7 +224,7 @@ to the <code>col_name</code> argument, containing the function values.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Ryan Tibshirani.</p>
+  <p>Developed by Ryan Tibshirani, Addison Hu, Collin Politsch.</p>
 </div>
 
 <div class="pkgdown">

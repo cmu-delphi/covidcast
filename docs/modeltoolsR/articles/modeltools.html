@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Get started with `modeltools` • modeltools</title>
+<title>Get started with modeltools • modeltools</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Get started with `modeltools`">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Get started with modeltools">
 <meta property="og:description" content="An introductory tutorial with examples.">
 <meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">modeltools</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -56,8 +56,23 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
 <li>
-  <a href="../articles/index.html">Articles</a>
+      <a href="../articles/pct-change.html">1. Compute percentage change of a covidcast signal over time</a>
+    </li>
+    <li>
+      <a href="../articles/estimate-deriv.html">2. Estimate the derivatives of a covidcast signal</a>
+    </li>
+    <li>
+      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of covidcast signals</a>
+    </li>
+  </ul>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -80,8 +95,7 @@
       </header><script src="modeltools_files/header-attrs-2.10/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Get started with <code>modeltools</code>
-</h1>
+      <h1 data-toc-skip>Get started with modeltools</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/cmu-delphi/covidcast/blob/main/R-packages/modeltools/vignettes/modeltools.Rmd"><code>vignettes/modeltools.Rmd</code></a></small>
@@ -91,35 +105,34 @@
 
     
     
-<p>This package provides tools for building COVID-19 statistical models, with an emphasis on short-term forecasting and hotspot prediction. It is designed to be used in conjunction with the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/"><code>covidcast</code></a> and <a href="https://cmu-delphi.github.io/covidcast/evalcastR/"><code>evalcast</code></a><br><tt>R</tt> packages, which are also developed and maintained by the <a href="https://delphi.cmu.edu">Delphi research group</a> (headquartered at Carnegie Mellon University).</p>
+<p>This package provides tools for building COVID-19 statistical models, with an emphasis on short-term forecasting and hotspot prediction. It is designed to be used in conjunction with the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/"><code>covidcast</code></a> and <a href="https://cmu-delphi.github.io/covidcast/evalcastR/"><code>evalcast</code></a> <tt>R</tt> packages, which are also developed and maintained by the <a href="https://delphi.cmu.edu">Delphi research group</a> (headquartered at Carnegie Mellon University).</p>
 <div id="installing" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installing" class="anchor"></a>Installing</h2>
 <blockquote>
-<p><strong><em>Warning</em>: This package is not on CRAN! There is a CRAN package named <code>modeltools</code>, but it is entirely unrelated to this one. To add further confusion, <code>pkgdown</code> automatically populates a link to the CRAN package in the sidebar of our <code>pkgdown</code> homepage. This is a mistake.</strong></p>
+<p><strong><em>Warning</em>: This package is not on CRAN!</strong> <br><br> An <tt>R</tt> package named <code>modeltools</code> does exist on CRAN, but it is entirely unrelated to this one. Our package is available on the Delphi research group’s <a href="https://github.com/cmu-delphi">GitHub page</a> and can be installed using the <a href="https://cran.r-project.org/package=devtools"><code>devtools</code></a> package, as shown below.</p>
 </blockquote>
-<p>This package is available on the Delphi research group’s <a href="https://github.com/cmu-delphi">GitHub page</a> and can be installed using the <a href="https://cran.r-project.org/package=devtools"><code>devtools</code></a> package, as shown below.</p>
-<div id="installing-without-vignettes" class="section level3">
-<h3 class="hasAnchor">
-<a href="#installing-without-vignettes" class="anchor"></a>Installing without vignettes</h3>
-<p>Building the <code>modeltools</code> vignettes, such as this <em>Getting started guide</em>, takes a significant amount of time. So, by default, the vignettes are not included in the installed package. The vignette-less package can be installed with the following command:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span>repo <span class="op">=</span> <span class="st">"cmu-delphi/covidcast"</span>, ref <span class="op">=</span> <span class="st">"collin-develop"</span>,
-                         subdir <span class="op">=</span> <span class="st">"R-packages/modeltools"</span><span class="op">)</span></code></pre></div>
-</div>
 <div id="installing-with-vignettes" class="section level3">
 <h3 class="hasAnchor">
 <a href="#installing-with-vignettes" class="anchor"></a>Installing with vignettes</h3>
-<p>If you wish to include the vignettes, then use the command below. Installation can take a couple minutes.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<p>If you wish to install <code>modeltools</code> with the tutorial vignettes included (encouraged), then use the command below.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span>repo <span class="op">=</span> <span class="st">"cmu-delphi/covidcast"</span>, ref <span class="op">=</span> <span class="st">"collin-develop"</span>,
                          subdir <span class="op">=</span> <span class="st">"R-packages/modeltools"</span>,
                          build_vignettes <span class="op">=</span> <span class="cn">TRUE</span>, dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
+<div id="installing-without-vignettes" class="section level3">
+<h3 class="hasAnchor">
+<a href="#installing-without-vignettes" class="anchor"></a>Installing without vignettes</h3>
+<p>Building the <code>modeltools</code> vignettes adds a couple minutes to the package installation. If you wish to avoid this, you can install the vignette-less package with the following command:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span>repo <span class="op">=</span> <span class="st">"cmu-delphi/covidcast"</span>, ref <span class="op">=</span> <span class="st">"collin-develop"</span>,
+                         subdir <span class="op">=</span> <span class="st">"R-packages/modeltools"</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="downloading-data-from-the-covidcast-api" class="section level2">
+</div>
+<div id="downloading-data-from-the-delphi-api" class="section level2">
 <h2 class="hasAnchor">
-<a href="#downloading-data-from-the-covidcast-api" class="anchor"></a>Downloading data from the <code>covidcast</code> API</h2>
+<a href="#downloading-data-from-the-delphi-api" class="anchor"></a>Downloading data from the Delphi API</h2>
 <p>For this <em>Getting started</em> vignette, we will fetch U.S. COVID-19 case rates — both raw and smoothed with 7-day trailing averages — from the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">Delphi API</a>. These particular COVID-19 data signals are reported by the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html"><em>USAFacts</em></a> data source and then cloned into the Delphi API. Here, we will download the signals at the state level for four states over the time window June 1, 2020 to November 15, 2020.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/">covidcast</a></span><span class="op">)</span>
@@ -158,7 +171,7 @@
 <span class="co">## first date                          : 2020-06-01</span>
 <span class="co">## last date                           : 2020-11-15</span>
 <span class="co">## median number of geo_values per day : 4</span></code></pre></div>
-<p>Taking a peek at each of the <code>covidcast_signal</code> data frames in the list:</p>
+<p>Taking a peek at the first 5 rows of each of the two <code>covidcast_signal</code> data frames in the list:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span>
@@ -398,18 +411,18 @@ ca
 <a href="#sliding" class="anchor"></a>Sliding</h2>
 <p>One of the most basic tools in the <code>modeltools</code> package is the <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> function which is based on the family of functions provided by the <code>slider</code> package.</p>
 <blockquote>
-<p><strong>Definition: In <code>modeltools</code>, to <em>slide</em> means, for each <code>geo_value</code>, we apply a user-specified function or formula over a trailing window of <code>n</code> days of data.</strong></p>
+<p><strong>Definition: In <code>modeltools</code>, to <em>slide</em> means that, for each <code>geo_value</code>, we apply a user-specified function or formula over a trailing window of <code>n</code> days of data.</strong></p>
 </blockquote>
-<p>Many other functions in the package, such as <code><a href="../reference/pct_change.html">pct_change()</a></code> and <code><a href="../reference/estimate_deriv.html">estimate_deriv()</a></code>, use <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> as their workhorse.</p>
+<p>Many other functions in this package, such as <code><a href="../reference/pct_change.html">pct_change()</a></code> and <code><a href="../reference/estimate_deriv.html">estimate_deriv()</a></code>, use <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> as their workhorse.</p>
 <div id="sliding-with-a-formula" class="section level3">
 <h3 class="hasAnchor">
 <a href="#sliding-with-a-formula" class="anchor"></a>Sliding with a formula</h3>
 <div id="example-1-computing-a-7-day-trailing-average-by-sliding-a-formula-over-the-raw-data" class="section level4">
 <h4 class="hasAnchor">
 <a href="#example-1-computing-a-7-day-trailing-average-by-sliding-a-formula-over-the-raw-data" class="anchor"></a>Example 1: Computing a 7-day trailing average by sliding a formula over the raw data</h4>
-<p>For example, to apply a 7-day trailing average to the raw values in the first <code>covidcast_signal</code> data frame fetched above (i.e. <code>signals[[1]]</code>), we can specify a formula via the <code>slide_fun</code> argument of <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code>:</p>
+<p>For example, to apply a 7-day trailing average to the raw values in the first <code>covidcast_signal</code> data frame fetched above (i.e. <code>signals[[1]]</code>), we can specify a formula via the <code>slide_fun</code> argument of <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code>, as follows:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools">modeltools</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cmu-delphi/covidcast">modeltools</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span>
 
@@ -418,8 +431,8 @@ ca
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">geo_value</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>format <span class="op">=</span> <span class="st">"html"</span>, digits <span class="op">=</span> <span class="fl">3</span>, align <span class="op">=</span> <span class="st">"c"</span>,
-        caption <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"U.S. COVID-19 case rates (7-day trailing average computed by sliding"</span>,
-                        <span class="st">"a formula)"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+        caption <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"U.S. COVID-19 case rates (7-day trailing average"</span>, 
+                        <span class="st">"computed by sliding a formula)"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <caption>
 U.S. COVID-19 case rates (7-day trailing average computed by sliding a formula)
@@ -581,16 +594,16 @@ ca
 </tr>
 </tbody>
 </table>
-<p>The formula specified by <code>slide_fun</code> has access to all columns present in the original <code>covidcast_signal</code> data frame, and must be referred to with the prefix <code>.x$</code>. Here, the function <code><a href="../reference/Min.html">Mean()</a></code> is a simple wrapper around <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> that omits <code>NA</code> values by default (provided by the <code>modeltools</code> package).</p>
-<p>Notice that the above <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> call returns a data frame with a new column appended that contains the results of the sliding operation specified by <code>slide_fun</code>. This column is named <code>"slide_value"</code> by default, but alternative namings can be used by passing a string to the <code>col_name</code> argument in the original <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> function call. For example:</p>
+<p>The formula specified by <code>slide_fun</code> has access to all columns present in the original <code>covidcast_signal</code> data frame, and must be referred to with the prefix <code>.x$</code>. Here, the function <code><a href="../reference/Min.html">modeltools::Mean()</a></code> is a simple wrapper around <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> that omits <code>NA</code> values by default.</p>
+<p>Notice that the above <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> call returns a data frame with a new column appended containing the results of the sliding operation specified by <code>slide_fun</code>. By default, this column is named <code>"slide_value"</code>, but alternative namings can be used by passing a string to the <code>col_name</code> argument in the original <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> function call. For example:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/slide_by_geo.html">slide_by_geo</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, slide_fun <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="../reference/Min.html">Mean</a></span><span class="op">(</span><span class="va">.x</span><span class="op">$</span><span class="va">value</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">7</span>, col_name <span class="op">=</span> <span class="st">"7dav"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">geo_value</span>, <span class="va">time_value</span>, <span class="va">value</span>, <span class="va">`7dav`</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">geo_value</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>format <span class="op">=</span> <span class="st">"html"</span>, digits <span class="op">=</span> <span class="fl">3</span>, align <span class="op">=</span> <span class="st">"c"</span>,
-        caption <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"U.S. COVID-19 case rates (7-day trailing average computed by sliding"</span>,
-                        <span class="st">"a formula)"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+        caption <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"U.S. COVID-19 case rates (7-day trailing average "</span>,
+                        <span class="st">"computed by sliding a formula)"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <caption>
 U.S. COVID-19 case rates (7-day trailing average computed by sliding a formula)
@@ -752,7 +765,7 @@ ca
 </tr>
 </tbody>
 </table>
-<p>As a simple sanity check, we compare the 7-day trailing average computed via <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> to the values of the smoothed signal from the API to ensure that they match (to machine precision). More specifically, the code chunk below computes the maximum absolute difference between the two 7-day averaged signals, over all state-date pairs.</p>
+<p>As a simple sanity check, below we compare the 7-day trailing average computed via <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> to the values of the smoothed signal from the Delphi API to ensure that they match (to machine precision). More specifically, the code chunk below computes the maximum absolute difference between the two 7-day trailing averages of the COVID-19 case rates signal, over all state-date pairs.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/slide_by_geo.html">slide_by_geo</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, slide_fun <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="../reference/Min.html">Mean</a></span><span class="op">(</span><span class="va">.x</span><span class="op">$</span><span class="va">value</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">7</span>, col_name <span class="op">=</span> <span class="st">"7dav"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">full_join</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"geo_value"</span>, <span class="st">"time_value"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -761,8 +774,8 @@ ca
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">difference</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="va">as.numeric</span>
 <span class="co">## [1] 6.757779e-08</span></code></pre></div>
-<p>The output of this sanity check confirms <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> is functioning as desired.</p>
-<p><strong>Note:</strong> This sanity check would <em>fail</em> without filtering the dates to <code>&gt;= "2020-06-07"</code> because the Delphi API has access to data before June 1, 2020, and can therefore return the trailing 7-day average for all days in the time window June 1, 2020 to November 15, 2020. On the other hand, since we are only providing <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> with daily COVID-19 case rates beginning on June 1, 2020, the trailing 7-day average computed by <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> is not a true 7-day average until June 7, 2020. When a trailing window of <code>n</code> days isn’t available, <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> just applies the function or formula to whatever data is available.</p>
+<p>The trivially small output of this sanity check confirms that <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> is functioning as desired.</p>
+<p><strong>Note:</strong> This sanity check would <em>fail</em> without filtering the dates to <code>&gt;= "2020-06-07"</code> because the Delphi API has access to data before June 1, 2020, and can therefore return the 7-day trailing average of COVID-19 case rates <em>for all</em> days in the time window June 1, 2020 to November 15, 2020. On the other hand, since we are only providing <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> with daily COVID-19 case rates beginning on June 1, 2020, the “7-day trailing average” computed by <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> does not become a true <em>7-day average</em> until June 7, 2020. When a trailing window of <code>n</code> days is not available, <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> just applies the function or formula to whatever data is available. So the “7-day trailing average” computed by <code><a href="../reference/slide_by_geo.html">slide_by_geo()</a></code> for the dates June <code>n</code>th where <code>n = 1,...,6</code>, is actually just an <code>n</code>-day trailing average of the daily COVID-19 case rates.</p>
 </div>
 </div>
 <div id="sliding-with-a-function" class="section level3">
@@ -777,7 +790,7 @@ ca
 <div id="example-2-computing-a-7-day-trailing-average-by-sliding-a-function-over-the-raw-data" class="section level4">
 <h4 class="hasAnchor">
 <a href="#example-2-computing-a-7-day-trailing-average-by-sliding-a-function-over-the-raw-data" class="anchor"></a>Example 2: Computing a 7-day trailing average by sliding a function over the raw data</h4>
-<p>The code chunk below recreates Example 1, but passes a function to the <code>slide_fun</code> argument instead of a formula.</p>
+<p>The code chunk below recreates <a href="#example-1-computing-a-7-day-trailing-average-by-sliding-a-formula-over-the-raw-data">Example 1</a>, but passes a function to the <code>slide_fun</code> argument instead of a formula.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/slide_by_geo.html">slide_by_geo</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, slide_fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span> <span class="fu"><a href="../reference/Min.html">Mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">value</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">7</span>, col_name <span class="op">=</span> <span class="st">"7dav"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">geo_value</span>, <span class="va">time_value</span>, <span class="va">value</span>, <span class="va">`7dav`</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -1193,7 +1206,7 @@ ca
 
 
       <footer><div class="copyright">
-  <p>Developed by Ryan Tibshirani.</p>
+  <p>Developed by Ryan Tibshirani, Addison Hu, Collin Politsch.</p>
 </div>
 
 <div class="pkgdown">

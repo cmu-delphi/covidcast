@@ -82,7 +82,7 @@ in conjuction with the covidcast and evalcast packages." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">modeltools</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -100,8 +100,23 @@ in conjuction with the covidcast and evalcast packages." />
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li>
-  <a href="../articles/index.html">Articles</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/pct-change.html">1. Compute percentage change of a covidcast signal over time</a>
+    </li>
+    <li>
+      <a href="../articles/estimate-deriv.html">2. Estimate the derivatives of a covidcast signal</a>
+    </li>
+    <li>
+      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of covidcast signals</a>
+    </li>
+  </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -124,7 +139,7 @@ in conjuction with the covidcast and evalcast packages." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>modeltools: Tools for Building COVID Forecasters and Related Models</h1>
+    <h1><code>modeltools</code>: Tools for Building COVID Forecasters and Related Models</h1>
     <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/main/R-packages/modeltools/R/modeltools.R'><code>R/modeltools.R</code></a></small>
     <div class="hidden name"><code>modeltools.Rd</code></div>
     </div>
@@ -149,7 +164,7 @@ in conjuction with the <code>covidcast</code> and <code>evalcast</code> packages
 
       <footer>
       <div class="copyright">
-  <p>Developed by Ryan Tibshirani.</p>
+  <p>Developed by Ryan Tibshirani, Addison Hu, Collin Politsch.</p>
 </div>
 
 <div class="pkgdown">

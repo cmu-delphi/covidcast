@@ -6,7 +6,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Estimate derivatives of values in covidcast_signal data frame — estimate_deriv • modeltools</title>
+<title>Estimate derivatives of values in
+covidcast_signal
+data frame — estimate_deriv • modeltools</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,7 +48,9 @@
 
 
 
-<meta property="og:title" content="Estimate derivatives of values in covidcast_signal data frame — estimate_deriv" />
+<meta property="og:title" content="Estimate derivatives of values in
+covidcast_signal
+data frame — estimate_deriv" />
 <meta property="og:description" content="Estimates derivatives of the values in a covidcast_signal data frame, using
 a local (in time) linear regression or smoothing spline. (When multiple issue
 dates are present, only the latest issue is considered.)  See the
@@ -84,7 +88,7 @@ for examples." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">modeltools</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -102,8 +106,23 @@ for examples." />
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li>
-  <a href="../articles/index.html">Articles</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/pct-change.html">1. Compute percentage change of a covidcast signal over time</a>
+    </li>
+    <li>
+      <a href="../articles/estimate-deriv.html">2. Estimate the derivatives of a covidcast signal</a>
+    </li>
+    <li>
+      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of covidcast signals</a>
+    </li>
+  </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -126,7 +145,9 @@ for examples." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Estimate derivatives of values in <code>covidcast_signal</code> data frame</h1>
+    <h1>Estimate derivatives of values in
+<a href='https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html'><code>covidcast_signal</code></a>
+data frame</h1>
     <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/main/R-packages/modeltools/R/deriv.R'><code>R/deriv.R</code></a></small>
     <div class="hidden name"><code>estimate_deriv.Rd</code></div>
     </div>
@@ -253,7 +274,7 @@ rule, respectively). Default is 8 when <code>cv = FALSE</code>, and "1se" when <
 
       <footer>
       <div class="copyright">
-  <p>Developed by Ryan Tibshirani.</p>
+  <p>Developed by Ryan Tibshirani, Addison Hu, Collin Politsch.</p>
 </div>
 
 <div class="pkgdown">

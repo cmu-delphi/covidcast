@@ -1,4 +1,4 @@
-# modeltools <tt>R</tt> package <a href="https://delphi.cmu.edu/"><img width="18%" src="man/figures/logo.png" align="right"/></a>
+# modeltools <tt>R</tt> package <a href="https://delphi.cmu.edu/"><img width="18%" src="man/figures/logo.png"/></a>
 
 Tools for building COVID-19 statistical models, with an emphasis on
 short-term forecasting and hotspot prediction. This package is meant to be 
@@ -10,14 +10,14 @@ used in conjunction with the
 headquartered at Carnegie Mellon University.
 
 **To get started** using this package, see the
-[Getting Started](../../docs/modeltoolsR/articles/modeltools.html)
+[**Getting Started**](../../docs/modeltoolsR/articles/modeltools.html)
 guide.
 
 
 ## Get updates
 
-**You should consider subscribing to the 
-[API mailing list](https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api)**
+You should consider subscribing to the 
+[API mailing list](https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api)
 to be notified of package updates, new data sources, corrections, and other updates.
 
 
@@ -26,7 +26,7 @@ to be notified of package updates, new data sources, corrections, and other upda
 **Warning:** This package is not on CRAN! An <tt>R</tt> package named 
 `modeltools` does exist on CRAN, but it is entirely unrelated to this one. 
 For our package, please follow the installation instructions in the 
-[Getting Started](../../docs/modeltoolsR/articles/modeltools.html)
+[**Getting Started**](../../docs/modeltoolsR/articles/modeltools.html)
 guide.
 
 

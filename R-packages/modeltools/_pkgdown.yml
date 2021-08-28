@@ -27,9 +27,6 @@ repo:
     user: https://github.com/
 
 reference:
-  - title: 
-  - contents:
-      - modeltools
   - title: Example forecasters
   - contents:
       - quantgen_forecaster

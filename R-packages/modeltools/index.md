@@ -50,7 +50,7 @@ Get the `evalcast` <tt>R</tt> package: <br/>
 
 ## Citation
 
-[Citing the `modeltools` package](../../docs/modeltoolsR/authors.html)
+[Citing the modeltools package](../../docs/modeltoolsR/authors.html)
 
 
 ## Developers

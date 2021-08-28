@@ -4,7 +4,7 @@ description: Estimate the derivatives of a covidcast signal, using various
   methods.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{2. Estimate the derivatives of a `covidcast` signal}
+  %\VignetteIndexEntry{2. Estimate the derivatives of a covidcast signal}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

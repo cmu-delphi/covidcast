@@ -4,7 +4,7 @@ description: Produce and evaluate quantile forecasts, based on `quantgen` and
   `evalcast`.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{3. Produce and evaluate quantile forecasts of `covidcast` signals}
+  %\VignetteIndexEntry{3. Produce and evaluate quantile forecasts of covidcast signals}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

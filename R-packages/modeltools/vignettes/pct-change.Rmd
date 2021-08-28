@@ -4,7 +4,7 @@ description: Compute the percentage change of covidcast signal values over
   time.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{1. Compute percentage change of a `covidcast` signal over time}
+  %\VignetteIndexEntry{1. Compute percentage change of a covidcast signal over time}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

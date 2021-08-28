@@ -30,14 +30,14 @@ reference:
   - title: 
   - contents:
       - modeltools
-  - title: Simple forecaster(s)
+  - title: Example forecasters
   - contents:
       - quantgen_forecaster
-  - title: Compute temporal changes
+  - title: Compute temporal changes in signals
   - contents:
       - estimate_deriv
       - pct_change
-  - title: Compute customized sliding operations
+  - title: Compute sliding operations on signals
   - contents:
       - slide_by_geo
   - title: COVID-19 Forecast Hub data

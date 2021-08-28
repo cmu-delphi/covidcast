@@ -1,5 +1,5 @@
 ---
-title: 3. Produce and evaluate quantile forecasts of `covidcast` signals
+title: 3. Produce and evaluate quantile forecasts of covidcast signals
 description: Produce and evaluate quantile forecasts, based on `quantgen` and 
   `evalcast`.
 output: rmarkdown::html_vignette

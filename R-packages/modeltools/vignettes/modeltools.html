@@ -137,7 +137,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<h1 class="title toc-ignore">Get started with <code>modeltools</code></h1>
+<h1 class="title toc-ignore">Get started with modeltools</h1>
 
 
 
@@ -148,67 +148,57 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><strong><em>Warning</em>: This package is not on CRAN! An <tt>R</tt> package named <code>modeltools</code> does exist on CRAN, but it is entirely unrelated to this one.</strong></p>
 </blockquote>
 <p>Our package is available on the Delphi research group’s <a href="https://github.com/cmu-delphi">GitHub page</a> and can be installed using the <a href="https://cran.r-project.org/package=devtools"><code>devtools</code></a> package, as shown below.</p>
-<div id="installing-with-vignettes" class="section level3">
-<h3>Installing with vignettes</h3>
-<p>If you wish to install <code>modeltools</code> with the tutorial vignettes (such as this <em>Getting started</em> guide) included (encouraged), then use the command below.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="at">repo =</span> <span class="st">&quot;cmu-delphi/covidcast&quot;</span>, <span class="at">ref =</span> <span class="st">&quot;collin-develop&quot;</span>,</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">subdir =</span> <span class="st">&quot;R-packages/modeltools&quot;</span>,</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">build_vignettes =</span> <span class="cn">TRUE</span>, <span class="at">dependencies =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
-<div id="installing-without-vignettes" class="section level3">
-<h3>Installing without vignettes</h3>
-<p>Building the <code>modeltools</code> vignettes adds some time to the package installation. If you wish to avoid this, you can install the vignette-less package with the following command:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="at">repo =</span> <span class="st">&quot;cmu-delphi/covidcast&quot;</span>, <span class="at">ref =</span> <span class="st">&quot;collin-develop&quot;</span>,</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">subdir =</span> <span class="st">&quot;R-packages/modeltools&quot;</span>)</span></code></pre></div>
-</div>
-</div>
-<div id="downloading-data-from-the-covidcast-api" class="section level2">
-<h2>Downloading data from the <code>covidcast</code> API</h2>
+<div id="downloading-data-from-the-delphi-api" class="section level2">
+<h2>Downloading data from the Delphi API</h2>
 <p>For this <em>Getting started</em> vignette, we will fetch U.S. COVID-19 case rates — both raw and smoothed with 7-day trailing averages — from the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">Delphi API</a>. These particular COVID-19 data signals are reported by the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html"><em>USAFacts</em></a> data source and then cloned into the Delphi API. Here, we will download the signals at the state level for four states over the time window June 1, 2020 to November 15, 2020.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(covidcast)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>start_day <span class="ot">&lt;-</span> <span class="st">&quot;2020-06-01&quot;</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>end_day <span class="ot">&lt;-</span> <span class="st">&quot;2020-11-15&quot;</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>geo_values <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;ca&quot;</span>, <span class="st">&quot;fl&quot;</span>, <span class="st">&quot;ny&quot;</span>, <span class="st">&quot;tx&quot;</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>signals <span class="ot">&lt;-</span> <span class="fu">covidcast_signals</span>(<span class="at">data_source =</span> <span class="st">&quot;usa-facts&quot;</span>,</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                             <span class="at">signal =</span> <span class="fu">c</span>(<span class="st">&quot;confirmed_incidence_prop&quot;</span>,</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;confirmed_7dav_incidence_prop&quot;</span>),</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>                             <span class="at">start_day =</span> start_day,</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                             <span class="at">end_day =</span> end_day,</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                             <span class="at">geo_type =</span> <span class="st">&quot;state&quot;</span>, </span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                             <span class="at">geo_values =</span> geo_values)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(covidcast)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>start_day <span class="ot">&lt;-</span> <span class="st">&quot;2020-06-01&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>end_day <span class="ot">&lt;-</span> <span class="st">&quot;2020-11-15&quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>geo_values <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;ca&quot;</span>, <span class="st">&quot;fl&quot;</span>, <span class="st">&quot;ny&quot;</span>, <span class="st">&quot;tx&quot;</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>signals <span class="ot">&lt;-</span> <span class="fu">covidcast_signals</span>(<span class="at">data_source =</span> <span class="st">&quot;usa-facts&quot;</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>                             <span class="at">signal =</span> <span class="fu">c</span>(<span class="st">&quot;confirmed_incidence_prop&quot;</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;confirmed_7dav_incidence_prop&quot;</span>),</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                             <span class="at">start_day =</span> start_day,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>                             <span class="at">end_day =</span> end_day,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>                             <span class="at">geo_type =</span> <span class="st">&quot;state&quot;</span>, </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>                             <span class="at">geo_values =</span> geo_values)</span></code></pre></div>
 <p>By default, the <code>covidcast_signals()</code> function returns the specified signals as a list of <code>covidcast_signal</code> data frames, with one data frame for each signal. So, in this case, <code>signals</code> is a list of two <code>covidcast_signal</code> data frames — the first being the raw COVID-19 case rates and the second being the COVID-19 case rates after smoothing with a 7-day trailing average. The <code>summary()</code> function can be called on each of these <code>covidcast_signal</code> data frames as follows:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(signals[[<span class="dv">1</span>]])</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="do">## A `covidcast_signal` dataframe with 672 rows and 12 columns.</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="do">## data_source : usa-facts</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="do">## signal      : confirmed_incidence_prop</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="do">## geo_type    : state</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="do">## first date                          : 2020-06-01</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="do">## last date                           : 2020-11-15</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="do">## median number of geo_values per day : 4</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(signals[[<span class="dv">2</span>]])</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="do">## A `covidcast_signal` dataframe with 672 rows and 12 columns.</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="do">## data_source : usa-facts</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="do">## signal      : confirmed_7dav_incidence_prop</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="do">## geo_type    : state</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="do">## first date                          : 2020-06-01</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="do">## last date                           : 2020-11-15</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="do">## median number of geo_values per day : 4</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(signals[[<span class="dv">1</span>]])</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="do">## A `covidcast_signal` dataframe with 672 rows and 12 columns.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="do">## data_source : usa-facts</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="do">## signal      : confirmed_incidence_prop</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="do">## geo_type    : state</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="do">## first date                          : 2020-06-01</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="do">## last date                           : 2020-11-15</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="do">## median number of geo_values per day : 4</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(signals[[<span class="dv">2</span>]])</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="do">## A `covidcast_signal` dataframe with 672 rows and 12 columns.</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="do">## data_source : usa-facts</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="do">## signal      : confirmed_7dav_incidence_prop</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="do">## geo_type    : state</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="do">## first date                          : 2020-06-01</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="do">## last date                           : 2020-11-15</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="do">## median number of geo_values per day : 4</span></span></code></pre></div>
 <p>Taking a peek at the first 5 rows of each of the two <code>covidcast_signal</code> data frames in the list:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>signals[[<span class="dv">1</span>]] <span class="sc">%&gt;%</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(data_source, signal, geo_value, time_value, value) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">format =</span> <span class="st">&quot;html&quot;</span>, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">&quot;U.S. COVID-19 case rates (raw)&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>signals[[<span class="dv">1</span>]] <span class="sc">%&gt;%</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(data_source, signal, geo_value, time_value, value) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">format =</span> <span class="st">&quot;html&quot;</span>, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">&quot;U.S. COVID-19 case rates (raw)&quot;</span>)</span></code></pre></div>
 <table>
 <caption>
 U.S. COVID-19 case rates (raw)
@@ -320,11 +310,11 @@ ca
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>signals[[<span class="dv">2</span>]] <span class="sc">%&gt;%</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(data_source, signal, geo_value, time_value, value) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="st">&quot;html&quot;</span>, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">&quot;U.S. COVID-19 case rates (7-day trailing average)&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>signals[[<span class="dv">2</span>]] <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(data_source, signal, geo_value, time_value, value) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="st">&quot;html&quot;</span>, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">&quot;U.S. COVID-19 case rates (7-day trailing average)&quot;</span>)</span></code></pre></div>
 <table>
 <caption>
 U.S. COVID-19 case rates (7-day trailing average)
@@ -449,17 +439,17 @@ ca
 <div id="example-1-computing-a-7-day-trailing-average-by-sliding-a-formula-over-the-raw-data" class="section level4">
 <h4>Example 1: Computing a 7-day trailing average by sliding a formula over the raw data</h4>
 <p>For example, to apply a 7-day trailing average to the raw values in the first <code>covidcast_signal</code> data frame fetched above (i.e. <code>signals[[1]]</code>), we can specify a formula via the <code>slide_fun</code> argument of <code>slide_by_geo()</code>, as follows:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(modeltools)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="at">slide_fun =</span> <span class="sc">~</span> <span class="fu">Mean</span>(.x<span class="sc">$</span>value), <span class="at">n =</span> <span class="dv">7</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(geo_value, time_value, value, slide_value) <span class="sc">%&gt;%</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geo_value) <span class="sc">%&gt;%</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">format =</span> <span class="st">&quot;html&quot;</span>, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="fu">paste</span>(<span class="st">&quot;U.S. COVID-19 case rates (7-day trailing average&quot;</span>, </span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;computed by sliding a formula)&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(modeltools)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="at">slide_fun =</span> <span class="sc">~</span> <span class="fu">Mean</span>(.x<span class="sc">$</span>value), <span class="at">n =</span> <span class="dv">7</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(geo_value, time_value, value, slide_value) <span class="sc">%&gt;%</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geo_value) <span class="sc">%&gt;%</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">format =</span> <span class="st">&quot;html&quot;</span>, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="fu">paste</span>(<span class="st">&quot;U.S. COVID-19 case rates (7-day trailing average&quot;</span>, </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;computed by sliding a formula)&quot;</span>))</span></code></pre></div>
 <table>
 <caption>
 U.S. COVID-19 case rates (7-day trailing average computed by sliding a formula)
@@ -625,13 +615,13 @@ ca
 </table>
 <p>The formula specified by <code>slide_fun</code> has access to all columns present in the original <code>covidcast_signal</code> data frame, and must be referred to with the prefix <code>.x$</code>. Here, the function <code>modeltools::Mean()</code> is a simple wrapper around <code>mean()</code> that omits <code>NA</code> values by default.</p>
 <p>Notice that the above <code>slide_by_geo()</code> call returns a data frame with a new column appended containing the results of the sliding operation specified by <code>slide_fun</code>. By default, this column is named <code>&quot;slide_value&quot;</code>, but alternative namings can be used by passing a string to the <code>col_name</code> argument in the original <code>slide_by_geo()</code> function call. For example:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="at">slide_fun =</span> <span class="sc">~</span> <span class="fu">Mean</span>(.x<span class="sc">$</span>value), <span class="at">n =</span> <span class="dv">7</span>, <span class="at">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(geo_value, time_value, value, <span class="st">`</span><span class="at">7dav</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geo_value) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">format =</span> <span class="st">&quot;html&quot;</span>, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="fu">paste</span>(<span class="st">&quot;U.S. COVID-19 case rates (7-day trailing average &quot;</span>,</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;computed by sliding a formula)&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="at">slide_fun =</span> <span class="sc">~</span> <span class="fu">Mean</span>(.x<span class="sc">$</span>value), <span class="at">n =</span> <span class="dv">7</span>, <span class="at">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(geo_value, time_value, value, <span class="st">`</span><span class="at">7dav</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geo_value) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">format =</span> <span class="st">&quot;html&quot;</span>, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="fu">paste</span>(<span class="st">&quot;U.S. COVID-19 case rates (7-day trailing average &quot;</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;computed by sliding a formula)&quot;</span>))</span></code></pre></div>
 <table>
 <caption>
 U.S. COVID-19 case rates (7-day trailing average computed by sliding a formula)
@@ -796,13 +786,13 @@ ca
 </tbody>
 </table>
 <p>As a simple sanity check, below we compare the 7-day trailing average computed via <code>slide_by_geo()</code> to the values of the smoothed signal from the Delphi API to ensure that they match (to machine precision). More specifically, the code chunk below computes the maximum absolute difference between the two 7-day trailing averages of the COVID-19 case rates signal, over all state-date pairs.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="at">slide_fun =</span> <span class="sc">~</span> <span class="fu">Mean</span>(.x<span class="sc">$</span>value), <span class="at">n =</span> <span class="dv">7</span>, <span class="at">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(signals[[<span class="dv">2</span>]], <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;geo_value&quot;</span>, <span class="st">&quot;time_value&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">difference =</span> <span class="st">`</span><span class="at">7dav</span><span class="st">`</span> <span class="sc">-</span> value.y) <span class="sc">%&gt;%</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(time_value <span class="sc">&gt;=</span> <span class="st">&quot;2020-06-07&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">max</span>(<span class="fu">abs</span>(difference))) <span class="sc">%&gt;%</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  as.numeric</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 6.757779e-08</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="at">slide_fun =</span> <span class="sc">~</span> <span class="fu">Mean</span>(.x<span class="sc">$</span>value), <span class="at">n =</span> <span class="dv">7</span>, <span class="at">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(signals[[<span class="dv">2</span>]], <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;geo_value&quot;</span>, <span class="st">&quot;time_value&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">difference =</span> <span class="st">`</span><span class="at">7dav</span><span class="st">`</span> <span class="sc">-</span> value.y) <span class="sc">%&gt;%</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(time_value <span class="sc">&gt;=</span> <span class="st">&quot;2020-06-07&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">max</span>(<span class="fu">abs</span>(difference))) <span class="sc">%&gt;%</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  as.numeric</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 6.757779e-08</span></span></code></pre></div>
 <p>The trivially small output of this sanity check confirms that <code>slide_by_geo()</code> is functioning as desired.</p>
 <p><strong>Note:</strong> This sanity check would <em>fail</em> without filtering the dates to <code>&gt;= &quot;2020-06-07&quot;</code> because the Delphi API has access to data before June 1, 2020, and can therefore return the 7-day trailing average of COVID-19 case rates <em>for all</em> days in the time window June 1, 2020 to November 15, 2020. On the other hand, since we are only providing <code>slide_by_geo()</code> with daily COVID-19 case rates beginning on June 1, 2020, the “7-day trailing average” computed by <code>slide_by_geo()</code> does not become a true <em>7-day average</em> until June 7, 2020. When a trailing window of <code>n</code> days is not available, <code>slide_by_geo()</code> just applies the function or formula to whatever data is available. So the “7-day trailing average” computed by <code>slide_by_geo()</code> for the dates June <code>n</code>th where <code>n = 1,...,6</code>, is actually just an <code>n</code>-day trailing average of the daily COVID-19 case rates.</p>
 </div>
@@ -818,13 +808,13 @@ ca
 <div id="example-2-computing-a-7-day-trailing-average-by-sliding-a-function-over-the-raw-data" class="section level4">
 <h4>Example 2: Computing a 7-day trailing average by sliding a function over the raw data</h4>
 <p>The code chunk below recreates <a href="#example-1-computing-a-7-day-trailing-average-by-sliding-a-formula-over-the-raw-data">Example 1</a>, but passes a function to the <code>slide_fun</code> argument instead of a formula.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="at">slide_fun =</span> <span class="cf">function</span>(x, ...) <span class="fu">Mean</span>(x<span class="sc">$</span>value), <span class="at">n =</span> <span class="dv">7</span>, <span class="at">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(geo_value, time_value, value, <span class="st">`</span><span class="at">7dav</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geo_value) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">format =</span> <span class="st">&quot;html&quot;</span>, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="fu">paste</span>(<span class="st">&quot;U.S. COVID-19 case rates (7-day trailing average computed by sliding&quot;</span>,</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;a function)&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="at">slide_fun =</span> <span class="cf">function</span>(x, ...) <span class="fu">Mean</span>(x<span class="sc">$</span>value), <span class="at">n =</span> <span class="dv">7</span>, <span class="at">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(geo_value, time_value, value, <span class="st">`</span><span class="at">7dav</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geo_value) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">format =</span> <span class="st">&quot;html&quot;</span>, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="fu">paste</span>(<span class="st">&quot;U.S. COVID-19 case rates (7-day trailing average computed by sliding&quot;</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;a function)&quot;</span>))</span></code></pre></div>
 <table>
 <caption>
 U.S. COVID-19 case rates (7-day trailing average computed by sliding a function)
@@ -992,38 +982,38 @@ ca
 <div id="example-3-advanced" class="section level4">
 <h4>Example 3 (advanced):</h4>
 <p>As a more sophisticated example, here we show how to <em>sensorize</em> the doctor visits signal. The sensor values are defined by the predicted values from a local (in time) regression of past case rates (response) on past doctor visits (covariate).</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Regression for doctor visits sensorization</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>dv_regression <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">m =</span> <span class="dv">3</span>, ...) {</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(x)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> ( n <span class="sc">&lt;=</span> m <span class="sc">+</span> <span class="dv">1</span> ) <span class="fu">return</span>(<span class="cn">NA</span>) <span class="co"># Take care of trivial case</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">tryCatch</span>(<span class="fu">suppressWarnings</span>(<span class="fu">suppressMessages</span>({</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Fit a regression, leaving out the last m days of data</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    lm_obj <span class="ot">&lt;-</span> <span class="fu">lm</span>(value.y <span class="sc">~</span> value.x, <span class="at">data =</span> x[<span class="dv">1</span><span class="sc">:</span>(n<span class="sc">-</span>m<span class="sc">+</span><span class="dv">1</span>), ])</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Form prediction for the last day of data, and return</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(lm_obj, <span class="at">newdata =</span> x[n, ])</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  })),</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">error =</span> <span class="cf">function</span>(e) <span class="fu">return</span>(<span class="cn">NA</span>)))</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Fetch doctor visits signal and join it to case rates</span></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>joined <span class="ot">&lt;-</span> <span class="fu">covidcast_signal</span>(<span class="at">data_source =</span> <span class="st">&quot;doctor-visits&quot;</span>,</span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>                           <span class="at">signal =</span> <span class="st">&quot;smoothed_adj_cli&quot;</span>,</span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>                           <span class="at">start_day =</span> start_day, </span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>                           <span class="at">end_day =</span> end_day,</span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>                           <span class="at">geo_type =</span> <span class="st">&quot;state&quot;</span>, </span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>                           <span class="at">geo_values =</span> geo_values) <span class="sc">%&gt;%</span></span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(signals[[<span class="dv">2</span>]], <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;geo_value&quot;</span>, <span class="st">&quot;time_value&quot;</span>))</span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform sensorization for each state; use the last n = 56 days (8 weeks) of </span></span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="co"># data, minus the last m = 3 days, for the regression</span></span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(joined, <span class="at">slide_fun =</span> dv_regression, <span class="at">n =</span> <span class="dv">56</span>, <span class="at">m =</span> <span class="dv">3</span>, </span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>             <span class="at">col_name =</span> <span class="st">&quot;sensor&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(geo_value, time_value, value.x, value.y, sensor) <span class="sc">%&gt;%</span></span>
-<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geo_value) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">format =</span> <span class="st">&quot;html&quot;</span>, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>, <span class="at">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Regression for doctor visits sensorization</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>dv_regression <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">m =</span> <span class="dv">3</span>, ...) {</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(x)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> ( n <span class="sc">&lt;=</span> m <span class="sc">+</span> <span class="dv">1</span> ) <span class="fu">return</span>(<span class="cn">NA</span>) <span class="co"># Take care of trivial case</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">tryCatch</span>(<span class="fu">suppressWarnings</span>(<span class="fu">suppressMessages</span>({</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Fit a regression, leaving out the last m days of data</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    lm_obj <span class="ot">&lt;-</span> <span class="fu">lm</span>(value.y <span class="sc">~</span> value.x, <span class="at">data =</span> x[<span class="dv">1</span><span class="sc">:</span>(n<span class="sc">-</span>m<span class="sc">+</span><span class="dv">1</span>), ])</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Form prediction for the last day of data, and return</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(lm_obj, <span class="at">newdata =</span> x[n, ])</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  })),</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">error =</span> <span class="cf">function</span>(e) <span class="fu">return</span>(<span class="cn">NA</span>)))</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Fetch doctor visits signal and join it to case rates</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>joined <span class="ot">&lt;-</span> <span class="fu">covidcast_signal</span>(<span class="at">data_source =</span> <span class="st">&quot;doctor-visits&quot;</span>,</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>                           <span class="at">signal =</span> <span class="st">&quot;smoothed_adj_cli&quot;</span>,</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>                           <span class="at">start_day =</span> start_day, </span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>                           <span class="at">end_day =</span> end_day,</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>                           <span class="at">geo_type =</span> <span class="st">&quot;state&quot;</span>, </span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>                           <span class="at">geo_values =</span> geo_values) <span class="sc">%&gt;%</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(signals[[<span class="dv">2</span>]], <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;geo_value&quot;</span>, <span class="st">&quot;time_value&quot;</span>))</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform sensorization for each state; use the last n = 56 days (8 weeks) of </span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="co"># data, minus the last m = 3 days, for the regression</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(joined, <span class="at">slide_fun =</span> dv_regression, <span class="at">n =</span> <span class="dv">56</span>, <span class="at">m =</span> <span class="dv">3</span>, </span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>             <span class="at">col_name =</span> <span class="st">&quot;sensor&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(geo_value, time_value, value.x, value.y, sensor) <span class="sc">%&gt;%</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geo_value) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">format =</span> <span class="st">&quot;html&quot;</span>, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>, <span class="at">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
 <table>
 <thead>
 <tr>

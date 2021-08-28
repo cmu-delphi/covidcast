@@ -1,6 +1,6 @@
 ---
-title: 2. Estimate the derivatives of a `covidcast` signal
-description: Estimate the derivatives of a `covidcast` signal, using various 
+title: 2. Estimate the derivatives of a covidcast signal
+description: Estimate the derivatives of a covidcast signal, using various 
   methods.
 output: rmarkdown::html_vignette
 vignette: >

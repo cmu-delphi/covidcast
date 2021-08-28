@@ -137,13 +137,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<h1 class="title toc-ignore">1. Compute percentage change of a <code>covidcast</code> signal over time</h1>
+<h1 class="title toc-ignore">1. Compute percentage change of a covidcast signal over time</h1>
 
 
 
 <p>A simple way of assessing the growth and decay of a <code>covidcast</code> signal is to look at the percentage change in its cumulative value between two adjacent time windows of equal length. We illustrate this in the current vignette using the <code>pct_change()</code> function from the <code>modeltools</code> package.</p>
-<div id="downloading-data-from-the-covidcast-api" class="section level2">
-<h2>Downloading data from the <code>covidcast</code> API</h2>
+<div id="downloading-data-from-the-delphi-api" class="section level2">
+<h2>Downloading data from the Delphi API</h2>
 <p>As in the <a href="https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html">Getting started guide</a>, we focus on state-level COVID-19 case rates from the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html"><em>USAFacts</em></a> data source, smoothed with 7-day trailing averages, from June 1, 2020 to November 15, 2020. The code chunk below fetches these data from the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">Delphi API</a>.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(covidcast)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>

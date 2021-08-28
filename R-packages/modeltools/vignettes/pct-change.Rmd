@@ -1,6 +1,6 @@
 ---
-title: 1. Compute percentage change of a `covidcast` signal over time
-description: Compute the percentage change of `covidcast` signal values over 
+title: 1. Compute percentage change of a covidcast signal over time
+description: Compute the percentage change of covidcast signal values over 
   time.
 output: rmarkdown::html_vignette
 vignette: >
@@ -19,7 +19,7 @@ windows of equal length. We illustrate this in the current vignette using the
 `pct_change()` function from the `modeltools` package. 
 
 
-## Downloading data from the `covidcast` API
+## Downloading data from the Delphi API
 
 As in the 
 [Getting started guide](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html), 

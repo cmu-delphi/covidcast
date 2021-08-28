@@ -1,4 +1,4 @@
-# `modeltools` <tt>R</tt> package <img src="man/figures/logo.png" align="right" />
+# modeltools <tt>R</tt> package <img src="man/figures/logo.png" align="right" />
 
 Tools for building COVID-19 statistical models, with an emphasis on
 short-term forecasting and hotspot prediction. This package is meant to be 
@@ -10,7 +10,7 @@ used in conjuction with the
 headquartered at Carnegie Mellon University.
 
 **To get started** using this package, see the
-[Getting Started](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html)
+[Getting Started](../../docs/modeltoolsR/articles/modeltools.html)
 guide.
 
 
@@ -25,8 +25,9 @@ to be notified of package updates, new data sources, corrections, and other upda
 **Warning:** This package is not on CRAN! An <tt>R</tt> package named 
 `modeltools` does exist on CRAN, but it is entirely unrelated to this one. 
 For our package, please follow the installation instructions in the 
-[Getting Started](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html)
+[Getting Started](../../docs/modeltoolsR/articles/modeltools.html)
 guide.
+
 
 ## Links
 

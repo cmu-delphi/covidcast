@@ -37,7 +37,7 @@ reference:
   - contents:
       - estimate_deriv
       - pct_change
-  - title: Compute sliding operations on signals
+  - title: Perform sliding operations on signals
   - contents:
       - slide_by_geo
   - title: COVID-19 Forecast Hub data

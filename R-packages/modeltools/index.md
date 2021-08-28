@@ -1,8 +1,8 @@
-# modeltools <tt>R</tt> package <img src="man/figures/logo.png" align="right" />
+# modeltools <tt>R</tt> package <a href="https://delphi.cmu.edu/"><img width="18%" src="man/figures/logo.png" align="right"/></a>
 
 Tools for building COVID-19 statistical models, with an emphasis on
 short-term forecasting and hotspot prediction. This package is meant to be 
-used in conjuction with the 
+used in conjunction with the 
 [`covidcast`](https://github.com/cmu-delphi/covidcast) and 
 [`evalcast`](https://github.com/cmu-delphi/covidcast/tree/main/R-packages/evalcast) 
 <tt>R</tt> packages that are also developed and maintained by the 
@@ -19,6 +19,7 @@ guide.
 **You should consider subscribing to the 
 [API mailing list](https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api)**
 to be notified of package updates, new data sources, corrections, and other updates.
+
 
 ## Usage
 

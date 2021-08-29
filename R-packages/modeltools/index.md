@@ -7,7 +7,7 @@ This package is meant to be used in conjunction with the
 [`covidcast`](https://cmu-delphi.github.io/covidcast/covidcastR) and 
 [`evalcast`](https://cmu-delphi.github.io/covidcast/evalcastR) 
 <tt>R</tt> packages that are also developed and maintained by the 
-[Delphi research group](https://delphi.cmu.edu/) 
+[**Delphi research group**](https://delphi.cmu.edu/) 
 headquartered at Carnegie Mellon University.
 
 **To get started** using the `modeltools` package, see this
@@ -19,8 +19,8 @@ guide.
 
 You should consider subscribing to the 
 [**Delphi COVIDcast Epidata API mailing list**](https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api)
-to be notified of package updates, new data sources, corrections, and other 
-updates from the Delphi research group.
+to receive notifications from the Delphi research group regarding package 
+updates, new data sources, data corrections, and other updates.
 
 
 ## Usage
@@ -63,7 +63,7 @@ Get the `evalcast` <tt>R</tt> package at: <br/>
 <ul class="list-unstyled">
 <li>Ryan Tibshirani <br><small class="roles"> Author, maintainer </small>
 <a href="https://orcid.org/0000-0002-2158-8304" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a></li>
-<li>Addison Hu <br><small class="roles"> Author </small>  </li>
 <li>Collin Politsch <br><small class="roles"> Author </small>  </li>
+<li>Addison Hu <br><small class="roles"> Author </small>  </li>
 <li><a href="../../docs/modeltoolsR/authors.html">All authors...</a></li>
 </ul>

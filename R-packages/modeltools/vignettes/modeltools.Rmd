@@ -1,9 +1,9 @@
 ---
-title: Get started with modeltools
+title: Getting started with modeltools
 description: An introductory tutorial with examples.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Get started with modeltools}
+  %\VignetteIndexEntry{Getting started with modeltools}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -12,30 +12,33 @@ vignette: >
 options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
-This package provides tools for building COVID-19 statistical models, with an 
-emphasis on short-term forecasting and hotspot prediction. It is designed to be 
-used in conjunction with the 
+This package provides tools for building data-driven statistical models for
+analyzing and forecasting the spread of the COVID-19 virus and other future 
+threats to public health, with an emphasis on short-term forecasting. It is 
+designed to be used in conjunction with the 
 [`covidcast`](https://cmu-delphi.github.io/covidcast/covidcastR/) and 
 [`evalcast`](https://cmu-delphi.github.io/covidcast/evalcastR/)
 <tt>R</tt> packages, which are also developed and maintained by the 
-[Delphi research group](https://delphi.cmu.edu) (headquartered at 
-Carnegie Mellon University).
+[Delphi research group](https://delphi.cmu.edu) headquartered at 
+Carnegie Mellon University.
 
 
 ## Installing
 
->**_Warning_: This package is not on CRAN!** <br/><br/>
-An <tt>R</tt> package named `modeltools` does exist on CRAN, but it is entirely 
-unrelated to this one. Our package is available on the Delphi research group's
-[GitHub page](https://github.com/cmu-delphi) and can be installed using the
+<font size="3">**_Warning_: This package is not on CRAN!**</font><br/><br/>
+An <tt>R</tt> package named "`modeltools`" does exist on CRAN, but it is entirely 
+unrelated to this one. Our `modeltools` package can be installed from the 
+Delphi research group's 
+[GitHub page](https://github.com/cmu-delphi/) using the
 [`devtools`](https://cran.r-project.org/package=devtools) package, as shown
-below.
+below. The source code for the package can be found
+[here](https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools).
 
 
 ### Installing with vignettes
 
-If you wish to install `modeltools` with the tutorial vignettes included 
-(encouraged), then use the command below.
+If you wish to install the `modeltools` package with the tutorial vignettes 
+included (encouraged), then use the command below.
 
 ```{r, eval = FALSE}
 devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
@@ -46,9 +49,11 @@ devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
 
 ### Installing without vignettes
 
-Building the `modeltools` vignettes adds a couple minutes to the package 
-installation. If you wish to avoid this, you can install the vignette-less 
-package with the following command:
+Building the vignettes for Delphi's 
+[`covidcast`](https://cmu-delphi.github.io/covidcast/covidcastR/) 
+package (a dependency of the `modeltools` package) adds a couple minutes to the 
+package installation. If you wish to avoid this, you can install the 
+`modeltools` package without vignettes with the following command:
 
 ```{r, eval = FALSE}
 devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
@@ -56,16 +61,16 @@ devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
 ```
 
 
-## Downloading data from the Delphi API
+## Downloading data from Delphi's Epidata API
 
-For this *Getting started* vignette, we will fetch U.S. COVID-19 case rates --- 
-both raw and smoothed with 7-day trailing averages --- from the [Delphi 
-API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html). 
-These particular COVID-19 data signals are reported by the 
-[*USAFacts*](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html)
-data source and then cloned into the Delphi API. Here, we will download the 
-signals at the state level for four states over the time window June 1, 2020 to 
-November 15, 2020.
+For this **_Getting started_** vignette, we will fetch U.S. COVID-19 case rates --- 
+both raw and smoothed with 7-day trailing averages --- from
+[**Delphi's Epidata API**](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html). 
+These particular COVID-19 data signals are reported by
+[**USAFacts**](https://usafacts.org/)
+and then cloned into Delphi's API. Here, we will download these COVID-19 case 
+rates at the state level over the time window June 1, 2020 to November 15, 2020 
+for four states --- CA, FL, NY, and TX.
 
 ```{r message = FALSE}
 library(covidcast)
@@ -83,11 +88,14 @@ signals <- covidcast_signals(data_source = "usa-facts",
                              geo_values = geo_values)
 ```
 
-By default, the `covidcast_signals()` function returns the specified signals as 
+By default, the 
+[`covidcast_signals()`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signals.html)
+function returns the specified signals as 
 a list of `covidcast_signal` data frames, with one data frame for each signal. 
 So, in this case, `signals` is a list of two `covidcast_signal` data frames ---
 the first being the raw COVID-19 case rates and the second being the COVID-19 
-case rates after smoothing with a 7-day trailing average. The `summary()` 
+case rates after smoothing with a 7-day trailing average. The 
+[`summary()`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/summary.covidcast_signal.html)
 function can be called on each of these `covidcast_signal` data frames as 
 follows:
 
@@ -121,7 +129,8 @@ signals[[2]] %>%
 ## Sliding
 
 One of the most basic tools in the `modeltools` package is the `slide_by_geo()`
-function which is based on the family of functions provided by the `slider` 
+function which is based on the family of functions provided by the 
+[`slider`](https://cran.r-project.org/web/packages/slider/vignettes/slider.html)
 package. 
 
 >**Definition: In `modeltools`, to *slide* means that, for each `geo_value`, we 
@@ -175,11 +184,12 @@ slide_by_geo(signals[[1]], slide_fun = ~ Mean(.x$value), n = 7, col_name = "7dav
                         "computed by sliding a formula)"))
 ```
 
-As a simple sanity check, below we compare the 7-day trailing average computed 
-via `slide_by_geo()` to the values of the smoothed signal from the Delphi API to
-ensure that they match (to machine precision). More specifically, the code chunk
-below computes the maximum absolute difference between the two 7-day trailing
-averages of the COVID-19 case rates signal, over all state-date pairs.
+As a simple sanity check, below we compare the 7-day trailing averages computed 
+via `slide_by_geo()` to the pre-computed 7-day trailing averages stored 
+in Delphi's Epidata API to ensure that they match (to machine precision). 
+More specifically, the code chunk below computes the maximum absolute difference
+between the two sets of 7-day trailing averages over all state-date pairs:
+$$\big\{\text{CA, FL, NY, TX}\big\} \times \big\{\text{date}: \text{date}\in \{\text{June 7, 2020, }\dots,\text{ November 15, 2020}\}\big\}.$$
 
 ```{r, collapse = TRUE}
 slide_by_geo(signals[[1]], slide_fun = ~ Mean(.x$value), n = 7, col_name = "7dav") %>%
@@ -191,20 +201,20 @@ slide_by_geo(signals[[1]], slide_fun = ~ Mean(.x$value), n = 7, col_name = "7dav
 ```
 
 The trivially small output of this sanity check confirms that `slide_by_geo()` 
-is functioning as desired.
+is functioning as desired. <br/><br/>
 
-**Note:** This sanity check would *fail* without filtering the dates to 
-`>= "2020-06-07"` because the Delphi API has access to data before June 1, 2020,
-and can therefore return the 7-day trailing average of COVID-19 case 
-rates *for all* days in the time window June 1, 2020 to November 15, 2020. On 
-the other hand, since we are only providing `slide_by_geo()` with daily COVID-19
-case rates beginning on June 1, 2020, the "7-day trailing average" computed by 
-`slide_by_geo()` does not become a true *7-day average* until June 7, 2020. 
-When a trailing window of `n` days is not available, `slide_by_geo()` just 
-applies the function or formula to whatever data is available. So the 
-"7-day trailing average" computed by `slide_by_geo()` for the dates June `n`th
-where `n = 1,...,6`, is actually just an `n`-day trailing average of the 
-daily COVID-19 case rates.
+**_Note_: This sanity check would fail** without filtering the dates to 
+`>= "2020-06-07"` because we are only providing `slide_by_geo()` with daily 
+COVID-19 case rates beginning on June 1, 2020, so the "7-day trailing average" 
+computed by `slide_by_geo()` does not become a true *7-day average* until 
+June 7, 2020. When a trailing window of `n` days is not available, 
+`slide_by_geo()` just applies the function or formula to whatever data *is* 
+available. So the "7-day trailing average" computed by `slide_by_geo()` for the
+dates June `n`th where `n = 1,...,6`, is actually just an `n`-day trailing 
+average of the daily COVID-19 case rates. On the other hand, the pre-computed 
+7-day trailing averages stored in Delphi's Epidata API are true 7-day averages
+for all dates June 1, 2020, $\dots$, November 15, 2020.
+
 
 
 ### Sliding with a function 

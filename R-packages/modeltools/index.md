@@ -1,47 +1,51 @@
-# modeltools <tt>R</tt> package <a href="https://delphi.cmu.edu/"><img width="18%" src="man/figures/logo.png"/></a>
+# modeltools <tt>R</tt> package <a href="https://delphi.cmu.edu/"><img src="man/figures/delphi_logo.png" height = 85><img src="man/figures/cmu_logo.png" height=55></a>
 
-Tools for building COVID-19 statistical models, with an emphasis on
-short-term forecasting and hotspot prediction. This package is meant to be 
-used in conjunction with the 
-[`covidcast`](https://github.com/cmu-delphi/covidcast) and 
-[`evalcast`](https://github.com/cmu-delphi/covidcast/tree/main/R-packages/evalcast) 
+This package provides tools for building data-driven statistical models for
+analyzing and forecasting the spread of the COVID-19 virus and other future 
+threats to public health, with an emphasis on short-term forecasting.
+This package is meant to be used in conjunction with the 
+[`covidcast`](https://cmu-delphi.github.io/covidcast/covidcastR) and 
+[`evalcast`](https://cmu-delphi.github.io/covidcast/evalcastR) 
 <tt>R</tt> packages that are also developed and maintained by the 
 [Delphi research group](https://delphi.cmu.edu/) 
 headquartered at Carnegie Mellon University.
 
-**To get started** using this package, see the
-[**Getting Started**](../../docs/modeltoolsR/articles/modeltools.html)
+**To get started** using the `modeltools` package, see this
+[**_Getting started_**](../../docs/modeltoolsR/articles/modeltools.html)
 guide.
 
 
 ## Get updates
 
 You should consider subscribing to the 
-[API mailing list](https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api)
-to be notified of package updates, new data sources, corrections, and other updates.
+[**Delphi COVIDcast Epidata API mailing list**](https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api)
+to be notified of package updates, new data sources, corrections, and other 
+updates from the Delphi research group.
 
 
 ## Usage
 
-**Warning:** This package is not on CRAN! An <tt>R</tt> package named 
-`modeltools` does exist on CRAN, but it is entirely unrelated to this one. 
-For our package, please follow the installation instructions in the 
-[**Getting Started**](../../docs/modeltoolsR/articles/modeltools.html)
+<font size="3">**_Warning_:** This package is not on CRAN!</font>
+
+An <tt>R</tt> package named "`modeltools`" does exist on CRAN, but it is 
+entirely unrelated to this one. To install Delphi's `modeltools` package, 
+please follow the installation instructions in this 
+[**_Getting started_**](../../docs/modeltoolsR/articles/modeltools.html)
 guide.
 
 
 ## Links
 
-Browse source code at: <br/>
+Browse the `modeltools` source code at: <br/>
 [https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools](https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools)
 
 Report a bug at: <br/>
 [https://github.com/cmu-delphi/covidcast/issues](https://github.com/cmu-delphi/covidcast/issues)
 
-Get the `covidcast` <tt>R</tt> package: <br/>
+Get the `covidcast` <tt>R</tt> package at: <br/>
 [https://cmu-delphi.github.io/covidcast/covidcastR](https://cmu-delphi.github.io/covidcast/covidcastR)
 
-Get the `evalcast` <tt>R</tt> package: <br/>
+Get the `evalcast` <tt>R</tt> package at: <br/>
 [https://cmu-delphi.github.io/covidcast/evalcastR](https://cmu-delphi.github.io/covidcast/evalcastR)
 
 

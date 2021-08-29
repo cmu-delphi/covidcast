@@ -1,10 +1,10 @@
 ---
-title: 2. Estimate the derivatives of a covidcast signal
-description: Estimate the derivatives of a covidcast signal, using various 
+title: 2. Estimating the derivatives of a covidcast signal
+description: Estimating the derivatives of a covidcast signal, using various 
   methods.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{2. Estimate the derivatives of a covidcast signal}
+  %\VignetteIndexEntry{2. Estimating the derivatives of a covidcast signal}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,7 +17,7 @@ In this vignette, we estimate derivatives of `covidcast` signals using the
 `estimate_deriv()` function from the `modeltools` package. 
 
 
-## Downloading data from the Delphi API
+## Downloading data from Delphi's Epidata API
 
 As in the 
 [Getting started guide](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html)

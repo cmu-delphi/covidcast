@@ -1,10 +1,10 @@
 ---
-title: 3. Produce and evaluate quantile forecasts of covidcast signals
-description: Produce and evaluate quantile forecasts, based on `quantgen` and 
+title: 3. Producing and evaluating quantile forecasts of covidcast signals
+description: Producing and evaluating quantile forecasts, based on `quantgen` and 
   `evalcast`.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{3. Produce and evaluate quantile forecasts of covidcast signals}
+  %\VignetteIndexEntry{3. Producing and evaluating quantile forecasts of covidcast signals}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

@@ -12,7 +12,7 @@
 
 
 
-<title>Get started with modeltools</title>
+<title>Getting started with modeltools</title>
 
 <script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
 
@@ -137,33 +137,31 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<h1 class="title toc-ignore">Get started with modeltools</h1>
+<h1 class="title toc-ignore">Getting started with modeltools</h1>
 
 
 
-<p>This package provides tools for building COVID-19 statistical models, with an emphasis on short-term forecasting and hotspot prediction. It is designed to be used in conjunction with the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/"><code>covidcast</code></a> and <a href="https://cmu-delphi.github.io/covidcast/evalcastR/"><code>evalcast</code></a> <tt>R</tt> packages, which are also developed and maintained by the <a href="https://delphi.cmu.edu">Delphi research group</a> (headquartered at Carnegie Mellon University).</p>
+<p>This package provides tools for building data-driven statistical models for analyzing and forecasting the spread of the COVID-19 virus and other future threats to public health, with an emphasis on short-term forecasting. It is designed to be used in conjunction with the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/"><code>covidcast</code></a> and <a href="https://cmu-delphi.github.io/covidcast/evalcastR/"><code>evalcast</code></a> <tt>R</tt> packages, which are also developed and maintained by the <a href="https://delphi.cmu.edu">Delphi research group</a> headquartered at Carnegie Mellon University.</p>
 <div id="installing" class="section level2">
 <h2>Installing</h2>
-<blockquote>
-<p><strong><em>Warning</em>: This package is not on CRAN!</strong> <br /><br /> An <tt>R</tt> package named <code>modeltools</code> does exist on CRAN, but it is entirely unrelated to this one. Our package is available on the Delphi research group’s <a href="https://github.com/cmu-delphi">GitHub page</a> and can be installed using the <a href="https://cran.r-project.org/package=devtools"><code>devtools</code></a> package, as shown below.</p>
-</blockquote>
+<p><font size="3"><strong><em>Warning</em>: This package is not on CRAN!</strong></font><br /><br /> An <tt>R</tt> package named “<code>modeltools</code>” does exist on CRAN, but it is entirely unrelated to this one. Our <code>modeltools</code> package can be installed from the Delphi research group’s <a href="https://github.com/cmu-delphi/">GitHub page</a> using the <a href="https://cran.r-project.org/package=devtools"><code>devtools</code></a> package, as shown below. The source code for the package can be found <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools">here</a>.</p>
 <div id="installing-with-vignettes" class="section level3">
 <h3>Installing with vignettes</h3>
-<p>If you wish to install <code>modeltools</code> with the tutorial vignettes included (encouraged), then use the command below.</p>
+<p>If you wish to install the <code>modeltools</code> package with the tutorial vignettes included (encouraged), then use the command below.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="at">repo =</span> <span class="st">&quot;cmu-delphi/covidcast&quot;</span>, <span class="at">ref =</span> <span class="st">&quot;collin-develop&quot;</span>,</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">subdir =</span> <span class="st">&quot;R-packages/modeltools&quot;</span>,</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">build_vignettes =</span> <span class="cn">TRUE</span>, <span class="at">dependencies =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 <div id="installing-without-vignettes" class="section level3">
 <h3>Installing without vignettes</h3>
-<p>Building the <code>modeltools</code> vignettes adds a couple minutes to the package installation. If you wish to avoid this, you can install the vignette-less package with the following command:</p>
+<p>Building the vignettes for Delphi’s <a href="https://cmu-delphi.github.io/covidcast/covidcastR/"><code>covidcast</code></a> package (a dependency of the <code>modeltools</code> package) adds a couple minutes to the package installation. If you wish to avoid this, you can install the <code>modeltools</code> package without vignettes with the following command:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="at">repo =</span> <span class="st">&quot;cmu-delphi/covidcast&quot;</span>, <span class="at">ref =</span> <span class="st">&quot;collin-develop&quot;</span>,</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">subdir =</span> <span class="st">&quot;R-packages/modeltools&quot;</span>)</span></code></pre></div>
 </div>
 </div>
-<div id="downloading-data-from-the-delphi-api" class="section level2">
-<h2>Downloading data from the Delphi API</h2>
-<p>For this <em>Getting started</em> vignette, we will fetch U.S. COVID-19 case rates — both raw and smoothed with 7-day trailing averages — from the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">Delphi API</a>. These particular COVID-19 data signals are reported by the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html"><em>USAFacts</em></a> data source and then cloned into the Delphi API. Here, we will download the signals at the state level for four states over the time window June 1, 2020 to November 15, 2020.</p>
+<div id="downloading-data-from-delphis-epidata-api" class="section level2">
+<h2>Downloading data from Delphi’s Epidata API</h2>
+<p>For this <strong><em>Getting started</em></strong> vignette, we will fetch U.S. COVID-19 case rates — both raw and smoothed with 7-day trailing averages — from <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html"><strong>Delphi’s Epidata API</strong></a>. These particular COVID-19 data signals are reported by <a href="https://usafacts.org/"><strong>USAFacts</strong></a> and then cloned into Delphi’s API. Here, we will download these COVID-19 case rates at the state level over the time window June 1, 2020 to November 15, 2020 for four states — CA, FL, NY, and TX.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(covidcast)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>start_day <span class="ot">&lt;-</span> <span class="st">&quot;2020-06-01&quot;</span></span>
@@ -177,7 +175,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                             <span class="at">end_day =</span> end_day,</span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                             <span class="at">geo_type =</span> <span class="st">&quot;state&quot;</span>, </span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                             <span class="at">geo_values =</span> geo_values)</span></code></pre></div>
-<p>By default, the <code>covidcast_signals()</code> function returns the specified signals as a list of <code>covidcast_signal</code> data frames, with one data frame for each signal. So, in this case, <code>signals</code> is a list of two <code>covidcast_signal</code> data frames — the first being the raw COVID-19 case rates and the second being the COVID-19 case rates after smoothing with a 7-day trailing average. The <code>summary()</code> function can be called on each of these <code>covidcast_signal</code> data frames as follows:</p>
+<p>By default, the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signals.html"><code>covidcast_signals()</code></a> function returns the specified signals as a list of <code>covidcast_signal</code> data frames, with one data frame for each signal. So, in this case, <code>signals</code> is a list of two <code>covidcast_signal</code> data frames — the first being the raw COVID-19 case rates and the second being the COVID-19 case rates after smoothing with a 7-day trailing average. The <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/summary.covidcast_signal.html"><code>summary()</code></a> function can be called on each of these <code>covidcast_signal</code> data frames as follows:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(signals[[<span class="dv">1</span>]])</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="do">## A `covidcast_signal` dataframe with 672 rows and 12 columns.</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
@@ -438,7 +436,7 @@ ca
 </div>
 <div id="sliding" class="section level2">
 <h2>Sliding</h2>
-<p>One of the most basic tools in the <code>modeltools</code> package is the <code>slide_by_geo()</code> function which is based on the family of functions provided by the <code>slider</code> package.</p>
+<p>One of the most basic tools in the <code>modeltools</code> package is the <code>slide_by_geo()</code> function which is based on the family of functions provided by the <a href="https://cran.r-project.org/web/packages/slider/vignettes/slider.html"><code>slider</code></a> package.</p>
 <blockquote>
 <p><strong>Definition: In <code>modeltools</code>, to <em>slide</em> means that, for each <code>geo_value</code>, we apply a user-specified function or formula over a trailing window of <code>n</code> days of data.</strong></p>
 </blockquote>
@@ -794,7 +792,7 @@ ca
 </tr>
 </tbody>
 </table>
-<p>As a simple sanity check, below we compare the 7-day trailing average computed via <code>slide_by_geo()</code> to the values of the smoothed signal from the Delphi API to ensure that they match (to machine precision). More specifically, the code chunk below computes the maximum absolute difference between the two 7-day trailing averages of the COVID-19 case rates signal, over all state-date pairs.</p>
+<p>As a simple sanity check, below we compare the 7-day trailing averages computed via <code>slide_by_geo()</code> to the pre-computed 7-day trailing averages stored in Delphi’s Epidata API to ensure that they match (to machine precision). More specifically, the code chunk below computes the maximum absolute difference between the two sets of 7-day trailing averages over all state-date pairs: <span class="math display">\[\big\{\text{CA, FL, NY, TX}\big\} \times \big\{\text{date}: \text{date}\in \{\text{June 7, 2020, }\dots,\text{ November 15, 2020}\}\big\}.\]</span></p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="at">slide_fun =</span> <span class="sc">~</span> <span class="fu">Mean</span>(.x<span class="sc">$</span>value), <span class="at">n =</span> <span class="dv">7</span>, <span class="at">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(signals[[<span class="dv">2</span>]], <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;geo_value&quot;</span>, <span class="st">&quot;time_value&quot;</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">difference =</span> <span class="st">`</span><span class="at">7dav</span><span class="st">`</span> <span class="sc">-</span> value.y) <span class="sc">%&gt;%</span></span>
@@ -802,8 +800,8 @@ ca
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">max</span>(<span class="fu">abs</span>(difference))) <span class="sc">%&gt;%</span></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  as.numeric</span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 6.757779e-08</span></span></code></pre></div>
-<p>The trivially small output of this sanity check confirms that <code>slide_by_geo()</code> is functioning as desired.</p>
-<p><strong>Note:</strong> This sanity check would <em>fail</em> without filtering the dates to <code>&gt;= &quot;2020-06-07&quot;</code> because the Delphi API has access to data before June 1, 2020, and can therefore return the 7-day trailing average of COVID-19 case rates <em>for all</em> days in the time window June 1, 2020 to November 15, 2020. On the other hand, since we are only providing <code>slide_by_geo()</code> with daily COVID-19 case rates beginning on June 1, 2020, the “7-day trailing average” computed by <code>slide_by_geo()</code> does not become a true <em>7-day average</em> until June 7, 2020. When a trailing window of <code>n</code> days is not available, <code>slide_by_geo()</code> just applies the function or formula to whatever data is available. So the “7-day trailing average” computed by <code>slide_by_geo()</code> for the dates June <code>n</code>th where <code>n = 1,...,6</code>, is actually just an <code>n</code>-day trailing average of the daily COVID-19 case rates.</p>
+<p>The trivially small output of this sanity check confirms that <code>slide_by_geo()</code> is functioning as desired. <br /><br /></p>
+<p><strong><em>Note</em>: This sanity check would fail</strong> without filtering the dates to <code>&gt;= &quot;2020-06-07&quot;</code> because we are only providing <code>slide_by_geo()</code> with daily COVID-19 case rates beginning on June 1, 2020, so the “7-day trailing average” computed by <code>slide_by_geo()</code> does not become a true <em>7-day average</em> until June 7, 2020. When a trailing window of <code>n</code> days is not available, <code>slide_by_geo()</code> just applies the function or formula to whatever data <em>is</em> available. So the “7-day trailing average” computed by <code>slide_by_geo()</code> for the dates June <code>n</code>th where <code>n = 1,...,6</code>, is actually just an <code>n</code>-day trailing average of the daily COVID-19 case rates. On the other hand, the pre-computed 7-day trailing averages stored in Delphi’s Epidata API are true 7-day averages for all dates June 1, 2020, <span class="math inline">\(\dots\)</span>, November 15, 2020.</p>
 </div>
 </div>
 <div id="sliding-with-a-function" class="section level3">

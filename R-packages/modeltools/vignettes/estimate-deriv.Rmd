@@ -67,6 +67,33 @@ First we illustrate the default method for derivative estimation
 `method = "lin"`, which uses the slope from a simple linear regression. Here 
 we also use the default trailing number of days `n = 14`.
 
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# Function for displaying nice html table heads
+library(knitr)
+library(kableExtra)
+table_head <- function(x, nrows = 6, title = NULL, footnote = NULL){
+
+  kbl.out <- x %>%
+    head(nrows) %>%
+    kbl(format = "html", digits = 3) %>%
+    kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+  
+  if ( !is.null(title) ){
+    header <- ncol(x)
+    names(header) <- title
+    kbl.out <- kbl.out %>% add_header_above(header, font_size = 15, line = F)
+  }
+  if ( !is.null(footnote) ){
+    kbl.out <- kbl.out %>% add_footnote(footnote, notation = "symbol")
+  }
+  if ( nrows > 20 ){
+    kbl.out <- kbl.out %>% 
+      scroll_box(width = "100%", height = "300px", box_css = "border: 0px solid #fff; padding: 2px; ")
+  }
+  return(kbl.out)
+}
+```
+
 ```{r, message = FALSE, warning = FALSE}
 case_rates <- estimate_deriv(case_rates, method = "lin", n = 14)
 

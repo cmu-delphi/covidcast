@@ -1,42 +1,45 @@
 Package: modeltools
 Type: Package
-Title: Tools for Building COVID Forecasters and Related Models 
+Title: Tools for Analyzing COVID-19 Data Streams and Building Forecasters
 Version: 0.2.0
-Date: 2021-08-27
+Date: 2021-09-05
 Authors@R:
 	c(
-    person(given = "Ryan",
+    person(given = "Ryan J.",
            family = "Tibshirani",
            role = c("aut", "cre"),
            email = "ryantibs@cmu.edu",
            comment = c(ORCID = "0000-0002-2158-8304")),
-    person(given = "Collin",
+    person(given = "Collin A.",
            family = "Politsch",
-           role = "aut"),
-    person(given = "Addison",
+           role = "aut",
+           comment = c(ORCID = "0000-0003-3727-9167")),
+    person(given = "Addison J.",
            family = "Hu",
-           role = "aut"),
+           role = "aut",
+           comment = c(ORCID = "0000-0002-9339-7291")),
     person(given = "Jacob",
            family = "Bien",
            role = "ctb"),
     person(given = "Jed",
            family = "Grabman",
            role = "ctb"),
-    person(given = "Daniel",
+    person(given = "Daniel J.",
            family = "McDonald",
            role = "ctb"),
     person(given = "Mike",
            family = "O'Brien",
            role = "ctb"),
-    person(given = "Kenneth",
+    person(given = "J. Kenneth",
            family = "Tay",
-           role = "ctb"))
+           role = "ctb")
+    )
 URL: https://github.com/cmu-delphi/covidcast
-Description: Tools for building COVID-19 statistical models, with an emphasis on
-    short-term forecasting and hotspot prediction. This package is meant to be 
-    used in conjuction with the `covidcast` and `evalcast` <tt>R</tt> packages 
-    that are also developed and maintained by the Delphi research group 
-    headquartered at Carnegie Mellon University.
+Description: Tools for analyzing the trajectories of COVID-19 data streams and 
+    building short-term forecasters. This package is developed and maintained by 
+    the Delphi research group headquartered at Carnegie Mellon University and 
+    is designed to be used in conjunction with Delphi's `covidcast` and 
+    `evalcast` <tt>R</tt> packages.
 License: MIT
 Encoding: UTF-8
 LazyData: true

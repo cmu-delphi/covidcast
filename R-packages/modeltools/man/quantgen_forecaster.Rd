@@ -2,7 +2,7 @@
 % Please edit documentation in R/quantgen.R
 \name{quantgen_forecaster}
 \alias{quantgen_forecaster}
-\title{Simple quantile autoregressive forecaster based on
+\title{Simple autoregressive quantile forecaster based on
 \href{https://github.com/ryantibs/quantgen}{\code{quantgen}}}
 \usage{
 quantgen_forecaster(
@@ -139,7 +139,7 @@ Data frame with columns \code{ahead}, \code{geo_value}, \code{quantile}, and
 quantile forecasts for that location and ahead.
 }
 \description{
-A simple quantile autoregressive forecaster based on \code{quantgen}, to be used
+A simple autoregressive quantile forecaster based on \code{quantgen}, to be used
 with \code{evalcast}, via \code{\link[evalcast:get_predictions]{evalcast::get_predictions()}}. See the \href{https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/quantgen-forecast.html}{quantgen forecast vignette}
 for examples.
 }

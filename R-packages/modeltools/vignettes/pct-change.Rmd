@@ -22,17 +22,16 @@ windows of equal length. We illustrate this in the current vignette using the
 ## Downloading data from Delphi's Epidata API
 
 As in the 
-[Getting started guide](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html), 
-we focus on state-level COVID-19 case rates from the 
-[*USAFacts*](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html) 
+[**_Getting started_**](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html)
+guide, we focus on state-level COVID-19 case rates from the 
+[**USAFacts**](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html) 
 data source, smoothed with 7-day trailing averages, from June 1, 2020 to 
 November 15, 2020. The code chunk below fetches these data from the 
-[Delphi API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html).
+[**Delphi API**](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html).
 
 ```{r message = FALSE}
 library(covidcast)
 library(dplyr)
-library(knitr)
 
 start_day <- "2020-06-01"
 end_day <- "2020-11-15"
@@ -46,12 +45,42 @@ case_rates <- covidcast_signal(data_source = "usa-facts",
                                geo_values = geo_values)
 ```
 
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# Function for displaying nice html table heads
+library(knitr)
+library(kableExtra)
+table_head <- function(x, nrows = 6, title = NULL, footnote = NULL){
+
+  kbl.out <- x %>%
+    head(nrows) %>%
+    kbl(format = "html", digits = 3) %>%
+    kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+  
+  if ( !is.null(title) ){
+    header <- ncol(x)
+    names(header) <- title
+    kbl.out <- kbl.out %>% add_header_above(header, font_size = 15, line = F)
+  }
+  if ( !is.null(footnote) ){
+    kbl.out <- kbl.out %>% add_footnote(footnote, notation = "symbol")
+  }
+  if ( nrows > 20 ){
+    kbl.out <- kbl.out %>% 
+      scroll_box(width = "100%", height = "300px", box_css = "border: 0px solid #fff; padding: 2px; ")
+  }
+  return(kbl.out)
+}
+```
+
 ```{r echo = FALSE}
 case_rates %>%
   select(data_source, signal, geo_value, time_value, value) %>% 
-  head(5) %>%
-  kable("html", digits = 3, caption = "U.S. COVID-19 case rates (7-day trailing average)")
+  table_head(title = "Daily COVID-19 cases per 100,000 (7-day trailing average)")
 ```
+
+The `table_head` function used above is a custom function for displaying nice 
+table heads in HTML. See the [`vignettes/pct-change.Rmd`](pct-change.Rmd) 
+file used to build this page to see the function's source code.
 
 
 ## Percentage change
@@ -89,23 +118,21 @@ one-line call to `pct_change()`:
 
 ```{r, message = FALSE, warning = FALSE}
 library(modeltools)
-
 case_rates <- pct_change(case_rates, n = 14)
 ```
 
 
 Now inspecting the output data frame:
 
-```{r, message = FALSE}
-library(dplyr)
-library(knitr)
-
+```{r, message = FALSE, echo = FALSE}
 case_rates %>% 
   arrange(geo_value) %>% 
   select(geo_value, time_value, value, pct_change) %>%
-  head(21) %>%
-  kable(format = "html", digits = 3, caption = paste("U.S. COVID-19 case rates (with",
-                                                     "weekly percentage change)"))
+  head(30) %>%
+  kbl(format = "html", digits = 3, booktabs = TRUE, centering = TRUE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
+  add_header_above(c("U.S. COVID-19 case rates (with weekly percentage change)" = 4), align = "c", font_size = "large", line = F) %>% 
+  scroll_box(width = "100%", height = "300px", box_css = "border: 0px solid #fff; padding: 2px; ")
 ```
 
 We do not allow missing values in the percentage change calculation, so as we
@@ -156,14 +183,17 @@ series with a 7-day trailing average via a suitable application of
 case_rates <- case_rates %>%
   pct_change(n = 2, col_name = "pct_change_daily") %>%
   slide_by_geo(~ Mean(.x$pct_change_daily), n = 7, col_name = "pct_change_daily_7dav")
+```
 
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 case_rates %>%
   arrange(geo_value) %>% 
   select(geo_value, time_value, value, pct_change_daily, pct_change_daily_7dav) %>%
-  head(n = 7) %>%
-  kable(format = "html", digits = 3, caption = paste("U.S. COVID-19 case rates (with",
-                                                     "daily percentage change and",
-                                                     "post-hoc 7-day trailing average)"))
+  head(n = 25) %>%
+  kbl(format = "html", digits = 3, booktabs = TRUE, centering = TRUE) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
+  add_header_above(c("U.S. COVID-19 case rates (with daily % change and post-hoc trailing average)" = 5), align = "c", font_size = "large", line = F) %>% 
+  scroll_box(width = "100%", height = "300px", box_css = "border: 0px solid #fff; padding: 2px; ")
 ```
 
 

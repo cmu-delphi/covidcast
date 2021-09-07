@@ -145,7 +145,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <div id="installing" class="section level2">
 <h2>Installing</h2>
-<p><font size="3"><strong><em>Warning</em>: This package is not on CRAN!</strong></font><br /><br /> An <tt>R</tt> package named “<code>modeltools</code>” does exist on CRAN, but it is completely unrelated to this one. The Delphi research group’s <code>modeltools</code> package can be installed from Delphi’s <a href="https://github.com/cmu-delphi/"><strong>GitHub page</strong></a> using the <a href="https://cran.r-project.org/package=devtools"><code>devtools</code></a> package, as shown below. The package’s source code can be found <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools"><strong>here</strong></a>.</p>
+<p><font size="3"><strong><em>Warning</em>: This package is not on CRAN!</strong></font><br /><br /> An <tt>R</tt> package named “<code>modeltools</code>” does exist on CRAN, but it is entirely unrelated to this one. Delphi’s <code>modeltools</code> package can be installed from the Delphi research group <a href="https://github.com/cmu-delphi/"><strong>GitHub page</strong></a> using the <a href="https://cran.r-project.org/package=devtools"><code>devtools</code></a> package, as shown below. The package’s source code can be found <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools"><strong>here</strong></a>.</p>
 <div id="installing-with-vignettes" class="section level3">
 <h3>Installing with vignettes</h3>
 <p>If you would like to install the <code>modeltools</code> package with tutorial vignettes included (recommended), then use the following command:</p>
@@ -155,7 +155,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="installing-without-vignettes" class="section level3">
 <h3>Installing without vignettes</h3>
-<p>Building the vignettes for Delphi’s <a href="https://cmu-delphi.github.io/covidcast/covidcastR/"><code>covidcast</code></a> package (a <code>modeltools</code> dependency) adds a couple minutes to the installation. If you prefer a quicker installation, you can install <code>modeltools</code> without vignettes (the default setting):</p>
+<p>Building the vignettes for Delphi’s <a href="https://cmu-delphi.github.io/covidcast/covidcastR/"><code>covidcast</code></a> package (a <code>modeltools</code> dependency) causes the above installation to take a couple minutes. If you prefer a quick installation, you can install <code>modeltools</code> without vignettes (the default setting):</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="at">repo =</span> <span class="st">&quot;cmu-delphi/covidcast&quot;</span>, <span class="at">ref =</span> <span class="st">&quot;collin-develop&quot;</span>,</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">subdir =</span> <span class="st">&quot;R-packages/modeltools&quot;</span>)</span></code></pre></div>
 <p><br /></p>
@@ -178,7 +178,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                             <span class="at">geo_type =</span> <span class="st">&quot;state&quot;</span>, </span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                             <span class="at">geo_values =</span> geo_values)</span></code></pre></div>
 <p><br /></p>
-<p>By default, the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signals.html"><code>covidcast_signals()</code></a> function returns the requested signals as a list of <code>covidcast_signal</code> data frames, with one data frame for each signal. So, in this case, <code>signals</code> is a list of two <code>covidcast_signal</code> data frames — the first containing the raw daily case rates and the second containing the smoothed case rates. The <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/summary.covidcast_signal.html"><code>summary()</code></a> function can be called on each of these <code>covidcast_signal</code> data frames, as below.</p>
+<p>By default, the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signals.html"><code>covidcast_signals()</code></a> function returns the requested signals as a list of <code>covidcast_signal</code> data frames, with one data frame for each signal. The <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/summary.covidcast_signal.html"><code>summary()</code></a> function can be called on each of these <code>covidcast_signal</code> data frames, as below.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(signals[[<span class="dv">1</span>]])</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="do">## A `covidcast_signal` dataframe with 672 rows and 12 columns.</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
@@ -201,18 +201,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="do">## last date                           : 2020-11-15</span></span>
 <span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="do">## median number of geo_values per day : 4</span></span></code></pre></div>
 <p><br /></p>
-<p>As shown in the summary output above, each of the <code>covidcast_signal</code> data frames in the list has 12 columns. Here, we’ll only need the 5 columns selected below. A full description of the USAFacts reporting data stored in Delphi’s API can be found <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html">here</a>.</p>
+<p>As shown in the summary output above, each of the fetched <code>covidcast_signal</code> data frames in the list has 12 columns. Here, we’ll only need the 5 columns selected below. A full description of the USAFacts reporting data stored in Delphi’s API can be found <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html">here</a>.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>signals[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> signals[[<span class="dv">1</span>]] <span class="sc">%&gt;%</span> <span class="fu">select</span>(data_source, signal, geo_value, time_value, value)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>signals[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> signals[[<span class="dv">2</span>]] <span class="sc">%&gt;%</span> <span class="fu">select</span>(data_source, signal, geo_value, time_value, value)</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>signals[[<span class="dv">1</span>]] <span class="sc">%&gt;%</span> <span class="fu">table_head</span>(<span class="at">title =</span> <span class="st">&quot;Daily COVID-19 cases per 100,000 (raw reported)&quot;</span>)</span></code></pre></div>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>signals[[<span class="dv">1</span>]] <span class="sc">%&gt;%</span> <span class="fu">table_head</span>(<span class="at">title =</span> <span class="st">&quot;Daily COVID-19 cases per 100,000 pop. (reported values)&quot;</span>)</span></code></pre></div>
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-size: 15px;" colspan="5">
 <div style>
-Daily COVID-19 cases per 100,000 (raw reported)
+Daily COVID-19 cases per 100,000 pop. (reported values)
 </div>
 </th>
 </tr>
@@ -339,13 +339,13 @@ fl
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>signals[[<span class="dv">2</span>]] <span class="sc">%&gt;%</span> <span class="fu">table_head</span>(<span class="at">title =</span> <span class="st">&quot;Daily COVID-19 cases per 100,000 (7-day trailing average)&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>signals[[<span class="dv">2</span>]] <span class="sc">%&gt;%</span> <span class="fu">table_head</span>(<span class="at">title =</span> <span class="st">&quot;Daily COVID-19 cases per 100,000 pop. (7-day trailing average)&quot;</span>)</span></code></pre></div>
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-size: 15px;" colspan="5">
 <div style>
-Daily COVID-19 cases per 100,000 (7-day trailing average)
+Daily COVID-19 cases per 100,000 pop. (7-day trailing average)
 </div>
 </th>
 </tr>
@@ -472,7 +472,7 @@ fl
 </tr>
 </tbody>
 </table>
-<p>The <code>table_head</code> function used above is a custom function for displaying nice table heads in HTML. See the <a href="modeltools.Rmd"><code>vignettes/modeltools.Rmd</code></a> file used to build this page to see the function’s source code.</p>
+<p>The <code>table_head</code> function used above is a custom function that we use in these tutorial vignettes to display table heads. The source code can be found in the <a href="modeltools.Rmd"><code>vignettes/modeltools.Rmd</code></a> file used to build this page.</p>
 </div>
 <div id="sliding" class="section level2">
 <h2>Sliding</h2>
@@ -489,14 +489,13 @@ fl
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(modeltools)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="at">slide_fun =</span> <span class="sc">~</span> <span class="fu">Mean</span>(.x<span class="sc">$</span>value), <span class="at">n =</span> <span class="dv">7</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">table_head</span>(<span class="at">title =</span> <span class="st">&quot;Daily COVID-19 cases per 100,000 (7-day trailing average)&quot;</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">footnote =</span> <span class="st">&quot;Trailing averages computed by sliding a formula&quot;</span>)</span></code></pre></div>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">table_head</span>(<span class="at">title =</span> <span class="st">&quot;Daily COVID-19 cases per 100,000 pop. (7-day trailing average)&quot;</span>)</span></code></pre></div>
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-size: 15px;" colspan="6">
 <div style>
-Daily COVID-19 cases per 100,000 (7-day trailing average)
+Daily COVID-19 cases per 100,000 pop. (7-day trailing average)
 </div>
 </th>
 </tr>
@@ -643,26 +642,18 @@ confirmed_incidence_prop
 </td>
 </tr>
 </tbody>
-<tfoot>
-<tr>
-<td style="padding: 0; border:0;" colspan="100%">
-<sup>*</sup> Trailing averages computed by sliding a formula
-</td>
-</tr>
-</tfoot>
 </table>
 <p><br /></p>
 <p>The formula specified by <code>slide_fun</code> has access to all columns present in the original <code>covidcast_signal</code> data frame, and must be referred to with the prefix <code>.x$</code>. Here, the function <code>modeltools::Mean()</code> is a simple wrapper around <code>mean()</code> that omits <code>NA</code> values by default.</p>
 <p>Notice that the above <code>slide_by_geo()</code> call returns a data frame with a new column appended that contains the results of the sliding operation specified by <code>slide_fun</code>. By default, this column is named <code>&quot;slide_value&quot;</code>, but alternate names can be passed to <code>slide_by_geo()</code>, as follows:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="at">slide_fun =</span> <span class="sc">~</span> <span class="fu">Mean</span>(.x<span class="sc">$</span>value), <span class="at">n =</span> <span class="dv">7</span>, <span class="at">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">table_head</span>(<span class="at">title =</span> <span class="st">&quot;Daily COVID-19 cases per 100,000 (7-day trailing average)&quot;</span>,</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">footnote =</span> <span class="st">&quot;Trailing averages computed by sliding a formula&quot;</span>)</span></code></pre></div>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">table_head</span>(<span class="at">title =</span> <span class="st">&quot;Daily COVID-19 cases per 100,000 pop. (7-day trailing average)&quot;</span>)</span></code></pre></div>
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-size: 15px;" colspan="6">
 <div style>
-Daily COVID-19 cases per 100,000 (7-day trailing average)
+Daily COVID-19 cases per 100,000 pop. (7-day trailing average)
 </div>
 </th>
 </tr>
@@ -809,13 +800,6 @@ confirmed_incidence_prop
 </td>
 </tr>
 </tbody>
-<tfoot>
-<tr>
-<td style="padding: 0; border:0;" colspan="100%">
-<sup>*</sup> Trailing averages computed by sliding a formula
-</td>
-</tr>
-</tfoot>
 </table>
 <p><br /></p>
 <p>Since this example is meant to reproduce the 7-day trailing average calculation carried out by the Delphi API, the values in the <code>7dav</code> column should match the pre-computed smoothed daily case rates signal stored in the API (to machine precision). To check this, the code chunk below calculates the maximum absolute difference between the two 7-day trailing averages, over all state-date pairs: <span class="math display">\[\big\{\text{CA, FL, NY, TX}\big\} \times \big\{\text{date}: \text{date}\in \{\text{June 7, 2020, }\dots,\text{ November 15, 2020}\}\big\}.\]</span></p>
@@ -840,16 +824,15 @@ confirmed_incidence_prop
 </ol>
 <div id="example-2-computing-a-7-day-trailing-average-by-sliding-a-function" class="section level4">
 <h4>Example 2: Computing a 7-day trailing average by sliding a function</h4>
-<p>The code chunk below reproduces <a href="#example-1-computing-a-7-day-trailing-average-by-sliding-a-formula"><strong>Example 1</strong></a>, but passes a function to the <code>slide_fun</code> argument instead of a formula.</p>
+<p>The code chunk below reproduces the 7-day trailing average from <a href="#example-1-computing-a-7-day-trailing-average-by-sliding-a-formula"><strong>Example 1</strong></a>, but passes a function to the <code>slide_fun</code> argument instead of a formula.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="at">slide_fun =</span> <span class="cf">function</span>(x, ...) <span class="fu">Mean</span>(x<span class="sc">$</span>value), <span class="at">n =</span> <span class="dv">7</span>, <span class="at">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">table_head</span>(<span class="at">title =</span> <span class="st">&quot;Daily COVID-19 cases per 100,000 (7-day trailing average)&quot;</span>,</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">footnote =</span> <span class="st">&quot;Trailing averages computed by sliding a function&quot;</span>)</span></code></pre></div>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">table_head</span>(<span class="at">title =</span> <span class="st">&quot;Daily COVID-19 cases per 100,000 pop. (7-day trailing average)&quot;</span>)</span></code></pre></div>
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-size: 15px;" colspan="6">
 <div style>
-Daily COVID-19 cases per 100,000 (7-day trailing average)
+Daily COVID-19 cases per 100,000 pop. (7-day trailing average)
 </div>
 </th>
 </tr>
@@ -996,15 +979,39 @@ confirmed_incidence_prop
 </td>
 </tr>
 </tbody>
-<tfoot>
-<tr>
-<td style="padding: 0; border:0;" colspan="100%">
-<sup>*</sup> Trailing averages computed by sliding a function
-</td>
-</tr>
-</tfoot>
 </table>
 <p><br /></p>
+</div>
+<div id="example-3-advanced" class="section level4">
+<h4>Example 3 (advanced):</h4>
+<p>As a more sophisticated example, here we show how to <em>sensorize</em> the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html">doctor visits signal</a> stored in the API, which is provided to Delphi by health system partners.</p>
+<p>Estimated percentage of outpatient doctor visits primarily about COVID-related symptoms</p>
+<p>The sensor values are defined by the predicted values of a local (in time) regression, where doctor visits are used to predict case rates.</p>
+<p>Perform sensorization for each state; use the last n = 56 days (8 weeks) of data, minus the last m = 3 days, for the regression.</p>
+<p>problems with “cases” in terms of delays, biases, etc.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>predict_case_rates <span class="ot">&lt;-</span> <span class="cf">function</span>(data, <span class="at">m =</span> <span class="dv">3</span>) {</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(data)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> ( n <span class="sc">&lt;=</span> m ) <span class="fu">return</span>(<span class="cn">NA</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  lm_obj <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> data[<span class="dv">1</span><span class="sc">:</span>(n <span class="sc">-</span> m), ])</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">predict</span>(lm_obj, <span class="at">newdata =</span> data[n, ]))</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">covidcast_signals</span>(<span class="at">data_source =</span> <span class="fu">c</span>(<span class="st">&quot;doctor-visits&quot;</span>, <span class="st">&quot;usa-facts&quot;</span>),</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                        <span class="at">signal =</span> <span class="fu">c</span>(<span class="st">&quot;smoothed_adj_cli&quot;</span>, <span class="st">&quot;confirmed_7dav_incidence_prop&quot;</span>),</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>                        <span class="at">start_day =</span> start_day,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>                        <span class="at">end_day =</span> end_day,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>                        <span class="at">geo_type =</span> <span class="st">&quot;state&quot;</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>                        <span class="at">geo_values =</span> geo_values) <span class="sc">%&gt;%</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  aggregate_signals <span class="sc">%&gt;%</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">value+0:doctor-visits_smoothed_adj_cli</span><span class="st">`</span>,</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">`</span><span class="at">value+0:usa-facts_confirmed_7dav_incidence_prop</span><span class="st">`</span>)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(df, <span class="at">slide_fun =</span> predict_case_rates, <span class="at">n =</span> <span class="dv">56</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(geo_value, time_value, <span class="st">`</span><span class="at">doctor-visits-cli</span><span class="st">`</span>, <span class="st">`</span><span class="at">reported-case-rates-7dav</span><span class="st">`</span>, </span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">predicted-case-rates-7dav</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geo_value) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">table_head</span>(<span class="at">nrows =</span> <span class="dv">100</span>)</span></code></pre></div>
+<p>The first 4 values of the sensor column <code>&quot;predicted-case-rates-7dav&quot;</code> are <code>NA</code> because of insufficient training data. (we need at least 2 training samples to fit the simple linear regression, and we omit the last <code>m = 3</code> days of data).</p>
 </div>
 </div>
 </div>

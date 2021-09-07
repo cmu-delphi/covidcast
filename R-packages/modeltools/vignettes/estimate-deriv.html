@@ -339,6 +339,7 @@ ca
 </tbody>
 </table>
 <p>Note above that a column <code>deriv</code> has been added to the output data frame, which contains the derivative estimates. Below we visualize these estimates in tandem with the signal itself. The <span style="color: red;">red</span> dots mark time points at which the derivative estimate exceeds an (arbitrarily chosen) threshold of 0.25. These seem to roughly but reasonably mark times of upswing in the underlying signal.</p>
+<p>The <code>table_head</code> function used above is a custom function that we use in these tutorial vignettes to display table heads. The source code can be found in the <a href="estimate-deriv.Rmd"><code>vignettes/estimate-deriv.Rmd</code></a> file used to build this page.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gridExtra)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>

@@ -110,6 +110,12 @@ with the signal itself. The <span style="color: red;">red</span> dots mark time 
 estimate exceeds an (arbitrarily chosen) threshold of 0.25. These seem to 
 roughly but reasonably mark times of upswing in the underlying signal. 
 
+The `table_head` function used above is a custom function that we use in 
+these tutorial vignettes to display
+table heads. The source code can be found in the 
+[`vignettes/estimate-deriv.Rmd`](estimate-deriv.Rmd) 
+file used to build this page.
+
 ```{r, message = FALSE, warning = FALSE, fig.align = "center", fig.width = 8, fig.height = 4, fig.retina = 2, dpi = 85}
 library(ggplot2)
 library(gridExtra)

@@ -16,8 +16,8 @@ options(rmarkdown.html_vignette.check_title = FALSE)
 
 <font size="3">**_Warning_: This package is not on CRAN!**</font><br/><br/>
 An <tt>R</tt> package named "`modeltools`" does exist on CRAN, but it is
-completely unrelated to this one. The Delphi research group's `modeltools` 
-package can be installed from Delphi's
+entirely unrelated to this one. Delphi's `modeltools` 
+package can be installed from the Delphi research group
 [**GitHub page**](https://github.com/cmu-delphi/) using the
 [`devtools`](https://cran.r-project.org/package=devtools) package, as shown
 below. The package's source code can be found
@@ -40,9 +40,9 @@ devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
 
 Building the vignettes for Delphi's 
 [`covidcast`](https://cmu-delphi.github.io/covidcast/covidcastR/) 
-package (a `modeltools` dependency) adds a couple minutes to the installation. 
-If you prefer a quicker installation, you can install `modeltools` without
-vignettes (the default setting):
+package (a `modeltools` dependency) causes the above installation to take a 
+couple minutes. If you prefer a quick installation, you can install `modeltools`
+without vignettes (the default setting):
 
 ```{r, eval = FALSE}
 devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
@@ -86,10 +86,7 @@ signals <- covidcast_signals(data_source = "usa-facts",
 By default, the 
 [`covidcast_signals()`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signals.html)
 function returns the requested signals as 
-a list of `covidcast_signal` data frames, with one data frame for each signal. 
-So, in this case, `signals` is a list of two `covidcast_signal` data frames ---
-the first containing the raw daily case rates and the second containing the 
-smoothed case rates. The 
+a list of `covidcast_signal` data frames, with one data frame for each signal. The 
 [`summary()`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/summary.covidcast_signal.html)
 function can be called on each of these `covidcast_signal` data frames, as 
 below.
@@ -101,7 +98,7 @@ summary(signals[[2]])
 ```
 <br />
 
-As shown in the summary output above, each of the `covidcast_signal` data 
+As shown in the summary output above, each of the fetched `covidcast_signal` data 
 frames in the list has 12 columns. Here, we'll only need the 5 columns selected 
 below. A full description of the USAFacts reporting data stored in Delphi's API
 can be found 
@@ -139,13 +136,15 @@ library(dplyr)
 signals[[1]] <- signals[[1]] %>% select(data_source, signal, geo_value, time_value, value)
 signals[[2]] <- signals[[2]] %>% select(data_source, signal, geo_value, time_value, value)
 
-signals[[1]] %>% table_head(title = "Daily COVID-19 cases per 100,000 (raw reported)")
-signals[[2]] %>% table_head(title = "Daily COVID-19 cases per 100,000 (7-day trailing average)")
+signals[[1]] %>% table_head(title = "Daily COVID-19 cases per 100,000 pop. (reported values)")
+signals[[2]] %>% table_head(title = "Daily COVID-19 cases per 100,000 pop. (7-day trailing average)")
 ```
 
-The `table_head` function used above is a custom function for displaying nice 
-table heads in HTML. See the [`vignettes/modeltools.Rmd`](modeltools.Rmd) 
-file used to build this page to see the function's source code.
+The `table_head` function used above is a custom function that we use in 
+these tutorial vignettes to display
+table heads. The source code can be found in the 
+[`vignettes/modeltools.Rmd`](modeltools.Rmd) 
+file used to build this page.
 
 
 ## Sliding
@@ -180,8 +179,7 @@ average formula to the `slide_fun` argument, as follows:
 library(modeltools)
 
 slide_by_geo(signals[[1]], slide_fun = ~ Mean(.x$value), n = 7) %>%
-  table_head(title = "Daily COVID-19 cases per 100,000 (7-day trailing average)",
-             footnote = "Trailing averages computed by sliding a formula")
+  table_head(title = "Daily COVID-19 cases per 100,000 pop. (7-day trailing average)")
 ```
 <br />
 
@@ -197,8 +195,7 @@ names can be passed to `slide_by_geo()`, as follows:
 
 ```{r}
 slide_by_geo(signals[[1]], slide_fun = ~ Mean(.x$value), n = 7, col_name = "7dav") %>%
-  table_head(title = "Daily COVID-19 cases per 100,000 (7-day trailing average)",
-             footnote = "Trailing averages computed by sliding a formula")
+  table_head(title = "Daily COVID-19 cases per 100,000 pop. (7-day trailing average)")
 ```
 <br />
 
@@ -250,13 +247,60 @@ this case, the passed function must have the following input argument structure:
 
 #### Example 2: Computing a 7-day trailing average by sliding a function
 
-The code chunk below reproduces
+The code chunk below reproduces the 7-day trailing average from
 [**Example 1**][Example 1: Computing a 7-day trailing average by sliding a formula], 
 but passes a function to the `slide_fun` argument instead of a formula.
 
 ```{r}
 slide_by_geo(signals[[1]], slide_fun = function(x, ...) Mean(x$value), n = 7, col_name = "7dav") %>%
-  table_head(title = "Daily COVID-19 cases per 100,000 (7-day trailing average)",
-             footnote = "Trailing averages computed by sliding a function")
+  table_head(title = "Daily COVID-19 cases per 100,000 pop. (7-day trailing average)")
 ```
 <br />
+
+#### Example 3 (advanced):
+
+As a more sophisticated example, here we show how to *sensorize* the 
+[doctor visits signal](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html)
+stored in the API, which is provided to Delphi by health system partners. 
+
+Estimated percentage of outpatient doctor visits primarily about COVID-related symptoms
+
+The 
+sensor values are defined by the predicted values of a local (in time) 
+regression, where doctor visits are used to predict case rates.
+
+Perform sensorization for each state; use the last n = 56 days (8 weeks) of 
+data, minus the last m = 3 days, for the regression.
+
+problems with “cases” in terms of delays, biases, etc.
+
+
+```{r message = FALSE, warning = FALSE, eval = FALSE}
+predict_case_rates <- function(data, m = 3) {
+  n <- nrow(data)
+  if ( n <= m ) return(NA)
+  lm_obj <- lm(y ~ x, data = data[1:(n - m), ])
+  return(predict(lm_obj, newdata = data[n, ]))
+}
+
+df <- covidcast_signals(data_source = c("doctor-visits", "usa-facts"),
+                        signal = c("smoothed_adj_cli", "confirmed_7dav_incidence_prop"),
+                        start_day = start_day,
+                        end_day = end_day,
+                        geo_type = "state",
+                        geo_values = geo_values) %>%
+  aggregate_signals %>%
+  rename(x = `value+0:doctor-visits_smoothed_adj_cli`,
+         y = `value+0:usa-facts_confirmed_7dav_incidence_prop`)
+
+slide_by_geo(df, slide_fun = predict_case_rates, n = 56) %>%
+  select(geo_value, time_value, `doctor-visits-cli`, `reported-case-rates-7dav`, 
+         `predicted-case-rates-7dav`) %>%
+  arrange(geo_value) %>% 
+  table_head(nrows = 100)
+```
+
+The first 4 values of the sensor column `"predicted-case-rates-7dav"` are 
+`NA` because of insufficient training data.
+(we need at least 2 training samples to fit the simple linear 
+regression, and we omit the last `m = 3` days of data).

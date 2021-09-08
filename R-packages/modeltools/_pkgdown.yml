@@ -2,12 +2,79 @@
 destination: ../../docs/modeltoolsR/
 
 home:
-    links:
-    - text: Get the covidcast R package 
-      href: https://cmu-delphi.github.io/covidcast/covidcastR/
-    - text: Get the evalcast R package
-      href: https://cmu-delphi.github.io/covidcast/evalcastR/
-    sidebar: FALSE
+  sidebar:
+    html: >
+      <center>
+        <a href="https://delphi.cmu.edu/"><img src="man/figures/delphi_logo.jpg" width = "90%">
+        <img src="man/figures/cmu_logo.png" width = "90%"></a>
+      </center>
+      
+      <h3>Links</h3>
+      
+      <ul class="list-unstyled">
+        <li>
+          Browse source code at <br/>
+          <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools">
+            https://github.com/cmu&#8209;delphi/covidcast/<br>tree/main/R&#8209;packages/modeltools
+          </a>
+        </li>
+        
+        <li>
+          Get the <samp>covidcast</samp> R package at <br/>
+          <a href="https://cmu-delphi.github.io/covidcast/covidcastR">
+            https://cmu&#8209;delphi.github.io/covidcast/<br>covidcastR
+          </a>
+        </li>
+        
+        <li>
+          Get the <samp>evalcast</samp> R package at <br/>
+          <a href="https://cmu-delphi.github.io/covidcast/evalcastR">
+            https://cmu&#8209;delphi.github.io/covidcast/<br>evalcastR
+          </a>
+        </li>
+        
+        <li>
+          Report a bug at <br/>
+          <a href="https://github.com/cmu-delphi/covidcast/issues">
+            https://github.com/cmu&#8209;delphi/covidcast/<br>issues
+          </a>
+        </li>
+        
+        <li>
+          View the COVIDcast map at <br/>
+          <a href="https://covidcast.cmu.edu/">https://covidcast.cmu.edu/</a>
+          </li>
+      </ul>
+
+      
+      <h3>License</h3>
+      <a href="https://opensource.org/licenses/mit-license.php">MIT</a>
+      
+      <h3>Citation</h3>
+      <a href="../../docs/modeltoolsR/authors.html">Citing the <samp>modeltools</samp> package</a>
+      
+      <h3>Developers</h3>
+      <ul class="list-unstyled">
+        <li>
+          Ryan J. Tibshirani 
+            <a href="https://orcid.org/0000-0002-2158-8304" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>
+            <br><small class="roles"> Author, maintainer </small>
+        </li>
+        
+        <li>
+          Collin A. Politsch 
+          <a href="https://orcid.org/0000-0003-3727-9167" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>
+          <br><small class="roles"> Author </small>
+        </li>
+        
+        <li>
+          Addison J. Hu 
+          <a href="https://orcid.org/0000-0002-9339-7291" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>
+          <br><small class="roles"> Author </small>
+        </li>
+        
+        <li><a href="../../docs/modeltoolsR/authors.html">All authors...</a></li>
+      </ul>
 
 articles:
   - title: Using the package
@@ -18,13 +85,6 @@ articles:
       - pct-change
       - estimate-deriv
       - quantgen-forecast
-
-repo:
-  url:
-    home: https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools
-    source: https://github.com/cmu-delphi/covidcast/blob/main/R-packages/modeltools/
-    issue: https://github.com/cmu-delphi/covidcast/issues
-    user: https://github.com/
 
 reference:
   - title: Example forecasters
@@ -37,7 +97,7 @@ reference:
   - title: Perform sliding operations on signals
   - contents:
       - slide_by_geo
-  - title: COVID-19 Forecast Hub data
+  - title: "COVID-19 Forecast Hub data"
   - contents:
       - covidhub_probs
   - title: Utilities

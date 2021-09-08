@@ -14,61 +14,18 @@ options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
 In this vignette, we estimate derivatives of `covidcast` signals using the 
-`estimate_deriv()` function from the `modeltools` package. 
+[`estimate_deriv()` ](../../../docs/modeltoolsR/reference/estimate_deriv.html)
+function from the `modeltools` package. 
 
 
 ## Downloading data from Delphi's Epidata API
 
-As in the 
-[Getting started guide](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html)
-and
-[Percentage change vignette](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/pct-change.html),
-we demonstrate this derivative estimation functionality on smoothed versions of 
-the state-level COVID-19 case rates reported by the
-[*USAFacts*](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html)
-data source from June 1, 2020 to November 15, 2020. The code chunk below fetches
-these data from the 
-[Delphi API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html).
-
-```{r message = FALSE}
-library(covidcast)
-library(modeltools)
-library(dplyr)
-library(knitr)
-
-start_day <- "2020-06-01"
-end_day <- "2020-11-15"
-geo_values <- c("ca", "fl", "ny", "tx")
-
-case_rates <- covidcast_signal(data_source = "usa-facts",
-                               signal = "confirmed_7dav_incidence_prop",
-                               start_day = start_day, 
-                               end_day = end_day,
-                               geo_type = "state", 
-                               geo_values = geo_values)
-```
-
-
-## Estimating derivatives
-
-The `modeltools` function for estimating derivatives is called 
-`estimate_deriv()`, and (in addition to a `covidcast_signal` data frame) takes 
-two primary arguments: 
-
-1. `method` : a string indicating the method to use for derivative estimation,
-
-2. `n` : a positive integer specifying the trailing number of days to use to
-train the given method.
-
-
-### Estimating derivatives via linear regression
-
-First we illustrate the default method for derivative estimation 
-`method = "lin"`, which uses the slope from a simple linear regression. Here 
-we also use the default trailing number of days `n = 14`.
+We'll use the same reporting data here that we used in the previous vignettes.
+The code chunk below fetches the data from the 
+[**Delphi API**](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html).
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# Function for displaying nice html table heads
+# Function for displaying table heads
 library(knitr)
 library(kableExtra)
 table_head <- function(x, nrows = 6, title = NULL, footnote = NULL){
@@ -94,14 +51,51 @@ table_head <- function(x, nrows = 6, title = NULL, footnote = NULL){
 }
 ```
 
+```{r message = FALSE}
+library(covidcast)
+library(dplyr)
+
+start_day <- "2020-06-01"
+end_day <- "2020-11-15"
+geo_values <- c("ca", "fl", "ny", "tx")
+
+case_rates <- covidcast_signal(data_source = "usa-facts",
+                               signal = "confirmed_7dav_incidence_prop",
+                               start_day = start_day, 
+                               end_day = end_day,
+                               geo_type = "state", 
+                               geo_values = geo_values) %>%
+  select(data_source, signal, geo_value, time_value, value) 
+
+case_rates %>% 
+  table_head(title = "Daily COVID-19 cases per 100,000 pop. (7-day trailing average)")
+```
+
+
+## Estimating derivatives
+
+The `modeltools` function for estimating derivatives is called 
+`estimate_deriv()`, and (in addition to a `covidcast_signal` data frame) takes 
+two primary arguments: 
+
+1. `method` : a string indicating the method to use for derivative estimation,
+
+2. `n` : a positive integer specifying the trailing number of days to use to
+train the given method.
+
+
+### Estimating derivatives via linear regression
+
+First we illustrate the default method for derivative estimation 
+`method = "lin"`, which uses the slope from a simple linear regression. Here 
+we also use the default trailing number of days `n = 14`.
+
 ```{r, message = FALSE, warning = FALSE}
+library(modeltools)
 case_rates <- estimate_deriv(case_rates, method = "lin", n = 14)
 
 case_rates %>% 
-  arrange(geo_value) %>% 
-  select(geo_value, time_value, value, deriv) %>%
-  head(10) %>%
-  kable(format = "html", digits = 3)
+  table_head(title = "Daily COVID-19 cases per 100,000 pop. (7-day trailing average)")
 ```
 
 Note above that a column `deriv` has been added to the output data frame, which
@@ -110,10 +104,9 @@ with the signal itself. The <span style="color: red;">red</span> dots mark time 
 estimate exceeds an (arbitrarily chosen) threshold of 0.25. These seem to 
 roughly but reasonably mark times of upswing in the underlying signal. 
 
-The `table_head` function used above is a custom function that we use in 
-these tutorial vignettes to display
-table heads. The source code can be found in the 
-[`vignettes/estimate-deriv.Rmd`](estimate-deriv.Rmd) 
+The `table_head` function used above is an internal function that we use in 
+these tutorial vignettes to display table heads. The source code can be found 
+in the [`vignettes/estimate-deriv.Rmd`](estimate-deriv.Rmd) 
 file used to build this page.
 
 ```{r, message = FALSE, warning = FALSE, fig.align = "center", fig.width = 8, fig.height = 4, fig.retina = 2, dpi = 85}

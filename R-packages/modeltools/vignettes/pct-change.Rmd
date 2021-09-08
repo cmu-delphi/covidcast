@@ -16,7 +16,7 @@ options(rmarkdown.html_vignette.check_title = FALSE)
 A simple way of assessing the growth or decay of a signal is to examine the 
 percentage change in its incidence over two adjacent time windows of equal 
 length. As shown here, this calculation can be done with the
-[`pct_change()`](https://cmu-delphi.github.io/covidcast/modeltoolsR/reference/pct_change.html)
+[`pct_change()`](../../../docs/modeltoolsR/reference/pct_change.html)
 function.
 
 
@@ -28,7 +28,7 @@ The code chunk below fetches the data from the
 [**Delphi API**](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html).
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# Function for displaying nice html table heads
+# Function for displaying table heads
 library(knitr)
 library(kableExtra)
 table_head <- function(x, nrows = 6, title = NULL, footnote = NULL){
@@ -74,7 +74,7 @@ case_rates %>%
   table_head(title = "Daily COVID-19 cases per 100,000 pop. (7-day trailing average)")
 ```
 
-The `table_head` function used above is a custom function that we use in 
+The `table_head` function used above is an internal function that we use in 
 these tutorial vignettes to display
 table heads. The source code can be found in the 
 [`vignettes/pct-change.Rmd`](pct-change.Rmd) 
@@ -95,10 +95,12 @@ trailing window,
 * $B$ is the total incidence of the signal over the last $n/2$ days of the 
 trailing window.
 
-The `pct_change()` function exploits the functionality of 
-[`slide_by_geo`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/slide_by_geo.html)
+The 
+[`pct_change()`](../../../docs/modeltoolsR/reference/pct_change.html)
+function exploits the functionality of 
+[`slide_by_geo()`](../../../docs/modeltoolsR/reference/slide_by_geo.html)
 to slide this calculation over a
-[`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html)
+[`covidcast_signal`](../../../docs/covidcastR/reference/covidcast_signal.html)
 data frame.
 
 The default setting is `n = 14`, corresponding to the percentage change in a
@@ -110,7 +112,8 @@ to refer to the `n = 2` case.
 ### Function call 
 
 The percentage change calculation follows via the following 
-one-line call to `pct_change()`:
+one-line call to 
+[`pct_change()`](../../../docs/modeltoolsR/reference/pct_change.html):
 
 ```{r, message = FALSE, warning = FALSE}
 library(modeltools)
@@ -161,7 +164,7 @@ Here, first we compute the 1-day percentage change (which we will also call
 **daily percentage change**) time series of the state-level COVID-19 case rates
 examined above, and then we post-process each state's percentage change time 
 series with a 7-day trailing average via a suitable application of 
-`slide_by_geo()`.
+[`slide_by_geo()`](../../../docs/modeltoolsR/reference/slide_by_geo.html).
 
 ```{r, message = FALSE, warning = FALSE}
 case_rates <- case_rates %>%
@@ -205,7 +208,7 @@ case_rates <- case_rates %>%
 p2 <- ggplot(case_rates %>% filter(geo_value == state), aes(x = time_value)) +
   geom_line(aes(y = pct_change_val, color = pct_change)) + 
   scale_color_manual(values=c('red', 'blue')) +
-  labs(x = "Date", y = "Daily percentage change", title = "Daily percentage change") +
+  labs(x = "Date", y = "Daily percent change", title = "Daily percent change") +
   theme(legend.position = "bottom", legend.title = element_blank())
 
 grid.arrange(p1, p2, nrow = 1)

@@ -15,6 +15,8 @@
 <title>2. Estimating the derivatives of a covidcast signal</title>
 
 <script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+<script src="data:application/javascript;base64,JChkb2N1bWVudCkucmVhZHkoZnVuY3Rpb24oKXsKICAgIGlmICh0eXBlb2YgJCgnW2RhdGEtdG9nZ2xlPSJ0b29sdGlwIl0nKS50b29sdGlwID09PSAnZnVuY3Rpb24nKSB7CiAgICAgICAgJCgnW2RhdGEtdG9nZ2xlPSJ0b29sdGlwIl0nKS50b29sdGlwKCk7CiAgICB9CiAgICBpZiAoJCgnW2RhdGEtdG9nZ2xlPSJwb3BvdmVyIl0nKS5wb3BvdmVyID09PSAnZnVuY3Rpb24nKSB7CiAgICAgICAgJCgnW2RhdGEtdG9nZ2xlPSJwb3BvdmVyIl0nKS5wb3BvdmVyKCk7CiAgICB9Cn0pOwo="></script>
+<link href="data:text/css,%0A%2Elightable%2Dminimal%20%7B%0Aborder%2Dcollapse%3A%20separate%3B%0Aborder%2Dspacing%3A%2016px%201px%3B%0Awidth%3A%20100%25%3B%0Amargin%2Dbottom%3A%2010px%3B%0A%7D%0A%2Elightable%2Dminimal%20td%20%7B%0Amargin%2Dleft%3A%205px%3B%0Amargin%2Dright%3A%205px%3B%0A%7D%0A%2Elightable%2Dminimal%20th%20%7B%0Amargin%2Dleft%3A%205px%3B%0Amargin%2Dright%3A%205px%3B%0A%7D%0A%2Elightable%2Dminimal%20thead%20tr%3Alast%2Dchild%20th%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%2300000050%3B%0Aempty%2Dcells%3A%20hide%3B%0A%7D%0A%2Elightable%2Dminimal%20tbody%20tr%3Afirst%2Dchild%20td%20%7B%0Apadding%2Dtop%3A%200%2E5em%3B%0A%7D%0A%2Elightable%2Dminimal%2Elightable%2Dhover%20tbody%20tr%3Ahover%20%7B%0Abackground%2Dcolor%3A%20%23f5f5f5%3B%0A%7D%0A%2Elightable%2Dminimal%2Elightable%2Dstriped%20tbody%20tr%3Anth%2Dchild%28even%29%20%7B%0Abackground%2Dcolor%3A%20%23f5f5f5%3B%0A%7D%0A%2Elightable%2Dclassic%20%7B%0Aborder%2Dtop%3A%200%2E16em%20solid%20%23111111%3B%0Aborder%2Dbottom%3A%200%2E16em%20solid%20%23111111%3B%0Awidth%3A%20100%25%3B%0Amargin%2Dbottom%3A%2010px%3B%0Amargin%3A%2010px%205px%3B%0A%7D%0A%2Elightable%2Dclassic%20tfoot%20tr%20td%20%7B%0Aborder%3A%200%3B%0A%7D%0A%2Elightable%2Dclassic%20tfoot%20tr%3Afirst%2Dchild%20td%20%7B%0Aborder%2Dtop%3A%200%2E14em%20solid%20%23111111%3B%0A%7D%0A%2Elightable%2Dclassic%20caption%20%7B%0Acolor%3A%20%23222222%3B%0A%7D%0A%2Elightable%2Dclassic%20td%20%7B%0Apadding%2Dleft%3A%205px%3B%0Apadding%2Dright%3A%205px%3B%0Acolor%3A%20%23222222%3B%0A%7D%0A%2Elightable%2Dclassic%20th%20%7B%0Apadding%2Dleft%3A%205px%3B%0Apadding%2Dright%3A%205px%3B%0Afont%2Dweight%3A%20normal%3B%0Acolor%3A%20%23222222%3B%0A%7D%0A%2Elightable%2Dclassic%20thead%20tr%3Alast%2Dchild%20th%20%7B%0Aborder%2Dbottom%3A%200%2E10em%20solid%20%23111111%3B%0A%7D%0A%2Elightable%2Dclassic%2Elightable%2Dhover%20tbody%20tr%3Ahover%20%7B%0Abackground%2Dcolor%3A%20%23F9EEC1%3B%0A%7D%0A%2Elightable%2Dclassic%2Elightable%2Dstriped%20tbody%20tr%3Anth%2Dchild%28even%29%20%7B%0Abackground%2Dcolor%3A%20%23f5f5f5%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%20%7B%0Aborder%2Dtop%3A%203px%20double%20%23111111%3B%0Aborder%2Dbottom%3A%203px%20double%20%23111111%3B%0Awidth%3A%20100%25%3B%0Amargin%2Dbottom%3A%2010px%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%20tfoot%20tr%20td%20%7B%0Aborder%3A%200%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%20tfoot%20tr%3Afirst%2Dchild%20td%20%7B%0Aborder%2Dtop%3A%203px%20double%20%23111111%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%20caption%20%7B%0Acolor%3A%20%23222222%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%20td%20%7B%0Apadding%2Dleft%3A%205px%3B%0Apadding%2Dright%3A%205px%3B%0Acolor%3A%20%23222222%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%20th%20%7B%0Apadding%2Dleft%3A%205px%3B%0Apadding%2Dright%3A%205px%3B%0Afont%2Dweight%3A%20normal%3B%0Acolor%3A%20%23222222%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%20tbody%20tr%3Alast%2Dchild%20td%20%7B%0Aborder%2Dbottom%3A%203px%20double%20%23111111%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%20thead%20tr%3Alast%2Dchild%20th%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23111111%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%2Elightable%2Dhover%20tbody%20tr%3Ahover%20%7B%0Abackground%2Dcolor%3A%20%23F9EEC1%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%2Elightable%2Dstriped%20tbody%20tr%3Anth%2Dchild%28even%29%20%7B%0Abackground%2Dcolor%3A%20%23f5f5f5%3B%0A%7D%0A%2Elightable%2Dmaterial%20%7B%0Amin%2Dwidth%3A%20100%25%3B%0Awhite%2Dspace%3A%20nowrap%3B%0Atable%2Dlayout%3A%20fixed%3B%0Afont%2Dfamily%3A%20Roboto%2C%20sans%2Dserif%3B%0Aborder%3A%201px%20solid%20%23EEE%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0Amargin%2Dbottom%3A%2010px%3B%0A%7D%0A%2Elightable%2Dmaterial%20tfoot%20tr%20td%20%7B%0Aborder%3A%200%3B%0A%7D%0A%2Elightable%2Dmaterial%20tfoot%20tr%3Afirst%2Dchild%20td%20%7B%0Aborder%2Dtop%3A%201px%20solid%20%23EEE%3B%0A%7D%0A%2Elightable%2Dmaterial%20th%20%7B%0Aheight%3A%2056px%3B%0Apadding%2Dleft%3A%2016px%3B%0Apadding%2Dright%3A%2016px%3B%0A%7D%0A%2Elightable%2Dmaterial%20td%20%7B%0Aheight%3A%2052px%3B%0Apadding%2Dleft%3A%2016px%3B%0Apadding%2Dright%3A%2016px%3B%0Aborder%2Dtop%3A%201px%20solid%20%23eeeeee%3B%0A%7D%0A%2Elightable%2Dmaterial%2Elightable%2Dhover%20tbody%20tr%3Ahover%20%7B%0Abackground%2Dcolor%3A%20%23f5f5f5%3B%0A%7D%0A%2Elightable%2Dmaterial%2Elightable%2Dstriped%20tbody%20tr%3Anth%2Dchild%28even%29%20%7B%0Abackground%2Dcolor%3A%20%23f5f5f5%3B%0A%7D%0A%2Elightable%2Dmaterial%2Elightable%2Dstriped%20tbody%20td%20%7B%0Aborder%3A%200%3B%0A%7D%0A%2Elightable%2Dmaterial%2Elightable%2Dstriped%20thead%20tr%3Alast%2Dchild%20th%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ddd%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%20%7B%0Amin%2Dwidth%3A%20100%25%3B%0Awhite%2Dspace%3A%20nowrap%3B%0Atable%2Dlayout%3A%20fixed%3B%0Afont%2Dfamily%3A%20Roboto%2C%20sans%2Dserif%3B%0Aborder%3A%201px%20solid%20%23FFFFFF12%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0Amargin%2Dbottom%3A%2010px%3B%0Abackground%2Dcolor%3A%20%23363640%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%20tfoot%20tr%20td%20%7B%0Aborder%3A%200%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%20tfoot%20tr%3Afirst%2Dchild%20td%20%7B%0Aborder%2Dtop%3A%201px%20solid%20%23FFFFFF12%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%20th%20%7B%0Aheight%3A%2056px%3B%0Apadding%2Dleft%3A%2016px%3B%0Apadding%2Dright%3A%2016px%3B%0Acolor%3A%20%23FFFFFF60%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%20td%20%7B%0Aheight%3A%2052px%3B%0Apadding%2Dleft%3A%2016px%3B%0Apadding%2Dright%3A%2016px%3B%0Acolor%3A%20%23FFFFFF%3B%0Aborder%2Dtop%3A%201px%20solid%20%23FFFFFF12%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%2Elightable%2Dhover%20tbody%20tr%3Ahover%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF12%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%2Elightable%2Dstriped%20tbody%20tr%3Anth%2Dchild%28even%29%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF12%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%2Elightable%2Dstriped%20tbody%20td%20%7B%0Aborder%3A%200%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%2Elightable%2Dstriped%20thead%20tr%3Alast%2Dchild%20th%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23FFFFFF12%3B%0A%7D%0A%2Elightable%2Dpaper%20%7B%0Awidth%3A%20100%25%3B%0Amargin%2Dbottom%3A%2010px%3B%0Acolor%3A%20%23444%3B%0A%7D%0A%2Elightable%2Dpaper%20tfoot%20tr%20td%20%7B%0Aborder%3A%200%3B%0A%7D%0A%2Elightable%2Dpaper%20tfoot%20tr%3Afirst%2Dchild%20td%20%7B%0Aborder%2Dtop%3A%201px%20solid%20%2300000020%3B%0A%7D%0A%2Elightable%2Dpaper%20thead%20tr%3Alast%2Dchild%20th%20%7B%0Acolor%3A%20%23666%3B%0Avertical%2Dalign%3A%20bottom%3B%0Aborder%2Dbottom%3A%201px%20solid%20%2300000020%3B%0Aline%2Dheight%3A%201%2E15em%3B%0Apadding%3A%2010px%205px%3B%0A%7D%0A%2Elightable%2Dpaper%20td%20%7B%0Avertical%2Dalign%3A%20middle%3B%0Aborder%2Dbottom%3A%201px%20solid%20%2300000010%3B%0Aline%2Dheight%3A%201%2E15em%3B%0Apadding%3A%207px%205px%3B%0A%7D%0A%2Elightable%2Dpaper%2Elightable%2Dhover%20tbody%20tr%3Ahover%20%7B%0Abackground%2Dcolor%3A%20%23F9EEC1%3B%0A%7D%0A%2Elightable%2Dpaper%2Elightable%2Dstriped%20tbody%20tr%3Anth%2Dchild%28even%29%20%7B%0Abackground%2Dcolor%3A%20%2300000008%3B%0A%7D%0A%2Elightable%2Dpaper%2Elightable%2Dstriped%20tbody%20td%20%7B%0Aborder%3A%200%3B%0A%7D%0A" rel="stylesheet" />
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -141,25 +143,159 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<p>In this vignette, we estimate derivatives of <code>covidcast</code> signals using the <code>estimate_deriv()</code> function from the <code>modeltools</code> package.</p>
+<p>In this vignette, we estimate derivatives of <code>covidcast</code> signals using the <a href="../../../docs/modeltoolsR/reference/estimate_deriv.html"><code>estimate_deriv()</code></a> function from the <code>modeltools</code> package.</p>
 <div id="downloading-data-from-delphis-epidata-api" class="section level2">
 <h2>Downloading data from Delphi’s Epidata API</h2>
-<p>As in the <a href="https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html">Getting started guide</a> and <a href="https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/pct-change.html">Percentage change vignette</a>, we demonstrate this derivative estimation functionality on smoothed versions of the state-level COVID-19 case rates reported by the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html"><em>USAFacts</em></a> data source from June 1, 2020 to November 15, 2020. The code chunk below fetches these data from the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">Delphi API</a>.</p>
+<p>We’ll use the same reporting data here that we used in the previous vignettes. The code chunk below fetches the data from the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html"><strong>Delphi API</strong></a>.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(covidcast)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(modeltools)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>start_day <span class="ot">&lt;-</span> <span class="st">&quot;2020-06-01&quot;</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>end_day <span class="ot">&lt;-</span> <span class="st">&quot;2020-11-15&quot;</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>geo_values <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;ca&quot;</span>, <span class="st">&quot;fl&quot;</span>, <span class="st">&quot;ny&quot;</span>, <span class="st">&quot;tx&quot;</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>case_rates <span class="ot">&lt;-</span> <span class="fu">covidcast_signal</span>(<span class="at">data_source =</span> <span class="st">&quot;usa-facts&quot;</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                               <span class="at">signal =</span> <span class="st">&quot;confirmed_7dav_incidence_prop&quot;</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                               <span class="at">start_day =</span> start_day, </span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                               <span class="at">end_day =</span> end_day,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>                               <span class="at">geo_type =</span> <span class="st">&quot;state&quot;</span>, </span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>                               <span class="at">geo_values =</span> geo_values)</span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>start_day <span class="ot">&lt;-</span> <span class="st">&quot;2020-06-01&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>end_day <span class="ot">&lt;-</span> <span class="st">&quot;2020-11-15&quot;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>geo_values <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;ca&quot;</span>, <span class="st">&quot;fl&quot;</span>, <span class="st">&quot;ny&quot;</span>, <span class="st">&quot;tx&quot;</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>case_rates <span class="ot">&lt;-</span> <span class="fu">covidcast_signal</span>(<span class="at">data_source =</span> <span class="st">&quot;usa-facts&quot;</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                               <span class="at">signal =</span> <span class="st">&quot;confirmed_7dav_incidence_prop&quot;</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                               <span class="at">start_day =</span> start_day, </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                               <span class="at">end_day =</span> end_day,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                               <span class="at">geo_type =</span> <span class="st">&quot;state&quot;</span>, </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                               <span class="at">geo_values =</span> geo_values) <span class="sc">%&gt;%</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(data_source, signal, geo_value, time_value, value) </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>case_rates <span class="sc">%&gt;%</span> </span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">table_head</span>(<span class="at">title =</span> <span class="st">&quot;Daily COVID-19 cases per 100,000 pop. (7-day trailing average)&quot;</span>)</span></code></pre></div>
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-size: 15px;" colspan="5">
+<div style>
+Daily COVID-19 cases per 100,000 pop. (7-day trailing average)
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+data_source
+</th>
+<th style="text-align:left;">
+signal
+</th>
+<th style="text-align:left;">
+geo_value
+</th>
+<th style="text-align:left;">
+time_value
+</th>
+<th style="text-align:right;">
+value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-01
+</td>
+<td style="text-align:right;">
+6.701
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:left;">
+fl
+</td>
+<td style="text-align:left;">
+2020-06-01
+</td>
+<td style="text-align:right;">
+3.381
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:left;">
+ny
+</td>
+<td style="text-align:left;">
+2020-06-01
+</td>
+<td style="text-align:right;">
+6.570
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:left;">
+tx
+</td>
+<td style="text-align:left;">
+2020-06-01
+</td>
+<td style="text-align:right;">
+4.406
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:left;">
+ca
+</td>
+<td style="text-align:left;">
+2020-06-02
+</td>
+<td style="text-align:right;">
+6.389
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:left;">
+fl
+</td>
+<td style="text-align:left;">
+2020-06-02
+</td>
+<td style="text-align:right;">
+3.454
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="estimating-derivatives" class="section level2">
 <h2>Estimating derivatives</h2>
@@ -171,18 +307,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="estimating-derivatives-via-linear-regression" class="section level3">
 <h3>Estimating derivatives via linear regression</h3>
 <p>First we illustrate the default method for derivative estimation <code>method = &quot;lin&quot;</code>, which uses the slope from a simple linear regression. Here we also use the default trailing number of days <code>n = 14</code>.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>case_rates <span class="ot">&lt;-</span> <span class="fu">estimate_deriv</span>(case_rates, <span class="at">method =</span> <span class="st">&quot;lin&quot;</span>, <span class="at">n =</span> <span class="dv">14</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>case_rates <span class="sc">%&gt;%</span> </span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geo_value) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(geo_value, time_value, value, deriv) <span class="sc">%&gt;%</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">format =</span> <span class="st">&quot;html&quot;</span>, <span class="at">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
-<table>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(modeltools)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>case_rates <span class="ot">&lt;-</span> <span class="fu">estimate_deriv</span>(case_rates, <span class="at">method =</span> <span class="st">&quot;lin&quot;</span>, <span class="at">n =</span> <span class="dv">14</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>case_rates <span class="sc">%&gt;%</span> </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">table_head</span>(<span class="at">title =</span> <span class="st">&quot;Daily COVID-19 cases per 100,000 pop. (7-day trailing average)&quot;</span>)</span></code></pre></div>
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
+<tr>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-size: 15px;" colspan="6">
+<div style>
+Daily COVID-19 cases per 100,000 pop. (7-day trailing average)
+</div>
+</th>
+</tr>
 <tr>
 <th style="text-align:left;">
 geo_value
+</th>
+<th style="text-align:left;">
+data_source
+</th>
+<th style="text-align:left;">
+signal
 </th>
 <th style="text-align:left;">
 time_value
@@ -201,6 +348,12 @@ deriv
 ca
 </td>
 <td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:left;">
 2020-06-01
 </td>
 <td style="text-align:right;">
@@ -213,6 +366,12 @@ NA
 <tr>
 <td style="text-align:left;">
 ca
+</td>
+<td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
 </td>
 <td style="text-align:left;">
 2020-06-02
@@ -229,6 +388,12 @@ ca
 ca
 </td>
 <td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:left;">
 2020-06-03
 </td>
 <td style="text-align:right;">
@@ -241,6 +406,12 @@ ca
 <tr>
 <td style="text-align:left;">
 ca
+</td>
+<td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
 </td>
 <td style="text-align:left;">
 2020-06-04
@@ -257,6 +428,12 @@ ca
 ca
 </td>
 <td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:left;">
 2020-06-05
 </td>
 <td style="text-align:right;">
@@ -271,6 +448,12 @@ ca
 ca
 </td>
 <td style="text-align:left;">
+usa-facts
+</td>
+<td style="text-align:left;">
+confirmed_7dav_incidence_prop
+</td>
+<td style="text-align:left;">
 2020-06-06
 </td>
 <td style="text-align:right;">
@@ -280,66 +463,10 @@ ca
 0.087
 </td>
 </tr>
-<tr>
-<td style="text-align:left;">
-ca
-</td>
-<td style="text-align:left;">
-2020-06-07
-</td>
-<td style="text-align:right;">
-6.741
-</td>
-<td style="text-align:right;">
-0.056
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-ca
-</td>
-<td style="text-align:left;">
-2020-06-08
-</td>
-<td style="text-align:right;">
-6.753
-</td>
-<td style="text-align:right;">
-0.039
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-ca
-</td>
-<td style="text-align:left;">
-2020-06-09
-</td>
-<td style="text-align:right;">
-6.993
-</td>
-<td style="text-align:right;">
-0.045
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-ca
-</td>
-<td style="text-align:left;">
-2020-06-10
-</td>
-<td style="text-align:right;">
-7.191
-</td>
-<td style="text-align:right;">
-0.056
-</td>
-</tr>
 </tbody>
 </table>
 <p>Note above that a column <code>deriv</code> has been added to the output data frame, which contains the derivative estimates. Below we visualize these estimates in tandem with the signal itself. The <span style="color: red;">red</span> dots mark time points at which the derivative estimate exceeds an (arbitrarily chosen) threshold of 0.25. These seem to roughly but reasonably mark times of upswing in the underlying signal.</p>
-<p>The <code>table_head</code> function used above is a custom function that we use in these tutorial vignettes to display table heads. The source code can be found in the <a href="estimate-deriv.Rmd"><code>vignettes/estimate-deriv.Rmd</code></a> file used to build this page.</p>
+<p>The <code>table_head</code> function used above is an internal function that we use in these tutorial vignettes to display table heads. The source code can be found in the <a href="estimate-deriv.Rmd"><code>vignettes/estimate-deriv.Rmd</code></a> file used to build this page.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gridExtra)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>

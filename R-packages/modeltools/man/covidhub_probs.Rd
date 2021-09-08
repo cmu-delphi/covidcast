@@ -4,7 +4,7 @@
 \name{covidhub_probs}
 \alias{covidhub_probs}
 \title{Probabilities (quantile levels) for
-\href{https://github.com/reichlab/covid19-forecast-hub}{COVID-19 Forecast Hub}
+\href{https://covid19forecasthub.org/}{COVID-19 Forecast Hub}
 forecasts}
 \format{
 Numeric vector with 23 entries.

@@ -178,7 +178,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                             <span class="at">geo_type =</span> <span class="st">&quot;state&quot;</span>, </span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                             <span class="at">geo_values =</span> geo_values)</span></code></pre></div>
 <p><br /></p>
-<p>By default, the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signals.html"><code>covidcast_signals()</code></a> function returns the requested signals as a list of <code>covidcast_signal</code> data frames, with one data frame for each signal. The <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/summary.covidcast_signal.html"><code>summary()</code></a> function can be called on each of these <code>covidcast_signal</code> data frames, as below.</p>
+<p>By default, the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signals.html"><code>covidcast_signals()</code></a> function returns the requested signals as a list of <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html"><code>covidcast_signal</code></a> data frames, with one data frame for each signal. The <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/summary.covidcast_signal.html"><code>summary()</code></a> function can be called on each of these <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html"><code>covidcast_signal</code></a> data frames, as below.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(signals[[<span class="dv">1</span>]])</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="do">## A `covidcast_signal` dataframe with 672 rows and 12 columns.</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
@@ -201,7 +201,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="do">## last date                           : 2020-11-15</span></span>
 <span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="do">## median number of geo_values per day : 4</span></span></code></pre></div>
 <p><br /></p>
-<p>As shown in the summary output above, each of the fetched <code>covidcast_signal</code> data frames in the list has 12 columns. Here, we’ll only need the 5 columns selected below. A full description of the USAFacts reporting data stored in Delphi’s API can be found <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html">here</a>.</p>
+<p>As shown in the summary output above, each of the fetched <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html"><code>covidcast_signal</code></a> data frames in the list has 12 columns. Here, we’ll only need the 5 columns selected below. A full description of the USAFacts reporting data stored in Delphi’s API can be found <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html">here</a>.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>signals[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> signals[[<span class="dv">1</span>]] <span class="sc">%&gt;%</span> <span class="fu">select</span>(data_source, signal, geo_value, time_value, value)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>signals[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> signals[[<span class="dv">2</span>]] <span class="sc">%&gt;%</span> <span class="fu">select</span>(data_source, signal, geo_value, time_value, value)</span>
@@ -472,20 +472,20 @@ fl
 </tr>
 </tbody>
 </table>
-<p>The <code>table_head</code> function used above is a custom function that we use in these tutorial vignettes to display table heads. The source code can be found in the <a href="modeltools.Rmd"><code>vignettes/modeltools.Rmd</code></a> file used to build this page.</p>
+<p>The <code>table_head</code> function used above is an internal function that we use in these tutorial vignettes to display table heads. The source code can be found in the <a href="modeltools.Rmd"><code>vignettes/modeltools.Rmd</code></a> file used to build this page.</p>
 </div>
 <div id="sliding" class="section level2">
 <h2>Sliding</h2>
 <p>One of the most basic tools in the <code>modeltools</code> package is the <code>slide_by_geo()</code> function, which is based on the family of functions provided by the <a href="https://cran.r-project.org/web/packages/slider/vignettes/slider.html"><code>slider</code></a> package.</p>
 <blockquote>
-<p><strong>Definition:</strong> In <code>modeltools</code>, to <em>slide</em> means that, for each <code>geo_value</code>, we apply a user-specified function or formula over a trailing window of <code>n</code> days of data.</p>
+<p><strong>Definition:</strong> In <code>modeltools</code>, to <em>slide</em> means that, for each <code>geo_value</code> in a <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html"><code>covidcast_signal</code></a> data frame, we apply a user-specified function or formula over a trailing window of <code>n</code> days of data.</p>
 </blockquote>
-<p>Many other functions in this package, such as <code>pct_change()</code> and <code>estimate_deriv()</code>, use <code>slide_by_geo()</code> as their workhorse. Below we provide some examples of performing sliding operations on <code>covidcast</code> signals with <code>slide_by_geo()</code>, utilizing both the function and formula options. <br /></p>
+<p>Many other functions in this package, such as <a href="../../../docs/modeltoolsR/reference/pct_change.html"><code>pct_change()</code></a> and <a href="../../../docs/modeltoolsR/reference/estimate_deriv.html"><code>estimate_deriv()</code></a>, use <a href="../../../docs/modeltoolsR/reference/slide_by_geo.html"><code>slide_by_geo()</code></a> as their workhorse. Below we provide some examples of performing sliding operations on <code>covidcast</code> signals with <a href="../../../docs/modeltoolsR/reference/slide_by_geo.html"><code>slide_by_geo()</code></a>, utilizing both the function and formula options. <br /></p>
 <div id="sliding-with-a-formula" class="section level3">
 <h3>Sliding with a formula</h3>
 <div id="example-1-computing-a-7-day-trailing-average-by-sliding-a-formula" class="section level4">
 <h4>Example 1: Computing a 7-day trailing average by sliding a formula</h4>
-<p>In this example we reproduce the calculation of the smoothed daily case rates that is performed by the Delphi API. This can be done by passing the <code>covidcast_signal</code> data frame of raw daily case rates (<code>signals[[1]]</code>) to <code>slide_by_geo()</code> and then passing a 7-day trailing average formula to the <code>slide_fun</code> argument, as follows:</p>
+<p>In this example we reproduce the calculation of the smoothed daily case rates that is performed by the Delphi API. This can be done by passing the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html"><code>covidcast_signal</code></a> data frame of raw daily case rates (<code>signals[[1]]</code>) to <a href="../../../docs/modeltoolsR/reference/slide_by_geo.html"><code>slide_by_geo()</code></a> and then passing a 7-day trailing average formula to the <code>slide_fun</code> argument, as follows:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(modeltools)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="at">slide_fun =</span> <span class="sc">~</span> <span class="fu">Mean</span>(.x<span class="sc">$</span>value), <span class="at">n =</span> <span class="dv">7</span>) <span class="sc">%&gt;%</span></span>
@@ -644,8 +644,8 @@ confirmed_incidence_prop
 </tbody>
 </table>
 <p><br /></p>
-<p>The formula specified by <code>slide_fun</code> has access to all columns present in the original <code>covidcast_signal</code> data frame, and must be referred to with the prefix <code>.x$</code>. Here, the function <code>modeltools::Mean()</code> is a simple wrapper around <code>mean()</code> that omits <code>NA</code> values by default.</p>
-<p>Notice that the above <code>slide_by_geo()</code> call returns a data frame with a new column appended that contains the results of the sliding operation specified by <code>slide_fun</code>. By default, this column is named <code>&quot;slide_value&quot;</code>, but alternate names can be passed to <code>slide_by_geo()</code>, as follows:</p>
+<p>The formula specified by <code>slide_fun</code> has access to all columns present in the original <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html"><code>covidcast_signal</code></a> data frame, and must be referred to with the prefix <code>.x$</code>. Here, the function <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/Min.html"><code>modeltools::Mean()</code></a> is a simple wrapper around <code>mean()</code> that omits <code>NA</code> values by default.</p>
+<p>Notice that the above <a href="../../../docs/modeltoolsR/reference/slide_by_geo.html"><code>slide_by_geo()</code></a> call returns a data frame with a new column appended that contains the results of the sliding operation specified by <code>slide_fun</code>. By default, this column is named <code>&quot;slide_value&quot;</code>, but alternate names can be passed to <a href="../../../docs/modeltoolsR/reference/slide_by_geo.html"><code>slide_by_geo()</code></a>, as follows:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(signals[[<span class="dv">1</span>]], <span class="at">slide_fun =</span> <span class="sc">~</span> <span class="fu">Mean</span>(.x<span class="sc">$</span>value), <span class="at">n =</span> <span class="dv">7</span>, <span class="at">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">table_head</span>(<span class="at">title =</span> <span class="st">&quot;Daily COVID-19 cases per 100,000 pop. (7-day trailing average)&quot;</span>)</span></code></pre></div>
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
@@ -810,15 +810,15 @@ confirmed_incidence_prop
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">max</span>(<span class="fu">abs</span>(difference))) <span class="sc">%&gt;%</span></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  as.numeric</span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 6.757779e-08</span></span></code></pre></div>
-<p>The trivial output of this calculation confirms that <code>slide_by_geo()</code> is functioning as desired. <br /><br /></p>
-<p><strong>Note:</strong> The raw daily case rates that we pass to <code>slide_by_geo()</code> begin on June 1, 2020, so the <code>&quot;7dav&quot;</code> column created by <code>slide_by_geo()</code> doesn’t represent a true <em>7-day average</em> until June 7, 2020. This is why we only perform the sanity check calculation above on the dates June 7, 2020, …, November 15, 2020. When a trailing window of <code>n</code> days is not available, <code>slide_by_geo()</code> just applies the <code>slide_fun</code> function/formula to whatever data <em>is</em> available. So for June <code>n</code>th, <code>n = 1,...,6</code>, the values in the <code>&quot;7dav&quot;</code> column are only <code>n</code>-day trailing averages. Whereas the pre-computed smoothed daily case rates signal stored in Delphi’s API is a true 7-day average for all dates June 1, 2020, …, November 15, 2020.</p>
+<p>The trivial output of this calculation confirms that <a href="../../../docs/modeltoolsR/reference/slide_by_geo.html"><code>slide_by_geo()</code></a> is functioning as desired. <br /><br /></p>
+<p><strong>Note:</strong> The raw daily case rates that we pass to <a href="../../../docs/modeltoolsR/reference/slide_by_geo.html"><code>slide_by_geo()</code></a> begin on June 1, 2020, so the <code>&quot;7dav&quot;</code> column created by <a href="../../../docs/modeltoolsR/reference/slide_by_geo.html"><code>slide_by_geo()</code></a> doesn’t represent a true <em>7-day average</em> until June 7, 2020. This is why we only perform the sanity check calculation above on the dates June 7, 2020, …, November 15, 2020. When a trailing window of <code>n</code> days is not available, <a href="../../../docs/modeltoolsR/reference/slide_by_geo.html"><code>slide_by_geo()</code></a> just applies the <code>slide_fun</code> function/formula to whatever data <em>is</em> available. So for June <code>n</code>th, <code>n = 1,...,6</code>, the values in the <code>&quot;7dav&quot;</code> column are only <code>n</code>-day trailing averages. Whereas the pre-computed smoothed daily case rates signal stored in Delphi’s API is a true 7-day average for all dates June 1, 2020, …, November 15, 2020.</p>
 </div>
 </div>
 <div id="sliding-with-a-function" class="section level3">
 <h3>Sliding with a function</h3>
-<p>We can also pass a function to the <code>slide_fun</code> argument in <code>slide_by_geo()</code>. In this case, the passed function must have the following input argument structure:</p>
+<p>We can also pass a function to the <code>slide_fun</code> argument in <a href="../../../docs/modeltoolsR/reference/slide_by_geo.html"><code>slide_by_geo()</code></a>. In this case, the passed function must have the following input argument structure:</p>
 <ol style="list-style-type: decimal">
-<li><p><code>x</code> : a data frame with the same column names as the data frame passed to <code>slide_by_geo()</code></p></li>
+<li><p><code>x</code> : a data frame with the same column names as the data frame passed to <a href="../../../docs/modeltoolsR/reference/slide_by_geo.html"><code>slide_by_geo()</code></a></p></li>
 <li><p>Any number of additional <strong>named</strong> arguments</p></li>
 <li><p>An ellipsis <code>...</code> to allow for any number of additional general arguments</p></li>
 </ol>
@@ -981,37 +981,6 @@ confirmed_incidence_prop
 </tbody>
 </table>
 <p><br /></p>
-</div>
-<div id="example-3-advanced" class="section level4">
-<h4>Example 3 (advanced):</h4>
-<p>As a more sophisticated example, here we show how to <em>sensorize</em> the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html">doctor visits signal</a> stored in the API, which is provided to Delphi by health system partners.</p>
-<p>Estimated percentage of outpatient doctor visits primarily about COVID-related symptoms</p>
-<p>The sensor values are defined by the predicted values of a local (in time) regression, where doctor visits are used to predict case rates.</p>
-<p>Perform sensorization for each state; use the last n = 56 days (8 weeks) of data, minus the last m = 3 days, for the regression.</p>
-<p>problems with “cases” in terms of delays, biases, etc.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>predict_case_rates <span class="ot">&lt;-</span> <span class="cf">function</span>(data, <span class="at">m =</span> <span class="dv">3</span>) {</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(data)</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> ( n <span class="sc">&lt;=</span> m ) <span class="fu">return</span>(<span class="cn">NA</span>)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  lm_obj <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> data[<span class="dv">1</span><span class="sc">:</span>(n <span class="sc">-</span> m), ])</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">predict</span>(lm_obj, <span class="at">newdata =</span> data[n, ]))</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">covidcast_signals</span>(<span class="at">data_source =</span> <span class="fu">c</span>(<span class="st">&quot;doctor-visits&quot;</span>, <span class="st">&quot;usa-facts&quot;</span>),</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                        <span class="at">signal =</span> <span class="fu">c</span>(<span class="st">&quot;smoothed_adj_cli&quot;</span>, <span class="st">&quot;confirmed_7dav_incidence_prop&quot;</span>),</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>                        <span class="at">start_day =</span> start_day,</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>                        <span class="at">end_day =</span> end_day,</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>                        <span class="at">geo_type =</span> <span class="st">&quot;state&quot;</span>,</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>                        <span class="at">geo_values =</span> geo_values) <span class="sc">%&gt;%</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  aggregate_signals <span class="sc">%&gt;%</span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">value+0:doctor-visits_smoothed_adj_cli</span><span class="st">`</span>,</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">`</span><span class="at">value+0:usa-facts_confirmed_7dav_incidence_prop</span><span class="st">`</span>)</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(df, <span class="at">slide_fun =</span> predict_case_rates, <span class="at">n =</span> <span class="dv">56</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(geo_value, time_value, <span class="st">`</span><span class="at">doctor-visits-cli</span><span class="st">`</span>, <span class="st">`</span><span class="at">reported-case-rates-7dav</span><span class="st">`</span>, </span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">predicted-case-rates-7dav</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geo_value) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">table_head</span>(<span class="at">nrows =</span> <span class="dv">100</span>)</span></code></pre></div>
-<p>The first 4 values of the sensor column <code>&quot;predicted-case-rates-7dav&quot;</code> are <code>NA</code> because of insufficient training data. (we need at least 2 training samples to fit the simple linear regression, and we omit the last <code>m = 3</code> days of data).</p>
 </div>
 </div>
 </div>

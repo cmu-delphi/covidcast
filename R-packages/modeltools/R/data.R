@@ -1,5 +1,5 @@
 #' Probabilities (quantile levels) for 
-#' [COVID-19 Forecast Hub](https://github.com/reichlab/covid19-forecast-hub)
+#' [COVID-19 Forecast Hub](https://covid19forecasthub.org/)
 #' forecasts
 #' 
 #' Probabilities (quantile levels) for forecasts in COVID Hub format: 0.01,

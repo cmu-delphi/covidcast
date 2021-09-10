@@ -3,6 +3,7 @@ library(mockery)
 library(MMWRweek)
 library(dplyr)
 
+# Test comment.
 # Many of these tests use mockery::with_mock_api. This replaces calls to the
 # live API server, instead returning static JSON files from disk. Three
 # weaknesses to be aware of:

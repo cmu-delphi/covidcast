@@ -30,6 +30,10 @@ details summary {
 }
 ```
 
+```{r, echo = F}
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
 ## Installation
 
 <span style="color:#ff3333;"><font size="3"><b>
@@ -42,15 +46,15 @@ The CRAN `modeltools` package is entirely unrelated to this one. Delphi's
 with the following command:
 
 ```{r, eval = F}
-devtools::install_github(repo = "cmu-delphi/covidcast", subdir = "R-packages/modeltools", 
+devtools::install_github(repo = "cmu-delphi/covidcast", subdir = "R-packages/modeltools",
                          ref = "modeltools")
 ```
 
 
 ## Downloading COVIDcast signals
 
-In this **Getting started** vignette, we'll fetch daily COVID-19 case rate 
-reporting data (i.e. the number of new COVID-19 cases reported per day, per 
+In this **Getting started** vignette, we'll fetch daily reporting data of 
+COVID-19 case rates (i.e. the number of new COVID-19 cases reported per day, per 
 100,000 population) from Delphi's
 [**COVIDcast Epidata API**](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html).
 The cases rates we'll examine here are reported by [**USAFacts**](https://usafacts.org/)
@@ -62,13 +66,15 @@ four U.S. states --- CA, FL, NY, and PA.
 
 ```{r, message = F, warning = F}
 library(covidcast)
+library(modeltools)
 library(dplyr)
 
+source <- "usa-facts"
 start_day <- "2020-03-01"
 end_day <- Sys.Date() - 5
 geo_values <- c("ca","fl","ny","pa")
 
-case_rates <- covidcast_signals(data_source = "usa-facts",
+case_rates <- covidcast_signals(data_source = source,
                                signal = c("confirmed_incidence_prop",
                                           "confirmed_7dav_incidence_prop"),
                                start_day = start_day,
@@ -76,7 +82,7 @@ case_rates <- covidcast_signals(data_source = "usa-facts",
                                geo_type = "state",
                                geo_values = geo_values) %>%
   aggregate_signals(format = "wide") %>%
-  setNames(gsub("value\\+0:usa-facts_","",names(.))) %>%
+  setNames(gsub(paste0("value\\+0:", source, "_"), "", names(.))) %>%
   arrange(geo_value, time_value)
 ```
 

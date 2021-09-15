@@ -6,9 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Slide a function over values in
-covidcast_signal
-data frame, grouped by the geo_value — slide_by_geo • modeltools</title>
+<title>Compute sliding window operations on the values in a covidcast_signal data
+frame, grouped by geographic location — slide_by_geo • modeltools</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -21,8 +20,8 @@ data frame, grouped by the geo_value — slide_by_geo • modeltools</title>
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -47,15 +46,15 @@ data frame, grouped by the geo_value — slide_by_geo • modeltools</title>
 
 
 
+  <link href="../extra.css" rel="stylesheet">
+  <script src="../extra.js"></script>
 
-<meta property="og:title" content="Slide a function over values in
-covidcast_signal
-data frame, grouped by the geo_value — slide_by_geo" />
-<meta property="og:description" content="Slides a given function over the values in a  covidcast_signal data frame,
-grouped by geo_value. (When multiple issue dates are present, only the
-latest issue is considered.) See the getting started guide
+<meta property="og:title" content="Compute sliding window operations on the values in a covidcast_signal data
+frame, grouped by geographic location — slide_by_geo" />
+<meta property="og:description" content="Slides a given function or formula over the values in a  covidcast_signal
+data frame, grouped by geo_value. See the
+slide_by_geo vignette
 for examples." />
-<meta property="og:image" content="/logo.png" />
 
 
 
@@ -113,20 +112,23 @@ for examples." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/pct-change.html">1. Compute percentage change of a covidcast signal over time</a>
+      <a href="../articles/slide_by_geo.html">1. Compute sliding window operations on a COVIDcast signal</a>
     </li>
     <li>
-      <a href="../articles/estimate-deriv.html">2. Estimate the derivatives of a covidcast signal</a>
+      <a href="../articles/pct-change.html">2. Compute percent change of a COVIDcast signal over time</a>
     </li>
     <li>
-      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of covidcast signals</a>
+      <a href="../articles/estimate-deriv.html">3. Estimate derivatives of a COVIDcast signal</a>
+    </li>
+    <li>
+      <a href="../articles/quantgen-forecast.html">4. Produce and evaluate quantile forecasts of a COVIDcast signal</a>
     </li>
   </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools">
+  <a href="https://github.com/cmu-delphi/covidcast/tree/modeltools/R-packages/modeltools">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -144,17 +146,16 @@ for examples." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Slide a function over values in
-<a href='https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html'><code>covidcast_signal</code></a>
-data frame, grouped by the <code>geo_value</code></h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/main/R-packages/modeltools/R/slide.R'><code>R/slide.R</code></a></small>
+    <h1>Compute sliding window operations on the values in a <code>covidcast_signal</code> data
+frame, grouped by geographic location</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/tree/modeltools/R-packages/modeltoolsR/slide.R'><code>R/slide.R</code></a></small>
     <div class="hidden name"><code>slide_by_geo.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Slides a given function over the values in a  <code>covidcast_signal</code> data frame,
-grouped by <code>geo_value</code>. (When multiple issue dates are present, only the
-latest issue is considered.) See the <a href='https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html'>getting started guide</a>
+    <p>Slides a given function or formula over the values in a  <code>covidcast_signal</code>
+data frame, grouped by <code>geo_value</code>. See the
+<a href='https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/slide_by_geo.html'><code>slide_by_geo</code> vignette</a>
 for examples.</p>
     </div>
 
@@ -186,15 +187,17 @@ can operate directly on <code>.x$value</code>, <code>.x$time_value</code>, etc.,
     </tr>
     <tr>
       <th>n</th>
-      <td><p>Size of the local window (in days) to use. For example, if <code>n = 5</code>,
-then to estimate the derivative on November 5, we train the given method on
-data in between November 1 and November 5. Default is 14.</p></td>
+      <td><p>Size of the trailing window (in days) to use. Defaults to <code>n = 14</code>.
+The sliding window includes the current day and the previous <code>n - 1</code> days.
+So, e.g., an <code>n = 14</code> sliding mean calculation on November 14 is an
+average of the 14 days of data from November 1 to November 14.</p></td>
     </tr>
     <tr>
       <th>col_name</th>
       <td><p>String indicating the name of the new column that will
-contain the derivative values. Default is "slide_value"; note that setting
-<code>col_name = "value"</code> will overwrite the existing "value" column.</p></td>
+contain the output of the sliding operation. Default is "slide_value";
+note that setting <code>col_name = "value"</code> will overwrite the existing "value"
+column.</p></td>
     </tr>
     <tr>
       <th>col_type</th>
@@ -224,7 +227,7 @@ to the <code>col_name</code> argument, containing the function values.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Ryan Tibshirani, Addison Hu, Collin Politsch.</p>
+  <p>Developed by <a href='http://www.stat.cmu.edu/~ryantibs/'>Ryan J. Tibshirani</a>, <a href='https://collinpolitsch.com/'>Collin A. Politsch</a>, <a href='http://huisaddison.com/'>Addison J. Hu</a>, <a href='https://delphi.cmu.edu/'><img src='man/figures/delphi_logo.jpg' width=75></a>, <a href='https://www.google.org/covid-19/'><img src='man/figures/google_logo.png' width=75></a>.</p>
 </div>
 
 <div class="pkgdown">

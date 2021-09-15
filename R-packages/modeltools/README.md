@@ -21,7 +21,7 @@ The CRAN `modeltools` package is entirely unrelated to this one. Delphi's
 with the following command:
 
 ``` r
-devtools::install_github(repo = "cmu-delphi/covidcast", subdir = "R-packages/modeltools")
+devtools::install_github(repo = "cmu-delphi/covidcast", subdir = "R-packages/modeltools", ref = "modeltools")
 ```
 
 ## Presentations

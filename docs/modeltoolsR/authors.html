@@ -19,8 +19,8 @@
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -45,9 +45,10 @@
 
 
 
+  <link href="extra.css" rel="stylesheet">
+  <script src="extra.js"></script>
 
 <meta property="og:title" content="Citation and Authors" />
-<meta property="og:image" content="/logo.png" />
 
 
 
@@ -105,20 +106,23 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="articles/pct-change.html">1. Compute percentage change of a covidcast signal over time</a>
+      <a href="articles/slide_by_geo.html">1. Compute sliding window operations on a COVIDcast signal</a>
     </li>
     <li>
-      <a href="articles/estimate-deriv.html">2. Estimate the derivatives of a covidcast signal</a>
+      <a href="articles/pct-change.html">2. Compute percent change of a COVIDcast signal over time</a>
     </li>
     <li>
-      <a href="articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of covidcast signals</a>
+      <a href="articles/estimate-deriv.html">3. Estimate derivatives of a COVIDcast signal</a>
+    </li>
+    <li>
+      <a href="articles/quantgen-forecast.html">4. Produce and evaluate quantile forecasts of a COVIDcast signal</a>
     </li>
   </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools">
+  <a href="https://github.com/cmu-delphi/covidcast/tree/modeltools/R-packages/modeltools">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -137,16 +141,16 @@
   <div class="contents col-md-9">
     <div class="page-header">
       <h1>Citation</h1>
-      <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/main/R-packages/modeltools/inst/CITATION'><code>inst/CITATION</code></a></small>
+      <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/tree/modeltools/R-packages/modeltoolsinst/CITATION'><code>inst/CITATION</code></a></small>
     </div>
 
-    <p>Tibshirani R, Hu A, Politsch C, McDonald D, Bien J, Grabman J, O'Brien M, Tay K (2021).
-<em>modeltools: Tools for Building COVID Forecasters and Related Models</em>.
+    <p>Tibshirani R, Politsch C, Hu A, Bien J, Grabman J, McDonald D, O'Brien M, Tay J (2021).
+<em>modeltools: Tools for Analyzing COVID Signals and Building Forecasting Models</em>.
 R package version 0.2.0, <a href="https://cmu-delphi.github.io/covidcast/modeltoolsR/">https://cmu-delphi.github.io/covidcast/modeltoolsR/</a>. 
 </p>
     <pre>@Manual{modeltools,
-  title = {{modeltools}: Tools for Building COVID Forecasters and Related Models},
-  author = {Ryan Tibshirani and Addison Hu and Collin Politsch and Daniel McDonald and Jacob Bien and Jed Grabman and Mike O'Brien and Kenneth Tay},
+  title = {{modeltools}: Tools for Analyzing COVID Signals and Building Forecasting Models},
+  author = {Ryan J. Tibshirani and Collin A. Politsch and Addison J. Hu and Jacob Bien and Jed Grabman and Daniel J. McDonald and Michael O'Brien and J. Kenneth Tay},
   year = {2021},
   note = {R package version 0.2.0},
   url = {https://cmu-delphi.github.io/covidcast/modeltoolsR/},
@@ -158,19 +162,23 @@ R package version 0.2.0, <a href="https://cmu-delphi.github.io/covidcast/modelto
 
     <ul class="list-unstyled">
       <li>
-        <p><strong>Ryan Tibshirani</strong>. Author, maintainer. <a href='https://orcid.org/0000-0002-2158-8304' target='orcid.widget' aria-label='ORCID'><span class='fab fa-orcid orcid' aria-hidden='true'></span></a>
+        <p><strong><a href='http://www.stat.cmu.edu/~ryantibs/'>Ryan J. Tibshirani</a></strong>. Author, maintainer. <a href='https://orcid.org/0000-0002-2158-8304' target='orcid.widget' aria-label='ORCID'><span class='fab fa-orcid orcid' aria-hidden='true'></span></a>
         </p>
       </li>
       <li>
-        <p><strong>Addison Hu</strong>. Author. 
+        <p><strong><a href='https://collinpolitsch.com/'>Collin A. Politsch</a></strong>. Author. <a href='https://orcid.org/0000-0003-3727-9167' target='orcid.widget' aria-label='ORCID'><span class='fab fa-orcid orcid' aria-hidden='true'></span></a>
         </p>
       </li>
       <li>
-        <p><strong>Collin Politsch</strong>. Author. 
+        <p><strong><a href='http://huisaddison.com/'>Addison J. Hu</a></strong>. Author. <a href='https://orcid.org/0000-0002-9339-7291' target='orcid.widget' aria-label='ORCID'><span class='fab fa-orcid orcid' aria-hidden='true'></span></a>
         </p>
       </li>
       <li>
-        <p><strong>Daniel McDonald</strong>. Contributor. 
+        <p><strong><a href='https://delphi.cmu.edu/'><img src='man/figures/delphi_logo.jpg' width=75></a></strong>. Copyright holder, funder. 
+        </p>
+      </li>
+      <li>
+        <p><strong><a href='https://www.google.org/covid-19/'><img src='man/figures/google_logo.png' width=75></a></strong>. Funder. 
         </p>
       </li>
       <li>
@@ -182,11 +190,15 @@ R package version 0.2.0, <a href="https://cmu-delphi.github.io/covidcast/modelto
         </p>
       </li>
       <li>
-        <p><strong>Mike O'Brien</strong>. Contributor. 
+        <p><strong>Daniel J. McDonald</strong>. Contributor. <a href='https://orcid.org/0000-0002-0443-4282' target='orcid.widget' aria-label='ORCID'><span class='fab fa-orcid orcid' aria-hidden='true'></span></a>
         </p>
       </li>
       <li>
-        <p><strong>Kenneth Tay</strong>. Contributor. 
+        <p><strong>Michael O'Brien</strong>. Contributor. <a href='https://orcid.org/0000-0002-5942-791X' target='orcid.widget' aria-label='ORCID'><span class='fab fa-orcid orcid' aria-hidden='true'></span></a>
+        </p>
+      </li>
+      <li>
+        <p><strong>J. Kenneth Tay</strong>. Contributor. 
         </p>
       </li>
     </ul>
@@ -199,7 +211,7 @@ R package version 0.2.0, <a href="https://cmu-delphi.github.io/covidcast/modelto
 
       <footer>
       <div class="copyright">
-  <p>Developed by Ryan Tibshirani, Addison Hu, Collin Politsch.</p>
+  <p>Developed by <a href='http://www.stat.cmu.edu/~ryantibs/'>Ryan J. Tibshirani</a>, <a href='https://collinpolitsch.com/'>Collin A. Politsch</a>, <a href='http://huisaddison.com/'>Addison J. Hu</a>, <a href='https://delphi.cmu.edu/'><img src='man/figures/delphi_logo.jpg' width=75></a>, <a href='https://www.google.org/covid-19/'><img src='man/figures/google_logo.png' width=75></a>.</p>
 </div>
 
 <div class="pkgdown">

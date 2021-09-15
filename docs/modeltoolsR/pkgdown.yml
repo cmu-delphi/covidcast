@@ -6,5 +6,6 @@ articles:
   modeltools: modeltools.html
   pct-change: pct-change.html
   quantgen-forecast: quantgen-forecast.html
-last_built: 2021-08-28T02:35Z
+  slide_by_geo: slide_by_geo.html
+last_built: 2021-09-15T23:09Z
 

@@ -19,8 +19,8 @@
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -45,9 +45,10 @@
 
 
 
+  <link href="../extra.css" rel="stylesheet">
+  <script src="../extra.js"></script>
 
 <meta property="og:title" content="Articles" />
-<meta property="og:image" content="/logo.png" />
 
 
 
@@ -105,20 +106,23 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/pct-change.html">1. Compute percentage change of a covidcast signal over time</a>
+      <a href="../articles/slide_by_geo.html">1. Compute sliding window operations on a COVIDcast signal</a>
     </li>
     <li>
-      <a href="../articles/estimate-deriv.html">2. Estimate the derivatives of a covidcast signal</a>
+      <a href="../articles/pct-change.html">2. Compute percent change of a COVIDcast signal over time</a>
     </li>
     <li>
-      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of covidcast signals</a>
+      <a href="../articles/estimate-deriv.html">3. Estimate derivatives of a COVIDcast signal</a>
+    </li>
+    <li>
+      <a href="../articles/quantgen-forecast.html">4. Produce and evaluate quantile forecasts of a COVIDcast signal</a>
     </li>
   </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools">
+  <a href="https://github.com/cmu-delphi/covidcast/tree/modeltools/R-packages/modeltools">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -146,12 +150,14 @@
       <dl>
         <dt><a href="modeltools.html">Get started with modeltools</a></dt>
         <dd><p>An introductory tutorial with examples.</p></dt>
-        <dt><a href="pct-change.html">1. Compute percentage change of a covidcast signal over time</a></dt>
-        <dd><p>Compute the percentage change of covidcast signal values over time.</p></dt>
-        <dt><a href="estimate-deriv.html">2. Estimate the derivatives of a covidcast signal</a></dt>
-        <dd><p>Estimate the derivatives of a covidcast signal, using various methods.</p></dt>
-        <dt><a href="quantgen-forecast.html">3. Produce and evaluate quantile forecasts of covidcast signals</a></dt>
-        <dd><p>Produce and evaluate quantile forecasts, based on <code>quantgen</code> and <code>evalcast</code>.</p></dt>
+        <dt><a href="slide_by_geo.html">1. Compute sliding window operations on a COVIDcast signal</a></dt>
+        <dd><p>Compute sliding window operations on the values in a <code>covidcast_signal</code> data frame, grouped by geographic location</p></dt>
+        <dt><a href="pct-change.html">2. Compute percent change of a COVIDcast signal over time</a></dt>
+        <dd><p>Compute a sliding percent change operation on the values in a <code>covidcast_signal</code> data frame, grouped by geographic location</p></dt>
+        <dt><a href="estimate-deriv.html">3. Estimate derivatives of a COVIDcast signal</a></dt>
+        <dd><p>Estimate the derivatives of a COVIDcast signal, using various methods.</p></dt>
+        <dt><a href="quantgen-forecast.html">4. Produce and evaluate quantile forecasts of a COVIDcast signal</a></dt>
+        <dd><p>Produce and evaluate quantile forecasts of a COVIDcast signal, using on <code>quantgen</code> and <code>evalcast</code>.</p></dt>
       </dl>
     </div>
   </div>
@@ -160,7 +166,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Ryan Tibshirani, Addison Hu, Collin Politsch.</p>
+  <p>Developed by <a href='http://www.stat.cmu.edu/~ryantibs/'>Ryan J. Tibshirani</a>, <a href='https://collinpolitsch.com/'>Collin A. Politsch</a>, <a href='http://huisaddison.com/'>Addison J. Hu</a>, <a href='https://delphi.cmu.edu/'><img src='man/figures/delphi_logo.jpg' width=75></a>, <a href='https://www.google.org/covid-19/'><img src='man/figures/google_logo.png' width=75></a>.</p>
 </div>
 
 <div class="pkgdown">

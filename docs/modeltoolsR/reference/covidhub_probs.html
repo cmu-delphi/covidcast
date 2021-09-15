@@ -21,8 +21,8 @@ forecasts — covidhub_probs • modeltools</title>
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -47,6 +47,8 @@ forecasts — covidhub_probs • modeltools</title>
 
 
 
+  <link href="../extra.css" rel="stylesheet">
+  <script src="../extra.js"></script>
 
 <meta property="og:title" content="Probabilities (quantile levels) for
 COVID-19 Forecast Hub
@@ -54,7 +56,6 @@ forecasts — covidhub_probs" />
 <meta property="og:description" content="Probabilities (quantile levels) for forecasts in COVID Hub format: 0.01,
 0.025, then evenly spaced from 0.05 to 0.95 in increments of 0.05, then
 0.975, 0.99." />
-<meta property="og:image" content="/logo.png" />
 
 
 
@@ -112,20 +113,23 @@ forecasts — covidhub_probs" />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/pct-change.html">1. Compute percentage change of a covidcast signal over time</a>
+      <a href="../articles/slide_by_geo.html">1. Compute sliding window operations on a COVIDcast signal</a>
     </li>
     <li>
-      <a href="../articles/estimate-deriv.html">2. Estimate the derivatives of a covidcast signal</a>
+      <a href="../articles/pct-change.html">2. Compute percent change of a COVIDcast signal over time</a>
     </li>
     <li>
-      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of covidcast signals</a>
+      <a href="../articles/estimate-deriv.html">3. Estimate derivatives of a COVIDcast signal</a>
+    </li>
+    <li>
+      <a href="../articles/quantgen-forecast.html">4. Produce and evaluate quantile forecasts of a COVIDcast signal</a>
     </li>
   </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools">
+  <a href="https://github.com/cmu-delphi/covidcast/tree/modeltools/R-packages/modeltools">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -144,9 +148,9 @@ forecasts — covidhub_probs" />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Probabilities (quantile levels) for
-<a href='https://github.com/reichlab/covid19-forecast-hub'>COVID-19 Forecast Hub</a>
+<a href='https://covid19forecasthub.org/'>COVID-19 Forecast Hub</a>
 forecasts</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/main/R-packages/modeltools/R/data.R'><code>R/data.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/tree/modeltools/R-packages/modeltoolsR/data.R'><code>R/data.R</code></a></small>
     <div class="hidden name"><code>covidhub_probs.Rd</code></div>
     </div>
 
@@ -174,7 +178,7 @@ forecasts</h1>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Ryan Tibshirani, Addison Hu, Collin Politsch.</p>
+  <p>Developed by <a href='http://www.stat.cmu.edu/~ryantibs/'>Ryan J. Tibshirani</a>, <a href='https://collinpolitsch.com/'>Collin A. Politsch</a>, <a href='http://huisaddison.com/'>Addison J. Hu</a>, <a href='https://delphi.cmu.edu/'><img src='man/figures/delphi_logo.jpg' width=75></a>, <a href='https://www.google.org/covid-19/'><img src='man/figures/google_logo.png' width=75></a>.</p>
 </div>
 
 <div class="pkgdown">

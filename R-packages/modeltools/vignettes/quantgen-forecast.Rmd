@@ -9,6 +9,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r, echo = F}
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
 Note that I'm using `covidcast` from the `r/0.4.0-release` branch, and 
 `evalcast` from the `evalcast-killcards` branch.
 

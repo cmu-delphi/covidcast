@@ -37,14 +37,6 @@ End <- function(x) tail(x, 1)
 
 ##########
 
-#' Drop prefix in column names, i.e. 'value:0<data_source>', after pivoting 
-#' to wide format
-#' @export
-#' @noRd
-drop_prefix <- function(x, data_source){
-  x %>% setNames(gsub(paste0("value\\+0:", data_source, "_"), "", names(.)))
-}
-
 #' Function for suppressing all types of output messages
 #' @export
 #' @noRd

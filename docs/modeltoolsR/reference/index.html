@@ -19,8 +19,8 @@
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -45,9 +45,10 @@
 
 
 
+  <link href="../extra.css" rel="stylesheet">
+  <script src="../extra.js"></script>
 
 <meta property="og:title" content="Function reference" />
-<meta property="og:image" content="/logo.png" />
 
 
 
@@ -105,20 +106,23 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/pct-change.html">1. Compute percentage change of a covidcast signal over time</a>
+      <a href="../articles/slide_by_geo.html">1. Compute sliding window operations on a COVIDcast signal</a>
     </li>
     <li>
-      <a href="../articles/estimate-deriv.html">2. Estimate the derivatives of a covidcast signal</a>
+      <a href="../articles/pct-change.html">2. Compute percent change of a COVIDcast signal over time</a>
     </li>
     <li>
-      <a href="../articles/quantgen-forecast.html">3. Produce and evaluate quantile forecasts of covidcast signals</a>
+      <a href="../articles/estimate-deriv.html">3. Estimate derivatives of a COVIDcast signal</a>
+    </li>
+    <li>
+      <a href="../articles/quantgen-forecast.html">4. Produce and evaluate quantile forecasts of a COVIDcast signal</a>
     </li>
   </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools">
+  <a href="https://github.com/cmu-delphi/covidcast/tree/modeltools/R-packages/modeltools">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -150,56 +154,7 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-example-forecasters" class="hasAnchor"><a href="#section-example-forecasters" class="anchor"></a>Example forecasters</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="quantgen_forecaster.html">quantgen_forecaster()</a></code> </p>
-        </td>
-        <td><p>Simple quantile autoregressive forecaster based on
-<a href='https://github.com/ryantibs/quantgen'><code>quantgen</code></a></p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-compute-temporal-changes-in-signals" class="hasAnchor"><a href="#section-compute-temporal-changes-in-signals" class="anchor"></a>Compute temporal changes in signals</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="estimate_deriv.html">estimate_deriv()</a></code> </p>
-        </td>
-        <td><p>Estimate derivatives of values in
-<a href='https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html'><code>covidcast_signal</code></a>
-data frame</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pct_change.html">pct_change()</a></code> </p>
-        </td>
-        <td><p>Compute percentage change of values in
-<a href='https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html'><code>covidcast_signal</code></a>
-data frame</p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-perform-sliding-operations-on-signals" class="hasAnchor"><a href="#section-perform-sliding-operations-on-signals" class="anchor"></a>Perform sliding operations on signals</h2>
+          <h2 id="section-functions" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Functions</h2>
           <p class="section-desc"></p>
         </th>
       </tr>
@@ -213,14 +168,32 @@ data frame</p></td>
         <td>
           <p><code><a href="slide_by_geo.html">slide_by_geo()</a></code> </p>
         </td>
-        <td><p>Slide a function over values in
-<a href='https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html'><code>covidcast_signal</code></a>
-data frame, grouped by the <code>geo_value</code></p></td>
+        <td><p>Compute sliding window operations on the values in a <code>covidcast_signal</code> data
+frame, grouped by geographic location</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="estimate_deriv.html">estimate_deriv()</a></code> </p>
+        </td>
+        <td><p>Estimate derivatives of a COVIDcast signal</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pct_change.html">pct_change()</a></code> </p>
+        </td>
+        <td><p>Compute the sliding window percent change in the values in a
+<code>covidcast_signal</code> data frame, grouped by geographic location</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="quantgen_forecaster.html">quantgen_forecaster()</a></code> </p>
+        </td>
+        <td><p>Simple quantile autoregressive forecaster based on <code>quantgen</code></p></td>
       </tr>
     </tbody><tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-covid-forecast-hub-data" class="hasAnchor"><a href="#section-covid-forecast-hub-data" class="anchor"></a>COVID-19 Forecast Hub data</h2>
+          <h2 id="section-data" class="hasAnchor"><a href="#section-data" class="anchor"></a>Data</h2>
           <p class="section-desc"></p>
         </th>
       </tr>
@@ -235,27 +208,8 @@ data frame, grouped by the <code>geo_value</code></p></td>
           <p><code><a href="covidhub_probs.html">covidhub_probs</a></code> </p>
         </td>
         <td><p>Probabilities (quantile levels) for
-<a href='https://github.com/reichlab/covid19-forecast-hub'>COVID-19 Forecast Hub</a>
+<a href='https://covid19forecasthub.org/'>COVID-19 Forecast Hub</a>
 forecasts</p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-utilities" class="hasAnchor"><a href="#section-utilities" class="anchor"></a>Utilities</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="Min.html">Min()</a></code> <code><a href="Min.html">Max()</a></code> <code><a href="Min.html">Sum()</a></code> <code><a href="Min.html">Mean()</a></code> <code><a href="Min.html">Median()</a></code> </p>
-        </td>
-        <td><p>Wrappers to functions that remove <code>NA</code> values by default</p></td>
       </tr>
     </tbody>
     </table>
@@ -271,7 +225,7 @@ forecasts</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Ryan Tibshirani, Addison Hu, Collin Politsch.</p>
+  <p>Developed by <a href='http://www.stat.cmu.edu/~ryantibs/'>Ryan J. Tibshirani</a>, <a href='https://collinpolitsch.com/'>Collin A. Politsch</a>, <a href='http://huisaddison.com/'>Addison J. Hu</a>, <a href='https://delphi.cmu.edu/'><img src='man/figures/delphi_logo.jpg' width=75></a>, <a href='https://www.google.org/covid-19/'><img src='man/figures/google_logo.png' width=75></a>.</p>
 </div>
 
 <div class="pkgdown">

@@ -9,14 +9,17 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r, echo = F}
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
 One of the most basic tools in the `modeltools` package is the `slide_by_geo()`
 function, which is based on the family of functions provided by the 
 [`slider`](https://cran.r-project.org/web/packages/slider/vignettes/slider.html)
 package. 
 
 >**Definition:** In `modeltools`, to *slide* means that, for each `geo_value`
-in a 
-[`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html) 
+in a [`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html) 
 data frame, we apply a user-specified function or formula over a trailing 
 window of `n` days of data.
 

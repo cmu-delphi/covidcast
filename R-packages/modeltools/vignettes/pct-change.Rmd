@@ -1,13 +1,17 @@
 ---
-title: 2. Compute percentage change of a COVIDcast signal over time
-description: Compute the percentage change of COVIDcast signal values over 
-  time.
+title: 2. Compute percent change of a COVIDcast signal over time
+description: Compute a sliding percent change operation on the values in a 
+  `covidcast_signal` data frame, grouped by geographic location
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{2. Compute percentage change of a COVIDcast signal over time}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+```{r, echo = F}
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
 
 A simple way of assessing the growth or decay of a signal is to examine the 
 percentage change in its incidence over two adjacent time windows of equal 

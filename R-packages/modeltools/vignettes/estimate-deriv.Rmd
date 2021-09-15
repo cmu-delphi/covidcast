@@ -9,6 +9,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r, echo = F}
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
 In this vignette, we estimate derivatives of `covidcast` signals using the 
 `estimate_deriv()` function from the `modeltools` package. 
 

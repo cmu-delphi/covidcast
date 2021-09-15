@@ -1,30 +1,22 @@
 ---
-title: 2. Estimating the derivatives of a covidcast signal
-description: Estimating the derivatives of a covidcast signal, using various 
+title: 3. Estimate derivatives of a COVIDcast signal
+description: Estimate the derivatives of a COVIDcast signal, using various 
   methods.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{2. Estimating the derivatives of a covidcast signal}
+  %\VignetteIndexEntry{3. Estimate derivatives of a COVIDcast signal}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, echo = FALSE}
-options(rmarkdown.html_vignette.check_title = FALSE)
-```
-
 In this vignette, we estimate derivatives of `covidcast` signals using the 
-[`estimate_deriv()` ](../../../docs/modeltoolsR/reference/estimate_deriv.html)
-function from the `modeltools` package. 
-
-
-## Downloading data from Delphi's Epidata API
+`estimate_deriv()` function from the `modeltools` package. 
 
 We'll use the same reporting data here that we used in the previous vignettes.
 The code chunk below fetches the data from the 
 [**Delphi API**](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html).
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
+```{r, echo = F, message = F, warning = F}
 # Function for displaying table heads
 library(knitr)
 library(kableExtra)
@@ -33,7 +25,7 @@ table_head <- function(x, nrows = 6, title = NULL, footnote = NULL){
   kbl.out <- x %>%
     head(nrows) %>%
     kbl(format = "html", digits = 3) %>%
-    kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+    kable_styling(bootstrap_options = c("striped","hover","condensed","responsive"))
   
   if ( !is.null(title) ){
     header <- ncol(x)
@@ -57,7 +49,7 @@ library(dplyr)
 
 start_day <- "2020-06-01"
 end_day <- "2020-11-15"
-geo_values <- c("ca", "fl", "ny", "tx")
+geo_values <- c("ca","fl","ny","tx")
 
 case_rates <- covidcast_signal(data_source = "usa-facts",
                                signal = "confirmed_7dav_incidence_prop",
@@ -87,8 +79,8 @@ train the given method.
 ### Estimating derivatives via linear regression
 
 First we illustrate the default method for derivative estimation 
-`method = "lin"`, which uses the slope from a simple linear regression. Here 
-we also use the default trailing number of days `n = 14`.
+`method = "lin"`, which uses the slope from a simple linear regression.
+Here we also use the default trailing number of days `n = 14`.
 
 ```{r, message = FALSE, warning = FALSE}
 library(modeltools)
@@ -100,16 +92,17 @@ case_rates %>%
 
 Note above that a column `deriv` has been added to the output data frame, which
 contains the derivative estimates. Below we visualize these estimates in tandem
-with the signal itself. The <span style="color: red;">red</span> dots mark time points at which the derivative 
-estimate exceeds an (arbitrarily chosen) threshold of 0.25. These seem to 
-roughly but reasonably mark times of upswing in the underlying signal. 
+with the signal itself. The <span style="color: red;">red</span> dots mark time 
+points at which the derivative estimate exceeds an (arbitrarily chosen) 
+threshold of 0.25. These seem to roughly but reasonably mark times of upswing
+in the underlying signal. 
 
 The `table_head` function used above is an internal function that we use in 
 these tutorial vignettes to display table heads. The source code can be found 
 in the [`vignettes/estimate-deriv.Rmd`](estimate-deriv.Rmd) 
 file used to build this page.
 
-```{r, message = FALSE, warning = FALSE, fig.align = "center", fig.width = 8, fig.height = 4, fig.retina = 2, dpi = 85}
+```{r, message = F, warning = F, fig.align = "center", fig.width = 8, fig.height = 4}
 library(ggplot2)
 library(gridExtra)
 
@@ -118,8 +111,7 @@ threshold <- 0.25
 
 p1 <- ggplot(case_rates %>% filter(geo_value == state), aes(x = time_value, y = value)) +
   geom_line() + 
-  geom_point(data = case_rates %>% 
-               filter(geo_value == state, deriv >= threshold),
+  geom_point(data = case_rates %>% filter(geo_value == state, deriv >= threshold),
              aes(x = time_value, y = value), color = "red") + 
   labs(x = "Date", y = "Cases per 100,000 people") 
 
@@ -146,14 +138,14 @@ splines (`stats::smooth.spline()`). Note that we also set a custom name for the
 output column with the estimated derivatives, via the `col_name` argument of
 `estimate_deriv()`.
 
-```{r, message = F, warning = F, fig.align = "center", fig.width = 8, fig.height = 4, fig.retina = 2, dpi = 85}
+```{r, message = F, warning = F, fig.width = 8}
 case_rates <- estimate_deriv(case_rates, method = "ss", n = 28,
                              col_name = "deriv_ss1", df = 8)
 
 case_rates <- estimate_deriv(case_rates, method = "ss", n = 28,
-                             col_name = "deriv_ss2", cv = TRUE)
+                             col_name = "deriv_ss2", cv = T)
 
-p1 <- ggplot(case_rates %>% filter(geo_value == state), 
+p1 <- ggplot(case_rates %>% filter(geo_value == state),
              aes(x = time_value, y = value)) +
   geom_line() + 
   geom_point(data = case_rates %>% 
@@ -162,10 +154,9 @@ p1 <- ggplot(case_rates %>% filter(geo_value == state),
   geom_point(data = case_rates %>% 
                filter(geo_value == state, deriv_ss2 >= threshold),
              aes(x = time_value, y = value), color = "blue", shape = 21) +
-  labs(x = "Date", y = "Cases per 100,000 people") 
+  labs(x = "Date", y = "Cases per 100,000 people")
 
-p2 <- ggplot(case_rates %>% filter(geo_value == state), 
-             aes(x = time_value)) +
+p2 <- ggplot(case_rates %>% filter(geo_value == state), aes(x = time_value)) +
   geom_line(aes(y = deriv_ss1), color = "red") + 
   geom_line(aes(y = deriv_ss2), color = "blue") + 
   geom_hline(yintercept = threshold, linetype = 2) +
@@ -195,14 +186,14 @@ regularization. Since the optimization here takes a while (it's based on
 computing a full solution path for the trend filtering problem, via the 
 `genlasso::trendfilter()` function), we only compute derivatives for Florida.
 
-```{r, warning = FALSE, fig.align = "center", fig.width = 8, fig.height = 4, fig.retina = 2, dpi = 85}
+```{r, warning = F, fig.width = 8, fig.height = 4}
 case_rates_state <- case_rates %>% filter(geo_value == state)
 
 case_rates_state <- estimate_deriv(case_rates_state, method = "tf", n = 28, 
                                    col_name = "deriv_tf1", df = 8)
 
 case_rates_state <- estimate_deriv(case_rates_state, method = "tf", n = 28, 
-                                   col_name = "deriv_tf2", cv = TRUE)
+                                   col_name = "deriv_tf2", cv = T)
 
 p1 <- ggplot(case_rates_state, aes(x = time_value, y = value)) +
   geom_line() + 

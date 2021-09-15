@@ -1,280 +1,163 @@
 ---
-title: Getting started with modeltools
+title: Get started with modeltools
 description: An introductory tutorial with examples.
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    code-copy: hover
 vignette: >
-  %\VignetteIndexEntry{Getting started with modeltools}
+  %\VignetteIndexEntry{Get started with modeltools}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, echo = FALSE}
-options(rmarkdown.html_vignette.check_title = FALSE)
+```{css, echo = F}
+details summary {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7pt;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  border-radius: 10px 10px 10px 10px;
+  padding: 1px 5px 1px 5px;
+  width: 14%;
+  margin: 0 0 15px 0;
+  background-color: #A6CEE3;
+  border-style: ridge;
+  border-color: #A6CEE3;
+  box-shadow: 3px 3px 4px black;
+  cursor: pointer;
+  list-style: none;
+}
 ```
 
-## Installing
+## Installation
 
-<font size="3">**_Warning_: This package is not on CRAN!**</font><br/><br/>
-An <tt>R</tt> package named "`modeltools`" does exist on CRAN, but it is
-entirely unrelated to this one. Delphi's `modeltools` package can be installed 
-from the Delphi research group
-[**GitHub page**](https://github.com/cmu-delphi/) using the
-[`devtools`](https://cran.r-project.org/package=devtools)
-package, as shown below. The package's source code can be found
-[**here**](https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools).
+<span style="color:#ff3333;"><font size="3"><b>
+This package is not on CRAN!
+</b></font></span>
 
+The CRAN `modeltools` package is entirely unrelated to this one. Delphi's 
+`modeltools` package can be installed from our 
+[**GitHub page**](https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools)
+with the following command:
 
-### Installing with vignettes
-
-If you would like to install the `modeltools` package with tutorial vignettes
-included (recommended), then use the following command:
-
-```{r, eval = FALSE}
-devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
-                         subdir = "R-packages/modeltools",
-                         build_vignettes = TRUE, dependencies = TRUE)
+```{r, eval = F}
+devtools::install_github(repo = "cmu-delphi/covidcast", subdir = "R-packages/modeltools", 
+                         ref = "modeltools")
 ```
 
 
-### Installing without vignettes
-
-Building the vignettes for Delphi's 
-[`covidcast`](https://cmu-delphi.github.io/covidcast/covidcastR/) 
-package (a `modeltools` dependency) causes the above installation to take a 
-couple minutes. If you prefer a quick installation, you can install `modeltools`
-without vignettes (the default setting):
-
-```{r, eval = FALSE}
-devtools::install_github(repo = "cmu-delphi/covidcast", ref = "collin-develop",
-                         subdir = "R-packages/modeltools")
-```
-<br />
-
-
-## Downloading data from Delphi's COVIDcast Epidata API
+## Downloading COVIDcast signals
 
 In this **Getting started** vignette, we'll fetch daily COVID-19 case rate 
 reporting data (i.e. the number of new COVID-19 cases reported per day, per 
 100,000 population) from Delphi's
 [**COVIDcast Epidata API**](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html).
-The cases rates we'll examine here are reported by
-[**USAFacts**](https://usafacts.org/)
-and cloned into Delphi's API every day. As with many other signals, the API 
-also stores a smoothed version of the signal --- a 7-day trailing average of 
-the (raw) daily case rates reported by USAFacts. Here, we'll look at both the 
-raw and smoothed USAFacts case rates from June 1, 2020 through November 15, 
-2020 for four U.S. states --- CA, FL, NY, and TX.
+The cases rates we'll examine here are reported by [**USAFacts**](https://usafacts.org/)
+and cloned into Delphi's API every day. As with many other signals, the API also
+stores a smoothed version of the signal --- a 7-day trailing average of the
+(raw) daily case rates reported by USAFacts. Here, we'll look at both the raw
+and smoothed USAFacts case rates from June 1, 2020 through November 15, 2020 for
+four U.S. states --- CA, FL, NY, and PA.
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# Function for displaying table heads
-library(knitr)
-library(kableExtra)
-table_head <- function(x, nrows = 6, title = NULL, footnote = NULL){
-
-  kbl.out <- x %>%
-    head(nrows) %>%
-    kbl(format = "html", digits = 3) %>%
-    kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
-  
-  if ( !is.null(title) ){
-    header <- ncol(x)
-    names(header) <- title
-    kbl.out <- kbl.out %>% add_header_above(header, font_size = 15, line = F)
-  }
-  if ( !is.null(footnote) ){
-    kbl.out <- kbl.out %>% add_footnote(footnote, notation = "symbol")
-  }
-  if ( nrows > 20 ){
-    kbl.out <- kbl.out %>% 
-      scroll_box(width = "100%", height = "300px", box_css = "border: 0px solid #fff; padding: 2px; ")
-  }
-  return(kbl.out)
-}
-```
-
-```{r message = FALSE}
+```{r, message = F, warning = F}
 library(covidcast)
-
-start_day <- "2020-06-01"
-end_day <- "2020-11-15"
-geo_values <- c("ca", "fl", "ny", "tx")
-
-signals <- covidcast_signals(data_source = "usa-facts",
-                             signal = c("confirmed_incidence_prop",
-                                        "confirmed_7dav_incidence_prop"),
-                             start_day = start_day,
-                             end_day = end_day,
-                             geo_type = "state", 
-                             geo_values = geo_values)
-```
-<br />
-
-By default, the 
-[`covidcast_signals()`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signals.html)
-function returns the requested signals as a list of 
-[`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html) 
-data frames, with one data frame for each signal. The 
-[`summary()`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/summary.covidcast_signal.html)
-function can be called on each of these 
-[`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html) 
-data frames, as below.
-
-```{r collapse = TRUE}
-summary(signals[[1]])
-
-summary(signals[[2]])
-```
-<br />
-
-As shown in the summary output above, each of the fetched 
-[`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html) 
-data frames in the list has 12 columns. Here, we'll only need the 5 columns 
-selected below. A full description of the USAFacts reporting data stored in 
-Delphi's API can be found 
-[here](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html).
-
-```{r, message = FALSE, warning = FALSE}
 library(dplyr)
-signals[[1]] <- signals[[1]] %>% select(data_source, signal, geo_value, time_value, value)
-signals[[2]] <- signals[[2]] %>% select(data_source, signal, geo_value, time_value, value)
 
-signals[[1]] %>% table_head(title = "Daily COVID-19 cases per 100,000 pop. (reported values)")
-signals[[2]] %>% table_head(title = "Daily COVID-19 cases per 100,000 pop. (7-day trailing average)")
+start_day <- "2020-03-01"
+end_day <- Sys.Date() - 5
+geo_values <- c("ca","fl","ny","pa")
+
+case_rates <- covidcast_signals(data_source = "usa-facts",
+                               signal = c("confirmed_incidence_prop",
+                                          "confirmed_7dav_incidence_prop"),
+                               start_day = start_day,
+                               end_day = end_day,
+                               geo_type = "state",
+                               geo_values = geo_values) %>%
+  aggregate_signals(format = "wide") %>%
+  setNames(gsub("value\\+0:usa-facts_","",names(.))) %>%
+  arrange(geo_value, time_value)
 ```
 
-The `table_head` function used above is an internal function that we use in 
-these tutorial vignettes to display table heads. The source code can be found 
-in the [`vignettes/modeltools.Rmd`](modeltools.Rmd) file used to build this 
-page.
 
+```{r, chunk-1, message = F, warning = F, echo = F, class = "table foo"}
+library(reactable)
+library(crosstalk)
 
-## Sliding
+case_rates_data <- SharedData$new(case_rates, group = "geo_value")
+col3.header <- JS("function(colInfo) {return colInfo.column.name + '<div style=\"color: #999\">Cases per 100,000</div>'}")
+col4.header <- JS("function(colInfo) {return colInfo.column.name + '<div style=\"color: #999\">Cases per 100,000 (smoothed)</div>'}")
+col2.def <- colDef(html = T, format = colFormat(date = T), sortable = T, 
+                   align = "right", maxWidth = 100)
+col3.def <- colDef(minWidth = 170, html = T, format = colFormat(digits = 3), 
+                   sortable = T, align = "center", header = col3.header)
+col4.def <- colDef(minWidth = 200, html = T, format = colFormat(digits = 3), 
+                   sortable = T, align = "center", header = col4.header )
 
-One of the most basic tools in the `modeltools` package is the `slide_by_geo()`
-function, which is based on the family of functions provided by the 
-[`slider`](https://cran.r-project.org/web/packages/slider/vignettes/slider.html)
-package. 
+columns <- list(geo_value = colDef(html = T, align = "left", maxWidth = 90),
+                time_value = col2.def, confirmed_incidence_prop = col3.def,
+                confirmed_7dav_incidence_prop = col4.def)
 
->**Definition:** In `modeltools`, to *slide* means that, for each `geo_value`
-in a 
-[`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html) 
-data frame, we apply a user-specified function or formula over a trailing 
-window of `n` days of data.
+case_rates_tbl <- reactable(case_rates_data, sortable = F, showSortable = T, 
+                            striped = T, defaultPageSize = 10, paginationType = "jump",
+                            columns = columns)
 
-Many other functions in this package, such as 
-[`pct_change()`](../../../docs/modeltoolsR/reference/pct_change.html)
-and 
-[`estimate_deriv()`](../../../docs/modeltoolsR/reference/estimate_deriv.html),
-use
-[`slide_by_geo()`](../../../docs/modeltoolsR/reference/slide_by_geo.html)
-as their workhorse. Below we provide some examples of performing sliding 
-operations on `covidcast` signals with 
-[`slide_by_geo()`](../../../docs/modeltoolsR/reference/slide_by_geo.html),
-utilizing both the function and formula options. <br/>
-
-
-### Sliding with a formula
-
-#### Example 1: Computing a 7-day trailing average by sliding a formula
-
-In this example we reproduce the calculation of the smoothed daily case rates 
-that is performed by the Delphi API. This can be done by passing the 
-[`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html) 
-data frame of raw daily case
-rates (`signals[[1]]`) to 
-[`slide_by_geo()`](../../../docs/modeltoolsR/reference/slide_by_geo.html)
-and then passing a 7-day trailing average formula to the `slide_fun` argument, 
-as follows:
-
-```{r, message = FALSE, warning = FALSE}
-library(modeltools)
-
-slide_by_geo(signals[[1]], slide_fun = ~ Mean(.x$value), n = 7) %>%
-  table_head(title = "Daily COVID-19 cases per 100,000 pop. (7-day trailing average)")
+bscols(case_rates_tbl, list(filter_checkbox("geo_value", "State", case_rates_data, ~toupper(geo_value))),
+       widths = c(10,2), device = "lg")
 ```
-<br />
-
-The formula specified by `slide_fun` has access to all columns present in the
-original
-[`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html) 
-data frame, and must be referred to with the prefix `.x$`. Here, the function
-[`modeltools::Mean()`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/Min.html) 
-is a simple wrapper around `mean()` that omits `NA` values by default.
-
-Notice that the above 
-[`slide_by_geo()`](../../../docs/modeltoolsR/reference/slide_by_geo.html)
-call returns a data frame with a new 
-column appended that contains the results of the sliding operation specified by
-`slide_fun`. By default, this column is named `"slide_value"`, but alternate
-names can be passed to 
-[`slide_by_geo()`](../../../docs/modeltoolsR/reference/slide_by_geo.html),
-as follows: 
-
-```{r}
-slide_by_geo(signals[[1]], slide_fun = ~ Mean(.x$value), n = 7, col_name = "7dav") %>%
-  table_head(title = "Daily COVID-19 cases per 100,000 pop. (7-day trailing average)")
+<details><summary>**Show Source Code**</summary>
+```{r, chunk-1, eval = F}
 ```
-<br />
+</details>
+<br>
 
-Since this example is meant to reproduce the 7-day trailing average calculation 
-carried out by the Delphi API, the values in the `7dav` column should match the 
-pre-computed smoothed daily case rates signal stored in the API 
-(to machine precision). To check this, the code chunk below calculates the 
-maximum absolute difference between the two 7-day trailing averages, 
-over all state-date pairs:
-$$\big\{\text{CA, FL, NY, TX}\big\} \times \big\{\text{date}: \text{date}\in \{\text{June 7, 2020, }\dots,\text{ November 15, 2020}\}\big\}.$$
+Below we plot the weekly percentage change of the smoothed COVID-19 case rates 
+fetched above alongside the smoothed COVID-19 case rates themselves. Here, we 
+focus solely on Florida COVID-19 case rates. 
 
-```{r, collapse = TRUE}
-slide_by_geo(signals[[1]], slide_fun = ~ Mean(.x$value), n = 7, col_name = "7dav") %>%
-  full_join(signals[[2]], by = c("geo_value", "time_value")) %>%
-  mutate(difference = `7dav` - value.y) %>%
-  filter(time_value >= "2020-06-07") %>%
-  summarize(max(abs(difference))) %>%
-  as.numeric
+```{r, chunk-2, message = F, warning = F, fig.width = 8, fig.height = 8, fig.asp = 1, echo = F}
+library(tidyr)
+library(ggplot2)
+library(ggpubr)
+
+case_rates <- case_rates %>% pivot_longer(3:4)
+max.y <- case_rates %>%
+  filter(name == "confirmed_7dav_incidence_prop") %>%
+  pull(value) %>%
+  max
+
+CA <- ggplot(case_rates %>% filter(geo_value == "ca"), aes(x = time_value)) +
+  scale_color_manual(labels = c("Daily cases per 100,000 population", 
+                                "Daily cases per 100,000 population (7-day trailing average)"),
+                     values = c("#A6CEE3", "#1F78B4")) +
+  ylim(0, max.y) +
+  geom_line(aes(y = value, col = rev(name)), size = 0.6) +  
+  theme(legend.position = "none", legend.title = element_blank(), legend.text = element_text(size = 11)) +
+  labs(x = "Date", y = "Daily cases per 100,000 population", title = "COVID-19 case rates in California") 
+
+FL <- ggplot(case_rates %>% filter(geo_value == "fl"), aes(x = time_value)) +
+  scale_colour_brewer(type = "qual", palette = 3) + 
+  ylim(0, max.y) +
+  geom_line(aes(y = value, col = rev(name)), size = 0.6) +  
+  labs(x = "Date", y = "Daily cases per 100,000 population", title = "COVID-19 case rates in Florida")
+
+NY <- ggplot(case_rates %>% filter(geo_value == "ny"), aes(x = time_value)) +
+  scale_colour_brewer(type = "qual", palette = 3) + 
+  ylim(0, max.y) +
+  geom_line(aes(y = value, col = rev(name)), size = 0.6) +  
+  labs(x = "Date", y = "Daily cases per 100,000 population", title = "COVID-19 case rates in New York")
+
+TX <- ggplot(case_rates %>% filter(geo_value == "pa"), aes(x = time_value)) +
+  scale_colour_brewer(type = "qual", palette = 3) + 
+  ylim(0, max.y) +
+  geom_line(aes(y = value, col = rev(name)), size = 0.6) +  
+  labs(x = "Date", y = "Daily cases per 100,000 population", title = "COVID-19 case rates in Pennsylvania")
+
+ggarrange(CA, FL, NY, TX, nrow = 2, ncol = 2, common.legend = T, legend = "bottom", align = "hv")
 ```
-
-The trivial output of this calculation confirms that 
-[`slide_by_geo()`](../../../docs/modeltoolsR/reference/slide_by_geo.html)
-is functioning as desired. <br /><br />
-
-**Note:** The raw daily case rates that we pass to 
-[`slide_by_geo()`](../../../docs/modeltoolsR/reference/slide_by_geo.html)
-begin on June 1, 2020, so the `"7dav"` column created by 
-[`slide_by_geo()`](../../../docs/modeltoolsR/reference/slide_by_geo.html)
-doesn't represent a true *7-day average* until June 7, 2020. This is why we only 
-perform the sanity check calculation above on the dates June 7, 2020, ...,
-November 15, 2020. When a trailing window of `n` days is not available, 
-[`slide_by_geo()`](../../../docs/modeltoolsR/reference/slide_by_geo.html)
-just applies the `slide_fun` function/formula to whatever data 
-*is* available. So for June `n`th, `n = 1,...,6`, the values in the `"7dav"` 
-column are only `n`-day trailing averages. Whereas the pre-computed smoothed 
-daily case rates signal stored in Delphi's API is a true 7-day average for 
-all dates June 1, 2020, ..., November 15, 2020.
-
-
-
-### Sliding with a function 
-
-We can also pass a function to the `slide_fun` argument in 
-[`slide_by_geo()`](../../../docs/modeltoolsR/reference/slide_by_geo.html).
-In this case, the passed function must have the following input argument 
-structure: 
-
-1. `x` : a data frame with the same column names as the data frame passed to
-[`slide_by_geo()`](../../../docs/modeltoolsR/reference/slide_by_geo.html)
-
-2. Any number of additional **named** arguments
-
-3. An ellipsis `...` to allow for any number of additional general arguments
-
-#### Example 2: Computing a 7-day trailing average by sliding a function
-
-The code chunk below reproduces the 7-day trailing average from
-[**Example 1**][Example 1: Computing a 7-day trailing average by sliding a formula], 
-but passes a function to the `slide_fun` argument instead of a formula.
-
-```{r}
-slide_by_geo(signals[[1]], slide_fun = function(x, ...) Mean(x$value), n = 7, col_name = "7dav") %>%
-  table_head(title = "Daily COVID-19 cases per 100,000 pop. (7-day trailing average)")
+<details><summary>**Show Source Code**</summary>
+```{r, chunk-2, eval = F}
 ```
-<br />
+</details>
+<br>

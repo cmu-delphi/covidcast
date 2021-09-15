@@ -2,9 +2,8 @@
 % Please edit documentation in R/change.R
 \name{pct_change}
 \alias{pct_change}
-\title{Compute percentage change of values in
-\href{https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html}{\code{covidcast_signal}}
-data frame}
+\title{Compute the sliding window percent change in the values in a
+\code{covidcast_signal} data frame, grouped by geographic location}
 \usage{
 pct_change(x, n = 14, col_name = "pct_change")
 }
@@ -26,7 +25,7 @@ A data frame given by appending a new column to \code{x} named according
 to the \code{col_name} argument, containing the percentage change values.
 }
 \description{
-Computes the percentage change of the values in a \code{covidcast_signal} data
+Computes the percent change of the values in a \code{covidcast_signal} data
 frame. (When multiple issue dates are present, only the latest issue is
 considered.)  See the \href{https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/pct-change.html}{percentage change vignette}
 for examples.

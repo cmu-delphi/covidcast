@@ -1,0 +1,185 @@
+---
+title: 1. Compute sliding window operations on a COVIDcast signal
+description: Compute sliding window operations on the values in a 
+  `covidcast_signal` data frame, grouped by geographic location
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{1. Compute sliding window operations on a COVIDcast signal}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+One of the most basic tools in the `modeltools` package is the `slide_by_geo()`
+function, which is based on the family of functions provided by the 
+[`slider`](https://cran.r-project.org/web/packages/slider/vignettes/slider.html)
+package. 
+
+>**Definition:** In `modeltools`, to *slide* means that, for each `geo_value`
+in a 
+[`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html) 
+data frame, we apply a user-specified function or formula over a trailing 
+window of `n` days of data.
+
+Many other functions in this package, such as `pct_change()` and
+`estimate_deriv()`, use `slide_by_geo()` as their workhorse. Below we provide
+some examples of performing sliding operations on `covidcast` signals with
+`slide_by_geo()`, utilizing both the function and formula options.
+
+We'll use the same reporting data here that we used in the
+[**Getting started guide**](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html).
+The code chunk below fetches the data from the 
+[**Delphi API**](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html).
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# Function for displaying table heads
+library(knitr)
+library(kableExtra)
+table_head <- function(x, nrows = 6, title = NULL, footnote = NULL){
+
+  kbl.out <- x %>%
+    head(nrows) %>%
+    kbl(format = "html", digits = 3) %>%
+    kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+  
+  if ( !is.null(title) ){
+    header <- ncol(x)
+    names(header) <- title
+    kbl.out <- kbl.out %>% add_header_above(header, font_size = 15, line = F)
+  }
+  if ( !is.null(footnote) ){
+    kbl.out <- kbl.out %>% add_footnote(footnote, notation = "symbol")
+  }
+  if ( nrows > 20 ){
+    kbl.out <- kbl.out %>% 
+      scroll_box(width = "100%", height = "300px", box_css = "border: 0px solid #fff; padding: 2px; ")
+  }
+  return(kbl.out)
+}
+```
+
+```{r message = FALSE}
+library(covidcast)
+library(dplyr)
+
+start_day <- "2020-06-01"
+end_day <- "2020-11-15"
+geo_values <- c("ca", "fl", "ny", "tx")
+
+case_rates <- covidcast_signal(data_source = "usa-facts",
+                               signal = "confirmed_incidence_prop",
+                               start_day = start_day,
+                               end_day = end_day,
+                               geo_type = "state",
+                               geo_values = geo_values) %>%
+  select(data_source, signal, geo_value, time_value, value)
+```
+
+Here, we'll only need the 5 columns selected below. See the 
+[`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html) 
+documentation for a description of the full set of columns in a 
+`covidcast_signal` object. The signal documentation for the USAFacts signals
+specifically can be found
+[here](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html).
+
+
+### Sliding with a formula
+
+#### Example 1: Computing a 7-day trailing average by sliding a formula
+
+In this example we reproduce the calculation of the smoothed daily case rates 
+that is performed by the Delphi API. This can be done by passing the 
+[`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html) 
+data frame of raw daily case rates to `slide_by_geo()` and then passing a 7-day
+trailing average formula to the `slide_fun` argument, as follows:
+
+```{r, message = FALSE, warning = FALSE}
+library(modeltools)
+
+slide_by_geo(case_rates, slide_fun = ~ Mean(.x$value), n = 7) %>%
+  table_head(title = "Daily COVID-19 cases per 100,000 pop. (7-day trailing average)")
+```
+
+The `table_head()` function used above is an internal function that we use in 
+these tutorial vignettes to display table heads. The source code can be found 
+in the [`vignettes/modeltools.Rmd`](modeltools.Rmd) file used to build this 
+page.
+
+The formula specified by `slide_fun` has access to all columns present in the
+original
+[`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html) 
+data frame, and must be referred to with the prefix `.x$`. Here, the function
+[`modeltools::Mean()`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/Min.html) 
+is a simple wrapper around `mean()` that omits `NA` values by default.
+
+Notice that the above `slide_by_geo()` call returns a data frame with a new 
+column appended that contains the results of the sliding operation specified by
+`slide_fun`. By default, this column is named `"slide_value"`, but alternate
+names can be passed to `slide_by_geo()`, as follows:
+
+```{r}
+slide_by_geo(case_rates, slide_fun = ~ Mean(.x$value), n = 7, col_name = "7dav") %>%
+  table_head(title = "Daily COVID-19 cases per 100,000 pop. (7-day trailing average)")
+```
+
+Since this example is meant to reproduce the 7-day trailing average calculation 
+carried out by the Delphi API, the values in the `7dav` column should match the 
+pre-computed smoothed daily case rates signal stored in the API 
+(to machine precision). To check this, the code chunk below calculates the 
+maximum absolute difference between the two 7-day trailing averages, 
+over all state-date pairs:
+$$\big\{\text{CA, FL, NY, TX}\big\} \times \big\{\text{date}: \text{date}\in \{\text{June 7, 2020, }\dots,\text{ November 15, 2020}\}\big\}.$$
+
+```{r, collapse = TRUE}
+case_rates_7dav <- covidcast_signal(data_source = "usa-facts",
+                                    signal = "confirmed_7dav_incidence_prop",
+                                    start_day = start_day,
+                                    end_day = end_day,
+                                    geo_type = "state",
+                                    geo_values = geo_values) %>%
+  select(data_source, signal, geo_value, time_value, value)
+
+slide_by_geo(case_rates, slide_fun = ~ Mean(.x$value), n = 7, col_name = "7dav") %>%
+  full_join(case_rates_7dav, by = c("geo_value", "time_value")) %>%
+  mutate(difference = `7dav` - value.y) %>%
+  filter(time_value >= "2020-06-07") %>%
+  summarize(max(abs(difference))) %>%
+  as.numeric
+```
+
+<details><summary>**Note:**</summary>
+The raw daily case rates that we pass to `slide_by_geo()` begin on June 1, 2020,
+so the `"7dav"` column created by `slide_by_geo()` doesn't represent a true 
+*7-day average* until June 7, 2020. This is why we only perform the sanity check
+calculation above on the dates June 7, 2020, ..., November 15, 2020. When a 
+trailing window of `n` days is not available, `slide_by_geo()` just applies the
+`slide_fun` function/formula to whatever data *is* available. So for June `n`th,
+`n = 1,...,6`, the values in the `"7dav"` column are only `n`-day trailing
+averages. Whereas the pre-computed smoothed daily case rates signal stored in
+Delphi's API is a true 7-day average for all dates June 1, 2020, ..., November
+15, 2020.
+</details>
+
+
+### Sliding with a function 
+
+We can also pass a function to the `slide_fun` argument in `slide_by_geo()`.
+In this case, the passed function must have the following input argument 
+structure: 
+
+1. `x` : a data frame with the same column names as the data frame passed to
+`slide_by_geo()`
+
+2. Any number of additional **named** arguments
+
+3. An ellipsis `...` to allow for any number of additional general arguments
+
+#### Example 2: Computing a 7-day trailing average by sliding a function
+
+The code chunk below reproduces the 7-day trailing average from
+[**Example 1**][Example 1: Computing a 7-day trailing average by sliding a formula], 
+but passes a function to the `slide_fun` argument instead of a formula.
+
+```{r}
+slide_by_geo(case_rates, slide_fun = function(x, ...) Mean(x$value), n = 7, col_name = "7dav") %>%
+  table_head(title = "Daily COVID-19 cases per 100,000 pop. (7-day trailing average)")
+```

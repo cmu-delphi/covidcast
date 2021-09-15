@@ -2,9 +2,8 @@
 % Please edit documentation in R/slide.R
 \name{slide_by_geo}
 \alias{slide_by_geo}
-\title{Slide a function over values in
-\href{https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html}{\code{covidcast_signal}}
-data frame, grouped by the \code{geo_value}}
+\title{Compute sliding window operations on the values in a \code{covidcast_signal} data
+frame, grouped by geographic location}
 \usage{
 slide_by_geo(
   x,
@@ -26,13 +25,15 @@ followed by any number of named additional arguments; and ending with
 \code{...}, to capture general additional arguments. If a formula, \code{slide_fun}
 can operate directly on \code{.x$value}, \code{.x$time_value}, etc., as in \code{~ mean(.x$value)} to compute a trailing mean over the last \code{n} days of data.}
 
-\item{n}{Size of the local window (in days) to use. For example, if \code{n = 5},
-then to estimate the derivative on November 5, we train the given method on
-data in between November 1 and November 5. Default is 14.}
+\item{n}{Size of the trailing window (in days) to use. Defaults to \code{n = 14}.
+The sliding window includes the current day and the previous \code{n - 1} days.
+So, e.g., an \code{n = 14} sliding mean calculation on November 14 is an
+average of the 14 days of data from November 1 to November 14.}
 
 \item{col_name}{String indicating the name of the new column that will
-contain the derivative values. Default is "slide_value"; note that setting
-\code{col_name = "value"} will overwrite the existing "value" column.}
+contain the output of the sliding operation. Default is "slide_value";
+note that setting \code{col_name = "value"} will overwrite the existing "value"
+column.}
 
 \item{col_type}{One of "dbl", "int", "lgl", "chr", or "list", indicating the
 data type (as tibble abbreviation) for the new column. Default is "dbl".}
@@ -45,8 +46,8 @@ A data frame given by appending a new column to \code{x} named according
 to the \code{col_name} argument, containing the function values.
 }
 \description{
-Slides a given function over the values in a  \code{covidcast_signal} data frame,
-grouped by \code{geo_value}. (When multiple issue dates are present, only the
-latest issue is considered.) See the \href{https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html}{getting started guide}
+Slides a given function or formula over the values in a  \code{covidcast_signal}
+data frame, grouped by \code{geo_value}. See the
+\href{https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/slide_by_geo.html}{\code{slide_by_geo} vignette}
 for examples.
 }

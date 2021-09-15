@@ -1,33 +1,25 @@
 ---
-title: 1. Computing percentage change of a covidcast signal over time
-description: Computing the percentage change of covidcast signal values over 
+title: 2. Compute percentage change of a COVIDcast signal over time
+description: Compute the percentage change of COVIDcast signal values over 
   time.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{1. Computing percentage change of a covidcast signal over time}
+  %\VignetteIndexEntry{2. Compute percentage change of a COVIDcast signal over time}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, echo = FALSE}
-options(rmarkdown.html_vignette.check_title = FALSE)
-```
-
 A simple way of assessing the growth or decay of a signal is to examine the 
 percentage change in its incidence over two adjacent time windows of equal 
-length. As shown here, this calculation can be done with the
-[`pct_change()`](../../../docs/modeltoolsR/reference/pct_change.html)
+length. As shown here, this calculation can be done with the `pct_change()`
 function.
-
-
-## Downloading data from Delphi's Epidata API
 
 We'll use the same reporting data here that we used in the
 [**Getting started guide**](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html).
 The code chunk below fetches the data from the 
 [**Delphi API**](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html).
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
+```{r, echo = F, message = F, warning = F}
 # Function for displaying table heads
 library(knitr)
 library(kableExtra)
@@ -36,7 +28,7 @@ table_head <- function(x, nrows = 6, title = NULL, footnote = NULL){
   kbl.out <- x %>%
     head(nrows) %>%
     kbl(format = "html", digits = 3) %>%
-    kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+    kable_styling(bootstrap_options = c("striped","hover","condensed","responsive"))
   
   if ( !is.null(title) ){
     header <- ncol(x)
@@ -54,13 +46,13 @@ table_head <- function(x, nrows = 6, title = NULL, footnote = NULL){
 }
 ```
 
-```{r message = FALSE}
+```{r message = F}
 library(covidcast)
 library(dplyr)
 
 start_day <- "2020-06-01"
 end_day <- "2020-11-15"
-geo_values <- c("ca", "fl", "ny", "tx")
+geo_values <- c("ca","fl","ny","tx")
 
 case_rates <- covidcast_signal(data_source = "usa-facts",
                                signal = "confirmed_7dav_incidence_prop",
@@ -75,10 +67,9 @@ case_rates %>%
 ```
 
 The `table_head` function used above is an internal function that we use in 
-these tutorial vignettes to display
-table heads. The source code can be found in the 
-[`vignettes/pct-change.Rmd`](pct-change.Rmd) 
-file used to build this page.
+these tutorial vignettes to display table heads. The source code can be found
+in the [`vignettes/pct-change.Rmd`](pct-change.Rmd) file used to build this
+page.
 
 
 ## Percentage change
@@ -95,11 +86,8 @@ trailing window,
 * $B$ is the total incidence of the signal over the last $n/2$ days of the 
 trailing window.
 
-The 
-[`pct_change()`](../../../docs/modeltoolsR/reference/pct_change.html)
-function exploits the functionality of 
-[`slide_by_geo()`](../../../docs/modeltoolsR/reference/slide_by_geo.html)
-to slide this calculation over a
+The `pct_change()` function exploits the functionality of `slide_by_geo()`
+to slide this trailings calculation over a
 [`covidcast_signal`](../../../docs/covidcastR/reference/covidcast_signal.html)
 data frame.
 
@@ -111,11 +99,10 @@ to refer to the `n = 2` case.
 
 ### Function call 
 
-The percentage change calculation follows via the following 
-one-line call to 
-[`pct_change()`](../../../docs/modeltoolsR/reference/pct_change.html):
+The percentage change calculation follows via the following one-line call to
+`pct_change()`:
 
-```{r, message = FALSE, warning = FALSE}
+```{r, message = F, warning = F}
 library(modeltools)
 case_rates <- pct_change(case_rates, n = 14, col_name = "pct_change")
 case_rates %>% 
@@ -133,7 +120,7 @@ Below we plot the weekly percentage change of the smoothed COVID-19 case rates
 fetched above alongside the smoothed COVID-19 case rates themselves. Here, we 
 focus solely on Florida COVID-19 case rates. 
 
-```{r, message = F, warning = F, fig.align = "center", fig.width = 8, fig.height = 4, fig.retina = 2, dpi = 85}
+```{r, message = F, warning = F, fig.width = 8, fig.height = 4}
 library(ggplot2)
 library(gridExtra)
 
@@ -164,21 +151,22 @@ Here, first we compute the 1-day percentage change (which we will also call
 **daily percentage change**) time series of the state-level COVID-19 case rates
 examined above, and then we post-process each state's percentage change time 
 series with a 7-day trailing average via a suitable application of 
-[`slide_by_geo()`](../../../docs/modeltoolsR/reference/slide_by_geo.html).
+`slide_by_geo()`.
 
-```{r, message = FALSE, warning = FALSE}
+```{r, message = F, warning = F}
 case_rates <- case_rates %>%
   pct_change(n = 2, col_name = "pct_change_daily") %>%
   slide_by_geo(~ Mean(.x$pct_change_daily), n = 7, col_name = "pct_change_daily_7dav")
 ```
 
-```{r, message = FALSE, warning = FALSE, echo = FALSE}
+<div class="fold o">
+```{r, message = F, warning = F, echo = F}
 case_rates %>%
   arrange(geo_value) %>% 
   select(geo_value, time_value, value, pct_change_daily, pct_change_daily_7dav) %>%
     table_head(title = "U.S. COVID-19 case rates (with daily % change and post-hoc trailing average)")
 ```
-
+</div>
 
 
 ### Visualizing the results
@@ -192,13 +180,12 @@ real variations in the spread of COVID-19 in Florida. The daily percentage
 change post-processed with a 7-day trailing average 
 (<span style="color: blue;">shown in blue</span>) is likely a better indicator.
 
-```{r, message = F, warning = F, fig.align = "center", fig.width = 8, fig.height = 4.5, fig.retina = 2, dpi = 85}
+```{r, message = F, warning = F, fig.width = 8, fig.height = 4.5}
 library(tidyr)
 
 p1 <- ggplot(case_rates %>% filter(geo_value == state), aes(x = time_value, y = value)) +
   geom_line() + 
-  labs(title = "Florida COVID-19 case rates (smoothed)", 
-       x = "Date", y = "Cases per 100,000 people") + 
+  labs(title = "Florida COVID-19 case rates (smoothed)", x = "Date", y = "Cases per 100,000 people") + 
   theme(plot.margin = margin(l = 0.1, t = 0.2, b = 1.6, unit = "cm"))
 
 case_rates <- case_rates %>%
@@ -207,7 +194,7 @@ case_rates <- case_rates %>%
 
 p2 <- ggplot(case_rates %>% filter(geo_value == state), aes(x = time_value)) +
   geom_line(aes(y = pct_change_val, color = pct_change)) + 
-  scale_color_manual(values=c('red', 'blue')) +
+  scale_color_manual(values = c('red', 'blue')) +
   labs(x = "Date", y = "Daily percent change", title = "Daily percent change") +
   theme(legend.position = "bottom", legend.title = element_blank())
 

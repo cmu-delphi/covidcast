@@ -1,8 +1,7 @@
-#' Compute percentage change of values in 
-#' [`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html)
-#' data frame
+#' Compute the sliding window percent change in the values in a 
+#' `covidcast_signal` data frame, grouped by geographic location
 #' 
-#' Computes the percentage change of the values in a `covidcast_signal` data
+#' Computes the percent change of the values in a `covidcast_signal` data
 #' frame. (When multiple issue dates are present, only the latest issue is
 #' considered.)  See the [percentage change
 #' vignette](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/pct-change.html)

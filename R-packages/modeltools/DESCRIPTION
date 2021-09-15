@@ -1,45 +1,54 @@
 Package: modeltools
 Type: Package
-Title: Tools for Analyzing COVID-19 Data Streams and Building Forecasters
+Title: Tools for Analyzing COVID Signals and Building Forecasting Models
 Version: 0.2.0
-Date: 2021-09-05
-Authors@R:
-	c(
-    person(given = "Ryan J.",
-           family = "Tibshirani",
-           role = c("aut", "cre"),
-           email = "ryantibs@cmu.edu",
-           comment = c(ORCID = "0000-0002-2158-8304")),
-    person(given = "Collin A.",
-           family = "Politsch",
-           role = "aut",
-           comment = c(ORCID = "0000-0003-3727-9167")),
-    person(given = "Addison J.",
-           family = "Hu",
-           role = "aut",
-           comment = c(ORCID = "0000-0002-9339-7291")),
-    person(given = "Jacob",
-           family = "Bien",
-           role = "ctb"),
-    person(given = "Jed",
-           family = "Grabman",
-           role = "ctb"),
-    person(given = "Daniel J.",
-           family = "McDonald",
-           role = "ctb"),
-    person(given = "Mike",
-           family = "O'Brien",
-           role = "ctb"),
-    person(given = "J. Kenneth",
-           family = "Tay",
-           role = "ctb")
-    )
-URL: https://github.com/cmu-delphi/covidcast
-Description: Tools for analyzing the trajectories of COVID-19 data streams and 
-    building short-term forecasters. This package is developed and maintained by 
-    the Delphi research group headquartered at Carnegie Mellon University and 
-    is designed to be used in conjunction with Delphi's `covidcast` and 
-    `evalcast` <tt>R</tt> packages.
+Date: 2021-09-12
+Authors@R: c(person(given = "Ryan J.",
+             family = "Tibshirani",
+             role = c("aut", "cre"),
+             email = "ryantibs@cmu.edu",
+             comment = c(ORCID = "0000-0002-2158-8304")),
+             person(given = "Collin A.",
+                    family = "Politsch",
+                    role = "aut",
+                    comment = c(ORCID = "0000-0003-3727-9167")),
+             person(given = "Addison J.",
+                    family = "Hu",
+                    role = "aut",
+                    comment = c(ORCID = "0000-0002-9339-7291")),
+             person(given = "Delphi",
+                    family = "group",
+                    role = c("cph","fnd")),
+             person(given = "Google",
+                    family = "org",
+                    role = "fnd"),
+             person(given = "Jacob",
+                    family = "Bien",
+                    role = "ctb"),
+             person(given = "Jed",
+                    family = "Grabman",
+                    role = "ctb"),
+             person(given = "Daniel J.",
+                    family = "McDonald",
+                    role = "ctb",
+                    comment = c(ORCID = "0000-0002-0443-4282")),
+             person(given = "Michael",
+                    family = "O'Brien",
+                    role = "ctb",
+                    comment = c(ORCID = "0000-0002-5942-791X")),
+             person(given = "J. Kenneth",
+                    family = "Tay",
+                    role = "ctb"))
+URL: https://cmu-delphi.github.io/covidcast/modeltoolsR/,
+  https://github.com/cmu-delphi/covidcast/tree/modeltools/R-packages/modeltools
+BugReports: https://github.com/cmu-delphi/covidcast/issues
+Description: Tools for analyzing the trajectories of COVID-19 signals ---
+             namely, those stored in Delphi's COVIDcast Epidata API --- and for
+             building short-term forecasting models. This package is developed
+             and maintained by the Delphi research group headquartered at 
+             Carnegie Mellon University and is designed to be used in 
+             conjunction with Delphi's `covidcast` and `evalcast` <tt>R</tt> 
+             packages.
 License: MIT
 Encoding: UTF-8
 LazyData: true
@@ -60,4 +69,3 @@ Imports:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-BugReports: https://github.com/cmu-delphi/covidcast/issues

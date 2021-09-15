@@ -2,9 +2,7 @@
 % Please edit documentation in R/deriv.R
 \name{estimate_deriv}
 \alias{estimate_deriv}
-\title{Estimate derivatives of values in
-\href{https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html}{\code{covidcast_signal}}
-data frame}
+\title{Estimate derivatives of a COVIDcast signal}
 \usage{
 estimate_deriv(
   x,

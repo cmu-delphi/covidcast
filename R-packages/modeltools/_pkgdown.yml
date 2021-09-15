@@ -1,6 +1,33 @@
 # Deploy to central docs directory that's on GitHub Pages
 destination: ../../docs/modeltoolsR/
 
+template:
+  code_folding: show
+  bootstrap: 4
+  params:
+    bootswatch: "cosmo"
+  bslib:
+    base_font:
+      google: "Sans Serif"
+    heading_font:
+      google: "Sans Serif"
+    code_font:
+      google: "JetBrains Mono"
+    
+authors:
+  Ryan J. Tibshirani:
+    href: "http://www.stat.cmu.edu/~ryantibs/"
+  Collin A. Politsch:
+    href: "https://collinpolitsch.com/"
+  Addison J. Hu:
+    href: "http://huisaddison.com/"
+  Delphi group:
+    href: "https://delphi.cmu.edu/"
+    html: "<img src='man/figures/delphi_logo.jpg' width=75>"
+  Google org:
+    href: "https://www.google.org/covid-19/"
+    html: "<img src='man/figures/google_logo.png' width=75>"
+    
 home:
   sidebar:
     html: >
@@ -14,20 +41,20 @@ home:
       <ul class="list-unstyled">
         <li>
           Browse source code at <br/>
-          <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools">
-            https://github.com/cmu&#8209;delphi/covidcast/<br>tree/main/R&#8209;packages/modeltools
+          <a href="https://github.com/cmu-delphi/covidcast/tree/modeltools/R-packages/modeltools">
+            https://github.com/cmu&#8209;delphi/covidcast/<br>tree/modeltools/R&#8209;packages/modeltools
           </a>
         </li>
         
         <li>
-          Get the <samp>covidcast</samp> R package at <br/>
+          Get the covidcast <tt>R</tt> package at <br/>
           <a href="https://cmu-delphi.github.io/covidcast/covidcastR">
             https://cmu&#8209;delphi.github.io/covidcast/<br>covidcastR
           </a>
         </li>
         
         <li>
-          Get the <samp>evalcast</samp> R package at <br/>
+          Get the evalcast <tt>R</tt> package at <br/>
           <a href="https://cmu-delphi.github.io/covidcast/evalcastR">
             https://cmu&#8209;delphi.github.io/covidcast/<br>evalcastR
           </a>
@@ -42,7 +69,7 @@ home:
         
         <li>
           View the COVIDcast map at <br/>
-          <a href="https://covidcast.cmu.edu/">https://covidcast.cmu.edu/</a>
+          <a href="https://delphi.cmu.edu/covidcast/summary">https://delphi.cmu.edu/covidcast/summary</a>
           </li>
       </ul>
 
@@ -51,59 +78,82 @@ home:
       <a href="https://opensource.org/licenses/mit-license.php">MIT</a>
       
       <h3>Citation</h3>
-      <a href="../../docs/modeltoolsR/authors.html">Citing the <samp>modeltools</samp> package</a>
+      <a href="../../docs/modeltoolsR/authors.html">Citing the modeltools package</a>
       
       <h3>Developers</h3>
       <ul class="list-unstyled">
         <li>
-          Ryan J. Tibshirani 
+          <a href="http://www.stat.cmu.edu/~ryantibs/">Ryan J. Tibshirani</a>
             <a href="https://orcid.org/0000-0002-2158-8304" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>
-            <br><small class="roles"> Author, maintainer </small>
+            <br><small>Author, maintainer</small>
         </li>
         
         <li>
-          Collin A. Politsch 
+          <a href="https://collinpolitsch.com/">Collin A. Politsch</a>
           <a href="https://orcid.org/0000-0003-3727-9167" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>
-          <br><small class="roles"> Author </small>
+          <br><small>Author</small>
         </li>
         
         <li>
-          Addison J. Hu 
+          <a href="http://huisaddison.com/">Addison J. Hu</a>
           <a href="https://orcid.org/0000-0002-9339-7291" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>
-          <br><small class="roles"> Author </small>
+          <br><small>Author</small><br>
+        </li>
+
+        <li>
+          <a href="https://delphi.cmu.edu/"><img src='man/figures/delphi_logo.jpg' width=75 style="vertical-align:bottom"></a>
+          <p><small class="roles">Research group, copyright holder</small></p>
+        </li>
+        
+        <li>
+          <a href="https://www.google.org/covid-19/"><img src='man/figures/google_logo.png' width=75 style="vertical-align:bottom"></a><br>
+          <p><small>Corporate sponsor</small></p>
         </li>
         
         <li><a href="../../docs/modeltoolsR/authors.html">All authors...</a></li>
       </ul>
+      
+figures:
+  dev: ragg::agg_png
+  dpi: 96
+  dev.args: []
+  fig.ext: png
+  fig.width: 8
+  fig.height: ~
+  fig.asp: 2
+  fig.retina: 2
+  fig.align: "center"
+  bg: NA
 
+reference:
+  - title: "Functions"
+  - contents:
+      - slide_by_geo
+      - estimate_deriv
+      - pct_change
+      - quantgen_forecaster
+  - title: "Data"
+  - contents:
+      - covidhub_probs
+      
 articles:
-  - title: Using the package
-    desc: Basic usage and examples.
+  - title: "Using the package"
+    desc: "Basic usage and examples."
     navbar: ~
     contents:
       - modeltools
+      - slide_by_geo
       - pct-change
       - estimate-deriv
       - quantgen-forecast
-
-reference:
-  - title: Example forecasters
-  - contents:
-      - quantgen_forecaster
-  - title: Compute temporal changes in signals
-  - contents:
-      - estimate_deriv
-      - pct_change
-  - title: Perform sliding operations on signals
-  - contents:
-      - slide_by_geo
-  - title: "COVID-19 Forecast Hub data"
-  - contents:
-      - covidhub_probs
-  - title: Utilities
-  - contents:
-      - Min
-      - Max
-      - Sum
-      - Mean
-      - Median
+      
+deploy:
+  install_metadata: true
+      
+repo:
+  branch: modeltools
+  url:
+    home: "https://github.com/cmu-delphi/covidcast/tree/modeltools/R-packages/modeltools"
+    source: "https://github.com/cmu-delphi/covidcast/tree/modeltools/R-packages/modeltools"
+    issue: "https://github.com/cmu-delphi/covidcast/issues"
+    user: "https://github.com/cmu-delphi"

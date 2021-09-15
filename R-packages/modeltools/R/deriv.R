@@ -1,6 +1,4 @@
-#' Estimate derivatives of values in 
-#' [`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html)
-#' data frame
+#' Estimate derivatives of a COVIDcast signal
 #' 
 #' Estimates derivatives of the values in a `covidcast_signal` data frame, using
 #' a local (in time) linear regression or smoothing spline. (When multiple issue

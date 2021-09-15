@@ -1,7 +1,7 @@
-#' Simple autoregressive quantile forecaster based on 
-#' [`quantgen`](https://github.com/ryantibs/quantgen)
+#' Simple quantile autoregressive forecaster based on `quantgen`
 #'
-#' A simple autoregressive quantile forecaster based on `quantgen`, to be used
+#' A simple autoregressive quantile forecaster based on 
+#' [`quantgen`](https://github.com/ryantibs/quantgen), to be used
 #' with `evalcast`, via [evalcast::get_predictions()]. See the [quantgen
 #' forecast
 #' vignette](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/quantgen-forecast.html)

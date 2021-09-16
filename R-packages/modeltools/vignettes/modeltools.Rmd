@@ -86,7 +86,7 @@ case_rates <- covidcast_signals(data_source = source,
 ```
 
 
-```{r, chunk-1, message = F, warning = F, echo = F, class = "table foo"}
+```{r, chunk-1, message = F, warning = F, echo = F}
 library(reactable)
 library(crosstalk)
 

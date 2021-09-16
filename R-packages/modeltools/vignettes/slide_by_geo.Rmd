@@ -2,7 +2,9 @@
 title: 1. Compute sliding window operations on a COVIDcast signal
 description: Compute sliding window operations on the values in a 
   `covidcast_signal` data frame, grouped by geographic location
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    code-copy: hover
 vignette: >
   %\VignetteIndexEntry{1. Compute sliding window operations on a COVIDcast signal}
   %\VignetteEngine{knitr::rmarkdown}

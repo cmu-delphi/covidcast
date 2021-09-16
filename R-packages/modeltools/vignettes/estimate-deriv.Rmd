@@ -2,7 +2,9 @@
 title: 3. Estimate derivatives of a COVIDcast signal
 description: Estimate the derivatives of a COVIDcast signal, using various 
   methods.
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    code-copy: hover
 vignette: >
   %\VignetteIndexEntry{3. Estimate derivatives of a COVIDcast signal}
   %\VignetteEngine{knitr::rmarkdown}

@@ -493,14 +493,13 @@ confirmed_incidence_prop
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">geo_values =</span> geo_values) <span class="sc">%&gt;%</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(data_source, signal, geo_value, time_value, value)</span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Fetched day 2020-06-01 to 2020-11-15: num_entries = 672</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(case_rates, <span class="at">slide_fun =</span> <span class="sc">~</span> <span class="fu">Mean</span>(.x<span class="sc">$</span>value), <span class="at">n =</span> <span class="dv">7</span>, <span class="at">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(case_rates_7dav, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;geo_value&quot;</span>, <span class="st">&quot;time_value&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">difference =</span> <span class="st">`</span><span class="at">7dav</span><span class="st">`</span> <span class="sc">-</span> value.y) <span class="sc">%&gt;%</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(time_value <span class="sc">&gt;=</span> <span class="st">&quot;2020-06-07&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">max</span>(<span class="fu">abs</span>(difference))) <span class="sc">%&gt;%</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  as.numeric</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 6.757779e-08</span></span></code></pre></div>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">slide_by_geo</span>(case_rates, <span class="at">slide_fun =</span> <span class="sc">~</span> <span class="fu">Mean</span>(.x<span class="sc">$</span>value), <span class="at">n =</span> <span class="dv">7</span>, <span class="at">col_name =</span> <span class="st">&quot;7dav&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(case_rates_7dav, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;geo_value&quot;</span>, <span class="st">&quot;time_value&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">difference =</span> <span class="st">`</span><span class="at">7dav</span><span class="st">`</span> <span class="sc">-</span> value.y) <span class="sc">%&gt;%</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(time_value <span class="sc">&gt;=</span> <span class="st">&quot;2020-06-07&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">max</span>(<span class="fu">abs</span>(difference))) <span class="sc">%&gt;%</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  as.numeric</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 6.757779e-08</span></span></code></pre></div>
 <details>
 <summary>
 <strong>Note:</strong>

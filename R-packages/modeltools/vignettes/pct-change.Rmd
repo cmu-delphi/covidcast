@@ -4,7 +4,7 @@ description: Compute a sliding percent change operation on the values in a
   `covidcast_signal` data frame, grouped by geographic location
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{2. Compute percentage change of a COVIDcast signal over time}
+  %\VignetteIndexEntry{2. Compute percent change of a COVIDcast signal over time}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

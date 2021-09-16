@@ -10,6 +10,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r, echo = F}
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
 ```{css, echo = F}
 details summary {
   font-family: 'JetBrains Mono', monospace;
@@ -30,10 +34,6 @@ details summary {
 }
 ```
 
-```{r, echo = F}
-options(rmarkdown.html_vignette.check_title = FALSE)
-```
-
 ## Installation
 
 <span style="color:#ff3333;"><font size="3"><b>
@@ -47,7 +47,7 @@ with the following command:
 
 ```{r, eval = F}
 devtools::install_github(repo = "cmu-delphi/covidcast", subdir = "R-packages/modeltools",
-                         ref = "modeltools")
+                         ref = "collin-develop")
 ```
 
 

@@ -20,7 +20,7 @@ function, which is based on the family of functions provided by the
 [`slider`](https://cran.r-project.org/web/packages/slider/vignettes/slider.html)
 package. 
 
->**Definition:** In `modeltools`, to *slide* means that, for each `geo_value`
+**Definition:** In `modeltools`, to *slide* means that, for each `geo_value`
 in a [`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html) 
 data frame, we apply a user-specified function or formula over a trailing 
 window of `n` days of data.
@@ -62,29 +62,26 @@ table_head <- function(x, nrows = 6, title = NULL, footnote = NULL){
 }
 ```
 
-```{r message = FALSE}
+```{r, message = F, warning = F}
 library(covidcast)
 library(dplyr)
 
-start_day <- "2020-06-01"
-end_day <- "2020-11-15"
-geo_values <- c("ca", "fl", "ny", "tx")
+source <- "usa-facts"
+start_day <- "2020-03-01"
+end_day <- Sys.Date() - 5
+geo_values <- c("ca","fl","ny","pa")
 
-case_rates <- covidcast_signal(data_source = "usa-facts",
-                               signal = "confirmed_incidence_prop",
+case_rates <- covidcast_signals(data_source = source,
+                               signal = c("confirmed_incidence_prop",
+                                          "confirmed_7dav_incidence_prop"),
                                start_day = start_day,
                                end_day = end_day,
                                geo_type = "state",
                                geo_values = geo_values) %>%
-  select(data_source, signal, geo_value, time_value, value)
+  aggregate_signals(format = "wide") %>%
+  setNames(gsub(paste0("value\\+0:", source, "_"), "", names(.))) %>%
+  arrange(geo_value, time_value)
 ```
-
-Here, we'll only need the 5 columns selected below. See the 
-[`covidcast_signal`](https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html) 
-documentation for a description of the full set of columns in a 
-`covidcast_signal` object. The signal documentation for the USAFacts signals
-specifically can be found
-[here](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html).
 
 
 ### Sliding with a formula
@@ -104,10 +101,6 @@ slide_by_geo(case_rates, slide_fun = ~ Mean(.x$value), n = 7) %>%
   table_head(title = "Daily COVID-19 cases per 100,000 pop. (7-day trailing average)")
 ```
 
-The `table_head()` function used above is an internal function that we use in 
-these tutorial vignettes to display table heads. The source code can be found 
-in the [`vignettes/modeltools.Rmd`](modeltools.Rmd) file used to build this 
-page.
 
 The formula specified by `slide_fun` has access to all columns present in the
 original
@@ -134,7 +127,7 @@ maximum absolute difference between the two 7-day trailing averages,
 over all state-date pairs:
 $$\big\{\text{CA, FL, NY, TX}\big\} \times \big\{\text{date}: \text{date}\in \{\text{June 7, 2020, }\dots,\text{ November 15, 2020}\}\big\}.$$
 
-```{r, collapse = TRUE}
+```{r, collapse = TRUE, eval = F}
 case_rates_7dav <- covidcast_signal(data_source = "usa-facts",
                                     signal = "confirmed_7dav_incidence_prop",
                                     start_day = start_day,

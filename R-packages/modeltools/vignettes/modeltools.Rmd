@@ -61,7 +61,9 @@ signals available in Delphi's
 The examples we provide here will center around the progression of COVID-19 case 
 rates (i.e. the number of new COVID-19 cases reported per day, per 100,000 
 population), as reported by [**USAFacts**](https://usafacts.org/), over the 
-course of the pandemic.
+course of the pandemic. The API documentation for USAFacts signals can be found
+[**here**](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/usa-facts.html).
+
 
 The code chunk below utilizes Delphi's COVIDcast API <tt>R</tt> client to fetch
 the reported case rates for four U.S. states --- CA, FL, NY, and PA --- starting
@@ -105,7 +107,7 @@ col3.header <- JS("function(colInfo) {return colInfo.column.name + '<div style=\
 col4.header <- JS("function(colInfo) {return colInfo.column.name + '<div style=\"color: #999\">Cases per 100,000 (smoothed)</div>'}")
 col2.def <- colDef(html = T, format = colFormat(date = T), sortable = T, 
                    align = "right", maxWidth = 100)
-col3.def <- colDef(minWidth = 170, html = T, format = colFormat(digits = 3), 
+col3.def <- colDef(minWidth = 175, html = T, format = colFormat(digits = 3), 
                    sortable = T, align = "center", header = col3.header)
 col4.def <- colDef(minWidth = 200, html = T, format = colFormat(digits = 3), 
                    sortable = T, align = "center", header = col4.header )

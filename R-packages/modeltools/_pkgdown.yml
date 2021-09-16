@@ -1,5 +1,5 @@
 # Deploy to central docs directory that's on GitHub Pages
-destination: ../../docs/modeltoolsR/
+destination: ../../../docs/modeltoolsR/
 
 template:
   code_folding: show

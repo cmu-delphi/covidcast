@@ -3,7 +3,7 @@ title: Get started with modeltools
 description: An introductory tutorial with examples.
 output: 
   rmarkdown::html_vignette:
-    code-copy: hover
+    code-copy: true
 vignette: >
   %\VignetteIndexEntry{Get started with modeltools}
   %\VignetteEngine{knitr::rmarkdown}

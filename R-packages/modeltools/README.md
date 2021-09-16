@@ -1,11 +1,11 @@
-# modeltools R package <img src="man/figures/delphi_logo.jpg" align="right" alt="" width="160" />
+# modeltools <tt>R</tt> package <img src="man/figures/delphi_logo.jpg" align="right" alt="" width="120" />
 
 This package is developed and maintained by the 
 [**Delphi research group**](https://delphi.cmu.edu/) headquartered at Carnegie
 Mellon University and is designed to be used in conjunction with our
 [`covidcast`](https://cmu-delphi.github.io/covidcast/covidcastR) and 
 [`evalcast`](https://cmu-delphi.github.io/covidcast/evalcastR) 
-R packages. The `modeltools` package provides tools for analyzing the
+<tt>R</tt> packages. The `modeltools` package provides tools for analyzing the
 trajectories of COVID-19 signals --- namely, those stored in Delphi's
 [**COVIDcast Epidata API**](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html) ---
 and for building short-term forecasting models.

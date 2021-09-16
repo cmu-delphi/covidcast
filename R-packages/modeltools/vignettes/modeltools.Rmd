@@ -34,35 +34,40 @@ details summary {
 }
 ```
 
+
 ## Installation
 
 <span style="color:#ff3333;"><font size="3"><b>
 This package is not on CRAN!
 </b></font></span>
 
-The CRAN `modeltools` package is entirely unrelated to this one. Delphi's 
-`modeltools` package can be installed from our 
+Delphi's `modeltools` package can be installed from our 
 [**GitHub page**](https://github.com/cmu-delphi/covidcast/tree/main/R-packages/modeltools)
-with the following command:
+with the command below. The CRAN `modeltools` package is entirely unrelated to 
+this one. 
 
 ```{r, eval = F}
 devtools::install_github(repo = "cmu-delphi/covidcast", subdir = "R-packages/modeltools",
-                         ref = "collin-develop")
+                         ref = "collin-develop", build_vignettes = TRUE)
 ```
 
 
 ## Downloading COVIDcast signals
 
-In this **Getting started** vignette, we'll fetch daily reporting data of 
-COVID-19 case rates (i.e. the number of new COVID-19 cases reported per day, per 
-100,000 population) from Delphi's
+In these vignettes, we'll illustrate the suite of tools provided by the 
+`modeltools` package for analyzing, manipulating, and forecasting the COVID-19 
+signals available in Delphi's
 [**COVIDcast Epidata API**](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html).
-The cases rates we'll examine here are reported by [**USAFacts**](https://usafacts.org/)
-and cloned into Delphi's API every day. As with many other signals, the API also
-stores a smoothed version of the signal --- a 7-day trailing average of the
-(raw) daily case rates reported by USAFacts. Here, we'll look at both the raw
-and smoothed USAFacts case rates from June 1, 2020 through November 15, 2020 for
-four U.S. states --- CA, FL, NY, and PA.
+The examples we provide here will center around the progression of COVID-19 case 
+rates (i.e. the number of new COVID-19 cases reported per day, per 100,000 
+population), as reported by [**USAFacts**](https://usafacts.org/), over the 
+course of the pandemic.
+
+The code chunk below utilizes Delphi's COVIDcast API <tt>R</tt> client to fetch
+the reported case rates for four U.S. states --- CA, FL, NY, and PA --- starting
+on March 1, 2020. See the `covidcast` 
+[**Getting started guide**](https://cmu-delphi.github.io/covidcast/covidcastR/articles/covidcast.html)
+for more examples on how to use the Delphi API's <tt>R</tt> client.
 
 ```{r, message = F, warning = F}
 library(covidcast)
@@ -85,6 +90,11 @@ case_rates <- covidcast_signals(data_source = source,
   arrange(geo_value, time_value)
 ```
 
+As with other signals stored in Delphi's API, the API also computes and stores 
+a smoothed version of the USAFacts case rates signal --- a 7-day trailing 
+average of the (raw) daily case rates reported by USAFacts. The code chunk above
+pulls both the raw and smoothed signals from the API and aggregates them
+into the "wide format" data frame displayed below.
 
 ```{r, chunk-1, message = F, warning = F, echo = F}
 library(reactable)
@@ -108,7 +118,7 @@ case_rates_tbl <- reactable(case_rates_data, sortable = F, showSortable = T,
                             striped = T, defaultPageSize = 10, paginationType = "jump",
                             columns = columns)
 
-bscols(case_rates_tbl, list(filter_checkbox("geo_value", "State", case_rates_data, ~toupper(geo_value))),
+bscols(case_rates_tbl, list(filter_select("geo_value", "State", case_rates_data, ~toupper(geo_value), multiple = F)),
        widths = c(10,2), device = "lg")
 ```
 <details><summary>**Show Source Code**</summary>
@@ -117,9 +127,8 @@ bscols(case_rates_tbl, list(filter_checkbox("geo_value", "State", case_rates_dat
 </details>
 <br>
 
-Below we plot the weekly percentage change of the smoothed COVID-19 case rates 
-fetched above alongside the smoothed COVID-19 case rates themselves. Here, we 
-focus solely on Florida COVID-19 case rates. 
+The reported USAFacts case rates, with 7-day trailing averages superposed, are
+plotted below for each of the four states.
 
 ```{r, chunk-2, message = F, warning = F, fig.width = 8, fig.height = 8, fig.asp = 1, echo = F}
 library(tidyr)

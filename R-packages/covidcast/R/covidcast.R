@@ -748,7 +748,7 @@ specific_meta <- function(data_source, signal, geo_type, time_type = "day") {
 # each batch and combines the resutls.
 covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
                            geo_value, time_type, as_of, issues, lag,
-                           max_geos = MAX_RESULTS) {
+                           max_geos) {
   days <- date_sequence(start_day, end_day, time_type)
   ndays <- length(days)
 
@@ -759,9 +759,11 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
     nissues <- 1
   }
 
+  max_results <- getOption("covidcast.max_results", default = MAX_RESULTS)
+
   # Theoretically, each geo_value could have data issued each day. Likely
   # overestimates when handling multiple issue dates, resulting in more batches.
-  max_days_at_time <- floor(MAX_RESULTS / (max_geos * nissues))
+  max_days_at_time <- floor(max_results / (max_geos * nissues))
 
   # In theory, we could exceed max rows with 1 day, but try anyway
   if (max_days_at_time == 0) {

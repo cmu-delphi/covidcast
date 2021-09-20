@@ -260,7 +260,7 @@ test_that("covidcast_days batches calls to covidcast", {
 
   # Set the row limit in the package to 3650, to force it to batch these
   # requests, instead of letting it use the current much larger limit
-  MAX_RESULTS <<- 3650
+  options(covidcast.max_results = 3650)
 
   m <- mock(covidcast_returns[[1]], covidcast_returns[[2]])
   stub(covidcast_days, "covidcast", m)
@@ -280,6 +280,9 @@ test_that("covidcast_days batches calls to covidcast", {
       ),
       regexp = NA)
   expect_called(m, 2)
+
+  # Restore default max_results
+  options(covidcast.max_results = MAX_RESULTS)
 })
 
 # This test requires the use of stub's depth parameter, but there is a bug in

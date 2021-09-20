@@ -15,6 +15,26 @@ vignette: >
 options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
+```{css, echo = F}
+details summary {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7pt;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  border-radius: 10px 10px 10px 10px;
+  padding: 1px 5px 1px 5px;
+  width: 14%;
+  margin: 0 0 15px 0;
+  background-color: #A6CEE3;
+  border-style: ridge;
+  border-color: #A6CEE3;
+  box-shadow: 3px 3px 4px black;
+  cursor: pointer;
+  list-style: none;
+}
+```
+
 The code chunk below took a while to run, so I ran it separately and
 saved the results in a file that you can find in the `modeltools/vignettes/`
 sub-folder.

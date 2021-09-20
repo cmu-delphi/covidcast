@@ -15,6 +15,26 @@ vignette: >
 options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
+```{css, echo = F}
+details summary {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7pt;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  border-radius: 10px 10px 10px 10px;
+  padding: 1px 5px 1px 5px;
+  width: 14%;
+  margin: 0 0 15px 0;
+  background-color: #A6CEE3;
+  border-style: ridge;
+  border-color: #A6CEE3;
+  box-shadow: 3px 3px 4px black;
+  cursor: pointer;
+  list-style: none;
+}
+```
+
 In this vignette, we estimate derivatives of `covidcast` signals using the 
 `estimate_deriv()` function from the `modeltools` package. 
 
@@ -144,7 +164,7 @@ splines (`stats::smooth.spline()`). Note that we also set a custom name for the
 output column with the estimated derivatives, via the `col_name` argument of
 `estimate_deriv()`.
 
-```{r, message = F, warning = F, fig.width = 8}
+```{r, message = F, warning = F, fig.width = 8, fig.height = 4}
 case_rates <- estimate_deriv(case_rates, method = "ss", n = 28,
                              col_name = "deriv_ss1", df = 8)
 

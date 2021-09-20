@@ -58,7 +58,7 @@ In these vignettes, we'll illustrate the suite of tools provided by the
 `modeltools` package for analyzing, manipulating, and forecasting the COVID-19 
 signals available in Delphi's
 [**COVIDcast Epidata API**](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html).
-The examples we provide here will center around the progression of COVID-19 case 
+The examples we provide here will focus on the progression of COVID-19 case 
 rates (i.e. the number of new COVID-19 cases reported per day, per 100,000 
 population), as reported by [**USAFacts**](https://usafacts.org/), over the 
 course of the pandemic. The API documentation for USAFacts signals can be found
@@ -89,7 +89,7 @@ case_rates <- covidcast_signals(data_source = source,
                                geo_values = geo_values) %>%
   aggregate_signals(format = "wide") %>%
   setNames(gsub(paste0("value\\+0:", source, "_"), "", names(.))) %>%
-  arrange(geo_value, time_value)
+  arrange(desc(geo_value), desc(time_value))
 ```
 
 As with other signals stored in Delphi's API, the API also computes and stores 
@@ -106,12 +106,11 @@ case_rates_data <- SharedData$new(case_rates, group = "geo_value")
 col3.header <- JS("function(colInfo) {return colInfo.column.name + '<div style=\"color: #999\">Cases per 100,000</div>'}")
 col4.header <- JS("function(colInfo) {return colInfo.column.name + '<div style=\"color: #999\">Cases per 100,000 (smoothed)</div>'}")
 col2.def <- colDef(html = T, format = colFormat(date = T), sortable = T, 
-                   align = "right", maxWidth = 100)
-col3.def <- colDef(minWidth = 175, html = T, format = colFormat(digits = 3), 
+                   align = "right", maxWidth = 110)
+col3.def <- colDef(minWidth = 170, html = T, format = colFormat(digits = 3), 
                    sortable = T, align = "center", header = col3.header)
 col4.def <- colDef(minWidth = 200, html = T, format = colFormat(digits = 3), 
                    sortable = T, align = "center", header = col4.header )
-
 columns <- list(geo_value = colDef(html = T, align = "left", maxWidth = 90),
                 time_value = col2.def, confirmed_incidence_prop = col3.def,
                 confirmed_7dav_incidence_prop = col4.def)

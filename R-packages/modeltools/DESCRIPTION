@@ -1,6 +1,6 @@
 Package: modeltools
 Type: Package
-Title: Tools for Building COVID Forecasters and Related Models 
+Title: Tools for Building COVID Forecasters and Related Models
 Version: 0.1.0
 Authors@R:
 	c(
@@ -19,7 +19,7 @@ RoxygenNote: 7.1.1
 Remotes:
     cmu-delphi/covidcast/R-packages/covidcast@main,
     cmu-delphi/covidcast/R-packages/evalcast@main,
-    ryantibs/quantgen/R-package/quantgen@master,
+    ryantibs/quantgen/quantgen@master,
 Imports:
     assertthat,
     covidcast,

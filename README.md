@@ -13,23 +13,23 @@ provides access to Delphi's COVID-19 indicators and related data:
 - R: [covidcast](https://cmu-delphi.github.io/covidcast/covidcastR/)
 - Python: [covidcast](https://cmu-delphi.github.io/covidcast/covidcast-py/html/)
 
-## Presentations
+## Modeling packages
 
-This repository also includes some talks we've given about the COVIDcast project: 
+This repository also includes two R packages to assist model building and 
+model evaluation.
 
-- [Intro to COVIDcast and API](https://cmu-delphi.github.io/covidcast/talks/intro-api/talk.html) 
-- [Survey Through Facebook](https://cmu-delphi.github.io/covidcast/talks/fb-survey/talk.html)
-- [Medical Claims Indicators](https://docs.google.com/presentation/d/1Pt2qMwIHyyuyGwwigZyndPGjcjILAS6RYxBcXKuuQ4U/edit?usp=sharing)
-- [Forecast Evaluation Toolkit](https://cmu-delphi.github.io/covidcast/talks/evalcast/talk.html)
-- [Overview Talk: Data, API, Surveys](https://cmu-delphi.github.io/covidcast/talks/copss-niss/talk.html)
+- [modeltools](https://cmu-delphi.github.io/covidcast/modeltoolsR/)
+- [evalcast](https://cmu-delphi.github.io/covidcast/evalcastR/)
 
 ## Related repos
 
-- [delphi-epidata](https://github.com/cmu-delphi/delphi-epidata/): Back end for
-  Delphi's Epidata API 
+- [covidcast-talks](https://github.com/cmu-delphi/delphi-epidata/): 
+  Presentations on Delphi's COVIDcast project
 - [covidcast-indicators](https://github.com/cmu-delphi/covidcast-indicators/):
   Back end for Delphi's COVID indicators 
+- [delphi-epidata](https://github.com/cmu-delphi/delphi-epidata/): Back end for
+  Delphi's Epidata API 
 - [www-covidcast](https://github.com/cmu-delphi/www-covidcast/): Front end for
-  Delphi's [COVIDcast map](https://covidcast.cmu.edu) 
+  Delphi's [COVIDcast dashboard](https://covidcast.cmu.edu) 
 - [covid-19-forecast](https://github.com/cmu-delphi/covid-19-forecast/): Public
   repo for Delphi's COVID forecasters 

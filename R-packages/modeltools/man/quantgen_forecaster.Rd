@@ -5,7 +5,7 @@
 \title{Simple quantile autoregressive forecaster based on \code{quantgen}}
 \usage{
 quantgen_forecaster(
-  df,
+  df_list,
   forecast_date,
   signals,
   incidence_period,
@@ -25,7 +25,7 @@ quantgen_forecaster(
 )
 }
 \arguments{
-\item{df}{Data frame of signal values to use for forecasting, of the format
+\item{df_list}{List of data frames of signal values to use for forecasting, of the format
 that is returned by \code{\link[covidcast:covidcast_signals]{covidcast::covidcast_signals()}}.}
 
 \item{forecast_date}{Date object or string of the form "YYYY-MM-DD",

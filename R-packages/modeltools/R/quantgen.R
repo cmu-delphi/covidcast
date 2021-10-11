@@ -7,7 +7,7 @@
 #' vignette](https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/quantgen-forecast.html)
 #' for examples.
 #' 
-#' @param df Data frame of signal values to use for forecasting, of the format
+#' @param df_list List of data frames of signal values to use for forecasting, of the format
 #'   that is returned by [covidcast::covidcast_signals()].
 #' @param forecast_date Date object or string of the form "YYYY-MM-DD",
 #'   indicating the date on which forecasts will be made. For example, if
@@ -110,7 +110,7 @@
 #' @importFrom dplyr filter select pull summarize between bind_cols
 #' @importFrom tidyr pivot_longer
 #' @export
-quantgen_forecaster <- function(df, forecast_date, signals, incidence_period,
+quantgen_forecaster = function(df_list, forecast_date, signals, incidence_period,
                                ahead, geo_type,
                                n = 4 * ifelse(incidence_period == "day", 7, 1),
                                lags = 0, tau = modeltools::covidhub_probs,
@@ -139,8 +139,8 @@ quantgen_forecaster <- function(df, forecast_date, signals, incidence_period,
     if (is.null(inv_trans)) {
       stop("If `transform` is specified, then `inv_trans` must be as well.")
     }
-    for (i in 1:length(df)) {
-      df[[i]] = df[[i]] %>% mutate(value = transform[[i]](value))
+    for (i in 1:length(df_list)) {
+      df_list[[i]] = df_list[[i]] %>% mutate(value = transform[[i]](value))
     }
   }
 
@@ -148,9 +148,9 @@ quantgen_forecaster <- function(df, forecast_date, signals, incidence_period,
   # shift, for each ahead value, for convenience later 
   dt = lapply(lags, "-")
   dt[[1]] = c(dt[[1]], ahead)
-    
+
   # Append shifts, and aggregate into wide format
-  df_wide = covidcast::aggregate_signals(df, dt = dt, format = "wide")
+  df_wide = covidcast::aggregate_signals(df_list, dt = dt, format = "wide")
   
   # Separate out into feature data frame, featurize if we need to
   df_features = df_wide %>%
@@ -215,7 +215,7 @@ quantgen_forecaster <- function(df, forecast_date, signals, incidence_period,
                      train_end_date - n + 1,
                      train_end_date)) %>%
       select(tidyselect::starts_with(sprintf("value+%i:", a))) %>% pull()
-    
+
     # Define noncrossing constraints, if we need to
     if (noncross) {
       if (noncross_points == "all") x0 = rbind(x, newx)

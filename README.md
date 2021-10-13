@@ -23,7 +23,7 @@ model evaluation.
 
 ## Related repos
 
-- [covidcast-talks](https://github.com/cmu-delphi/delphi-epidata/): 
+- [covidcast-talks](https://github.com/cmu-delphi/covidcast-talks/): 
   Presentations on Delphi's COVIDcast project
 - [covidcast-indicators](https://github.com/cmu-delphi/covidcast-indicators/):
   Back end for Delphi's COVID indicators 

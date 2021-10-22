@@ -3,8 +3,8 @@ library(mockery)
 library(MMWRweek)
 library(dplyr)
 
-# Many of these tests use mockery::with_mock_api. This replaces calls to the
-# live API server, instead returning static JSON files from disk. Three
+# Many of these tests use httptest::with_mock_api. This replaces calls to the
+# live API server, instead returning static CSV files from disk. Three
 # weaknesses to be aware of:
 #
 # 1. The HTTP URL and parameters are hashed into a single filename to use. This

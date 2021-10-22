@@ -43,7 +43,7 @@
 <meta property="og:description" content="Computes correlations between two covidcast_signal data frames, allowing
 for slicing by geo location, or by time. (Only the latest issue from each
 data frame is used for correlations.) See the correlations vignette
-for examples: vignette(&quot;correlation-utils&quot;, package = &quot;covidcast&quot;)" />
+for examples: vignette(&quot;correlation-utils&quot;, package = &quot;covidcast&quot;)." />
 
 
 
@@ -75,7 +75,7 @@ for examples: vignette(&quot;correlation-utils&quot;, package = &quot;covidcast&
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.3</span>
       </span>
     </div>
 
@@ -83,7 +83,7 @@ for examples: vignette(&quot;correlation-utils&quot;, package = &quot;covidcast&
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -121,7 +121,7 @@ for examples: vignette(&quot;correlation-utils&quot;, package = &quot;covidcast&
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -147,7 +147,7 @@ for examples: vignette(&quot;correlation-utils&quot;, package = &quot;covidcast&
     <p>Computes correlations between two <code>covidcast_signal</code> data frames, allowing
 for slicing by geo location, or by time. (Only the latest issue from each
 data frame is used for correlations.) See the correlations vignette
-for examples: <code><a href='../articles/correlation-utils.html'>vignette("correlation-utils", package = "covidcast")</a></code></p>
+for examples: <code><a href='../articles/correlation-utils.html'>vignette("correlation-utils", package = "covidcast")</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>covidcast_cor</span><span class='op'>(</span>
@@ -169,12 +169,12 @@ for examples: <code><a href='../articles/correlation-utils.html'>vignette("corre
     </tr>
     <tr>
       <th>dt_x, dt_y</th>
-      <td><p>Time shifts to consider for <code>x</code> and <code>y</code>, respectively,
-before computing correlations. Negative shifts translate into in a lag
-value and positive shifts into a lead value; for example, if <code>dt = -1</code>,
-then the new value on June 2 is the original value on June 1; if <code>dt = 1</code>,
-then the new value on June 2 is the original value on June 3; if <code>dt = 0</code>,
-then the values are left as is. Default is 0 for both <code>dt_x</code> and <code>dt_y</code>.</p></td>
+      <td><p>Time shifts (in days) to consider for <code>x</code> and <code>y</code>,
+respectively, before computing correlations. Default is 0. Negative shifts
+translate into in a lag value and positive shifts into a lead value; for
+example, setting <code>dt_y = 2</code> results in values of <code>y</code> being shifted earlier
+(leading) by 2 days before correlation, so values of <code>x</code> are correlated
+with values of <code>y</code> from two days later.</p></td>
     </tr>
     <tr>
       <th>by</th>
@@ -194,9 +194,35 @@ default for <code>use</code> (different than <code><a href='https://rdrr.io/r/st
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data frame with first column <code>geo_value</code> or <code>time_value</code> (depending
-on <code>by</code>), and second column <code>value</code>, which gives the correlation.</p>
+    <p>A data frame with first column <code>geo_value</code> or <code>time_value</code> (matching
+<code>by</code>), and second column <code>value</code>, which gives the correlation.</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># For all these examples, let x and y be two signals measured at the county</span>
+<span class='co'># level over several months.</span>
+
+<span class='co'>## `by = "geo_value"`</span>
+<span class='co'># Correlate each county's time series together, returning one correlation per</span>
+<span class='co'># county:</span>
+<span class='fu'>covidcast_cor</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, by <span class='op'>=</span> <span class='st'>"geo_value"</span><span class='op'>)</span>
+
+<span class='co'># Correlate x in each county with values of y 14 days later</span>
+<span class='fu'>covidcast_cor</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, dt_y <span class='op'>=</span> <span class='fl'>14</span>, by <span class='op'>=</span> <span class='st'>"geo_value"</span><span class='op'>)</span>
+
+<span class='co'># Equivalently, x can be shifted -14 days:</span>
+<span class='fu'>covidcast_cor</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, dt_x <span class='op'>=</span> <span class='op'>-</span><span class='fl'>14</span>, by <span class='op'>=</span> <span class='st'>"geo_value"</span><span class='op'>)</span>
+
+<span class='co'>## `by = "time_value"`</span>
+<span class='co'># For each date, correlate x's values in every county against y's values in</span>
+<span class='co'># the same counties. Returns one correlation per date:</span>
+<span class='fu'>covidcast_cor</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, by <span class='op'>=</span> <span class='st'>"time_value"</span><span class='op'>)</span>
+
+<span class='co'># Correlate x values across counties against y values 7 days later</span>
+<span class='fu'>covidcast_cor</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, dt_y <span class='op'>=</span> <span class='fl'>7</span>, by <span class='op'>=</span> <span class='st'>"time_value"</span><span class='op'>)</span>
+<span class='op'>}</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

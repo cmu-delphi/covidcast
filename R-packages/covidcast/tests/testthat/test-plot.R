@@ -9,8 +9,6 @@ library(dplyr)
 # plotting options and ensuring they all function.
 
 test_that("simple line graph", {
-  skip_if( (R.Version()$major != "4") )
-
   fake_data <- structure(data.frame(
     data_source = "foo",
     signal = "bar",
@@ -38,8 +36,6 @@ test_that("simple line graph", {
 })
 
 test_that("state line graphs", {
-  skip_if( (R.Version()$major != "4") )
-
   fb_state <- readRDS(test_path("data/survey-data-state.rds"))
 
   expect_doppelganger("default state line graph",
@@ -56,8 +52,6 @@ test_that("state line graphs", {
 })
 
 test_that("simple state choropleths", {
-  skip_if( (R.Version()$major != "4") )
-
   fb_state <- readRDS(test_path("data/survey-data-state.rds"))
 
   expect_doppelganger("default state choropleth",
@@ -95,8 +89,6 @@ test_that("simple state choropleths", {
 })
 
 test_that("simple HRR choropleths", {
-  skip_if( (R.Version()$major != "4") )
-
   fb_hrr <- readRDS(test_path("data/survey-data-hrr.rds"))
 
   expect_doppelganger("default HRR choropleth",
@@ -108,8 +100,6 @@ test_that("simple HRR choropleths", {
 })
 
 test_that("simple MSA choropleths", {
-  skip_if( (R.Version()$major != "4") | (R.Version()$minor != "0.3"))
-
   fb_msa <- readRDS(test_path("data/survey-data-msa.rds"))
 
   expect_doppelganger("default MSA choropleth",
@@ -121,8 +111,6 @@ test_that("simple MSA choropleths", {
 })
 
 test_that("state bubble plot with both missing and 0 values", {
-  skip_if( (R.Version()$major != "4") )
-
   fake_data <- structure(data.frame(
     data_source = "foo",
     signal = "bar",
@@ -143,8 +131,6 @@ test_that("state bubble plot with both missing and 0 values", {
 })
 
 test_that("simple county bubble plot", {
-  skip_if( (R.Version()$major != "4") )
-
   fb_county <- readRDS(test_path("data/survey-data-county.rds"))
 
   expect_doppelganger("simple county bubble plot",
@@ -154,8 +140,6 @@ test_that("simple county bubble plot", {
 
 
 test_that("warn on incomplete metadata", {
-  skip_if( (R.Version()$major != "4") )
-
   fake_data <- structure(data.frame(
     data_source = "foo",
     signal = "bar",

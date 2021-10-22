@@ -44,7 +44,7 @@ the pull request.
 
 We test our plots and maps with the [vdiffr](https://github.com/r-lib/vdiffr)
 package, which renders plots and then visually compares them to a saved
-reference image.
+reference image (saved in `tests/testthat/_snaps/`).
 
 See `tests/testthat/test-plot.R` for examples. Each test case uses
 `vdiffr::expect_doppelganger` with two arguments: a name (which will be the
@@ -53,7 +53,7 @@ plot, such as a ggplot object.
 
 When you add new test case or change how a plotting feature works, you will need
 to "validate" the tests, meaning vdiffr will render the plots and ask you if
-they look correct. To do this, run `vdiffr::manage_cases()` from within the
+they look correct. To do this, run `testthat::snapshot_review()` from within the
 package working directory. A Shiny app will open up and present you with each
 plot. For new plots, it will simply show you the plot, and a "Validate" button
 will let you indicate that the plot looks good. For changed plots, it will show
@@ -62,6 +62,10 @@ that the changes look correct, then press Validate.
 
 Once you've validated all changes, press Quit and you will be able to commit the
 changed images and run the tests successfully.
+
+Note that the tests only run on R 4.1.0 or newer, since changes in the R
+graphics engine can cause spurious differences between rendered versions of the
+plots.
 
 ### Using data files in tests
 

@@ -37,11 +37,9 @@ the United States between 2020-05-01 and 2020-05-07, we can use
 library(covidcast)
 library(dplyr)
 
-cli <- suppressMessages(
-  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
-                   start_day = "2020-05-01", end_day = "2020-05-07",
-                   geo_type = "county")
-)
+cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
+                        start_day = "2020-05-01", end_day = "2020-05-07",
+                        geo_type = "county")
 knitr::kable(head(cli))
 ```
 
@@ -52,11 +50,6 @@ day. The county FIPS code is given in the `geo_value` column, the date in the
 smoothed estimate of the percentage of people with COVID-like illness, based on
 the symptom surveys, and `stderr` is its standard error. See the
 `covidcast_signal()` documentation for details on the returned data frame.
-
-Notice the use of `suppressMessages()` to hide progress reporting from the
-function as it downloads the data; if you download particularly large amounts of
-data, you may prefer to allow the progress reporting so you know how long to
-wait.
 
 To get a basic summary of the returned data frame:
 
@@ -69,24 +62,20 @@ levels, and `covidcast_signal()` defaults to requesting county-level data. To
 request estimates for states instead of counties, we use the `geo_type`
 argument:
 
-```{r}
-cli <- suppressMessages(
-  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
-                   start_day = "2020-05-01", end_day = "2020-05-07",
-                   geo_type = "state")
-)
+```{r, message=FALSE}
+cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
+                        start_day = "2020-05-01", end_day = "2020-05-07",
+                        geo_type = "state")
 knitr::kable(head(cli))
 ```
 
 One can also select a specific geographic region by its ID. For example, this is
 the FIPS code for Allegheny County, Pennsylvania:
 
-```{r}
-cli <- suppressMessages(
-  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
-                   start_day = "2020-05-01", end_day = "2020-05-07",
-                   geo_type = "county", geo_value = "42003")
-)
+```{r, message=FALSE}
+cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
+                        start_day = "2020-05-01", end_day = "2020-05-07",
+                        geo_type = "county", geo_value = "42003")
 knitr::kable(head(cli))
 ```
 

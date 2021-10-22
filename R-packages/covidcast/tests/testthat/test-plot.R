@@ -8,12 +8,6 @@ library(dplyr)
 # below simple build simple graphs of each type, thus exercising the different
 # plotting options and ensuring they all function.
 
-
-# Contexts are no longer required or recommended in testthat, but vdiffr still
-# wants one to place the figure files correctly. See
-# https://github.com/r-lib/vdiffr/issues/71
-context("plot")
-
 test_that("simple line graph", {
   skip_if( (R.Version()$major != "4") )
 

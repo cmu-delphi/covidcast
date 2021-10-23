@@ -60,7 +60,7 @@ Imports:
     rlang,
     sf,
     tidyr
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Suggests: 
     gridExtra,
     httptest,
@@ -72,4 +72,3 @@ Suggests:
     vdiffr
 VignetteBuilder: knitr
 Config/testthat/edition: 3
-

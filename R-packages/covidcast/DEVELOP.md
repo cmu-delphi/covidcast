@@ -118,4 +118,5 @@ new GitHub Issue and check off the items one at a time.
 - [ ] Open a pull request to merge the release branch to `main` and request review.
 ```
 
-Once the pull request is merged, the new version is live.
+The package can now be built and submitted to CRAN, and once accepted, the pull
+request can be merged to main.

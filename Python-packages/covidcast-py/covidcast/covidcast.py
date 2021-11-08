@@ -183,8 +183,7 @@ def signal(data_source: str,
 
     if start_day > end_day:
         raise ValueError("end_day must be on or after start_day, but "
-                         "start_day = '{start}', end_day = '{end}'".format(
-                             start=start_day, end=end_day))
+                         f"start_day = '{start_day}', end_day = '{end_day}'")
     if _ASYNC_CALL:
         dfs = _async_fetch_epidata(
             data_source, signal, start_day, end_day, geo_type,
@@ -503,12 +502,8 @@ def _signal_metadata(data_source: str,
     matches = meta[mask]
 
     if matches.shape[0] == 0:
-        raise ValueError("Unable to find metadata for source '{source}', "
-                         "signal '{signal}', at '{geo_type}' "
-                         "resolution.".format(
-                             source=data_source,
-                             signal=signal,
-                             geo_type=geo_type))
+        raise ValueError(f"Unable to find metadata for source '{data_source}', "
+                         f"signal '{signal}', at '{geo_type}' resolution.")
 
     assert matches.shape[0] == 1, "it should be impossible to have two identical signals"
     output: dict = matches.to_dict("records")[0]

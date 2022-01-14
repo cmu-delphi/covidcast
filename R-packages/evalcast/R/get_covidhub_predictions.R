@@ -330,7 +330,43 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
                         covidhub_forecaster_name)
 
     dir.create(output_dir, recursive = TRUE)
-    download.file(filename, output_file, mode = "w", quiet = TRUE)
+    
+    # Download file. Re-attempt up to 8 times.
+    attempt <- 0
+    n_max_attempt <- 8
+    base_wait <- 1 # second
+    
+    while (attempt < n_max_attempt) {
+      attempt <- attempt + 1
+      # Increase time between download attempts in exponential backoff
+      wait <- base_wait * 2 ^ (attempt - 1)
+      download_status <- try({
+        download.file(filename, output_file, mode="w", quiet=TRUE)
+      }, silent=TRUE)
+      
+      if (is(download_status, "try-error")) {
+        if (startsWith(attr(download_status, "condition")$message, "cannot open URL")) {
+          if (attempt < n_max_attempt) { message("retrying...") }
+          Sys.sleep(wait)
+          next
+        } else {
+          # Raise any unexpected error.
+          stop(attr(download_status, "condition"))
+        }
+      } else {
+        break
+      }
+    }
+    
+    if (attempt == n_max_attempt & download_status != 0) {
+      warning(filename, " could not be downloaded")
+      # Delete dir. We expect it to be empty, but double check.
+      if (length(list.files(output_dir)) == 0) {
+        unlink(output_dir, recursive = TRUE)
+      }
+    } else if (attempt > 1 & download_status == 0) {
+      message("succeeded after ", attempt, " attempts")
+    }
   }
 
   sch <- schema(forecast_date=string(),

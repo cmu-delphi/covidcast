@@ -1,10 +1,9 @@
-citHeader("To cite the covidcast package in publications use:")
-
 year <- sub("-.*", "", meta$Date)
 note <- sprintf("R package version %s", meta$Version)
 
 bibentry(bibtype = "Manual",
-         title = "{covidcast}: Client for Delphi's COVIDcast Epidata API",
+         header = "To cite the covidcast package in publications use:",
+         title = "{covidcast}: Client for {D}elphi's {COVID}cast {E}pidata {API}",
          author = c(person(given = "Taylor", family = "Arnold"),
                     person(given = "Jacob", family = "Bien"),
                     person(given = "Logan", family = "Brooks"),
@@ -19,7 +18,19 @@ bibentry(bibtype = "Manual",
          url = "https://cmu-delphi.github.io/covidcast/covidcastR/",
          key = "covidcast")
 
+bibentry(bibtype = "article",
+         header = "To cite COVIDcast data in publications use:",
+         title = "An open repository of real-time {COVID}-19 indicators",
+         author = "Alex Reinhart, Logan Brooks, Maria Jahja, Aaron Rumack, Jingjing Tang, Sumit Agrawal, Wael Al Saeed, Taylor Arnold, Amartya Basu, Jacob Bien, Ángel A. Cabrera, Andrew Chin, Eu Jing Chua, Brian Clark, Sarah Colquhoun, Nat DeFries, David C. Farrow, Jodi Forlizzi, Jed Grabman, Samuel Gratzl, Alden Green, George Haff, Robin Han, Kate Harwood, Addison J. Hu, Raphael Hyde, Sangwon Hyun, Ananya Joshi, Jimi Kim, Andrew Kuznetsov, Wichada La Motte-Kerr, Yeon Jin Lee, Kenneth Lee, Zachary C. Lipton, Michael X. Liu, Lester Mackey, Kathryn Mazaitis, Daniel J. McDonald, Phillip McGuinness, Balasubramanian Narasimhan, Michael P. O’Brien, Natalia L. Oliveira, Pratik Patil, Adam Perer, Collin A. Politsch, Samyak Rajanala, Dawn Rucker, Chris Scott, Nigam H. Shah, Vishnu Shankar, James Sharpnack, Dmitry Shemetov, Noah Simon, Benjamin Y. Smith, Vishakha Srivastava, Shuyi Tan, Robert Tibshirani, Elena Tuzhilina, Ana Karina Van Nortwick, Valérie Ventura, Larry Wasserman, Benjamin Weaver, Jeremy C. Weiss, Spencer Whitman, Kristin Williams, Roni Rosenfeld, and Ryan J. Tibshirani",
+         year = 2021,
+         journal = "Proceedings of the National Academy of Sciences",
+         volume = 118,
+         number = 51,
+         doi = "10.1073/pnas.2111452118",
+         key = "covidcastPNAS")
+
 citFooter(paste0(
-  c("For information about citing the datasets provided by the API, see: ",
-    "https://cmu-delphi.github.io/delphi-epidata/api/covidcast_licensing.html"
-    )))
+    c("For more information about citing the datasets provided by the API, ",
+      "including their licensing, see: ",
+      "https://cmu-delphi.github.io/delphi-epidata/api/covidcast_licensing.html"
+      )))

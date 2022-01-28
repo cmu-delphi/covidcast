@@ -5,7 +5,8 @@ get_target_response <- function(signals,
                                 incidence_period,
                                 ahead,
                                 geo_type,
-                                geo_values) {
+                                geo_values,
+                                offline_signal_dir = NULL) {
   response <- signals[1, ]
   target_periods <- forecast_dates %>%
     enframe(name = NULL, value = "forecast_date") %>%
@@ -39,7 +40,7 @@ get_target_response <- function(signals,
     mutate(data_source = response$data_source,
            signal = response$signal,
            geo_type = geo_type) %>%
-    pmap(download_signal, geo_values = geo_values) # apply_corrections would need to run here,
+    pmap(download_signal, geo_values = geo_values, offline_signal_dir = offline_signal_dir) # apply_corrections would need to run here,
   # but can only use part of response
   # we don't allow this for now.
   

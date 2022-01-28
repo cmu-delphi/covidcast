@@ -331,7 +331,7 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
 
     dir.create(output_dir, recursive = TRUE)
     
-    # Download file. Re-attempt up to 8 times.
+    # Download file. Re-attempt up to 8 times (max 2 min wait).
     attempt <- 0
     n_max_attempt <- 8
     base_wait <- 1 # second
@@ -342,17 +342,12 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
       wait <- base_wait * 2 ^ (attempt - 1)
       download_status <- try({
         download.file(filename, output_file, mode="w", quiet=TRUE)
-      }, silent=TRUE)
-      
-      if (is(download_status, "try-error")) {
-        if (startsWith(attr(download_status, "condition")$message, "cannot open URL")) {
-          if (attempt < n_max_attempt) { message("retrying...") }
-          Sys.sleep(wait)
-          next
-        } else {
-          # Raise any unexpected error.
-          stop(attr(download_status, "condition"))
-        }
+      })
+
+      if (download_status != 0) {
+        if (attempt < n_max_attempt) { message("retrying...") }
+        Sys.sleep(wait)
+        next
       } else {
         break
       }

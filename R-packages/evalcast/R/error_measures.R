@@ -187,12 +187,17 @@ sharpness <- function(quantile, value, actual_value) {
 }
 
 
-# @param quantiles vector of forecasted quantiles
-# @param values vector of forecasted values
-# @param actual_value actual_value, either as a scalar or a vector of the same 
-#   length as `quantiles` and `values`
-# @param id string to identify the caller of the function and displayed in
-#   error messages (recommended to be the parent function's name)
+#' Common parameter checks for score functions
+#'
+#' A set of common checks for score functions, meant to identify common causes
+#' of issues.
+#'
+#' @param quantiles vector of forecasted quantiles
+#' @param values vector of forecasted values
+#' @param actual_value actual_value, either as a scalar or a vector of the same 
+#'   length as `quantiles` and `values`
+#' @param id string to identify the caller of the function and displayed in
+#'   error messages (recommended to be the parent function's name)
 score_func_param_checker <- function(quantiles, values, actual_value, id = ""){
   id_str = paste0(id, ": ")
   if (length(actual_value) > 1) {

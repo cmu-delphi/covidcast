@@ -118,7 +118,8 @@ evaluate_covid_predictions <- function(predictions_cards,
                                         backfill_buffer = 0,
                                         geo_type = c("county", "hrr", "msa",
                                                      "dma", "state", "hhs",
-                                                     "nation")) {
+                                                     "nation"),
+                                        offline_signal_dir = NULL) {
   assert_that("predictions_cards" %in% class(predictions_cards),
               msg = "predictions_cards must be of class `predictions_cards`")
   geo_type <- match.arg(geo_type)
@@ -129,7 +130,7 @@ evaluate_covid_predictions <- function(predictions_cards,
                "forecast_date",
                "ahead")
   actual_data <- get_covidcast_data(predictions_cards, backfill_buffer,
-                                    geo_type)
+                                    geo_type, offline_signal_dir)
   predictions_cards <- left_join(predictions_cards,
                                  actual_data,
                                  by = grp_vars)
@@ -146,7 +147,8 @@ evaluate_covid_predictions <- function(predictions_cards,
 
 get_covidcast_data <- function(predictions_cards,
                                backfill_buffer, 
-                               geo_type) {
+                               geo_type,
+                               offline_signal_dir = NULL) {
   grouped_preds <- predictions_cards %>%
                      group_split(data_source, signal, ahead, incidence_period)
   actuals <- list()
@@ -176,7 +178,8 @@ get_covidcast_data <- function(predictions_cards,
                                              incidence_period,
                                              ahead,
                                              geo_type,
-                                             geo_values)
+                                             geo_values,
+                                             offline_signal_dir)
       target_response <- target_response %>%
                           add_column(data_source = data_source,
                                      signal = signal,

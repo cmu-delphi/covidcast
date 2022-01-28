@@ -39,9 +39,18 @@
 #'   to `forecaster()`. A common use case would be to pass the period ahead
 #'   (e.g. predict 1 day, 2 days, ..., k days ahead). Note that `ahead` is a 
 #'   required component of the forecaster output (see above).
+#' @param parallel_execution a bool that, if true, uses parallel::mclapply to execute each
+#' forecast dates' prediction in parallel. Otherwise, the code is run on a single core.
+#' @param honest_as_of a boolean that, if true, ensures that the forecast_day, end_day,
+#' and as_of are all equal when downloading data. Otherwise, as_of is allowed to be freely
+#' set (and defaults to current date if not presented).
+#' @param offline_signal_dir the directory that stores the cached data for each 
+#' (signal, forecast day) pair. If this is null, no caching is done and the data is 
+#' downloaded from covidcast.
 #'
 #' @template predictions_cards-template
 #' 
+#' @importFrom progressr progressor
 #'
 #' @examples \dontrun{
 #' baby_predictions = get_predictions(
@@ -69,22 +78,36 @@ get_predictions <- function(forecaster,
                             apply_corrections = function(signals) signals,
                             response_data_source = signals$data_source[1],
                             response_data_signal = signals$signal[1],
-                            forecaster_args = list()) {
-  
+                            parallel_execution = TRUE,
+                            forecaster_args = list(),
+                            honest_as_of = TRUE,
+                            offline_signal_dir = NULL) {
+
   assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
-  
-  
-  out <- forecast_dates %>%
-    map(~ do.call(
-          get_predictions_single_date,
-          list(forecaster = forecaster,
-               signals = signals,
-               forecast_date = .x,
-               apply_corrections = apply_corrections,
-               forecaster_args = forecaster_args)
-          )
-        ) %>%
-    bind_rows()
+  assert_that(xor(honest_as_of, "as_of" %in% names(signals)), msg="`honest_as_of` should be set if and only if `as_of` is not set. Either remove as_of specification or set honest_as_of to FALSE.")
+
+  p = progressor(steps = length(forecast_dates))
+  get_predictions_single_date_ <- function(forecast_date) {
+    p()
+    do.call(get_predictions_single_date,
+            list(forecaster = forecaster,
+              signals = signals,
+              forecast_date = forecast_date,
+              apply_corrections = apply_corrections,
+              forecaster_args = forecaster_args,
+              honest_as_of = honest_as_of,
+              offline_signal_dir = offline_signal_dir))
+  }
+  if(parallel_execution) {
+    out <- parallel::mclapply(
+      forecast_dates, 
+      get_predictions_single_date_, 
+      mc.cores=max(parallel::detectCores()-1, 1)
+    ) %>% bind_rows()
+  }
+  else {
+    out <- map(forecast_dates, get_predictions_single_date_) %>% bind_rows()
+  }
 
   # for some reason, `value` gets named and ends up in attr
   names(out$value) = NULL 
@@ -100,7 +123,7 @@ get_predictions <- function(forecaster,
       incidence_period = incidence_period
       ) %>% 
     relocate(.data$forecaster, .before = .data$forecast_date)
-  
+
   class(out) <- c("predictions_cards", class(out))
   out
 }
@@ -110,15 +133,21 @@ get_predictions_single_date <- function(forecaster,
                                         signals,
                                         forecast_date,
                                         apply_corrections,
-                                        forecaster_args) {
+                                        forecaster_args,
+                                        honest_as_of = TRUE,
+                                        offline_signal_dir = NULL) {
 
   forecast_date <- lubridate::ymd(forecast_date)
   signals <- signal_listcols(signals, forecast_date)
-  
+
   df_list <- signals %>%
     pmap(function(...) {
       sig <- list(...)
+      if (honest_as_of) {
+        sig$as_of <- forecast_date
+      }
       download_signal(
+        offline_signal_dir = offline_signal_dir,
         data_source = sig$data_source,
         signal = sig$signal,
         start_day = sig$start_day,
@@ -127,21 +156,20 @@ get_predictions_single_date <- function(forecaster,
         geo_type = sig$geo_type,
         geo_values = sig$geo_values)
     })
-  
+
   # Downloaded data postprocessing
-  if(!is.null(apply_corrections)) df_list <- apply_corrections(df_list)
+  if (!is.null(apply_corrections)) df_list <- apply_corrections(df_list)
 
   forecaster_args$forecast_date = forecast_date
   forecaster_args$df_list <- df_list # pass in the data named to the right arg
-  
+
   out <- do.call(forecaster, forecaster_args)
   assert_that(all(c("ahead", "geo_value", "quantile", "value") %in% names(out)),
               msg = paste("Your forecaster must return a data frame with",
                           "(at least) the columnns `ahead`, `geo_value`,",
                           "`quantile`, and `value`."))
-  
+
   # make a predictions card
   out$forecast_date = forecast_date
   return(out)
 }
-

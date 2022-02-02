@@ -1,8 +1,11 @@
+# evalcast 0.3.1
+
+- Added a download_signal caching folder option
+
 # evalcast 0.3.0
 
 - Added pkgdown
 - Lives on `main`
-
 
 # evalcast 0.2.0
 

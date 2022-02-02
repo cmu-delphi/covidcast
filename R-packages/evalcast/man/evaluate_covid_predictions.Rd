@@ -9,7 +9,8 @@ evaluate_covid_predictions(
   err_measures = list(wis = weighted_interval_score, ae = absolute_error, coverage_80 =
     interval_coverage(coverage = 0.8)),
   backfill_buffer = 0,
-  geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation")
+  geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation"),
+  offline_signal_dir = NULL
 )
 }
 \arguments{

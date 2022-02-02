@@ -2,16 +2,20 @@
 % Please edit documentation in R/download_signals.R
 \name{download_signal}
 \alias{download_signal}
-\title{Wrapper around \code{covidcast::covidcast_signal()} with additional logging.}
+\title{Wrapper around \code{covidcast::covidcast_signal()} with additional logging and caching.}
 \usage{
-download_signal(...)
+download_signal(offline_signal_dir = NULL, ...)
 }
 \arguments{
+\item{offline_signal_dir}{the directory that stores the cached data for each
+(signal, forecast day) pair. If this is null, no caching is done and the data is
+downloaded from covidcast.}
+
 \item{...}{arguments to be passed to \code{covidcast::covidcast_signal()}.}
 }
 \value{
 \code{covidcast_signal} data frame.
 }
 \description{
-Wrapper around \code{covidcast::covidcast_signal()} with additional logging.
+Wrapper around \code{covidcast::covidcast_signal()} with additional logging and caching.
 }

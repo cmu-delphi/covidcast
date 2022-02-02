@@ -33,7 +33,7 @@ test_that("get_predictions works", {
   # - the forecaster to avoid dependencies on its internal prediction algorithm.
   fake_downloaded_signals <- list(
     create_fake_downloaded_signal("in", "jhu_csse", "deaths_incidence_num"),
-    create_fake_downloaded_signal("in", "jhu_csse", "confirmed_incidence_num")
+    create_fake_downloaded_signal("nc", "jhu_csse", "confirmed_incidence_num")
   )
   mock_download_signal <- mock(fake_downloaded_signals[[1]],
                                fake_downloaded_signals[[2]],
@@ -52,32 +52,37 @@ test_that("get_predictions works", {
                              name_of_forecaster = "fake",
                              signals = signals,
                              forecast_dates = forecast_dates,
-                             incidence_period = "epiweek")
+                             incidence_period = "epiweek",
+                             parallel_execution = FALSE)
 
     expect_called(mock_download_signal, 4)
     expect_equal(mock_args(mock_download_signal),
-                 list(list(data_source = "jhu-csse",
+                 list(list(offline_signal_dir = NULL,
+                           data_source = "jhu-csse",
                            signal = "deaths_incidence_num",
                            start_day = as.Date("2020-01-01"),
                            end_day = as.Date("2020-01-01"),
                            as_of = as.Date("2020-01-01"),
                            geo_type = "state",
                            geo_values = "*"),
-                      list(data_source = "jhu-csse",
+                      list(offline_signal_dir = NULL,
+                           data_source = "jhu-csse",
                            signal = "confirmed_incidence_num",
                            start_day = as.Date("2020-01-01"),
                            end_day = as.Date("2020-01-01"),
                            as_of = as.Date("2020-01-01"),
                            geo_type = "county",
                            geo_values = "*"),
-                      list(data_source = "jhu-csse",
+                      list(offline_signal_dir = NULL,
+                           data_source = "jhu-csse",
                            signal = "deaths_incidence_num",
                            start_day = as.Date("2020-01-01"),
                            end_day = as.Date("2020-01-02"),
                            as_of = as.Date("2020-01-02"),
                            geo_type = "state",
                            geo_values = "*"),
-                      list(data_source = "jhu-csse",
+                      list(offline_signal_dir = NULL,
+                           data_source = "jhu-csse",
                            signal = "confirmed_incidence_num",
                            start_day = as.Date("2020-01-01"),
                            end_day = as.Date("2020-01-02"),
@@ -117,7 +122,7 @@ test_that("get_predictions works when forecaster has additional arguments", {
   # - the forecaster to avoid dependencies on its internal prediction algorithm.
   fake_downloaded_signals <- list(
     create_fake_downloaded_signal("in", "jhu_csse", "deaths_incidence_num"),
-    create_fake_downloaded_signal("in", "jhu_csse", "confirmed_incidence_num")
+    create_fake_downloaded_signal("nc", "jhu_csse", "confirmed_incidence_num")
   )
   mock_download_signal <- mock(fake_downloaded_signals[[1]],
                                fake_downloaded_signals[[2]],
@@ -136,7 +141,8 @@ test_that("get_predictions works when forecaster has additional arguments", {
                              signals = signals,
                              forecast_dates = forecast_dates,
                              incidence_period = "epiweek",
-                             forecaster_args = list(a = 1, b = "2"))
+                             forecaster_args = list(a = 1, b = "2"),
+                             parallel_execution = FALSE)
 
     expect_called(mock_download_signal, 4)
     expect_called(mock_forecaster, 2)
@@ -174,7 +180,7 @@ test_that("no start_day within signals works", {
   # - the forecaster to avoid dependencies on its internal prediction algorithm.
   fake_downloaded_signals <- list(
     create_fake_downloaded_signal("fl", "jhu_csse", "deaths_incidence_num"),
-    create_fake_downloaded_signal("fl", "jhu_csse", "confirmed_incidence_num")
+    create_fake_downloaded_signal("ga", "jhu_csse", "confirmed_incidence_num")
   )
   mock_download_signal <- do.call(mock, fake_downloaded_signals)
   mockr::with_mock(download_signal = mock_download_signal, {
@@ -190,18 +196,21 @@ test_that("no start_day within signals works", {
                               name_of_forecaster = "fake",
                               signals = signals_no_start_day,
                               forecast_dates = forecast_dates,
-                              incidence_period = "epiweek")
+                              incidence_period = "epiweek",
+                              parallel_execution = FALSE)
 
     expect_called(mock_download_signal, 2)
     expect_equal(mock_args(mock_download_signal),
-                 list(list(data_source = "jhu-csse",
+                 list(list(offline_signal_dir = NULL,
+                           data_source = "jhu-csse",
                            signal = "deaths_incidence_num",
                            start_day = NULL,
                            end_day = as.Date("2020-01-01"),
                            as_of = as.Date("2020-01-01"),
                            geo_type = "state",
                            geo_values = "*"),
-                      list(data_source = "jhu-csse",
+                      list(offline_signal_dir = NULL,
+                           data_source = "jhu-csse",
                            signal = "confirmed_incidence_num",
                            start_day = NULL,
                            end_day = as.Date("2020-01-01"),
@@ -237,7 +246,7 @@ test_that("start_day function within signals works", {
   # - the forecaster to avoid dependencies on its internal prediction algorithm.
   fake_downloaded_signals <- list(
     create_fake_downloaded_signal("fl", "jhu_csse", "deaths_incidence_num"),
-    create_fake_downloaded_signal("fl", "jhu_csse", "confirmed_incidence_num")
+    create_fake_downloaded_signal("ga", "jhu_csse", "confirmed_incidence_num")
   )
   mock_download_signal <- mock(fake_downloaded_signals[[1]],
                                fake_downloaded_signals[[2]],
@@ -259,32 +268,37 @@ test_that("start_day function within signals works", {
                              name_of_forecaster = "fake",
                              signals = signals_with_start_day_fn,
                              forecast_dates = forecast_dates,
-                             incidence_period = "epiweek")
+                             incidence_period = "epiweek",
+                             parallel_execution = FALSE)
 
     expect_called(mock_download_signal, 4)
     expect_equal(mock_args(mock_download_signal),
-                 list(list(data_source = "jhu-csse",
+                 list(list(offline_signal_dir = NULL,
+                           data_source = "jhu-csse",
                            signal = "deaths_incidence_num",
                            start_day = as.Date("2020-12-01"),
                            end_day = as.Date("2020-12-11"),
                            as_of = as.Date("2020-12-11"),
                            geo_type = "state",
                            geo_values = "*"),
-                      list(data_source = "jhu-csse",
+                      list(offline_signal_dir = NULL,
+                           data_source = "jhu-csse",
                            signal = "confirmed_incidence_num",
                            start_day = as.Date("2020-12-01"),
                            end_day = as.Date("2020-12-11"),
                            as_of = as.Date("2020-12-11"),
                            geo_type = "state",
                            geo_values = "*"),
-                      list(data_source = "jhu-csse",
+                      list(offline_signal_dir = NULL,
+                           data_source = "jhu-csse",
                            signal = "deaths_incidence_num",
                            start_day = as.Date("2020-12-02"),
                            end_day = as.Date("2020-12-12"),
                            as_of = as.Date("2020-12-12"),
                            geo_type = "state",
                            geo_values = "*"),
-                      list(data_source = "jhu-csse",
+                      list(offline_signal_dir = NULL,
+                           data_source = "jhu-csse",
                            signal = "confirmed_incidence_num",
                            start_day = as.Date("2020-12-02"),
                            end_day = as.Date("2020-12-12"),
@@ -345,7 +359,8 @@ test_that("start_day function and date mix within signals works", {
                              name_of_forecaster = "fake",
                              signals = signals_with_start_day_fn,
                              forecast_dates = forecast_dates,
-                             incidence_period = "epiweek")
+                             incidence_period = "epiweek",
+                             parallel_execution = FALSE)
 
     expect_called(mock_download_signal, 4)
     expect_called(mock_forecaster, 2)

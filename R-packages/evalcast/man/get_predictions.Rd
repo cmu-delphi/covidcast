@@ -13,7 +13,10 @@ get_predictions(
   apply_corrections = function(signals) signals,
   response_data_source = signals$data_source[1],
   response_data_signal = signals$signal[1],
-  forecaster_args = list()
+  parallel_execution = TRUE,
+  forecaster_args = list(),
+  honest_as_of = TRUE,
+  offline_signal_dir = NULL
 )
 }
 \arguments{
@@ -98,10 +101,21 @@ same as the \code{data_source} in the first row of the \code{signals} tibble.}
 This is used mainly for downstream evaluation. By default, this will be the
 same as the \code{signal} in the first row in the \code{signals} tibble.}
 
+\item{parallel_execution}{a bool that, if true, uses parallel::mclapply to execute each
+forecast dates' prediction in parallel. Otherwise, the code is run on a single core.}
+
 \item{forecaster_args}{a list of additional named arguments to be passed
 to \code{forecaster()}. A common use case would be to pass the period ahead
 (e.g. predict 1 day, 2 days, ..., k days ahead). Note that \code{ahead} is a
 required component of the forecaster output (see above).}
+
+\item{honest_as_of}{a boolean that, if true, ensures that the forecast_day, end_day,
+and as_of are all equal when downloading data. Otherwise, as_of is allowed to be freely
+set (and defaults to current date if not presented).}
+
+\item{offline_signal_dir}{the directory that stores the cached data for each
+(signal, forecast day) pair. If this is null, no caching is done and the data is
+downloaded from covidcast.}
 }
 \value{
 Long data frame of forecasts with a class of \code{predictions_cards}.

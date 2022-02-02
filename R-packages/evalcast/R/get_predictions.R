@@ -50,7 +50,10 @@
 #'
 #' @template predictions_cards-template
 #' 
+#' @importFrom lubridate ymd
 #' @importFrom progressr progressor
+#' @importFrom parallel mclapply
+#' @importFrom parallel detectCores
 #'
 #' @examples \dontrun{
 #' baby_predictions = get_predictions(
@@ -99,10 +102,10 @@ get_predictions <- function(forecaster,
               offline_signal_dir = offline_signal_dir))
   }
   if(parallel_execution) {
-    out <- parallel::mclapply(
+    out <- mclapply(
       forecast_dates, 
       get_predictions_single_date_, 
-      mc.cores=max(parallel::detectCores()-1, 1)
+      mc.cores=max(detectCores()-1, 1)
     ) %>% bind_rows()
   }
   else {
@@ -137,7 +140,7 @@ get_predictions_single_date <- function(forecaster,
                                         honest_as_of = TRUE,
                                         offline_signal_dir = NULL) {
 
-  forecast_date <- lubridate::ymd(forecast_date)
+  forecast_date <- ymd(forecast_date)
   signals <- signal_listcols(signals, forecast_date)
 
   df_list <- signals %>%

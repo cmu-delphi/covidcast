@@ -1,4 +1,4 @@
 library(testthat)
 library(evalcast)
 
-test_check("evalcast")
+test_local(".", filter = "predictions")

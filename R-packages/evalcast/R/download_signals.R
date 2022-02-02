@@ -5,10 +5,15 @@
 #' @param ... arguments to be passed to `covidcast::covidcast_signal()`.
 #' @return `covidcast_signal` data frame.
 #'
+#' @importFrom fs dir_create
+#'
 #' @export
 download_signal <- function(offline_signal_dir=NULL, ...) {
   args <- list(...)
+  # Mirror covidcast_signal defaults
   if (is.null(args$as_of)) args$as_of <- Sys.Date()
+  if (is.null(args$geo_type)) args$geo_type <- "county"
+  if (is.null(args$end_day)) stop("end_day must be set.")
 
   if (is.null(offline_signal_dir)) {
     if (is.null(args$start_day)) {
@@ -31,20 +36,20 @@ download_signal <- function(offline_signal_dir=NULL, ...) {
     }
 
     message(msg)
-    df <- base::suppressMessages({covidcast_signal(...)})
+    df <- suppressMessages({covidcast_signal_wrapper(...)})
   } else {
     signal_fpath <- file.path(offline_signal_dir, args$geo_type, sprintf("%s_%s_%s_%s.RDS", args$data_source, args$signal, args$end_day, args$as_of))
     message("Using API data caching mechanism. Be warned that a stale cache could cause issues (for safety, you can remove the 'offline_signal_dir' argument or clean the cache directory).")
 
-    if(file.exists(signal_fpath)) {
+    if (file.exists(signal_fpath)) {
       message(sprintf("Reading signal from disk: %s", signal_fpath))
       df <- readRDS(signal_fpath)
       read_from_disk <- TRUE
     }
     else {
       message(sprintf("Downloading signal from API and storing in: %s", signal_fpath))
-      df <- base::suppressMessages({covidcast_signal(...)})
-      fs::dir_create(dirname(signal_fpath), recurse = TRUE)
+      df <- suppressMessages({covidcast_signal_wrapper(...)})
+      dir_create(dirname(signal_fpath), recurse = TRUE)
       saveRDS(df, signal_fpath)
       read_from_disk <- FALSE
     }
@@ -66,4 +71,10 @@ download_signal <- function(offline_signal_dir=NULL, ...) {
   }
 
   return(df)
+}
+
+# The thinnest wrapper possible to allow mock testing see:
+# https://krlmlr.github.io/mockr/articles/mockr.html#write-wrapper-functions
+covidcast_signal_wrapper <- function(...) {
+  return(covidcast_signal(...))
 }

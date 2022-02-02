@@ -2,12 +2,12 @@ Package: evalcast
 Type: Package
 Title: Tools For Evaluating COVID Forecasters
 Version: 0.3.0
-Authors@R: 
+Authors@R:
   c(
-		person(given = "Daniel",
-			     family = "McDonald",
-			     role = c("aut", "cre"),
-			     email = "daniel@stat.ubc.ca"),
+    person(given = "Daniel",
+           family = "McDonald",
+           role = c("aut", "cre"),
+           email = "daniel@stat.ubc.ca"),
     person(given = "Jacob",
            family = "Bien",
            role = "aut"),
@@ -36,7 +36,7 @@ Authors@R:
            family = "Tibshirani",
            role = "aut"))
 URL: https://cmu-delphi.github.io/covidcast/evalcastR/,
-  https://github.com/cmu-delphi/covidcast 
+  https://github.com/cmu-delphi/covidcast
 BugReports: https://github.com/cmu-delphi/covidcast/issues
 Description: Tools for evaluating probabilistic COVID-19 forecasters. This
     package provides functionality for accurately evaluating forecaster
@@ -59,7 +59,7 @@ Remotes:
   reichlab/zoltr,
   reichlab/covidHubUtils,
   epiforecasts/scoringutils
-Imports: 
+Imports:
     assertthat,
     covidcast,
     dplyr,
@@ -81,11 +81,11 @@ Imports:
     forcats,
     data.table,
     arrow
-Suggests: 
+Suggests:
     testthat,
     mockr,
     mockery,
     scoringutils,
     vdiffr
-Depends: 
+Depends:
     R (>= 3.5.0)

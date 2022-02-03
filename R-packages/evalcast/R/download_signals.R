@@ -13,7 +13,7 @@ download_signal <- function(offline_signal_dir=NULL, ...) {
   # Mirror covidcast_signal defaults
   if (is.null(args$as_of)) args$as_of <- Sys.Date()
   if (is.null(args$geo_type)) args$geo_type <- "county"
-  if (is.null(args$end_day)) stop("end_day must be set.")
+  if (!is.null(offline_signal_dir) & is.null(args$end_day)) stop("end_day must be set.")
 
   if (is.null(offline_signal_dir)) {
     if (is.null(args$start_day)) {

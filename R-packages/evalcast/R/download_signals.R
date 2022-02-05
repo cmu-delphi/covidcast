@@ -6,6 +6,7 @@
 #' @return `covidcast_signal` data frame.
 #'
 #' @importFrom fs dir_create
+#' @importFrom rlang warn inform
 #'
 #' @export
 download_signal <- function(..., offline_signal_dir=NULL) {
@@ -39,15 +40,24 @@ download_signal <- function(..., offline_signal_dir=NULL) {
     df <- suppressMessages({covidcast_signal_wrapper(...)})
   } else {
     signal_fpath <- file.path(offline_signal_dir, args$geo_type, sprintf("%s_%s_%s_%s.RDS", args$data_source, args$signal, args$end_day, args$as_of))
-    message("Using API data caching mechanism. Be warned that a stale cache could cause issues (for safety, you can remove the 'offline_signal_dir' argument or clean the cache directory).")
+    inform(
+      "Using API data caching mechanism. Be warned that a stale cache could cause issues (for safety, you can remove the 'offline_signal_dir' argument or clean the cache directory).",
+      "cache_info"
+    )
 
     if (file.exists(signal_fpath)) {
-      message(sprintf("Reading signal from disk: %s", signal_fpath))
+      inform(
+        sprintf("Reading signal from disk: %s", signal_fpath),
+        "cache_info"
+      )
       df <- readRDS(signal_fpath)
       read_from_disk <- TRUE
     }
     else {
-      message(sprintf("Downloading signal from API and storing in: %s", signal_fpath))
+      inform(
+        sprintf("Downloading signal from API and storing in: %s", signal_fpath),
+        "cache_info"
+      )
       df <- suppressMessages({covidcast_signal_wrapper(...)})
       dir_create(dirname(signal_fpath), recurse = TRUE)
       saveRDS(df, signal_fpath)
@@ -55,13 +65,13 @@ download_signal <- function(..., offline_signal_dir=NULL) {
     }
 
     max_time_value <- (df %>% summarize(max(time_value)))[[1]]
-    if (read_from_disk && (max_time_value < args$end_day)) warning("Data in cache ends earlier than `end_day`.")
+    if (read_from_disk && (max_time_value < args$end_day)) warn("Data in cache ends earlier than `end_day`.", "cache_warning")
 
     if (is.null(args$start_day)) {
       df <- df %>% filter(time_value <= args$end_day)
     } else {
       min_time_value <- (df %>% summarize(min(time_value)))[[1]]
-      if (read_from_disk && (min_time_value > args$start_day)) warning("Data in cache starts later than `start_day`.")
+      if (read_from_disk && (min_time_value > args$start_day)) warn("Data in cache starts later than `start_day`.", "cache_warning")
       df <- df %>% filter(time_value >= args$start_day, time_value <= args$end_day)
     }
 

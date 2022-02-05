@@ -29,8 +29,12 @@ test_that("download_signals runs as normal without cache dir", {
   # Call once.
   mockr::with_mock(covidcast_signal_wrapper = mock_covidcast_signal, {
     downloaded_data <- download_signal(
-      # offline_signal_dir = tempdir(),
-      data_source = "source", signal = "signal", geo_type = "state", geo_value = c("al", "wy"), end_day = as.Date("2020-01-01"), issue = as.Date("2020-01-02")
+      data_source = "source",
+      signal = "signal",
+      geo_type = "state",
+      geo_value = c("al", "wy"),
+      end_day = as.Date("2020-01-01"),
+      issue = as.Date("2020-01-02")
     )
   })
 
@@ -40,8 +44,12 @@ test_that("download_signals runs as normal without cache dir", {
   # Call a second time.
   mockr::with_mock(covidcast_signal_wrapper = mock_covidcast_signal, {
     downloaded_data <- download_signal(
-      # offline_signal_dir = tempdir(),
-      data_source = "source", signal = "signal", geo_type = "state", geo_value = c("al", "wy"), end_day = as.Date("2020-01-01"), issue = as.Date("2020-01-02")
+      data_source = "source",
+      signal = "signal",
+      geo_type = "state",
+      geo_value = c("al", "wy"),
+      end_day = as.Date("2020-01-01"),
+      issue = as.Date("2020-01-02")
     )
   })
 
@@ -60,8 +68,13 @@ test_that("download_signals caches when called with cache dir", {
   # Call once.
   mockr::with_mock(covidcast_signal_wrapper = mock_covidcast_signal, {
     downloaded_data <- download_signal(
-      offline_signal_dir = tempdir(),
-      data_source = "source", signal = "signal", geo_type = "state", geo_values = c("al", "wy"), end_day = as.Date("2020-01-01"), issue = as.Date("2020-01-02")
+      data_source = "source",
+      signal = "signal",
+      geo_type = "state",
+      geo_values = c("al", "wy"),
+      end_day = as.Date("2020-01-01"),
+      issue = as.Date("2020-01-02"),
+      offline_signal_dir = tempdir()
     )
   })
 
@@ -71,8 +84,13 @@ test_that("download_signals caches when called with cache dir", {
   # Call a second time.
   mockr::with_mock(covidcast_signal_wrapper = mock_covidcast_signal, {
     downloaded_data <- download_signal(
-      offline_signal_dir = tempdir(),
-      data_source = "source", signal = "signal", geo_type = "state", geo_values = c("al", "wy"), end_day = as.Date("2020-01-01"), issue = as.Date("2020-01-02")
+      data_source = "source",
+      signal = "signal",
+      geo_type = "state",
+      geo_values = c("al", "wy"),
+      end_day = as.Date("2020-01-01"),
+      issue = as.Date("2020-01-02"),
+      offline_signal_dir = tempdir()
     )
   })
 

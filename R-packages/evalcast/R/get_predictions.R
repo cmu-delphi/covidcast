@@ -41,6 +41,8 @@
 #'   required component of the forecaster output (see above).
 #' @param parallel_execution a bool that, if true, uses parallel::mclapply to execute each
 #' forecast dates' prediction in parallel. Otherwise, the code is run on a single core.
+#' By default, checks the "mc.cores" option for the number of cores, otherwise defaults to
+#' the total number of cores minus 1 (or 1, if that is larger).
 #' @param honest_as_of a boolean that, if true, ensures that the forecast_day, end_day,
 #' and as_of are all equal when downloading data. Otherwise, as_of is allowed to be freely
 #' set (and defaults to current date if not presented).
@@ -105,7 +107,7 @@ get_predictions <- function(forecaster,
     out <- mclapply(
       forecast_dates, 
       get_predictions_single_date_, 
-      mc.cores=max(detectCores()-1, 1)
+      mc.cores=getOption("mc.cores", max(detectCores()-1, 1))
     ) %>% bind_rows()
   }
   else {
@@ -150,14 +152,15 @@ get_predictions_single_date <- function(forecaster,
         sig$as_of <- forecast_date
       }
       download_signal(
-        offline_signal_dir = offline_signal_dir,
         data_source = sig$data_source,
         signal = sig$signal,
         start_day = sig$start_day,
         end_day = forecast_date,
         as_of = sig$as_of,
         geo_type = sig$geo_type,
-        geo_values = sig$geo_values)
+        geo_values = sig$geo_values,
+        offline_signal_dir = offline_signal_dir
+      )
     })
 
   # Downloaded data postprocessing

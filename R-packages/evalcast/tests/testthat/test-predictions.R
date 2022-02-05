@@ -56,39 +56,50 @@ test_that("get_predictions works", {
                              parallel_execution = FALSE)
 
     expect_called(mock_download_signal, 4)
-    expect_equal(mock_args(mock_download_signal),
-                 list(list(offline_signal_dir = NULL,
-                           data_source = "jhu-csse",
-                           signal = "deaths_incidence_num",
-                           start_day = as.Date("2020-01-01"),
-                           end_day = as.Date("2020-01-01"),
-                           as_of = as.Date("2020-01-01"),
-                           geo_type = "state",
-                           geo_values = "*"),
-                      list(offline_signal_dir = NULL,
-                           data_source = "jhu-csse",
-                           signal = "confirmed_incidence_num",
-                           start_day = as.Date("2020-01-01"),
-                           end_day = as.Date("2020-01-01"),
-                           as_of = as.Date("2020-01-01"),
-                           geo_type = "county",
-                           geo_values = "*"),
-                      list(offline_signal_dir = NULL,
-                           data_source = "jhu-csse",
-                           signal = "deaths_incidence_num",
-                           start_day = as.Date("2020-01-01"),
-                           end_day = as.Date("2020-01-02"),
-                           as_of = as.Date("2020-01-02"),
-                           geo_type = "state",
-                           geo_values = "*"),
-                      list(offline_signal_dir = NULL,
-                           data_source = "jhu-csse",
-                           signal = "confirmed_incidence_num",
-                           start_day = as.Date("2020-01-01"),
-                           end_day = as.Date("2020-01-02"),
-                           as_of = as.Date("2020-01-02"),
-                           geo_type = "county",
-                           geo_values = "*"))
+    expect_equal(
+      mock_args(mock_download_signal),
+      list(
+        list(
+          data_source = "jhu-csse",
+          signal = "deaths_incidence_num",
+          start_day = as.Date("2020-01-01"),
+          end_day = as.Date("2020-01-01"),
+          as_of = as.Date("2020-01-01"),
+          geo_type = "state",
+          geo_values = "*",
+          offline_signal_dir = NULL
+        ),
+        list(
+          data_source = "jhu-csse",
+          signal = "confirmed_incidence_num",
+          start_day = as.Date("2020-01-01"),
+          end_day = as.Date("2020-01-01"),
+          as_of = as.Date("2020-01-01"),
+          geo_type = "county",
+          geo_values = "*",
+          offline_signal_dir = NULL
+        ),
+        list(
+          data_source = "jhu-csse",
+          signal = "deaths_incidence_num",
+          start_day = as.Date("2020-01-01"),
+          end_day = as.Date("2020-01-02"),
+          as_of = as.Date("2020-01-02"),
+          geo_type = "state",
+          geo_values = "*",
+          offline_signal_dir = NULL
+        ),
+        list(
+          data_source = "jhu-csse",
+          signal = "confirmed_incidence_num",
+          start_day = as.Date("2020-01-01"),
+          end_day = as.Date("2020-01-02"),
+          as_of = as.Date("2020-01-02"),
+          geo_type = "county",
+          geo_values = "*",
+          offline_signal_dir = NULL
+        )
+      )
     )
     expect_called(mock_forecaster, 2)
     expect_equal(mock_args(mock_forecaster),
@@ -200,23 +211,30 @@ test_that("no start_day within signals works", {
                               parallel_execution = FALSE)
 
     expect_called(mock_download_signal, 2)
-    expect_equal(mock_args(mock_download_signal),
-                 list(list(offline_signal_dir = NULL,
-                           data_source = "jhu-csse",
-                           signal = "deaths_incidence_num",
-                           start_day = NULL,
-                           end_day = as.Date("2020-01-01"),
-                           as_of = as.Date("2020-01-01"),
-                           geo_type = "state",
-                           geo_values = "*"),
-                      list(offline_signal_dir = NULL,
-                           data_source = "jhu-csse",
-                           signal = "confirmed_incidence_num",
-                           start_day = NULL,
-                           end_day = as.Date("2020-01-01"),
-                           as_of = as.Date("2020-01-01"),
-                           geo_type = "state",
-                           geo_values = "*"))
+    expect_equal(
+      mock_args(mock_download_signal),
+      list(
+        list(
+          data_source = "jhu-csse",
+          signal = "deaths_incidence_num",
+          start_day = NULL,
+          end_day = as.Date("2020-01-01"),
+          as_of = as.Date("2020-01-01"),
+          geo_type = "state",
+          geo_values = "*",
+          offline_signal_dir = NULL
+        ),
+        list(
+          data_source = "jhu-csse",
+          signal = "confirmed_incidence_num",
+          start_day = NULL,
+          end_day = as.Date("2020-01-01"),
+          as_of = as.Date("2020-01-01"),
+          geo_type = "state",
+          geo_values = "*",
+          offline_signal_dir = NULL
+        )
+      )
     )
     expect_called(mock_forecaster, 1)
     expect_equal(mock_args(mock_forecaster),
@@ -272,39 +290,50 @@ test_that("start_day function within signals works", {
                              parallel_execution = FALSE)
 
     expect_called(mock_download_signal, 4)
-    expect_equal(mock_args(mock_download_signal),
-                 list(list(offline_signal_dir = NULL,
-                           data_source = "jhu-csse",
-                           signal = "deaths_incidence_num",
-                           start_day = as.Date("2020-12-01"),
-                           end_day = as.Date("2020-12-11"),
-                           as_of = as.Date("2020-12-11"),
-                           geo_type = "state",
-                           geo_values = "*"),
-                      list(offline_signal_dir = NULL,
-                           data_source = "jhu-csse",
-                           signal = "confirmed_incidence_num",
-                           start_day = as.Date("2020-12-01"),
-                           end_day = as.Date("2020-12-11"),
-                           as_of = as.Date("2020-12-11"),
-                           geo_type = "state",
-                           geo_values = "*"),
-                      list(offline_signal_dir = NULL,
-                           data_source = "jhu-csse",
-                           signal = "deaths_incidence_num",
-                           start_day = as.Date("2020-12-02"),
-                           end_day = as.Date("2020-12-12"),
-                           as_of = as.Date("2020-12-12"),
-                           geo_type = "state",
-                           geo_values = "*"),
-                      list(offline_signal_dir = NULL,
-                           data_source = "jhu-csse",
-                           signal = "confirmed_incidence_num",
-                           start_day = as.Date("2020-12-02"),
-                           end_day = as.Date("2020-12-12"),
-                           as_of = as.Date("2020-12-12"),
-                           geo_type = "state",
-                           geo_values = "*"))
+    expect_equal(
+      mock_args(mock_download_signal),
+      list(
+        list(
+          data_source = "jhu-csse",
+          signal = "deaths_incidence_num",
+          start_day = as.Date("2020-12-01"),
+          end_day = as.Date("2020-12-11"),
+          as_of = as.Date("2020-12-11"),
+          geo_type = "state",
+          geo_values = "*",
+          offline_signal_dir = NULL
+        ),
+        list(
+          data_source = "jhu-csse",
+          signal = "confirmed_incidence_num",
+          start_day = as.Date("2020-12-01"),
+          end_day = as.Date("2020-12-11"),
+          as_of = as.Date("2020-12-11"),
+          geo_type = "state",
+          geo_values = "*",
+          offline_signal_dir = NULL
+        ),
+        list(
+          data_source = "jhu-csse",
+          signal = "deaths_incidence_num",
+          start_day = as.Date("2020-12-02"),
+          end_day = as.Date("2020-12-12"),
+          as_of = as.Date("2020-12-12"),
+          geo_type = "state",
+          geo_values = "*",
+          offline_signal_dir = NULL
+        ),
+        list(
+          data_source = "jhu-csse",
+          signal = "confirmed_incidence_num",
+          start_day = as.Date("2020-12-02"),
+          end_day = as.Date("2020-12-12"),
+          as_of = as.Date("2020-12-12"),
+          geo_type = "state",
+          geo_values = "*",
+          offline_signal_dir = NULL
+        )
+      )
     )
     expect_called(mock_forecaster, 2)
     expect_equal(mock_args(mock_forecaster),

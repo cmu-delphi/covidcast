@@ -1,14 +1,14 @@
 #' Wrapper around `covidcast::covidcast_signal()` with additional logging and caching.
+#' @param ... arguments to be passed to `covidcast::covidcast_signal()`.
 #' @param offline_signal_dir the directory that stores the cached data for each
 #' (signal, forecast day) pair. If this is null, no caching is done and the data is
 #' downloaded from covidcast.
-#' @param ... arguments to be passed to `covidcast::covidcast_signal()`.
 #' @return `covidcast_signal` data frame.
 #'
 #' @importFrom fs dir_create
 #'
 #' @export
-download_signal <- function(offline_signal_dir=NULL, ...) {
+download_signal <- function(..., offline_signal_dir=NULL) {
   args <- list(...)
   # Mirror covidcast_signal defaults
   if (is.null(args$as_of)) args$as_of <- Sys.Date()

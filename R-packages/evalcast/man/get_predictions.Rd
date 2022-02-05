@@ -102,7 +102,9 @@ This is used mainly for downstream evaluation. By default, this will be the
 same as the \code{signal} in the first row in the \code{signals} tibble.}
 
 \item{parallel_execution}{a bool that, if true, uses parallel::mclapply to execute each
-forecast dates' prediction in parallel. Otherwise, the code is run on a single core.}
+forecast dates' prediction in parallel. Otherwise, the code is run on a single core.
+By default, checks the "mc.cores" option for the number of cores, otherwise defaults to
+the total number of cores minus 1 (or 1, if that is larger).}
 
 \item{forecaster_args}{a list of additional named arguments to be passed
 to \code{forecaster()}. A common use case would be to pass the period ahead

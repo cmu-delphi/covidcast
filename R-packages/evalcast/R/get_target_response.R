@@ -33,14 +33,49 @@ get_target_response <- function(signals,
   }
   target_periods <- target_periods %>% filter(.data$available) %>%
     mutate(available = NULL)
-  
+
+
+  download_signal_retry <- function(...) {
+    # Download file. Re-attempt up to 8 times (max 2 min wait).
+    attempt <- 0
+    n_max_attempt <- 8
+    base_wait <- 1 # second
+
+    while (attempt < n_max_attempt) {
+      attempt <- attempt + 1
+      # Increase time between download attempts in exponential backoff
+      wait <- base_wait * 2 ^ (attempt - 1)
+      # If an error is raised, `out` stores the error, else the return value of the
+      # expression
+      out <- try({
+        download_signal(...)
+      })
+
+      if ( inherits(out, "try-error") ) {
+        if (attempt < n_max_attempt) { message("retrying...") }
+        Sys.sleep(wait)
+        next
+      } else {
+        break
+      }
+    }
+
+    if (attempt == n_max_attempt & inherits(out, "try-error")) {
+      stop("signal could not be downloaded")
+    } else if (attempt > 1 & !inherits(out, "try-error")) {
+      message("succeeded after ", attempt, " attempts")
+    }
+    out
+  }
+
+
   if (length(geo_values) > 30) geo_values = "*"
   out <- target_periods %>%
     rename(start_day = .data$start, end_day = .data$end) %>%
     mutate(data_source = response$data_source,
            signal = response$signal,
            geo_type = geo_type) %>%
-    pmap(download_signal, geo_values = geo_values, offline_signal_dir = offline_signal_dir) # apply_corrections would need to run here,
+    pmap(download_signal_retry, geo_values = geo_values, offline_signal_dir = offline_signal_dir) # apply_corrections would need to run here,
   # but can only use part of response
   # we don't allow this for now.
   

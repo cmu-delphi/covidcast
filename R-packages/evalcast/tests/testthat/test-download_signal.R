@@ -65,6 +65,8 @@ test_that("download_signals caches when called with cache dir", {
     create_fake_downloaded_signal(c("al", "wy"), 10)
   )
 
+  temp_offline_signal_dir = fs::dir_create(withr::local_file(tempfile()))
+
   # Call once.
   mockr::with_mock(covidcast_signal_wrapper = mock_covidcast_signal, {
     downloaded_data <- download_signal(
@@ -74,7 +76,7 @@ test_that("download_signals caches when called with cache dir", {
       geo_values = c("al", "wy"),
       end_day = as.Date("2020-01-01"),
       issue = as.Date("2020-01-02"),
-      offline_signal_dir = tempdir()
+      offline_signal_dir = temp_offline_signal_dir
     )
   })
 
@@ -90,7 +92,7 @@ test_that("download_signals caches when called with cache dir", {
       geo_values = c("al", "wy"),
       end_day = as.Date("2020-01-01"),
       issue = as.Date("2020-01-02"),
-      offline_signal_dir = tempdir()
+      offline_signal_dir = temp_offline_signal_dir
     )
   })
 

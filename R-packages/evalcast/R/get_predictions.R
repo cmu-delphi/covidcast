@@ -39,10 +39,10 @@
 #'   to `forecaster()`. A common use case would be to pass the period ahead
 #'   (e.g. predict 1 day, 2 days, ..., k days ahead). Note that `ahead` is a 
 #'   required component of the forecaster output (see above).
-#' @param parallel_execution a bool that, if true, uses parallel::mclapply to execute each
-#' forecast dates' prediction in parallel. Otherwise, the code is run on a single core.
-#' By default, checks the "mc.cores" option for the number of cores, otherwise defaults to
-#' the total number of cores minus 1 (or 1, if that is larger).
+#' @param parallel_execution is a mixed logical/integer. If true, uses parallel::mclapply to
+#' execute each forecast date prediction in parallel on max number of cores - 1. If false, the
+#' code is run on a single core. If integer, runs in parallel on that many cores, clipped to
+#' the range [1, max number of cores].
 #' @param honest_as_of a boolean that, if true, ensures that the forecast_day, end_day,
 #' and as_of are all equal when downloading data. Otherwise, as_of is allowed to be freely
 #' set (and defaults to current date if not presented).
@@ -54,8 +54,7 @@
 #' 
 #' @importFrom lubridate ymd
 #' @importFrom progressr progressor
-#' @importFrom parallel mclapply
-#' @importFrom parallel detectCores
+#' @importFrom parallel mclapply detectCores
 #'
 #' @examples \dontrun{
 #' baby_predictions = get_predictions(
@@ -88,10 +87,10 @@ get_predictions <- function(forecaster,
                             honest_as_of = TRUE,
                             offline_signal_dir = NULL) {
 
-  assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
-  assert_that(xor(honest_as_of, "as_of" %in% names(signals)), msg="`honest_as_of` should be set if and only if `as_of` is not set. Either remove as_of specification or set honest_as_of to FALSE.")
+  assert_that(is_tibble(signals), msg = "`signals` should be a tibble.")
+  assert_that(xor(honest_as_of, "as_of" %in% names(signals)), msg = "`honest_as_of` should be set if and only if `as_of` is not set. Either remove as_of specification or set honest_as_of to FALSE.")
 
-  p = progressor(steps = length(forecast_dates))
+  p <- progressor(steps = length(forecast_dates))
   get_predictions_single_date_ <- function(forecast_date) {
     p()
     do.call(get_predictions_single_date,
@@ -103,16 +102,23 @@ get_predictions <- function(forecaster,
               honest_as_of = honest_as_of,
               offline_signal_dir = offline_signal_dir))
   }
-  if(parallel_execution) {
-    out <- mclapply(
-      forecast_dates, 
-      get_predictions_single_date_, 
-      mc.cores=getOption("mc.cores", max(detectCores()-1, 1))
-    ) %>% bind_rows()
+
+  if(is.logical(parallel_execution) & parallel_execution == TRUE) {
+    num_cores <- max(1, detectCores() - 1)
+  } else if (is.logical(parallel_execution) & parallel_execution == FALSE) {
+    num_cores <- 1
+  } else if (is.integer(parallel_execution)) {
+    num_cores <- max(1, min(detectCores(), parallel_execution))
   }
   else {
-    out <- map(forecast_dates, get_predictions_single_date_) %>% bind_rows()
+    stop("parallel_execution variable neither logical nor integer.")
   }
+
+  out <- mclapply(
+    forecast_dates,
+    get_predictions_single_date_,
+    mc.cores = num_cores
+  ) %>% bind_rows()
 
   # for some reason, `value` gets named and ends up in attr
   names(out$value) = NULL 

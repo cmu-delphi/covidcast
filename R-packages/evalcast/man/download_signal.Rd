@@ -4,14 +4,39 @@
 \alias{download_signal}
 \title{Wrapper around \code{covidcast::covidcast_signal()} with additional logging and caching.}
 \usage{
-download_signal(..., offline_signal_dir = NULL)
+download_signal(
+  data_source,
+  signal,
+  start_day = NULL,
+  end_day = NULL,
+  geo_type = "county",
+  as_of = NULL,
+  offline_signal_dir = NULL,
+  ...
+)
 }
 \arguments{
-\item{...}{arguments to be passed to \code{covidcast::covidcast_signal()}.}
+\item{data_source}{a data source in covidcast.}
 
-\item{offline_signal_dir}{the directory that stores the cached data for each
-(signal, forecast day) pair. If this is null, no caching is done and the data is
-downloaded from covidcast.}
+\item{signal}{a signal in covidcast.}
+
+\item{start_day}{a date in the format "YYYY-MM-DD". First day of data to pull.}
+
+\item{end_day}{a date in the format "YYYY-MM-DD". Last day of data to pull.}
+
+\item{geo_type}{a geo type. One of "county", "state", "hrr", "msa", "nation", "hhs", "zip".}
+
+\item{as_of}{a date in the format "YYYY-MM-DD". Pulls the latest issue of the data available in covidcast on this date.}
+
+\item{offline_signal_dir}{the directory that stores the cached data for each (signal, forecast day) pair. If this is
+null, no caching is done and the data is downloaded from covidcast. The data is stored in a csv file with the format
+'offline_signal_dir/data-source_signal_geo-type_as-of.csv`. Warning: no intelligent fetching is done, so if you request
+the same signal, geo type, and as of, but vary the other parameters (non-empty symmetric difference geo_value subsets or
+non-empty symmetric difference start_day and end_day arguments), then the cache will return the result of the first call
+for later calls. To avoid this and use caching, make sure to make a call that fetches all the data you anticipate to use
+first and then request subsets. You can use populate_cache() below to fetch all the needed data.}
+
+\item{...}{other arguments to be passed to \code{covidcast::covidcast_signal()}.}
 }
 \value{
 \code{covidcast_signal} data frame.

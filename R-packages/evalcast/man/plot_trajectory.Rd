@@ -16,6 +16,7 @@ plot_trajectory(
   show_quantiles = TRUE,
   nrow = NULL,
   ncol = NULL,
+  facet_drop = TRUE,
   ...
 )
 }

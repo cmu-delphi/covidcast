@@ -51,9 +51,7 @@
 #' downloaded from covidcast.
 #'
 #' @template predictions_cards-template
-#' 
-#' @importFrom lubridate ymd
-#' @importFrom progressr progressor
+#'
 #' @importFrom parallel mclapply detectCores
 #'
 #' @examples \dontrun{
@@ -82,28 +80,31 @@ get_predictions <- function(forecaster,
                             apply_corrections = function(signals) signals,
                             response_data_source = signals$data_source[1],
                             response_data_signal = signals$signal[1],
-                            parallel_execution = TRUE,
                             forecaster_args = list(),
+                            parallel_execution = TRUE,
                             honest_as_of = TRUE,
                             offline_signal_dir = NULL) {
 
   assert_that(is_tibble(signals), msg = "`signals` should be a tibble.")
   assert_that(xor(honest_as_of, "as_of" %in% names(signals)), msg = "`honest_as_of` should be set if and only if `as_of` is not set. Either remove as_of specification or set honest_as_of to FALSE.")
 
-  p <- progressor(steps = length(forecast_dates))
   get_predictions_single_date_ <- function(forecast_date) {
-    p()
-    do.call(get_predictions_single_date,
-            list(forecaster = forecaster,
-              signals = signals,
-              forecast_date = forecast_date,
-              apply_corrections = apply_corrections,
-              forecaster_args = forecaster_args,
-              honest_as_of = honest_as_of,
-              offline_signal_dir = offline_signal_dir))
+    preds <- do.call(get_predictions_single_date,
+      list(
+        forecaster = forecaster,
+        signals = signals,
+        forecast_date = forecast_date,
+        apply_corrections = apply_corrections,
+        forecaster_args = forecaster_args,
+        honest_as_of = honest_as_of,
+        offline_signal_dir = offline_signal_dir
+      )
+    )
+    if (is.null(preds)) abort("A child process was terminated and returned a null .")
+    return(preds)
   }
 
-  if(is.logical(parallel_execution) & parallel_execution == TRUE) {
+  if (is.logical(parallel_execution) & parallel_execution == TRUE) {
     num_cores <- max(1, detectCores() - 1)
   } else if (is.logical(parallel_execution) & parallel_execution == FALSE) {
     num_cores <- 1
@@ -114,11 +115,7 @@ get_predictions <- function(forecaster,
     stop("parallel_execution variable neither logical nor integer.")
   }
 
-  out <- mclapply(
-    forecast_dates,
-    get_predictions_single_date_,
-    mc.cores = num_cores
-  ) %>% bind_rows()
+  out <- mclapply(forecast_dates, get_predictions_single_date_, mc.cores = num_cores) %>% bind_rows()
 
   # for some reason, `value` gets named and ends up in attr
   names(out$value) = NULL 
@@ -139,7 +136,7 @@ get_predictions <- function(forecaster,
   out
 }
 
-
+#' @importFrom lubridate ymd
 get_predictions_single_date <- function(forecaster,
                                         signals,
                                         forecast_date,

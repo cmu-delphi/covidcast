@@ -14,27 +14,31 @@
 #' first and then request subsets. You can use populate_cache() below to fetch all the needed data.
 #' @param ... other arguments to be passed to `covidcast::covidcast_signal()`.
 #' @return `covidcast_signal` data frame.
-#' 
+#'
 #' @importFrom assertthat assert_that
 #' @importFrom stringr str_glue
 #' @importFrom rlang inform warn
 #' @importFrom fs dir_create
+#' @importFrom magrittr %>%
 #'
 #' @export
-download_signal <- function(data_source, signal, start_day = NULL, end_day = NULL, geo_type = "county", as_of = NULL, offline_signal_dir = NULL, ...) {
+download_signal <- function(data_source, signal, start_day = NULL, end_day = NULL, geo_type = "county", geo_values = "*", as_of = NULL, offline_signal_dir = NULL, ...) {
   args <- list(...)
   if (is.null(as_of)) as_of <- Sys.Date()
   if (is.null(end_day)) end_day <- max(as_of)
   if (!is.null(start_day)) assert_that(as.Date(start_day) < as.Date(end_day))
 
   if (is.null(offline_signal_dir)) {
-    if (is.null(start_day)) {
-      msg <- str_glue("Downloading {signal} from covidcast through {end}.", end = end_day, signal = signal, .sep = " ")
-    } else {
-      msg <- str_glue("Downloading {signal} from covidcast for period from", "{start} to {end}.", start = start_day, end = end_day, signal = signal, .sep = " ")
-    }
+    msg <- str_glue("Downloading {signal} from covidcast from ", signal = signal, .sep = " ")
+
+    if (is.null(start_day)) msg <- str_glue("{msg} the earliest date possible to", msg = msg)
+    else msg <- str_glue("{msg} {start_day} to", msg = msg, start_day = start_day)
+
+    if (is.null(end_day)) msg <- str_glue("{msg} the latest date possible.", msg = msg)
+    else msg <- str_glue("{msg} {end_day}", msg = msg, end_day = end_day)
+
     message(msg)
-    df <- suppressMessages(covidcast_signal_wrapper(data_source = data_source, signal = signal, start_day = start_day, end_day = end_day, geo_type = geo_type, as_of = as_of, ...))
+    df <- suppressMessages(covidcast_signal_wrapper(data_source = data_source, signal = signal, start_day = start_day, end_day = end_day, geo_type = geo_type, geo_values = geo_values, as_of = as_of, ...))
   } else {
     signal_fpath <- file.path(offline_signal_dir, sprintf("%s_%s_%s_%s.RDS", data_source, signal, geo_type, as_of))
     inform("Using API data caching mechanism. Be warned that a stale cache could cause issues.", "evalcast::download_signals:cache_info_announce")
@@ -44,7 +48,7 @@ download_signal <- function(data_source, signal, start_day = NULL, end_day = NUL
       df <- readRDS(signal_fpath)
     } else {
       inform(sprintf("Downloading signal from API and storing in: %s", signal_fpath), "evalcast::download_signals:cache_info_write")
-      df <- suppressMessages(covidcast_signal_wrapper(data_source = data_source, signal = signal, start_day = start_day, end_day = end_day, geo_type = geo_type, as_of = as_of, ...))
+      df <- suppressMessages(covidcast_signal_wrapper(data_source = data_source, signal = signal, start_day = start_day, end_day = end_day, geo_type = geo_type, geo_values = geo_values, as_of = as_of, ...))
       dir_create(dirname(signal_fpath), recurse = TRUE)
       saveRDS(df, signal_fpath)
     }
@@ -57,7 +61,7 @@ download_signal <- function(data_source, signal, start_day = NULL, end_day = NUL
         df <- df %>% filter(start_day >= time_value)
       }
       if (!is.null(end_day)) df <- df %>% filter(time_value <= end_day)
-      if (!"*" %in% args$geo_values) df <- df %>% filter(geo_value %in% args$geo_values)
+      if (!"*" %in% geo_values) df <- df %>% filter(geo_value %in% geo_values)
     }
   }
 
@@ -80,6 +84,7 @@ download_signal <- function(data_source, signal, start_day = NULL, end_day = NUL
 #' @return no returns.
 #' 
 #' @importFrom purrr pmap
+#' @importFrom magrittr %>%
 #'
 #' @export
 populate_cache <- function(source_signals, offline_signal_dir) {

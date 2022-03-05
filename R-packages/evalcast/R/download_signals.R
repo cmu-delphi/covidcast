@@ -23,7 +23,8 @@
 #'
 #' @export
 download_signal <- function(data_source, signal, start_day = NULL, end_day = NULL, geo_type = "county", geo_values = "*", as_of = NULL, offline_signal_dir = NULL, ...) {
-  args <- list(...)
+  if (is.null(geo_type)) geo_type <- "county"
+  if (is.null(geo_values)) geo_values <- "*"
   if (is.null(as_of)) as_of <- Sys.Date()
   if (is.null(end_day)) end_day <- max(as_of)
   if (!is.null(start_day)) assert_that(as.Date(start_day) < as.Date(end_day))
@@ -58,7 +59,7 @@ download_signal <- function(data_source, signal, start_day = NULL, end_day = NUL
 
       if (!is.null(start_day)) {
         if (min(df$time_value) > start_day) warn("Data in cache starts later than `start_day`.", "evalcast::download_signals:cache_warning_start_day")
-        df <- df %>% filter(start_day >= time_value)
+        df <- df %>% filter(start_day <= time_value)
       }
       if (!is.null(end_day)) df <- df %>% filter(time_value <= end_day)
       if (!"*" %in% geo_values) df <- df %>% filter(geo_value %in% geo_values)

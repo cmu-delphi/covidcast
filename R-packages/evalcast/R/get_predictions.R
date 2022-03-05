@@ -112,7 +112,7 @@ get_predictions <- function(forecaster,
     num_cores <- max(1, min(detectCores(), parallel_execution))
   }
   else {
-    stop("parallel_execution variable neither logical nor integer.")
+    stop("parallel_execution argument neither logical nor integer.")
   }
 
   out <- mclapply(forecast_dates, get_predictions_single_date_, mc.cores = num_cores) %>% bind_rows()
@@ -151,9 +151,8 @@ get_predictions_single_date <- function(forecaster,
   df_list <- signals %>%
     pmap(function(...) {
       sig <- list(...)
-      if (honest_as_of) {
-        sig$as_of <- forecast_date
-      }
+      if (honest_as_of) sig$as_of <- forecast_date
+
       download_signal(
         data_source = sig$data_source,
         signal = sig$signal,

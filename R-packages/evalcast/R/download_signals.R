@@ -86,7 +86,7 @@ download_signal <- function(data_source, signal, start_day = NULL, end_day = NUL
 #' @param offline_signal_dir the directory that stores the cached data for each
 #' (signal, forecast day) pair.
 #' @return no returns.
-#' 
+#'
 #' @importFrom purrr pmap
 #' @importFrom magrittr %>%
 #'
@@ -97,9 +97,9 @@ populate_cache <- function(source_signals, offline_signal_dir) {
 
 #' The thinnest wrapper possible. For mock testing, see:
 #' https://krlmlr.github.io/mockr/articles/mockr.html#write-wrapper-functions
-#' 
+#'
 #' @param ... same arguments as covidcast_signal
-#' 
+#'
 #' @importFrom covidcast covidcast_signal
 covidcast_signal_wrapper <- function(...) {
   return(covidcast_signal(...))

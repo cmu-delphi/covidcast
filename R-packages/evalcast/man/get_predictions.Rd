@@ -106,7 +106,7 @@ to \code{forecaster()}. A common use case would be to pass the period ahead
 (e.g. predict 1 day, 2 days, ..., k days ahead). Note that \code{ahead} is a
 required component of the forecaster output (see above).}
 
-\item{parallel_execution}{is a mixed logical/integer. If true, uses parallel::mclapply to
+\item{parallel_execution}{is a mixed logical/integer. If true, uses bettermc::mclapply to
 execute each forecast date prediction in parallel on max number of cores - 1. If false, the
 code is run on a single core. If integer, runs in parallel on that many cores, clipped to
 integers from 1 to max number of cores.}

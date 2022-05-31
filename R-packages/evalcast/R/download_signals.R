@@ -23,8 +23,6 @@
 #' @importFrom fs dir_create
 #' @importFrom magrittr %>%
 #' @importFrom plyr empty
-#'
-#' @export
 download_signal <- function(data_source, signal, start_day = NULL, end_day = NULL, geo_type = "county", geo_values = "*", as_of = NULL, offline_signal_dir = NULL, ...) {
   if (is.null(geo_type)) geo_type <- "county"
   if (is.null(geo_values)) geo_values <- "*"

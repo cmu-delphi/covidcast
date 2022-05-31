@@ -27,6 +27,9 @@ download_signal(
 
 \item{geo_type}{a geo type. One of "county", "state", "hrr", "msa", "nation", "hhs", "zip".}
 
+\item{geo_values}{a geo value. If "*" all geo values returned, otherwise it should be a list of the geo values to query
+e.g. c("ak", "ca") for states.}
+
 \item{as_of}{a date in the format "YYYY-MM-DD". Pulls the latest issue of the data available in covidcast on this date.}
 
 \item{offline_signal_dir}{the directory that stores the cached data for each (signal, forecast day) pair. If this is

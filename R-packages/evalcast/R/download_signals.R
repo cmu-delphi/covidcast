@@ -4,6 +4,8 @@
 #' @param start_day a date in the format "YYYY-MM-DD". First day of data to pull.
 #' @param end_day a date in the format "YYYY-MM-DD". Last day of data to pull.
 #' @param geo_type a geo type. One of "county", "state", "hrr", "msa", "nation", "hhs", "zip".
+#' @param geo_values a geo value. If "*" all geo values returned, otherwise it should be a list of the geo values to query
+#' e.g. c("ak", "ca") for states.
 #' @param as_of a date in the format "YYYY-MM-DD". Pulls the latest issue of the data available in covidcast on this date.
 #' @param offline_signal_dir the directory that stores the cached data for each (signal, forecast day) pair. If this is
 #' null, no caching is done and the data is downloaded from covidcast. The data is stored in a csv file with the format
@@ -95,6 +97,9 @@ populate_cache <- function(source_signals, offline_signal_dir) {
 
 #' The thinnest wrapper possible. For mock testing, see:
 #' https://krlmlr.github.io/mockr/articles/mockr.html#write-wrapper-functions
+#' 
+#' @param ... same arguments as covidcast_signal
+#' 
 #' @importFrom covidcast covidcast_signal
 covidcast_signal_wrapper <- function(...) {
   return(covidcast_signal(...))

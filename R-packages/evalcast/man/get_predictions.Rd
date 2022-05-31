@@ -109,7 +109,7 @@ required component of the forecaster output (see above).}
 \item{parallel_execution}{is a mixed logical/integer. If true, uses parallel::mclapply to
 execute each forecast date prediction in parallel on max number of cores - 1. If false, the
 code is run on a single core. If integer, runs in parallel on that many cores, clipped to
-the range \link{1, max number of cores}.}
+integers from 1 to max number of cores.}
 
 \item{honest_as_of}{a boolean that, if true, ensures that the forecast_day, end_day,
 and as_of are all equal when downloading data. Otherwise, as_of is allowed to be freely

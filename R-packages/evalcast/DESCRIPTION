@@ -81,13 +81,16 @@ Imports:
     forcats,
     data.table,
     arrow,
-    progressr,
-    fs
+    fs,
+    plyr,
+    bettermc,
 Suggests:
     testthat,
     mockr,
     mockery,
     scoringutils,
-    vdiffr
+    vdiffr,
+    withr,
+    backports
 Depends:
     R (>= 3.5.0)

@@ -105,6 +105,8 @@ evaluate_predictions <- function(
 #'   may be provided if scoring is not desired.
 #' @param backfill_buffer How many days until response is deemed trustworthy
 #'   enough to be taken as correct? See details for more.
+#' @param offline_signal_dir a path to a directory where to cache downloaded data.
+#'   Data not cached if NULL.
 #' @template geo_type-template
 #' @return tibble of "score cards". Contains the same information as the
 #'   `predictions_cards()` with additional columns for each `err_measure` and

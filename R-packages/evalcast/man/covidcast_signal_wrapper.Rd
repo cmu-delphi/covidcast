@@ -7,6 +7,9 @@ https://krlmlr.github.io/mockr/articles/mockr.html#write-wrapper-functions}
 \usage{
 covidcast_signal_wrapper(...)
 }
+\arguments{
+\item{...}{same arguments as covidcast_signal}
+}
 \description{
 The thinnest wrapper possible. For mock testing, see:
 https://krlmlr.github.io/mockr/articles/mockr.html#write-wrapper-functions

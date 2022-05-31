@@ -1,3 +1,7 @@
+# TODO: This is workaround for a bug in scoringutils, see
+# https://github.com/epiforecasts/scoringutils/issues/235
+library(backports)
+
 test_that("coverage calulations are accurate", {
   quantiles <- c(0.01, 0.05, 0.1, 0.3, 0.5, 0.7, 0.9, 0.95, 0.99)
   value <- c(1, 5, 10, 30, 50, 70, 90, 95, 99)
@@ -114,22 +118,21 @@ test_that("wis works, 1 interval and median", {
                           quantile = rep(c(0.25, 0.5, 0.75), each = 3),
                           value = c(c(0, 1, 0), c(1, 2, 3), c(2, 2, 3)),
                           loc = rep(letters[1:3], times = 3))
-  
-  ours <- test_data %>% group_by(loc) %>% 
+
+  ours <- test_data %>% group_by(loc) %>%
     summarise(wis = weighted_interval_score(quantile, value, actual)) %>%
     pull()
-  
+
   test_data <- data.frame(true_value =   rep(c(1, -15, 22), times = 3),
                           quantile = rep(c(0.25, 0.5, 0.75), each = 3),
                           prediction = c(c(0, 1, 0), c(1, 2, 3), c(2, 2, 3)),
                           model = c("model1"),
                           date = rep(1:3, times = 3))
 
-  eval <- scoringutils::eval_forecasts(
-    test_data,
-    interval_score_arguments = list(count_median_twice = FALSE))
+  eval <- scoringutils::score(test_data, metrics = list("interval_score")) %>%
+          scoringutils::summarize_scores(by = "date")
   theirs <- eval$interval_score
-  
+
   expected <- c(1/3, 16.5, 19.5)
   expect_identical(ours, expected)
   expect_identical(theirs, expected) # will fail if their package changes
@@ -138,7 +141,6 @@ test_that("wis works, 1 interval and median", {
 
 
 test_that("over/under prediction work, 1 interval and median", {
-  
   test_data <- data.frame(actual =   rep(c(1, -15, 22), times = 4),
                           quantile = rep(c(0.25, 0.5, 0.75, NA), each = 3),
                           value = c(c(0, 1, 0), c(1, 2, 3),
@@ -159,7 +161,6 @@ test_that("over/under prediction work, 1 interval and median", {
 })
 
 test_that("wis over/under works, 2 intervals and median", {
-  
   test_data <- data.frame(true_value =   rep(c(1, -15, 22), times = 6),
                           quantile = rep(c(0.1, 0.25, 0.5, 0.75, 0.9, NA),
                                          each = 3),
@@ -168,11 +169,10 @@ test_that("wis over/under works, 2 intervals and median", {
                                          c(0.9, 1.9, 2.9)),
                           model = c("model1"),
                           date = rep(1:3, times = 6))
-  
-  eval <- scoringutils::eval_forecasts(
-    test_data,
-    interval_score_arguments = list(count_median_twice = FALSE))
-   
+
+  eval <- scoringutils::score(test_data, metrics = list("interval_score")) %>%
+          scoringutils::summarize_scores(by = "date", na.rm = TRUE)
+
   wis <- test_data %>% group_by(date) %>% 
     summarise(wis = weighted_interval_score(quantile, prediction, true_value)) %>%
     pull()
@@ -182,14 +182,12 @@ test_that("wis over/under works, 2 intervals and median", {
   under <- test_data %>% group_by(date) %>% 
     summarise(wis = underprediction(quantile, prediction, true_value)) %>%
     pull()
-  
+
   expect_identical(wis, c(.36, 15.34, 19.14))
   expect_identical(over, c(0,15,0))
   expect_identical(under, c(0,0,18.6))
-  
+
   expect_identical(wis, eval$interval_score)
   expect_identical(over, eval$overprediction)
   expect_identical(under, eval$underprediction)
 })
-
-

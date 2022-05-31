@@ -42,7 +42,7 @@
 #' @param parallel_execution is a mixed logical/integer. If true, uses parallel::mclapply to
 #' execute each forecast date prediction in parallel on max number of cores - 1. If false, the
 #' code is run on a single core. If integer, runs in parallel on that many cores, clipped to
-#' the range [1, max number of cores].
+#' integers from 1 to max number of cores.
 #' @param honest_as_of a boolean that, if true, ensures that the forecast_day, end_day,
 #' and as_of are all equal when downloading data. Otherwise, as_of is allowed to be freely
 #' set (and defaults to current date if not presented).
@@ -52,7 +52,8 @@
 #'
 #' @template predictions_cards-template
 #'
-#' @importFrom parallel mclapply detectCores
+#' @importFrom bettermc mclapply
+#' @importFrom parallel detectCores
 #'
 #' @examples \dontrun{
 #' baby_predictions = get_predictions(
@@ -100,7 +101,6 @@ get_predictions <- function(forecaster,
         offline_signal_dir = offline_signal_dir
       )
     )
-    if (is.null(preds)) abort("A child process was terminated and returned a null .")
     return(preds)
   }
 
@@ -112,7 +112,7 @@ get_predictions <- function(forecaster,
     num_cores <- max(1, min(detectCores(), parallel_execution))
   }
   else {
-    stop("parallel_execution argument neither logical nor integer.")
+    stop("parallel_execution argument is neither logical nor integer.")
   }
 
   out <- mclapply(forecast_dates, get_predictions_single_date_, mc.cores = num_cores) %>% bind_rows()

@@ -129,6 +129,7 @@ test_that("populate_cache calls mock_covidcast_signal appropriately", {
         start_day = "2020-08-01",
         end_day = "2022-01-01",
         geo_type = "state",
+        geo_values = "*",
         as_of = "2022-01-01"
       ),
       list(
@@ -137,6 +138,7 @@ test_that("populate_cache calls mock_covidcast_signal appropriately", {
         start_day = "2020-08-01",
         end_day = "2022-01-01",
         geo_type = "state",
+        geo_values = "*",
         as_of = "2022-01-01"
       )
     )

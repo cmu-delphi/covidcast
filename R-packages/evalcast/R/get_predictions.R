@@ -86,6 +86,17 @@ get_predictions <- function(forecaster,
   assert_that(is_tibble(signals), msg = "`signals` should be a tibble.")
   assert_that(xor(honest_as_of, "as_of" %in% names(signals)), msg = "`honest_as_of` should be set if and only if `as_of` is not set. Either remove as_of specification or set honest_as_of to FALSE.")
 
+  if (is.logical(parallel_execution) & parallel_execution == TRUE) {
+    num_cores <- max(1, parallel::detectCores() - 1)
+  } else if (is.logical(parallel_execution) & parallel_execution == FALSE) {
+    num_cores <- 1
+  } else if (is.integer(parallel_execution)) {
+    num_cores <- max(1, min(parallel::detectCores(), parallel_execution))
+  }
+  else {
+    stop("parallel_execution argument is neither logical nor integer.")
+  }
+
   get_predictions_single_date_ <- function(forecast_date) {
     preds <- do.call(get_predictions_single_date,
       list(
@@ -99,17 +110,6 @@ get_predictions <- function(forecaster,
       )
     )
     return(preds)
-  }
-
-  if (is.logical(parallel_execution) & parallel_execution == TRUE) {
-    num_cores <- max(1, parallel::detectCores() - 1)
-  } else if (is.logical(parallel_execution) & parallel_execution == FALSE) {
-    num_cores <- 1
-  } else if (is.integer(parallel_execution)) {
-    num_cores <- max(1, min(parallel::detectCores(), parallel_execution))
-  }
-  else {
-    stop("parallel_execution argument is neither logical nor integer.")
   }
 
   out <- bettermc::mclapply(forecast_dates, get_predictions_single_date_, mc.cores = num_cores) %>% bind_rows()
@@ -133,7 +133,6 @@ get_predictions <- function(forecaster,
   out
 }
 
-#' @importFrom lubridate ymd
 get_predictions_single_date <- function(forecaster,
                                         signals,
                                         forecast_date,
@@ -142,7 +141,7 @@ get_predictions_single_date <- function(forecaster,
                                         honest_as_of = TRUE,
                                         offline_signal_dir = NULL) {
 
-  forecast_date <- ymd(forecast_date)
+  forecast_date <- lubridate::ymd(forecast_date)
   signals <- signal_listcols(signals, forecast_date)
 
   df_list <- signals %>%

@@ -15,6 +15,7 @@ get_predictions(
   response_data_signal = signals$signal[1],
   forecaster_args = list(),
   parallel_execution = TRUE,
+  additional_mclapply_args = list(),
   honest_as_of = TRUE,
   offline_signal_dir = NULL
 )
@@ -106,10 +107,15 @@ to \code{forecaster()}. A common use case would be to pass the period ahead
 (e.g. predict 1 day, 2 days, ..., k days ahead). Note that \code{ahead} is a
 required component of the forecaster output (see above).}
 
-\item{parallel_execution}{is a mixed logical/integer. If true, uses bettermc::mclapply to
-execute each forecast date prediction in parallel on max number of cores - 1. If false, the
-code is run on a single core. If integer, runs in parallel on that many cores, clipped to
-integers from 1 to max number of cores.}
+\item{parallel_execution}{TRUE, FALSE, or a single positive integer. If TRUE,
+uses bettermc::mclapply to execute each forecast date prediction in
+parallel on max number of cores - 1. If FALSE, the code is run on a single
+core. If integer, runs in parallel on that many cores, clipping to the max
+number of detected cores if a greater number is requested.}
+
+\item{additional_mclapply_args}{a named list of additional arguments to pass
+to \link[bettermc:mclapply]{\code{bettermc::mclapply}} (besides \code{X}, \code{FUN}, and
+\code{mc.cores}.)}
 
 \item{honest_as_of}{a boolean that, if true, ensures that the forecast_day, end_day,
 and as_of are all equal when downloading data. Otherwise, as_of is allowed to be freely

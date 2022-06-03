@@ -39,10 +39,14 @@
 #'   to `forecaster()`. A common use case would be to pass the period ahead
 #'   (e.g. predict 1 day, 2 days, ..., k days ahead). Note that `ahead` is a
 #'   required component of the forecaster output (see above).
-#' @param parallel_execution is a mixed logical/integer. If true, uses bettermc::mclapply to
-#' execute each forecast date prediction in parallel on max number of cores - 1. If false, the
-#' code is run on a single core. If integer, runs in parallel on that many cores, clipped to
-#' integers from 1 to max number of cores.
+#' @param parallel_execution TRUE, FALSE, or a single positive integer. If TRUE,
+#'   uses bettermc::mclapply to execute each forecast date prediction in
+#'   parallel on max number of cores - 1. If FALSE, the code is run on a single
+#'   core. If integer, runs in parallel on that many cores, clipping to the max
+#'   number of detected cores if a greater number is requested.
+#' @param additional_mclapply_args a named list of additional arguments to pass
+#'   to \link[bettermc:mclapply]{`bettermc::mclapply`} (besides `X`, `FUN`, and
+#'   `mc.cores`.)
 #' @param honest_as_of a boolean that, if true, ensures that the forecast_day, end_day,
 #' and as_of are all equal when downloading data. Otherwise, as_of is allowed to be freely
 #' set (and defaults to current date if not presented).
@@ -80,6 +84,7 @@ get_predictions <- function(forecaster,
                             response_data_signal = signals$signal[1],
                             forecaster_args = list(),
                             parallel_execution = TRUE,
+                            additional_mclapply_args = list(),
                             honest_as_of = TRUE,
                             offline_signal_dir = NULL) {
 
@@ -92,14 +97,16 @@ get_predictions <- function(forecaster,
 
   if (is.logical(parallel_execution) && parallel_execution == TRUE) {
     num_cores <- max(1, parallel::detectCores() - 1)
-  } else if (is.logical(parallel_execution) & parallel_execution == FALSE) {
+  } else if (is.logical(parallel_execution) && parallel_execution == FALSE) {
     num_cores <- 1
-  } else if (is.integer(parallel_execution)) {
+  } else if (is.integer(parallel_execution) && length(parallel_execution)==1L && parallel_execution >= 1L) {
     num_cores <- max(1, min(parallel::detectCores(), parallel_execution))
-  }
-  else {
+  } else {
     stop("parallel_execution argument is neither boolean nor integer.")
   }
+
+  assert_that(rlang::is_named2(additional_mclapply_args) &&
+              all(rlang::names2(additional_mclapply_args) %in% rlang::fn_fmls_names(bettermc::mclapply)))
 
   get_predictions_single_date_ <- function(forecast_date) {
     preds <- do.call(get_predictions_single_date,
@@ -116,7 +123,7 @@ get_predictions <- function(forecaster,
     return(preds)
   }
 
-  out <- bettermc::mclapply(forecast_dates, get_predictions_single_date_, mc.cores = num_cores) %>% bind_rows()
+  out <- rlang::inject(bettermc::mclapply(forecast_dates, get_predictions_single_date_, mc.cores = num_cores, !!!additional_mclapply_args)) %>% bind_rows()
 
   # for some reason, `value` gets named and ends up in attr
   names(out$value) <- NULL

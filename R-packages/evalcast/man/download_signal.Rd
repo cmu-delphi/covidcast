@@ -12,6 +12,7 @@ download_signal(
   geo_type = "county",
   geo_values = "*",
   as_of = NULL,
+  time_type = "day",
   offline_signal_dir = NULL,
   ...
 )

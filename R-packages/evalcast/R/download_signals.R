@@ -23,12 +23,16 @@
 #' @importFrom fs dir_create
 #' @importFrom magrittr %>%
 #' @importFrom plyr empty
-download_signal <- function(data_source, signal, start_day = NULL, end_day = NULL, geo_type = "county", geo_values = "*", as_of = NULL, offline_signal_dir = NULL, ...) {
+#' 
+#' @export
+download_signal <- function(data_source, signal, start_day = NULL, end_day = NULL, geo_type = "county", geo_values = "*", as_of = NULL, time_type = "day", offline_signal_dir = NULL, ...) {
   if (is.null(geo_type)) geo_type <- "county"
   if (is.null(geo_values)) geo_values <- "*"
   if (is.null(as_of)) as_of <- Sys.Date()
   if (is.null(end_day)) end_day <- max(as_of)
-  if (!is.null(start_day)) assert_that(as.Date(start_day) < as.Date(end_day))
+  if (!is.null(start_day)) assert_that(as.Date(start_day) <= as.Date(end_day))
+  if (!is.null(offline_signal_dir) && !is.null(list(...)$issues)) rlang::abort("issues argument is not supported with caching", "evalcast::download_signals")
+  if (!is.null(offline_signal_dir) && !is.null(list(...)$lag)) rlang::abort("lag is not supported with caching", "evalcast::download_signals")
 
   if (is.null(offline_signal_dir)) {
     msg <- str_glue("Downloading {signal} from covidcast from ", signal = signal, .sep = " ")
@@ -42,7 +46,7 @@ download_signal <- function(data_source, signal, start_day = NULL, end_day = NUL
     message(msg)
     df <- suppressMessages(covidcast_signal_wrapper(data_source = data_source, signal = signal, start_day = start_day, end_day = end_day, geo_type = geo_type, geo_values = geo_values, as_of = as_of, ...))
   } else {
-    signal_fpath <- file.path(offline_signal_dir, sprintf("%s_%s_%s_%s.RDS", data_source, signal, geo_type, as_of))
+    signal_fpath <- file.path(offline_signal_dir, sprintf("%s_%s_%s_%s_%s.RDS", data_source, signal, geo_type, time_type, as_of))
     inform("Using API data caching mechanism. Be warned that a stale cache could cause issues.", "evalcast::download_signals:cache_info_announce")
 
     if (file.exists(signal_fpath)) {

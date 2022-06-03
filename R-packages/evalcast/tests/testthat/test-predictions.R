@@ -64,9 +64,10 @@ test_that("get_predictions works", {
           signal = "deaths_incidence_num",
           start_day = as.Date("2020-01-01"),
           end_day = as.Date("2020-01-01"),
-          as_of = as.Date("2020-01-01"),
           geo_type = "state",
           geo_values = "*",
+          as_of = as.Date("2020-01-01"),
+          time_type = "day",
           offline_signal_dir = NULL
         ),
         list(
@@ -74,9 +75,10 @@ test_that("get_predictions works", {
           signal = "confirmed_incidence_num",
           start_day = as.Date("2020-01-01"),
           end_day = as.Date("2020-01-01"),
-          as_of = as.Date("2020-01-01"),
           geo_type = "county",
           geo_values = "*",
+          as_of = as.Date("2020-01-01"),
+          time_type = "day",
           offline_signal_dir = NULL
         ),
         list(
@@ -84,9 +86,10 @@ test_that("get_predictions works", {
           signal = "deaths_incidence_num",
           start_day = as.Date("2020-01-01"),
           end_day = as.Date("2020-01-02"),
-          as_of = as.Date("2020-01-02"),
           geo_type = "state",
           geo_values = "*",
+          as_of = as.Date("2020-01-02"),
+          time_type = "day",
           offline_signal_dir = NULL
         ),
         list(
@@ -94,9 +97,10 @@ test_that("get_predictions works", {
           signal = "confirmed_incidence_num",
           start_day = as.Date("2020-01-01"),
           end_day = as.Date("2020-01-02"),
-          as_of = as.Date("2020-01-02"),
           geo_type = "county",
           geo_values = "*",
+          as_of = as.Date("2020-01-02"),
+          time_type = "day",
           offline_signal_dir = NULL
         )
       )
@@ -219,9 +223,10 @@ test_that("no start_day within signals works", {
           signal = "deaths_incidence_num",
           start_day = NULL,
           end_day = as.Date("2020-01-01"),
-          as_of = as.Date("2020-01-01"),
           geo_type = "state",
           geo_values = "*",
+          as_of = as.Date("2020-01-01"),
+          time_type = "day",
           offline_signal_dir = NULL
         ),
         list(
@@ -229,9 +234,10 @@ test_that("no start_day within signals works", {
           signal = "confirmed_incidence_num",
           start_day = NULL,
           end_day = as.Date("2020-01-01"),
-          as_of = as.Date("2020-01-01"),
           geo_type = "state",
           geo_values = "*",
+          as_of = as.Date("2020-01-01"),
+          time_type = "day",
           offline_signal_dir = NULL
         )
       )
@@ -298,9 +304,10 @@ test_that("start_day function within signals works", {
           signal = "deaths_incidence_num",
           start_day = as.Date("2020-12-01"),
           end_day = as.Date("2020-12-11"),
-          as_of = as.Date("2020-12-11"),
           geo_type = "state",
           geo_values = "*",
+          as_of = as.Date("2020-12-11"),
+          time_type = "day",
           offline_signal_dir = NULL
         ),
         list(
@@ -308,9 +315,10 @@ test_that("start_day function within signals works", {
           signal = "confirmed_incidence_num",
           start_day = as.Date("2020-12-01"),
           end_day = as.Date("2020-12-11"),
-          as_of = as.Date("2020-12-11"),
           geo_type = "state",
           geo_values = "*",
+          as_of = as.Date("2020-12-11"),
+          time_type = "day",
           offline_signal_dir = NULL
         ),
         list(
@@ -318,9 +326,10 @@ test_that("start_day function within signals works", {
           signal = "deaths_incidence_num",
           start_day = as.Date("2020-12-02"),
           end_day = as.Date("2020-12-12"),
-          as_of = as.Date("2020-12-12"),
           geo_type = "state",
           geo_values = "*",
+          as_of = as.Date("2020-12-12"),
+          time_type = "day",
           offline_signal_dir = NULL
         ),
         list(
@@ -328,9 +337,10 @@ test_that("start_day function within signals works", {
           signal = "confirmed_incidence_num",
           start_day = as.Date("2020-12-02"),
           end_day = as.Date("2020-12-12"),
-          as_of = as.Date("2020-12-12"),
           geo_type = "state",
           geo_values = "*",
+          as_of = as.Date("2020-12-12"),
+          time_type = "day",
           offline_signal_dir = NULL
         )
       )

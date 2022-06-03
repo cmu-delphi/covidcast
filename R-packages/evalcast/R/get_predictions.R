@@ -56,9 +56,9 @@
 #' baby_predictions = get_predictions(
 #'   baseline_forecaster, "baby",
 #'   tibble::tibble(
-#'     data_source="jhu-csse",
-#'     signal ="deaths_incidence_num",
-#'     start_day="2020-08-15",
+#'     data_source = "jhu-csse",
+#'     signal = "deaths_incidence_num",
+#'     start_day = "2020-08-15",
 #'     geo_values = "mi",
 #'     geo_type = "state"),
 #'   forecast_dates = "2020-10-01",
@@ -85,8 +85,12 @@ get_predictions <- function(forecaster,
 
   assert_that(is_tibble(signals), msg = "`signals` should be a tibble.")
   assert_that(xor(honest_as_of, "as_of" %in% names(signals)), msg = "`honest_as_of` should be set if and only if `as_of` is not set. Either remove as_of specification or set honest_as_of to FALSE.")
+  if (incidence_period == "epiweek") rlang::warn("incidence_period of 'epiweek' only selects weekly (Saturday) target end dates, actual 'epiweek' signals not supported.", "evalcast::get_predictions")
+  if (!is.null(signals$time_type) & (signals$time_type == "week" || signals$time_type == "epiweek")) rlang::abort("time_type in the signals arg can only be 'day'.", "evalcast::get_predictions")
+  if (!is.null(signals$lag)) rlang::abort("lag in the signals arg will be ignored.", "evalcast::get_predictions")
+  if (!is.null(signals$issues)) rlang::abort("issues in the signals arg will be ignored.", "evalcast::get_predictions")
 
-  if (is.logical(parallel_execution) & parallel_execution == TRUE) {
+  if (is.logical(parallel_execution) && parallel_execution == TRUE) {
     num_cores <- max(1, parallel::detectCores() - 1)
   } else if (is.logical(parallel_execution) & parallel_execution == FALSE) {
     num_cores <- 1
@@ -94,7 +98,7 @@ get_predictions <- function(forecaster,
     num_cores <- max(1, min(parallel::detectCores(), parallel_execution))
   }
   else {
-    stop("parallel_execution argument is neither logical nor integer.")
+    stop("parallel_execution argument is neither boolean nor integer.")
   }
 
   get_predictions_single_date_ <- function(forecast_date) {
@@ -154,9 +158,10 @@ get_predictions_single_date <- function(forecaster,
         signal = sig$signal,
         start_day = sig$start_day,
         end_day = forecast_date,
-        as_of = sig$as_of,
         geo_type = sig$geo_type,
         geo_values = sig$geo_values,
+        as_of = sig$as_of,
+        time_type = "day",
         offline_signal_dir = offline_signal_dir
       )
     })

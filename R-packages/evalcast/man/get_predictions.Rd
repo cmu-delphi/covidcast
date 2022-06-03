@@ -142,9 +142,9 @@ predictions made using the information as of September 14).
 baby_predictions = get_predictions(
   baseline_forecaster, "baby",
   tibble::tibble(
-    data_source="jhu-csse",
-    signal ="deaths_incidence_num",
-    start_day="2020-08-15",
+    data_source = "jhu-csse",
+    signal = "deaths_incidence_num",
+    start_day = "2020-08-15",
     geo_values = "mi",
     geo_type = "state"),
   forecast_dates = "2020-10-01",

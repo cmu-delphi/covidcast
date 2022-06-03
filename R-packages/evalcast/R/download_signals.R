@@ -23,12 +23,13 @@
 #' @importFrom fs dir_create
 #' @importFrom magrittr %>%
 #' @importFrom plyr empty
+#' @export
 download_signal <- function(data_source, signal, start_day = NULL, end_day = NULL, geo_type = "county", geo_values = "*", as_of = NULL, offline_signal_dir = NULL, ...) {
   if (is.null(geo_type)) geo_type <- "county"
   if (is.null(geo_values)) geo_values <- "*"
   if (is.null(as_of)) as_of <- Sys.Date()
   if (is.null(end_day)) end_day <- max(as_of)
-  if (!is.null(start_day)) assert_that(as.Date(start_day) < as.Date(end_day))
+  if (!is.null(start_day)) assert_that(as.Date(start_day) <= as.Date(end_day))
 
   if (is.null(offline_signal_dir)) {
     msg <- str_glue("Downloading {signal} from covidcast from ", signal = signal, .sep = " ")

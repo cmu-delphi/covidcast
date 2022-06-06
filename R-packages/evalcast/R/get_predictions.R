@@ -90,6 +90,8 @@ get_predictions <- function(forecaster,
 
   assert_that(is_tibble(signals), msg = "`signals` should be a tibble.")
   assert_that(xor(honest_as_of, "as_of" %in% names(signals)), msg = "`honest_as_of` should be set if and only if `as_of` is not set. Either remove as_of specification or set honest_as_of to FALSE.")
+  incidence_period <- match.arg(incidence_period)
+
   if (incidence_period == "epiweek") rlang::warn("incidence_period of 'epiweek' only selects weekly (Saturday) target end dates, actual 'epiweek' signals not supported.", "evalcast::get_predictions")
   if (!is.null(signals$time_type) & (signals$time_type == "week" || signals$time_type == "epiweek")) rlang::abort("time_type in the signals arg can only be 'day'.", "evalcast::get_predictions")
   if (!is.null(signals$lag)) rlang::abort("lag in the signals arg will be ignored.", "evalcast::get_predictions")

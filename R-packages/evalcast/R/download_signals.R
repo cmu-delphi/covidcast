@@ -44,7 +44,7 @@ download_signal <- function(data_source, signal, start_day = NULL, end_day = NUL
     else msg <- str_glue("{msg} {end_day}", msg = msg, end_day = end_day)
 
     message(msg)
-    df <- suppressMessages(covidcast_signal_wrapper(data_source = data_source, signal = signal, start_day = start_day, end_day = end_day, geo_type = geo_type, geo_values = geo_values, as_of = as_of, ...))
+    df <- suppressMessages(covidcast_signal_wrapper(data_source = data_source, signal = signal, start_day = start_day, end_day = end_day, geo_type = geo_type, geo_values = geo_values, as_of = as_of, time_type = time_type, ...))
   } else {
     signal_fpath <- file.path(offline_signal_dir, sprintf("%s_%s_%s_%s_%s.RDS", data_source, signal, geo_type, time_type, as_of))
     inform("Using API data caching mechanism. Be warned that a stale cache could cause issues.", "evalcast::download_signals:cache_info_announce")
@@ -54,7 +54,7 @@ download_signal <- function(data_source, signal, start_day = NULL, end_day = NUL
       df <- readRDS(signal_fpath)
     } else {
       inform(sprintf("Downloading signal from API and storing in: %s", signal_fpath), "evalcast::download_signals:cache_info_write")
-      df <- suppressMessages(covidcast_signal_wrapper(data_source = data_source, signal = signal, start_day = start_day, end_day = end_day, geo_type = geo_type, geo_values = "*", as_of = as_of, ...))
+      df <- suppressMessages(covidcast_signal_wrapper(data_source = data_source, signal = signal, start_day = start_day, end_day = end_day, geo_type = geo_type, geo_values = "*", as_of = as_of, time_type = time_type, ...))
       dir_create(dirname(signal_fpath), recurse = TRUE)
       saveRDS(df, signal_fpath)
     }

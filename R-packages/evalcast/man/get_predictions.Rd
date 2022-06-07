@@ -114,7 +114,7 @@ core. If integer, runs in parallel on that many cores, clipping to the max
 number of detected cores if a greater number is requested.}
 
 \item{additional_mclapply_args}{a named list of additional arguments to pass
-to \link[bettermc:mclapply]{\code{bettermc::mclapply}} (besides \code{X}, \code{FUN}, and
+to \code{\link[bettermc:mclapply]{bettermc::mclapply}} (besides \code{X}, \code{FUN}, and
 \code{mc.cores}.)}
 
 \item{honest_as_of}{a boolean that, if true, ensures that the forecast_day, end_day,

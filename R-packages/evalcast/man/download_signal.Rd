@@ -33,6 +33,8 @@ e.g. c("ak", "ca") for states.}
 
 \item{as_of}{a date in the format "YYYY-MM-DD". Pulls the latest issue of the data available in covidcast on this date.}
 
+\item{time_type}{a string. For most signals this is "day", but for a select few this is "week". Check Epidata docs for info.}
+
 \item{offline_signal_dir}{the directory that stores the cached data for each (signal, forecast day) pair. If this is
 null, no caching is done and the data is downloaded from covidcast. The data is stored in a csv file with the format
 'offline_signal_dir/data-source_signal_geo-type_as-of.csv`. Warning: no intelligent fetching is done, so if you request

@@ -92,5 +92,7 @@ Suggests:
     vdiffr,
     withr,
     backports
+VignetteBuilder:
+    utils
 Depends:
     R (>= 3.5.0)

@@ -115,7 +115,7 @@ test_that("populate_cache calls mock_covidcast_signal appropriately", {
     populate_cache(tibble(
       data_source = c("hhs", "jhu-csse"),
       signal = c("confirmed_admissions_covid_1d", "confirmed_incidence_num"),
-      start_day = c("2020-08-01", "2020-08-01"),
+      start_day = c("2019-01-01", "2019-01-01"),
       as_of = c("2022-01-01", "2022-01-01"),
       geo_type = c("state", "state")
     ), offline_signal_dir = temp_offline_signal_dir)
@@ -126,20 +126,22 @@ test_that("populate_cache calls mock_covidcast_signal appropriately", {
       list(
         data_source = "hhs",
         signal = "confirmed_admissions_covid_1d",
-        start_day = "2020-08-01",
+        start_day = "2019-01-01",
         end_day = "2022-01-01",
         geo_type = "state",
         geo_values = "*",
-        as_of = "2022-01-01"
+        as_of = "2022-01-01",
+        time_type = "day"
       ),
       list(
         data_source = "jhu-csse",
         signal = "confirmed_incidence_num",
-        start_day = "2020-08-01",
+        start_day = "2019-01-01",
         end_day = "2022-01-01",
         geo_type = "state",
         geo_values = "*",
-        as_of = "2022-01-01"
+        as_of = "2022-01-01",
+        time_type = "day"
       )
     )
   )

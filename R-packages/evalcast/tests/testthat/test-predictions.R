@@ -1,5 +1,6 @@
 library(mockr)
 library(mockery)
+library(magrittr)
 
 # Create a fake result from the covidcast API as returned by the `evalcast::download_signals()`
 # function.
@@ -53,7 +54,8 @@ test_that("get_predictions works", {
                              signals = signals,
                              forecast_dates = forecast_dates,
                              incidence_period = "epiweek",
-                             parallel_execution = FALSE)
+                             parallel_execution = FALSE) %>%
+             expect_warning()
 
     expect_called(mock_download_signal, 4)
     expect_equal(
@@ -157,7 +159,8 @@ test_that("get_predictions works when forecaster has additional arguments", {
                              forecast_dates = forecast_dates,
                              incidence_period = "epiweek",
                              forecaster_args = list(a = 1, b = "2"),
-                             parallel_execution = FALSE)
+                             parallel_execution = FALSE) %>%
+             expect_warning()
 
     expect_called(mock_download_signal, 4)
     expect_called(mock_forecaster, 2)
@@ -212,7 +215,8 @@ test_that("no start_day within signals works", {
                               signals = signals_no_start_day,
                               forecast_dates = forecast_dates,
                               incidence_period = "epiweek",
-                              parallel_execution = FALSE)
+                              parallel_execution = FALSE) %>%
+             expect_warning()
 
     expect_called(mock_download_signal, 2)
     expect_equal(
@@ -293,7 +297,8 @@ test_that("start_day function within signals works", {
                              signals = signals_with_start_day_fn,
                              forecast_dates = forecast_dates,
                              incidence_period = "epiweek",
-                             parallel_execution = FALSE)
+                             parallel_execution = FALSE) %>%
+             expect_warning()
 
     expect_called(mock_download_signal, 4)
     expect_equal(

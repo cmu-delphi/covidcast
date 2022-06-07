@@ -75,7 +75,7 @@ plot_trajectory <- function(predictions_cards,
 
   g <- ggplot(pd$truth_df, mapping = aes(x = .data$target_end_date))
 
-  if (show_quantiles && !is.null(pd$quantiles_df)){
+  if (show_quantiles && !"quantiles_df" %in% names(pd)) {
     n_quantiles = nlevels(pd$quantiles_df$interval)
     l_quantiles = levels(pd$quantiles_df$interval)
     alp = c(.4, .2, .1)
@@ -108,7 +108,7 @@ plot_trajectory <- function(predictions_cards,
 
   if (plot_it) {
     gp <- g + theme_bw() + scale_fill_viridis_d() + scale_color_viridis_d()
-    if (show_quantiles && !is.null(pd$quantiles_df) &&
+    if (show_quantiles && !"quantiles_df" %in% names(pd) &&
         nlevels(pd$quantiles_df$forecaster > 1)) {
       gp + facet_grid(.data$forecaster ~ .data$geo_value, scales = "free_y")
     } else {
@@ -133,7 +133,7 @@ setup_plot_trajectory <- function(predictions_cards,
   ## add check that incidence period and geo_type are all the same, default to
   ## the first otherwise
   if (is.null(side_truth)) {
-    if (is.null(args$geo_values)) { # what do we download
+    if ("geo_values" %in% names(args)) { # what do we download
       geo_values <- unique(predictions_cards$geo_value)
     } else {
       geo_values <- args$geo_values
@@ -143,7 +143,7 @@ setup_plot_trajectory <- function(predictions_cards,
     } else {
       args$geo_values <- geo_values
     }
-    if (is.null(args$data_source)) {
+    if ("data_source" %in% names(args)) {
       args$data_source <- predictions_cards$data_source[1]
       args$signal <- predictions_cards$signal[1]
     }

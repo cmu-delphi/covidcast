@@ -7,6 +7,7 @@
 #' @param geo_values a geo value. If "*" all geo values returned, otherwise it should be a list of the geo values to query
 #' e.g. c("ak", "ca") for states.
 #' @param as_of a date in the format "YYYY-MM-DD". Pulls the latest issue of the data available in covidcast on this date.
+#' @param time_type a string. For most signals this is "day", but for a select few this is "week". Check Epidata docs for info.
 #' @param offline_signal_dir the directory that stores the cached data for each (signal, forecast day) pair. If this is
 #' null, no caching is done and the data is downloaded from covidcast. The data is stored in a csv file with the format
 #' 'offline_signal_dir/data-source_signal_geo-type_as-of.csv`. Warning: no intelligent fetching is done, so if you request
@@ -17,22 +18,19 @@
 #' @param ... other arguments to be passed to `covidcast::covidcast_signal()`.
 #' @return `covidcast_signal` data frame.
 #'
-#' @importFrom assertthat assert_that
 #' @importFrom stringr str_glue
-#' @importFrom rlang inform warn
-#' @importFrom fs dir_create
+#' @importFrom rlang inform warn .data
 #' @importFrom magrittr %>%
-#' @importFrom plyr empty
-#' 
+#'
 #' @export
 download_signal <- function(data_source, signal, start_day = NULL, end_day = NULL, geo_type = "county", geo_values = "*", as_of = NULL, time_type = "day", offline_signal_dir = NULL, ...) {
   if (is.null(geo_type)) geo_type <- "county"
   if (is.null(geo_values)) geo_values <- "*"
   if (is.null(as_of)) as_of <- Sys.Date()
   if (is.null(end_day)) end_day <- max(as_of)
-  if (!is.null(start_day)) assert_that(as.Date(start_day) <= as.Date(end_day))
-  if (!is.null(offline_signal_dir) && !is.null(list(...)$issues)) rlang::abort("issues argument is not supported with caching", "evalcast::download_signals")
-  if (!is.null(offline_signal_dir) && !is.null(list(...)$lag)) rlang::abort("lag is not supported with caching", "evalcast::download_signals")
+  if (!is.null(start_day)) assertthat::assert_that(as.Date(start_day) <= as.Date(end_day))
+  if (!is.null(offline_signal_dir) && "issues" %in% names(list(...))) rlang::abort("issues argument is not supported with caching", "evalcast::download_signals")
+  if (!is.null(offline_signal_dir) && "lag" %in% names(list(...))) rlang::abort("lag is not supported with caching", "evalcast::download_signals")
 
   if (is.null(offline_signal_dir)) {
     msg <- str_glue("Downloading {signal} from covidcast from ", signal = signal, .sep = " ")
@@ -55,19 +53,19 @@ download_signal <- function(data_source, signal, start_day = NULL, end_day = NUL
     } else {
       inform(sprintf("Downloading signal from API and storing in: %s", signal_fpath), "evalcast::download_signals:cache_info_write")
       df <- suppressMessages(covidcast_signal_wrapper(data_source = data_source, signal = signal, start_day = start_day, end_day = end_day, geo_type = geo_type, geo_values = "*", as_of = as_of, time_type = time_type, ...))
-      dir_create(dirname(signal_fpath), recurse = TRUE)
+      fs::dir_create(dirname(signal_fpath), recurse = TRUE)
       saveRDS(df, signal_fpath)
     }
 
     if (!plyr::empty(df)) {
-      if (max(df$time_value) < end_day) warn("Data in cache ends earlier than `end_day`.", "evalcast::download_signals:cache_warning_end_day")
+      if (max(df[["time_value"]]) < end_day) warn("Data in cache ends earlier than `end_day`.", "evalcast::download_signals:cache_warning_end_day")
 
       if (!is.null(start_day)) {
-        if (min(df$time_value) > start_day) warn("Data in cache starts later than `start_day`.", "evalcast::download_signals:cache_warning_start_day")
-        df <- df %>% filter(start_day <= time_value)
+        if (min(df[["time_value"]]) > start_day) warn("Data in cache starts later than `start_day`.", "evalcast::download_signals:cache_warning_start_day")
+        df <- df %>% filter(start_day <= .data$time_value)
       }
-      if (!is.null(end_day)) df <- df %>% filter(time_value <= end_day)
-      if (!"*" %in% geo_values) df <- df %>% filter(geo_value %in% geo_values)
+      if (!is.null(end_day)) df <- df %>% filter(.data$time_value <= end_day)
+      if (!"*" %in% geo_values) df <- df %>% filter(.data$geo_value %in% geo_values)
     }
   }
 

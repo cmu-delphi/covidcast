@@ -17,7 +17,8 @@ as.predictions_cards(x, ...)
   incidence_period = c("epiweek", "day"),
   data_source = "data_source",
   signal = "signal",
-  target_end_date = NULL
+  target_end_date = NULL,
+  ...
 )
 }
 \arguments{

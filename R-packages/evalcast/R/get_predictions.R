@@ -1,5 +1,5 @@
 #' Get predictions
-#'
+#' 
 #' For each of the provided forecast dates, runs a forecaster using the data
 #' that would have been available as of that given forecast date. Returns a list
 #' of "predictions cards", where each list element corresponds to a different
@@ -45,7 +45,7 @@
 #'   core. If integer, runs in parallel on that many cores, clipping to the max
 #'   number of detected cores if a greater number is requested.
 #' @param additional_mclapply_args a named list of additional arguments to pass
-#'   to \link[bettermc:mclapply]{`bettermc::mclapply`} (besides `X`, `FUN`, and
+#'   to [`bettermc::mclapply`] (besides `X`, `FUN`, and
 #'   `mc.cores`.)
 #' @param honest_as_of a boolean that, if true, ensures that the forecast_day, end_day,
 #' and as_of are all equal when downloading data. Otherwise, as_of is allowed to be freely
@@ -74,6 +74,7 @@
 #' }
 #'
 #' @export
+#' @md
 get_predictions <- function(forecaster,
                             name_of_forecaster,
                             signals,
@@ -93,9 +94,9 @@ get_predictions <- function(forecaster,
   incidence_period <- match.arg(incidence_period)
 
   if (incidence_period == "epiweek") rlang::warn("incidence_period of 'epiweek' only selects weekly (Saturday) target end dates, actual 'epiweek' signals not supported.", "evalcast::get_predictions")
-  if (!is.null(signals$time_type) & (signals$time_type == "week" || signals$time_type == "epiweek")) rlang::abort("time_type in the signals arg can only be 'day'.", "evalcast::get_predictions")
-  if (!is.null(signals$lag)) rlang::abort("lag in the signals arg will be ignored.", "evalcast::get_predictions")
-  if (!is.null(signals$issues)) rlang::abort("issues in the signals arg will be ignored.", "evalcast::get_predictions")
+  if ("time_type" %in% names(signals) && any(signals$time_type == "week" | signals$time_type == "epiweek")) rlang::abort("time_type in the signals arg can only be 'day'.", "evalcast::get_predictions")
+  if ("lag" %in% names(signals)) rlang::warn("lag in the signals arg will be ignored.", "evalcast::get_predictions")
+  if ("issues" %in% names(signals)) rlang::warn("issues in the signals arg will be ignored.", "evalcast::get_predictions")
 
   if (is.logical(parallel_execution) && parallel_execution == TRUE) {
     num_cores <- max(1, parallel::detectCores() - 1)

@@ -67,9 +67,7 @@ Imports:
     lubridate,
     purrr,
     tibble,
-    tidyr,
     stringr,
-    readr,
     MMWRweek,
     zoo,
     rlang,
@@ -84,6 +82,7 @@ Imports:
     fs,
     plyr,
     bettermc,
+    tidyr
 Suggests:
     testthat,
     mockr,

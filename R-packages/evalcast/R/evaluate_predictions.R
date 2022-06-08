@@ -66,7 +66,7 @@ evaluate_predictions <- function(
     select(-.data$quantile, -.data$value)
 
   score_card <- score_card %>%
-                 relocate(attr(err_measures, "name"), .after = last_col())
+                 relocate(attr(err_measures, "names"), .after = last_col())
   return(score_card)
 }
 

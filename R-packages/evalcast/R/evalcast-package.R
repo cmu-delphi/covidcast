@@ -11,8 +11,6 @@
 #' @import dplyr
 #' @import purrr
 #' @import tibble
-#' @import tidyr
-#' @import readr
 #' @import stringr
 #' @import ggplot2
 #' @import lubridate

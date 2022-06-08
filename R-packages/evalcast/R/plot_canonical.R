@@ -18,6 +18,8 @@
 #'   `base_forecaster` before aggregating by the `aggr` function. FALSE by
 #'   default.
 #' 
+#' @importFrom tidyr drop_na
+#' 
 #' @export
 plot_canonical <- function(df, x, y,
                            facet_rows = NULL,

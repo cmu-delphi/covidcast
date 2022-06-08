@@ -2,9 +2,11 @@
 #'
 #' @param cards either predictions_cards or scorecards
 #'
-#' @return cards of the same class but with only one row for each 
+#' @return cards of the same class but with only one row for each
 #'   geo_value/forecast_date/ahead/forecaster (the point estimate)
-#'   
+#'
+#' @importFrom tidyr pivot_wider
+#'
 #' @export
 collapse_cards <- function(cards){
   cls <- class(cards)[1]

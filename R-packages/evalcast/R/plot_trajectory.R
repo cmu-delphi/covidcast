@@ -121,6 +121,7 @@ plot_trajectory <- function(predictions_cards,
   }
 }
 
+#' @importFrom tidyr pivot_wider
 setup_plot_trajectory <- function(predictions_cards,
                                   intervals = c(.5, .8, .95),
                                   side_truth = NULL,

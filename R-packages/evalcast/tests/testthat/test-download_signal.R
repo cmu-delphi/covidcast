@@ -6,11 +6,11 @@ library(magrittr)
 
 # Create a fake result from the covidcast API as returned by the `evalcast::download_signals()`
 # function.
-create_fake_downloaded_signal <- function(geo_value, value) {
+create_fake_downloaded_signal <- function(geo_values, value) {
   tibble(
     data_source = "source",
     signal = "signal",
-    geo_value = geo_value,
+    geo_value = geo_values,
     time_value = as.Date("2020-01-01"),
     issue = as.Date("2020-01-02"),
     lag = 1L,
@@ -33,7 +33,7 @@ test_that("download_signals runs as normal without cache dir", {
       data_source = "source",
       signal = "signal",
       geo_type = "state",
-      geo_value = c("al", "wy"),
+      geo_values = c("al", "wy"),
       end_day = as.Date("2020-01-01"),
       issue = as.Date("2020-01-02")
     )
@@ -48,7 +48,7 @@ test_that("download_signals runs as normal without cache dir", {
       data_source = "source",
       signal = "signal",
       geo_type = "state",
-      geo_value = c("al", "wy"),
+      geo_values = c("al", "wy"),
       end_day = as.Date("2020-01-01"),
       issue = as.Date("2020-01-02")
     )

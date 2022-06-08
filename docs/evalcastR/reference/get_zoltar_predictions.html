@@ -73,7 +73,7 @@ predictions card, so it can be easily evaluated and compared." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -86,19 +86,10 @@ predictions card, so it can be easily evaluated and compared." />
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../articles/evalcast.html">Get started</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/intro-evalcast.html">Introduction to evalcast</a>
-    </li>
-  </ul>
+<li>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
@@ -142,7 +133,7 @@ predictions card, so it can be easily evaluated and compared.</p>
   ahead <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>,
   incidence_period <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"epiweek"</span>, <span class='st'>"day"</span><span class='op'>)</span>,
   signal <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"confirmed_incidence_num"</span>, <span class='st'>"deaths_incidence_num"</span>,
-    <span class='st'>"deaths_cumulative_num"</span><span class='op'>)</span>,
+    <span class='st'>"deaths_cumulative_num"</span>, <span class='st'>"confirmed_admissions_covid_1d"</span><span class='op'>)</span>,
   as_of <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
@@ -184,8 +175,8 @@ both</p></td>
     <tr>
       <th>signal</th>
       <td><p>this function supports only "confirmed_incidence_num",
-"deaths_incidence_num", and/or "deaths_cumulative_num" (those currently)
-forecast by the COVIDhub-ensemble). For other types, use one of the
+"deaths_incidence_num", "deaths_cumulative_num", and/or
+"confirmed_admissions_covid_1d". For other types, use one of the
 alternatives mentioned above</p></td>
     </tr>
     <tr>
@@ -223,7 +214,7 @@ remainder specify the prediction task, 10 columns in total:
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Jed Grabman, Alden Green, Daniel McDonald, Balasubramanian Narasimhan, Mike O'Brien, Ryan Tibshirani.</p>
+  <p>Developed by Daniel McDonald, Jacob Bien, Mike O'Brien, Jed Grabman, Sarah Colquhoun, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

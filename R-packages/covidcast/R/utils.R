@@ -27,7 +27,8 @@ earliest_issue <- function(df) {
 # Helper to do either first or last issue.
 first_or_last_issue <- function(df, latest) {
   if (!inherits(df, c("covidcast_signal", "covidcast_signal_long"))) {
-    stop("`df` must be a `covidcast_signal` or `covidcast_signal_long` data frame")
+    stop("`df` must be a `covidcast_signal` ",
+         "or `covidcast_signal_long` data frame")
   }
 
   # Save the attributes, such as metadata, since dplyr drops them
@@ -85,16 +86,16 @@ first_or_last_issue <- function(df, latest) {
 #' name_to_fips("Miami", ties_method = "all")
 #' name_to_fips(c("Allegheny", "Miami", "New "), ties_method = "all")
 #'
-#' @seealso [fips_to_name()], [cbsa_to_name()]
+#' @seealso [state_fips_to_name()], [cbsa_to_name()]
 #' @export
-name_to_fips = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
+name_to_fips <- function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all"), state = NULL) {
   # Leave states in county_census (so we can find state fips)
-  df = covidcast::county_census # %>% dplyr::filter(COUNTY != 0)
+  df <- covidcast::county_census # %>% dplyr::filter(COUNTY != 0)
 
   # Restrict to a particular state, if we're asked to
   if (!is.null(state)) {
-    df = df %>% dplyr::filter(STNAME == abbr_to_name(toupper(state)))
+    df <- df %>% dplyr::filter(.data$STNAME == abbr_to_name(toupper(state)))
   }
 
   # Now perform the grep-based look up
@@ -105,14 +106,16 @@ name_to_fips = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 
 #' @rdname name_to_fips
 #' @export
-name_to_cbsa = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
+name_to_cbsa <- function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all"), state = NULL) {
   # Restrict msa_census to metro areas
-  df = covidcast::msa_census %>% dplyr::filter(LSAD == "Metropolitan Statistical Area")
+  df <- dplyr::filter(
+    covidcast::msa_census, .data$LSAD == "Metropolitan Statistical Area"
+  )
 
   # Restrict to a particular state, if we're asked to
   if (!is.null(state)) {
-    df = df %>% dplyr::slice(grep(toupper(state), df$STATE))
+    df <- df %>% dplyr::slice(grep(toupper(state), df$STATE))
   }
 
   # Now perform the grep-based look up
@@ -121,56 +124,51 @@ name_to_cbsa = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
               ties_method = ties_method)
 }
 
-#' Get county or metropolitan area names from FIPS or CBSA codes
+#' Get state, county or metropolitan area names from FIPS or CBSA codes
 #'
-#' Look up county or metropolitan area names by FIPS or CBSA codes,
-#' respectively; these functions are based on `grep()`, and hence allow for
-#' regular expressions.
+#' Look up county or metropolitan area names by FIPS or CBSA codes. Looking up
+#' FIPS code is done with the first 2 numbers (state) or 5 numbers (county) and
+#' therefore can be called with longer FIPS codes.
 #'
 #' @param code Vector of FIPS or CBSA codes to look up.
-#' @param ignore.case,perl,fixed Arguments to pass to `grep()`, with the same
-#'   defaults as in the latter function. Hence, by default, regular expressions
-#'   are used; to match against a fixed string (no regular expressions), set
-#'   `fixed = TRUE`.
-#' @param ties_method If "first", then only the first match for each code is
-#'   returned. If "all", then all matches for each code are returned.
 #'
-#' @return A vector of county or metro names if `ties_method` equals "first",
-#'   and a list of county or names otherwise.
+#' @return A vector of state, county or metro names.
 #'
 #' @examples
-#' fips_to_name("42003")
+#' state_fips_to_name("42")
+#' state_fips_to_name("42003") # same as previous
+#' county_fips_to_name("42003")
+#' county_fips_to_name("42000") # the county "000" returns the state name
 #' cbsa_to_name("38300")
-#' fips_to_name("4200", ties_method = "all")
-#'
-#' # Count the number of counties, grouped by first two digits of FIPS code
-#' # (which identify states):
-#' unlist(lapply(fips_to_name(sprintf("%02d", 1:99), ties = "all"), length))
 #'
 #' @seealso [name_to_fips()], [name_to_cbsa()]
 #' @export
-fips_to_name = function(code, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
-                        ties_method = c("first", "all")) {
-  # Leave states in county_census (so we can find state fips)
-  df = covidcast::county_census # %>% dplyr::filter(COUNTY != 0)
-
-  # Now perform the grep-based look up
-  grep_lookup(key = code, keys = df$FIPS, values = df$CTYNAME,
-              ignore.case = ignore.case, perl = perl, fixed = fixed,
-              ties_method = ties_method)
+state_fips_to_name <- function(code) {
+  fips <- sprintf("%02d", covidcast::state_census$STATE)
+  index <- match(substr(code, 1, 2), fips)
+  output <- covidcast::state_census$NAME[index]
+  names(output) <- fips[index]
+  output
 }
 
-#' @rdname fips_to_name
+#' @rdname state_fips_to_name
 #' @export
-cbsa_to_name = function(code, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
-                        ties_method = c("first", "all")) {
-  # Restrict msa_census to metro areas
-  df = covidcast::msa_census %>% dplyr::filter(LSAD == "Metropolitan Statistical Area")
+county_fips_to_name <- function(code) {
+  index <- match(substr(code, 1, 5), covidcast::county_census$FIPS)
+  output <- covidcast::county_census$CTYNAME[index]
+  names(output) <- covidcast::county_census$FIPS[index]
+  output
+}
 
-  # Now perform the grep-based look up
-  grep_lookup(key = code, keys = df$CBSA, values = df$NAME,
-              ignore.case = ignore.case, perl = perl, fixed = fixed,
-              ties_method = ties_method)
+#' @rdname state_fips_to_name
+#' @export
+cbsa_to_name <- function(code) {
+  df <- covidcast::msa_census[
+    covidcast::msa_census$LSAD == "Metropolitan Statistical Area",]
+  index <- match(substr(code, 1, 5), df$CBSA)
+  output <- df$NAME[index]
+  names(output) <- df$CBSA[index]
+  output
 }
 
 #' Get state abbreviations from state names
@@ -196,10 +194,10 @@ cbsa_to_name = function(code, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 #'
 #' @seealso [abbr_to_name()]
 #' @export
-name_to_abbr = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
+name_to_abbr <- function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
   # First get rid of United States from state_census
-  df = covidcast::state_census %>% dplyr::filter(STATE > 0)
+  df <- covidcast::state_census %>% dplyr::filter(.data$STATE > 0)
 
   # Now perform the grep-based look up
   grep_lookup(key = name, keys = df$NAME, values = df$ABBR,
@@ -230,10 +228,10 @@ name_to_abbr = function(name, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 #'
 #' @seealso [name_to_abbr()]
 #' @export
-abbr_to_name = function(abbr, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
+abbr_to_name <- function(abbr, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
   # First get rid of United States from state_census
-  df = covidcast::state_census %>% dplyr::filter(STATE > 0)
+  df <- covidcast::state_census %>% dplyr::filter(.data$STATE > 0)
 
   # Perform the grep-based look up
   grep_lookup(key = abbr, keys = df$ABBR, values = df$NAME,
@@ -267,12 +265,12 @@ abbr_to_name = function(abbr, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
 #'
 #' @seealso [abbr_to_name()]
 #' @export
-abbr_to_fips = function(abbr, ignore.case = TRUE, perl = FALSE, fixed = FALSE,
+abbr_to_fips <- function(abbr, ignore.case = TRUE, perl = FALSE, fixed = FALSE,
                         ties_method = c("first", "all")) {
   # First get rid of United States from state_census, then convert FIPS codes to
   # appropriate character format
-  df = covidcast::state_census %>% dplyr::filter(STATE > 0) %>%
-    dplyr::mutate(STATE = format_state_fips(STATE))
+  df <- covidcast::state_census %>% dplyr::filter(.data$STATE > 0) %>%
+    dplyr::mutate(STATE = format_state_fips(.data$STATE))
 
   # Now perform the grep-based look up
   grep_lookup(key = abbr, keys = df$ABBR, values = df$STATE,
@@ -283,67 +281,51 @@ abbr_to_fips = function(abbr, ignore.case = TRUE, perl = FALSE, fixed = FALSE,
 #' Get state abbreviations from FIPS codes
 #'
 #' Look up state abbreviations by FIPS codes (including District of Columbia and
-#' Puerto Rico); this function is based on `grep()`, and hence allows for
-#' regular expressions.
+#' Puerto Rico). Will match the first two digits of the input codes, so should
+#' work for 5-digit county codes, or even longer tract and census block FIPS
+#' codes.
 #'
-#' @param code Vector of FIPS codes to look up; codes can have either two digits
-#'   (as in "42") or five digits (as in "42000"), either is allowed.
-#' @param ignore.case,perl,fixed Arguments to pass to `grep()`, with the same
-#'   defaults as in the latter function, except for `ignore.case = TRUE`. Hence,
-#'   by default, regular expressions are used; to match against a fixed string
-#'   (no regular expressions), set `fixed = TRUE`.
-#' @param ignore.case,perl,fixed Arguments to pass to `grep()`, with the same
-#'   defaults as in the latter function. Hence, by default, regular expressions
-#'   are used; to match against a fixed string (no regular expressions), set
-#'   `fixed = TRUE`.
-#' @param ties_method If "first", then only the first match for each code is
-#'   returned. If "all", then all matches for each code are returned.
+#' @param code Vector of FIPS codes to look up; will match the first two digits
+#'             of the code. Note that these are treated as strings; the number
+#'             1 will not match "01".
 #'
-#' @return A vector of state abbreviations if `ties_method` equals "first", and
-#'   a list of state abbreviations otherwise.
+#' @return A vector of state abbreviations.
 #'
 #' @examples
 #' fips_to_abbr("42000")
 #' fips_to_abbr(c("42", "72", "11"))
 #'
-#' # Note that fips_to_name() works for state names too:
-#' fips_to_name("42000")
-#'
 #' @seealso [abbr_to_fips()]
 #' @export
-fips_to_abbr = function(code, ignore.case = TRUE, perl = FALSE, fixed = FALSE,
-                        ties_method = c("first", "all")) {
-  # First get rid of United States from state_census, then convert FIPS codes to
-  # appropriate character format
-  df = covidcast::state_census %>% dplyr::filter(STATE > 0) %>%
-    dplyr::mutate(STATE = format_state_fips(STATE))
-
-  # Now perform the grep-based look up
-  grep_lookup(key = code, keys = df$STATE, values = df$ABBR,
-              ignore.case = ignore.case, perl = perl, fixed = fixed,
-              ties_method = ties_method)
+fips_to_abbr <- function(code)
+{
+  fips <- sprintf("%02d", covidcast::state_census$STATE)
+  index <- match(substr(code, 1, 2), fips)
+  output <- covidcast::state_census$ABBR[index]
+  names(output) <- fips[index]
+  output
 }
 
 # This is the core lookup function
-grep_lookup = function(key, keys, values, ignore.case = FALSE, perl = FALSE,
+grep_lookup <- function(key, keys, values, ignore.case = FALSE, perl = FALSE,
                        fixed = FALSE,  ties_method = c("first", "all")) {
-  ties_method = match.arg(ties_method)
+  ties_method <- match.arg(ties_method)
 
   # Only do grep lookup for unique keys, to keep the look sort. It's a common
-  # use case to, say, call fips_to_name on a covidcast_signal data frame over
-  # many days of data with many repeat observations of the same locations.
+  # use case to, say, call state_fips_to_name on a covidcast_signal data frame
+  # over many days of data with many repeat observations of the same locations.
   unique_key <- unique(key)
 
-  res = vector("list", length(unique_key))
+  res <- vector("list", length(unique_key))
   for (i in seq_along(unique_key)) {
-    ind = grep(unique_key[i], keys, ignore.case = ignore.case, perl = perl,
+    ind <- grep(unique_key[i], keys, ignore.case = ignore.case, perl = perl,
                fixed = fixed)
     if (length(ind) == 0) {
-      res[[i]] = NA
-      names(res[[i]]) = unique_key[i]
+      res[[i]] <- NA
+      names(res[[i]]) <- unique_key[i]
     } else {
-      res[[i]] = values[ind]
-      names(res[[i]]) = keys[ind]
+      res[[i]] <- values[ind]
+      names(res[[i]]) <- keys[ind]
     }
   }
 
@@ -361,9 +343,9 @@ grep_lookup = function(key, keys, values, ignore.case = FALSE, perl = FALSE,
                "first match in each case."),
          res = res, key = key, class = "grep_lookup_nonunique_match")
   }
-  return(sapply(res, `[`, 1))
+  return(unlist(lapply(res, `[`, 1)))
 }
 
 # Simple convenience functions for FIPS formatting
-format_fips = function(fips) { sprintf("%05d", fips) }
-format_state_fips = function(fips) { sprintf("%02d000", fips) }
+format_fips <- function(fips) { sprintf("%05d", fips) }
+format_state_fips <- function(fips) { sprintf("%02d000", fips) }

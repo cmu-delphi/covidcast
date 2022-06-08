@@ -1,0 +1,211 @@
+---
+title: "evalcast"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{evalcast}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE, message = FALSE, warning = FALSE,
+  collapse = TRUE, cache=FALSE,
+  comment = "#>"
+)
+```
+
+The `evalcast` package provides the infrastructure for developing and evaluating probabilistic forecasters that are based on data obtained with the [covidcast](https://cmu-delphi.github.io/covidcast/covidcastR/) R package.  A unique feature of the `covidcast` API is that it can retrieve data that would have been available *as of* a certain date.  This accounts for a difficult property of working with certain COVID-19 data sources, which is that they may be backfilled (retrospectively updated).  Failing to account for backfill can lead to poorly trained forecasters and overly optimistic retrospective evaluations.  The `evalcast` package is designed to help forecasters avoid these pitfalls.
+
+
+## Testing forecasters
+We will use the included `baseline_forecaster` to demonstrate how to backtest a forecaster and compare its predictions to contemporaneous forecasts that were submitted to CovidHub. While `baseline_forecaster` is very simple, it can be used as a template for creating more sophisticated forecasters.
+
+The format of a forecaster is aligned with the [CovidHub submission instructions](https://github.com/reichlab/covid19-forecast-hub/blob/master/data-processed/README.md) and with the [covidcast](https://cmu-delphi.github.io/covidcast/covidcastR/) R package.
+
+### Specify the signals that will be used by forecaster
+
+We start by specifying which signals the forecaster will be using.  See [here](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html) for a full list of signals available through the `covidcast` API.  Each signal is specified by two strings: `data_source` and `signal`.  Optionally, we can specify how far back in time we will want data.
+
+```{r}
+library(tibble)
+library(dplyr)
+library(magrittr)
+library(ggplot2)
+signals <- tibble(data_source = "jhu-csse", 
+                  signal = "deaths_incidence_num", 
+                  start_day = "2020-06-15",
+                  geo_type = "state")
+signals
+```
+
+### Run the forecaster on some dates
+
+Within the `evalcast` framework, forecasters do not directly retrieve historic data. Instead, `get_predictions` provides *only the data that would have been available at the time* to the specified forecaster in order to generate retrospective predictions.
+
+```{r}
+library(evalcast)
+library(covidcast)
+library(lubridate)
+library(dplyr)
+
+forecast_dates <- get_covidhub_forecast_dates("CMU-TimeSeries")
+forecast_dates_dec <- forecast_dates[forecast_dates >= "2020-12-01" & 
+                                        forecast_dates <= "2020-12-31"]
+
+# Retrieve past predictions from CovidHub...
+predictions_cards_ens <- get_covidhub_predictions(
+  "COVIDhub-ensemble", as_date(forecast_dates_dec), ahead = 3, 
+  signal = "deaths_incidence_num") %>%
+  filter(nchar(geo_value)==2) # remove counties
+predictions_cards_cmu <- get_covidhub_predictions(
+  "CMU-TimeSeries", forecast_dates_dec,  ahead = 3, 
+  signal = "deaths_incidence_num")
+# ...or make new predictions using baseline_forecaster
+predictions_cards <- get_predictions(baseline_forecaster,
+                                     name_of_forecaster = "baseline",
+                                     signals = signals,
+                                     forecast_dates = forecast_dates_dec,
+                                     incidence_period = "epiweek",
+                                     forecaster_args = list(
+                                       ahead = 3
+                                     )
+)
+
+predictions <- bind_rows(predictions_cards, predictions_cards_cmu, 
+                         predictions_cards_ens)
+
+```
+
+`get_predictions()` and `get_covidhub_predictions()` return a long data frame with one row for each `(forecast date, ahead, geo_value, quantile)` combination.
+
+```{r}
+head(predictions_cards_cmu, n=25)
+```
+
+
+Let's look at one location:
+
+```{r}
+michigan_abr = tolower(covidcast::name_to_abbr("Michigan")) # = "mi"
+predictions_cards_cmu %>% 
+  filter(geo_value == michigan_abr, forecast_date == forecast_dates_dec[1]) %>%
+  select(geo_value, quantile, value, forecast_date)
+```
+
+Forecasts are generally probabilistic, meaning that they predict a likely distribution of values (defined by quantiles) instead of a single value. For example, on `r predictions_cards_cmu$forecast_date[1]` the Covidhub ensemble forecaster made the following prediction for how many cases there would be in California `r predictions_cards_cmu$ahead[1]` week(s) later.
+```{r}
+california_abr = tolower(covidcast::name_to_abbr("California")) # = "ca"
+predictions_cards_ens %>%
+  filter(geo_value == california_abr, 
+         forecast_date == forecast_dates_dec[1]) %>%
+  select(quantile, value)
+```
+
+An `NA` in the `quantile` column indicates a point forecast (typically the median or mean).
+
+### Evaluate the performance of a forecaster
+
+Now that we've made these predictions, we'd like to know how well they perform.  By default, `evalcast` uses the following three performance measures, but these can be easily substituted:
+
+```{r}
+err_measures <- list(wis = weighted_interval_score,
+                     ae = absolute_error,
+                     coverage_80 = interval_coverage(coverage = 0.8))
+```
+
+We may now create scorecards for each forecaster's predictions or for a filtered subset. 
+
+```{r}
+scorecards <- evaluate_covid_predictions(
+  predictions,
+  err_measures = err_measures,
+  backfill_buffer = 10,
+  geo_type = "state"
+  )
+```
+
+
+`evaluate_covid_predictions()` returns a long data frame with one column for each error measure added to the `predictions_cards` and the `quantile` and `value` columns removed and one row for each geo_value/ahead/forecast_date/forecaster combination. If quantile predictions are needed for plotting or other downstream analysis, then use the `predictions_cards`. 
+
+```{r}
+scorecards %>% str()
+```
+
+
+**Technical note:** What does `backfill_buffer = 10` do?  When we evaluate a forecaster in backtesting we are assuming that we know what actually occurred.  However, in light of backfill, we may not trust the data for some period of time.  The argument `backfill_buffer` allows us to specify how many days until we believe that the data has "settled down" and is unlikely to be updated further.  The choice of this argument will depend on the particular signal you are forecasting.
+
+### Plots of performance measures
+
+`evalcast` provides a number of tools to visually assess a forecaster (including comparisons with other forecasters).
+
+We can examine forecaster calibration.
+
+```{r}
+plot_calibration(predictions_cards = predictions, 
+                 geo_type = "state", type = "wedgeplot", 
+                 facet_rows = "forecaster", 
+                 facet_cols = c("ahead", "forecast_date"))
+```
+
+By default, the proportion is the number of `geo_values` that fall above/below the quantile at each forecast date and ahead, but the grouping and variables to average over can be specified.
+
+```{r}
+plot_calibration(predictions_cards = predictions, 
+                 geo_type = "state",
+                 grp_vars = "forecaster",
+                 facet_cols = "forecaster",
+                 avg_vars = c("geo_value", "forecast_date"),
+                 facet_rows = NULL)
+```
+
+We can also examine a more traditional calibration plot:
+
+```{r}
+plot_calibration(predictions_cards = predictions, geo_type = "state", type = "traditional")
+```
+
+
+For extra flexibility, you can perform the core calculations using something like:
+
+```{r, eval=FALSE}
+compute_calibration(predictions, geo_type = "state") %>% setup_wedgeplot()
+
+```
+
+We can display the coverage of the interval forecasts:
+
+```{r}
+plot_coverage(predictions_cards = predictions, 
+              geo_type = "state") + theme(legend.position = "none")
+```
+
+Or the width of the intervals:
+
+```{r}
+plot_width(predictions_cards = predictions) + scale_y_log10() +
+  guides(color = "none") 
+```
+
+Because `score_cards` are just long data frames, custom plots can also be created by using [{ggplot2}](http://ggplot2.tidyverse.org):
+
+```{r}
+scorecards %>% filter(geo_value != "us") %>%
+  ggplot(aes(y=forecaster, x=wis, fill=forecaster)) +
+  geom_boxplot() +
+  facet_wrap(~forecast_date) +
+  scale_x_log10() +
+  theme_bw() +
+  scale_fill_viridis_d() +
+  theme(legend.position = "bottom")
+```
+
+
+## Cumulative forecasting
+
+While the above describes incident forecasting, the same `evalcast` functions can also be used for cumulative forecasting.
+
+- For example, for `k`-day-ahead cumulative forecasting, choose a cumulative signal from `covidcast` (e.g., `deaths_cumulative_num`), set `incidence_period = "day"` and `ahead = k`.
+
+- For example, for `k`-week-ahead cumulative epiweek forecasting, do the same as above but with `ahead = 7 * k`.
+

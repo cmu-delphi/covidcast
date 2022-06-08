@@ -75,7 +75,7 @@ this point based on quantiles of symmetrized week-to-week residuals." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -88,19 +88,10 @@ this point based on quantiles of symmetrized week-to-week residuals." />
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../articles/evalcast.html">Get started</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/intro-evalcast.html">Introduction to evalcast</a>
-    </li>
-  </ul>
+<li>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
@@ -139,12 +130,10 @@ this point based on quantiles of symmetrized week-to-week residuals.</p>
     </div>
 
     <pre class="usage"><span class='fu'>baseline_forecaster</span><span class='op'>(</span>
-  <span class='va'>df</span>,
+  <span class='va'>df_list</span>,
   <span class='va'>forecast_date</span>,
-  <span class='va'>signals</span>,
   incidence_period <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"epiweek"</span>, <span class='st'>"day"</span><span class='op'>)</span>,
-  <span class='va'>ahead</span>,
-  <span class='va'>geo_type</span>,
+  ahead <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>,
   symmetrize <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span></pre>
 
@@ -152,8 +141,8 @@ this point based on quantiles of symmetrized week-to-week residuals.</p>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>df</th>
-      <td><p>Data frame of the format that is returned by
+      <th>df_list</th>
+      <td><p>list of data of the format that is returned by
 <code><a href='https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html'>covidcast::covidcast_signal()</a></code> or <code><a href='https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signals.html'>covidcast::covidcast_signals()</a></code>.</p></td>
     </tr>
     <tr>
@@ -161,24 +150,6 @@ this point based on quantiles of symmetrized week-to-week residuals.</p>
       <td><p>Date object or string of the form "YYYY-MM-DD",
 indicating date on which forecasts will be made about some period (e.g.,
 epiweek). For example, if <code>forecast_date = "2020-05-11"</code>, <code>incidence_period = "day"</code>, and <code>ahead = 3</code>, then, we'd be making forecasts for "2020-05-14".</p></td>
-    </tr>
-    <tr>
-      <th>signals</th>
-      <td><p>Tibble with columns <code>data_source</code> and <code>signal</code> that specifies
-which variables from the COVIDcast API will be used by <code>forecaster</code>. Each
-row of <code>signals</code> represents a separate signal, and first row is taken to be
-the response. If using <code>incidence_period = "epiweek"</code>, the response should
-be something for which summing daily values over an epiweek makes sense
-(e.g., counts or proportions but not log(counts) or log(proportions)).
-Available data sources and signals are documented in the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>COVIDcast signal documentation</a>.
-An optional column <code>start_day</code> can also be included. This can be a Date
-object or string in the form "YYYY-MM-DD", indicating the earliest date of
-data needed from that data source. Importantly, <code>start_day</code> can also be a
-function (represented as a list column) that takes a forecast date and
-returns a start date for model training (again, Date object or string in
-the form "YYYY-MM-DD"). The latter is useful when the start date should be
-computed dynamically from the forecast date (e.g., when <code>forecaster</code> only
-trains on the most recent 4 weeks of data).</p></td>
     </tr>
     <tr>
       <th>incidence_period</th>
@@ -192,11 +163,6 @@ are you forecasting? If <code>incidence_period = "epiweek"</code> and forecast_d
 Sunday or Monday, then <code>ahead = 1</code> means the epiweek that includes the
 forecast date; if <code>forecast_date</code> falls on a Tuesday through Saturday, then
 it is the following epiweek. If <code>incidence_period = "day"</code>, then <code>ahead = 1</code> means the day after forecast date.</p></td>
-    </tr>
-    <tr>
-      <th>geo_type</th>
-      <td><p>String indicating geographical type, one of "county", "dma",
-"hrr", "msa", or "state".</p></td>
     </tr>
     <tr>
       <th>symmetrize</th>
@@ -225,7 +191,7 @@ distribution for that location and ahead. An NA indicates a point forecast
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Jed Grabman, Alden Green, Daniel McDonald, Balasubramanian Narasimhan, Mike O'Brien, Ryan Tibshirani.</p>
+  <p>Developed by Daniel McDonald, Jacob Bien, Mike O'Brien, Jed Grabman, Sarah Colquhoun, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

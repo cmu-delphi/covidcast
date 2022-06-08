@@ -12,6 +12,9 @@
 #' @return A tibble whose columns are `c(id_cols, score_cols)` whose `id_cols` values are copied
 #'   directly from `score_card` and whose `score_cols` values are normalized with respect to 
 #'   `base_forecaster_name`.
+#' 
+#' @importFrom tidyr pivot_wider pivot_longer
+#'
 #' @export
 scale_by_forecaster <- function(score_card,
                                 score_cols,

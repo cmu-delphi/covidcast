@@ -13,12 +13,17 @@ reference:
 - title: "Creating or importing predictions"
 - contents:
   - get_predictions
+  - get_forecaster_predictions
+  - get_forecast_dates
   - contains("zoltar")
   - contains("covidhub")
 - title: "Evaluating predictions"
 - contents:
-  - evaluate_predictions
+  - starts_with("evaluate")
   - weighted_interval_score
+  - sharpness
+  - overprediction
+  - underprediction
   - absolute_error
   - interval_coverage
   - get_actuals
@@ -26,6 +31,7 @@ reference:
 - contents:
   - starts_with("compute_")
   - scale_by_forecaster
+  - filter_predictions
 - title: "Visualizing performance"
 - contents:
   - starts_with("plot_")
@@ -35,7 +41,11 @@ reference:
 - title: "Utilities"
 - contents:
   - get_target_period
+  - get_target_ahead
+  - starts_with("format")
   - setup_wedgeplot
   - collapse_cards
   - averaging_checks
   - intersect_averagers
+  - contains("_epiweek")
+  - starts_with("as.")

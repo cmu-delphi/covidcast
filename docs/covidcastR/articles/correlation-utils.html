@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
       </span>
     </div>
 
@@ -116,41 +116,41 @@
 
 <span class="va">iprop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span><span class="op">(</span>
   <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"jhu-csse"</span>,
-                   signal <span class="op">=</span> <span class="st">"confirmed_7dav_incidence_prop"</span>, 
+                   signal <span class="op">=</span> <span class="st">"confirmed_7dav_incidence_prop"</span>,
                    start_day <span class="op">=</span> <span class="va">start_day</span>, end_day <span class="op">=</span> <span class="va">end_day</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">iprop</span><span class="op">)</span></pre></div>
-<pre><code>## A `covidcast_signal` data frame with 550032 rows and 9 columns.
-## 
-## data_source : jhu-csse
-## signal      : confirmed_7dav_incidence_prop
-## geo_type    : county
-## 
-## first date                          : 2020-03-01
-## last date                           : 2020-08-15
-## median number of geo_values per day : 3274</code></pre>
+<pre><code>A `covidcast_signal` dataframe with 550032 rows and 9 columns.
+
+data_source : jhu-csse
+signal      : confirmed_7dav_incidence_prop
+geo_type    : county
+
+first date                          : 2020-03-01
+last date                           : 2020-08-15
+median number of geo_values per day : 3274</code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit">
 <span class="va">dprop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span><span class="op">(</span>
   <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"jhu-csse"</span>,
-                   signal <span class="op">=</span> <span class="st">"deaths_7dav_incidence_prop"</span>, 
+                   signal <span class="op">=</span> <span class="st">"deaths_7dav_incidence_prop"</span>,
                    start_day <span class="op">=</span> <span class="va">start_day</span>, end_day <span class="op">=</span> <span class="va">end_day</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">dprop</span><span class="op">)</span></pre></div>
-<pre><code>## A `covidcast_signal` data frame with 550032 rows and 9 columns.
-## 
-## data_source : jhu-csse
-## signal      : deaths_7dav_incidence_prop
-## geo_type    : county
-## 
-## first date                          : 2020-03-01
-## last date                           : 2020-08-15
-## median number of geo_values per day : 3274</code></pre>
+<pre><code>A `covidcast_signal` dataframe with 550032 rows and 9 columns.
+
+data_source : jhu-csse
+signal      : deaths_7dav_incidence_prop
+geo_type    : county
+
+first date                          : 2020-03-01
+last date                           : 2020-08-15
+median number of geo_values per day : 3274</code></pre>
 <div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="co"># Restrict attention to "active" counties with at least 500 total cases </span>
+<span class="co"># Restrict attention to "active" counties with at least 500 total cases</span>
 <span class="va">case_num</span> <span class="op">&lt;-</span> <span class="fl">500</span>
 <span class="va">geo_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span><span class="op">(</span>
   <span class="fu"><a href="../reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"jhu-csse"</span>,
-                   signal <span class="op">=</span> <span class="st">"confirmed_cumulative_num"</span>, 
+                   signal <span class="op">=</span> <span class="st">"confirmed_cumulative_num"</span>,
                    start_day <span class="op">=</span> <span class="va">end_day</span>, end_day <span class="op">=</span> <span class="va">end_day</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">value</span> <span class="op">&gt;=</span> <span class="va">case_num</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">geo_value</span><span class="op">)</span>
 <span class="op">)</span>
@@ -167,12 +167,14 @@
 <span class="va">df_cor</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_cor.html">covidcast_cor</a></span><span class="op">(</span><span class="va">iprop_act</span>, <span class="va">dprop_act</span>, by <span class="op">=</span> <span class="st">"time_value"</span><span class="op">)</span>
 
 <span class="co"># Plot the correlation time series</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df_cor</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">time_value</span>, y <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df_cor</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">time_value</span>, y <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Correlation between case and death rates"</span>,
-       subtitle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"Per day, over counties with at least %i cases"</span>, 
+       subtitle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"Per day, over counties with at least %i cases"</span>,
                           <span class="va">case_num</span><span class="op">)</span>,
-       x <span class="op">=</span> <span class="st">"Date"</span>, y <span class="op">=</span> <span class="st">"Correlation"</span><span class="op">)</span> </pre></div>
-<p><img src="correlation-utils_files/figure-html/unnamed-chunk-3-1.png" width="768"></p>
+       x <span class="op">=</span> <span class="st">"Date"</span>, y <span class="op">=</span> <span class="st">"Correlation"</span><span class="op">)</span></pre></div>
+<div class="figure">
+<img src="figures/corr-unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3"><p class="caption">plot of chunk unnamed-chunk-3</p>
+</div>
 <p>The above plot addresses the question: “on any given day, are case and death rates linearly associated, over US counties?”. We might be interested in broadening this question, instead asking: “on any given day, do higher case rates tend to associate with higher death rates?”, removing the dependence on a linear relationship. The latter can be addressed using Spearman correlation, accomplished by setting <code>method = "spearman"</code> in the call to <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code>. Spearman correlation is highly robust and invariant to monotone transformations (it doesn’t rely on any particular functional form for the dependence between two variables).</p>
 <div id="lagged-correlations" class="section level3">
 <h3 class="hasAnchor">
@@ -181,7 +183,7 @@
 <p>Here we set <code>dt_x = -10</code>. This means that <code>iprop_act</code> will be lagged by 10 days, meaning that cases on June 1st will be correlated with deaths on June 11th. (It might help to think of it this way: deaths on a certain day will be correlated with cases with an offset of -10 days.)</p>
 <div class="sourceCode" id="cb7"><pre class="downlit">
 <span class="co"># Use Spearman correlation, with case rates and 10-day lagged case rates</span>
-<span class="va">df_cor1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_cor.html">covidcast_cor</a></span><span class="op">(</span><span class="va">iprop_act</span>, <span class="va">dprop_act</span>, by <span class="op">=</span> <span class="st">"time_value"</span>, 
+<span class="va">df_cor1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_cor.html">covidcast_cor</a></span><span class="op">(</span><span class="va">iprop_act</span>, <span class="va">dprop_act</span>, by <span class="op">=</span> <span class="st">"time_value"</span>,
                          method <span class="op">=</span> <span class="st">"spearman"</span><span class="op">)</span>
 <span class="va">df_cor2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_cor.html">covidcast_cor</a></span><span class="op">(</span><span class="va">iprop_act</span>, <span class="va">dprop_act</span>, by <span class="op">=</span> <span class="st">"time_value"</span>, dt_x <span class="op">=</span> <span class="op">-</span><span class="fl">10</span>,
                          method <span class="op">=</span> <span class="st">"spearman"</span><span class="op">)</span>
@@ -189,14 +191,16 @@
 <span class="co"># Stack rowwise into one data frame, then plot time series</span>
 <span class="va">df_cor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span><span class="va">df_cor1</span>, <span class="va">df_cor2</span><span class="op">)</span>
 <span class="va">df_cor</span><span class="op">$</span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">df_cor1</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">df_cor2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df_cor</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">time_value</span>, y <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">dt</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df_cor</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">time_value</span>, y <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">dt</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Correlation between case and death rates"</span>,
-       subtitle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"Per day, over counties with at least %i cases"</span>, 
-                          <span class="va">case_num</span><span class="op">)</span>, 
+       subtitle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"Per day, over counties with at least %i cases"</span>,
+                          <span class="va">case_num</span><span class="op">)</span>,
        x <span class="op">=</span> <span class="st">"Date"</span>, y <span class="op">=</span> <span class="st">"Correlation"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></pre></div>
-<p><img src="correlation-utils_files/figure-html/unnamed-chunk-4-1.png" width="768"></p>
+<div class="figure">
+<img src="figures/corr-unnamed-chunk-4-1.png" alt="plot of chunk unnamed-chunk-4"><p class="caption">plot of chunk unnamed-chunk-4</p>
+</div>
 <p>We can see that, for the most part, the Spearman measure has bolstered the correlations; and generally, lagging the case rates back by 10 days improves correlations, confirming case rates are better correlated with death rates 10 days from now.</p>
 </div>
 </div>
@@ -212,13 +216,15 @@
 <span class="co"># Stack rowwise into one data frame, then plot densities</span>
 <span class="va">df_cor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span><span class="va">df_cor1</span>, <span class="va">df_cor2</span><span class="op">)</span>
 <span class="va">df_cor</span><span class="op">$</span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">df_cor1</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">df_cor2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df_cor</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">dt</span>, fill <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> 
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df_cor</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">dt</span>, fill <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Correlation between case and death rates"</span>,
        subtitle <span class="op">=</span> <span class="st">"Computed separately for each county, over all times"</span>,
        x <span class="op">=</span> <span class="st">"Date"</span>, y <span class="op">=</span> <span class="st">"Density"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></pre></div>
-<p><img src="correlation-utils_files/figure-html/unnamed-chunk-5-1.png" width="768"></p>
+<div class="figure">
+<img src="figures/corr-unnamed-chunk-5-1.png" alt="plot of chunk unnamed-chunk-5"><p class="caption">plot of chunk unnamed-chunk-5</p>
+</div>
 <p>Using some tricks, we can attach the necessary properties to the data frame so we can plot these correlations in space as a choropleth map, using <code><a href="../reference/plot.covidcast_signal.html">plot.covidcast_signal()</a></code>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit">
 <span class="co"># Turn the data into a covidcast_signal data frame so it can be plotted</span>
@@ -230,7 +236,9 @@
 <span class="co"># Plot choropleth maps, using the covidcast plotting functionality</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">df_cor2</span>, title <span class="op">=</span> <span class="st">"Correlations between 10-day lagged case and death rates"</span>,
      range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, choro_col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"orange"</span>, <span class="st">"lightblue"</span>, <span class="st">"purple"</span><span class="op">)</span><span class="op">)</span></pre></div>
-<p><img src="correlation-utils_files/figure-html/unnamed-chunk-6-1.png" width="960"></p>
+<div class="figure">
+<img src="figures/corr-unnamed-chunk-6-1.png" alt="plot of chunk unnamed-chunk-6"><p class="caption">plot of chunk unnamed-chunk-6</p>
+</div>
 </div>
 <div id="more-systematic-lag-analysis" class="section level2">
 <h2 class="hasAnchor">
@@ -255,7 +263,9 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Median correlation between case and death rates"</span>,
        x <span class="op">=</span> <span class="st">"dt"</span>, y <span class="op">=</span> <span class="st">"Correlation"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></pre></div>
-<p><img src="correlation-utils_files/figure-html/unnamed-chunk-7-1.png" width="576"></p>
+<div class="figure">
+<img src="figures/corr-unnamed-chunk-7-1.png" alt="plot of chunk unnamed-chunk-7"><p class="caption">plot of chunk unnamed-chunk-7</p>
+</div>
 <p>We can see that the median correlation between case and death rates (where the correlations come from slicing by location) is maximized when we lag the case incidence rates back 8 days in time.</p>
 </div>
   </div>
@@ -271,7 +281,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Filter a list of predictions cards based on attributes — filter_predictions • evalcast</title>
+<title>Drop irrelevant predictions — filter_predictions • evalcast</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Filter a list of predictions cards based on attributes — filter_predictions" />
-<meta property="og:description" content="Filter a list of predictions cards based on attributes" />
+<meta property="og:title" content="Drop irrelevant predictions — filter_predictions" />
+<meta property="og:description" content="Drop irrelevant predictions" />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -80,34 +80,27 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../articles/evalcast.html">Get started</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/intro-evalcast.html">Introduction to evalcast</a>
-    </li>
-    <li>
-      <a href="../articles/intro_vignette.html">Introduction to evalcast</a>
-    </li>
-  </ul>
+<li>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/cmu-delphi/covidcast/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -121,71 +114,43 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Filter a list of predictions cards based on attributes</h1>
-    
+    <h1>Drop irrelevant predictions</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/predictions_processing_utils.R'><code>R/predictions_processing_utils.R</code></a></small>
     <div class="hidden name"><code>filter_predictions.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Filter a list of predictions cards based on attributes</p>
+    <p>Drop irrelevant predictions</p>
     </div>
 
-    <pre class="usage"><span class='fu'>filter_predictions</span>(
-  <span class='no'>predictions_cards</span>,
-  <span class='kw'>name_of_forecaster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>response_data_source</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>response_signal</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>forecast_date</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>incidence_period</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>ahead</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>geo_type</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+    <pre class="usage"><span class='fu'>filter_predictions</span><span class='op'>(</span><span class='va'>predictions</span>, <span class='va'>forecast_type</span>, <span class='va'>incidence_period</span>, <span class='va'>signal</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>predictions_cards</th>
-      <td><p>List of predictions cards, as created by <code><a href='get_predictions.html'>get_predictions()</a></code>.</p></td>
+      <th>predictions</th>
+      <td><p>Dataframe as produced by <code>process_target</code>.</p></td>
     </tr>
     <tr>
-      <th>name_of_forecaster</th>
-      <td><p>String indicating name of the forecaster.</p></td>
-    </tr>
-    <tr>
-      <th>response_data_source</th>
-      <td><p>String indicating response data source.</p></td>
-    </tr>
-    <tr>
-      <th>response_signal</th>
-      <td><p>String indicating response signal.</p></td>
-    </tr>
-    <tr>
-      <th>forecast_date</th>
-      <td><p>Date object or string of the form "YYYY-MM-DD",
-indicating date on which forecasts will be made about some period (e.g.,
-epiweek). For example, if <code>forecast_date = "2020-05-11"</code>, <code>incidence_period = "day"</code>, and <code>ahead = 3</code>, then, we'd be making forecasts for "2020-05-14".</p></td>
+      <th>forecast_type</th>
+      <td><p>"quantile", "point", or both</p></td>
     </tr>
     <tr>
       <th>incidence_period</th>
-      <td><p>String indicating the incidence period, either
-"epiweek" or "day".</p></td>
+      <td><p>"epiweek", "day", or both</p></td>
     </tr>
     <tr>
-      <th>ahead</th>
-      <td><p>Vector of (one or more) integers. How many epiweeks/days ahead
-are you forecasting? If <code>incidence_period = "epiweek"</code> and forecast_date is
-Sunday or Monday, then <code>ahead = 1</code> means the epiweek that includes the
-forecast date; if <code>forecast_date</code> falls on a Tuesday through Saturday, then
-it is the following epiweek. If <code>incidence_period = "day"</code>, then <code>ahead = 1</code> means the day after forecast date.</p></td>
-    </tr>
-    <tr>
-      <th>geo_type</th>
-      <td><p>String indicating geographical type, one of "county", "dma",
-"hrr", "msa", or "state".</p></td>
+      <th>signal</th>
+      <td><p>Any combination of "confirmed_incidence_num",
+"deaths_incidence_num", "deaths_cumulative_num", and/or
+"confirmed_admissions_covid_1d".</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>predictions dataframe with irrelevant rows removed</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -198,11 +163,11 @@ it is the following epiweek. If <code>incidence_period = "day"</code>, then <cod
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Alden Green, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
+  <p>Developed by Daniel McDonald, Jacob Bien, Mike O'Brien, Jed Grabman, Sarah Colquhoun, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

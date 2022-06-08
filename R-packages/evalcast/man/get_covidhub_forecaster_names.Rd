@@ -4,17 +4,26 @@
 \alias{get_covidhub_forecaster_names}
 \title{List all COVID forecast models available}
 \usage{
-get_covidhub_forecaster_names(repo = c("zoltar", "covid19forecast_repo"))
+get_covidhub_forecaster_names(
+  repo = c("zoltar", "covid19forecast_repo"),
+  designations = "*"
+)
 }
 \arguments{
-\item{repo}{character strinng either "zoltar" indicating the
+\item{repo}{character string either "zoltar" indicating the
 \href{https://zoltardata.com}{Zoltar} Forecast Archive or "covid19forecast_repo"
 which lists those available at the
 \href{https://github.com/reichlab/covid19-forecast-hub}{Reich Lab}
 Github submission repo.}
+
+\item{designations}{vector of character strings representing acceptable
+designation types for models. If \code{"*"} (the default), models of all
+designations will be returned. See
+\href{https://github.com/reichlab/covid19-forecast-hub/blob/master/data-processed/METADATA.md#team_model_designation}{Reich Lab's Documentation}
+for allowed designations and their meanings.}
 }
 \value{
-character vector of all available forecasters
+character vector of all available forecasters matching given criteria
 }
 \description{
 Utility function to list all forecasters submitting COVID-19 forecasts to

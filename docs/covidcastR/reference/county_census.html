@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
       </span>
     </div>
 
@@ -150,15 +150,20 @@
     <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
     <p>A data frame with 3193 rows, one for each county (along with the 50
-states and DC). There are many columns. The most crucial are:</p>
+states and DC). Columns include:</p>
 <dl>
+<dt>SUMLEV</dt><dd><p>Geographic summary level. Either 40 (state) or 50 (county).</p></dd>
+<dt>REGION</dt><dd><p>Census Region code</p></dd>
+<dt>DIVISION</dt><dd><p>Census Division code</p></dd>
+<dt>STATE</dt><dd><p>State FIPS code.</p></dd>
+<dt>COUNTY</dt><dd><p>County FIPS</p></dd>
+<dt>STNAME</dt><dd><p>Name of the state in which this county belongs.</p></dd>
+<dt>CTYNAME</dt><dd><p>County name, to help find counties by name.</p></dd>
+<dt>POPESTIMATE2019</dt><dd><p>Estimate of the county's resident population as of
+July 1, 2019.</p></dd>
 <dt>FIPS</dt><dd><p>Five-digit county FIPS codes. These are unique identifiers
 used, for example, as the <code>geo_values</code> argument to <code><a href='covidcast_signal.html'>covidcast_signal()</a></code> to
 request data from a specific county.</p></dd>
-<dt>CTYNAME</dt><dd><p>County name, to help find counties by name.</p></dd>
-<dt>STNAME</dt><dd><p>Name of the state in which this county belongs.</p></dd>
-<dt>POPESTIMATE2019</dt><dd><p>Estimate of the county's resident population as of
-July 1, 2019.</p></dd>
 
 </dl>
 
@@ -169,10 +174,12 @@ July 1, 2019.</p></dd>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Census Bureau documentation of all columns and their meaning:
-<a href='https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.pdf'>https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.pdf</a></p>
+<a href='https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.pdf'>https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.pdf</a>,
+<a href='https://www.census.gov/data/tables/time-series/demo/popest/2010s-total-puerto-rico-municipios.html'>https://www.census.gov/data/tables/time-series/demo/popest/2010s-total-puerto-rico-municipios.html</a>,
+and <a href='https://www.census.gov/data/tables/2010/dec/2010-island-areas.html'>https://www.census.gov/data/tables/2010/dec/2010-island-areas.html</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='fips_to_name.html'>fips_to_name()</a></code>, <code><a href='name_to_fips.html'>name_to_fips()</a></code></p></div>
+    <div class='dont-index'><p><code><a href='state_fips_to_name.html'>county_fips_to_name()</a></code>, <code><a href='name_to_fips.html'>name_to_fips()</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -185,7 +192,7 @@ July 1, 2019.</p></dd>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

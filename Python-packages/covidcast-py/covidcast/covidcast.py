@@ -27,7 +27,8 @@ def signal(data_source: str,
            geo_values: Union[str, Iterable[str]] = "*",
            as_of: date = None,
            issues: Union[date, Tuple[date], List[date]] = None,
-           lag: int = None) -> Union[pd.DataFrame, None]:
+           lag: int = None,
+           time_type: str = "day") -> Union[pd.DataFrame, None]:
     """Download a Pandas data frame for one signal.
 
     Obtains data for selected date ranges for all geographic regions of the
@@ -76,10 +77,12 @@ def signal(data_source: str,
       such as ``"smoothed_cli"``.
     :param start_day: Query data beginning on this date. Provided as a
       ``datetime.date`` object. If ``start_day`` is ``None``, defaults to the
-      first day data is available for this signal.
+      first day data is available for this signal. If ``time_type == "week"``, then
+      this is rounded to the epiweek containing the day (i.e. the previous Sunday).
     :param end_day: Query data up to this date, inclusive. Provided as a
       ``datetime.date`` object. If ``end_day`` is ``None``, defaults to the most
-      recent day data is available for this signal.
+      recent day data is available for this signal. If ``time_type == "week"``, then
+      this is rounded to the epiweek containing the day (i.e. the previous Sunday).
     :param geo_type: The geography type for which to request this data, such as
       ``"county"`` or ``"state"``. Available types are described in the
       COVIDcast signal documentation. Defaults to ``"county"``.
@@ -89,19 +92,24 @@ def signal(data_source: str,
       ...) of strings.
     :param as_of: Fetch only data that was available on or before this date,
       provided as a ``datetime.date`` object. If ``None``, the default, return
-      the most recent available data.
+      the most recent available data. If ``time_type == "week"``, then
+      this is rounded to the epiweek containing the day (i.e. the previous Sunday).
     :param issues: Fetch only data that was published or updated ("issued") on
       these dates. Provided as either a single ``datetime.date`` object,
       indicating a single date to fetch data issued on, or a tuple or list
       specifying (start, end) dates. In this case, return all data issued in
       this range. There may be multiple rows for each observation, indicating
       several updates to its value. If ``None``, the default, return the most
-      recently issued data.
+      recently issued data. If ``time_type == "week"``, then these are rounded to
+      the epiweek containing the day (i.e. the previous Sunday).
     :param lag: Integer. If, for example, ``lag=3``, fetch only data that was
       published or updated exactly 3 days after the date. For example, a row
       with ``time_value`` of June 3 will only be included in the results if its
       data was issued or updated on June 6. If ``None``, the default, return the
       most recently issued data regardless of its lag.
+    :param time_type: The temporal resolution to request this data. Most signals
+      are available at the "day" resolution (the default); some are only
+      available at the "week" resolution, representing an MMWR week ("epiweek").
     :returns: A Pandas data frame with matching data, or ``None`` if no data is
       returned. Each row is one observation on one day in one geographic location.
       Contains the following columns:
@@ -119,7 +127,8 @@ def signal(data_source: str,
       ``time_value``
         Contains a `pandas Timestamp object
         <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html>`_
-        identifying the date this estimate is for.
+        identifying the date this estimate is for. For data with ``time_type = "week"``, this
+        is the first day of the corresponding epiweek.
 
       ``issue``
         Contains a `pandas Timestamp object
@@ -174,21 +183,22 @@ def signal(data_source: str,
 
     if start_day > end_day:
         raise ValueError("end_day must be on or after start_day, but "
-                         "start_day = '{start}', end_day = '{end}'".format(
-                             start=start_day, end=end_day))
+                         f"start_day = '{start_day}', end_day = '{end_day}'")
     if _ASYNC_CALL:
         dfs = _async_fetch_epidata(
-            data_source, signal, start_day, end_day, geo_type, geo_values, as_of, issues, lag
+            data_source, signal, start_day, end_day, geo_type,
+            geo_values, as_of, issues, lag, time_type
         )
     else:
         dfs = _fetch_epidata(
-            data_source, signal, start_day, end_day, geo_type, geo_values, as_of, issues, lag
+            data_source, signal, start_day, end_day, geo_type,
+            geo_values, as_of, issues, lag, time_type
         )
     if len(dfs) > 0:
         out = pd.concat(dfs)
         out.drop("direction", axis=1, inplace=True)
-        out["time_value"] = pd.to_datetime(out["time_value"], format="%Y%m%d")
-        out["issue"] = pd.to_datetime(out["issue"], format="%Y%m%d")
+        out["time_value"] = out["time_value"].apply(lambda x: _parse_datetimes(x, time_type))
+        out["issue"] = out["issue"].apply(lambda x: _parse_datetimes(x, time_type))
         out["geo_type"] = geo_type
         out["data_source"] = data_source
         out["signal"] = signal
@@ -385,7 +395,8 @@ def _fetch_epidata(data_source: str,
                    geo_value: Union[str, Iterable[str]],
                    as_of: date,
                    issues: Union[date, tuple, list],
-                   lag: int) -> Union[pd.DataFrame, None]:
+                   lag: int,
+                   time_type: str = "day") -> Union[pd.DataFrame, None]:
     """Fetch data from Epidata API.
 
     signal() wraps this to support fetching data over a range of dates
@@ -395,13 +406,13 @@ def _fetch_epidata(data_source: str,
     entries.
 
     """
-    as_of_str = _date_to_api_string(as_of) if as_of is not None else None
-    issues_strs = _dates_to_api_strings(issues) if issues is not None else None
+    as_of_str = _date_to_api_string(as_of, time_type) if as_of is not None else None
+    issues_strs = _dates_to_api_strings(issues, time_type) if issues is not None else None
     cur_day = start_day
     dfs = []
     while cur_day <= end_day:
-        day_str = _date_to_api_string(cur_day)
-        day_data = Epidata.covidcast(data_source, signal, time_type="day",
+        day_str = _date_to_api_string(cur_day, time_type)
+        day_data = Epidata.covidcast(data_source, signal, time_type=time_type,
                                      geo_type=geo_type, time_values=day_str,
                                      geo_value=geo_value, as_of=as_of_str,
                                      issues=issues_strs, lag=lag)
@@ -419,9 +430,9 @@ def _fetch_epidata(data_source: str,
         # In the too-much-data case, we continue to try putting the truncated
         # data in our results. In the no-data case, skip this day entirely,
         # since there is no "epidata" in the response.
-        if "epidata" in day_data:
+        if day_data.get("epidata"):
             dfs.append(pd.DataFrame.from_dict(day_data["epidata"]))
-        cur_day += timedelta(1)
+        cur_day += timedelta(1) if time_type == "day" else timedelta(7)
     return dfs
 
 
@@ -433,7 +444,8 @@ def _async_fetch_epidata(data_source: str,
                          geo_value: Union[str, Iterable[str]],
                          as_of: date,
                          issues: Union[date, tuple, list],
-                         lag: int) -> Union[pd.DataFrame, None]:
+                         lag: int,
+                         time_type: str = "day") -> Union[pd.DataFrame, None]:
     """Fetch data from Epidata API asynchronously.
 
     signal() wraps this to support fetching data over a range of dates
@@ -444,7 +456,8 @@ def _async_fetch_epidata(data_source: str,
     """
     dfs = []
     params = []
-    for day in pd.date_range(start_day, end_day):
+    date_range = pd.date_range(start_day, end_day, freq="D" if time_type == "day" else "W")
+    for day in date_range:
         day_param = {
             "source": "covidcast",
             "data_source": data_source,
@@ -452,12 +465,12 @@ def _async_fetch_epidata(data_source: str,
             "time_type": "day",
             "geo_type": geo_type,
             "geo_value": geo_value,
-            "time_values": _date_to_api_string(day),
+            "time_values": _date_to_api_string(day, time_type),
         }
         if as_of:
-            day_param["as_of"] = _date_to_api_string(as_of)
+            day_param["as_of"] = _date_to_api_string(as_of, time_type)
         if issues:
-            day_param["issues"] = _dates_to_api_strings(issues)
+            day_param["issues"] = _dates_to_api_strings(issues, time_type)
         if lag:
             day_param["lag"] = lag
         params.append(day_param)
@@ -470,7 +483,7 @@ def _async_fetch_epidata(data_source: str,
             warnings.warn(f"Problem obtaining {data_source} {signal} "
                           f"data on {params['time_values']} "
                           f"for geography '{geo_type}': {day_data['message']}", RuntimeWarning)
-        if "epidata" in day_data:
+        if day_data.get("epidata"):
             dfs.append(pd.DataFrame.from_dict(day_data["epidata"]))
     return dfs
 
@@ -489,26 +502,26 @@ def _signal_metadata(data_source: str,
     matches = meta[mask]
 
     if matches.shape[0] == 0:
-        raise ValueError("Unable to find metadata for source '{source}', "
-                         "signal '{signal}', at '{geo_type}' "
-                         "resolution.".format(
-                             source=data_source,
-                             signal=signal,
-                             geo_type=geo_type))
+        raise ValueError(f"Unable to find metadata for source '{data_source}', "
+                         f"signal '{signal}', at '{geo_type}' resolution.")
 
     assert matches.shape[0] == 1, "it should be impossible to have two identical signals"
     output: dict = matches.to_dict("records")[0]
     return output
 
 
-def _date_to_api_string(date: date) -> str:  # pylint: disable=W0621
-    """Convert a date object to a YYYYMMDD string expected by the API."""
-    return date.strftime("%Y%m%d")
+def _date_to_api_string(date: date, time_type: str = "day") -> str:  # pylint: disable=W0621
+    """Convert a date object to a YYYYMMDD or YYYYMM string expected by the API."""
+    if time_type == "day":
+        date_str = date.strftime("%Y%m%d")
+    elif time_type == "week":
+        date_str = Week.fromdate(date).cdcformat()
+    return date_str
 
 
-def _dates_to_api_strings(dates: Union[date, list, tuple]) -> str:
+def _dates_to_api_strings(dates: Union[date, list, tuple], time_type: str = "day") -> str:
     """Convert a date object, or pair of (start, end) objects, to YYYYMMDD strings."""
     if not isinstance(dates, (list, tuple)):
-        return _date_to_api_string(dates)
+        return _date_to_api_string(dates, time_type)
 
-    return "-".join(_date_to_api_string(date) for date in dates)
+    return "-".join(_date_to_api_string(date, time_type) for date in dates)

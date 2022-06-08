@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create a data frame of score cards — evaluate_predictions • evalcast</title>
+<title>Create a score card data frame — evaluate_predictions • evalcast</title>
 
 
 <!-- jquery -->
@@ -39,18 +39,15 @@
 
 
 
-<meta property="og:title" content="Create a data frame of score cards — evaluate_predictions" />
-<meta property="og:description" content="Performs backtesting, through the following steps:
-Takes a list of predictions cards (as created by
+<meta property="og:title" content="Create a score card data frame — evaluate_predictions" />
+<meta property="og:description" content="Evaluates the performance of a forecaster, through the following steps:
+Takes a prediction card (as created by
 get_predictions()).
-Downloads from the COVIDcast API the latest available data to compute
-what actually occurred (summing the response over the incidence period).
 Computes various user-specified error measures.
-The result is a data frame of &quot;score cards&quot;, where each row corresponds to
-a distinct ahead value. A score card is a data frame in which each row
-corresponds to a location-day pair, and the columns give the values of the
-error measures (along with other information including the forecast
-distributions and the actual response values)." />
+The result is a &quot;score card&quot; data frame, where each row corresponds to
+a prediction-result pair, where the columns define the prediction
+task, give the observed value, and give the calculated values of the provided
+error measures." />
 
 
 
@@ -82,7 +79,7 @@ distributions and the actual response values)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -95,19 +92,10 @@ distributions and the actual response values)." />
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../articles/evalcast.html">Get started</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/intro-evalcast.html">Introduction to evalcast</a>
-    </li>
-  </ul>
+<li>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
@@ -133,33 +121,29 @@ distributions and the actual response values)." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create a data frame of score cards</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/evaluate-predictions.R'><code>R/evaluate-predictions.R</code></a></small>
+    <h1>Create a score card data frame</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmu-delphi/covidcast/blob/master/R/evaluate_predictions.R'><code>R/evaluate_predictions.R</code></a></small>
     <div class="hidden name"><code>evaluate_predictions.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Performs backtesting, through the following steps:</p><ol>
-<li><p>Takes a list of predictions cards (as created by
+    <p>Evaluates the performance of a forecaster, through the following steps:</p><ol>
+<li><p>Takes a prediction card (as created by
 <code><a href='get_predictions.html'>get_predictions()</a></code>).</p></li>
-<li><p>Downloads from the COVIDcast API the latest available data to compute
-what actually occurred (summing the response over the incidence period).</p></li>
 <li><p>Computes various user-specified error measures.</p></li>
-</ol><p>The result is a data frame of "score cards", where each row corresponds to
-a distinct ahead value. A score card is a data frame in which each row
-corresponds to a location-day pair, and the columns give the values of the
-error measures (along with other information including the forecast
-distributions and the actual response values).</p>
+</ol><p>The result is a "score card" data frame, where each row corresponds to
+a prediction-result pair, where the columns define the prediction
+task, give the observed value, and give the calculated values of the provided
+error measures.</p>
     </div>
 
     <pre class="usage"><span class='fu'>evaluate_predictions</span><span class='op'>(</span>
   <span class='va'>predictions_cards</span>,
+  <span class='va'>truth_data</span>,
   err_measures <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>wis <span class='op'>=</span> <span class='va'>weighted_interval_score</span>, ae <span class='op'>=</span> <span class='va'>absolute_error</span>, coverage_80 <span class='op'>=</span>
     <span class='fu'><a href='interval_coverage.html'>interval_coverage</a></span><span class='op'>(</span>coverage <span class='op'>=</span> <span class='fl'>0.8</span><span class='op'>)</span><span class='op'>)</span>,
-  backfill_buffer <span class='op'>=</span> <span class='fl'>10</span>,
-  side_truth <span class='op'>=</span> <span class='cn'>NULL</span>,
-  grp_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forecaster"</span>, <span class='st'>"forecast_date"</span>, <span class='st'>"ahead"</span>, <span class='st'>"geo_value"</span><span class='op'>)</span>,
-  geo_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"county"</span>, <span class='st'>"hrr"</span>, <span class='st'>"msa"</span>, <span class='st'>"dma"</span>, <span class='st'>"state"</span><span class='op'>)</span>
+  grp_vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forecaster"</span>, <span class='fu'><a href='https://rdrr.io/r/base/sets.html'>intersect</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>predictions_cards</span><span class='op'>)</span>,
+    <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>truth_data</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -167,70 +151,37 @@ distributions and the actual response values).</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>predictions_cards</th>
-      <td><p>tibble of predictions
-that are all for the same prediction task, meaning they are for the same
-response, incidence period,and geo type. Forecasts may be for a
-different forecast date or forecaster.
-A predictions card may be created by the function
-<code><a href='get_predictions.html'>get_predictions()</a></code>, downloaded with <code><a href='get_covidhub_predictions.html'>get_covidhub_predictions()</a></code> or
-possibly created manually.</p></td>
+      <td><p>tibble of quantile forecasts, which contains at
+least <code>quantile</code> and <code>value</code> columns, as well as any other prediction task
+identifiers. For covid data, a predictions card may be created by the
+function <code><a href='get_predictions.html'>get_predictions()</a></code>, downloaded with <code><a href='get_covidhub_predictions.html'>get_covidhub_predictions()</a></code>
+or created manually.</p></td>
+    </tr>
+    <tr>
+      <th>truth_data</th>
+      <td><p>truth data (observed). This should be a data frame that
+will be joined to <code>predictions_cards</code> by all available columns. The
+observed data column should be named <code>actual</code>.</p></td>
     </tr>
     <tr>
       <th>err_measures</th>
       <td><p>Named list of one or more functions, where each function
 takes a data frame with three columns <code>quantile</code>, <code>value</code> and <code>actual</code>
-(i.e., observed) returns a scalar measure of error. Null or an empty list
-may be provided if scoring is not desired.</p></td>
-    </tr>
-    <tr>
-      <th>backfill_buffer</th>
-      <td><p>How many days until response is deemed trustworthy
-enough to be taken as correct? See details for more.</p></td>
-    </tr>
-    <tr>
-      <th>side_truth</th>
-      <td><p>you can optionally provide your own truth data (observed).
-Adding this column bypasses all checks to get appropriate data as
-reported at the time of the forecast. This column should either be a vector
-the same length as <code>predictions_cards</code> or a data frame that will be
-joined to <code>predictions_cards</code> by all available columns. If a data frame,
-the observed data should be named <code>actual</code></p></td>
+(i.e., observed) and returns a scalar measure of error. Null or an empty
+list may be provided if scoring is not desired.</p></td>
     </tr>
     <tr>
       <th>grp_vars</th>
-      <td><p>character vector of named columns in the predictions_cards
-such that the combination gives a unique (quantile) prediction. Ignored if
-<code>predictions_cards</code> is of the type returned by <code><a href='get_covidhub_predictions.html'>get_covidhub_predictions()</a></code>
-or <code><a href='get_predictions.html'>get_predictions()</a></code> (class is <code>predictions_cards</code>)</p></td>
-    </tr>
-    <tr>
-      <th>geo_type</th>
-      <td><p>String indicating geographical type, one of "county", "dma",
-"hrr", "msa", or "state".</p></td>
+      <td><p>character vector of named columns in <code>predictions_cards</code>
+such that the combination gives a unique (quantile) prediction.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>tibble of "score cards". Contains the same information as the
-<code>predictions_cards()</code> with additional columns for each err_measure and
-for the truth (named <code>actual</code>). All the columns may be necessary for
-some types of plotting, but it may be useful to shrink this down</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Backfill refers to the process by which some data sources go back in time
-updating previously reported values. Suppose it is September 14 and we are
-evaluating our predictions for what happened in the previous epiweek
-(September 6 through 12). Although we may be able to calculate a value for
-"actual", we might not trust this value since on September 16, backfill may
-occur changing what is known about the period September 6 through 12.  There are
-two consequences of this phenomenon.  First, running this function on
-different dates may result in different estimates of the error. Second, we
-may not trust the evaluations we get that are too recent.  The parameter
-<code>backfill_buffer</code> specifies how long of a buffer period we should
-enforce.  This will be dependent on the data source and signal and is left
-to the user to determine.  If backfill is not relevant for the particular
-signal you are predicting, then you can set <code>backfill_buffer</code> to 0.</p>
+<code>predictions_cards()</code> with additional columns for each <code>err_measure</code> and
+for the truth (named <code>actual</code>).</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -243,7 +194,7 @@ signal you are predicting, then you can set <code>backfill_buffer</code> to 0.</
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Jed Grabman, Alden Green, Daniel McDonald, Balasubramanian Narasimhan, Mike O'Brien, Ryan Tibshirani.</p>
+  <p>Developed by Daniel McDonald, Jacob Bien, Mike O'Brien, Jed Grabman, Sarah Colquhoun, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

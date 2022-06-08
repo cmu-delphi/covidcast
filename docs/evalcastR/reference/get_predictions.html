@@ -79,7 +79,7 @@ predictions made using the information as of September 14)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">evalcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -92,19 +92,10 @@ predictions made using the information as of September 14)." />
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../articles/evalcast.html">Get started</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/intro-evalcast.html">Introduction to evalcast</a>
-    </li>
-  </ul>
+<li>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
@@ -151,14 +142,11 @@ predictions made using the information as of September 14).</p>
   <span class='va'>name_of_forecaster</span>,
   <span class='va'>signals</span>,
   <span class='va'>forecast_dates</span>,
-  <span class='va'>incidence_period</span>,
-  <span class='va'>ahead</span>,
-  <span class='va'>geo_type</span>,
-  geo_values <span class='op'>=</span> <span class='st'>"*"</span>,
-  apply_corrections <span class='op'>=</span> <span class='cn'>NULL</span>,
-  signal_aggregation <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"list"</span>, <span class='st'>"wide"</span>, <span class='st'>"long"</span><span class='op'>)</span>,
-  signal_aggregation_dt <span class='op'>=</span> <span class='cn'>NULL</span>,
-  <span class='va'>...</span>
+  incidence_period <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"epiweek"</span>, <span class='st'>"day"</span><span class='op'>)</span>,
+  apply_corrections <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>signals</span><span class='op'>)</span> <span class='va'>signals</span>,
+  response_data_source <span class='op'>=</span> <span class='va'>signals</span><span class='op'>$</span><span class='va'>data_source</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>,
+  response_data_signal <span class='op'>=</span> <span class='va'>signals</span><span class='op'>$</span><span class='va'>signal</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>,
+  forecaster_args <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -169,7 +157,16 @@ predictions made using the information as of September 14).</p>
       <td><p>Function that outputs a tibble with columns <code>ahead</code>,
 <code>geo_value</code>, <code>quantile</code>, and <code>value</code>. The <code>quantile</code> column gives the
 probabilities associated with quantile forecasts for that location and
-ahead. If your forecaster produces point forecasts, then set <code>quantile=NA</code>.</p></td>
+ahead. If your forecaster produces point forecasts, then set <code>quantile=NA</code>.</p>
+<p>One argument to <code>forecaster</code> must be named <code>df_list</code>. It will be
+populated with the list of historical data returned by a call
+to COVIDcast. The list will be the same length as the number of rows in
+the <code>signals</code> tibble (see below).
+The forecaster will also receive a single <code>forecast_date</code> as a named argument.
+Any additional named arguments can be passed via the <code>forecaster_args</code>
+argument below.</p>
+<p>Thus, the forecaster should have a signature like
+<code>forecaster(df_list = data, forecast_data = forecast_date, ...)</code></p></td>
     </tr>
     <tr>
       <th>name_of_forecaster</th>
@@ -177,21 +174,44 @@ ahead. If your forecaster produces point forecasts, then set <code>quantile=NA</
     </tr>
     <tr>
       <th>signals</th>
-      <td><p>Tibble with columns <code>data_source</code> and <code>signal</code> that specifies
-which variables from the COVIDcast API will be used by <code>forecaster</code>. Each
+      <td><p>Tibble with mandatory columns <code>data_source</code> and <code>signal</code> and
+optional columns <code>start_day</code>, <code>as_of</code>, <code>geo_typ</code>, <code>geo_values</code>.</p>
+<p><code>data_source</code> and <code>signal</code> specify which variables from the COVIDcast API
+will be used by <code>forecaster</code>. Each
 row of <code>signals</code> represents a separate signal, and first row is taken to be
-the response. If using <code>incidence_period = "epiweek"</code>, the response should
+the response unless explicitly overridden.
+If using <code>incidence_period = "epiweek"</code>, the response should
 be something for which summing daily values over an epiweek makes sense
 (e.g., counts or proportions but not log(counts) or log(proportions)).
 Available data sources and signals are documented in the <a href='https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html'>COVIDcast signal documentation</a>.
-An optional column <code>start_day</code> can also be included. This can be a Date
+A few optional columns are also allowed. If not specified, these will default
+to the values of the similarly named argument.</p>
+<p>A column <code>start_day</code> can be included. This can be a <a href='https://rdrr.io/r/base/Dates.html'>Date</a>
 object or string in the form "YYYY-MM-DD", indicating the earliest date of
 data needed from that data source. Importantly, <code>start_day</code> can also be a
 function (represented as a list column) that takes a forecast date and
 returns a start date for model training (again, Date object or string in
 the form "YYYY-MM-DD"). The latter is useful when the start date should be
 computed dynamically from the forecast date (e.g., when <code>forecaster</code> only
-trains on the most recent 4 weeks of data).</p></td>
+trains on the most recent 4 weeks of data).</p>
+<p>You may also include a <code>geo_type</code> column, a <code>geo_values</code> column and/or an
+<code>as_of</code> column.
+The first two should contain a string. If unspecified, these will have
+the same defaults as <code><a href='https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html'>covidcast::covidcast_signal()</a></code>, namely
+<code>geo_type = "county"</code> and <code>geo_values = "*"</code>.
+These arguments allow you to download different data than
+what you're actually trying to predict, say using state-level data to
+predict national outcomes.</p>
+<p>By default, the <code>as_of</code> date of data downloaded from
+COVIDcast is loaded with <code>as_of = forecast_date</code>. This means that data
+is "rewound" to days in the past. Any data revisions made since, would
+not have been present at that time, and would not be available to the
+forecaster. It's likely, for example, that no data would actually exist
+for the forecast date on the forecast date (there is some latency between
+the time signals are reported and the dates for which they are reported).
+You can override this functionality, though we strongly advise you do so
+with care, by passing a function of the forecast_date or a single date
+here. The function should return a <a href='https://rdrr.io/r/base/Dates.html'>Date</a>.</p></td>
     </tr>
     <tr>
       <th>forecast_dates</th>
@@ -204,50 +224,31 @@ trains on the most recent 4 weeks of data).</p></td>
 "epiweek" or "day".</p></td>
     </tr>
     <tr>
-      <th>ahead</th>
-      <td><p>Vector of (one or more) integers. How many epiweeks/days ahead
-are you forecasting? If <code>incidence_period = "epiweek"</code> and forecast_date is
-Sunday or Monday, then <code>ahead = 1</code> means the epiweek that includes the
-forecast date; if <code>forecast_date</code> falls on a Tuesday through Saturday, then
-it is the following epiweek. If <code>incidence_period = "day"</code>, then <code>ahead = 1</code> means the day after forecast date.</p></td>
-    </tr>
-    <tr>
-      <th>geo_type</th>
-      <td><p>String indicating geographical type, one of "county", "dma",
-"hrr", "msa", or "state".</p></td>
-    </tr>
-    <tr>
-      <th>geo_values</th>
-      <td><p>Vector or list of locations whose data will be passed to
-<code>forecaster</code>. The default, "*", fetches all that is available in the API.</p></td>
-    </tr>
-    <tr>
       <th>apply_corrections</th>
       <td><p>an optional function that applies data corrections
 to the signals. Input is a data frame or list as returned as
 <code>df &lt;- covidcast::download_signals()</code>.
 The returned object should be of the type expected by your forecaster.
-This function will be called as <code>apply_corrections(df, ...)</code> using any
-named arguments passed in <code>...</code> to <code>get_predictions()</code>.</p></td>
+This function will be called as <code>apply_corrections(df)</code>.</p></td>
     </tr>
     <tr>
-      <th>signal_aggregation</th>
-      <td><p>this and the next argument control the type of
-data your forecaster expects to receive from covidcast. By default,
-different signals are passed in "list" format. But you may alternatively
-request "wide" or "long". See <code><a href='https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signals.html'>covidcast::covidcast_signals()</a></code> and
-<code><a href='https://cmu-delphi.github.io/covidcast/covidcastR/reference/aggregate_signals.html'>covidcast::aggregate_signals()</a></code> for more details.</p></td>
+      <th>response_data_source</th>
+      <td><p>String indicating the <code>data_source</code> of the response.
+This is used mainly for downstream evaluation. By default, this will be the
+same as the <code>data_source</code> in the first row of the <code>signals</code> tibble.</p></td>
     </tr>
     <tr>
-      <th>signal_aggregation_dt</th>
-      <td><p>for any data format,
-<code><a href='https://cmu-delphi.github.io/covidcast/covidcastR/reference/aggregate_signals.html'>covidcast::aggregate_signals()</a></code> can perform leading and lagging for you.
-See that documentation for more details.</p></td>
+      <th>response_data_signal</th>
+      <td><p>String indicating the <code>signal</code> of the response.
+This is used mainly for downstream evaluation. By default, this will be the
+same as the <code>signal</code> in the first row in the <code>signals</code> tibble.</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>Additional named arguments to be passed to <code>forecaster()</code> and
-<code>apply_corrections()</code></p></td>
+      <th>forecaster_args</th>
+      <td><p>a list of additional named arguments to be passed
+to <code>forecaster()</code>. A common use case would be to pass the period ahead
+(e.g. predict 1 day, 2 days, ..., k days ahead). Note that <code>ahead</code> is a
+required component of the forecaster output (see above).</p></td>
     </tr>
     </table>
 
@@ -261,15 +262,23 @@ remainder specify the prediction task, 10 columns in total:
 <code>data_source</code> and <code>signal</code> correspond to the response variable only.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='va'>baby_predictions</span> <span class='op'>=</span> <span class='fu'>get_predictions</span><span class='op'>(</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='va'>baby_predictions</span> <span class='op'>=</span> <span class='fu'>get_predictions</span><span class='op'>(</span>
   <span class='va'>baseline_forecaster</span>, <span class='st'>"baby"</span>,
   <span class='fu'>tibble</span><span class='fu'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></span><span class='op'>(</span>
-    data_source<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"jhu-csse"</span>, <span class='st'>"usa-facts"</span><span class='op'>)</span>,
-    signal <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"deaths_incidence_num"</span>,<span class='st'>"confirmed_incidence_num"</span><span class='op'>)</span>,
-    start_day<span class='op'>=</span><span class='st'>"2020-08-15"</span><span class='op'>)</span>, 
-  <span class='st'>"2020-10-01"</span>,<span class='st'>"epiweek"</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>, 
-  <span class='st'>"state"</span>, <span class='st'>"mi"</span>, signal_aggregation<span class='op'>=</span><span class='st'>"long"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Downloading deaths_incidence_num from covidcast for period from 2020-08-15 to 2020-10-01.</span></div><div class='output co'>#&gt; <span class='message'>Downloading confirmed_incidence_num from covidcast for period from 2020-08-15 to 2020-10-01.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Data not fetched for the following days: 2020-10-01</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Data not fetched for the following days: 2020-10-01</span></div><div class='input'>
+    data_source<span class='op'>=</span><span class='st'>"jhu-csse"</span>,
+    signal <span class='op'>=</span><span class='st'>"deaths_incidence_num"</span>,
+    start_day<span class='op'>=</span><span class='st'>"2020-08-15"</span>,
+    geo_values <span class='op'>=</span> <span class='st'>"mi"</span>,
+    geo_type <span class='op'>=</span> <span class='st'>"state"</span><span class='op'>)</span>, 
+  forecast_dates <span class='op'>=</span> <span class='st'>"2020-10-01"</span>,
+  incidence_period <span class='op'>=</span> <span class='st'>"epiweek"</span>,
+  forecaster_args <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
+    incidence_period <span class='op'>=</span> <span class='st'>"epiweek"</span>,
+    ahead <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>
+  <span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
+
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -282,7 +291,7 @@ remainder specify the prediction task, 10 columns in total:
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jacob Bien, Jed Grabman, Alden Green, Daniel McDonald, Balasubramanian Narasimhan, Mike O'Brien, Ryan Tibshirani.</p>
+  <p>Developed by Daniel McDonald, Jacob Bien, Mike O'Brien, Jed Grabman, Sarah Colquhoun, Balasubramanian Narasimhan, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

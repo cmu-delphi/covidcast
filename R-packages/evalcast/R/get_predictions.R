@@ -1,5 +1,5 @@
 #' Get predictions
-#'
+#' 
 #' For each of the provided forecast dates, runs a forecaster using the data
 #' that would have been available as of that given forecast date. Returns a list
 #' of "predictions cards", where each list element corresponds to a different
@@ -13,164 +13,182 @@
 #'   `geo_value`, `quantile`, and `value`. The `quantile` column gives the
 #'   probabilities associated with quantile forecasts for that location and
 #'   ahead. If your forecaster produces point forecasts, then set `quantile=NA`.
+#'
+#'   One argument to `forecaster` must be named `df_list`. It will be
+#'   populated with the list of historical data returned by a call
+#'   to COVIDcast. The list will be the same length as the number of rows in
+#'   the `signals` tibble (see below).
+#'   The forecaster will also receive a single `forecast_date` as a named argument.
+#'   Any additional named arguments can be passed via the `forecaster_args`
+#'   argument below.
+#'
+#'   Thus, the forecaster should have a signature like
+#'   `forecaster(df_list = data, forecast_data = forecast_date, ...)`
 #' @param name_of_forecaster String indicating name of the forecaster.
 #' @template signals-template
 #' @template forecast_dates-template
 #' @template incidence_period-template
-#' @template ahead-template
-#' @template geo_type-template
-#' @template geo_values-template
 #' @template apply_corrections-template
-#' @param signal_aggregation this and the next argument control the type of
-#'   data your forecaster expects to receive from covidcast. By default,
-#'   different signals are passed in "list" format. But you may alternatively
-#'   request "wide" or "long". See [covidcast::covidcast_signals()] and 
-#'   [covidcast::aggregate_signals()] for more details.
-#' @param signal_aggregation_dt for any data format, 
-#'   [covidcast::aggregate_signals()] can perform leading and lagging for you.
-#'   See that documentation for more details.
-#' @param as_of_override by default, the `as_of` date of data downloaded from
-#'   covidcast is loaded with `as_of = forecast_date`. This means that data
-#'   is "rewound" to days in the past. Any data revisions made since, would
-#'   not have been present at that time, and would not be available to the
-#'   forecaster. It's likely, for example, that no data would actually exist
-#'   for the forecast date on the forecast date (there is some latency between
-#'   the time signals are reported and the dates for which they are reported).
-#'   You can override this functionality, though we strongly advise you do so
-#'   with care, by passing a function of a single forecast_date here. The 
-#'   function should return a date.
-#' @param ... Additional named arguments to be passed to `forecaster()` 
+#' @param response_data_source String indicating the `data_source` of the response.
+#'   This is used mainly for downstream evaluation. By default, this will be the
+#'   same as the `data_source` in the first row of the `signals` tibble.
+#' @param response_data_signal String indicating the `signal` of the response.
+#'   This is used mainly for downstream evaluation. By default, this will be the
+#'   same as the `signal` in the first row in the `signals` tibble.
+#' @param forecaster_args a list of additional named arguments to be passed
+#'   to `forecaster()`. A common use case would be to pass the period ahead
+#'   (e.g. predict 1 day, 2 days, ..., k days ahead). Note that `ahead` is a
+#'   required component of the forecaster output (see above).
+#' @param parallel_execution TRUE, FALSE, or a single positive integer. If TRUE,
+#'   uses bettermc::mclapply to execute each forecast date prediction in
+#'   parallel on max number of cores - 1. If FALSE, the code is run on a single
+#'   core. If integer, runs in parallel on that many cores, clipping to the max
+#'   number of detected cores if a greater number is requested.
+#' @param additional_mclapply_args a named list of additional arguments to pass
+#'   to [`bettermc::mclapply`] (besides `X`, `FUN`, and
+#'   `mc.cores`.)
+#' @param honest_as_of a boolean that, if true, ensures that the forecast_day, end_day,
+#' and as_of are all equal when downloading data. Otherwise, as_of is allowed to be freely
+#' set (and defaults to current date if not presented).
+#' @param offline_signal_dir the directory that stores the cached data for each
+#' (signal, forecast day) pair. If this is null, no caching is done and the data is
+#' downloaded from covidcast.
+#'
 #' @template predictions_cards-template
-#' 
 #'
 #' @examples \dontrun{
 #' baby_predictions = get_predictions(
 #'   baseline_forecaster, "baby",
 #'   tibble::tibble(
-#'     data_source=c("jhu-csse", "usa-facts"),
-#'     signal = c("deaths_incidence_num","confirmed_incidence_num"),
-#'     start_day="2020-08-15"), 
-#'   "2020-10-01","epiweek", 1:4, 
-#'   "state", "mi", signal_aggregation="long")
+#'     data_source = "jhu-csse",
+#'     signal = "deaths_incidence_num",
+#'     start_day = "2020-08-15",
+#'     geo_values = "mi",
+#'     geo_type = "state"),
+#'   forecast_dates = "2020-10-01",
+#'   incidence_period = "epiweek",
+#'   forecaster_args = list(
+#'     incidence_period = "epiweek",
+#'     ahead = 1:4
+#'   ))
 #' }
-#' 
+#'
 #' @export
+#' @md
 get_predictions <- function(forecaster,
                             name_of_forecaster,
                             signals,
                             forecast_dates,
-                            incidence_period,
-                            ahead,
-                            geo_type,
-                            geo_values = "*",
-                            apply_corrections = NULL,
-                            signal_aggregation = c("list", "wide", "long"),
-                            signal_aggregation_dt = NULL,
-                            as_of_override = function(forecast_date) forecast_date,
-                            ...) {
-  assert_that(is_tibble(signals), msg="`signals` should be a tibble.")
-  signal_aggregation = match.arg(signal_aggregation, c("list", "wide", "long"))
-  params <- list(...)
-  out <- forecast_dates %>%
-    map(~ do.call(
-          get_predictions_single_date,
-          c(list(forecaster = forecaster,
-                 name_of_forecaster = name_of_forecaster,
-                 signals = signals,
-                 forecast_date = .x,
-                 incidence_period = incidence_period,
-                 ahead = ahead,
-                 geo_type = geo_type,
-                 geo_values = geo_values,
-                 apply_corrections = apply_corrections,
-                 signal_aggregation = signal_aggregation,
-                 signal_aggregation_dt = signal_aggregation_dt,
-                 as_of_override = as_of_override),
-                 params))) %>%
-    bind_rows()
+                            incidence_period = c("epiweek", "day"),
+                            apply_corrections = function(signals) signals,
+                            response_data_source = signals$data_source[1],
+                            response_data_signal = signals$signal[1],
+                            forecaster_args = list(),
+                            parallel_execution = TRUE,
+                            additional_mclapply_args = list(),
+                            honest_as_of = TRUE,
+                            offline_signal_dir = NULL) {
+
+  assert_that(is_tibble(signals), msg = "`signals` should be a tibble.")
+  assert_that(xor(honest_as_of, "as_of" %in% names(signals)), msg = "`honest_as_of` should be set if and only if `as_of` is not set. Either remove as_of specification or set honest_as_of to FALSE.")
+  incidence_period <- match.arg(incidence_period)
+
+  if (incidence_period == "epiweek") rlang::warn("incidence_period of 'epiweek' only selects weekly (Saturday) target end dates, actual 'epiweek' signals not supported.", "evalcast::get_predictions")
+  if ("time_type" %in% names(signals) && any(signals$time_type == "week" | signals$time_type == "epiweek")) rlang::abort("time_type in the signals arg can only be 'day'.", "evalcast::get_predictions")
+  if ("lag" %in% names(signals)) rlang::warn("lag in the signals arg will be ignored.", "evalcast::get_predictions")
+  if ("issues" %in% names(signals)) rlang::warn("issues in the signals arg will be ignored.", "evalcast::get_predictions")
+
+  if (is.logical(parallel_execution) && parallel_execution == TRUE) {
+    num_cores <- max(1, parallel::detectCores() - 1)
+  } else if (is.logical(parallel_execution) && parallel_execution == FALSE) {
+    num_cores <- 1
+  } else if (is.integer(parallel_execution) && length(parallel_execution)==1L && parallel_execution >= 1L) {
+    num_cores <- max(1, min(parallel::detectCores(), parallel_execution))
+  } else {
+    stop("parallel_execution argument is neither boolean nor integer.")
+  }
+
+  assert_that(rlang::is_named2(additional_mclapply_args) &&
+              all(rlang::names2(additional_mclapply_args) %in% rlang::fn_fmls_names(bettermc::mclapply)))
+
+  get_predictions_single_date_ <- function(forecast_date) {
+    preds <- do.call(get_predictions_single_date,
+      list(
+        forecaster = forecaster,
+        signals = signals,
+        forecast_date = forecast_date,
+        apply_corrections = apply_corrections,
+        forecaster_args = forecaster_args,
+        honest_as_of = honest_as_of,
+        offline_signal_dir = offline_signal_dir
+      )
+    )
+    return(preds)
+  }
+
+  out <- rlang::inject(bettermc::mclapply(forecast_dates, get_predictions_single_date_, mc.cores = num_cores, !!!additional_mclapply_args)) %>% bind_rows()
 
   # for some reason, `value` gets named and ends up in attr
-  names(out$value) = NULL 
+  names(out$value) <- NULL
+  out <- out %>%
+    mutate(
+      forecaster = name_of_forecaster,
+      data_source = response_data_source,
+      signal = response_data_signal,
+      target_end_date = get_target_period(
+        .data$forecast_date,
+        incidence_period,
+        .data$ahead)$end,
+      incidence_period = incidence_period
+      ) %>%
+    relocate(.data$forecaster, .before = .data$forecast_date)
+
   class(out) <- c("predictions_cards", class(out))
   out
 }
 
-
 get_predictions_single_date <- function(forecaster,
-                                        name_of_forecaster,
                                         signals,
                                         forecast_date,
-                                        incidence_period,
-                                        ahead,
-                                        geo_type,
-                                        geo_values,
                                         apply_corrections,
-                                        signal_aggregation,
-                                        signal_aggregation_dt,
-                                        as_of_override,
-                                        ...) {
-  # see get_predictions() for descriptions of the arguments
+                                        forecaster_args,
+                                        honest_as_of = TRUE,
+                                        offline_signal_dir = NULL) {
 
   forecast_date <- lubridate::ymd(forecast_date)
-  # compute the start_day from the forecast_date, if we need to
-  if (!is.null(signals$start_day) && is.list(signals$start_day)) {
-    for (i in 1:length(signals$start_day)) {
-      if (is.function(signals$start_day[[i]])) {
-        signals$start_day <- signals$start_day[[i]](forecast_date)
-      }
-    }
-  }
-  # get data that would have been available as of forecast_date
-  # API has trouble with too many individual calls, 30 seemed safe
-  # (imagining ~50 states). So bigger, just grab everything and then filter
-  if(length(geo_values) > 30) {
-    geo_values_dl <- "*"
-  } else {
-    geo_values_dl <- unique(geo_values)
-  }
-  df <- download_signals(data_source = signals$data_source,
-                         signal = signals$signal,
-                         start_day = signals$start_day,
-                         end_day = forecast_date,
-                         as_of = as_of_override(forecast_date),
-                         geo_type = geo_type,
-                         geo_values = geo_values_dl,
-                         signal_aggregation = signal_aggregation,
-                         signal_aggregation_dt = signal_aggregation_dt)
+  signals <- signal_listcols(signals, forecast_date)
 
-  # Dump out any extra geo_values we don't want.
-  if (any(geo_values != "*")) {
-    if (signal_aggregation == "list") {
-      df <- map(df, ~filter(.x, .data$geo_value %in% geo_values))  
-    } else {
-      df <- filter(df, .data$geo_value %in% geo_values)
-    }
-  }
-    
-  
-  
-  if(!is.null(apply_corrections)) df <- apply_corrections(df)
-  
+  df_list <- signals %>%
+    pmap(function(...) {
+      sig <- list(...)
+      if (honest_as_of) sig$as_of <- forecast_date
 
-  out <- forecaster(df,
-                    forecast_date,
-                    signals,
-                    incidence_period,
-                    ahead,
-                    geo_type,
-                    ...)
+      download_signal(
+        data_source = sig$data_source,
+        signal = sig$signal,
+        start_day = sig$start_day,
+        end_day = forecast_date,
+        geo_type = sig$geo_type,
+        geo_values = sig$geo_values,
+        as_of = sig$as_of,
+        time_type = "day",
+        offline_signal_dir = offline_signal_dir
+      )
+    })
+
+  # Downloaded data postprocessing
+  if (!is.null(apply_corrections)) df_list <- apply_corrections(df_list)
+
+  forecaster_args$forecast_date <- forecast_date
+  forecaster_args$df_list <- df_list # pass in the data named to the right arg
+
+  out <- do.call(forecaster, forecaster_args)
   assert_that(all(c("ahead", "geo_value", "quantile", "value") %in% names(out)),
               msg = paste("Your forecaster must return a data frame with",
                           "(at least) the columnns `ahead`, `geo_value`,",
                           "`quantile`, and `value`."))
-  # make a predictions card for each ahead
-  out %>% 
-    mutate(
-      forecaster = name_of_forecaster,
-      forecast_date = forecast_date,
-      data_source = signals$data_source[1],
-      signal = signals$signal[1],
-      target_end_date = get_target_period(forecast_date, 
-                                          incidence_period, ahead)$end,
-      incidence_period = incidence_period) 
+
+  # make a predictions card
+  out$forecast_date <- forecast_date
+  return(out)
 }

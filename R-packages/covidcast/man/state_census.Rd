@@ -10,13 +10,25 @@ whole, plus the District of Columbia and the Puerto Rico Commonwealth).
 Important columns:
 
 \describe{
-\item{NAME}{Name of the state.}
-\item{POPESTIMATE2019}{Estimate of the state's resident population in 2019.}
+\item{SUMLEV}{Geographic summary level.}
+\item{REGION}{Census Region code}
+\item{DIVISION}{Census Division code}
+\item{STATE}{State FIPS code}
+\item{NAME}{Name of the state}
+\item{POPESTIMATE2019}{Estimate of the state's resident population in
+2019.}
+\item{POPEST18PLUS2019}{Estimate of the state's resident population in
+2019 that is over 18 years old.}
+\item{PCNT_POPEST18PLUS}{Estimate of the percent of a state's resident
+population in 2019 that is over 18.}
+\item{ABBR}{Postal abbreviation of the state}
 }
 }
 \source{
 United States Census Bureau, at
-\url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/state/detail/SCPRC-EST2019-18+POP-RES.csv}
+\url{https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.pdf},
+\url{https://www.census.gov/data/tables/time-series/demo/popest/2010s-total-puerto-rico-municipios.html},
+and \url{https://www.census.gov/data/tables/2010/dec/2010-island-areas.html}
 }
 \usage{
 state_census

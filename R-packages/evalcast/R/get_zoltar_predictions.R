@@ -22,8 +22,8 @@
 #' @param incidence_period one of "epiweek" or "day". NULL will attempt to fetch
 #'   both
 #' @param signal this function supports only "confirmed_incidence_num",
-#'   "deaths_incidence_num", and/or "deaths_cumulative_num" (those currently)
-#'   forecast by the COVIDhub-ensemble). For other types, use one of the 
+#'   "deaths_incidence_num", "deaths_cumulative_num", and/or
+#'   "confirmed_admissions_covid_1d". For other types, use one of the 
 #'   alternatives mentioned above
 #' @param as_of only forecasts available as of this date will be retrieved.
 #'   Default (NULL) is effectively as of today
@@ -41,7 +41,8 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
                                    incidence_period = c("epiweek", "day"),
                                    signal = c("confirmed_incidence_num",
                                               "deaths_incidence_num",
-                                              "deaths_cumulative_num"),
+                                              "deaths_cumulative_num",
+                                              "confirmed_admissions_covid_1d"),
                                    as_of = NULL){
   if (is.null(geo_values) || geo_values == "*"){
     geo_values <- NULL
@@ -58,9 +59,11 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
   } else {
     sig <- match.arg(signal, c("confirmed_incidence_num", 
                                "deaths_incidence_num",
-                               "deaths_cumulative_num"), TRUE)
-    cd <- ifelse(substr(sig, 1, 1)=="c", "case", "death")
-    ic <- ifelse(str_extract(sig,"(?<=_)[ci]") == "c", "cum", "inc")
+                               "deaths_cumulative_num",
+                               "confirmed_admissions_covid_1d"), TRUE)
+    cd <- ifelse(startsWith(sig, "deaths"), "death",
+                 ifelse(sig == "confirmed_incidence_num", "case", "hosp"))
+    ic <- ifelse(str_detect(sig, "cum"), "cum", "inc")
     incidence_period <- match.arg(incidence_period, c("epiweek","day"))
     dw <- ifelse(incidence_period == "epiweek", "wk", "day")
     targets <- paste(dw, "ahead", ic, cd)
@@ -109,36 +112,18 @@ get_zoltar_predictions <- function(forecaster_names = NULL,
     select(.data$model, .data$timezero, .data$unit, 
                   .data$target, .data$quantile, .data$value) %>%
     rename(forecaster = .data$model, forecast_date = .data$timezero,
-           geo_value = .data$unit) %>%
-    separate(.data$target,
-             into = c("ahead", "incidence_period", NA, "inc", "response"),
-             remove = TRUE) %>%
-    mutate(incidence_period = if_else(
-      .data$incidence_period == "wk", "epiweek","day"),
-      ahead = as.numeric(.data$ahead),
-      inc = if_else(.data$inc == "inc", "incidence", "cumulative"),
-      response = case_when(.data$response == "death" ~ "deaths", 
-                           .data$response == "case" ~ "confirmed",
-                           TRUE ~ "drop",),
-      signal = paste(.data$response, .data$inc, "num", sep="_"),
-      data_source = if_else(.data$response == "drop", "drop", "jhu-csse"),
-      forecast_date = lubridate::ymd(.data$forecast_date),
+           location = .data$unit) %>%
+    process_target(remove = TRUE) %>% 
+    mutate(forecast_date = lubridate::ymd(.data$forecast_date),
       target_end_date = .data$forecast_date + .data$ahead)
   epw <- forecasts$incidence_period == "epiweek"
   forecasts$target_end_date[epw] <- get_target_period(
     forecasts$forecast_date[epw], "epiweek", forecasts$ahead[epw])$end
   
   forecasts <- forecasts %>%
-    filter(.data$response != "hosp") %>%
-    select(.data$ahead, .data$geo_value, .data$quantile, .data$value,
-                  .data$forecaster, .data$forecast_date, .data$data_source,
-                  .data$signal, .data$target_end_date, 
-                  .data$incidence_period) %>%
-    mutate(geo_value = if_else(
-      nchar(.data$geo_value) == 2,
-      fips_2_abbr(.data$geo_value),
-      tolower(.data$geo_value)))
-  
+    filter(.data$response != "drop") %>%
+    select_pcard_cols() %>%
+    location_2_geo_value(default_process_fn = tolower)
   if (is.null(signal) && !is.null(ahead)) {
     forecasts <- filter(forecasts, .data$ahead %in% !!ahead)
   }

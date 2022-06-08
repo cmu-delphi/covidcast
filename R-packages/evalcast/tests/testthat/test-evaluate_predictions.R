@@ -46,13 +46,16 @@ test_that("evaluate_covid_predictions evaluates against downloaded data", {
                            data_source = "source",
                            signal = "signal",
                            geo_type = "state",
-                           geo_values = c("al", "wy")),
+                           geo_values = c("al", "wy"),
+                           offline_signal_dir = NULL),
                       list(start_day = as.Date("2020-01-12"),
                            end_day = as.Date("2020-01-18"),
                            data_source = "source",
                            signal = "signal",
                            geo_type = "state",
-                           geo_values = c("al", "wy"))))
+                           geo_values = c("al", "wy"),
+                           offline_signal_dir = NULL
+                           )))
 
     expect_equal(colnames(score_card),
                   c("ahead", "geo_value", "forecaster", "forecast_date", "data_source", "signal",

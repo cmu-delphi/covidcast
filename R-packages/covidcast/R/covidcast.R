@@ -40,10 +40,10 @@
 NULL
 
 # API base url
-COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/api.php'
+COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/'
 
 # Max rows returned by API
-MAX_RESULTS <- 3649
+MAX_RESULTS <- 1000000
 
 .onAttach <- function(libname, pkgname) {
   msg <- c("We encourage COVIDcast API users to register on our mailing list:",
@@ -613,9 +613,7 @@ covidcast_signals <- function(data_source, signal,
 #' @importFrom utils read.csv
 #' @export
 covidcast_meta <- function() {
-  meta <- .request(
-    list(source = "covidcast_meta",
-         format = "csv"))
+  meta <- .request("covidcast_meta", list(format = "csv"))
 
   if (nchar(meta) == 0) {
     abort("Failed to obtain metadata", class = "covidcast_meta_fetch_failed")
@@ -750,7 +748,7 @@ specific_meta <- function(data_source, signal, geo_type, time_type = "day") {
 # each batch and combines the resutls.
 covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
                            geo_value, time_type, as_of, issues, lag,
-                           max_geos = MAX_RESULTS) {
+                           max_geos) {
   days <- date_sequence(start_day, end_day, time_type)
   ndays <- length(days)
 
@@ -761,9 +759,11 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
     nissues <- 1
   }
 
+  max_results <- getOption("covidcast.max_results", default = MAX_RESULTS)
+
   # Theoretically, each geo_value could have data issued each day. Likely
   # overestimates when handling multiple issue dates, resulting in more batches.
-  max_days_at_time <- floor(MAX_RESULTS / (max_geos * nissues))
+  max_days_at_time <- floor(max_results / (max_geos * nissues))
 
   # In theory, we could exceed max rows with 1 day, but try anyway
   if (max_days_at_time == 0) {
@@ -916,7 +916,6 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
 
   # Set up request
   params <- list(
-    source = "covidcast",
     data_source = data_source,
     signal = signal,
     time_type = time_type,
@@ -954,7 +953,7 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   # Make the API call. If the API returns a non-200 status code, indicating e.g.
   # a database error, .request() raises an error. It returns an empty string if
   # there are no results for our query.
-  response <- .request(params)
+  response <- .request("covidcast", params)
   if (nchar(response) == 0) {
     # empty if no results
     return(NULL)
@@ -985,16 +984,17 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
 }
 
 # Helper function to request and parse epidata
-.request <- function(params) {
+.request <- function(endpoint, params) {
   # API call. Allow base API URL to be replaced, e.g. to use a staging/testing
   # server when needed.
-  response <- httr::GET(
-    getOption("covidcast.base_url", default = COVIDCAST_BASE_URL),
-    httr::user_agent("covidcastR"), query = params)
-  if (httr::status_code(response) == 414){
-    response <- httr::POST(getOption("covidcast.base_url",
-                           default = COVIDCAST_BASE_URL),
-                           httr::user_agent("covidcastR"),
+  url <- paste0(getOption("covidcast.base_url", default = COVIDCAST_BASE_URL),
+                endpoint, "/")
+  response <- httr::GET(url, httr::user_agent("covidcastR"), query = params)
+
+  # Query URL can be too long if lots of time values or geo values are involved;
+  # switch to POST
+  if (httr::status_code(response) == 414) {
+    response <- httr::POST(url, httr::user_agent("covidcastR"),
                            body = params)
   }
 

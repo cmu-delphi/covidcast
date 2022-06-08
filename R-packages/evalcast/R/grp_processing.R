@@ -1,3 +1,4 @@
+#' @importFrom tidyr pivot_longer
 grp_processing_for_facets <- function(cards, 
                                       grp_vars, 
                                       grp_limit = NULL, 

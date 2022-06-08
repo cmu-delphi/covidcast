@@ -9,6 +9,8 @@
 #' @param remove 	If TRUE, remove input `target` column from output data frame.
 #'   See `dplyr::separate`.
 #'
+#' @importFrom tidyr separate
+#'
 #' @return predictions dataframe with new `ahead`, `incidence_period`, `inc`,
 #'   `response`, `data_source`, and `signal` fields
 process_target <- function(predictions,

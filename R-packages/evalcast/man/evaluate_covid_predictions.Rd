@@ -9,7 +9,8 @@ evaluate_covid_predictions(
   err_measures = list(wis = weighted_interval_score, ae = absolute_error, coverage_80 =
     interval_coverage(coverage = 0.8)),
   backfill_buffer = 0,
-  geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation")
+  geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation"),
+  offline_signal_dir = NULL
 )
 }
 \arguments{
@@ -30,6 +31,9 @@ enough to be taken as correct? See details for more.}
 \item{geo_type}{String indicating geographical type, such as "county", or
 "state". See the \href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}{COVIDcast Geographic Coding documentation}
 for available options.}
+
+\item{offline_signal_dir}{a path to a directory where to cache downloaded data.
+Data not cached if NULL.}
 }
 \value{
 tibble of "score cards". Contains the same information as the

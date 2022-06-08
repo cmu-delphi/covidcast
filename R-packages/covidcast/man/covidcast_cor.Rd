@@ -17,12 +17,12 @@ covidcast_cor(
 \arguments{
 \item{x, y}{The \code{covidcast_signal} data frames to correlate.}
 
-\item{dt_x, dt_y}{Time shifts to consider for \code{x} and \code{y}, respectively,
-before computing correlations. Negative shifts translate into in a lag
-value and positive shifts into a lead value; for example, if \code{dt = -1},
-then the new value on June 2 is the original value on June 1; if \code{dt = 1},
-then the new value on June 2 is the original value on June 3; if \code{dt = 0},
-then the values are left as is. Default is 0 for both \code{dt_x} and \code{dt_y}.}
+\item{dt_x, dt_y}{Time shifts (in days) to consider for \code{x} and \code{y},
+respectively, before computing correlations. Default is 0. Negative shifts
+translate into in a lag value and positive shifts into a lead value; for
+example, setting \code{dt_y = 2} results in values of \code{y} being shifted earlier
+(leading) by 2 days before correlation, so values of \code{x} are correlated
+with values of \code{y} from two days later.}
 
 \item{by}{If "geo_value", then correlations are computed for each geo
 location, over all time. Each correlation is measured between two time
@@ -35,12 +35,38 @@ default for \code{use} (different than \code{cor()}) and "pearson" the default f
 \code{method} (same as \code{cor()}).}
 }
 \value{
-A data frame with first column \code{geo_value} or \code{time_value} (depending
-on \code{by}), and second column \code{value}, which gives the correlation.
+A data frame with first column \code{geo_value} or \code{time_value} (matching
+\code{by}), and second column \code{value}, which gives the correlation.
 }
 \description{
 Computes correlations between two \code{covidcast_signal} data frames, allowing
 for slicing by geo location, or by time. (Only the latest issue from each
 data frame is used for correlations.) See the correlations vignette
-for examples: \code{vignette("correlation-utils", package = "covidcast")}
+for examples: \code{vignette("correlation-utils", package = "covidcast")}.
+}
+\examples{
+\dontrun{
+# For all these examples, let x and y be two signals measured at the county
+# level over several months.
+
+## `by = "geo_value"`
+# Correlate each county's time series together, returning one correlation per
+# county:
+covidcast_cor(x, y, by = "geo_value")
+
+# Correlate x in each county with values of y 14 days later
+covidcast_cor(x, y, dt_y = 14, by = "geo_value")
+
+# Equivalently, x can be shifted -14 days:
+covidcast_cor(x, y, dt_x = -14, by = "geo_value")
+
+## `by = "time_value"`
+# For each date, correlate x's values in every county against y's values in
+# the same counties. Returns one correlation per date:
+covidcast_cor(x, y, by = "time_value")
+
+# Correlate x values across counties against y values 7 days later
+covidcast_cor(x, y, dt_y = 7, by = "time_value")
+}
+
 }

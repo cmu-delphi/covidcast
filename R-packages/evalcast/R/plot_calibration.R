@@ -48,6 +48,8 @@ plot_calibration <- function(predictions_cards,
 #'
 #' @param calib the output from [compute_calibration()]
 #'
+#' @importFrom tidyr pivot_longer
+#' 
 #' @return a data frame
 #' @export
 setup_wedgeplot <- function(calib) {

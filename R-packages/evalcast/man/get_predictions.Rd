@@ -13,7 +13,11 @@ get_predictions(
   apply_corrections = function(signals) signals,
   response_data_source = signals$data_source[1],
   response_data_signal = signals$signal[1],
-  forecaster_args = list()
+  forecaster_args = list(),
+  parallel_execution = TRUE,
+  additional_mclapply_args = list(),
+  honest_as_of = TRUE,
+  offline_signal_dir = NULL
 )
 }
 \arguments{
@@ -102,6 +106,24 @@ same as the \code{signal} in the first row in the \code{signals} tibble.}
 to \code{forecaster()}. A common use case would be to pass the period ahead
 (e.g. predict 1 day, 2 days, ..., k days ahead). Note that \code{ahead} is a
 required component of the forecaster output (see above).}
+
+\item{parallel_execution}{TRUE, FALSE, or a single positive integer. If TRUE,
+uses bettermc::mclapply to execute each forecast date prediction in
+parallel on max number of cores - 1. If FALSE, the code is run on a single
+core. If integer, runs in parallel on that many cores, clipping to the max
+number of detected cores if a greater number is requested.}
+
+\item{additional_mclapply_args}{a named list of additional arguments to pass
+to \code{\link[bettermc:mclapply]{bettermc::mclapply}} (besides \code{X}, \code{FUN}, and
+\code{mc.cores}.)}
+
+\item{honest_as_of}{a boolean that, if true, ensures that the forecast_day, end_day,
+and as_of are all equal when downloading data. Otherwise, as_of is allowed to be freely
+set (and defaults to current date if not presented).}
+
+\item{offline_signal_dir}{the directory that stores the cached data for each
+(signal, forecast day) pair. If this is null, no caching is done and the data is
+downloaded from covidcast.}
 }
 \value{
 Long data frame of forecasts with a class of \code{predictions_cards}.
@@ -126,11 +148,11 @@ predictions made using the information as of September 14).
 baby_predictions = get_predictions(
   baseline_forecaster, "baby",
   tibble::tibble(
-    data_source="jhu-csse",
-    signal ="deaths_incidence_num",
-    start_day="2020-08-15",
+    data_source = "jhu-csse",
+    signal = "deaths_incidence_num",
+    start_day = "2020-08-15",
     geo_values = "mi",
-    geo_type = "state"), 
+    geo_type = "state"),
   forecast_dates = "2020-10-01",
   incidence_period = "epiweek",
   forecaster_args = list(

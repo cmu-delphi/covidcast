@@ -1,26 +1,26 @@
 #' Plot predictions along with truth
 #'
-#' @param predictions_cards long data frame of forecasts with a class of 
-#'   `predictions_cards` as created by [get_predictions()] or 
+#' @param predictions_cards long data frame of forecasts with a class of
+#'   `predictions_cards` as created by [get_predictions()] or
 #'   [get_zoltar_predictions()] or [get_covidhub_predictions()].
 #'   The first 4 columns are the same as those returned by the forecaster. The
-#'   remainder specify the prediction task, 10 columns in total: 
+#'   remainder specify the prediction task, 10 columns in total:
 #'   `ahead`, `geo_value`, `quantile`, `value`, `forecaster`, `forecast_date`,
 #'   `data_source`, `signal`, `target_end_date`, and `incidence_period`. Here
 #'   `data_source` and `signal` correspond to the response variable only.
 #' @template geo_type-template
-#' @param intervals vector of confidence intervals to show. More than 3 is ugly 
+#' @param intervals vector of confidence intervals to show. More than 3 is ugly
 #'   and will be reduced to the default set.
-#' @param plot_it should we actually produce the figure. If you have many 
+#' @param plot_it should we actually produce the figure. If you have many
 #'   geo_values or forecasters, best not to. Then you can assign the output
 #'   to an object and facet or apply aesthetic specifications to meet your
 #'   own standards.
-#' @param show_geo_value a subset of `geo_values` in your `predictions_cards`. 
-#'   Default uses all available. If you only want to see some, this may speed 
+#' @param show_geo_value a subset of `geo_values` in your `predictions_cards`.
+#'   Default uses all available. If you only want to see some, this may speed
 #'   up the call.
-#' @param show_forecaster a subset of `forecasters` in your `predictions_cards`. 
-#'   Default uses all available. If you only want to see some, this may speed 
-#'   up the call. 
+#' @param show_forecaster a subset of `forecasters` in your `predictions_cards`.
+#'   Default uses all available. If you only want to see some, this may speed
+#'   up the call.
 #' @param side_truth optional. Use your own truth data rather than downloading
 #'   with [covidcast::covidcast_signal()]. Must contain columns `geo_value`,
 #'   `value` and `target_end_date`
@@ -70,45 +70,45 @@ plot_trajectory <- function(predictions_cards,
     warning("More than 3 intervals are difficult to see. Resetting to default.")
     intervals = c(.5, .8, .95)
   }
-  pd <- setup_plot_trajectory(predictions_cards, intervals, side_truth, 
+  pd <- setup_plot_trajectory(predictions_cards, intervals, side_truth,
                               geo_type, ...)
-  
+
   g <- ggplot(pd$truth_df, mapping = aes(x = .data$target_end_date))
-  
-  if (show_quantiles && !is.null(pd$quantiles_df)){
+
+  if (show_quantiles && !"quantiles_df" %in% names(pd)) {
     n_quantiles = nlevels(pd$quantiles_df$interval)
     l_quantiles = levels(pd$quantiles_df$interval)
     alp = c(.4, .2, .1)
     for (qq in n_quantiles:1) {
-      g <- g + 
+      g <- g +
         geom_ribbon(data = pd$quantiles_df %>%
                       filter(.data$interval == l_quantiles[qq]),
-                    mapping = aes(ymin = .data$lower, 
+                    mapping = aes(ymin = .data$lower,
                                   ymax = .data$upper,
                                   group = interaction(.data$forecast_date, .data$forecaster),
                                   fill = .data$forecaster),
-                    alpha = alp[qq]) 
+                    alpha = alp[qq])
     }
   }
-    
+
   g <- g +
     geom_line(aes(y = .data$value)) +
-    geom_line(data = pd$points_df, 
-              mapping = aes(y = .data$value, 
+    geom_line(data = pd$points_df,
+              mapping = aes(y = .data$value,
                             group = interaction(.data$forecast_date, .data$forecaster),
                             color = .data$forecaster))
   if (show_points) {
-    g <- g + 
+    g <- g +
       geom_point(aes(y = .data$value)) +
-      geom_point(data = pd$points_df, 
-                 mapping = aes(y = .data$value, 
+      geom_point(data = pd$points_df,
+                 mapping = aes(y = .data$value,
                                group = interaction(.data$forecast_date, .data$forecaster),
                                color = .data$forecaster))
   }
-  
+
   if (plot_it) {
     gp <- g + theme_bw() + scale_fill_viridis_d() + scale_color_viridis_d()
-    if (show_quantiles && !is.null(pd$quantiles_df) && 
+    if (show_quantiles && !"quantiles_df" %in% names(pd) &&
         nlevels(pd$quantiles_df$forecaster > 1)) {
       gp + facet_grid(.data$forecaster ~ .data$geo_value, scales = "free_y")
     } else {
@@ -121,6 +121,7 @@ plot_trajectory <- function(predictions_cards,
   }
 }
 
+#' @importFrom tidyr pivot_wider
 setup_plot_trajectory <- function(predictions_cards,
                                   intervals = c(.5, .8, .95),
                                   side_truth = NULL,
@@ -133,8 +134,8 @@ setup_plot_trajectory <- function(predictions_cards,
   ## add check that incidence period and geo_type are all the same, default to
   ## the first otherwise
   if (is.null(side_truth)) {
-    if (is.null(args$geo_values)) { # what do we download
-      geo_values <- unique(predictions_cards$geo_value) 
+    if ("geo_values" %in% names(args)) { # what do we download
+      geo_values <- unique(predictions_cards$geo_value)
     } else {
       geo_values <- args$geo_values
     }
@@ -143,7 +144,7 @@ setup_plot_trajectory <- function(predictions_cards,
     } else {
       args$geo_values <- geo_values
     }
-    if (is.null(args$data_source)) {
+    if ("data_source" %in% names(args)) {
       args$data_source <- predictions_cards$data_source[1]
       args$signal <- predictions_cards$signal[1]
     }
@@ -165,27 +166,27 @@ setup_plot_trajectory <- function(predictions_cards,
   } else { # side_truth is provided
     stopifnot(c("geo_value", "time_value", "value") %in% names(side_truth))
     truth_data <- side_truth %>%
-      dplyr::select(.data$geo_value, .data$time_value, .data$value) 
+      dplyr::select(.data$geo_value, .data$time_value, .data$value)
     if (ip == "epiweek") {
       truth_data <- handle_epiweek(truth_data)
     } else {
-      truth_data <- truth_data %>% 
+      truth_data <- truth_data %>%
         dplyr::rename(target_end_date = .data$time_value)
     }
   }
-  
+
   ## Now we process the predictions_cards
   predictions_cards <- predictions_cards %>%
-    dplyr::select(.data$geo_value, .data$quantile, 
+    dplyr::select(.data$geo_value, .data$quantile,
                   .data$value, .data$forecaster, .data$forecast_date,
                   .data$target_end_date)
-  
-  lower_bounds <- predictions_cards %>% 
+
+  lower_bounds <- predictions_cards %>%
     select(.data$quantile) %>%
     filter(.data$quantile < 0.5) %>%
     unique() %>%
     pull()
-  
+
   # if quantile forecasts are not available, work with point forecasts only
   if (length(lower_bounds) < 1){
     intervals <- NULL
@@ -195,7 +196,7 @@ setup_plot_trajectory <- function(predictions_cards,
       intervals <- NULL
     }
   }
-  
+
   if (is.null(intervals)) {
     quantiles_df <- NULL
   } else {
@@ -212,9 +213,9 @@ setup_plot_trajectory <- function(predictions_cards,
       select(-.data$quantile, -.data$alp) %>%
       pivot_wider(names_from = "endpoint_type", values_from = "value")
   }
-  
+
   points_df <- predictions_cards %>%
-    filter(as.integer(round(.data$quantile*1000)) == 500L | 
+    filter(as.integer(round(.data$quantile*1000)) == 500L |
              is.na(.data$quantile))
   if (any(is.na(points_df$quantile))) {
     points_df <- points_df %>%
@@ -225,9 +226,10 @@ setup_plot_trajectory <- function(predictions_cards,
     points_df <- points_df %>%
       select(-.data$quantile)
   }
-  
-  list(truth_df = truth_data, 
-       points_df = points_df, 
+
+  if(!is.null(side_truth)) truth_data <- side_truth
+  list(truth_df = truth_data,
+       points_df = points_df,
        quantiles_df = quantiles_df)
 }
 
@@ -238,9 +240,9 @@ handle_epiweek <- function(truth_data) {
                 "available truth data should span at least",
                 "2 weeks."))
   truth_data <- truth_data %>%
-    filter(.data$time_value >= 
+    filter(.data$time_value >=
              shift_day_to_following_xxxday(min(.data$time_value), 1),
-           .data$time_value <= 
+           .data$time_value <=
              shift_day_to_preceding_xxxday(max(.data$time_value), 7)) %>%
     dplyr::select(.data$geo_value, .data$time_value, .data$value) %>%
     sum_to_epiweek() %>%

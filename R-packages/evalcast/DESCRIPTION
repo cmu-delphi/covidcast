@@ -1,13 +1,13 @@
 Package: evalcast
 Type: Package
 Title: Tools For Evaluating COVID Forecasters
-Version: 0.3.0
-Authors@R: 
+Version: 0.3.1
+Authors@R:
   c(
-		person(given = "Daniel",
-			     family = "McDonald",
-			     role = c("aut", "cre"),
-			     email = "daniel@stat.ubc.ca"),
+    person(given = "Daniel",
+           family = "McDonald",
+           role = c("aut", "cre"),
+           email = "daniel@stat.ubc.ca"),
     person(given = "Jacob",
            family = "Bien",
            role = "aut"),
@@ -36,7 +36,7 @@ Authors@R:
            family = "Tibshirani",
            role = "aut"))
 URL: https://cmu-delphi.github.io/covidcast/evalcastR/,
-  https://github.com/cmu-delphi/covidcast 
+  https://github.com/cmu-delphi/covidcast
 BugReports: https://github.com/cmu-delphi/covidcast/issues
 Description: Tools for evaluating probabilistic COVID-19 forecasters. This
     package provides functionality for accurately evaluating forecaster
@@ -54,12 +54,12 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.0
 Remotes:
   reichlab/zoltr,
   reichlab/covidHubUtils,
   epiforecasts/scoringutils
-Imports: 
+Imports:
     assertthat,
     covidcast,
     dplyr,
@@ -67,9 +67,7 @@ Imports:
     lubridate,
     purrr,
     tibble,
-    tidyr,
     stringr,
-    readr,
     MMWRweek,
     zoo,
     rlang,
@@ -80,12 +78,20 @@ Imports:
     covidHubUtils,
     forcats,
     data.table,
-    arrow
-Suggests: 
+    arrow,
+    fs,
+    plyr,
+    bettermc,
+    tidyr
+Suggests:
     testthat,
     mockr,
     mockery,
     scoringutils,
-    vdiffr
-Depends: 
+    vdiffr,
+    withr,
+    backports
+VignetteBuilder:
+    utils
+Depends:
     R (>= 3.5.0)

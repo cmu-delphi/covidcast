@@ -2,6 +2,7 @@ library(mockr)
 library(mockery)
 library(covidcast)
 library(fs)
+library(magrittr)
 
 # Create a fake result from the covidcast API as returned by the `evalcast::download_signals()`
 # function.
@@ -116,10 +117,11 @@ test_that("populate_cache calls mock_covidcast_signal appropriately", {
       data_source = c("hhs", "jhu-csse"),
       signal = c("confirmed_admissions_covid_1d", "confirmed_incidence_num"),
       start_day = c("2019-01-01", "2019-01-01"),
+      end_day = c("2022-01-01", "2022-01-01"),
       as_of = c("2022-01-01", "2022-01-01"),
       geo_type = c("state", "state")
     ), offline_signal_dir = temp_offline_signal_dir)
-  })
+  }) %>% expect_warning()
 
   expect_called(mock_covidcast_signal, 2)
   expect_equal(mock_args(mock_covidcast_signal), list(

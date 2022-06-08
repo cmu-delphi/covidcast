@@ -39,7 +39,7 @@ process_target <- function(predictions,
   predictions <- predictions %>% 
     left_join(unique_targets, by = "target")
   if (remove)
-    return(predictions %>% select(-target))
+    return(predictions %>% select(-.data$target))
   else
     return(predictions)
 }

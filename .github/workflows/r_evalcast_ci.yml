@@ -14,6 +14,11 @@ on:
   pull_request:
     branches: [ main, evalcast ]
 
+env:
+  USE_BSPM: "true"
+  _R_CHECK_FORCE_SUGGESTS_: "false"
+  R_VERSION: 3.5
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,31 +29,30 @@ jobs:
         working-directory: R-packages/evalcast/
     strategy:
       matrix:
-        r-version: [3.5]
+        include:
+          - {os: macOS-latest}
+          - {os: ubuntu-latest}
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set up R ${{ matrix.r-version }}
-        uses: r-lib/actions/setup-r@v1
-        with:
-          r-version: ${{ matrix.r-version }}
-      - name: Install linux dependencies  
+
+      # See https://eddelbuettel.github.io/r-ci/ for more info on below.
+      - name: Bootstrap
         run: |
-            sudo apt-get install libcurl4-openssl-dev
-            sudo apt-get install libudunits2-dev
-            sudo apt-get install libgdal-dev
-            sudo apt-get install libicu-dev
+          curl -OLs https://eddelbuettel.github.io/r-ci/run.sh
+          chmod 0755 run.sh
+          ./run.sh bootstrap
+
       - name: Cache R packages
         uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-r-eval-1-
-      - name: Install dependencies
-        run: |
-          install.packages(c("remotes", "rcmdcheck"))
-          remotes::install_deps(dependencies = TRUE)
-        shell: Rscript {0}
-      - name: Check
-        run: |
-          rcmdcheck::rcmdcheck(args = c("--no-manual", "--ignore-vignettes", "--as-cran"), build_args = c("--no-build-vignettes"), error_on = "error")
-        shell: Rscript {0}
+
+      - name: Dependencies
+        run: ./run.sh install_all
+
+      - name: Test
+        run: ./run.sh run_tests

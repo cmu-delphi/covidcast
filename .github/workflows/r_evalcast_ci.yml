@@ -27,13 +27,6 @@ jobs:
     defaults:
       run:
         working-directory: R-packages/evalcast/
-    strategy:
-      matrix:
-        include:
-          - {os: macOS-latest}
-          - {os: ubuntu-latest}
-
-    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v2

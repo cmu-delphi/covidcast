@@ -16,12 +16,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       USE_BSPM: "true"
       _R_CHECK_FORCE_SUGGESTS_: "false"
-      R_VERSION: 4.0
+      R_VERSION: 3.5
     defaults:
       run:
         working-directory: R-packages/evalcast/

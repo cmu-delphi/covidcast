@@ -36,12 +36,12 @@ jobs:
           chmod 0755 run.sh
           ./run.sh bootstrap
 
-      - name: Cache R packages
-        uses: actions/cache@v2
-        with:
-          path: |
-            /usr/lib/R/site-library
-          key: ${{ runner.os }}-r-${{ env.R_VERSION }}-eval-1-
+      # - name: Cache R packages
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: |
+      #       /usr/lib/R/site-library
+      #     key: ${{ runner.os }}-r-${{ env.R_VERSION }}-eval-1-
 
       - name: Dependencies
         run: ./run.sh install_all

@@ -14,16 +14,14 @@ on:
   pull_request:
     branches: [ main, evalcast ]
 
-env:
-  USE_BSPM: "true"
-  _R_CHECK_FORCE_SUGGESTS_: "false"
-  R_VERSION: 4.0
-
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      USE_BSPM: "true"
+      _R_CHECK_FORCE_SUGGESTS_: "false"
+      R_VERSION: 4.0
     defaults:
       run:
         working-directory: R-packages/evalcast/
@@ -34,9 +32,15 @@ jobs:
       # See https://eddelbuettel.github.io/r-ci/ for more info on below.
       - name: Bootstrap
         run: |
-          curl -OLs https://eddelbuettel.github.io/r-ci/run.sh
+          curl -OLs https://eddelbuettel.github.io/r-ci/
           chmod 0755 run.sh
           ./run.sh bootstrap
+
+      - name: Cache R packages
+        uses: actions/cache@v2
+        with:
+          path: /usr/lib/R/site-library
+          key: ${{ runner.os }}-r-${{ env.R_VERSION }}-eval-1-
 
       - name: Dependencies
         run: ./run.sh install_all

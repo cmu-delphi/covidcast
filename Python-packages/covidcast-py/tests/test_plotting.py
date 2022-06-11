@@ -3,6 +3,7 @@ from datetime import date
 from unittest.mock import patch
 
 import matplotlib
+from matplotlib import pyplot as plt
 import platform
 import geopandas as gpd
 import numpy as np
@@ -49,21 +50,22 @@ def test_plot(mock_metadata):
     test_county["value"] = test_county.value.astype("float")
 
     # w/o megacounties
-    no_mega_fig1 = plotting.plot(test_county,
-                                 time_value=date(2020, 8, 4),
-                                 combine_megacounties=False)
+    plotting.plot(test_county, time_value=date(2020, 8, 4), combine_megacounties=False)
+    no_mega_fig1 = plt.gcf()
     # give margin of +-2 for floating point errors and weird variations (1 isn't consistent)
     assert np.allclose(_convert_to_array(no_mega_fig1), expected["no_mega_1"], atol=2, rtol=0)
 
-    no_mega_fig2 = plotting.plot_choropleth(test_county,
-                                            cmap="viridis",
-                                            figsize=(5, 5),
-                                            edgecolor="0.8",
-                                            combine_megacounties=False)
+    plotting.plot_choropleth(test_county,
+                             cmap="viridis",
+                             figsize=(5, 5),
+                             edgecolor="0.8",
+                             combine_megacounties=False)
+    no_mega_fig2 = plt.gcf()
     assert np.allclose(_convert_to_array(no_mega_fig2), expected["no_mega_2"], atol=2, rtol=0)
 
     # w/ megacounties
-    mega_fig = plotting.plot_choropleth(test_county, time_value=date(2020, 8, 4))
+    plotting.plot_choropleth(test_county, time_value=date(2020, 8, 4))
+    mega_fig = plt.gcf()
     # give margin of +-2 for floating point errors and weird variations (1 isn't consistent)
     assert np.allclose(_convert_to_array(mega_fig), expected["mega"], atol=2, rtol=0)
 
@@ -72,7 +74,8 @@ def test_plot(mock_metadata):
         os.path.join(CURRENT_PATH, "reference_data/test_input_state_signal.csv"), dtype=str)
     test_state["time_value"] = test_state.time_value.astype("datetime64[D]")
     test_state["value"] = test_state.value.astype("float")
-    state_fig = plotting.plot(test_state)
+    plotting.plot(test_state)
+    state_fig = plt.gcf()
     assert np.allclose(_convert_to_array(state_fig), expected["state"], atol=2, rtol=0)
 
     # test MSA
@@ -80,12 +83,13 @@ def test_plot(mock_metadata):
         os.path.join(CURRENT_PATH, "reference_data/test_input_msa_signal.csv"), dtype=str)
     test_msa["time_value"] = test_msa.time_value.astype("datetime64[D]")
     test_msa["value"] = test_msa.value.astype("float")
-    msa_fig = plotting.plot(test_msa)
+    plotting.plot(test_msa)
+    msa_fig = plt.gcf()
     assert np.allclose(_convert_to_array(msa_fig), expected["msa"], atol=2, rtol=0)
 
     # test bubble
-    msa_bubble_fig = plotting.plot(test_msa, plot_type="bubble")
-    from matplotlib import pyplot as plt
+    plotting.plot(test_msa, plot_type="bubble")
+    msa_bubble_fig = plt.gcf()
     assert np.allclose(_convert_to_array(msa_bubble_fig), expected["msa_bubble"], atol=2, rtol=0)
 
 

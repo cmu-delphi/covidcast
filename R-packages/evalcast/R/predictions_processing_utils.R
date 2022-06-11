@@ -15,10 +15,11 @@
 #'   `response`, `data_source`, and `signal` fields
 process_target <- function(predictions,
                            remove) {
-  predictions %>%
+  unique_targets <- predictions %>%
+    distinct(.data$target) %>% 
     separate(.data$target,
              into = c("ahead", "incidence_period", NA, "inc", "response"),
-             remove = remove, sep = " ") %>%
+             remove = FALSE, sep = " ") %>%
     mutate(incidence_period = if_else(
       .data$incidence_period == "wk", "epiweek","day"),
       inc = if_else(.data$inc == "inc", "incidence", "cumulative"),
@@ -35,6 +36,12 @@ process_target <- function(predictions,
         .data$data_source == "hhs" & .data$inc == "incidence" ~ "confirmed_admissions_covid_1d",
         TRUE ~ "drop"),
       ahead = as.integer(.data$ahead))
+  predictions <- predictions %>% 
+    left_join(unique_targets, by = "target")
+  if (remove)
+    return(predictions %>% select(-.data$target))
+  else
+    return(predictions)
 }
 
 #' Drop irrelevant predictions

@@ -152,7 +152,7 @@ get_forecast_dates <- function(forecasters,
   forecaster_dates <- vector("list", length = length(forecasters))
   for (i in seq_len(length(forecasters))) {
     forecaster_dates[[i]] <- tryCatch({
-      lubridate::as_date(get_covidhub_forecast_dates(forecasters[i]))
+      lubridate::as_date(get_zoltar_forecast_dates(forecasters[i]))
     },
     error = function(e) cat(sprintf("%i. %s\n", i, e$message))
     )
@@ -228,7 +228,7 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
   url <- "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed"
   pcards <- list()
   if (is.null(forecast_dates))
-    forecast_dates <- get_covidhub_forecast_dates(covidhub_forecaster_name)
+    forecast_dates <- get_zoltar_forecast_dates(covidhub_forecaster_name)
   forecast_dates <- as.character(forecast_dates)
   for (forecast_date in forecast_dates) {
     filename <- sprintf("%s/%s/%s-%s.csv",
@@ -316,7 +316,7 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
 ) {
   url <- "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed"
   if (is.null(forecast_dates))
-    forecast_dates <- get_covidhub_forecast_dates(covidhub_forecaster_name)
+    forecast_dates <- get_zoltar_forecast_dates(covidhub_forecaster_name)
   forecast_dates <- as.character(forecast_dates)
   # Download files to disk first
   # File layout is data/<covidhub_forecaster_name>/<forecast_date>/data.csv

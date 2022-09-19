@@ -596,7 +596,7 @@ plot_bubble <- function(x, time_value = NULL, include = c(), range = NULL,
   given_time_value <- time_value
   df <- x %>%
     dplyr::filter(.data$time_value == given_time_value) %>%
-    dplyr::select(val = .data$value, geo = .data$geo_value)
+    dplyr::select(val = "value", geo = "geo_value")
   val <- df$val
   geo <- df$geo
   names(val) <- geo
@@ -762,7 +762,7 @@ plot_line <- function(x, range = NULL, title = NULL, params = list()) {
 
   # Grab the values
   df <- x %>% dplyr::select(
-    .data$value, .data$time_value, .data$geo_value, .data$stderr
+    "value", "time_value", "geo_value", "stderr"
   )
 
   # Set the range, if we need to

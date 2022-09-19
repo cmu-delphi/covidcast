@@ -780,7 +780,8 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
     query_start_day <- start_day + start_offset
     query_end_day <- start_day + end_offset
 
-    time_values <- days[(start_offset + 1):(end_offset + 1)]
+    # Use range calls where possible for speed.
+    time_values <- paste0(days[(start_offset + 1)], "-", days[(end_offset + 1)])
     response <- covidcast(data_source = data_source,
                           signal = signal,
                           time_type = time_type,

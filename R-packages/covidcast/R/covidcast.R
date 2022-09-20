@@ -780,6 +780,9 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
     query_start_day <- start_day + start_offset
     query_end_day <- start_day + end_offset
 
+    # Expected number of unique dates fetched, to check against later
+    num_time_values <- length(days[(start_offset + 1):(end_offset + 1)])
+
     # Use range calls where possible for speed.
     time_values <- paste0(days[(start_offset + 1)], "-", days[(end_offset + 1)])
     response <- covidcast(data_source = data_source,
@@ -828,7 +831,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
         dplyr::summarize(geo_value = list(geo_value))
       returned_time_values <- returned_geo_array$time_value
 
-      if (length(returned_time_values) != length(time_values)) {
+      if (length(returned_time_values) != num_time_values) {
         missing_time_values <- setdiff(time_values, returned_time_values)
         missing_dates <- api_to_date(missing_time_values, time_type)
 

@@ -81,7 +81,7 @@ apply_shifts_one <- function(x, dt) {
   }
 
   # Remove value column, restore attributes, and return
-  x <- dplyr::select(x, -.data$value)
+  x <- dplyr::select(x, -"value")
   attributes(x) <- c(attributes(x), attrs)
   return(x)
 }
@@ -210,7 +210,7 @@ aggregate_signals <- function(x, dt = NULL, format = c("wide", "long")) {
         dplyr::rename_with(~ paste0(.x, ":", src, "_", sig),
                            dplyr::starts_with("value")) %>%
         dplyr::select(
-          .data$geo_value, .data$time_value, dplyr::starts_with("value")
+          "geo_value", "time_value", dplyr::starts_with("value")
         )
     }
 
@@ -288,11 +288,10 @@ covidcast_longer <- function(x) {
                     sep = "_", extra = "merge")
 
   # Now add dt column, and reorder columns a bit
-  x <- x %>% dplyr::mutate(dt = as.numeric(sub("value", "", .data$dt))) %>%
-    dplyr::relocate(
-      .data$data_source, .data$signal, .data$geo_value, .data$time_value
-    ) %>%
-    dplyr::relocate(.data$dt, .before = .data$value)
+  x <- x %>%
+    dplyr::mutate(dt = as.numeric(sub("value", "", .data$dt))) %>%
+    dplyr::relocate("data_source", "signal", "geo_value", "time_value") %>%
+    dplyr::relocate("dt", .before = "value")
 
   # Change class and return
   class(x) <- c("covidcast_signal_long", "data.frame")
@@ -311,8 +310,8 @@ covidcast_wider <- function(x) {
   metadata <- attributes(x)$metadata
 
   # Select only essential columns
-  x <- dplyr::select(x, .data$geo_value, .data$time_value, .data$data_source,
-                     .data$signal, .data$dt, .data$value)
+  x <- dplyr::select(x, "geo_value", "time_value", "data_source",
+                     "signal", "dt", "value")
 
   # Renamer function (bit ugly)
   renamer <- Vectorize(function(name) {

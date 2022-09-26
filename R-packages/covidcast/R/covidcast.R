@@ -422,8 +422,7 @@ as.covidcast_signal.data.frame <- function(x,
 
   # Reorder data_source, signal, geo_value, time_value, so that they appear in
   # this order.
-  x <- dplyr::relocate(x, .data$data_source, .data$signal, .data$geo_value,
-                       .data$time_value)
+  x <- dplyr::relocate(x, "data_source", "signal", "geo_value", "time_value")
 
   attributes(x)$metadata <- metadata
 
@@ -822,7 +821,7 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
       desired_geos <- tolower(unique(geo_value))
 
       returned_geo_array <- response %>%
-        dplyr::select(geo_value, .data$time_value) %>%
+        dplyr::select("geo_value", "time_value") %>%
         dplyr::group_by(.data$time_value) %>%
         dplyr::summarize(geo_value = list(geo_value))
       returned_time_values <- returned_geo_array$time_value

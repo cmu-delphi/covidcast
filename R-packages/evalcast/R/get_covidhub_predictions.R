@@ -426,7 +426,9 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
 get_covidhub_forecast_dates <- function(forecaster_name) {
   url <- "https://github.com/reichlab/covid19-forecast-hub/tree/master/data-processed/"
   out <- xml2::read_html(paste0(url, forecaster_name)) %>%
-    rvest::html_nodes(xpath = "//*[@id=\"js-repo-pjax-container\"]/turbo-frame/div/div/div/div[3]") %>%
+    # In main element (identified by id), look for a `grid` object that has `row` children.
+    # Avoid using the full xpath due to fragility.
+    rvest::html_nodes(xpath = "//*[@id=\"js-repo-pjax-container\"]//div[@role=\"grid\" and .//@role=\"row\"]") %>%
     rvest::html_text() %>%
     stringr::str_remove_all("\\n") %>%
     stringr::str_match_all(sprintf("(20\\d{2}-\\d{2}-\\d{2})-%s.csv",

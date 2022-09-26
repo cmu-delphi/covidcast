@@ -1,5 +1,5 @@
 pandoc: 2.14.2
-pkgdown: 1.6.1
+pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   correlation-utils: correlation-utils.html
@@ -7,5 +7,5 @@ articles:
   external-data: external-data.html
   multi-signals: multi-signals.html
   plotting-signals: plotting-signals.html
-last_built: 2021-10-22T23:52Z
+last_built: 2022-09-26T17:10Z
 

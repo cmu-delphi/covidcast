@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.3</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../articles/covidcast.html">Get started</a>
 </li>
@@ -50,7 +46,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -76,7 +72,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast">
+  <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -91,13 +87,13 @@
 
       
 
-      </header><script src="multi-signals_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>3. Manipulating multiple signals</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cmu-delphi/covidcast/blob/main/R-packages/covidcast/vignettes/multi-signals.Rmd"><code>vignettes/multi-signals.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmu-delphi/covidcast/blob/main/R-packages/covidcast/vignettes/multi-signals.Rmd" class="external-link"><code>vignettes/multi-signals.Rmd</code></a></small>
       <div class="hidden name"><code>multi-signals.Rmd</code></div>
 
     </div>
@@ -105,293 +101,293 @@
     
     
 <p>Various analyses involve working with multiple signals at once. The covidcast package provides some helper functions for fetching multiple signals from the API, and aggregating them into one data frame for various downstream uses.</p>
-<div id="fetching-multiple-signals" class="section level2">
-<h2 class="hasAnchor">
-<a href="#fetching-multiple-signals" class="anchor"></a>Fetching multiple signals</h2>
+<div class="section level2">
+<h2 id="fetching-multiple-signals">Fetching multiple signals<a class="anchor" aria-label="anchor" href="#fetching-multiple-signals"></a>
+</h2>
 <p>To load confirmed cases and deaths at the state level, in a single function call, we can use <code><a href="../reference/covidcast_signals.html">covidcast_signals()</a></code> (note the plural form of “signals”):</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/">covidcast</a></span><span class="op">)</span>
-
-<span class="va">start_day</span> <span class="op">&lt;-</span> <span class="st">"2020-06-01"</span>
-<span class="va">end_day</span> <span class="op">&lt;-</span> <span class="st">"2020-10-01"</span>
-
-<span class="va">signals</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signals.html">covidcast_signals</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"usa-facts"</span>,
-                             signal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"confirmed_incidence_num"</span>,
-                                        <span class="st">"deaths_incidence_num"</span><span class="op">)</span>,
-                             start_day <span class="op">=</span> <span class="va">start_day</span>, end_day <span class="op">=</span> <span class="va">end_day</span>,
-                             geo_type <span class="op">=</span> <span class="st">"state"</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></code></pre></div>
-<pre><code>## A `covidcast_signal` dataframe with 6273 rows and 15 columns.
-## 
-## data_source : usa-facts
-## signal      : confirmed_incidence_num
-## geo_type    : state
-## 
-## first date                          : 2020-06-01
-## last date                           : 2020-10-01
-## median number of geo_values per day : 51</code></pre>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/" class="external-link">covidcast</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">start_day</span> <span class="op">&lt;-</span> <span class="st">"2020-06-01"</span></span>
+<span><span class="va">end_day</span> <span class="op">&lt;-</span> <span class="st">"2020-10-01"</span></span>
+<span></span>
+<span><span class="va">signals</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_signals.html">covidcast_signals</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"usa-facts"</span>,</span>
+<span>                             signal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"confirmed_incidence_num"</span>,</span>
+<span>                                        <span class="st">"deaths_incidence_num"</span><span class="op">)</span>,</span>
+<span>                             start_day <span class="op">=</span> <span class="va">start_day</span>, end_day <span class="op">=</span> <span class="va">end_day</span>,</span>
+<span>                             geo_type <span class="op">=</span> <span class="st">"state"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## A `covidcast_signal` dataframe with 6273 rows and 15 columns.</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## data_source : usa-facts</span></span>
+<span><span class="co">## signal      : confirmed_incidence_num</span></span>
+<span><span class="co">## geo_type    : state</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## first date                          : 2020-06-01</span></span>
+<span><span class="co">## last date                           : 2020-10-01</span></span>
+<span><span class="co">## median number of geo_values per day : 51</span></span></code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></code></pre></div>
-<pre><code>## A `covidcast_signal` dataframe with 6273 rows and 15 columns.
-## 
-## data_source : usa-facts
-## signal      : deaths_incidence_num
-## geo_type    : state
-## 
-## first date                          : 2020-06-01
-## last date                           : 2020-10-01
-## median number of geo_values per day : 51</code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## A `covidcast_signal` dataframe with 6273 rows and 15 columns.</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## data_source : usa-facts</span></span>
+<span><span class="co">## signal      : deaths_incidence_num</span></span>
+<span><span class="co">## geo_type    : state</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## first date                          : 2020-06-01</span></span>
+<span><span class="co">## last date                           : 2020-10-01</span></span>
+<span><span class="co">## median number of geo_values per day : 51</span></span></code></pre>
 <p>This returns a list of <code>covidcast_signal</code> objects. The argument structure for <code><a href="../reference/covidcast_signals.html">covidcast_signals()</a></code> matches that of <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code>, except the first four arguments (<code>data_source</code>, <code>signal</code>, <code>start_day</code>, <code>end_day</code>) are allowed to be vectors. See the <code><a href="../reference/covidcast_signals.html">covidcast_signals()</a></code> documentation for details.</p>
 </div>
-<div id="aggregating-signals-wide-format" class="section level2">
-<h2 class="hasAnchor">
-<a href="#aggregating-signals-wide-format" class="anchor"></a>Aggregating signals, wide format</h2>
+<div class="section level2">
+<h2 id="aggregating-signals-wide-format">Aggregating signals, wide format<a class="anchor" aria-label="anchor" href="#aggregating-signals-wide-format"></a>
+</h2>
 <p>To aggregate multiple signals together, we can use the <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> function, which accepts a list of <code>covidcast_signal</code> objects, as returned by <code><a href="../reference/covidcast_signals.html">covidcast_signals()</a></code>. With all arguments set to their default values, <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> returns a data frame in “wide” format:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
-
-<span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>##   geo_value time_value value+0:usa-facts_confirmed_incidence_num
-## 1        ak 2020-06-02                                        18
-## 2        ak 2020-06-04                                         8
-## 3        ak 2020-06-05                                        15
-## 4        ak 2020-06-18                                        21
-## 5        ak 2020-06-20                                        16
-## 6        ak 2020-06-23                                        14
-##   value+0:usa-facts_deaths_incidence_num
-## 1                                      0
-## 2                                      1
-## 3                                      0
-## 4                                      0
-## 5                                      0
-## 6                                      0</code></pre>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   geo_value time_value value+0:usa-facts_confirmed_incidence_num</span></span>
+<span><span class="co">## 1        ne 2020-06-01                                       258</span></span>
+<span><span class="co">## 2        ne 2020-06-02                                       274</span></span>
+<span><span class="co">## 3        ne 2020-06-03                                       265</span></span>
+<span><span class="co">## 4        ne 2020-06-04                                       253</span></span>
+<span><span class="co">## 5        ne 2020-06-05                                       261</span></span>
+<span><span class="co">## 6        ne 2020-06-06                                       166</span></span>
+<span><span class="co">##   value+0:usa-facts_deaths_incidence_num</span></span>
+<span><span class="co">## 1                                      8</span></span>
+<span><span class="co">## 2                                      3</span></span>
+<span><span class="co">## 3                                      5</span></span>
+<span><span class="co">## 4                                      1</span></span>
+<span><span class="co">## 5                                      1</span></span>
+<span><span class="co">## 6                                      1</span></span></code></pre>
 <p>In “wide” format, only the latest issue of data is retained, and the columns <code>data_source</code>, <code>signal</code>, <code>issue</code>, <code>lag</code>, <code>stderr</code>, <code>sample_size</code> are all dropped from the returned data frame. Each unique signal—defined by a combination of data source name, signal name, and time-shift—is given its own column, whose name indicates its defining quantities.</p>
 <p>As hinted above, <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> can also apply time-shifts to the given signals, through the optional <code>dt</code> argument. This can be either be a single vector of shifts or a list of vectors of shifts, this list having the same length as the list of <code>covidcast_signal</code> objects (to apply, respectively, the same shifts or a different set of shifts to each <code>covidcast_signal</code> object). Negative shifts translate into in a <em>lag</em> value and positive shifts into a <em>lead</em> value; for example, if <code>dt = -1</code>, then the value on June 2 that gets reported is the original value on June 1; if <code>dt = 0</code>, then the values are left as is.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>##   geo_value time_value value-1:usa-facts_confirmed_incidence_num
-## 1        tx 2020-06-01                                        NA
-## 2        tx 2020-06-02                                       593
-## 3        tx 2020-06-03                                      1688
-## 4        tx 2020-06-04                                      1703
-## 5        tx 2020-06-05                                      1649
-## 6        tx 2020-06-06                                      1693
-##   value+0:usa-facts_confirmed_incidence_num
-## 1                                       593
-## 2                                      1688
-## 3                                      1703
-## 4                                      1649
-## 5                                      1693
-## 6                                      1940
-##   value-1:usa-facts_deaths_incidence_num value+0:usa-facts_deaths_incidence_num
-## 1                                     NA                                     20
-## 2                                     20                                     28
-## 3                                     28                                     31
-## 4                                     31                                     21
-## 5                                     21                                     25
-## 6                                     25                                     34</code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   geo_value time_value value-1:usa-facts_confirmed_incidence_num</span></span>
+<span><span class="co">## 1        tx 2020-06-01                                        NA</span></span>
+<span><span class="co">## 2        tx 2020-06-02                                       593</span></span>
+<span><span class="co">## 3        tx 2020-06-03                                      1688</span></span>
+<span><span class="co">## 4        tx 2020-06-04                                      1703</span></span>
+<span><span class="co">## 5        tx 2020-06-05                                      1649</span></span>
+<span><span class="co">## 6        tx 2020-06-06                                      1693</span></span>
+<span><span class="co">##   value+0:usa-facts_confirmed_incidence_num</span></span>
+<span><span class="co">## 1                                       593</span></span>
+<span><span class="co">## 2                                      1688</span></span>
+<span><span class="co">## 3                                      1703</span></span>
+<span><span class="co">## 4                                      1649</span></span>
+<span><span class="co">## 5                                      1693</span></span>
+<span><span class="co">## 6                                      1940</span></span>
+<span><span class="co">##   value-1:usa-facts_deaths_incidence_num value+0:usa-facts_deaths_incidence_num</span></span>
+<span><span class="co">## 1                                     NA                                     20</span></span>
+<span><span class="co">## 2                                     20                                     28</span></span>
+<span><span class="co">## 3                                     28                                     31</span></span>
+<span><span class="co">## 4                                     31                                     21</span></span>
+<span><span class="co">## 5                                     21                                     25</span></span>
+<span><span class="co">## 6                                     25                                     34</span></span></code></pre>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>##   geo_value time_value value+0:usa-facts_confirmed_incidence_num
-## 1        tx 2020-06-01                                       593
-## 2        tx 2020-06-02                                      1688
-## 3        tx 2020-06-03                                      1703
-## 4        tx 2020-06-04                                      1649
-## 5        tx 2020-06-05                                      1693
-## 6        tx 2020-06-06                                      1940
-##   value-1:usa-facts_deaths_incidence_num value+0:usa-facts_deaths_incidence_num
-## 1                                     NA                                     20
-## 2                                     20                                     28
-## 3                                     28                                     31
-## 4                                     31                                     21
-## 5                                     21                                     25
-## 6                                     25                                     34
-##   value+1:usa-facts_deaths_incidence_num
-## 1                                     28
-## 2                                     31
-## 3                                     21
-## 4                                     25
-## 5                                     34
-## 6                                     18</code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   geo_value time_value value+0:usa-facts_confirmed_incidence_num</span></span>
+<span><span class="co">## 1        tx 2020-06-01                                       593</span></span>
+<span><span class="co">## 2        tx 2020-06-02                                      1688</span></span>
+<span><span class="co">## 3        tx 2020-06-03                                      1703</span></span>
+<span><span class="co">## 4        tx 2020-06-04                                      1649</span></span>
+<span><span class="co">## 5        tx 2020-06-05                                      1693</span></span>
+<span><span class="co">## 6        tx 2020-06-06                                      1940</span></span>
+<span><span class="co">##   value-1:usa-facts_deaths_incidence_num value+0:usa-facts_deaths_incidence_num</span></span>
+<span><span class="co">## 1                                     NA                                     20</span></span>
+<span><span class="co">## 2                                     20                                     28</span></span>
+<span><span class="co">## 3                                     28                                     31</span></span>
+<span><span class="co">## 4                                     31                                     21</span></span>
+<span><span class="co">## 5                                     21                                     25</span></span>
+<span><span class="co">## 6                                     25                                     34</span></span>
+<span><span class="co">##   value+1:usa-facts_deaths_incidence_num</span></span>
+<span><span class="co">## 1                                     28</span></span>
+<span><span class="co">## 2                                     31</span></span>
+<span><span class="co">## 3                                     21</span></span>
+<span><span class="co">## 4                                     25</span></span>
+<span><span class="co">## 5                                     34</span></span>
+<span><span class="co">## 6                                     18</span></span></code></pre>
 <p>Finally, <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> also accepts a single data frame (instead of a list of data frames), intended to be convenient when applying shifts to a single <code>covidcast_signal</code> object:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>##   geo_value time_value value-1:usa-facts_confirmed_incidence_num
-## 1        tx 2020-06-01                                        NA
-## 2        tx 2020-06-02                                       593
-## 3        tx 2020-06-03                                      1688
-## 4        tx 2020-06-04                                      1703
-## 5        tx 2020-06-05                                      1649
-## 6        tx 2020-06-06                                      1693
-##   value+0:usa-facts_confirmed_incidence_num
-## 1                                       593
-## 2                                      1688
-## 3                                      1703
-## 4                                      1649
-## 5                                      1693
-## 6                                      1940
-##   value+1:usa-facts_confirmed_incidence_num
-## 1                                      1688
-## 2                                      1703
-## 3                                      1649
-## 4                                      1693
-## 5                                      1940
-## 6                                      1425</code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   geo_value time_value value-1:usa-facts_confirmed_incidence_num</span></span>
+<span><span class="co">## 1        tx 2020-06-01                                        NA</span></span>
+<span><span class="co">## 2        tx 2020-06-02                                       593</span></span>
+<span><span class="co">## 3        tx 2020-06-03                                      1688</span></span>
+<span><span class="co">## 4        tx 2020-06-04                                      1703</span></span>
+<span><span class="co">## 5        tx 2020-06-05                                      1649</span></span>
+<span><span class="co">## 6        tx 2020-06-06                                      1693</span></span>
+<span><span class="co">##   value+0:usa-facts_confirmed_incidence_num</span></span>
+<span><span class="co">## 1                                       593</span></span>
+<span><span class="co">## 2                                      1688</span></span>
+<span><span class="co">## 3                                      1703</span></span>
+<span><span class="co">## 4                                      1649</span></span>
+<span><span class="co">## 5                                      1693</span></span>
+<span><span class="co">## 6                                      1940</span></span>
+<span><span class="co">##   value+1:usa-facts_confirmed_incidence_num</span></span>
+<span><span class="co">## 1                                      1688</span></span>
+<span><span class="co">## 2                                      1703</span></span>
+<span><span class="co">## 3                                      1649</span></span>
+<span><span class="co">## 4                                      1693</span></span>
+<span><span class="co">## 5                                      1940</span></span>
+<span><span class="co">## 6                                      1425</span></span></code></pre>
 </div>
-<div id="aggregating-signals-long-format" class="section level2">
-<h2 class="hasAnchor">
-<a href="#aggregating-signals-long-format" class="anchor"></a>Aggregating signals, long format</h2>
+<div class="section level2">
+<h2 id="aggregating-signals-long-format">Aggregating signals, long format<a class="anchor" aria-label="anchor" href="#aggregating-signals-long-format"></a>
+</h2>
 <p>We can also use <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> in “long” format, with one observation per row:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, format <span class="op">=</span> <span class="st">"long"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>##   data_source                  signal geo_value time_value    source geo_type
-## 1   usa-facts confirmed_incidence_num        tx 2020-06-01 usa-facts    state
-## 2   usa-facts confirmed_incidence_num        tx 2020-06-02 usa-facts    state
-## 3   usa-facts confirmed_incidence_num        tx 2020-06-03 usa-facts    state
-## 4   usa-facts confirmed_incidence_num        tx 2020-06-04 usa-facts    state
-## 5   usa-facts confirmed_incidence_num        tx 2020-06-05 usa-facts    state
-## 6   usa-facts confirmed_incidence_num        tx 2020-06-06 usa-facts    state
-##   time_type      issue lag missing_value missing_stderr missing_sample_size
-## 1       day 2021-10-20 506             0              5                   5
-## 2       day 2021-10-20 505             0              5                   5
-## 3       day 2021-10-20 504             0              5                   5
-## 4       day 2021-10-20 503             0              5                   5
-## 5       day 2021-10-20 502             0              5                   5
-## 6       day 2021-10-20 501             0              5                   5
-##   stderr sample_size dt value
-## 1     NA          NA  0   593
-## 2     NA          NA  0  1688
-## 3     NA          NA  0  1703
-## 4     NA          NA  0  1649
-## 5     NA          NA  0  1693
-## 6     NA          NA  0  1940</code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, format <span class="op">=</span> <span class="st">"long"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   data_source                  signal geo_value time_value    source geo_type</span></span>
+<span><span class="co">## 1   usa-facts confirmed_incidence_num        tx 2020-06-01 usa-facts    state</span></span>
+<span><span class="co">## 2   usa-facts confirmed_incidence_num        tx 2020-06-02 usa-facts    state</span></span>
+<span><span class="co">## 3   usa-facts confirmed_incidence_num        tx 2020-06-03 usa-facts    state</span></span>
+<span><span class="co">## 4   usa-facts confirmed_incidence_num        tx 2020-06-04 usa-facts    state</span></span>
+<span><span class="co">## 5   usa-facts confirmed_incidence_num        tx 2020-06-05 usa-facts    state</span></span>
+<span><span class="co">## 6   usa-facts confirmed_incidence_num        tx 2020-06-06 usa-facts    state</span></span>
+<span><span class="co">##   time_type      issue lag missing_value missing_stderr missing_sample_size</span></span>
+<span><span class="co">## 1       day 2021-10-20 506             0              5                   5</span></span>
+<span><span class="co">## 2       day 2021-10-20 505             0              5                   5</span></span>
+<span><span class="co">## 3       day 2021-10-20 504             0              5                   5</span></span>
+<span><span class="co">## 4       day 2021-10-20 503             0              5                   5</span></span>
+<span><span class="co">## 5       day 2021-10-20 502             0              5                   5</span></span>
+<span><span class="co">## 6       day 2021-10-20 501             0              5                   5</span></span>
+<span><span class="co">##   stderr sample_size dt value</span></span>
+<span><span class="co">## 1     NA          NA  0   593</span></span>
+<span><span class="co">## 2     NA          NA  0  1688</span></span>
+<span><span class="co">## 3     NA          NA  0  1703</span></span>
+<span><span class="co">## 4     NA          NA  0  1649</span></span>
+<span><span class="co">## 5     NA          NA  0  1693</span></span>
+<span><span class="co">## 6     NA          NA  0  1940</span></span></code></pre>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, format <span class="op">=</span> <span class="st">"long"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>##   data_source                  signal geo_value time_value    source geo_type
-## 1   usa-facts confirmed_incidence_num        tx 2020-06-01 usa-facts    state
-## 2   usa-facts confirmed_incidence_num        tx 2020-06-01 usa-facts    state
-## 3   usa-facts confirmed_incidence_num        tx 2020-06-02 usa-facts    state
-## 4   usa-facts confirmed_incidence_num        tx 2020-06-02 usa-facts    state
-## 5   usa-facts confirmed_incidence_num        tx 2020-06-03 usa-facts    state
-## 6   usa-facts confirmed_incidence_num        tx 2020-06-03 usa-facts    state
-##   time_type      issue lag missing_value missing_stderr missing_sample_size
-## 1       day 2021-10-20 506             0              5                   5
-## 2       day 2021-10-20 506             0              5                   5
-## 3       day 2021-10-20 505             0              5                   5
-## 4       day 2021-10-20 505             0              5                   5
-## 5       day 2021-10-20 504             0              5                   5
-## 6       day 2021-10-20 504             0              5                   5
-##   stderr sample_size dt value
-## 1     NA          NA -1    NA
-## 2     NA          NA  0   593
-## 3     NA          NA -1   593
-## 4     NA          NA  0  1688
-## 5     NA          NA -1  1688
-## 6     NA          NA  0  1703</code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, format <span class="op">=</span> <span class="st">"long"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   data_source                  signal geo_value time_value    source geo_type</span></span>
+<span><span class="co">## 1   usa-facts confirmed_incidence_num        tx 2020-06-01 usa-facts    state</span></span>
+<span><span class="co">## 2   usa-facts confirmed_incidence_num        tx 2020-06-01 usa-facts    state</span></span>
+<span><span class="co">## 3   usa-facts confirmed_incidence_num        tx 2020-06-02 usa-facts    state</span></span>
+<span><span class="co">## 4   usa-facts confirmed_incidence_num        tx 2020-06-02 usa-facts    state</span></span>
+<span><span class="co">## 5   usa-facts confirmed_incidence_num        tx 2020-06-03 usa-facts    state</span></span>
+<span><span class="co">## 6   usa-facts confirmed_incidence_num        tx 2020-06-03 usa-facts    state</span></span>
+<span><span class="co">##   time_type      issue lag missing_value missing_stderr missing_sample_size</span></span>
+<span><span class="co">## 1       day 2021-10-20 506             0              5                   5</span></span>
+<span><span class="co">## 2       day 2021-10-20 506             0              5                   5</span></span>
+<span><span class="co">## 3       day 2021-10-20 505             0              5                   5</span></span>
+<span><span class="co">## 4       day 2021-10-20 505             0              5                   5</span></span>
+<span><span class="co">## 5       day 2021-10-20 504             0              5                   5</span></span>
+<span><span class="co">## 6       day 2021-10-20 504             0              5                   5</span></span>
+<span><span class="co">##   stderr sample_size dt value</span></span>
+<span><span class="co">## 1     NA          NA -1    NA</span></span>
+<span><span class="co">## 2     NA          NA  0   593</span></span>
+<span><span class="co">## 3     NA          NA -1   593</span></span>
+<span><span class="co">## 4     NA          NA  0  1688</span></span>
+<span><span class="co">## 5     NA          NA -1  1688</span></span>
+<span><span class="co">## 6     NA          NA  0  1703</span></span></code></pre>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, format <span class="op">=</span> <span class="st">"long"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>##   data_source                  signal geo_value time_value    source geo_type
-## 1   usa-facts confirmed_incidence_num        tx 2020-06-01 usa-facts    state
-## 2   usa-facts confirmed_incidence_num        tx 2020-06-02 usa-facts    state
-## 3   usa-facts confirmed_incidence_num        tx 2020-06-03 usa-facts    state
-## 4   usa-facts confirmed_incidence_num        tx 2020-06-04 usa-facts    state
-## 5   usa-facts confirmed_incidence_num        tx 2020-06-05 usa-facts    state
-## 6   usa-facts confirmed_incidence_num        tx 2020-06-06 usa-facts    state
-##   time_type      issue lag missing_value missing_stderr missing_sample_size
-## 1       day 2021-10-20 506             0              5                   5
-## 2       day 2021-10-20 505             0              5                   5
-## 3       day 2021-10-20 504             0              5                   5
-## 4       day 2021-10-20 503             0              5                   5
-## 5       day 2021-10-20 502             0              5                   5
-## 6       day 2021-10-20 501             0              5                   5
-##   stderr sample_size dt value
-## 1     NA          NA -1    NA
-## 2     NA          NA -1   593
-## 3     NA          NA -1  1688
-## 4     NA          NA -1  1703
-## 5     NA          NA -1  1649
-## 6     NA          NA -1  1693</code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, format <span class="op">=</span> <span class="st">"long"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   data_source                  signal geo_value time_value    source geo_type</span></span>
+<span><span class="co">## 1   usa-facts confirmed_incidence_num        tx 2020-06-01 usa-facts    state</span></span>
+<span><span class="co">## 2   usa-facts confirmed_incidence_num        tx 2020-06-02 usa-facts    state</span></span>
+<span><span class="co">## 3   usa-facts confirmed_incidence_num        tx 2020-06-03 usa-facts    state</span></span>
+<span><span class="co">## 4   usa-facts confirmed_incidence_num        tx 2020-06-04 usa-facts    state</span></span>
+<span><span class="co">## 5   usa-facts confirmed_incidence_num        tx 2020-06-05 usa-facts    state</span></span>
+<span><span class="co">## 6   usa-facts confirmed_incidence_num        tx 2020-06-06 usa-facts    state</span></span>
+<span><span class="co">##   time_type      issue lag missing_value missing_stderr missing_sample_size</span></span>
+<span><span class="co">## 1       day 2021-10-20 506             0              5                   5</span></span>
+<span><span class="co">## 2       day 2021-10-20 505             0              5                   5</span></span>
+<span><span class="co">## 3       day 2021-10-20 504             0              5                   5</span></span>
+<span><span class="co">## 4       day 2021-10-20 503             0              5                   5</span></span>
+<span><span class="co">## 5       day 2021-10-20 502             0              5                   5</span></span>
+<span><span class="co">## 6       day 2021-10-20 501             0              5                   5</span></span>
+<span><span class="co">##   stderr sample_size dt value</span></span>
+<span><span class="co">## 1     NA          NA -1    NA</span></span>
+<span><span class="co">## 2     NA          NA -1   593</span></span>
+<span><span class="co">## 3     NA          NA -1  1688</span></span>
+<span><span class="co">## 4     NA          NA -1  1703</span></span>
+<span><span class="co">## 5     NA          NA -1  1649</span></span>
+<span><span class="co">## 6     NA          NA -1  1693</span></span></code></pre>
 <p>As we can see, time-shifts work just as before, in “wide” format. However, in “long” format, all columns are retained, and an additional <code>dt</code> column is added to record the time-shift being used.</p>
 <p>Just as before, <code><a href="../reference/covidcast_signals.html">covidcast_signals()</a></code> can also operate on a single data frame, to conveniently apply shifts, in “long” format:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, format <span class="op">=</span> <span class="st">"long"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>##   data_source                  signal geo_value time_value    source geo_type
-## 1   usa-facts confirmed_incidence_num        tx 2020-06-01 usa-facts    state
-## 2   usa-facts confirmed_incidence_num        tx 2020-06-01 usa-facts    state
-## 3   usa-facts confirmed_incidence_num        tx 2020-06-02 usa-facts    state
-## 4   usa-facts confirmed_incidence_num        tx 2020-06-02 usa-facts    state
-## 5   usa-facts confirmed_incidence_num        tx 2020-06-03 usa-facts    state
-## 6   usa-facts confirmed_incidence_num        tx 2020-06-03 usa-facts    state
-##   time_type      issue lag missing_value missing_stderr missing_sample_size
-## 1       day 2021-10-20 506             0              5                   5
-## 2       day 2021-10-20 506             0              5                   5
-## 3       day 2021-10-20 505             0              5                   5
-## 4       day 2021-10-20 505             0              5                   5
-## 5       day 2021-10-20 504             0              5                   5
-## 6       day 2021-10-20 504             0              5                   5
-##   stderr sample_size dt value
-## 1     NA          NA -1    NA
-## 2     NA          NA  0   593
-## 3     NA          NA -1   593
-## 4     NA          NA  0  1688
-## 5     NA          NA -1  1688
-## 6     NA          NA  0  1703</code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, format <span class="op">=</span> <span class="st">"long"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   data_source                  signal geo_value time_value    source geo_type</span></span>
+<span><span class="co">## 1   usa-facts confirmed_incidence_num        tx 2020-06-01 usa-facts    state</span></span>
+<span><span class="co">## 2   usa-facts confirmed_incidence_num        tx 2020-06-01 usa-facts    state</span></span>
+<span><span class="co">## 3   usa-facts confirmed_incidence_num        tx 2020-06-02 usa-facts    state</span></span>
+<span><span class="co">## 4   usa-facts confirmed_incidence_num        tx 2020-06-02 usa-facts    state</span></span>
+<span><span class="co">## 5   usa-facts confirmed_incidence_num        tx 2020-06-03 usa-facts    state</span></span>
+<span><span class="co">## 6   usa-facts confirmed_incidence_num        tx 2020-06-03 usa-facts    state</span></span>
+<span><span class="co">##   time_type      issue lag missing_value missing_stderr missing_sample_size</span></span>
+<span><span class="co">## 1       day 2021-10-20 506             0              5                   5</span></span>
+<span><span class="co">## 2       day 2021-10-20 506             0              5                   5</span></span>
+<span><span class="co">## 3       day 2021-10-20 505             0              5                   5</span></span>
+<span><span class="co">## 4       day 2021-10-20 505             0              5                   5</span></span>
+<span><span class="co">## 5       day 2021-10-20 504             0              5                   5</span></span>
+<span><span class="co">## 6       day 2021-10-20 504             0              5                   5</span></span>
+<span><span class="co">##   stderr sample_size dt value</span></span>
+<span><span class="co">## 1     NA          NA -1    NA</span></span>
+<span><span class="co">## 2     NA          NA  0   593</span></span>
+<span><span class="co">## 3     NA          NA -1   593</span></span>
+<span><span class="co">## 4     NA          NA  0  1688</span></span>
+<span><span class="co">## 5     NA          NA -1  1688</span></span>
+<span><span class="co">## 6     NA          NA  0  1703</span></span></code></pre>
 </div>
-<div id="pivoting-longer-or-wider" class="section level2">
-<h2 class="hasAnchor">
-<a href="#pivoting-longer-or-wider" class="anchor"></a>Pivoting longer or wider</h2>
+<div class="section level2">
+<h2 id="pivoting-longer-or-wider">Pivoting longer or wider<a class="anchor" aria-label="anchor" href="#pivoting-longer-or-wider"></a>
+</h2>
 <p>The package also provides functions for pivoting an aggregated signal data frame longer or wider. These are essentially wrappers around <code>pivot_longer()</code> and <code>pivot_wider()</code> from the <code>tidyr</code> package, that set the column structure and column names appropriately. For example, to pivot longer:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="../reference/covidcast_longer.html">covidcast_longer</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>##   data_source                  signal geo_value time_value dt value
-## 1   usa-facts confirmed_incidence_num        tx 2020-06-01 -1    NA
-## 2   usa-facts    deaths_incidence_num        tx 2020-06-01  0    20
-## 3   usa-facts confirmed_incidence_num        tx 2020-06-02 -1   593
-## 4   usa-facts    deaths_incidence_num        tx 2020-06-02  0    28
-## 5   usa-facts confirmed_incidence_num        tx 2020-06-03 -1  1688
-## 6   usa-facts    deaths_incidence_num        tx 2020-06-03  0    31</code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/covidcast_longer.html">covidcast_longer</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   data_source                  signal geo_value time_value dt value</span></span>
+<span><span class="co">## 1   usa-facts confirmed_incidence_num        tx 2020-06-01 -1    NA</span></span>
+<span><span class="co">## 2   usa-facts    deaths_incidence_num        tx 2020-06-01  0    20</span></span>
+<span><span class="co">## 3   usa-facts confirmed_incidence_num        tx 2020-06-02 -1   593</span></span>
+<span><span class="co">## 4   usa-facts    deaths_incidence_num        tx 2020-06-02  0    28</span></span>
+<span><span class="co">## 5   usa-facts confirmed_incidence_num        tx 2020-06-03 -1  1688</span></span>
+<span><span class="co">## 6   usa-facts    deaths_incidence_num        tx 2020-06-03  0    31</span></span></code></pre>
 <p>And to pivot wider:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, format <span class="op">=</span> <span class="st">"long"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="../reference/covidcast_longer.html">covidcast_wider</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>##   geo_value time_value value-1:usa-facts_confirmed_incidence_num
-## 1        tx 2020-06-01                                        NA
-## 2        tx 2020-06-02                                       593
-## 3        tx 2020-06-03                                      1688
-## 4        tx 2020-06-04                                      1703
-## 5        tx 2020-06-05                                      1649
-## 6        tx 2020-06-06                                      1693
-##   value+0:usa-facts_deaths_incidence_num
-## 1                                     20
-## 2                                     28
-## 3                                     31
-## 4                                     21
-## 5                                     25
-## 6                                     34</code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span>, dt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, format <span class="op">=</span> <span class="st">"long"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/covidcast_longer.html">covidcast_wider</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">geo_value</span> <span class="op">==</span> <span class="st">"tx"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   geo_value time_value value-1:usa-facts_confirmed_incidence_num</span></span>
+<span><span class="co">## 1        tx 2020-06-01                                        NA</span></span>
+<span><span class="co">## 2        tx 2020-06-02                                       593</span></span>
+<span><span class="co">## 3        tx 2020-06-03                                      1688</span></span>
+<span><span class="co">## 4        tx 2020-06-04                                      1703</span></span>
+<span><span class="co">## 5        tx 2020-06-05                                      1649</span></span>
+<span><span class="co">## 6        tx 2020-06-06                                      1693</span></span>
+<span><span class="co">##   value+0:usa-facts_deaths_incidence_num</span></span>
+<span><span class="co">## 1                                     20</span></span>
+<span><span class="co">## 2                                     28</span></span>
+<span><span class="co">## 3                                     31</span></span>
+<span><span class="co">## 4                                     21</span></span>
+<span><span class="co">## 5                                     25</span></span>
+<span><span class="co">## 6                                     34</span></span></code></pre>
 </div>
-<div id="a-sanity-check" class="section level2">
-<h2 class="hasAnchor">
-<a href="#a-sanity-check" class="anchor"></a>A sanity check</h2>
+<div class="section level2">
+<h2 id="a-sanity-check">A sanity check<a class="anchor" aria-label="anchor" href="#a-sanity-check"></a>
+</h2>
 <p>Lastly, here’s a small sanity check, that lagging cases by 7 days using <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> and correlating this with deaths using <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code> yields the same result as telling <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code> to do the time-shifting itself:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">df_cor1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_cor.html">covidcast_cor</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, dt <span class="op">=</span> <span class="op">-</span><span class="fl">7</span>,
-                                              format <span class="op">=</span> <span class="st">"long"</span><span class="op">)</span>,
-                        y <span class="op">=</span> <span class="va">signals</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
-
-<span class="va">df_cor2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_cor.html">covidcast_cor</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, y <span class="op">=</span> <span class="va">signals</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, dt_x <span class="op">=</span> <span class="op">-</span><span class="fl">7</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/identical.html">identical</a></span><span class="op">(</span><span class="va">df_cor1</span>, <span class="va">df_cor2</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] TRUE</code></pre>
+<code class="sourceCode R"><span><span class="va">df_cor1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_cor.html">covidcast_cor</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, dt <span class="op">=</span> <span class="op">-</span><span class="fl">7</span>,</span>
+<span>                                              format <span class="op">=</span> <span class="st">"long"</span><span class="op">)</span>,</span>
+<span>                        y <span class="op">=</span> <span class="va">signals</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">df_cor2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_cor.html">covidcast_cor</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">signals</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, y <span class="op">=</span> <span class="va">signals</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, dt_x <span class="op">=</span> <span class="op">-</span><span class="fl">7</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">df_cor1</span>, <span class="va">df_cor2</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 </div>
   </div>
 
@@ -406,11 +402,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p></p>
+<p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>
@@ -418,6 +416,8 @@
 
   
 
+
+  
 
   </body>
 </html>

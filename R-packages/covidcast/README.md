@@ -28,7 +28,7 @@ deaths <- covidcast_signal("jhu-csse", "deaths_incidence_num",
 plot(deaths, plot_type = "line")
 ```
 
-![](man/figures/README-example-plot-1.png)<!-- -->
+![](man/figures/README-example-plot-1.svg)<!-- -->
 
 The package supports convenient plotting and mapping tools, correlation
 analyses between signals, and various geographic utilities for working
@@ -51,7 +51,7 @@ list](https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api)**
 to be notified of package updates, new data sources, corrections, and
 other updates.
 
-## Usage terms
+## Usage terms and citation
 
 We request that if you use the covidcast package in your work, or use
 any of the data provided by the COVIDcast Epidata API, that you cite us
@@ -59,7 +59,7 @@ appropriately:
 
 Arnold T, Bien J, Brooks L, Colquhoun S, Farrow D, Grabman J,
 Maynard-Zhang P, Reinhart A, Tibshirani R (2021). *covidcast: Client for
-Delphi’s COVIDcast Epidata API*. R package version 0.4.2, \<URL:
+Delphi’s COVIDcast Epidata API*. R package version 0.4.3, \<URL:
 <https://cmu-delphi.github.io/covidcast/covidcastR/>\>.
 
 See the [COVIDcast Epidata licensing
@@ -75,16 +75,3 @@ use.
 See also the [COVIDcast Terms of
 Use](https://delphi.cmu.edu/covidcast/terms-of-use/), noting that the
 data is a research product and not warranted for a particular purpose.
-
-## Developing
-
-The latest development version can be installed using the
-[`devtools`](https://cran.r-project.org/package=devtools) package:
-
-``` r
-devtools::install_github("cmu-delphi/covidcast", ref = "main",
-                         subdir = "R-packages/covidcast")
-```
-
-See `DEVELOP.md` for details on how to set up, test, and document this
-package.

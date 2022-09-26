@@ -24,18 +24,14 @@ the data is simple:
 ```{r, message=FALSE}
 library(covidcast)
 
-comb <- suppressMessages(
-  covidcast_signal(data_source = "indicator-combination",
-                   signal = "nmf_day_doc_fbc_fbs_ght",
-                   start_day = "2020-07-01", end_day = "2020-07-14")
-)
+comb <- covidcast_signal(data_source = "indicator-combination",
+                         signal = "nmf_day_doc_fbc_fbs_ght",
+                         start_day = "2020-07-01", end_day = "2020-07-14")
 summary(comb)
 
-inum <- suppressMessages(
-  covidcast_signal(data_source = "usa-facts",
-                   signal = "confirmed_7dav_incidence_num",
-                   start_day = "2020-07-01", end_day = "2020-07-14")
-)
+inum <- covidcast_signal(data_source = "usa-facts",
+                         signal = "confirmed_7dav_incidence_num",
+                         start_day = "2020-07-01", end_day = "2020-07-14")
 summary(inum)
 ```
 
@@ -83,12 +79,10 @@ plot(inum, choro_col = colors, choro_params = list(breaks = breaks),
 Lastly, we show how we can use custom breaks to (visually) answer the question:
 which counties have cumulative case rates of at least 1/100?
 
-```{r}
-cprop <- suppressMessages(
-  covidcast_signal(data_source = "usa-facts",
-                   signal = "confirmed_cumulative_prop",
-                   start_day = "2020-07-01", end_day = "2020-07-14")
-)
+```{r, message=FALSE}
+cprop <- covidcast_signal(data_source = "usa-facts",
+                          signal = "confirmed_cumulative_prop",
+                          start_day = "2020-07-01", end_day = "2020-07-14")
 
 breaks <- c(0, 1000)
 colors <- c("#D3D3D3", "#FFC0CB")
@@ -126,12 +120,10 @@ As a final example, suppose we want to plot only counties in the state of Texas.
 We'd like to compare counts per 100,000 against absolute counts, so we fetch the
 proportion signal:
 
-```{r}
-iprop <- suppressMessages(
-  covidcast_signal(data_source = "usa-facts",
-                   signal = "confirmed_7dav_incidence_prop",
-                   start_day = "2020-07-01", end_day = "2020-07-14")
-)
+```{r, message=FALSE}
+iprop <- covidcast_signal(data_source = "usa-facts",
+                          signal = "confirmed_7dav_incidence_prop",
+                          start_day = "2020-07-01", end_day = "2020-07-14")
 ```
 
 Then we make two maps side-by-side with custom ranges:
@@ -163,8 +155,7 @@ knitr::opts_chunk$set(fig.width = 8, fig.height = 6)
 Let's fetch the combination indicator and case counts, but for all states rather
 than for all counties. This will make the time series plots more manageable.
 
-```{r}
-suppressMessages({
+```{r, message=FALSE}
 comb_st <- covidcast_signal(data_source = "indicator-combination",
                                signal = "nmf_day_doc_fbc_fbs_ght",
                                start_day = "2020-04-15", end_day = "2020-07-01",
@@ -173,7 +164,6 @@ inum_st <- covidcast_signal(data_source = "usa-facts",
                                signal = "confirmed_7dav_incidence_num",
                                start_day = "2020-04-15", end_day = "2020-07-01",
                                geo_type = "state")
-})
 ```
 
 By default, time series plots show all available data, including all
@@ -204,7 +194,6 @@ For example:
 ```{r, warning = FALSE}
 library(ggplot2)
 
-suppressMessages({
 comb_md <- covidcast_signal(data_source = "indicator-combination",
                                signal = "nmf_day_doc_fbc_fbs_ght",
                                start_day = "2020-06-01", end_day = "2020-07-15",
@@ -213,7 +202,6 @@ inum_md <- covidcast_signal(data_source = "usa-facts",
                                signal = "confirmed_7dav_incidence_num",
                                start_day = "2020-06-01", end_day = "2020-07-15",
                                geo_values = name_to_fips("Miami-Dade"))
-})
 
 # Compute the ranges of the two signals
 range1 <- inum_md %>% select("value") %>% range

@@ -3,8 +3,8 @@ library(mockery)
 library(MMWRweek)
 library(dplyr)
 
-# Many of these tests use mockery::with_mock_api. This replaces calls to the
-# live API server, instead returning static JSON files from disk. Three
+# Many of these tests use httptest::with_mock_api. This replaces calls to the
+# live API server, instead returning static CSV files from disk. Three
 # weaknesses to be aware of:
 #
 # 1. The HTTP URL and parameters are hashed into a single filename to use. This
@@ -83,7 +83,7 @@ with_mock_api({
                    class = "covidcast_missing_geo_values")
 
     # ...but not when they *are* available.
-    # covidcast-114ddd.csv
+    # covidcast-ed05bd.csv
     expect_silent(suppressMessages(
       covidcast_signal("foo", "bar", "2020-01-01", "2020-01-01",
                        geo_values = c("pa", "tx"))))
@@ -91,12 +91,12 @@ with_mock_api({
 
   test_that("covidcast_signal warns when requested dates are unavailable", {
     # with geo_values = "*".
-    # covidcast-666130.csv
+    # covidcast-76884c.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-02"),
                    class = "covidcast_fetch_failed")
 
     # and with geo_values = "pa"
-    # covidcast-496c2d.csv
+    # covidcast-053255.csv
     expect_warning(covidcast_signal("foo", "bar", "2020-01-02", "2020-01-02",
                                     geo_values = "pa"),
                    class = "covidcast_fetch_failed")
@@ -110,7 +110,7 @@ with_mock_api({
 
   test_that("covidcast_signal works for signals with no meta", {
     # when no meta is available, we must provide start_day and end_day.
-    # covidcast-b3e628.csv
+    # covidcast-616b30.csv
     expect_equal(
       covidcast_signal("foo", "bar-not-found",
                        "2020-01-01", "2020-01-01"),
@@ -146,7 +146,7 @@ with_mock_api({
   })
 
   test_that("covidcast_signal fetches signals with time_type = week", {
-    # covidcast-f95d04.csv
+    # covidcast-38938f.csv
     # this covers 5 MMWR weeks, weeks 1-5
     foo <- covidcast_signal("foo", "barweek", "2020-01-01", "2020-02-01",
                             time_type = "week")

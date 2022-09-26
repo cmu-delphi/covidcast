@@ -1,3 +1,25 @@
+# covidcast 0.4.3
+
+Released October 25, 2021.
+
+## Major changes
+
+- Fetching large amounts of data with `covidcast_signal()` should now be much
+  faster, as the package now uses a new API endpoint with much higher row
+  limits. Most requests can be served in a single API call, rather than being
+  split across many API calls.
+
+- The map data included in the package has been improved. There should no longer
+  be gaps between adjacent geographical areas, resulting in better-looking
+  choropleth maps.
+
+## Minor changes
+
+- Miscellaneous improvements to documentation, such as clearer examples for
+  `covidcast_cor()`.
+
+- The package tests now support vdiffr 1.0.0.
+
 # covidcast 0.4.2
 
 Changes to prepare for release on CRAN. Released May 4, 2021.

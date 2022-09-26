@@ -35,9 +35,12 @@
 #' See also `covidcast_signal()` for details on how to obtain COVIDcast data as
 #' a data frame.
 #'
-#' @docType package
-#' @name covidcast
-NULL
+#' @references A. Reinhart et al., An open repository of real-time COVID-19
+#'   indicators. Proc. Natl. Acad. Sci. U.S.A. 118, e2111452118 (2021).
+#'   <https://doi.org/10.1073/pnas.2111452118>
+#'
+#' @keywords internal
+"_PACKAGE"
 
 # API base url
 COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/'

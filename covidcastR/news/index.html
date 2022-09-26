@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.3</span>
       </span>
     </div>
 
@@ -79,7 +79,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -117,7 +117,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -138,14 +138,36 @@
       <small>Source: <a href='https://github.com/cmu-delphi/covidcast/blob/main/R-packages/covidcast/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="covidcast-043" class="section level1">
+<h1 class="page-header" data-toc-text="0.4.3">
+<a href="#covidcast-043" class="anchor"></a>covidcast 0.4.3<small> Unreleased </small>
+</h1>
+<p>Released October 25, 2021.</p>
+<div id="major-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#major-changes" class="anchor"></a>Major changes</h2>
+<ul>
+<li><p>Fetching large amounts of data with <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> should now be much faster, as the package now uses a new API endpoint with much higher row limits. Most requests can be served in a single API call, rather than being split across many API calls.</p></li>
+<li><p>The map data included in the package has been improved. There should no longer be gaps between adjacent geographical areas, resulting in better-looking choropleth maps.</p></li>
+</ul>
+</div>
+<div id="minor-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-changes" class="anchor"></a>Minor changes</h2>
+<ul>
+<li><p>Miscellaneous improvements to documentation, such as clearer examples for <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code>.</p></li>
+<li><p>The package tests now support vdiffr 1.0.0.</p></li>
+</ul>
+</div>
+</div>
     <div id="covidcast-042" class="section level1">
 <h1 class="page-header" data-toc-text="0.4.2">
 <a href="#covidcast-042" class="anchor"></a>covidcast 0.4.2<small> 2021-05-04 </small>
 </h1>
 <p>Changes to prepare for release on CRAN. Released May 4, 2021.</p>
-<div id="major-changes" class="section level2">
+<div id="major-changes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#major-changes" class="anchor"></a>Major changes</h2>
+<a href="#major-changes-1" class="anchor"></a>Major changes</h2>
 <ul>
 <li><p>Removed extra variables in the metadata tables.</p></li>
 <li><p>Storing geographic data as compressed geojson files.</p></li>
@@ -158,18 +180,18 @@
 <a href="#covidcast-041" class="anchor"></a>covidcast 0.4.1<small> Unreleased </small>
 </h1>
 <p>Released January 19, 2021.</p>
-<div id="major-changes-1" class="section level2">
+<div id="major-changes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#major-changes-1" class="anchor"></a>Major changes</h2>
+<a href="#major-changes-2" class="anchor"></a>Major changes</h2>
 <ul>
 <li><p>Removed the dependency on the <code>usmap</code> package, which was removed from CRAN on January 10, 2021.</p></li>
 <li><p><code><a href="../reference/plot.covidcast_signal.html">plot.covidcast_signal()</a></code> now supports mapping Puerto Rico in bubble plots.</p></li>
 <li><p>The <code>county_geo</code> and <code>state_geo</code> built-in datasets have been removed. These were used to support bubble plots, but the changes to <code><a href="../reference/plot.covidcast_signal.html">plot.covidcast_signal()</a></code> rendered them unnecessary.</p></li>
 </ul>
 </div>
-<div id="minor-changes" class="section level2">
+<div id="minor-changes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-1" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Geographic lookup functions, such as <code>fips_to_name()</code> or <code><a href="../reference/name_to_fips.html">name_to_cbsa()</a></code>, are now much faster when given input vectors with many duplicate values.</li>
 </ul>
@@ -180,9 +202,9 @@
 <a href="#covidcast-040" class="anchor"></a>covidcast 0.4.0<small> Unreleased </small>
 </h1>
 <p>Released January 13, 2021.</p>
-<div id="major-changes-2" class="section level2">
+<div id="major-changes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#major-changes-2" class="anchor"></a>Major changes</h2>
+<a href="#major-changes-3" class="anchor"></a>Major changes</h2>
 <ul>
 <li><p>The <code><a href="../reference/plot.covidcast_signal.html">plot.covidcast_signal()</a></code> method now supports making choropleth plots for metropolitan areas and hospital referral regions.</p></li>
 <li><p>A new <code><a href="../reference/as.covidcast_signal.html">as.covidcast_signal()</a></code> generic function makes it easy to turn any data frame, such as data loaded from an external source, into a <code>covidcast_signal</code> object that can be plotted and wrangled using the functions in this package. See <code><a href="../articles/external-data.html">vignette("external-data")</a></code> for examples.</p></li>
@@ -206,9 +228,9 @@
 <li>The <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code> function now interprets its <code>dt_x</code> and <code>dt_y</code> arguments in the opposite way as before, i.e. what was once a positive lag is now a negative lag. See the documentation for details.</li>
 </ul>
 </div>
-<div id="major-changes-3" class="section level2">
+<div id="major-changes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#major-changes-3" class="anchor"></a>Major changes</h2>
+<a href="#major-changes-4" class="anchor"></a>Major changes</h2>
 <ul>
 <li>The new <code><a href="../reference/covidcast_signals.html">covidcast_signals()</a></code> function allows users to query multiple signals from the API at once, returning a list of data frames. The <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> function can convert this list into a “wide” or “long” format data frame for further analysis, while <code><a href="../reference/covidcast_longer.html">covidcast_wider()</a></code> and <code><a href="../reference/covidcast_longer.html">covidcast_longer()</a></code> can convert from “long” to “wide” format and vice versa.</li>
 </ul>
@@ -219,9 +241,9 @@
 <a href="#covidcast-030" class="anchor"></a>covidcast 0.3.0<small> Unreleased </small>
 </h1>
 <p>Released August 22, 2020.</p>
-<div id="major-changes-4" class="section level2">
+<div id="major-changes-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#major-changes-4" class="anchor"></a>Major changes</h2>
+<a href="#major-changes-5" class="anchor"></a>Major changes</h2>
 <ul>
 <li><p>New <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code> function for calculating correlations between COVIDcast signals. See <code><a href="../articles/correlation-utils.html">vignette("correlation-utils")</a></code> for examples.</p></li>
 <li><p>New utility functions <code><a href="../reference/name_to_fips.html">name_to_fips()</a></code> and <code><a href="../reference/name_to_fips.html">name_to_cbsa()</a></code> to look up FIPS codes (for counties) or CBSA codes (for metropolitan statistical areas) based on the names of the counties or MSAs.</p></li>
@@ -235,9 +257,9 @@
 <a href="#covidcast-020" class="anchor"></a>covidcast 0.2.0<small> Unreleased </small>
 </h1>
 <p>Released July 26, 2020.</p>
-<div id="major-changes-5" class="section level2">
+<div id="major-changes-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#major-changes-5" class="anchor"></a>Major changes</h2>
+<a href="#major-changes-6" class="anchor"></a>Major changes</h2>
 <ul>
 <li><p><strong>Name change:</strong> The package is now called covidcast, not covidcastR. If already installed, users should remove covidcastR using <code><a href="https://rdrr.io/r/utils/remove.packages.html">remove.packages()</a></code> and then install covidcast using the instructions in <code><a href="../articles/covidcast.html">vignette("covidcast")</a></code>.</p></li>
 <li><p><strong>Incompatible change:</strong> The <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> function now takes <code>start_day</code> and <code>end_day</code> arguments as strings in the form YYYY-MM-DD, rather than YYYYMMDD, for consistency with <code><a href="https://rdrr.io/r/base/as.Date.html">as.Date()</a></code> and other common R usage. The arguments can also be passed as <code>Date</code> objects directly.</p></li>
@@ -245,9 +267,9 @@
 <li><p>New feature: The <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> function now supports arguments <code>as_of</code>, <code>issues</code>, and <code>lag</code>, allowing users to request specific versions of data in the API. This allows users to track revisions of data and to see only data that was available as of a specific date. See <code><a href="../articles/covidcast.html">vignette("covidcast")</a></code> for examples.</p></li>
 </ul>
 </div>
-<div id="minor-changes-1" class="section level2">
+<div id="minor-changes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-1" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-2" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>The object returned from <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> is now a data frame augmented with extra attributes indicating the geography type and signal metadata. Additional <code>data_source</code> and <code>signal</code> columns are provided, in anticipation of options to request more than one signal at once. Methods for <code>print</code> and <code>summary</code> are provided (as <code><a href="../reference/print.covidcast_signal.html">print.covidcast_signal()</a></code> and <code><a href="../reference/summary.covidcast_signal.html">summary.covidcast_signal()</a></code>) to conveniently view these objects. They can still be used as ordinary data frames as well.</li>
 </ul>

@@ -49,7 +49,7 @@ a data frame.
 \references{
 A. Reinhart et al., An open repository of real-time COVID-19
 indicators. Proc. Natl. Acad. Sci. U.S.A. 118, e2111452118 (2021).
-\url{https://doi.org/10.1073/pnas.2111452118}
+\doi{10.1073/pnas.2111452118}
 }
 \seealso{
 Useful links:

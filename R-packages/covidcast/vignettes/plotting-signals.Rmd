@@ -15,7 +15,7 @@ packages, but the covidcast package also provides some tools for plotting and
 mapping signals in an easy way.
 
 For this vignette, we'll use our [combination
-signal](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/indicator-combination.html)
+signal](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/indicator-combination-inactive.html#statistical-combination-signals)
 as an example; the combination indicator is a statistical combination of several
 data sources collected by Delphi, and for every county provides a measure of
 factors related to COVID activity. We'll also use incident case counts. Fetching

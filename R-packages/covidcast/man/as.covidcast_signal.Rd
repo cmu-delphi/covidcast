@@ -61,16 +61,16 @@ into \code{covidcast_signal} objects, which can be used with the various
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{covidcast_signal}: Simply returns the \code{covidcast_signal} object
+\item \code{as.covidcast_signal(covidcast_signal)}: Simply returns the \code{covidcast_signal} object
 unchanged.
 
-\item \code{data.frame}: The input data frame \code{x} must contain the
+\item \code{as.covidcast_signal(data.frame)}: The input data frame \code{x} must contain the
 columns \code{time_value}, \code{value}, and \code{geo_value}. If an \code{issue} column is
 present in \code{x}, it will be used as the issue date for each observation; if
 not, the \code{issue} argument will be used. Other columns will be preserved
 as-is.
-}}
 
+}}
 \seealso{
 \code{\link[=covidcast_signal]{covidcast_signal()}}
 }

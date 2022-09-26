@@ -71,16 +71,17 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.3" id="covidcast-043">covidcast 0.4.3<a class="anchor" aria-label="anchor" href="#covidcast-043"></a></h2>
-<p>Released October 25, 2021.</p>
 <div class="section level3">
 <h3 id="major-changes-0-4-3">Major changes<a class="anchor" aria-label="anchor" href="#major-changes-0-4-3"></a></h3>
 <ul><li><p>Fetching large amounts of data with <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> should now be much faster, as the package now uses a new API endpoint with much higher row limits. Most requests can be served in a single API call, rather than being split across many API calls.</p></li>
-<li><p>The map data included in the package has been improved. There should no longer be gaps between adjacent geographical areas, resulting in better-looking choropleth maps.</p></li>
+<li><p>The map data included in the package has been improved. There should no longer be gaps between adjacent geographical areas, resulting in better-looking choropleth maps (<a href="https://github.com/statsmaths" class="external-link">@statsmaths</a>, <a href="https://github.com/cmu-delphi/covidcast/issues/542" class="external-link">#542</a>).</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="minor-changes-0-4-3">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-0-4-3"></a></h3>
 <ul><li><p>Miscellaneous improvements to documentation, such as clearer examples for <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code>.</p></li>
+<li><p>Updated <code>CITATION</code> for the package; see <code>citation("covidcast")</code>.</p></li>
 <li><p>The package tests now support vdiffr 1.0.0.</p></li>
+<li><p>Updates to conform to latest tidyselection syntax (<a href="https://github.com/hadley" class="external-link">@hadley</a>, <a href="https://github.com/cmu-delphi/covidcast/issues/590" class="external-link">#590</a>).</p></li>
 </ul></div>
 </div>
     <div class="section level2">

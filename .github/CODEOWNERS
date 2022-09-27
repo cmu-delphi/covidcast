@@ -6,7 +6,7 @@
 /R-packages/data-raw/ @capnrefsmmat  @statsmaths
 
 # evalcast R package
-/R-packages/evalcast/ @jacobbien @dajmcdon
+/R-packages/evalcast/ @nmdefries @brookslogan @dshemetov
 
 # modeltools R package
 /R-packages/modeltools/ @huisaddison @dajmcdon

@@ -121,7 +121,7 @@ datasets. These include each area's unique identifier, used in the
 population and other Census data.
 
 Downloading large amounts of data may be slow, so this function prints
-messages for each day of data it downloads. To suppress these, use
+messages for each chunk of data it downloads. To suppress these, use
 \code{\link[base:message]{base::suppressMessages()}}, as in
 \code{suppressMessages(covidcast_signal("fb-survey", ...))}.
 }

@@ -73,7 +73,7 @@ MAX_RESULTS <- 1000000
 #' population and other Census data.
 #'
 #' Downloading large amounts of data may be slow, so this function prints
-#' messages for each day of data it downloads. To suppress these, use
+#' messages for each chunk of data it downloads. To suppress these, use
 #' [base::suppressMessages()], as in
 #' `suppressMessages(covidcast_signal("fb-survey", ...))`.
 #'

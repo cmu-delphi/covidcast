@@ -1,7 +1,5 @@
 # covidcast 0.4.3
 
-Released October 25, 2021.
-
 ## Major changes
 
 - Fetching large amounts of data with `covidcast_signal()` should now be much
@@ -11,14 +9,18 @@ Released October 25, 2021.
 
 - The map data included in the package has been improved. There should no longer
   be gaps between adjacent geographical areas, resulting in better-looking
-  choropleth maps.
+  choropleth maps (@statsmaths, #542).
 
 ## Minor changes
 
 - Miscellaneous improvements to documentation, such as clearer examples for
   `covidcast_cor()`.
 
+- Updated `CITATION` for the package; see `citation("covidcast")`.
+
 - The package tests now support vdiffr 1.0.0.
+
+- Updates to conform to latest tidyselection syntax (@hadley, #590).
 
 # covidcast 0.4.2
 

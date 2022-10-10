@@ -307,7 +307,7 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
   geom_args <- list()
   geom_args$color <- border_col
   geom_args$size <- border_size
-  geom_args$mapping <- ggplot2::aes_string(geometry="geometry")
+  geom_args$mapping <- ggplot2::aes(geometry=.data$geometry)
 
   geom_args$fill <- main_col
   geom_args$data <- main_df
@@ -433,7 +433,7 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
   geom_args <- list()
   geom_args$color <- border_col
   geom_args$size <- border_size
-  geom_args$mapping <- ggplot2::aes_string(geometry="geometry")
+  geom_args$mapping <- ggplot2::aes(geometry=.data$geometry)
   coord_args <- list()
 
   geom_args$fill <- main_col
@@ -464,8 +464,8 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
 
     # Now the legend layer (hidden + scale)
     hidden_df <- data.frame(x = rep(Inf, n), z = legend_breaks)
-    hidden_layer <- ggplot2::geom_point(ggplot2::aes_string(
-      x = "x", y = "x", color = "z"),
+    hidden_layer <- ggplot2::geom_point(ggplot2::aes(
+      x = .data$x, y = .data$x, color = .data$z),
                                        data = hidden_df, alpha = 0)
     guide <- ggplot2::guide_colorbar(title = NULL, horizontal = TRUE,
                                     barheight = legend_height,
@@ -487,7 +487,7 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
     # Now the legend layer (hidden + scale)
     hidden_df <- data.frame(x = rep(Inf, n), z = as.factor(legend_breaks))
     hidden_layer <- ggplot2::geom_polygon(
-      ggplot2::aes_string(x = "x", y = "x", fill = "z"),
+      ggplot2::aes(x = .data$x, y = .data$x, fill = .data$z),
       data = hidden_df, alpha = 0
     )
     guide <- ggplot2::guide_legend(title = NULL, horizontal = TRUE, nrow = 1,
@@ -680,7 +680,7 @@ plot_bubble <- function(x, time_value = NULL, include = c(), range = NULL,
   geom_args <- list()
   geom_args$color <- border_col
   geom_args$size <- border_size
-  geom_args$mapping <- ggplot2::aes_string(geometry="geometry")
+  geom_args$mapping <- ggplot2::aes(geometry=.data$geometry)
   geom_args$fill <- main_df$back_color
   geom_args$data <- main_df
   main_layer <- do.call(ggplot2::geom_sf, geom_args)
@@ -708,8 +708,8 @@ plot_bubble <- function(x, time_value = NULL, include = c(), range = NULL,
 
   # Create the bubble layers
   geom_args <- list()
-  geom_args$mapping <- ggplot2::aes_string(
-    geometry = "geometry", size = "bubble_val"
+  geom_args$mapping <- ggplot2::aes(
+    geometry = .data$geometry, size = .data$bubble_val
   )
   geom_args$color <- col
   geom_args$alpha <- alpha
@@ -778,20 +778,20 @@ plot_line <- function(x, range = NULL, title = NULL, params = list()) {
   # Create lim, line, and ribbon layers
   aes <- ggplot2::aes
   lim_layer <- ggplot2::coord_cartesian(ylim = range)
-  line_layer <- ggplot2::geom_line(ggplot2::aes_string(
-    y = "value", color = "geo_value", group = "geo_value"
+  line_layer <- ggplot2::geom_line(ggplot2::aes(
+    y = .data$value, color = .data$geo_value, group = .data$geo_value
   ))
   ribbon_layer <- NULL
   if (stderr_bands) {
     df$ymin <- df$value - df$stderr
     df$ymax <- df$value + df$stderr
-    ribbon_layer <- ggplot2::geom_ribbon(ggplot2::aes_string(
-      ymin = "ymin", ymax = "ymax", fill = "geo_value"
+    ribbon_layer <- ggplot2::geom_ribbon(ggplot2::aes(
+      ymin = .data$ymin, ymax = .data$ymax, fill = .data$geo_value
     ), alpha = stderr_alpha)
   }
 
   # Put it all together and return
-  return(ggplot2::ggplot(ggplot2::aes_string(x = "time_value"), data = df) +
+  return(ggplot2::ggplot(ggplot2::aes(x = .data$time_value), data = df) +
          line_layer + ribbon_layer + lim_layer + label_layer + theme_layer)
 }
 

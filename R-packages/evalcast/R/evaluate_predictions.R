@@ -133,9 +133,6 @@ evaluate_covid_predictions <- function(predictions_cards,
                "ahead")
   actual_data <- get_covidcast_data(predictions_cards, backfill_buffer,
                                     geo_type, offline_signal_dir)
-  predictions_cards <- left_join(predictions_cards,
-                                 actual_data,
-                                 by = grp_vars)
   score_card <- evaluate_predictions(predictions_cards,
                                      actual_data,
                                      err_measures)

@@ -43,9 +43,13 @@ evaluate_predictions <- function(
   assert_that(is.data.frame(truth_data),
               msg = paste("In evaluate_predictions: `truth_data` must be a
                           data frame"))
+  if ("actual" %in% names(predictions_cards)) {
+    warning("`predictions_cards` already has an `actual` column; this `actual` column will be used and `truth_data` will be ignored.")
+  }
   assert_that("actual" %in% names(truth_data),
               msg = paste("`truth_data` must contain a column named `actual`"))
-  predictions_cards <- left_join(predictions_cards, truth_data)
+  predictions_cards <- left_join(predictions_cards, truth_data,
+                                 by=intersect(colnames(predictions_cards), colnames(truth_data)))
   if (is.null(err_measures) || length(err_measures) == 0) {
     score_card <- predictions_cards
   } else {

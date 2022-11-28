@@ -129,12 +129,6 @@ evaluate_covid_predictions <- function(predictions_cards,
   assert_that("predictions_cards" %in% class(predictions_cards),
               msg = "predictions_cards must be of class `predictions_cards`")
   geo_type <- match.arg(geo_type)
-  grp_vars <- c("data_source",
-               "signal",
-               "incidence_period",
-               "geo_value",
-               "forecast_date",
-               "ahead")
   actual_data <- get_covidcast_data(predictions_cards, backfill_buffer,
                                     geo_type, offline_signal_dir)
   score_card <- evaluate_predictions(predictions_cards,

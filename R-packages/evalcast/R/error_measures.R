@@ -171,7 +171,7 @@ underprediction <- function(quantile, value, actual_value) {
 }
 #' Sharpness component of the weighted interval score
 #' 
-#' Requires symmetric quantile forecasts. Roughly, a penalty for the w
+#' Requires symmetric quantile forecasts. Roughly, a penalty for the
 #' width of predicted quantiles.
 #'
 #' @param quantile vector of forecasted quantiles
@@ -213,7 +213,7 @@ score_func_param_checker <- function(quantiles, values, actual_value, id = ""){
   assert_that(length(quantiles) == length(values),
               msg = paste0(id_str, 
                            "quantiles and values must be of the same length"))
-  assert_that(!any(duplicated(quantiles)),
+  assert_that(!anyDuplicated(quantiles),
               msg = paste0(id_str,
                            "quantiles must be unique."))
 }

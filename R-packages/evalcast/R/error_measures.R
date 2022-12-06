@@ -15,7 +15,9 @@
 weighted_interval_score <- function(quantile, value, actual_value) {
   score_func_param_checker(quantile, value, actual_value, "weighted_interval_score")
   if (all(is.na(actual_value))) return(NA)
-  actual_value <- unique(actual_value)
+  # `score_func_param_checker` above has already checked for uniqueness, so we
+  # can save a bit of effort and just take the first actual.
+  actual_value <- actual_value[1]
 
   value <- value[!is.na(quantile)]
   quantile <- quantile[!is.na(quantile)]
@@ -117,7 +119,9 @@ overprediction <- function(quantile, value, actual_value) {
     return(NA)
   }
   if (all(is.na(actual_value))) return(NA)
-  actual_value <- unique(actual_value)
+  # `score_func_param_checker` above has already checked for uniqueness, so we
+  # can save a bit of effort and just take the first actual.
+  actual_value <- actual_value[1]
   
   lower <- value[!is.na(quantile) & quantile < .5]
   med <- value[find_quantile_match(quantile, 0.5)]
@@ -155,7 +159,9 @@ underprediction <- function(quantile, value, actual_value) {
     return(NA)
   }
   if (all(is.na(actual_value))) return(NA)
-  actual_value <- unique(actual_value)
+  # `score_func_param_checker` above has already checked for uniqueness, so we
+  # can save a bit of effort and just take the first actual.
+  actual_value <- actual_value[1]
   
   upper <- value[!is.na(quantile) & quantile > .5]
   med <- value[find_quantile_match(quantile, 0.5)]

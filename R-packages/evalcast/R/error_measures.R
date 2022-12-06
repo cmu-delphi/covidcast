@@ -232,10 +232,9 @@ find_quantile_match <- function(quantiles, val_to_match, tol=1e-8){
 erm <- function(x, err_measures){
   # just binds up any error measure functions for an lapply
   # I'm sure there's a better way to do this, but I couldn't think of one
-  out <- double(length(err_measures))
+  out <- list()
   for (i in seq_along(err_measures)) {
-    out[i] <- err_measures[[i]](x$quantile, x$value, x$actual)
+    out[[names(err_measures)[i]]] <- err_measures[[i]](x$quantile, x$value, x$actual)
   }
-  names(out) <- names(err_measures)
-  bind_rows(out)
+  as_tibble_row(out)
 }

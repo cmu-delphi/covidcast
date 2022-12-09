@@ -72,7 +72,7 @@ test_that("evaluate_covid_predictions evaluates against downloaded data", {
     expect_equal(score_card$actual, rep(c(5, 10), each=n/2))
     expect_equal(score_card$wis, rep(c(7.4/3, 13.4/3), each=n/2)) # computed by hand
     expect_equal(score_card$ae, rep(c(3, 5), each=n/2))
-    expect_equal(score_card$coverage_80, rep(0, n))
+    expect_equal(score_card$coverage_80, rep(FALSE, n))
   })
 })
 
@@ -135,7 +135,7 @@ test_that("evaluate_predictions evaluates against truth_data", {
     expect_equal(score_card$actual, rep(c(5, 10), each=n/2))
     expect_equal(score_card$wis, rep(c(7.4/3, 13.4/3), each=n/2)) # computed by hand
     expect_equal(score_card$ae, rep(c(3, 5), each=n/2))
-    expect_equal(score_card$coverage_80, rep(0, n))
+    expect_equal(score_card$coverage_80, rep(FALSE, n))
   })
 })
 
@@ -179,7 +179,7 @@ test_that("evaluate_predictions uses alternate grouping variables", {
     expect_equal(score_card$actual, rep(c(5, 10), each=n/2))
     expect_equal(score_card$wis, rep(c(7.4/3, 13.4/3), each=n/2)) # computed by hand
     expect_equal(score_card$ae, rep(c(3, 5), each=n/2))
-    expect_equal(score_card$coverage_80, rep(0, n))
+    expect_equal(score_card$coverage_80, rep(FALSE, n))
   })  
 })
 

@@ -233,14 +233,3 @@ is_symmetric <- function(x, tol=1e-8) {
 find_quantile_match <- function(quantiles, val_to_match, tol=1e-8){
   return(abs(quantiles - val_to_match) < tol  & !is.na(quantiles))
 }
-
-
-erm <- function(x, err_measures){
-  # just binds up any error measure functions for an lapply
-  # I'm sure there's a better way to do this, but I couldn't think of one
-  out <- list()
-  for (i in seq_along(err_measures)) {
-    out[[names(err_measures)[i]]] <- err_measures[[i]](x$quantile, x$value, x$actual)
-  }
-  as_tibble_row(out)
-}

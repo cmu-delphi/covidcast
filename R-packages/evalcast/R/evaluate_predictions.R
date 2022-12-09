@@ -30,6 +30,9 @@
 #'   `predictions_cards()` with additional columns for each `err_measure` and
 #'   for the truth (named `actual`).
 #'
+#' @importFrom rlang parse_quos
+#' @importFrom stringr str_glue
+#'
 #' @export
 evaluate_predictions <- function(
   predictions_cards,
@@ -53,13 +56,17 @@ evaluate_predictions <- function(
   if (is.null(err_measures) || length(err_measures) == 0) {
     score_card <- predictions_cards
   } else {
-    score_card <- predictions_cards %>% group_by(across(all_of(grp_vars)))
-    sc_keys <- score_card %>% group_keys()
-    score_card <- score_card %>%
-      group_split() %>%
-      lapply(erm, err_measures = err_measures) %>%
-      bind_rows() %>%
-      bind_cols(sc_keys) %>%
+    err_calls <- stats::setNames(
+      as.character(str_glue(
+        "err_measures[[{i}]](quantile, value, actual)",
+        i = 1:length(err_measures)
+      )),
+      names(err_measures))
+    err_calls <- parse_quos(err_calls, env=environment())
+
+    score_card <- predictions_cards %>%
+      group_by(across(all_of(grp_vars))) %>%
+      summarize(!!!err_calls, .groups = "drop") %>%
       inner_join(predictions_cards, by = grp_vars)
   }
   class(score_card) <- c("score_cards", class(score_card))

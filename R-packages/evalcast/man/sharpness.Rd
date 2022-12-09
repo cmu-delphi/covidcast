@@ -14,6 +14,6 @@ sharpness(quantile, value, actual_value)
 \item{actual_value}{Actual value.}
 }
 \description{
-Requires symmetric quantile forecasts. Roughly, a penalty for the w
+Requires symmetric quantile forecasts. Roughly, a penalty for the
 width of predicted quantiles.
 }

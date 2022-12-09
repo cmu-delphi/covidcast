@@ -19,5 +19,5 @@ error messages (recommended to be the parent function's name)}
 }
 \description{
 A set of common checks for score functions, meant to identify common causes
-of issues.
+of issues. Avoids \code{assert_that} for speed.
 }

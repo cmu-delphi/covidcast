@@ -196,7 +196,7 @@ sharpness <- function(quantile, value, actual_value) {
 #' Common parameter checks for score functions
 #'
 #' A set of common checks for score functions, meant to identify common causes
-#' of issues.
+#' of issues. Avoids `assert_that` for speed.
 #'
 #' @param quantiles vector of forecasted quantiles
 #' @param values vector of forecasted values
@@ -207,23 +207,29 @@ sharpness <- function(quantile, value, actual_value) {
 score_func_param_checker <- function(quantiles, values, actual_value, id = ""){
   id_str = paste0(id, ": ")
   if (length(actual_value) > 1) {
-    assert_that(length(actual_value) == length(values),
-                msg = paste0(id_str, 
-                             "actual_value must be a scalar or the same length",
-                             " as values"))
+    if (length(actual_value) != length(values)) {
+      stop(paste0(id_str,
+                  "actual_value must be a scalar or the same length",
+                  " as values"))
+    }
     actual_value = unique(actual_value)
   }
-  assert_that(length(actual_value) == 1,
-              msg = paste0(id_str,
-                           "actual_value must have exactly 1 unique value"))
-  assert_that(length(quantiles) == length(values),
-              msg = paste0(id_str, 
-                           "quantiles and values must be of the same length"))
-  assert_that(!anyDuplicated(quantiles),
-              msg = paste0(id_str,
-                           "quantiles must be unique."))
-}
 
+  if (length(actual_value) != 1) {
+    stop(paste0(id_str,
+                "actual_value must have exactly 1 unique value"))
+  }
+  if (length(quantiles) != length(values)) {
+    stop(paste0(id_str,
+                "quantiles and values must be of the same length"))
+  }
+
+  if (anyDuplicated(quantiles)) {
+    stop(paste0(id_str,
+                "quantiles must be unique.")
+    )
+  }
+}
 
 is_symmetric <- function(x, tol=1e-8) {
   x <- sort(x)

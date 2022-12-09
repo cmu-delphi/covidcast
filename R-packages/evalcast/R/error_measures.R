@@ -232,9 +232,17 @@ score_func_param_checker <- function(quantiles, values, actual_value, id = ""){
 }
 
 is_symmetric <- function(x, tol=1e-8) {
-  x <- sort(x)
+  # Checking if `x` is sorted is much faster than trying to sort it again
+  if (is.unsorted(x, na.rm=TRUE)) {
+    # Implicitly drops NA values
+    x <- sort(x)
+  } else {
+    # Match `sort` behavior
+    x <- x[!is.na(x)]
+  }
   all(abs(x + rev(x) - 1) < tol)
 }
+
 
 find_quantile_match <- function(quantiles, val_to_match, tol=1e-8){
   return(abs(quantiles - val_to_match) < tol  & !is.na(quantiles))

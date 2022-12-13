@@ -407,7 +407,7 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
                 value=string())
 
   ds <- open_dataset(file.path("data", covidhub_forecaster_name),
-                     format = "csv", schema = sch)
+                     format = "csv", schema = sch, skip_rows = 1)
 
   # Create all derived columns from target first to join later
   # Works with just the distinct values of target for efficiency

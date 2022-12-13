@@ -303,6 +303,8 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
 #'
 #' @importFrom arrow open_dataset schema string
 #' @importFrom utils download.file
+#' @importFrom readr read_csv write_csv col_double cols col_character
+#' @importFrom dplyr relocate
 get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
                                            forecast_dates = NULL,
                                            geo_values = "*",
@@ -361,6 +363,38 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
       }
     } else if (attempt > 1 & download_status == 0) {
       message("succeeded after ", attempt, " attempts")
+    }
+
+    # Check if header order is correct and matches the `arrow` schema; newer
+    # versions of `arrow` (> 4.0.1) don't reorder columns by name on load.
+    # Most of the time columns are ordered correctly, so the
+    # read-reorder-write step won't happen that often.
+    #
+    # The motivating examples here are:
+    # - `JHUAPL-Gecko`, which uses a non-standard column ordering
+    #   (forecast_date, target, target_end_date, quantile, value, location,
+    #   type).
+    # - `COVIDhub_CDC-ensemble`, which switched to a non-standard column
+    #   ordering as of 2021-11-15.
+    expected_headers <- c(
+      "forecast_date",
+      "target",
+      "target_end_date",
+      "location",
+      "type",
+      "quantile",
+      "value"
+    )
+    header <- (readLines(output_file, n=1) %>% strsplit(",", fixed = TRUE))[[1]]
+    if (!all(header == expected_headers)) {
+      message(filename, " columns are not ordered correctly, reordering")
+      # Re-save file with columns in the correct order.
+      classes <- cols(
+        .default = col_character(), quantile = col_double(), value = col_double()
+      )
+      read_csv(output_file, col_types = classes) %>%
+        relocate(expected_headers) %>%
+        write_csv(output_file)
     }
   }
 

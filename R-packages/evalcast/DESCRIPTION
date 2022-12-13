@@ -82,7 +82,8 @@ Imports:
     fs,
     plyr,
     bettermc,
-    tidyr
+    tidyr,
+    readr
 Suggests:
     testthat,
     mockr,

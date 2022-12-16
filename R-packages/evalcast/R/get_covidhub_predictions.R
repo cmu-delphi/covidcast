@@ -305,6 +305,7 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
 #' @importFrom utils download.file
 #' @importFrom readr read_csv write_csv col_double cols col_character
 #' @importFrom dplyr relocate
+#' @importFrom stringr str_replace_all
 get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
                                            forecast_dates = NULL,
                                            geo_values = "*",
@@ -385,7 +386,8 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
       "quantile",
       "value"
     )
-    header <- (readLines(output_file, n=1) %>% strsplit(",", fixed = TRUE))[[1]]
+    header <- (readLines(output_file, n=1) %>% strsplit(",", fixed = TRUE))[[1]] %>%
+      str_replace_all(fixed("\""), "")
     if (!all(header == expected_headers)) {
       message(filename, " columns are not ordered correctly, reordering")
       # Re-save file with columns in the correct order.

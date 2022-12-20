@@ -1,3 +1,13 @@
+# covidcast 0.4.5
+
+- Updates to plotting code to be compatible with ggplot2 version 3.4.0.
+  (@krivard, #598)
+- Puerto Rico is no longer rotated in maps produced with `plot()`. On platforms
+  using ATLAS as the BLAS implementation, rotation created invalid polygons,
+  resulting in errors that prevented any plotting from working. Without
+  rotation, Puerto Rico is slightly tilted compared to the rest of the United
+  States.
+
 # covidcast 0.4.3
 
 ## Major changes

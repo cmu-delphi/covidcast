@@ -714,6 +714,7 @@ plot_bubble <- function(x, time_value = NULL, include = c(), range = NULL,
   geom_args$color <- col
   geom_args$alpha <- alpha
   geom_args$na.rm <- TRUE
+  geom_args$show.legend <- "point"
 
   # If there is no bubble data (all values are missing), return blank layer
   bubble_blank_if_all_na <- function(geom_args, df) {

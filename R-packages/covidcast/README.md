@@ -58,8 +58,8 @@ any of the data provided by the COVIDcast Epidata API, that you cite us
 appropriately:
 
 Arnold T, Bien J, Brooks L, Colquhoun S, Farrow D, Grabman J,
-Maynard-Zhang P, Reinhart A, Tibshirani R (2022). *covidcast: Client for
-Delphi’s COVIDcast Epidata API*. R package version 0.4.3,
+Maynard-Zhang P, Reinhart A, Tibshirani R (2023). *covidcast: Client for
+Delphi’s COVIDcast Epidata API*. R package version 0.4.5,
 <https://cmu-delphi.github.io/covidcast/covidcastR/>.
 
 Reinhart A, Brooks L, Jahja M, Rumack A, Tang J, Agrawal S, Saeed WA,

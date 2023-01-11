@@ -38,7 +38,7 @@ summary(inum)
 ## Choropleth maps
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(fig.width = 10, fig.height = 8)
+knitr::opts_chunk$set(fig.width = 6, fig.height = 4)
 ```
 
 The default `plot` method for `covidcast_signal` objects,
@@ -112,10 +112,6 @@ plot(inum, plot_type = "bubble",
      bubble_params = list(breaks = seq(20, 200, len = 6)))
 ```
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(fig.width = 10, fig.height = 6)
-```
-
 As a final example, suppose we want to plot only counties in the state of Texas.
 We'd like to compare counts per 100,000 against absolute counts, so we fetch the
 proportion signal:
@@ -128,7 +124,7 @@ iprop <- covidcast_signal(data_source = "usa-facts",
 
 Then we make two maps side-by-side with custom ranges:
 
-```{r}
+```{r, fig.width=8, fig.height=4, message=FALSE}
 library(gridExtra)
 
 breaks1 <- c(1, 10, 100, 1000)
@@ -147,10 +143,6 @@ grid.arrange(p1, p2, nrow = 1)
 ```
 
 ## Time series plots
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(fig.width = 8, fig.height = 6)
-```
 
 Let's fetch the combination indicator and case counts, but for all states rather
 than for all counties. This will make the time series plots more manageable.

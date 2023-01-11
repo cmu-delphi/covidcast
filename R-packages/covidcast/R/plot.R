@@ -714,6 +714,7 @@ plot_bubble <- function(x, time_value = NULL, include = c(), range = NULL,
   geom_args$color <- col
   geom_args$alpha <- alpha
   geom_args$na.rm <- TRUE
+  geom_args$show.legend <- "point"
 
   # If there is no bubble data (all values are missing), return blank layer
   bubble_blank_if_all_na <- function(geom_args, df) {
@@ -815,12 +816,8 @@ hawaii_crs <- '+proj=aea +lat_1=8 +lat_2=18 +lat_0=13 +lon_0=-157 +x_0=0
 shift_pr <- function(map_df) {
   pr_df <- map_df %>% dplyr::filter(.data$is_pr)
   pr_df <- sf::st_transform(pr_df, final_crs)
-  pr_shift <- sf::st_geometry(pr_df) + c(-0.9e+6, 1e+6)
+  pr_shift <- sf::st_geometry(pr_df) + c(-1.2e+6, 0.5e+6)
   pr_df <- sf::st_set_geometry(pr_df, pr_shift)
-  r <- 16 * pi / 180
-  rotation <- matrix(c(cos(r), sin(r), -sin(r), cos(r)), nrow = 2, ncol = 2)
-  pr_rotate <- (sf::st_geometry(pr_df)) * rotation
-  pr_df <- sf::st_set_geometry(pr_df, pr_rotate)
 
   # Pretend this was in final_crs all along
   suppressWarnings({

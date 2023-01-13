@@ -17,7 +17,7 @@ weighted_interval_score <- function(quantile, value, actual_value) {
   if (all(is.na(actual_value))) return(NA)
   # `score_func_param_checker` above has already checked for uniqueness, so we
   # can save a bit of effort and just take the first actual.
-  actual_value <- actual_value[1]
+  actual_value <- actual_value[[1L]]
 
   value <- value[!is.na(quantile)]
   quantile <- quantile[!is.na(quantile)]
@@ -97,7 +97,7 @@ interval_coverage <- function(coverage) {
     
     lower <- value[which(find_quantile_match(quantiles, lower_interval))]
     upper <- value[which(find_quantile_match(quantiles, upper_interval))]
-    return(actual_value[1] >= lower & actual_value[1] <= upper)
+    return(actual_value[[1L]] >= lower & actual_value[[1L]] <= upper)
   }
 }
 
@@ -121,7 +121,7 @@ overprediction <- function(quantile, value, actual_value) {
   if (all(is.na(actual_value))) return(NA)
   # `score_func_param_checker` above has already checked for uniqueness, so we
   # can save a bit of effort and just take the first actual.
-  actual_value <- actual_value[1]
+  actual_value <- actual_value[[1L]]
   
   lower <- value[!is.na(quantile) & quantile < .5]
   med <- value[find_quantile_match(quantile, 0.5)]
@@ -131,11 +131,8 @@ overprediction <- function(quantile, value, actual_value) {
               (med - actual_value) * (med > actual_value),
               NULL)
   
-    
-  
   ans <- mean(c(
     rep((lower - actual_value) * (lower > actual_value), 2), m))
-    
   
   return(ans)
 }
@@ -161,7 +158,7 @@ underprediction <- function(quantile, value, actual_value) {
   if (all(is.na(actual_value))) return(NA)
   # `score_func_param_checker` above has already checked for uniqueness, so we
   # can save a bit of effort and just take the first actual.
-  actual_value <- actual_value[1]
+  actual_value <- actual_value[[1L]]
   
   upper <- value[!is.na(quantile) & quantile > .5]
   med <- value[find_quantile_match(quantile, 0.5)]

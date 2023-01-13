@@ -35,9 +35,12 @@
 #' See also `covidcast_signal()` for details on how to obtain COVIDcast data as
 #' a data frame.
 #'
-#' @docType package
-#' @name covidcast
-NULL
+#' @references A. Reinhart et al., An open repository of real-time COVID-19
+#'   indicators. Proc. Natl. Acad. Sci. U.S.A. 118, e2111452118 (2021).
+#'   \doi{10.1073/pnas.2111452118}
+#'
+#' @keywords internal
+"_PACKAGE"
 
 # API base url
 COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/'
@@ -70,7 +73,7 @@ MAX_RESULTS <- 1000000
 #' population and other Census data.
 #'
 #' Downloading large amounts of data may be slow, so this function prints
-#' messages for each day of data it downloads. To suppress these, use
+#' messages for each chunk of data it downloads. To suppress these, use
 #' [base::suppressMessages()], as in
 #' `suppressMessages(covidcast_signal("fb-survey", ...))`.
 #'
@@ -422,8 +425,7 @@ as.covidcast_signal.data.frame <- function(x,
 
   # Reorder data_source, signal, geo_value, time_value, so that they appear in
   # this order.
-  x <- dplyr::relocate(x, .data$data_source, .data$signal, .data$geo_value,
-                       .data$time_value)
+  x <- dplyr::relocate(x, "data_source", "signal", "geo_value", "time_value")
 
   attributes(x)$metadata <- metadata
 
@@ -780,7 +782,11 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
     query_start_day <- start_day + start_offset
     query_end_day <- start_day + end_offset
 
-    time_values <- days[(start_offset + 1):(end_offset + 1)]
+    # Expected number of unique dates fetched, to check against later
+    num_time_values <- length(days[(start_offset + 1):(end_offset + 1)])
+
+    # Use range calls where possible for speed.
+    time_values <- paste0(days[(start_offset + 1)], "-", days[(end_offset + 1)])
     response <- covidcast(data_source = data_source,
                           signal = signal,
                           time_type = time_type,
@@ -822,12 +828,12 @@ covidcast_days <- function(data_source, signal, start_day, end_day, geo_type,
       desired_geos <- tolower(unique(geo_value))
 
       returned_geo_array <- response %>%
-        dplyr::select(geo_value, .data$time_value) %>%
+        dplyr::select("geo_value", "time_value") %>%
         dplyr::group_by(.data$time_value) %>%
         dplyr::summarize(geo_value = list(geo_value))
       returned_time_values <- returned_geo_array$time_value
 
-      if (length(returned_time_values) != length(time_values)) {
+      if (length(returned_time_values) != num_time_values) {
         missing_time_values <- setdiff(time_values, returned_time_values)
         missing_dates <- api_to_date(missing_time_values, time_type)
 

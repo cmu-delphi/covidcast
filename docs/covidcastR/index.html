@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,18 +40,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.5</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="articles/covidcast.html">Get started</a>
 </li>
@@ -57,7 +53,7 @@
   <a href="reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -83,8 +79,8 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -100,80 +96,99 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="covidcast-r-package" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#covidcast-r-package" class="anchor"></a>covidcast R package</h1></div>
-<p>Provides R access to the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast Epidata API</a> published by the <a href="https://delphi.cmu.edu/">Delphi group</a> at <a href="https://www.cmu.edu">Carnegie Mellon University</a>. This API provides daily access to a range of COVID-related signals Delphi that builds and maintains, from sources like symptom surveys and medical claims data, and also standard signals that we simply mirror, like confirmed cases and deaths.</p>
-<p>Consult the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast Epidata API documentation</a> for details on the data included in the API, licensing, and how to cite this data in your work. The <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html">signals documentation</a> lists all the data sources and signals available through this API.</p>
+<div class="section level1">
+<div class="page-header"><h1 id="covidcast-r-package">covidcast R package<a class="anchor" aria-label="anchor" href="#covidcast-r-package"></a>
+</h1></div>
+<!-- README.md is generated from README.Rmd; edit that instead,
+then use rmarkdown::render("README.Rmd") to regenerate --><p><a href="https://cran.r-project.org/package=covidcast" class="external-link"><img src="https://www.r-pkg.org/badges/version/covidcast" alt="CRAN status"></a></p>
+<p>Provides R access to the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html" class="external-link">COVIDcast Epidata API</a> published by the <a href="https://delphi.cmu.edu/" class="external-link">Delphi group</a> at <a href="https://www.cmu.edu" class="external-link">Carnegie Mellon University</a>. This API provides daily access to a range of COVID-related signals Delphi that builds and maintains, from sources like symptom surveys and medical claims data, and also standard signals that we simply mirror, like confirmed cases and deaths.</p>
+<p>Fetching data in a data frame is as easy <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html" class="external-link">selecting the signal you want</a> and then using <code><a href="reference/covidcast_signal.html">covidcast_signal()</a></code>:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/" class="external-link">covidcast</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">deaths</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span><span class="st">"jhu-csse"</span>, <span class="st">"deaths_incidence_num"</span>,</span>
+<span>                           <span class="st">"2020-04-15"</span>, <span class="st">"2021-04-15"</span>,</span>
+<span>                           geo_type <span class="op">=</span> <span class="st">"nation"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">deaths</span>, plot_type <span class="op">=</span> <span class="st">"line"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-example-plot-1.svg"><!-- --></p>
+<p>The package supports convenient plotting and mapping tools, correlation analyses between signals, and various geographic utilities for working with counties, metropolitan areas, and other units.</p>
+<p>Consult the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html" class="external-link">COVIDcast Epidata API documentation</a> for details on the data included in the API, licensing, and how to cite this data in your work. The <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html" class="external-link">signals documentation</a> lists all the data sources and signals available through this API.</p>
 <p><strong>To get started</strong> using this package, view the Getting Started guide at <code><a href="articles/covidcast.html">vignette("covidcast")</a></code>.</p>
-<div id="get-updates" class="section level2">
-<h2 class="hasAnchor">
-<a href="#get-updates" class="anchor"></a>Get updates</h2>
-<p><strong>You should consider subscribing to the <a href="https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api">API mailing list</a></strong> to be notified of package updates, new data sources, corrections, and other updates.</p>
+<div class="section level2">
+<h2 id="get-updates">Get updates<a class="anchor" aria-label="anchor" href="#get-updates"></a>
+</h2>
+<p><strong>You should consider subscribing to the <a href="https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api" class="external-link">API mailing list</a></strong> to be notified of package updates, new data sources, corrections, and other updates.</p>
 </div>
-<div id="usage-terms" class="section level2">
-<h2 class="hasAnchor">
-<a href="#usage-terms" class="anchor"></a>Usage terms</h2>
+<div class="section level2">
+<h2 id="usage-terms-and-citation">Usage terms and citation<a class="anchor" aria-label="anchor" href="#usage-terms-and-citation"></a>
+</h2>
+<p>We request that if you use the covidcast package in your work, or use any of the data provided by the COVIDcast Epidata API, that you cite us appropriately:</p>
+<p>Arnold T, Bien J, Brooks L, Colquhoun S, Farrow D, Grabman J, Maynard-Zhang P, Reinhart A, Tibshirani R (2023). <em>covidcast: Client for Delphi’s COVIDcast Epidata API</em>. R package version 0.4.5, <a href="https://cmu-delphi.github.io/covidcast/covidcastR/" class="external-link uri">https://cmu-delphi.github.io/covidcast/covidcastR/</a>.</p>
+<p>Reinhart A, Brooks L, Jahja M, Rumack A, Tang J, Agrawal S, Saeed WA, Arnold T, Basu A, Bien J, Cabrera ÁA, Chin A, Chua EJ, Clark B, Colquhoun S, DeFries N, Farrow DC, Forlizzi J, Grabman J, Gratzl S, Green A, Haff G, Han R, Harwood K, Hu AJ, Hyde R, Hyun S, Joshi A, Kim J, Kuznetsov A, La Motte-Kerr W, Lee YJ, Lee K, Lipton ZC, Liu MX, Mackey L, Mazaitis K, McDonald DJ, McGuinness P, Narasimhan B, O’Brien MP, Oliveira NL, Patil P, Perer A, Politsch CA, Rajanala S, Rucker D, Scott C, Shah NH, Shankar V, Sharpnack J, Shemetov D, Simon N, Smith BY, Srivastava V, Tan S, Tibshirani R, Tuzhilina E, Van Nortwick AK, Ventura V, Wasserman L, Weaver B, Weiss JC, Whitman S, Williams K, Rosenfeld R, Tibshirani RJ (2021). “An open repository of real-time COVID-19 indicators.” <em>Proceedings of the National Academy of Sciences</em>, <em>118</em>(51). <a href="doi:10.1073/pnas.2111452118" class="uri">doi:10.1073/pnas.2111452118</a> <a href="https://doi.org/10.1073/pnas.2111452118" class="external-link uri">https://doi.org/10.1073/pnas.2111452118</a>.</p>
+<p>See the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_licensing.html" class="external-link">COVIDcast Epidata licensing documentation</a> for information about citing the datasets provided by the API.</p>
 <p><strong>Warning:</strong> If you use data from the COVIDcast API to power a product, dashboard, app, or other service, please download the data you need and store it centrally rather than making API requests for every user. Our server resources are limited and cannot support high-volume interactive use.</p>
-<p>See also the <a href="https://covidcast.cmu.edu/terms-of-use.html">COVIDcast Terms of Use</a>, noting that the data is a research product and not warranted for a particular purpose.</p>
+<p>See also the <a href="https://delphi.cmu.edu/covidcast/terms-of-use/" class="external-link">COVIDcast Terms of Use</a>, noting that the data is a research product and not warranted for a particular purpose.</p>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=covidcast">https://​cloud.r-project.org/​package=covidcast</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast">https://​github.com/​cmu-delphi/​covidcast/​tree/​main/​R-packages/​covidcast</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/cmu-delphi/covidcast/issues">https://​github.com/​cmu-delphi/​covidcast/​issues</a>
-</li>
-<li>Get the Python client at <br><a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">https://​cmu-delphi.github.io/​covidcast/​covidcast-py/​html/​</a>
-</li>
-<li>View the COVIDcast map at <br><a href="https://covidcast.cmu.edu/">https://​covidcast.cmu.edu/​</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=covidcast" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/cmu-delphi/covidcast/tree/main/R-packages/covidcast" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/cmu-delphi/covidcast/issues" class="external-link">Report a bug</a></li>
+<li><a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/" class="external-link">Get the Python client</a></li>
+<li><a href="https://delphi.cmu.edu/covidcast/" class="external-link">View the COVIDcast map</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>
-<a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
+<a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
 </li>
 </ul>
 </div>
+
+
 <div class="citation">
-<h2>Citation</h2>
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html">Citing covidcast</a></li>
+<li><a href="authors.html#citation">Citing covidcast</a></li>
 </ul>
 </div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Taylor Arnold <br><small class="roles"> Author </small>  </li>
 <li>Jacob Bien <br><small class="roles"> Author </small>  </li>
 <li>Logan Brooks <br><small class="roles"> Author </small>  </li>
 <li>Sarah Colquhoun <br><small class="roles"> Author </small>  </li>
 <li>David Farrow <br><small class="roles"> Author </small>  </li>
-<li>Alex Reinhart <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-6658-514X" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Alex Reinhart <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-6658-514X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Ryan Tibshirani <br><small class="roles"> Author </small>  </li>
-<li><a href="authors.html">All authors...</a></li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
+
+
 
   </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p></p>
+<p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
@@ -181,6 +196,8 @@
 
   
 
+
+  
 
   </body>
 </html>

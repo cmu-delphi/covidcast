@@ -1,3 +1,37 @@
+# covidcast 0.4.5
+
+- Updates to plotting code to be compatible with ggplot2 version 3.4.0.
+  (@krivard, #598)
+- Puerto Rico is no longer rotated in maps produced with `plot()`. On platforms
+  using ATLAS as the BLAS implementation, rotation created invalid polygons,
+  resulting in errors that prevented any plotting from working. Without
+  rotation, Puerto Rico is slightly tilted compared to the rest of the United
+  States.
+
+# covidcast 0.4.3
+
+## Major changes
+
+- Fetching large amounts of data with `covidcast_signal()` should now be much
+  faster, as the package now uses a new API endpoint with much higher row
+  limits. Most requests can be served in a single API call, rather than being
+  split across many API calls.
+
+- The map data included in the package has been improved. There should no longer
+  be gaps between adjacent geographical areas, resulting in better-looking
+  choropleth maps (@statsmaths, #542).
+
+## Minor changes
+
+- Miscellaneous improvements to documentation, such as clearer examples for
+  `covidcast_cor()`.
+
+- Updated `CITATION` for the package; see `citation("covidcast")`.
+
+- The package tests now support vdiffr 1.0.0.
+
+- Updates to conform to latest tidyselection syntax (@hadley, #590).
+
 # covidcast 0.4.2
 
 Changes to prepare for release on CRAN. Released May 4, 2021.

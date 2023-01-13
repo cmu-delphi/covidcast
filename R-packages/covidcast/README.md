@@ -28,7 +28,7 @@ deaths <- covidcast_signal("jhu-csse", "deaths_incidence_num",
 plot(deaths, plot_type = "line")
 ```
 
-![](man/figures/README-example-plot-1.png)<!-- -->
+![](man/figures/README-example-plot-1.svg)<!-- -->
 
 The package supports convenient plotting and mapping tools, correlation
 analyses between signals, and various geographic utilities for working
@@ -51,16 +51,31 @@ list](https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api)**
 to be notified of package updates, new data sources, corrections, and
 other updates.
 
-## Usage terms
+## Usage terms and citation
 
 We request that if you use the covidcast package in your work, or use
 any of the data provided by the COVIDcast Epidata API, that you cite us
 appropriately:
 
 Arnold T, Bien J, Brooks L, Colquhoun S, Farrow D, Grabman J,
-Maynard-Zhang P, Reinhart A, Tibshirani R (2021). *covidcast: Client for
-Delphi’s COVIDcast Epidata API*. R package version 0.4.2, \<URL:
-<https://cmu-delphi.github.io/covidcast/covidcastR/>\>.
+Maynard-Zhang P, Reinhart A, Tibshirani R (2023). *covidcast: Client for
+Delphi’s COVIDcast Epidata API*. R package version 0.4.5,
+<https://cmu-delphi.github.io/covidcast/covidcastR/>.
+
+Reinhart A, Brooks L, Jahja M, Rumack A, Tang J, Agrawal S, Saeed WA,
+Arnold T, Basu A, Bien J, Cabrera ÁA, Chin A, Chua EJ, Clark B,
+Colquhoun S, DeFries N, Farrow DC, Forlizzi J, Grabman J, Gratzl S,
+Green A, Haff G, Han R, Harwood K, Hu AJ, Hyde R, Hyun S, Joshi A, Kim
+J, Kuznetsov A, La Motte-Kerr W, Lee YJ, Lee K, Lipton ZC, Liu MX,
+Mackey L, Mazaitis K, McDonald DJ, McGuinness P, Narasimhan B, O’Brien
+MP, Oliveira NL, Patil P, Perer A, Politsch CA, Rajanala S, Rucker D,
+Scott C, Shah NH, Shankar V, Sharpnack J, Shemetov D, Simon N, Smith BY,
+Srivastava V, Tan S, Tibshirani R, Tuzhilina E, Van Nortwick AK, Ventura
+V, Wasserman L, Weaver B, Weiss JC, Whitman S, Williams K, Rosenfeld R,
+Tibshirani RJ (2021). “An open repository of real-time COVID-19
+indicators.” *Proceedings of the National Academy of Sciences*,
+*118*(51). <doi:10.1073/pnas.2111452118>
+<https://doi.org/10.1073/pnas.2111452118>.
 
 See the [COVIDcast Epidata licensing
 documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_licensing.html)
@@ -75,16 +90,3 @@ use.
 See also the [COVIDcast Terms of
 Use](https://delphi.cmu.edu/covidcast/terms-of-use/), noting that the
 data is a research product and not warranted for a particular purpose.
-
-## Developing
-
-The latest development version can be installed using the
-[`devtools`](https://cran.r-project.org/package=devtools) package:
-
-``` r
-devtools::install_github("cmu-delphi/covidcast", ref = "main",
-                         subdir = "R-packages/covidcast")
-```
-
-See `DEVELOP.md` for details on how to set up, test, and document this
-package.

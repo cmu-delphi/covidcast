@@ -3,5 +3,8 @@
 ^\.Rproj\.user$
 ^docs$
 ^_pkgdown\.yml$
-^index\.md
 ^DEVELOP.md$
+^doc$
+^Meta$
+^README.Rmd$
+^README.html$

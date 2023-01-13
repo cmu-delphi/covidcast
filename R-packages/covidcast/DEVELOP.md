@@ -1,14 +1,8 @@
 # covidcast development guide
 
-We follow a Git Flow model for development. The `main` branch is for the
-"release" version of the package, since changes on `main` are immediately
-available for installation and immediately appear on the documentation website.
-New features are instead developed on the `r-pkg-devel` branch so they can be
-beta-tested before release.
-
-To make a change to the package, pull the latest version of `r-pkg-devel` and
-make a branch starting from there. When you open a pull request, set the base
-branch to be `r-pkg-devel`, *not* `main`.
+We use `main` as the primary development branch. Because `main` is deployed to
+GitHub Pages, we update the rendered documentation only when releasing a new
+version to CRAN.
 
 A short checklist for submitting pull requests:
 
@@ -23,10 +17,13 @@ A short checklist for submitting pull requests:
    when updating the package, which can be done with the script precompile.R
    found in the vignette directory.
 4. If you changed any documentation, rebuild the documentation with
-   `devtools::document()` and then `pkgdown::build_site()`. (This can be slow,
-   because our vignettes take a long time to build.)
-5. Submit the pull request, setting the base branch to `r-pkg-devel`, and see if
-   the CI can also successfully run the tests.
+   `devtools::document()`. You might locally run `pkgdown::build_site()` to
+   ensure the site builds correctly, but **do not commit the `docs/` changes
+   unless you are ready to make a new CRAN release**, because they will appear
+   on the documentation website as soon as they are merged. (Building the site
+   can be slow, because our vignettes take a long time to build.)
+5. Submit the pull request and see if the CI can also successfully run the
+   tests.
 
 ## Unit tests
 
@@ -44,7 +41,7 @@ the pull request.
 
 We test our plots and maps with the [vdiffr](https://github.com/r-lib/vdiffr)
 package, which renders plots and then visually compares them to a saved
-reference image.
+reference image (saved in `tests/testthat/_snaps/`).
 
 See `tests/testthat/test-plot.R` for examples. Each test case uses
 `vdiffr::expect_doppelganger` with two arguments: a name (which will be the
@@ -53,7 +50,7 @@ plot, such as a ggplot object.
 
 When you add new test case or change how a plotting feature works, you will need
 to "validate" the tests, meaning vdiffr will render the plots and ask you if
-they look correct. To do this, run `vdiffr::manage_cases()` from within the
+they look correct. To do this, run `testthat::snapshot_review()` from within the
 package working directory. A Shiny app will open up and present you with each
 plot. For new plots, it will simply show you the plot, and a "Validate" button
 will let you indicate that the plot looks good. For changed plots, it will show
@@ -63,11 +60,23 @@ that the changes look correct, then press Validate.
 Once you've validated all changes, press Quit and you will be able to commit the
 changed images and run the tests successfully.
 
+Note that the tests only run on R 4.1.0 or newer, since changes in the R
+graphics engine can cause spurious differences between rendered versions of the
+plots.
+
+### Testing API interactions
+
+To write unit tests for interactions with the API server, we need a way to use
+static files as mock API server responses. We use `httptest::with_mock_api()`
+for this purpose. See the comments in `tests/testthat/test-covidcast.R` for
+details and examples.
+
 ### Using data files in tests
 
 Unit tests should not depend on being able to load data from the COVIDcast API,
-since that data is subject to change. It is preferable to either use toy
-examples or to store static datasets to be loaded and used.
+since that data is subject to change. For tests such as plots that need some
+data to use, it is preferable to either use toy examples or to store static
+datasets to be loaded and used.
 
 Small static datasets can be kept in `tests/testthat/data/` in RDS form (using
 `saveRDS` and `loadRDS`). The `testthat::test_path` function locates files
@@ -92,7 +101,7 @@ major package features.
 After changing a vignette or documentation, you'll need to rebuild the
 documentation. Use `devtools::document()` to do this. Then
 `pkgdown::build_site(".")` (from within the package directory) will rebuild the
-HTML documentation site.
+HTML documentation site, if you're ready to release the changes to the world.
 
 ## Release checklist
 
@@ -105,8 +114,9 @@ new GitHub Issue and check off the items one at a time.
 - [ ] Run `devtools::check()` and ensure there are no errors.
 - [ ] Run `devtools::document()` and then `pkgdown::build_site()`.
 - [ ] Browse the generated documentation site and ensure there are no problems.
-- [ ] Commit the updated HTML to `r-pkg-devel`. Make sure you don't miss any new plot files!
-- [ ] Open a pull request to merge `r-pkg-devel` to `main` and request review.
+- [ ] Commit the updated HTML. Make sure you don't miss any new plot files!
+- [ ] Open a pull request to merge the release branch to `main` and request review.
 ```
 
-Once the pull request is merged, the new version is live.
+The package can now be built and submitted to CRAN, and once accepted, the pull
+request can be merged to main.

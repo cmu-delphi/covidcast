@@ -30,8 +30,7 @@
 #'   `predictions_cards()` with additional columns for each `err_measure` and
 #'   for the truth (named `actual`).
 #'
-#' @importFrom rlang parse_quos
-#' @importFrom stringr str_glue
+#' @importFrom rlang quo .data
 #'
 #' @export
 evaluate_predictions <- function(
@@ -56,14 +55,9 @@ evaluate_predictions <- function(
   if (is.null(err_measures) || length(err_measures) == 0) {
     score_card <- predictions_cards
   } else {
-    err_calls <- stats::setNames(
-      as.character(str_glue(
-        "err_measures[[{i}]](quantile, value, actual)",
-        i = 1:length(err_measures)
-      )),
-      names(err_measures))
-    err_calls <- parse_quos(err_calls, env=environment())
-
+    err_calls <- lapply(err_measures, function(err_measure) {
+      quo(err_measure(.data$quantile, .data$value, .data$actual))
+    })
     score_card <- predictions_cards %>%
       group_by(across(all_of(grp_vars))) %>%
       summarize(!!!err_calls, .groups = "drop") %>%

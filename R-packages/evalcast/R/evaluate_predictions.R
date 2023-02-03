@@ -61,7 +61,7 @@ evaluate_predictions <- function(
     score_card <- predictions_cards %>%
       group_by(across(all_of(grp_vars))) %>%
       summarize(!!!err_calls, .groups = "drop") %>%
-      inner_join(predictions_cards, by = grp_vars)
+      inner_join(predictions_cards, by = grp_vars, multiple = "all")
   }
   class(score_card) <- c("score_cards", class(score_card))
   attributes(score_card) <- c(attributes(score_card),

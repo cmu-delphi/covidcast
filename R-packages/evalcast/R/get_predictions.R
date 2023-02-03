@@ -126,7 +126,11 @@ get_predictions <- function(forecaster,
     return(preds)
   }
 
-  out <- rlang::inject(bettermc::mclapply(forecast_dates, get_predictions_single_date_, mc.cores = num_cores, !!!additional_mclapply_args)) %>% bind_rows()
+  if (parallel_execution) {
+    out <- rlang::inject(bettermc::mclapply(forecast_dates, get_predictions_single_date_, mc.cores = num_cores, !!!additional_mclapply_args)) %>% bind_rows()
+  } else {
+    out <- lapply(forecast_dates, get_predictions_single_date_) %>% bind_rows()
+  }
 
   # for some reason, `value` gets named and ends up in attr
   names(out$value) <- NULL

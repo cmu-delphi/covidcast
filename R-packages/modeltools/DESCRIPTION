@@ -15,19 +15,23 @@ License: MIT
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Remotes:
     cmu-delphi/covidcast/R-packages/covidcast@main,
-    cmu-delphi/covidcast/R-packages/evalcast@main,
-    ryantibs/quantgen/quantgen@master,
+    cmu-delphi/covidcast/R-packages/evalcast@evalcast,
+    ryantibs/quantgen/quantgen@master
 Imports:
     assertthat,
     covidcast,
     dplyr,
-    evalcast,
     genlasso,
+    lubridate,
+    MMWRweek,
     purrr,
+    quantgen,
     slider,
+    tibble,
     tidyselect,
-    tidyr,
-    quantgen
+    tidyr
+Suggests:
+    evalcast

@@ -126,8 +126,10 @@ get_predictions <- function(forecaster,
     return(preds)
   }
 
-  if (parallel_execution) {
+  if (rlang::is_bool(parallel_execution) && parallel_execution == TRUE) {
     out <- rlang::inject(bettermc::mclapply(forecast_dates, get_predictions_single_date_, mc.cores = num_cores, !!!additional_mclapply_args)) %>% bind_rows()
+  } else if (rlang::is_integer(parallel_execution) && parallel_execution > 1L) {
+    out <- rlang::inject(bettermc::mclapply(forecast_dates, get_predictions_single_date_, mc.cores = parallel_execution, !!!additional_mclapply_args)) %>% bind_rows()
   } else {
     out <- lapply(forecast_dates, get_predictions_single_date_) %>% bind_rows()
   }

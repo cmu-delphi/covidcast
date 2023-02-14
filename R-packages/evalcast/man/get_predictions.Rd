@@ -108,10 +108,11 @@ to \code{forecaster()}. A common use case would be to pass the period ahead
 required component of the forecaster output (see above).}
 
 \item{parallel_execution}{TRUE, FALSE, or a single positive integer. If TRUE,
-uses bettermc::mclapply to execute each forecast date prediction in
-parallel on max number of cores - 1. If FALSE, the code is run on a single
-core. If integer, runs in parallel on that many cores, clipping to the max
-number of detected cores if a greater number is requested.}
+executes each forecast date prediction in parallel on the number of
+detected cores available minus 1. If FALSE, the code is run on a single
+core. If integer, runs in parallel on that many cores, clipping to the
+number of detected cores available if a greater number is requested. Uses
+\code{\link[bettermc:mclapply]{bettermc::mclapply}} for parallelism if using more than one core.}
 
 \item{additional_mclapply_args}{a named list of additional arguments to pass
 to \code{\link[bettermc:mclapply]{bettermc::mclapply}} (besides \code{X}, \code{FUN}, and

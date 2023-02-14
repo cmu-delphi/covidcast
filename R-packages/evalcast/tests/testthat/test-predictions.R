@@ -1,6 +1,7 @@
 library(mockr)
 library(mockery)
 library(magrittr)
+library(dplyr)
 
 # Create a fake result from the covidcast API as returned by the `evalcast::download_signals()`
 # function.
@@ -10,7 +11,7 @@ create_fake_downloaded_signal <- function(geo_value, data_source, signal) {
          geo_value = geo_value,
          time_value = as.Date(c("2020-01-01", "2020-01-02")),
          issue = as.Date("2020-01-02"),
-         lag = 1L,
+         lag = as.integer(.data$issue - .data$time_value),
          value = c(1, 2),
          stderr = c(0.1, 0.2),
          sample_size = c(2, 2)) 
@@ -438,7 +439,7 @@ create_fake_downloaded_signal_large <- function(geo_value, data_source, signal) 
     geo_value = geo_value,
     time_value = seq(as.Date("2020-01-01"), as.Date("2020-01-31"), by = "days"),
     issue = as.Date("2020-01-31"),
-    lag = 0L,
+    lag = as.integer(.data$issue - .data$time_value),
     value = seq(1, 31),
     stderr = seq(1, 31) * 0.1,
     sample_size = seq(1, 31) * 10,
@@ -450,7 +451,7 @@ test_that("get_predictions on baseline_forecaster works with parallel_execution=
     signal = c("deaths_incidence_num", "confirmed_incidence_num"),
     start_day = "2020-01-01"
   )
-  forecast_dates <- ymd(c("2020-01-30", "2020-01-31"))
+  forecast_dates <- as.Date(c("2020-01-30", "2020-01-31"))
   fake_downloaded_signals <- list(
     create_fake_downloaded_signal_large("in", "jhu-csse", "deaths_incidence_num"),
     create_fake_downloaded_signal_large("nc", "jhu-csse", "confirmed_incidence_num")

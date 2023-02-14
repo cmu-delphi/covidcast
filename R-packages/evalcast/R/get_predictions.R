@@ -40,10 +40,11 @@
 #'   (e.g. predict 1 day, 2 days, ..., k days ahead). Note that `ahead` is a
 #'   required component of the forecaster output (see above).
 #' @param parallel_execution TRUE, FALSE, or a single positive integer. If TRUE,
-#'   uses bettermc::mclapply to execute each forecast date prediction in
-#'   parallel on max number of cores - 1. If FALSE, the code is run on a single
-#'   core. If integer, runs in parallel on that many cores, clipping to the max
-#'   number of detected cores if a greater number is requested.
+#'   executes each forecast date prediction in parallel on the number of
+#'   detected cores available minus 1. If FALSE, the code is run on a single
+#'   core. If integer, runs in parallel on that many cores, clipping to the
+#'   number of detected cores available if a greater number is requested. Uses
+#'   [`bettermc::mclapply`] for parallelism if using more than one core.
 #' @param additional_mclapply_args a named list of additional arguments to pass
 #'   to [`bettermc::mclapply`] (besides `X`, `FUN`, and
 #'   `mc.cores`.)
@@ -98,12 +99,12 @@ get_predictions <- function(forecaster,
   if ("lag" %in% names(signals)) rlang::warn("lag in the signals arg will be ignored.", "evalcast::get_predictions")
   if ("issues" %in% names(signals)) rlang::warn("issues in the signals arg will be ignored.", "evalcast::get_predictions")
 
-  if (is.logical(parallel_execution) && parallel_execution == TRUE) {
-    num_cores <- max(1, parallel::detectCores() - 1)
-  } else if (is.logical(parallel_execution) && parallel_execution == FALSE) {
-    num_cores <- 1
-  } else if (is.integer(parallel_execution) && length(parallel_execution)==1L && parallel_execution >= 1L) {
-    num_cores <- max(1, min(parallel::detectCores(), parallel_execution))
+  if (rlang::is_bool(parallel_execution) && parallel_execution == TRUE) {
+    num_cores <- max(1L, parallel::detectCores() - 1L)
+  } else if (rlang::is_bool(parallel_execution) && parallel_execution == FALSE) {
+    num_cores <- 1L
+  } else if (rlang::is_integerish(parallel_execution, n = 1L) && parallel_execution >= 1L) {
+    num_cores <- max(1L, min(parallel::detectCores(), as.integer(parallel_execution)))
   } else {
     stop("parallel_execution argument is neither boolean nor integer.")
   }
@@ -126,10 +127,8 @@ get_predictions <- function(forecaster,
     return(preds)
   }
 
-  if (rlang::is_bool(parallel_execution) && parallel_execution == TRUE) {
+  if (num_cores > 1L) {
     out <- rlang::inject(bettermc::mclapply(forecast_dates, get_predictions_single_date_, mc.cores = num_cores, !!!additional_mclapply_args)) %>% bind_rows()
-  } else if (rlang::is_integer(parallel_execution) && parallel_execution > 1L) {
-    out <- rlang::inject(bettermc::mclapply(forecast_dates, get_predictions_single_date_, mc.cores = parallel_execution, !!!additional_mclapply_args)) %>% bind_rows()
   } else {
     out <- lapply(forecast_dates, get_predictions_single_date_) %>% bind_rows()
   }

@@ -430,3 +430,57 @@ test_that("start_day function and date mix within signals works", {
     expect_equal(pcard$incidence_period, rep("epiweek", n))
   })
 })
+
+create_fake_downloaded_signal_large <- function(geo_value, data_source, signal) {
+  tibble(
+    data_source = data_source,
+    signal = signal,
+    geo_value = geo_value,
+    time_value = seq(as.Date("2020-01-01"), as.Date("2020-01-31"), by = "days"),
+    issue = as.Date("2020-01-31"),
+    lag = 0L,
+    value = seq(1, 31),
+    stderr = seq(1, 31) * 0.1,
+    sample_size = seq(1, 31) * 10,
+  )
+}
+test_that("get_predictions on baseline_forecaster works with parallel_execution=TRUE and parallel_execution=num_cores-1", {
+  signals <- tibble(
+    data_source = "jhu-csse",
+    signal = c("deaths_incidence_num", "confirmed_incidence_num"),
+    start_day = "2020-01-01"
+  )
+  forecast_dates <- ymd(c("2020-01-30", "2020-01-31"))
+  fake_downloaded_signals <- list(
+    create_fake_downloaded_signal_large("in", "jhu-csse", "deaths_incidence_num"),
+    create_fake_downloaded_signal_large("nc", "jhu-csse", "confirmed_incidence_num")
+  )
+  mock_download_signal <- mock(fake_downloaded_signals[[1]],
+                               fake_downloaded_signals[[2]],
+                               cycle = TRUE)
+
+  mockr::with_mock(download_signal = mock_download_signal, {
+
+    predictions_cards <- get_predictions(baseline_forecaster,
+                                        name_of_forecaster = "baseline",
+                                        signals = signals,
+                                        forecast_dates = forecast_dates,
+                                        incidence_period = "day",
+                                        parallel_execution = FALSE)
+    predictions_cards_parallel1 <- get_predictions(baseline_forecaster,
+                                        name_of_forecaster = "baseline",
+                                        signals = signals,
+                                        forecast_dates = forecast_dates,
+                                        incidence_period = "day",
+                                        parallel_execution = TRUE)
+    predictions_cards_parallel2 <- get_predictions(baseline_forecaster,
+                                        name_of_forecaster = "baseline",
+                                        signals = signals,
+                                        forecast_dates = forecast_dates,
+                                        incidence_period = "day",
+                                        parallel_execution = max(parallel::detectCores() - 1L, 1L))
+
+    expect_equal(predictions_cards, predictions_cards_parallel1)
+    expect_equal(predictions_cards, predictions_cards_parallel2)
+  })
+})

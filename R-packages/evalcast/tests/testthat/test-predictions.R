@@ -460,6 +460,11 @@ test_that("get_predictions on baseline_forecaster works with parallel_execution=
                                fake_downloaded_signals[[2]],
                                cycle = TRUE)
 
+  # CRAN limits cores to 2, so we do the same in tests
+  # see: https://stackoverflow.com/a/50571533
+  chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+  num_workers <- min(2L, parallel::detectCores())
+
   mockr::with_mock(download_signal = mock_download_signal, {
 
     predictions_cards <- get_predictions(baseline_forecaster,
@@ -473,15 +478,19 @@ test_that("get_predictions on baseline_forecaster works with parallel_execution=
                                         signals = signals,
                                         forecast_dates = forecast_dates,
                                         incidence_period = "day",
-                                        parallel_execution = TRUE)
-    predictions_cards_parallel2 <- get_predictions(baseline_forecaster,
-                                        name_of_forecaster = "baseline",
-                                        signals = signals,
-                                        forecast_dates = forecast_dates,
-                                        incidence_period = "day",
-                                        parallel_execution = max(parallel::detectCores() - 1L, 1L))
+                                        parallel_execution = num_workers)
 
     expect_equal(predictions_cards, predictions_cards_parallel1)
-    expect_equal(predictions_cards, predictions_cards_parallel2)
+
+    # Only run this test if we're not in CRAN mode
+    if (!(nzchar(chk) && chk == "TRUE")) {
+      predictions_cards_parallel2 <- get_predictions(baseline_forecaster,
+                                          name_of_forecaster = "baseline",
+                                          signals = signals,
+                                          forecast_dates = forecast_dates,
+                                          incidence_period = "day",
+                                          parallel_execution = TRUE)
+      expect_equal(predictions_cards, predictions_cards_parallel2)
+    }
   })
 })

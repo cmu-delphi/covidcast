@@ -5,6 +5,8 @@ from unittest.mock import patch
 import matplotlib
 import platform
 import geopandas as gpd
+# for some reason gpd.testing gives "no attribute" so we'll import it explicitly
+import geopandas.testing as gpd_testing
 import numpy as np
 import pandas as pd
 import pytest
@@ -195,7 +197,7 @@ def test__join_county_geo_df():
         os.path.join(CURRENT_PATH,
                      "reference_data/expected__join_county_geo_df_no_mega_right.gpkg"),
         dtype={"geo_value": str})
-    pd.testing.assert_frame_equal(expected_no_mega_r, no_mega_r)
+    gpd_testing.assert_geodataframe_equal(expected_no_mega_r, no_mega_r)
 
     # test left join
     no_mega_l = plotting._join_county_geo_df(test_input, "county_code", geo_info, "left")
@@ -203,7 +205,7 @@ def test__join_county_geo_df():
         os.path.join(CURRENT_PATH,
                      "reference_data/expected__join_county_geo_df_no_mega_left.gpkg"),
         dtype={"geo_value": str})
-    pd.testing.assert_frame_equal(expected_no_mega_l, no_mega_l)
+    gpd_testing.assert_geodataframe_equal(expected_no_mega_l, no_mega_l)
 
     # test w/ megacounty combine
     mega = plotting._join_county_geo_df(test_input, "county_code", geo_info, "left", True)
@@ -211,7 +213,7 @@ def test__join_county_geo_df():
         os.path.join(CURRENT_PATH,
                      "reference_data/expected__join_county_geo_df_mega.gpkg"),
         dtype={"geo_value": str})
-    pd.testing.assert_frame_equal(expected_mega, mega)
+    gpd_testing.assert_geodataframe_equal(expected_mega, mega)
 
 
 def test__join_msa_geo_df():

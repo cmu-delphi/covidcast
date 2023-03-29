@@ -324,7 +324,7 @@ def _project_and_transform(data: gpd.GeoDataFrame,
 
     alaska.geometry = alaska.geometry.scale(0.35, 0.35, origin=(0, 0)).translate(-1.8e6, -1.6e6)
     hawaii.geometry = hawaii.geometry.translate(-1e6, -2e6)
-    pr.geometry = pr.geometry.translate(-0.9e6, 1e6).rotate(-16, origin=(0, 0))
+    pr.geometry = pr.geometry.translate(-1.2e6, 0.5e6)
     return cont, alaska, pr, hawaii
 
 

@@ -995,16 +995,28 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   # server when needed.
   url <- paste0(getOption("covidcast.base_url", default = COVIDCAST_BASE_URL),
                 endpoint, "/")
-  response <- httr::GET(url, httr::user_agent("covidcastR"), query = params)
+  auth <- getOption("covidcast.auth", default = NA)
+  user_agent <- httr::user_agent("covidcastR")
+  headers <- httr::add_headers(Authorization = ifelse(is.na(auth), "", paste("Bearer", auth)))
+
+  response <- httr::GET(url,
+                        user_agent,
+                        headers,
+                        query = params)
 
   # Query URL can be too long if lots of time values or geo values are involved;
   # switch to POST
   if (httr::status_code(response) == 414) {
-    response <- httr::POST(url, httr::user_agent("covidcastR"),
+    response <- httr::POST(url, user_agent,
+                           headers,
                            body = params)
   }
 
-  httr::stop_for_status(response, task = "fetch data from API")
+  msg <- "fetch data from API"
+  if (httr::status_code(response) %in% c(429, 401)) {
+    msg <- paste(msg, "anonymously - to register for an API key, visit TODO")
+  }
+  httr::stop_for_status(response, task = msg)
 
   return(httr::content(response, as = "text",
                        encoding = "utf-8"))

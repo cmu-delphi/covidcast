@@ -58,13 +58,13 @@ apply_shifts_one <- function(x, dt) {
 
   # Make sure that we have a complete record of dates for each geo_value (fill
   # with NAs as necessary)
-  x_all <- x %>% dplyr::group_by(.data$geo_value) %>%
-    dplyr::summarize(time_value = seq.Date(as.Date(min(.data$time_value)),
-                                           as.Date(max(.data$time_value)),
-                                           by = "day"),
-                     data_source = .data$data_source[1],
-                     signal = .data$signal[1]) %>%
-    dplyr::ungroup()
+  x_all <- x %>%
+    dplyr::group_by(.data$geo_value) %>%
+    dplyr::reframe(time_value = seq.Date(as.Date(min(.data$time_value)),
+                                         as.Date(max(.data$time_value)),
+                                         by = "day"),
+                   data_source = .data$data_source[1],
+                   signal = .data$signal[1])
   x <- dplyr::full_join(
     x, x_all, by = c("data_source", "signal", "geo_value", "time_value")
   )

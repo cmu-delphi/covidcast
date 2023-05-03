@@ -23,16 +23,16 @@ def use_api_key(key):
 
     :param key: String containing the API key for you and/or your group.
 
-    Anyone may access the Epidata API anonymously without providing an API
-    key. Anonymous API access is limited to $RATE_LIMIT with a maximum of two of
+    Anyone may access the Epidata API anonymously without providing an API key.
+    Anonymous API access is currently rate-limited and with a maximum of two of
     the requested parameters having multiple selections (signals, dates, issues,
     regions, etc). To be exempt from these limits, use this function to apply an
     API key to all subsequent queries. You can register for an API key at
-    <TODO:URL>.
+    <https://forms.gle/hkBr5SfQgxguAfEt7>.
 
-    Consult the `API documentation <TODO:URL>`_ for details on our API key
-    policies.
-
+    Consult the `API documentation
+    <https://cmu-delphi.github.io/delphi-epidata/api/api_keys.html>`_
+    for details on our API key policies.
     """
     Epidata.auth = key
 

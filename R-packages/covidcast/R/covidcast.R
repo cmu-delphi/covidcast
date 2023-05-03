@@ -1013,8 +1013,8 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   }
 
   msg <- "fetch data from API"
-  if (httr::status_code(response) %in% c(429, 401)) {
-    msg <- paste(msg, "anonymously - to register for an API key, visit TODO")
+  if (is.na(auth)) {
+    msg <- paste(msg, "anonymously")
   }
   httr::stop_for_status(response, task = msg)
 

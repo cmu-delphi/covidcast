@@ -330,7 +330,38 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
                         covidhub_forecaster_name)
 
     dir.create(output_dir, recursive = TRUE)
-    download.file(filename, output_file, mode = "w", quiet = TRUE)
+
+    # Download file. Re-attempt up to 8 times (max 2 min wait).
+    attempt <- 0
+    n_max_attempt <- 8
+    base_wait <- 1 # second
+
+    while (attempt < n_max_attempt) {
+      attempt <- attempt + 1
+      # Increase time between download attempts in exponential backoff
+      wait <- base_wait * 2 ^ (attempt - 1)
+      download_status <- try({
+        download.file(filename, output_file, mode="w", quiet=TRUE)
+      })
+
+      if (download_status != 0) {
+        if (attempt < n_max_attempt) { message("retrying...") }
+        Sys.sleep(wait)
+        next
+      } else {
+        break
+      }
+    }
+
+    if (attempt == n_max_attempt & download_status != 0) {
+      warning(filename, " could not be downloaded")
+      # Delete dir. We expect it to be empty, but double check.
+      if (length(list.files(output_dir)) == 0) {
+        unlink(output_dir, recursive = TRUE)
+      }
+    } else if (attempt > 1 & download_status == 0) {
+      message("succeeded after ", attempt, " attempts")
+    }
   }
 
   sch <- schema(forecast_date=string(),
@@ -395,7 +426,9 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
 get_covidhub_forecast_dates <- function(forecaster_name) {
   url <- "https://github.com/reichlab/covid19-forecast-hub/tree/master/data-processed/"
   out <- xml2::read_html(paste0(url, forecaster_name)) %>%
-    rvest::html_nodes(xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div/div/div[3]") %>%
+    # In main element (identified by id), look for a `grid` object that has `row` children.
+    # Avoid using the full xpath due to fragility.
+    rvest::html_nodes(xpath = "//*[@id=\"js-repo-pjax-container\"]//div[@role=\"grid\" and .//@role=\"row\"]") %>%
     rvest::html_text() %>%
     stringr::str_remove_all("\\n") %>%
     stringr::str_match_all(sprintf("(20\\d{2}-\\d{2}-\\d{2})-%s.csv",

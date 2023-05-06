@@ -30,6 +30,8 @@
 #'   `predictions_cards()` with additional columns for each `err_measure` and
 #'   for the truth (named `actual`).
 #'
+#' @importFrom rlang quo .data
+#'
 #' @export
 evaluate_predictions <- function(
   predictions_cards,
@@ -43,20 +45,23 @@ evaluate_predictions <- function(
   assert_that(is.data.frame(truth_data),
               msg = paste("In evaluate_predictions: `truth_data` must be a
                           data frame"))
+  if ("actual" %in% names(predictions_cards)) {
+    warning("`predictions_cards` already has an `actual` column; this `actual` column will be used and `truth_data` will be ignored.")
+  }
   assert_that("actual" %in% names(truth_data),
               msg = paste("`truth_data` must contain a column named `actual`"))
-  predictions_cards <- left_join(predictions_cards, truth_data)
+  predictions_cards <- left_join(predictions_cards, truth_data,
+                                 by=intersect(colnames(predictions_cards), colnames(truth_data)))
   if (is.null(err_measures) || length(err_measures) == 0) {
     score_card <- predictions_cards
   } else {
-    score_card <- predictions_cards %>% group_by(across(all_of(grp_vars)))
-    sc_keys <- score_card %>% group_keys()
-    score_card <- score_card %>%
-      group_split() %>%
-      lapply(erm, err_measures = err_measures) %>%
-      bind_rows() %>%
-      bind_cols(sc_keys) %>%
-      inner_join(predictions_cards, by = grp_vars)
+    err_calls <- lapply(err_measures, function(err_measure) {
+      quo(err_measure(.data$quantile, .data$value, .data$actual))
+    })
+    score_card <- predictions_cards %>%
+      group_by(across(all_of(grp_vars))) %>%
+      summarize(!!!err_calls, .groups = "drop") %>%
+      inner_join(predictions_cards, by = grp_vars, multiple = "all")
   }
   class(score_card) <- c("score_cards", class(score_card))
   attributes(score_card) <- c(attributes(score_card),
@@ -66,7 +71,7 @@ evaluate_predictions <- function(
     select(-.data$quantile, -.data$value)
 
   score_card <- score_card %>%
-                 relocate(attr(err_measures, "name"), .after = last_col())
+                 relocate(attr(err_measures, "names"), .after = last_col())
   return(score_card)
 }
 
@@ -105,6 +110,8 @@ evaluate_predictions <- function(
 #'   may be provided if scoring is not desired.
 #' @param backfill_buffer How many days until response is deemed trustworthy
 #'   enough to be taken as correct? See details for more.
+#' @param offline_signal_dir a path to a directory where to cache downloaded data.
+#'   Data not cached if NULL.
 #' @template geo_type-template
 #' @return tibble of "score cards". Contains the same information as the
 #'   `predictions_cards()` with additional columns for each `err_measure` and
@@ -118,21 +125,13 @@ evaluate_covid_predictions <- function(predictions_cards,
                                         backfill_buffer = 0,
                                         geo_type = c("county", "hrr", "msa",
                                                      "dma", "state", "hhs",
-                                                     "nation")) {
+                                                     "nation"),
+                                        offline_signal_dir = NULL) {
   assert_that("predictions_cards" %in% class(predictions_cards),
               msg = "predictions_cards must be of class `predictions_cards`")
   geo_type <- match.arg(geo_type)
-  grp_vars <- c("data_source",
-               "signal",
-               "incidence_period",
-               "geo_value",
-               "forecast_date",
-               "ahead")
   actual_data <- get_covidcast_data(predictions_cards, backfill_buffer,
-                                    geo_type)
-  predictions_cards <- left_join(predictions_cards,
-                                 actual_data,
-                                 by = grp_vars)
+                                    geo_type, offline_signal_dir)
   score_card <- evaluate_predictions(predictions_cards,
                                      actual_data,
                                      err_measures)
@@ -146,7 +145,8 @@ evaluate_covid_predictions <- function(predictions_cards,
 
 get_covidcast_data <- function(predictions_cards,
                                backfill_buffer, 
-                               geo_type) {
+                               geo_type,
+                               offline_signal_dir = NULL) {
   grouped_preds <- predictions_cards %>%
                      group_split(data_source, signal, ahead, incidence_period)
   actuals <- list()
@@ -176,7 +176,8 @@ get_covidcast_data <- function(predictions_cards,
                                              incidence_period,
                                              ahead,
                                              geo_type,
-                                             geo_values)
+                                             geo_values,
+                                             offline_signal_dir)
       target_response <- target_response %>%
                           add_column(data_source = data_source,
                                      signal = signal,

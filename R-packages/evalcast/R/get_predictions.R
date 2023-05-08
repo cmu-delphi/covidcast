@@ -85,7 +85,7 @@ get_predictions <- function(forecaster,
                             response_data_source = signals$data_source[1],
                             response_data_signal = signals$signal[1],
                             forecaster_args = list(),
-                            parallel_execution = TRUE,
+                            parallel_execution = FALSE,
                             additional_mclapply_args = list(),
                             honest_as_of = TRUE,
                             offline_signal_dir = NULL) {

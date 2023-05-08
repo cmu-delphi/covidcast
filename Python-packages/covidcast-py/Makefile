@@ -20,6 +20,11 @@ build:
 	python3 setup.py clean
 	python3 setup.py sdist bdist_wheel
 
+sphinx: venv
+	. env/bin/activate; \
+	cd docs; \
+	make html
+
 lint:
 	. env/bin/activate; pylint covidcast/ --rcfile .pylintrc
 	. env/bin/activate; pydocstyle covidcast/
@@ -29,4 +34,5 @@ test:
 	pytest tests/ -W ignore::UserWarning
 
 clean:
+	cd docs && make clean && cd -; \
 	rm -rf env

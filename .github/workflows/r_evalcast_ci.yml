@@ -43,11 +43,13 @@ jobs:
         with:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-r-eval-1-
-      - name: Install dependencies
-        run: |
-          install.packages(c("remotes", "rcmdcheck"))
-          remotes::install_deps(dependencies = TRUE)
-        shell: Rscript {0}
+      - name: Install and cache dependencies
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          working-directory: R-packages/evalcast/
+          upgrade: 'TRUE'
       - name: Check
         run: |
           rcmdcheck::rcmdcheck(args = c("--no-manual", "--ignore-vignettes", "--as-cran"), build_args = c("--no-build-vignettes"), error_on = "error")

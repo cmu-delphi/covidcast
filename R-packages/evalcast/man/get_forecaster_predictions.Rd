@@ -11,8 +11,8 @@ get_forecaster_predictions(
   forecast_type = c("point", "quantile"),
   ahead = 1:4,
   incidence_period = c("epiweek", "day"),
-  signal = c("confirmed_incidence_num", "deaths_incidence_num",
-    "deaths_cumulative_num", "confirmed_admissions_covid_1d")
+  signal = c("confirmed_incidence_num", "deaths_incidence_num", "deaths_cumulative_num",
+    "confirmed_admissions_covid_1d")
 )
 }
 \arguments{

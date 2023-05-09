@@ -39,7 +39,7 @@
 #'   to `forecaster()`. A common use case would be to pass the period ahead
 #'   (e.g. predict 1 day, 2 days, ..., k days ahead). Note that `ahead` is a
 #'   required component of the forecaster output (see above).
-#' @param parallel_execution TRUE, FALSE, or a single positive integer. If TRUE,
+#' @param parallel_execution FALSE (default), TRUE, or a single positive integer. If TRUE,
 #'   executes each forecast date prediction in parallel on the number of
 #'   detected cores available minus 1. If FALSE, the code is run on a single
 #'   core. If integer, runs in parallel on that many cores, clipping to the

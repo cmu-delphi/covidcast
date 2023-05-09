@@ -54,10 +54,11 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3
 Remotes:
-    reichlab/zoltr,
-    reichlab/covidHubUtils,
+    bettermc=github::gfkse/bettermc@v1.1.2,
+    zoltr=github::reichlab/zoltr,
+    covidHubUtils=github::reichlab/covidHubUtils
 Imports:
     assertthat,
     covidcast,

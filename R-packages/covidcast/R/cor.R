@@ -66,13 +66,12 @@ covidcast_cor <- function(x, y, dt_x = 0, dt_y = 0,
   # Make sure that we have a complete record of dates for each geo_value (fill
   # with NAs as necessary)
   z_all <- dplyr::group_by(z, .data$geo_value)
-  z_all <- dplyr::summarize(z_all,
-                            time_value = seq.Date(
-                              as.Date(min(.data$time_value)),
-                              as.Date(max(.data$time_value)),
-                              by = "day")
-                            )
-  z_all <- dplyr::ungroup(z_all)
+  z_all <- dplyr::reframe(z_all,
+                          time_value = seq.Date(
+                            as.Date(min(.data$time_value)),
+                            as.Date(max(.data$time_value)),
+                            by = "day")
+                          )
 
   z <- dplyr::full_join(z, z_all, by = c("geo_value", "time_value"))
 

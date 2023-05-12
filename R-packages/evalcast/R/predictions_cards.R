@@ -42,13 +42,14 @@ as.predictions_cards.predictions_cards <- function(x, ...) {
 #'    Other columns will be preserved as-is.
 #' @export
 as.predictions_cards.data.frame <- function(
-  x, 
+  x,
   forecaster = "forecaster",
   forecast_date = lubridate::today(),
-  incidence_period = c("epiweek","day"),
+  incidence_period = c("epiweek", "day"),
   data_source = "data_source",
   signal = "signal",
-  target_end_date = NULL
+  target_end_date = NULL,
+  ...
 ) {
   provided_cols <- names(x)
   req_cols <- c("ahead", "geo_value", "quantile", "value")

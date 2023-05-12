@@ -17,7 +17,8 @@ as.predictions_cards(x, ...)
   incidence_period = c("epiweek", "day"),
   data_source = "data_source",
   signal = "signal",
-  target_end_date = NULL
+  target_end_date = NULL,
+  ...
 )
 }
 \arguments{
@@ -58,13 +59,13 @@ evaluation and plotting functions.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{predictions_cards}: Simply returns the \code{predictions_cards} object
+\item \code{as.predictions_cards(predictions_cards)}: Simply returns the \code{predictions_cards} object
 unchanged.
 
-\item \code{data.frame}: The input data frame \code{x} must contain the
+\item \code{as.predictions_cards(data.frame)}: The input data frame \code{x} must contain the
 columns \code{ahead}, \code{geo_value}, \code{quantile} and \code{value}. Addional columns
 \code{forecaster} \code{forecast_date}, \code{incidence_period}, \code{data_source},
 \code{signal}, and \code{target_end_date} will be created if missing.
 Other columns will be preserved as-is.
-}}
 
+}}

@@ -46,8 +46,10 @@ def test_plot(mock_metadata):
 
     # test county plots
     test_county = pd.read_csv(
-        os.path.join(CURRENT_PATH, "reference_data/test_input_county_signal.csv"), dtype=str)
-    test_county["time_value"] = test_county.time_value.astype("datetime64[D]")
+        os.path.join(CURRENT_PATH, "reference_data/test_input_county_signal.csv"),
+        dtype=str,
+        parse_dates=["time_value"]
+    )
     test_county["value"] = test_county.value.astype("float")
 
     # w/o megacounties
@@ -71,23 +73,26 @@ def test_plot(mock_metadata):
 
     # test state
     test_state = pd.read_csv(
-        os.path.join(CURRENT_PATH, "reference_data/test_input_state_signal.csv"), dtype=str)
-    test_state["time_value"] = test_state.time_value.astype("datetime64[D]")
-    test_state["value"] = test_state.value.astype("float")
+        os.path.join(CURRENT_PATH, "reference_data/test_input_state_signal.csv"),
+        dtype = str,
+        converters = {"value": float},
+        parse_dates = ["time_value"],
+    )
     state_fig = plotting.plot(test_state)
     assert np.allclose(_convert_to_array(state_fig), expected["state"], atol=2, rtol=0)
 
     # test MSA
     test_msa = pd.read_csv(
-        os.path.join(CURRENT_PATH, "reference_data/test_input_msa_signal.csv"), dtype=str)
-    test_msa["time_value"] = test_msa.time_value.astype("datetime64[D]")
-    test_msa["value"] = test_msa.value.astype("float")
+        os.path.join(CURRENT_PATH, "reference_data/test_input_msa_signal.csv"),
+        dtype = str,
+        converters = {"value": float},
+        parse_dates = ["time_value"],
+    )
     msa_fig = plotting.plot(test_msa)
     assert np.allclose(_convert_to_array(msa_fig), expected["msa"], atol=2, rtol=0)
 
     # test bubble
     msa_bubble_fig = plotting.plot(test_msa, plot_type="bubble")
-    from matplotlib import pyplot as plt
     assert np.allclose(_convert_to_array(msa_bubble_fig), expected["msa_bubble"], atol=2, rtol=0)
 
 
@@ -144,12 +149,10 @@ def test_get_geo_df():
         os.path.join(CURRENT_PATH, "reference_data/test_input_county_signal.csv"),
         dtype={"geo_value": str}, parse_dates=["time_value", "issue"]
     )
-    expected_geo_signal = gpd.read_file(
-        os.path.join(CURRENT_PATH, "reference_data/expected_get_geo_df_right_2.gpkg"),
-        dtype={"geo_value": str})
-    # geopandas reads file types slightly differently than pandas so need t`o recast
-    expected_geo_signal["time_value"] = expected_geo_signal.time_value.astype("datetime64[ns]")
-    expected_geo_signal["issue"] = expected_geo_signal.issue.astype("datetime64[ns]")
+    expected_geo_signal = gpd.read_file(os.path.join(CURRENT_PATH, "reference_data/expected_get_geo_df_right_2.gpkg"),dtype={"geo_value": str})
+    # geopandas reads file types slightly differently than pandas so need to recast
+    expected_geo_signal["time_value"] = expected_geo_signal.time_value.dt.tz_localize(None)
+    expected_geo_signal["issue"] = expected_geo_signal.issue.dt.tz_localize(None)
     expected_geo_signal["direction"] = np.nan
     output5 = plotting.get_geo_df(test_signal)
     pd.testing.assert_frame_equal(expected_geo_signal, output5)

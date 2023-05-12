@@ -15,7 +15,9 @@
 weighted_interval_score <- function(quantile, value, actual_value) {
   score_func_param_checker(quantile, value, actual_value, "weighted_interval_score")
   if (all(is.na(actual_value))) return(NA)
-  actual_value <- unique(actual_value)
+  # `score_func_param_checker` above has already checked for uniqueness, so we
+  # can save a bit of effort and just take the first actual.
+  actual_value <- actual_value[[1L]]
 
   value <- value[!is.na(quantile)]
   quantile <- quantile[!is.na(quantile)]
@@ -95,7 +97,7 @@ interval_coverage <- function(coverage) {
     
     lower <- value[which(find_quantile_match(quantiles, lower_interval))]
     upper <- value[which(find_quantile_match(quantiles, upper_interval))]
-    return(actual_value[1] >= lower & actual_value[1] <= upper)
+    return(actual_value[[1L]] >= lower & actual_value[[1L]] <= upper)
   }
 }
 
@@ -117,7 +119,9 @@ overprediction <- function(quantile, value, actual_value) {
     return(NA)
   }
   if (all(is.na(actual_value))) return(NA)
-  actual_value <- unique(actual_value)
+  # `score_func_param_checker` above has already checked for uniqueness, so we
+  # can save a bit of effort and just take the first actual.
+  actual_value <- actual_value[[1L]]
   
   lower <- value[!is.na(quantile) & quantile < .5]
   med <- value[find_quantile_match(quantile, 0.5)]
@@ -127,11 +131,8 @@ overprediction <- function(quantile, value, actual_value) {
               (med - actual_value) * (med > actual_value),
               NULL)
   
-    
-  
   ans <- mean(c(
     rep((lower - actual_value) * (lower > actual_value), 2), m))
-    
   
   return(ans)
 }
@@ -155,7 +156,9 @@ underprediction <- function(quantile, value, actual_value) {
     return(NA)
   }
   if (all(is.na(actual_value))) return(NA)
-  actual_value <- unique(actual_value)
+  # `score_func_param_checker` above has already checked for uniqueness, so we
+  # can save a bit of effort and just take the first actual.
+  actual_value <- actual_value[[1L]]
   
   upper <- value[!is.na(quantile) & quantile > .5]
   med <- value[find_quantile_match(quantile, 0.5)]
@@ -171,7 +174,7 @@ underprediction <- function(quantile, value, actual_value) {
 }
 #' Sharpness component of the weighted interval score
 #' 
-#' Requires symmetric quantile forecasts. Roughly, a penalty for the w
+#' Requires symmetric quantile forecasts. Roughly, a penalty for the
 #' width of predicted quantiles.
 #'
 #' @param quantile vector of forecasted quantiles
@@ -187,50 +190,57 @@ sharpness <- function(quantile, value, actual_value) {
 }
 
 
-# @param quantiles vector of forecasted quantiles
-# @param values vector of forecasted values
-# @param actual_value actual_value, either as a scalar or a vector of the same 
-#   length as `quantiles` and `values`
-# @param id string to identify the caller of the function and displayed in
-#   error messages (recommended to be the parent function's name)
+#' Common parameter checks for score functions
+#'
+#' A set of common checks for score functions, meant to identify common causes
+#' of issues. Avoids `assert_that` for speed.
+#'
+#' @param quantiles vector of forecasted quantiles
+#' @param values vector of forecasted values
+#' @param actual_value actual_value, either as a scalar or a vector of the same 
+#'   length as `quantiles` and `values`
+#' @param id string to identify the caller of the function and displayed in
+#'   error messages (recommended to be the parent function's name)
 score_func_param_checker <- function(quantiles, values, actual_value, id = ""){
   id_str = paste0(id, ": ")
   if (length(actual_value) > 1) {
-    assert_that(length(actual_value) == length(values),
-                msg = paste0(id_str, 
-                             "actual_value must be a scalar or the same length",
-                             " as values"))
+    if (length(actual_value) != length(values)) {
+      stop(paste0(id_str,
+                  "actual_value must be a scalar or the same length",
+                  " as values"))
+    }
     actual_value = unique(actual_value)
   }
-  assert_that(length(actual_value) == 1,
-              msg = paste0(id_str,
-                           "actual_value must have exactly 1 unique value"))
-  assert_that(length(quantiles) == length(values),
-              msg = paste0(id_str, 
-                           "quantiles and values must be of the same length"))
-  assert_that(!any(duplicated(quantiles)),
-              msg = paste0(id_str,
-                           "quantiles must be unique."))
+
+  if (length(actual_value) != 1) {
+    stop(paste0(id_str,
+                "actual_value must have exactly 1 unique value"))
+  }
+  if (length(quantiles) != length(values)) {
+    stop(paste0(id_str,
+                "quantiles and values must be of the same length"))
+  }
+
+  if (anyDuplicated(quantiles)) {
+    stop(paste0(id_str,
+                "quantiles must be unique.")
+    )
+  }
 }
 
-
 is_symmetric <- function(x, tol=1e-8) {
-  x <- sort(x)
+  # Checking if `x` is sorted is much faster than trying to sort it again
+  if (is.unsorted(x, na.rm=TRUE)) {
+    # Implicitly drops NA values
+    x <- sort(x)
+  } else {
+    # Match `sort` behavior
+    x <- x[!is.na(x)]
+  }
   all(abs(x + rev(x) - 1) < tol)
 }
 
+
 find_quantile_match <- function(quantiles, val_to_match, tol=1e-8){
   return(abs(quantiles - val_to_match) < tol  & !is.na(quantiles))
-}
-
-
-erm <- function(x, err_measures){
-  # just binds up any error measure functions for an lapply
-  # I'm sure there's a better way to do this, but I couldn't think of one
-  out <- double(length(err_measures))
-  for (i in seq_along(err_measures)) {
-    out[i] <- err_measures[[i]](x$quantile, x$value, x$actual)
-  }
-  names(out) <- names(err_measures)
-  bind_rows(out)
 }

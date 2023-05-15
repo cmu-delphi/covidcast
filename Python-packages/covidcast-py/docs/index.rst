@@ -40,12 +40,14 @@ To get started, check out :ref:`getting started <getting-started>`.
    free API key <https://forms.gle/hkBr5SfQgxguAfEt7>`_ even if your usage falls
    within the anonymous usage limits. API key usage helps us understand who and
    how others are using our Delphi Epidata API, which may in turn inform our
-   future research, data partnerships, and funding. As we are a research group,
-   our server resources are limited and cannot support high-volume interactive
-   use (with or without an API key). If you use data from the COVIDcast Epidata
-   API to power a public product, dashboard, app, or other service, please
-   download the data you need and store it centrally rather than making API
-   requests for every user.
+   future research, data partnerships, and funding. For usage instructions, see
+   :py:func:`covidcast.use_api_key`.
+
+   As we are a research group, our server resources are limited and cannot
+   support high-volume interactive use (with or without an API key). If you use
+   data from the COVIDcast Epidata API to power a public product, dashboard,
+   app, or other service, please download the data you need and store it
+   centrally rather than making API requests for every user.
 
    See also the `COVIDcast Terms of Use
    <https://covidcast.cmu.edu/terms-of-use.html>`_, noting that the data is a

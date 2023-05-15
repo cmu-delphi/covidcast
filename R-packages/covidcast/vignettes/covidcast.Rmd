@@ -9,6 +9,7 @@ vignette: >
 ---
 
 This package provides access to data frames of values from the [COVIDcast
+endpoint of the Epidata
 API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html). Using the
 `covidcast_signal()` function, you can fetch any data you may be interested in
 analyzing, then use `plot.covidcast_signal()` to make plots and maps. Since the
@@ -77,6 +78,31 @@ cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
                         start_day = "2020-05-01", end_day = "2020-05-07",
                         geo_type = "county", geo_value = "42003")
 knitr::kable(head(cli))
+```
+
+### API keys
+
+By default, this package submits queries to the API anonymously. All the
+examples in the package documentation are compatible with anonymous use of the
+API, but [there are some limits on anonymous
+queries](https://cmu-delphi.github.io/delphi-epidata/api/api_keys.html) which do
+not apply if you use an API key to authenticate your queries. If you regularly
+or frequently use our system, please consider [registering for a free API
+key](https://forms.gle/hkBr5SfQgxguAfEt7) even if your usage falls within the
+anonymous usage limits. API key usage helps us understand who and how others are
+using our Delphi Epidata API, which may in turn inform our future research, data
+partnerships, and funding. If you do have an API key, you can use it with this
+package by setting the `covidcast.auth` option, then call fetch functions as
+normal:
+
+```{r, eval=FALSE}
+options(covidcast.auth = "your_api_key")
+
+cli <- suppressMessages(
+  covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
+                   start_day = "2020-05-01", end_day = "2020-05-07",
+                   geo_type = "state")
+)
 ```
 
 ### Plotting and mapping

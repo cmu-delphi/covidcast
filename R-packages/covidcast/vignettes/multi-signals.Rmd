@@ -27,7 +27,7 @@ signals <- covidcast_signals(data_source = "usa-facts",
                              signal = c("confirmed_incidence_num",
                                         "deaths_incidence_num"),
                              start_day = start_day, end_day = end_day,
-                             geo_type = "state")
+                             geo_type = "state", geo_values = "pa")
 
 summary(signals[[1]])
 summary(signals[[2]])

@@ -20,7 +20,7 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     install_requires=[
-        "pandas",
+        "pandas<2",
         "requests",
         "delphi-epidata>=0.0.11",
         "geopandas",

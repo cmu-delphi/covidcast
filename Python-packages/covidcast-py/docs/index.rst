@@ -31,10 +31,23 @@ To get started, check out :ref:`getting started <getting-started>`.
    notified of package updates, new data sources, corrections, and other
    updates.
 
-.. warning :: If you use data from the COVIDcast Epidata API to power a public
-   product, dashboard, app, or other service, please download the data you need
-   and store it centrally rather than making API requests for every user. Our
-   server resources are limited and cannot support high-volume interactive use.
+.. warning :: By default, this package submits queries to the API
+   anonymously. All the examples in the package documentation are compatible
+   with anonymous use of the API, but `there are some limits on anonymous
+   queries <https://cmu-delphi.github.io/delphi-epidata/api/api_keys.html>`_
+   which do not apply if you use an API key to authenticate your queries. If you
+   regularly or frequently use our system, please consider `registering for a
+   free API key <https://forms.gle/hkBr5SfQgxguAfEt7>`_ even if your usage falls
+   within the anonymous usage limits. API key usage helps us understand who and
+   how others are using our Delphi Epidata API, which may in turn inform our
+   future research, data partnerships, and funding. For usage instructions, see
+   :py:func:`covidcast.use_api_key`.
+
+   As we are a research group, our server resources are limited and cannot
+   support high-volume interactive use (with or without an API key). If you use
+   data from the COVIDcast Epidata API to power a public product, dashboard,
+   app, or other service, please download the data you need and store it
+   centrally rather than making API requests for every user.
 
    See also the `COVIDcast Terms of Use
    <https://covidcast.cmu.edu/terms-of-use.html>`_, noting that the data is a

@@ -11,13 +11,30 @@ from epiweeks import Week
 
 from .errors import NoDataWarning
 
-# Point API requests to the AWS endpoint
+# Point API requests to the default endpoint
 Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
 
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state",  "hhs", "nation"}
 
 _ASYNC_CALL = False
 
+def use_api_key(key):
+    """Set the API key to use for all subsequent queries.
+
+    :param key: String containing the API key for you and/or your group.
+
+    Anyone may access the Epidata API anonymously without providing an API key.
+    Anonymous API access is currently rate-limited and with a maximum of two of
+    the requested parameters having multiple selections (signals, dates, issues,
+    regions, etc). To be exempt from these limits, use this function to apply an
+    API key to all subsequent queries. You can register for an API key at
+    <https://forms.gle/hkBr5SfQgxguAfEt7>.
+
+    Consult the `API documentation
+    <https://cmu-delphi.github.io/delphi-epidata/api/api_keys.html>`_
+    for details on our API key policies.
+    """
+    Epidata.auth = key
 
 def signal(data_source: str,
            signal: str,  # pylint: disable=W0621

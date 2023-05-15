@@ -80,6 +80,8 @@ cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
 knitr::kable(head(cli))
 ```
 
+### API keys
+
 By default, this package submits queries to the API anonymously. All the
 examples in the package documentation are compatible with anonymous use of the
 API, but [there are some limits on anonymous

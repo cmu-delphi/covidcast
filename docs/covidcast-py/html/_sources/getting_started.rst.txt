@@ -104,6 +104,18 @@ May 1st were updated on May 23rd based on new data, giving a ``lag`` of 22 days.
 See the :py:func:`covidcast.signal` documentation for details on the returned
 data frame.
 
+.. _api-key-usage:
+.. note ::
+
+   By default, this package submits queries to the API anonymously. If you have an
+   API key, you can use it with this package by calling
+   :py:func:`covidcast.use_api_key`, then call fetch functions as normal:
+
+       >>> covidcast.use_api_key("your_api_key")
+       >>> data = covidcast.signal("fb-survey", "smoothed_cli",
+       ...                         date(2020, 5, 1), date(2020, 5, 7),
+       ...                         "county")
+
 The API documentation lists each available signal and provides technical details
 on how it is estimated and how its standard error is calculated. In this case,
 for example, the `symptom surveys documentation page

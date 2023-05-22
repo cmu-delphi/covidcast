@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v0.1.6, May _, 2023
+-------------------
+
+- New feature: This package now supports queries that require an API key. Call
+  :py:func:`covidcast.use_api_key` before running fetch functions to
+  authenticate your requests.
+
 v0.1.5, May 11, 2021
 --------------------
 

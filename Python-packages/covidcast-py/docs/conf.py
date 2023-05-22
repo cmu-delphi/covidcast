@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'COVIDcast API client'
-copyright = '2021, Delphi research group'
+copyright = '2023, Delphi research group'
 author = 'Delphi research group'
 
 # The full version, including alpha/beta/rc tags

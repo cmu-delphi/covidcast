@@ -16,8 +16,9 @@ install:  venv
 	pip install -r requirements_dev.txt; \
 	pip install -e .
 
-build:
-	python3 setup.py clean
+build: venv
+	. env/bin/activate; \
+	python3 setup.py clean && \
 	python3 setup.py sdist bdist_wheel
 
 sphinx: venv

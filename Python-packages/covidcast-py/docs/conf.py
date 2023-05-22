@@ -21,7 +21,7 @@ copyright = '2021, Delphi research group'
 author = 'Delphi research group'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.5'
+release = '0.2.0'
 
 
 # -- General configuration ---------------------------------------------------

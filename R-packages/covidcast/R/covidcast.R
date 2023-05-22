@@ -1038,7 +1038,8 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
 
   # HTTP 429 Too Many Requests may be API rate-limiting
   if (httr::status_code(response) == 429 && is.na(auth)) {
-    abort("Rate limit exceeded when fetching data from API anonymously. See the \"API keys\" section of the `covidcast_signal()` documentation for information on registering for an API key.")
+    abort("Rate limit exceeded when fetching data from API anonymously. See the \"API keys\" section of the `covidcast_signal()` documentation for information on registering for an API key.",
+          class = "covidcast_rate_limit")
   }
 
   # Catch all other kinds of errors

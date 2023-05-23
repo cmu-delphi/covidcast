@@ -1,6 +1,11 @@
 Fetching Data
 =============
 
+API keys
+--------
+
+.. autofunction:: covidcast.use_api_key
+
 Signals
 -------
 

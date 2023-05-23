@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
       </span>
     </div>
 
@@ -109,7 +109,7 @@ then use rmarkdown::render("README.Rmd") to regenerate --><p><a href="https://cr
 <span><span class="va">deaths</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/covidcast_signal.html">covidcast_signal</a></span><span class="op">(</span><span class="st">"jhu-csse"</span>, <span class="st">"deaths_incidence_num"</span>,</span>
 <span>                           <span class="st">"2020-04-15"</span>, <span class="st">"2021-04-15"</span>,</span>
 <span>                           geo_type <span class="op">=</span> <span class="st">"nation"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">deaths</span>, plot_type <span class="op">=</span> <span class="st">"line"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">deaths</span>, plot_type <span class="op">=</span> <span class="st">"line"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-example-plot-1.svg"><!-- --></p>
 <p>The package supports convenient plotting and mapping tools, correlation analyses between signals, and various geographic utilities for working with counties, metropolitan areas, and other units.</p>
 <p>Consult the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html" class="external-link">COVIDcast Epidata API documentation</a> for details on the data included in the API, licensing, and how to cite this data in your work. The <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html" class="external-link">signals documentation</a> lists all the data sources and signals available through this API.</p>

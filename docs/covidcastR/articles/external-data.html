@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
       </span>
     </div>
 
@@ -219,7 +219,7 @@
 <td align="left">ak</td>
 <td align="left">2020-10-31</td>
 <td align="right">7</td>
-<td align="left">2023-01-09</td>
+<td align="left">2023-05-23</td>
 </tr>
 <tr class="even">
 <td align="left">covid-tracking</td>
@@ -227,7 +227,7 @@
 <td align="left">al</td>
 <td align="left">2020-10-31</td>
 <td align="right">0</td>
-<td align="left">2023-01-09</td>
+<td align="left">2023-05-23</td>
 </tr>
 <tr class="odd">
 <td align="left">covid-tracking</td>
@@ -235,7 +235,7 @@
 <td align="left">ar</td>
 <td align="left">2020-10-31</td>
 <td align="right">35</td>
-<td align="left">2023-01-09</td>
+<td align="left">2023-05-23</td>
 </tr>
 <tr class="even">
 <td align="left">covid-tracking</td>
@@ -243,7 +243,7 @@
 <td align="left">as</td>
 <td align="left">2020-10-31</td>
 <td align="right">0</td>
-<td align="left">2023-01-09</td>
+<td align="left">2023-05-23</td>
 </tr>
 <tr class="odd">
 <td align="left">covid-tracking</td>
@@ -251,7 +251,7 @@
 <td align="left">az</td>
 <td align="left">2020-10-31</td>
 <td align="right">68</td>
-<td align="left">2023-01-09</td>
+<td align="left">2023-05-23</td>
 </tr>
 <tr class="even">
 <td align="left">covid-tracking</td>
@@ -259,13 +259,13 @@
 <td align="left">ca</td>
 <td align="left">2020-10-31</td>
 <td align="right">0</td>
-<td align="left">2023-01-09</td>
+<td align="left">2023-05-23</td>
 </tr>
 </tbody>
 </table>
 <p>This allows us to make maps using the same functions used for other COVIDcast data:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">hospitalized</span>, plot_type <span class="op">=</span> <span class="st">"choro"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">hospitalized</span>, plot_type <span class="op">=</span> <span class="st">"choro"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: Metadata for signal mean and standard deviation not available;</span></span>
 <span><span class="co">## defaulting to observed mean and standard deviation to set plot range.</span></span></code></pre>
 <p><img src="external-data_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
@@ -294,7 +294,7 @@
 <span><span class="co">## <span style="color: #BCBCBC;"> 8</span> 2020-10-08  0.056<span style="text-decoration: underline;">1</span></span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 9</span> 2020-10-09  0.034<span style="text-decoration: underline;">4</span></span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span> 2020-10-10  0.090<span style="text-decoration: underline;">5</span></span></span>
-<span><span class="co">## <span style="color: #949494;"># … with 21 more rows</span></span></span></code></pre>
+<span><span class="co">## <span style="color: #949494;"># ℹ 21 more rows</span></span></span></code></pre>
 <p>We can also use the tools provided by this package to place both signals into a single data frame for analysis. For example, to build a model that uses hospitalizations and other data to predict deaths, it may be convenient to produce a data frame where each row represents one state on one day, and each column is a variable (such as hospitalization or death). Using <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code>, this is easy:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">death_hosp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aggregate_signals.html">aggregate_signals</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">deaths</span>, <span class="va">hospitalized</span><span class="op">)</span>,</span>

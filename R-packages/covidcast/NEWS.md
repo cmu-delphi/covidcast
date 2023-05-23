@@ -1,3 +1,10 @@
+# covidcast 0.5.0
+
+## Major changes
+
+- The package now supports queries that require an API key. Set the option
+  `covidcast.auth` before any fetch call to authenticate your requests.
+
 # covidcast 0.4.5
 
 - Updates to plotting code to be compatible with ggplot2 version 3.4.0.

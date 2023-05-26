@@ -71,14 +71,13 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.0" id="covidcast-050">covidcast 0.5.0<a class="anchor" aria-label="anchor" href="#covidcast-050"></a></h2>
-<div class="section level3">
-<h3 id="major-changes-0-5-0">Major changes<a class="anchor" aria-label="anchor" href="#major-changes-0-5-0"></a></h3>
-<ul><li>The package now supports queries that require an API key. Set the option <code>covidcast.auth</code> before any fetch call to authenticate your requests.</li></ul></div>
-</div>
+<ul><li><p>The package now supports supplying API keys with requests to the COVIDcast Epidata API. Beginning June 28, 2023, the Epidata API server will reject queries made without an API key. See the “API keys” section of <code><a href="../reference/covidcast_signal.html">?covidcast_signal</a></code> for details on how to obtain and specify an API key. (<a href="https://github.com/krivard" class="external-link">@krivard</a>, <a href="https://github.com/cmu-delphi/covidcast/issues/618" class="external-link">#618</a>)</p></li>
+<li><p>Updates to be compatible with changes in dplyr 1.1.0. (<a href="https://github.com/capnrefsmmat" class="external-link">@capnrefsmmat</a>, <a href="https://github.com/cmu-delphi/covidcast/issues/620" class="external-link">#620</a>)</p></li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.5" id="covidcast-045">covidcast 0.4.5<small>2023-01-07</small><a class="anchor" aria-label="anchor" href="#covidcast-045"></a></h2>
 <ul><li>Updates to plotting code to be compatible with ggplot2 version 3.4.0. (<a href="https://github.com/krivard" class="external-link">@krivard</a>, <a href="https://github.com/cmu-delphi/covidcast/issues/598" class="external-link">#598</a>)</li>
-<li>Puerto Rico is no longer rotated in maps produced with <code><a href="https://rdrr.io/r/graphics/plot.html" class="external-link">plot()</a></code>. On platforms using ATLAS as the BLAS implementation, rotation created invalid polygons, resulting in errors that prevented any plotting from working. Without rotation, Puerto Rico is slightly tilted compared to the rest of the United States.</li>
+<li>Puerto Rico is no longer rotated in maps produced with <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. On platforms using ATLAS as the BLAS implementation, rotation created invalid polygons, resulting in errors that prevented any plotting from working. Without rotation, Puerto Rico is slightly tilted compared to the rest of the United States.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.3" id="covidcast-043">covidcast 0.4.3<small>2022-10-06</small><a class="anchor" aria-label="anchor" href="#covidcast-043"></a></h2>
@@ -180,7 +179,7 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p></p><p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Kathryn Mazaitis, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

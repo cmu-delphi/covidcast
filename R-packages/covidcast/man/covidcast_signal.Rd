@@ -178,10 +178,11 @@ By default, \code{covidcast_signal()} submits queries to the API anonymously. Al
 the examples in the package documentation are compatible with anonymous use
 of the API, but \href{https://cmu-delphi.github.io/delphi-epidata/api/api_keys.html}{there are some limits on anonymous queries},
 including a rate limit. If you regularly query large amounts of data, please
-consider \href{https://forms.gle/hkBr5SfQgxguAfEt7}{registering for a free API key}, which lifts these limits. Even if
-your usage falls within the anonymous usage limits, registration helps us
-understand who and how others are using the Delphi Epidata API, which may in
-turn inform future research, data partnerships, and funding.
+consider \href{https://api.delphi.cmu.edu/epidata/admin/registration_form}{registering for a free API key}, which lifts
+these limits. Even if your usage falls within the anonymous usage limits,
+registration helps us understand who and how others are using the Delphi
+Epidata API, which may in turn inform future research, data partnerships, and
+funding.
 
 If you have an API key, you can use it by setting the \code{covidcast.auth}
 option once before calling \code{covidcast_signal()} or \code{covidcast_signals()}:

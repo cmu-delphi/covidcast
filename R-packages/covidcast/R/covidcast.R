@@ -127,10 +127,11 @@ MAX_RESULTS <- 1000000
 #' queries](https://cmu-delphi.github.io/delphi-epidata/api/api_keys.html),
 #' including a rate limit. If you regularly query large amounts of data, please
 #' consider [registering for a free API
-#' key](https://forms.gle/hkBr5SfQgxguAfEt7), which lifts these limits. Even if
-#' your usage falls within the anonymous usage limits, registration helps us
-#' understand who and how others are using the Delphi Epidata API, which may in
-#' turn inform future research, data partnerships, and funding.
+#' key](https://api.delphi.cmu.edu/epidata/admin/registration_form), which lifts
+#' these limits. Even if your usage falls within the anonymous usage limits,
+#' registration helps us understand who and how others are using the Delphi
+#' Epidata API, which may in turn inform future research, data partnerships, and
+#' funding.
 #'
 #' If you have an API key, you can use it by setting the `covidcast.auth`
 #' option once before calling `covidcast_signal()` or `covidcast_signals()`:

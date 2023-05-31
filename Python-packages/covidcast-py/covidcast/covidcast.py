@@ -34,7 +34,7 @@ def use_api_key(key):
     <https://cmu-delphi.github.io/delphi-epidata/api/api_keys.html>`_
     for details on our API key policies.
     """
-    Epidata.auth = key
+    Epidata.auth = ("epidata", key)
 
 def signal(data_source: str,
            signal: str,  # pylint: disable=W0621

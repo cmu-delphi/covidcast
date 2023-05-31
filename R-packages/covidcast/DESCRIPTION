@@ -62,7 +62,8 @@ Imports:
     purrr,
     rlang,
     sf,
-    tidyr
+    tidyr,
+    xml2
 RoxygenNote: 7.2.3
 Suggests: 
     gridExtra,

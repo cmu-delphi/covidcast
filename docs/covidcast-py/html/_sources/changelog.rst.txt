@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v0.2.1, June 1, 2023
+--------------------
+
+- Bug fix: Corrected how API keys are installed in the underlying interface.
+- Bug fix: Corrected minimum dependency version for delphi-epidata library.
+- Update: Replaced link for API key registration.
+
 v0.2.0, May 23, 2023
 --------------------
 

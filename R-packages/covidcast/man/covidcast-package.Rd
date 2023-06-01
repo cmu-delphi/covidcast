@@ -70,6 +70,7 @@ Authors:
   \item Logan Brooks
   \item Sarah Colquhoun
   \item David Farrow
+  \item Kathryn Mazaitis
   \item Ryan Tibshirani
 }
 

@@ -27,7 +27,7 @@ signals <- covidcast_signals(data_source = "usa-facts",
                              signal = c("confirmed_incidence_num",
                                         "deaths_incidence_num"),
                              start_day = start_day, end_day = end_day,
-                             geo_type = "state", geo_values = "pa")
+                             geo_type = "state", geo_values = "tx")
 
 summary(signals[[1]])
 summary(signals[[2]])
@@ -69,9 +69,9 @@ as is.
 
 ```{r}
 aggregate_signals(signals, dt = c(-1, 0)) %>%
-  filter(geo_value == "tx") %>% head()
+  head()
 aggregate_signals(signals, dt = list(0, c(-1, 0, 1))) %>%
-  filter(geo_value == "tx") %>% head()
+  head()
 ```
 
 Finally, `aggregate_signals()` also accepts a single data frame (instead of a
@@ -80,7 +80,7 @@ list of data frames), intended to be convenient when applying shifts to a single
 
 ```{r}
 aggregate_signals(signals[[1]], dt = c(-1, 0, 1)) %>%
-  filter(geo_value == "tx") %>% head()
+  head()
 ```
 
 ## Aggregating signals, long format
@@ -90,13 +90,13 @@ per row:
 
 ```{r}
 aggregate_signals(signals, format = "long") %>%
-  filter(geo_value == "tx") %>% head()
+  head()
 
 aggregate_signals(signals, dt = c(-1, 0), format = "long") %>%
-  filter(geo_value == "tx") %>% head()
+  head()
 
 aggregate_signals(signals, dt = list(-1, 0), format = "long") %>%
-  filter(geo_value == "tx") %>% head()
+  head()
 ```
 
 As we can see, time-shifts work just as before, in "wide" format. However, in
@@ -108,7 +108,7 @@ to conveniently apply shifts, in "long" format:
 
 ```{r}
 aggregate_signals(signals[[1]], dt = c(-1, 0), format = "long") %>%
-  filter(geo_value == "tx") %>% head()
+  head()
 ```
 
 ## Pivoting longer or wider
@@ -121,7 +121,7 @@ column names appropriately. For example, to pivot longer:
 ```{r}
 aggregate_signals(signals, dt = list(-1, 0)) %>%
   covidcast_longer() %>%
-  filter(geo_value == "tx") %>% head()
+  head()
 ```
 
 And to pivot wider:
@@ -129,7 +129,7 @@ And to pivot wider:
 ```{r}
 aggregate_signals(signals, dt = list(-1, 0), format = "long") %>%
   covidcast_wider() %>%
-  filter(geo_value == "tx") %>% head()
+  head()
 ```
 
 ## A sanity check

@@ -119,6 +119,31 @@ MAX_RESULTS <- 1000000
 #' issued in this case. To see all results, split your query across multiple
 #' calls with different `issues` arguments.
 #'
+#' @section API keys:
+#'
+#' By default, `covidcast_signal()` submits queries to the API anonymously. All
+#' the examples in the package documentation are compatible with anonymous use
+#' of the API, but [there are some limits on anonymous
+#' queries](https://cmu-delphi.github.io/delphi-epidata/api/api_keys.html),
+#' including a rate limit. If you regularly query large amounts of data, please
+#' consider [registering for a free API
+#' key](https://api.delphi.cmu.edu/epidata/admin/registration_form), which lifts
+#' these limits. Even if your usage falls within the anonymous usage limits,
+#' registration helps us understand who and how others are using the Delphi
+#' Epidata API, which may in turn inform future research, data partnerships, and
+#' funding.
+#'
+#' If you have an API key, you can use it by setting the `covidcast.auth`
+#' option once before calling `covidcast_signal()` or `covidcast_signals()`:
+#'
+#' ```
+#' options(covidcast.auth = "your_api_key")
+#'
+#' cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
+#'                         start_day = "2020-05-01", end_day = "2020-05-07",
+#'                         geo_type = "state")
+#' ```
+#'
 #' @param data_source String identifying the data source to query. See
 #'   <https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html>
 #'   for a list of available data sources.
@@ -1012,10 +1037,25 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
                            body = params)
   }
 
+  # HTTP 429 Too Many Requests may be API rate-limiting
+  if (httr::status_code(response) == 429 && is.na(auth)) {
+    msg <- xml2::xml_text(xml2::xml_find_all(xml2::read_html(
+        httr::content(response, as = "text", encoding = "utf-8")),
+        "//p"
+        ))
+    abort(c("Rate limit exceeded when fetching data from API anonymously. See the \"API keys\" section of the `covidcast_signal()` documentation for information on registering for an API key.",
+            "i" = "Message from server:",
+            "i" = msg),
+          class = "covidcast_rate_limit",
+          call = parent.frame())
+  }
+
+  # Catch all other kinds of errors
   msg <- "fetch data from API"
   if (is.na(auth)) {
     msg <- paste(msg, "anonymously")
   }
+
   httr::stop_for_status(response, task = msg)
 
   return(httr::content(response, as = "text",

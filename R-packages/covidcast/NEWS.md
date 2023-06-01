@@ -1,3 +1,13 @@
+# covidcast 0.5.0
+
+- The package now supports supplying API keys with requests to the COVIDcast
+  Epidata API. Beginning June 21, 2023, the Epidata API server will limit the
+  rate and type of queries made without an API key. See the "API keys" section
+  of `?covidcast_signal` for details on how to obtain and specify an API key.
+  (@krivard, #618)
+
+- Updates to be compatible with changes in dplyr 1.1.0. (@capnrefsmmat, #620)
+
 # covidcast 0.4.5
 
 - Updates to plotting code to be compatible with ggplot2 version 3.4.0.

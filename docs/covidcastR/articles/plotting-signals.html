@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
       </span>
     </div>
 
@@ -177,16 +177,16 @@
 <p>As an alternative to choropleth maps, we can also quickly plot bubble maps. By default, bubble maps have 8 bubble size bins evenly spaced over the range, where zero always means zero bubble size. The legend shows all bins, interpreted as each bubble size meaning <em>at least</em> the corresponding value.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">inum</span>, plot_type <span class="op">=</span> <span class="st">"bubble"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning in plot_bubble(x, time_value = time_value, include = include, range</span></span>
-<span><span class="co">## = range, : Bubble maps can be hard to read when there is missing data;the</span></span>
+<pre><code><span><span class="co">## Warning in plot_bubble(x, time_value = time_value, include = include, range =</span></span>
+<span><span class="co">## range, : Bubble maps can be hard to read when there is missing data;the</span></span>
 <span><span class="co">## locations without data are filled in gray.</span></span></code></pre>
 <p><img src="plotting-signals_files/figure-html/unnamed-chunk-7-1.png" width="576"></p>
 <p>As before, we can of course set customized breaks. As values to the left of the first bin do not get drawn, this map is much sparser, and highlights areas with larger case counts.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">inum</span>, plot_type <span class="op">=</span> <span class="st">"bubble"</span>,</span>
 <span>     bubble_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">200</span>, len <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning in plot_bubble(x, time_value = time_value, include = include, range</span></span>
-<span><span class="co">## = range, : Bubble maps can be hard to read when there is missing data;the</span></span>
+<pre><code><span><span class="co">## Warning in plot_bubble(x, time_value = time_value, include = include, range =</span></span>
+<span><span class="co">## range, : Bubble maps can be hard to read when there is missing data;the</span></span>
 <span><span class="co">## locations without data are filled in gray.</span></span></code></pre>
 <p><img src="plotting-signals_files/figure-html/unnamed-chunk-8-1.png" width="576"></p>
 <p>As a final example, suppose we want to plot only counties in the state of Texas. We’d like to compare counts per 100,000 against absolute counts, so we fetch the proportion signal:</p>
@@ -306,7 +306,7 @@
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+<p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Kathryn Mazaitis, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

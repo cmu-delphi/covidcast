@@ -60,12 +60,9 @@ updates.
 ## Usage terms and citation
 
 We request that if you use the covidcast package in your work, or use any of the
-data provided by the COVIDcast Epidata API, that you cite us appropriately:
-
-```{r citation, echo=FALSE, results="asis"}
-print(citation("covidcast"), style = "text")
-```
-
+data provided by the COVIDcast Epidata API, that you cite us using the citations
+given by
+[`citation("covidcast")`](https://cmu-delphi.github.io/covidcast/covidcastR/authors.html#citation).
 See the [COVIDcast Epidata licensing
 documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_licensing.html)
 for information about citing the datasets provided by the API.

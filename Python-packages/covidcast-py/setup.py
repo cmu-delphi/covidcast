@@ -22,7 +22,7 @@ setuptools.setup(
     install_requires=[
         "pandas<2",
         "requests",
-        "delphi-epidata>=0.0.11",
+        "delphi-epidata>=4.1.1",
         "geopandas",
         "matplotlib",
         "numpy",

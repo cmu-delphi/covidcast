@@ -28,7 +28,7 @@ def use_api_key(key):
     the requested parameters having multiple selections (signals, dates, issues,
     regions, etc). To be exempt from these limits, use this function to apply an
     API key to all subsequent queries. You can register for an API key at
-    <https://forms.gle/hkBr5SfQgxguAfEt7>.
+    <https://api.delphi.cmu.edu/epidata/admin/registration_form>.
 
     Consult the `API documentation
     <https://cmu-delphi.github.io/delphi-epidata/api/api_keys.html>`_

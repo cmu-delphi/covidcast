@@ -23,7 +23,7 @@ argument."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/m
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
       </span>
     </div>
 
@@ -287,6 +287,27 @@ argument may return more results than the query limit. A warning will be
 issued in this case. To see all results, split your query across multiple
 calls with different <code>issues</code> arguments.</p>
     </div>
+    <div id="api-keys">
+    <h2>API keys</h2>
+    
+
+
+<p>By default, <code>covidcast_signal()</code> submits queries to the API anonymously. All
+the examples in the package documentation are compatible with anonymous use
+of the API, but <a href="https://cmu-delphi.github.io/delphi-epidata/api/api_keys.html" class="external-link">there are some limits on anonymous queries</a>,
+including a rate limit. If you regularly query large amounts of data, please
+consider <a href="https://forms.gle/hkBr5SfQgxguAfEt7" class="external-link">registering for a free API key</a>, which lifts these limits. Even if
+your usage falls within the anonymous usage limits, registration helps us
+understand who and how others are using the Delphi Epidata API, which may in
+turn inform future research, data partnerships, and funding.</p>
+<p>If you have an API key, you can use it by setting the <code>covidcast.auth</code>
+option once before calling <code>covidcast_signal()</code> or <code><a href="covidcast_signals.html">covidcast_signals()</a></code>:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">covidcast.auth =</span> <span class="st">"your_api_key"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>cli <span class="ot">&lt;-</span> <span class="fu">covidcast_signal</span>(<span class="at">data_source =</span> <span class="st">"fb-survey"</span>, <span class="at">signal =</span> <span class="st">"smoothed_cli"</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">start_day =</span> <span class="st">"2020-05-01"</span>, <span class="at">end_day =</span> <span class="st">"2020-05-07"</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">geo_type =</span> <span class="st">"state"</span>)</span></code></pre><p></p></div>
+    </div>
     <div id="references">
     <h2>References</h2>
     <p>COVIDcast API documentation:
@@ -331,7 +352,7 @@ calls with different <code>issues</code> arguments.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Alex Reinhart, Ryan Tibshirani.</p>
+  <p></p><p>Developed by Taylor Arnold, Jacob Bien, Logan Brooks, Sarah Colquhoun, David Farrow, Kathryn Mazaitis, Alex Reinhart, Ryan Tibshirani.</p>
 </div>
 
 <div class="pkgdown">

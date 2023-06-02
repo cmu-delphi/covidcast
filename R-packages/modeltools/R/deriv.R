@@ -74,6 +74,26 @@
 #' 
 #' @return A data frame given by appending a new column to `x` named according
 #'   to the `col_name` argument, containing the estimated derivative values. 
+#'   
+#' @examples \dontrun{
+#' df <- covidcast::covidcast_signal("fb-survey", "smoothed_cli", 
+#'     start_day = "2021-01-01", 
+#'     end_day = "2021-02-28",
+#'     geo_type = "state",
+#'     geo_values = c("ca", "fl"))
+#' 
+#' # estimate derivative using linear regression and n = 10 days
+#' estimate_deriv(df, method = "lin", n = 10)
+#' 
+#' # keep the linear regression fits
+#' estimate_deriv(df, method = "lin", n = 10, keep_obj = TRUE)
+#' 
+#' # estimate derivative using smoothing spline with 8 degrees of freedom
+#' estimate_deriv(df, method = "ss", n = 28, df = 8)
+#' 
+#' # estimate derivative using trend filtering with 8 degrees of freedom
+#' estimate_deriv(df, method = "tf", n = 28, df = 8)
+#' }
 #'
 #' @export
 estimate_deriv = function(x, method = c("lin", "ss", "tf"), n = 14,

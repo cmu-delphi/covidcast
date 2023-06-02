@@ -9,6 +9,7 @@ slide_by_geo(
   x,
   slide_fun,
   n = 14,
+  shift = 0,
   col_name = "slide_value",
   col_type = c("dbl", "int", "lgl", "chr", "list"),
   ...
@@ -19,15 +20,20 @@ slide_by_geo(
 
 \item{slide_fun}{Function or formula to slide over the values in \code{x}, grouped
 by \code{geo_value}. To "slide" means to apply the function or formula over a
-trailing window of \code{n} days of data. If a function, \code{slide_fun} must take
+right-aligned window of \code{n} days of data. If a function, \code{slide_fun} must take
 \code{x}, a data frame the same column names as the original data frame;
 followed by any number of named additional arguments; and ending with
 \code{...}, to capture general additional arguments. If a formula, \code{slide_fun}
 can operate directly on \code{.x$value}, \code{.x$time_value}, etc., as in \code{~ mean(.x$value)} to compute a trailing mean over the last \code{n} days of data.}
 
-\item{n}{Size of the local window (in days) to use. For example, if \code{n = 5},
-then to estimate the derivative on November 5, we train the given method on
-data in between November 1 and November 5. Default is 14.}
+\item{n}{Size of the local window (in days) to use.  Default is 14.}
+
+\item{shift}{Number of days forward from the \code{time_value} to shift the window.  Because the
+window is right-aligned, if \code{n = 5} and \code{shift = 0}, then for a \code{time_value} of November 5,
+the function will be applied to values from November 1 to November 5.  A positive value shifts
+the window forwards in time, while negative values shift the window backwards in time.  Ex:
+for a \code{time_value} of November 5 \code{shift = 3} captures November 4 through November 8;
+\code{shift = -3} captures October 29 through November 2.  Default is not to shift.}
 
 \item{col_name}{String indicating the name of the new column that will
 contain the derivative values. Default is "slide_value"; note that setting
@@ -44,8 +50,21 @@ A data frame given by appending a new column to \code{x} named according
 to the \code{col_name} argument, containing the function values.
 }
 \description{
-Slides a given function over the values in a  \code{covidcast_signal} data frame,
+Slides a given function over the values in a \code{covidcast_signal} data frame,
 grouped by \code{geo_value}. (When multiple issue dates are present, only the
 latest issue is considered.) See the \href{https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/modeltools.html}{getting started guide}
 for examples.
+}
+\examples{
+\dontrun{
+df <- covidcast::covidcast_signal("fb-survey", "smoothed_cli", 
+    start_day = "2021-01-01", 
+    end_day = "2021-01-31",
+    geo_type = "state")
+    
+# two equivalent ways to compute 7-day trailing averages
+slide_by_geo(df, slide_fun = ~ Mean(.x$value), n = 7)
+slide_by_geo(df, slide_fun = function(x, ...) Mean(x$value) , n = 7)
+}
+
 }

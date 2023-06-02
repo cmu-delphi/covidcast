@@ -29,3 +29,18 @@ frame. (When multiple issue dates are present, only the latest issue is
 considered.)  See the \href{https://cmu-delphi.github.io/covidcast/modeltoolsR/articles/pct-change.html}{percentage change vignette}
 for examples.
 }
+\examples{
+\dontrun{
+df <- covidcast::covidcast_signal("fb-survey", "smoothed_cli", 
+    start_day = "2021-01-01", 
+    end_day = "2021-01-31",
+    geo_type = "state")
+
+# percentage change between back-to-back weeks (default, as n = 14)
+pct_change(df)
+
+# percentage change between back-to-back days
+pct_change(df, n = 2)
+}
+
+}

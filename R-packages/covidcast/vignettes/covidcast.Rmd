@@ -38,7 +38,7 @@ the United States between 2020-05-01 and 2020-05-07, we can use
 library(covidcast)
 library(dplyr)
 
-cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
+cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_wcli",
                         start_day = "2020-05-01", end_day = "2020-05-07",
                         geo_type = "county")
 knitr::kable(head(cli))
@@ -64,7 +64,7 @@ request estimates for states instead of counties, we use the `geo_type`
 argument:
 
 ```{r, message=FALSE}
-cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
+cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_wcli",
                         start_day = "2020-05-01", end_day = "2020-05-07",
                         geo_type = "state")
 knitr::kable(head(cli))
@@ -74,7 +74,7 @@ One can also select a specific geographic region by its ID. For example, this is
 the FIPS code for Allegheny County, Pennsylvania:
 
 ```{r, message=FALSE}
-cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_cli",
+cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_wcli",
                         start_day = "2020-05-01", end_day = "2020-05-07",
                         geo_type = "county", geo_value = "42003")
 knitr::kable(head(cli))
@@ -219,7 +219,7 @@ First, we can request the data that was available *as of* a specific date, using
 the `as_of` argument:
 
 ```{r, message = FALSE}
-covidcast_signal(data_source = "doctor-visits", signal = "smoothed_cli",
+covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
                  start_day = "2020-05-01", end_day = "2020-05-01",
                  geo_type = "state", geo_values = "pa", as_of = "2020-05-07")
 ```
@@ -228,7 +228,7 @@ This shows that an estimate of about 2.3% was issued on May 7. If we don't
 specify `as_of`, we get the most recent estimate available:
 
 ```{r, message = FALSE}
-covidcast_signal(data_source = "doctor-visits", signal = "smoothed_cli",
+covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
                  start_day = "2020-05-01", end_day = "2020-05-01",
                  geo_type = "state", geo_values = "pa")
 ```
@@ -246,7 +246,7 @@ By using the `issues` argument, we can request all issues in a certain time
 period:
 
 ```{r, message = FALSE}
-covidcast_signal(data_source = "doctor-visits", signal = "smoothed_cli",
+covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
                  start_day = "2020-05-01", end_day = "2020-05-01",
                  geo_type = "state", geo_values = "pa",
                  issues = c("2020-05-01", "2020-05-15")) %>%
@@ -270,7 +270,7 @@ certain lag. For example, requesting a lag of 7 days means to request only
 issues 7 days after the corresponding `time_value`:
 
 ```{r, message = FALSE}
-covidcast_signal(data_source = "doctor-visits", signal = "smoothed_cli",
+covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
                  start_day = "2020-05-01", end_day = "2020-05-07",
                  geo_type = "state", geo_values = "pa", lag = 7) %>%
   knitr::kable()
@@ -282,7 +282,7 @@ because the query will only include a result for May 3rd if a value were issued
 on May 10th (a 7-day lag), but in fact the value was not updated on that day:
 
 ```{r, message = FALSE}
-covidcast_signal(data_source = "doctor-visits", signal = "smoothed_cli",
+covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
                  start_day = "2020-05-03", end_day = "2020-05-03",
                  geo_type = "state", geo_values = "pa",
                  issues = c("2020-05-09", "2020-05-15")) %>%

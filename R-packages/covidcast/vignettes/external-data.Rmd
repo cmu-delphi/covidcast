@@ -91,7 +91,7 @@ hospitalizations correlate with outpatient doctor visits with deaths during
 October 2020, where we use death data as reported by the API.
 
 ```{r, message=FALSE}
-deaths <- covidcast_signal("indicator-combination", "deaths_incidence_prop",
+deaths <- covidcast_signal("jhu-csse", "deaths_7dav_incidence_prop",
                            start_day = "2020-10-01",
                            end_day = "2020-10-31",
                            geo_type = "state")

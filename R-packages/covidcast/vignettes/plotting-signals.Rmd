@@ -29,8 +29,8 @@ comb <- covidcast_signal(data_source = "indicator-combination",
                          start_day = "2020-07-01", end_day = "2020-07-14")
 summary(comb)
 
-inum <- covidcast_signal(data_source = "usa-facts",
-                         signal = "confirmed_7dav_incidence_num",
+inum <- covidcast_signal(data_source = "jhu-csse",
+                         signal = "confirmed_7dav_incidence_prop",
                          start_day = "2020-07-01", end_day = "2020-07-14")
 summary(inum)
 ```
@@ -80,7 +80,7 @@ Lastly, we show how we can use custom breaks to (visually) answer the question:
 which counties have cumulative case rates of at least 1/100?
 
 ```{r, message=FALSE}
-cprop <- covidcast_signal(data_source = "usa-facts",
+cprop <- covidcast_signal(data_source = "jhu-csse",
                           signal = "confirmed_cumulative_prop",
                           start_day = "2020-07-01", end_day = "2020-07-14")
 
@@ -117,7 +117,7 @@ We'd like to compare counts per 100,000 against absolute counts, so we fetch the
 proportion signal:
 
 ```{r, message=FALSE}
-iprop <- covidcast_signal(data_source = "usa-facts",
+iprop <- covidcast_signal(data_source = "jhu-csse",
                           signal = "confirmed_7dav_incidence_prop",
                           start_day = "2020-07-01", end_day = "2020-07-14")
 ```
@@ -152,8 +152,8 @@ comb_st <- covidcast_signal(data_source = "indicator-combination",
                                signal = "nmf_day_doc_fbc_fbs_ght",
                                start_day = "2020-04-15", end_day = "2020-07-01",
                                geo_type = "state")
-inum_st <- covidcast_signal(data_source = "usa-facts",
-                               signal = "confirmed_7dav_incidence_num",
+inum_st <- covidcast_signal(data_source = "jhu-csse",
+                               signal = "confirmed_7dav_incidence_prop",
                                start_day = "2020-04-15", end_day = "2020-07-01",
                                geo_type = "state")
 ```
@@ -190,8 +190,8 @@ comb_md <- covidcast_signal(data_source = "indicator-combination",
                                signal = "nmf_day_doc_fbc_fbs_ght",
                                start_day = "2020-06-01", end_day = "2020-07-15",
                                geo_values = name_to_fips("Miami-Dade"))
-inum_md <- covidcast_signal(data_source = "usa-facts",
-                               signal = "confirmed_7dav_incidence_num",
+inum_md <- covidcast_signal(data_source = "jhu-csse",
+                               signal = "confirmed_7dav_incidence_prop",
                                start_day = "2020-06-01", end_day = "2020-07-15",
                                geo_values = name_to_fips("Miami-Dade"))
 

@@ -14,20 +14,19 @@ structure is designed to be tidy and easily wrangled using your favorite
 packages, but the covidcast package also provides some tools for plotting and
 mapping signals in an easy way.
 
-For this vignette, we'll use our [combination
-signal](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/indicator-combination-inactive.html#statistical-combination-signals)
-as an example; the combination indicator is a statistical combination of several
-data sources collected by Delphi, and for every county provides a measure of
-factors related to COVID activity. We'll also use incident case counts. Fetching
-the data is simple:
+For this vignette, we'll use our [doctor visits
+signal](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html)
+as an example; it records the percentage of outpatient doctor visits with COVID
+symptom codes, as reported by Delphi's health system partners. We'll also use
+incident case counts. Fetching the data is simple:
 
 ```{r, message=FALSE}
 library(covidcast)
 
-comb <- covidcast_signal(data_source = "indicator-combination",
-                         signal = "nmf_day_doc_fbc_fbs_ght",
+dv <- covidcast_signal(data_source = "doctor-visits",
+                         signal = "smoothed_adj_cli",
                          start_day = "2020-07-01", end_day = "2020-07-14")
-summary(comb)
+summary(dv)
 
 inum <- covidcast_signal(data_source = "jhu-csse",
                          signal = "confirmed_7dav_incidence_prop",
@@ -46,7 +45,7 @@ The default `plot` method for `covidcast_signal` objects,
 `usmap` package:
 
 ```{r}
-plot(comb)
+plot(dv)
 ```
 
 The color scheme is automatically chosen to be similar to that used on the
@@ -56,8 +55,8 @@ One can choose the day and also choose the color scales, transparency level for
 mega counties, and title:
 
 ```{r}
-plot(comb, time_value = "2020-07-04", choro_col = cm.colors(10), alpha = 0.4,
-     title = "Combination of COVID-19 indicators on 2020-07-04")
+plot(dv, time_value = "2020-07-04", choro_col = cm.colors(10), alpha = 0.4,
+     title = "COVID doctor visits on 2020-07-04")
 ```
 
 By providing `breaks` and `colors`, we can create custom color scales, for
@@ -144,18 +143,18 @@ grid.arrange(p1, p2, nrow = 1)
 
 ## Time series plots
 
-Let's fetch the combination indicator and case counts, but for all states rather
-than for all counties. This will make the time series plots more manageable.
+Let's fetch the doctor visits and case counts, but for all states rather than
+for all counties. This will make the time series plots more manageable.
 
 ```{r, message=FALSE}
-comb_st <- covidcast_signal(data_source = "indicator-combination",
-                               signal = "nmf_day_doc_fbc_fbs_ght",
-                               start_day = "2020-04-15", end_day = "2020-07-01",
-                               geo_type = "state")
+dv_st <- covidcast_signal(data_source = "doctor-visits",
+                          signal = "smoothed_adj_cli",
+                          start_day = "2020-04-15", end_day = "2020-07-01",
+                          geo_type = "state")
 inum_st <- covidcast_signal(data_source = "jhu-csse",
-                               signal = "confirmed_7dav_incidence_prop",
-                               start_day = "2020-04-15", end_day = "2020-07-01",
-                               geo_type = "state")
+                            signal = "confirmed_7dav_incidence_prop",
+                            start_day = "2020-04-15", end_day = "2020-07-01",
+                            geo_type = "state")
 ```
 
 By default, time series plots show all available data, including all
@@ -166,14 +165,12 @@ states and plot all data for them:
 library(dplyr)
 
 states <- c("ca", "pa", "tx", "ny")
-plot(comb_st %>% filter(geo_value %in% states), plot_type = "line")
+plot(dv_st %>% filter(geo_value %in% states), plot_type = "line")
 plot(inum_st %>% filter(geo_value %in% states), plot_type = "line")
 ```
 
-Notice how in Texas, the combined indicator rose several weeks in advance of
-confirmed cases, suggesting the signal could be predictive. Delphi is
-investigating these signals for their usefulness in forecasting, as well as
-hotspot detection and will publish results when they are available.
+Notice how in Texas, the doctor visits indicator rose several weeks in advance
+of confirmed cases, suggesting the signal could be predictive.
 
 ## Manual plotting
 
@@ -186,18 +183,18 @@ For example:
 ```{r, warning = FALSE}
 library(ggplot2)
 
-comb_md <- covidcast_signal(data_source = "indicator-combination",
-                               signal = "nmf_day_doc_fbc_fbs_ght",
-                               start_day = "2020-06-01", end_day = "2020-07-15",
-                               geo_values = name_to_fips("Miami-Dade"))
+dv_md <- covidcast_signal(data_source = "doctor-visits",
+                          signal = "smoothed_adj_cli",
+                          start_day = "2020-06-01", end_day = "2020-07-15",
+                          geo_values = name_to_fips("Miami-Dade"))
 inum_md <- covidcast_signal(data_source = "jhu-csse",
-                               signal = "confirmed_7dav_incidence_prop",
-                               start_day = "2020-06-01", end_day = "2020-07-15",
-                               geo_values = name_to_fips("Miami-Dade"))
+                            signal = "confirmed_7dav_incidence_prop",
+                            start_day = "2020-06-01", end_day = "2020-07-15",
+                            geo_values = name_to_fips("Miami-Dade"))
 
 # Compute the ranges of the two signals
 range1 <- inum_md %>% select("value") %>% range
-range2 <- comb_md %>% select("value") %>% range
+range2 <- dv_md %>% select("value") %>% range
 
 # Function to transform from one range to another
 trans <- function(x, from_range, to_range) {
@@ -209,11 +206,11 @@ trans <- function(x, from_range, to_range) {
 trans12 <- function(x) trans(x, range1, range2)
 trans21 <- function(x) trans(x, range2, range1)
 
-# Transform the combined signal to the incidence range, then stack
+# Transform the doctor visits signal to the incidence range, then stack
 # these rowwise into one data frame
-df <- select(rbind(comb_md %>% mutate_at("value", trans21),
+df <- select(rbind(dv_md %>% mutate_at("value", trans21),
                    inum_md), c("time_value", "value"))
-df$signal <- c(rep("Combined indicator", nrow(comb_md)),
+df$signal <- c(rep("Doctor visits", nrow(dv_md)),
                rep("New COVID-19 cases", nrow(inum_md)))
 
 # Finally, plot both signals
@@ -222,11 +219,11 @@ ggplot(df, aes(x = time_value, y = value)) +
   geom_line(aes(color = signal)) +
   scale_y_continuous(
     name = "New COVID-19 cases (7-day trailing average)",
-    sec.axis = sec_axis(trans12, name = "Combination of COVID-19 indicators")
+    sec.axis = sec_axis(trans12, name = "Doctor visits")
   ) +
   theme(legend.position = "bottom",
         legend.title = ggplot2::element_blank())
 ```
 
-Again, we see that the combined indicator starts rising several days before the
-new COVID-19 cases do, an exciting phenomenon that Delphi is studying now.
+Again, we see that the doctor visits indicator starts rising several days before
+the new COVID-19 cases do.

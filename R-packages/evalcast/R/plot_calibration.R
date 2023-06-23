@@ -107,9 +107,7 @@ format_wedgeplot <- function(calib,
     geom_segment(aes(x = 0.5, y = 0.5, xend = 1, yend = 0), 
                  size = 0.25, color = "black") +
     labs(x = "Nominal quantile level",
-         y = "Proportion",
-         title = sprintf("%s (ahead = %s): Proportion above/below", 
-                         .data$name, .data$ahead)) +
+         y = "Proportion") +
     scale_alpha_continuous(range = c(0.5, 1)) +
     scale_size_continuous(range = c(0.5, 1)) +
     guides(alpha = FALSE, size = FALSE) +
@@ -147,9 +145,7 @@ format_traditional_calib_plot <- function(calib,
     ggplot(aes(x = .data$nominal_prob, y = .data$prop_below)) +
     geom_abline(slope = 1, intercept = 0) +
     labs(x = "Quantile level",
-         y = "Proportion",
-         title = sprintf("%s (ahead %s): Calibration", 
-                         .data$name, .data$ahead)) +
+         y = "Proportion") +
     geom_line(aes(color = .data$color, group = .data$color)) +
     scale_color_viridis_d() +
     facet_layer 

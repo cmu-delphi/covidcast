@@ -1,7 +1,7 @@
 Package: evalcast
 Type: Package
 Title: Tools For Evaluating COVID Forecasters
-Version: 0.3.1
+Version: 0.3.2
 Authors@R:
   c(
     person(given = "Daniel",
@@ -56,9 +56,9 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Remotes:
-    bettermc=github::gfkse/bettermc@v1.1.2,
-    zoltr=github::reichlab/zoltr,
-    covidHubUtils=github::reichlab/covidHubUtils
+    gfkse/bettermc@v1.1.2,
+    reichlab/zoltr,
+    reichlab/covidHubUtils
 Imports:
     assertthat,
     covidcast,

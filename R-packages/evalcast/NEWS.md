@@ -1,3 +1,9 @@
+# evalcast 0.3.2
+
+- Fix DESCRIPTION remotes so `remotes` and `devtools` work
+- Fix `plot_calibration` by removing badly specified titles in the `lab` argument
+- Pin `bettermc` to the GitHub version 1.1.2 to avoid a CRAN error
+
 # evalcast 0.3.1
 
 - Added a download_signal caching folder option

@@ -10,6 +10,7 @@ covidcast_signals(
   start_day = NULL,
   end_day = NULL,
   geo_type = c("county", "hrr", "msa", "dma", "state", "hhs", "nation"),
+  time_type = c("day", "week"),
   geo_values = "*",
   as_of = NULL,
   issues = NULL,
@@ -37,6 +38,10 @@ recent day data is available for this signal.}
 "county" or "state". Defaults to "county". See
 \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html}
 for details on which types are available.}
+
+\item{time_type}{The temporal resolution to request this data. Most signals
+are available at the "day" resolution (the default); some are only
+available at the "week" resolution, representing an MMWR week ("epiweek").}
 
 \item{geo_values}{Which geographies to return. The default, "*", fetches all
 geographies. To fetch specific geographies, specify their IDs as a vector

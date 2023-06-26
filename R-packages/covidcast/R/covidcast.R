@@ -560,6 +560,7 @@ covidcast_signals <- function(data_source, signal,
                                 "hhs",
                                 "nation"
                               ),
+                              time_type = c("day", "week"),
                               geo_values = "*",
                               as_of = NULL, issues = NULL, lag = NULL) {
   N <- max(length(data_source), length(signal))
@@ -595,6 +596,7 @@ covidcast_signals <- function(data_source, signal,
                                      start_day = start_day[i],
                                      end_day = end_day[i],
                                      geo_type = geo_type,
+                                     time_type = time_type,
                                      geo_values = geo_values,
                                      as_of = as_of, issues = issues,
                                      lag = lag)

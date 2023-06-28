@@ -48,6 +48,9 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/'
 # Max rows returned by API
 MAX_RESULTS <- 1000000
 
+# Cache the httr covidcast_meta response when available
+META_RESPONSE <- NA
+
 .onAttach <- function(libname, pkgname) {
   msg <- c("We encourage COVIDcast API users to register on our mailing list:",
            "https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api",
@@ -642,7 +645,14 @@ covidcast_signals <- function(data_source, signal,
 #' @importFrom utils read.csv
 #' @export
 covidcast_meta <- function() {
-  meta <- .request("covidcast_meta", list(format = "csv"))
+  # use cached metadata whenever possible
+  META_RESPONSE <- ifelse(
+    is.na(META_RESPONSE),
+    .request("covidcast_meta", list(format = "csv"), raw = TRUE),
+    httr::rerequest(META_RESPONSE)
+  )
+  meta <- httr::content(META_RESPONSE, as = "text",
+                        encoding = "utf-8")
 
   if (nchar(meta) == 0) {
     abort("Failed to obtain metadata", class = "covidcast_meta_fetch_failed")
@@ -1017,7 +1027,7 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
 }
 
 # Helper function to request and parse epidata
-.request <- function(endpoint, params) {
+.request <- function(endpoint, params, raw = FALSE) {
   # API call. Allow base API URL to be replaced, e.g. to use a staging/testing
   # server when needed.
   url <- paste0(getOption("covidcast.base_url", default = COVIDCAST_BASE_URL),
@@ -1059,6 +1069,10 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   }
 
   httr::stop_for_status(response, task = msg)
+
+  if (raw) {
+    return(response)
+  }
 
   return(httr::content(response, as = "text",
                        encoding = "utf-8"))

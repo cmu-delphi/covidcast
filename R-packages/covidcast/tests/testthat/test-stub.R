@@ -18,8 +18,11 @@ with_mock_api({
   test_that("mockery::stub takes effect even when httptest::with_mock_api is active", {
     mock_identical <- mock(TRUE)
     stub(.request_meta, "identical", mock_identical)
-    covidcast_meta()
-    print(mock_calls(mock_identical))
-    expect_called(mock_identical, 1)
+    tryCatch(
+      covidcast_meta(),
+      finally={
+        print(mock_calls(mock_identical))
+        expect_called(mock_identical, 1)
+      })
   })
 })

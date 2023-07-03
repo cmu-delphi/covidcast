@@ -646,7 +646,7 @@ covidcast_signals <- function(data_source, signal,
 #' @export
 covidcast_meta <- function() {
   # use cached metadata whenever possible
-  META_RESPONSE <- if(all(is.na(META_RESPONSE))) {
+  META_RESPONSE <<- if(all(is.na(META_RESPONSE))) {
     .request("covidcast_meta", list(format = "csv"), raw = TRUE)
   } else {
     META_RESPONSE

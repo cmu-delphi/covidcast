@@ -49,7 +49,7 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/'
 MAX_RESULTS <- 1000000
 
 # Cache the httr covidcast_meta response when available
-META_RESPONSE <- NA
+META_RESPONSE <<- NA
 
 .onAttach <- function(libname, pkgname) {
   msg <- c("We encourage COVIDcast API users to register on our mailing list:",
@@ -645,15 +645,7 @@ covidcast_signals <- function(data_source, signal,
 #' @importFrom utils read.csv
 #' @export
 covidcast_meta <- function() {
-  # use cached metadata whenever possible
-  META_RESPONSE <<- if(all(is.na(META_RESPONSE))) {
-    .request("covidcast_meta", list(format = "csv"), raw = TRUE)
-  } else {
-    META_RESPONSE
-    #httr::rerequest(META_RESPONSE)
-  }
-  meta <- httr::content(META_RESPONSE, as = "text",
-                        encoding = "utf-8")
+  meta <- .request_meta()
 
   if (nchar(meta) == 0) {
     abort("Failed to obtain metadata", class = "covidcast_meta_fetch_failed")
@@ -1025,6 +1017,17 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
     values <- list(values)
   }
   return(paste0(unlist(lapply(values, .listitem)), collapse=','))
+}
+
+# Helper function to use cached metadata whenever possible
+.request_meta <- function() {
+  META_RESPONSE <<- if(identical(META_RESPONSE, NA)) {
+    .request("covidcast_meta", list(format = "csv"), raw = TRUE)
+  } else {
+    httr::rerequest(META_RESPONSE)
+  }
+  return(httr::content(META_RESPONSE, as = "text",
+                       encoding = "utf-8"))
 }
 
 # Helper function to request and parse epidata

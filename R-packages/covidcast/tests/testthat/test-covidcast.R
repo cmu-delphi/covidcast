@@ -69,6 +69,8 @@ with_mock_api({
 
 test_that("covidcast_meta raises error when API signals one", {
   stub(covidcast_meta, ".request", "")
+  stub(covidcast_meta, "httr::rerequest", "")
+  stub(covidcast_meta, "httr::content", "")
 
   expect_error(covidcast_meta(),
                class = "covidcast_meta_fetch_failed")

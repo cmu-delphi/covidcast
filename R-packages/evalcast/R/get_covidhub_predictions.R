@@ -427,14 +427,14 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
 get_covidhub_forecast_dates <- function(forecaster_name) {
   url <- "https://api.github.com/repos/reichlab/covid19-forecast-hub/git/trees/master"
 
-  # Get the submissions folder.
+  # Get the URL for the submissions folder "data-processed".
   submissions_folder <- url %>%
     httr::GET() %>%
     httr::content() %>%
     purrr::pluck("tree") %>%
     magrittr::extract2(which(purrr::map_chr(., "path") == "data-processed"))
 
-  # Find the forecaster folder.
+  # Get the URL for the specified forecaster folder.
   forecaster_folder <- submissions_folder$url %>%
     httr::GET() %>%
     httr::content() %>%
@@ -442,20 +442,19 @@ get_covidhub_forecast_dates <- function(forecaster_name) {
     magrittr::extract2(which(purrr::map_chr(., "path") == forecaster_name))
 
   # Get the forecaster submission files.
-  submission_file_pattern <- sprintf("(20\\d{2}-\\d{2}-\\d{2})-%s.csv", forecaster_name)
+  submission_file_pattern <- sprintf("^(20\\d{2}-\\d{2}-\\d{2})-%s.csv$", forecaster_name)
   submission_files <- forecaster_folder$url %>%
     httr::GET() %>%
     httr::content() %>%
     purrr::pluck("tree") %>%
     purrr::map_chr("path") %>%
-    purrr::keep(function(x) stringr::str_detect(x, submission_file_pattern))
+    magrittr::extract(stringr::str_detect(., submission_file_pattern))
 
   # Extract the dates.
   submission_dates <- submission_files %>%
     # get first group of each match, requiring exactly one match per filename:
-    stringr::str_match_all(submission_file_pattern) %>%
-    purrr::map_chr(2) %>%
-    as.Date
+    stringr::str_match(submission_file_pattern) %>%
+    magrittr::extract(, 2)
 
   return(submission_dates)
 }

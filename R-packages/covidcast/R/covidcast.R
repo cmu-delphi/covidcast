@@ -1030,6 +1030,9 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   } else {
     httr::rerequest(pkg_env$META_RESPONSE)
   }
+
+  report_api_errors(pkg_env$META_RESPONSE)
+
   return(httr::content(pkg_env$META_RESPONSE, as = "text",
                        encoding = "utf-8"))
 }
@@ -1057,6 +1060,22 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
                            body = params)
   }
 
+  report_api_errors(response)
+
+  write(c(response$url, as.character(testthat::is_testing())), file = "~/requests.txt", append = TRUE, ncolumns = 2)
+
+  if (raw) {
+    return(response)
+  }
+
+  return(httr::content(response, as = "text",
+                       encoding = "utf-8"))
+}
+
+# Examine httr response object and report errors accordingly
+report_api_errors <- function(response) {
+  auth <- getOption("covidcast.auth", default = NA)
+
   # HTTP 429 Too Many Requests may be API rate-limiting
   if (httr::status_code(response) == 429 && is.na(auth)) {
     msg <- xml2::xml_text(xml2::xml_find_all(xml2::read_html(
@@ -1077,13 +1096,6 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   }
 
   httr::stop_for_status(response, task = msg)
-
-  if (raw) {
-    return(response)
-  }
-
-  return(httr::content(response, as = "text",
-                       encoding = "utf-8"))
 }
 
 # This is the date format expected by the API

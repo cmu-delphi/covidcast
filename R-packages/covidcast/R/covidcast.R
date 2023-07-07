@@ -48,8 +48,11 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/'
 # Max rows returned by API
 MAX_RESULTS <- 1000000
 
+# Package-local environment for shared storage
+pkg_env <- new.env()
+
 # Cache the httr covidcast_meta response when available
-META_RESPONSE <<- NA
+pkg_env$META_RESPONSE <- NA
 
 .onAttach <- function(libname, pkgname) {
   msg <- c("We encourage COVIDcast API users to register on our mailing list:",
@@ -1022,12 +1025,12 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
 # Helper function to use cached metadata whenever possible
 .request_meta <- function() {
   # temporary check while we wait for rerequest support in httptest: always request while testing
-  META_RESPONSE <<- if(identical(META_RESPONSE, NA) || testthat::is_testing()) {
+  pkg_env$META_RESPONSE <- if(identical(pkg_env$META_RESPONSE, NA) || testthat::is_testing()) {
     .request("covidcast_meta", list(format = "csv"), raw = TRUE)
   } else {
-    httr::rerequest(META_RESPONSE)
+    httr::rerequest(pkg_env$META_RESPONSE)
   }
-  return(httr::content(META_RESPONSE, as = "text",
+  return(httr::content(pkg_env$META_RESPONSE, as = "text",
                        encoding = "utf-8"))
 }
 

@@ -1,7 +1,7 @@
 Package: evalcast
 Type: Package
 Title: Tools For Evaluating COVID Forecasters
-Version: 0.3.2
+Version: 0.3.3
 Authors@R:
   c(
     person(given = "Daniel",
@@ -72,7 +72,6 @@ Imports:
     zoo,
     rlang,
     rvest,
-    xml2,
     ggplot2,
     zoltr,
     covidHubUtils,
@@ -82,7 +81,8 @@ Imports:
     fs,
     plyr,
     bettermc,
-    tidyr
+    tidyr,
+    httr
 Suggests:
     testthat,
     mockr,

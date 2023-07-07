@@ -1,3 +1,8 @@
+# evalcast 0.3.3
+
+- Fix `get_covidhub_forecast_dates`, likely broken by GitHub website format
+  change, by refactoring it to use GitHub API
+
 # evalcast 0.3.2
 
 - Fix DESCRIPTION remotes so `remotes` and `devtools` work

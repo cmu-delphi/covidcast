@@ -7,13 +7,12 @@
 get_covidhub_forecast_dates(forecaster_name)
 }
 \arguments{
-\item{forecaster_name}{String indicating of the forecaster
-(matching what it is called on the COVID Hub).}
+\item{forecaster_name}{String indicating of the forecaster (matching what it
+is called on the COVID Hub).}
 }
 \value{
 vector of forecast dates
 }
 \description{
-Retrieves the forecast dates that a forecaster submitted to
-the \href{https://github.com/reichlab/covid19-forecast-hub/}{COVID Hub}.
+Retrieves the forecast dates that a forecaster submitted to the \href{https://github.com/reichlab/covid19-forecast-hub/}{COVID Hub}. Uses the \href{https://docs.github.com/en/rest/git/trees?apiVersion=2022-11-28#get-a-tree}{GitHub API}.
 }

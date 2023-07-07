@@ -414,26 +414,49 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
 
 #' Get available forecast dates for a forecaster on the COVID Hub
 #'
-#' Retrieves the forecast dates that a forecaster submitted to
-#' the [COVID Hub](https://github.com/reichlab/covid19-forecast-hub/).
+#' Retrieves the forecast dates that a forecaster submitted to the [COVID
+#' Hub](https://github.com/reichlab/covid19-forecast-hub/). Uses the [GitHub
+#' API](https://docs.github.com/en/rest/git/trees?apiVersion=2022-11-28#get-a-tree).
 #'
-#' @param forecaster_name String indicating of the forecaster
-#'   (matching what it is called on the COVID Hub).
+#' @param forecaster_name String indicating of the forecaster (matching what it
+#'   is called on the COVID Hub).
 #'
 #' @return vector of forecast dates
 #'
 #' @export
 get_covidhub_forecast_dates <- function(forecaster_name) {
-  url <- "https://github.com/reichlab/covid19-forecast-hub/tree/master/data-processed/"
-  out <- xml2::read_html(paste0(url, forecaster_name)) %>%
-    # In main element (identified by id), look for a `grid` object that has `row` children.
-    # Avoid using the full xpath due to fragility.
-    rvest::html_nodes(xpath = "//*[@id=\"js-repo-pjax-container\"]//div[@role=\"grid\" and .//@role=\"row\"]") %>%
-    rvest::html_text() %>%
-    stringr::str_remove_all("\\n") %>%
-    stringr::str_match_all(sprintf("(20\\d{2}-\\d{2}-\\d{2})-%s.csv",
-                                   forecaster_name))
-  lubridate::as_date(out[[1]][, 2])
+  url <- "https://api.github.com/repos/reichlab/covid19-forecast-hub/git/trees/master"
+
+  # Get the URL for the submissions folder "data-processed".
+  submissions_folder <- url %>%
+    httr::GET() %>%
+    httr::content() %>%
+    purrr::pluck("tree") %>%
+    magrittr::extract2(which(purrr::map_chr(., "path") == "data-processed"))
+
+  # Get the URL for the specified forecaster folder.
+  forecaster_folder <- submissions_folder$url %>%
+    httr::GET() %>%
+    httr::content() %>%
+    purrr::pluck("tree") %>%
+    magrittr::extract2(which(purrr::map_chr(., "path") == forecaster_name))
+
+  # Get the forecaster submission files.
+  submission_file_pattern <- sprintf("^(20\\d{2}-\\d{2}-\\d{2})-%s.csv$", forecaster_name)
+  submission_files <- forecaster_folder$url %>%
+    httr::GET() %>%
+    httr::content() %>%
+    purrr::pluck("tree") %>%
+    purrr::map_chr("path") %>%
+    magrittr::extract(stringr::str_detect(., submission_file_pattern))
+
+  # Extract the dates.
+  submission_dates <- submission_files %>%
+    # get first group of each match, requiring exactly one match per filename:
+    stringr::str_match(submission_file_pattern) %>%
+    magrittr::extract(, 2)
+
+  return(submission_dates)
 }
 
 

@@ -432,16 +432,14 @@ get_covidhub_forecast_dates <- function(forecaster_name) {
     httr::GET() %>%
     httr::content() %>%
     purrr::pluck("tree") %>%
-    magrittr::extract(purrr::map_chr(., "path") == "data-processed") %>%
-    purrr::pluck(1)
+    magrittr::extract2(which(purrr::map_chr(., "path") == "data-processed"))
 
   # Find the forecaster folder.
   forecaster_folder <- submissions_folder$url %>%
     httr::GET() %>%
     httr::content() %>%
     purrr::pluck("tree") %>%
-    magrittr::extract(purrr::map_chr(., "path") == forecaster_name) %>%
-    purrr::pluck(1)
+    magrittr::extract2(which(purrr::map_chr(., "path") == forecaster_name))
 
   # Get the forecaster submission files.
   submission_file_pattern <- sprintf("(20\\d{2}-\\d{2}-\\d{2})-%s.csv", forecaster_name)
@@ -454,6 +452,7 @@ get_covidhub_forecast_dates <- function(forecaster_name) {
 
   # Extract the dates.
   submission_dates <- submission_files %>%
+    # get first group of each match, requiring exactly one match per filename:
     stringr::str_match_all(submission_file_pattern) %>%
     purrr::map_chr(2) %>%
     as.Date

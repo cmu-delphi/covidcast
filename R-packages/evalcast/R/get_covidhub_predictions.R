@@ -426,17 +426,33 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
 #' @export
 get_covidhub_forecast_dates <- function(forecaster_name) {
   url <- "https://api.github.com/repos/reichlab/covid19-forecast-hub/git/trees/master"
+  # Look for a GitHub API token to avoid rate limits.
+  # Returns an empty string "" if env variable not found.
+  gh_token <- Sys.getenv("GITHUB_PAT")
+  if (gh_token == "") {
+    # Try again with the secondary name.
+    gh_token <- Sys.getenv("GITHUB_TOKEN")
+  }
+  # Construct a header to send with GET requests
+  if (gh_token == "") {
+    # Empty header
+    auth_header <- httr::add_headers()
+  } else {
+    auth_header <- httr::add_headers(Authorization = paste("Bearer", gh_token))
+  }
 
   # Get the URL for the submissions folder "data-processed".
   submissions_folder <- url %>%
-    httr::GET() %>%
+    httr::GET(auth_header) %>%
+    is_rate_limit_exceeded() %>%
     httr::content() %>%
     purrr::pluck("tree") %>%
     magrittr::extract2(which(purrr::map_chr(., "path") == "data-processed"))
 
   # Get the URL for the specified forecaster folder.
   forecaster_folder <- submissions_folder$url %>%
-    httr::GET() %>%
+    httr::GET(auth_header) %>%
+    is_rate_limit_exceeded() %>%
     httr::content() %>%
     purrr::pluck("tree") %>%
     magrittr::extract2(which(purrr::map_chr(., "path") == forecaster_name))
@@ -444,7 +460,8 @@ get_covidhub_forecast_dates <- function(forecaster_name) {
   # Get the forecaster submission files.
   submission_file_pattern <- sprintf("^(20\\d{2}-\\d{2}-\\d{2})-%s.csv$", forecaster_name)
   submission_files <- forecaster_folder$url %>%
-    httr::GET() %>%
+    httr::GET(auth_header) %>%
+    is_rate_limit_exceeded() %>%
     httr::content() %>%
     purrr::pluck("tree") %>%
     purrr::map_chr("path") %>%
@@ -459,6 +476,25 @@ get_covidhub_forecast_dates <- function(forecaster_name) {
   return(submission_dates)
 }
 
+#' Check if GH API rate limit has been reached
+#'
+#' If the rate limit has been reached, exits with an error. Otherwise, returns
+#' the original response object.
+#'
+#' @param response httr::response object from a GET request
+#'
+#' @return the unmodified response object if API rate limit has not been reached
+#'
+#' @noRd
+is_rate_limit_exceeded <- function(response) {
+  if (response$status_code == 403) {
+    # Looks like "API rate limit exceeded for <IP address>. (But here's the
+    # good news: Authenticated requests get a higher rate limit. Check out
+    # the documentation for more details.)"
+    stop(paste("GitHub", httr::content(response) %>% purrr::pluck("message")))
+  }
+  return(response)
+}
 
 #' List all COVID forecast models available
 #'

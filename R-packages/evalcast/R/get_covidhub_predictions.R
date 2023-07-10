@@ -491,7 +491,7 @@ is_rate_limit_exceeded <- function(response) {
     # Looks like "API rate limit exceeded for <IP address>. (But here's the
     # good news: Authenticated requests get a higher rate limit. Check out
     # the documentation for more details.)"
-    stop(paste("GitHub", httr::content(response) %>% purrr::pluck("message")))
+    stop(paste("The GitHub API request had a problem!", httr::content(response) %>% purrr::pluck("message")))
   }
   return(response)
 }

@@ -1,3 +1,20 @@
+# covidcast 0.5.2
+
+- `covidcast_meta()` now caches the server's response for a length of time
+  specified by the COVIDcast API server, based on how frequently the metadata is
+  recomputed. Because `covidcast_meta()` is called by `covidcast_signal()`, this
+  saves one API call per call to `covidcast_signal()`.
+
+# covidcast 0.5.1
+
+- `covidcast_signals()` now supports the `time_type` argument, to match
+  `covidcast_signal()`. If you used optional arguments to `covidcast_signals()`
+  by position rather than by name, this may cause problems until you switch to
+  using named arguments.
+
+- Package vignettes have been altered to demonstrate more widely suitable
+  signals, and to consolidate on a smaller set of signals.
+
 # covidcast 0.5.0
 
 - The package now supports supplying API keys with requests to the COVIDcast

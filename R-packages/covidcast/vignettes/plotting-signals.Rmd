@@ -24,8 +24,8 @@ incident case counts. Fetching the data is simple:
 library(covidcast)
 
 dv <- covidcast_signal(data_source = "doctor-visits",
-                         signal = "smoothed_adj_cli",
-                         start_day = "2020-07-01", end_day = "2020-07-14")
+                       signal = "smoothed_adj_cli",
+                       start_day = "2020-07-01", end_day = "2020-07-14")
 summary(dv)
 
 inum <- covidcast_signal(data_source = "jhu-csse",

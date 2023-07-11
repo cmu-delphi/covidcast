@@ -1024,7 +1024,9 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
 
 # Helper function to use cached metadata whenever possible
 .request_meta <- function() {
-  # temporary check while we wait for rerequest support in httptest: always request while testing
+  # temporary check while we wait for rerequest support in httptest: always
+  # request while testing. see
+  # https://github.com/nealrichardson/httptest/issues/84
   pkg_env$META_RESPONSE <- if(identical(pkg_env$META_RESPONSE, NA) || testthat::is_testing()) {
     .request("covidcast_meta", list(format = "csv"), raw = TRUE)
   } else {

@@ -1062,7 +1062,6 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
 
   report_api_errors(response)
 
-  write(c(response$url, as.character(testthat::is_testing())), file = "~/requests.txt", append = TRUE, ncolumns = 2)
 
   if (raw) {
     return(response)

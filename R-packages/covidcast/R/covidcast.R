@@ -48,6 +48,12 @@ COVIDCAST_BASE_URL <- 'https://api.covidcast.cmu.edu/epidata/'
 # Max rows returned by API
 MAX_RESULTS <- 1000000
 
+# Package-local environment for shared storage
+pkg_env <- new.env()
+
+# Cache the httr covidcast_meta response when available
+pkg_env$META_RESPONSE <- NA
+
 .onAttach <- function(libname, pkgname) {
   msg <- c("We encourage COVIDcast API users to register on our mailing list:",
            "https://lists.andrew.cmu.edu/mailman/listinfo/delphi-covidcast-api",
@@ -642,7 +648,7 @@ covidcast_signals <- function(data_source, signal,
 #' @importFrom utils read.csv
 #' @export
 covidcast_meta <- function() {
-  meta <- .request("covidcast_meta", list(format = "csv"))
+  meta <- .request_meta()
 
   if (nchar(meta) == 0) {
     abort("Failed to obtain metadata", class = "covidcast_meta_fetch_failed")
@@ -1016,8 +1022,25 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   return(paste0(unlist(lapply(values, .listitem)), collapse=','))
 }
 
+# Helper function to use cached metadata whenever possible
+.request_meta <- function() {
+  # temporary check while we wait for rerequest support in httptest: always
+  # request while testing. see
+  # https://github.com/nealrichardson/httptest/issues/84
+  pkg_env$META_RESPONSE <- if(identical(pkg_env$META_RESPONSE, NA) || testthat::is_testing()) {
+    .request("covidcast_meta", list(format = "csv"), raw = TRUE)
+  } else {
+    httr::rerequest(pkg_env$META_RESPONSE)
+  }
+
+  report_api_errors(pkg_env$META_RESPONSE)
+
+  return(httr::content(pkg_env$META_RESPONSE, as = "text",
+                       encoding = "utf-8"))
+}
+
 # Helper function to request and parse epidata
-.request <- function(endpoint, params) {
+.request <- function(endpoint, params, raw = FALSE) {
   # API call. Allow base API URL to be replaced, e.g. to use a staging/testing
   # server when needed.
   url <- paste0(getOption("covidcast.base_url", default = COVIDCAST_BASE_URL),
@@ -1039,6 +1062,21 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
                            body = params)
   }
 
+  report_api_errors(response)
+
+
+  if (raw) {
+    return(response)
+  }
+
+  return(httr::content(response, as = "text",
+                       encoding = "utf-8"))
+}
+
+# Examine httr response object and report errors accordingly
+report_api_errors <- function(response) {
+  auth <- getOption("covidcast.auth", default = NA)
+
   # HTTP 429 Too Many Requests may be API rate-limiting
   if (httr::status_code(response) == 429 && is.na(auth)) {
     msg <- xml2::xml_text(xml2::xml_find_all(xml2::read_html(
@@ -1059,9 +1097,6 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   }
 
   httr::stop_for_status(response, task = msg)
-
-  return(httr::content(response, as = "text",
-                       encoding = "utf-8"))
 }
 
 # This is the date format expected by the API

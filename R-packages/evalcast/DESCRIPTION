@@ -77,7 +77,6 @@ Imports:
     covidHubUtils,
     forcats,
     data.table,
-    arrow,
     fs,
     plyr,
     bettermc,

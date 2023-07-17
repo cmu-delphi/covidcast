@@ -301,8 +301,7 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
 #' @return Predictions card. For more flexible processing of COVID Hub data, try
 #'   using [zoltr](https://docs.zoltardata.com/zoltr/)
 #'
-#' @importFrom arrow open_dataset schema string
-#' @importFrom utils download.file
+#' @importFrom data.table fread rbindlist
 get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
                                            forecast_dates = NULL,
                                            geo_values = "*",
@@ -318,33 +317,29 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
   if (is.null(forecast_dates))
     forecast_dates <- get_covidhub_forecast_dates(covidhub_forecaster_name)
   forecast_dates <- as.character(forecast_dates)
-  # Download files to disk first
-  # File layout is data/<covidhub_forecaster_name>/<forecast_date>/data.csv
-  for (forecast_date in forecast_dates) {
-    output_dir <- file.path("data", covidhub_forecaster_name, forecast_date)
-    output_file <- file.path("data", covidhub_forecaster_name, forecast_date, "data.csv")
-    filename <- sprintf("%s/%s/%s-%s.csv",
+  # Read files directly from GitHub
+  ds <- lapply(forecast_dates, function(forecast_date) {
+    target_url <- sprintf("%s/%s/%s-%s.csv",
                         url,
                         covidhub_forecaster_name,
                         forecast_date,
                         covidhub_forecaster_name)
 
-    dir.create(output_dir, recursive = TRUE)
-
-    # Download file. Re-attempt up to 8 times (max 2 min wait).
+    # Read file. Re-attempt up to 8 times (max 2 min wait).
     attempt <- 0
-    n_max_attempt <- 8
+    n_max_attempt <- 4
     base_wait <- 1 # second
 
     while (attempt < n_max_attempt) {
       attempt <- attempt + 1
       # Increase time between download attempts in exponential backoff
       wait <- base_wait * 2 ^ (attempt - 1)
-      download_status <- try({
-        download.file(filename, output_file, mode="w", quiet=TRUE)
+      # If the read attempt succeeds, returns a datatable; else a try-error
+      read_status <- try({
+        fread(target_url, showProgress = FALSE, data.table = FALSE)
       })
 
-      if (download_status != 0) {
+      if (inherits(read_status, "try-error")) {
         if (attempt < n_max_attempt) { message("retrying...") }
         Sys.sleep(wait)
         next
@@ -353,38 +348,24 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
       }
     }
 
-    if (attempt == n_max_attempt & download_status != 0) {
-      warning(filename, " could not be downloaded")
-      # Delete dir. We expect it to be empty, but double check.
-      if (length(list.files(output_dir)) == 0) {
-        unlink(output_dir, recursive = TRUE)
-      }
-    } else if (attempt > 1 & download_status == 0) {
+    if (attempt == n_max_attempt & inherits(read_status, "try-error")) {
+      warning(target_url, " could not be read")
+    } else if (attempt > 1 & !inherits(read_status, "try-error")) {
       message("succeeded after ", attempt, " attempts")
     }
-  }
 
-  sch <- schema(forecast_date=string(),
-                target=string(),
-                target_end_date=string(),
-                location=string(),
-                type=string(),
-                quantile=string(),
-                value=string())
-
-  ds <- open_dataset(file.path("data", covidhub_forecaster_name),
-                     format = "csv", schema = sch)
+    return(read_status)
+  }) %>%
+    rbindlist()
 
   # Create all derived columns from target first to join later
   # Works with just the distinct values of target for efficiency
   target_separated <- ds %>%
     select(.data$target) %>%
-    collect() %>%
     distinct() %>%
     process_target(remove = FALSE)
 
   pcards <- ds %>%
-      collect() %>%
       left_join(target_separated, by = "target") %>%
       select(-.data$target) %>%
       mutate(forecaster = covidhub_forecaster_name,
@@ -406,10 +387,7 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
   pcards <- filter(pcards, .data$signal %in% !!signal)
   class(pcards) = c("predictions_cards", class(pcards))
 
-  # Cleanup, delete downloaded CSVs from disk
-  unlink(file.path("data", covidhub_forecaster_name), recursive = TRUE)
-
-  pcards
+  return(pcards)
 }
 
 #' Get available forecast dates for a forecaster on the COVID Hub

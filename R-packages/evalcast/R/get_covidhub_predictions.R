@@ -334,9 +334,14 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
       attempt <- attempt + 1
       # Increase time between download attempts in exponential backoff
       wait <- base_wait * 2 ^ (attempt - 1)
-      # If the read attempt succeeds, returns a datatable; else a try-error
+      # If the read attempt succeeds, returns a dataframe; else a try-error
       read_status <- try({
-        fread(target_url, showProgress = FALSE, data.table = FALSE)
+        fread(target_url, showProgress = FALSE, data.table = FALSE,
+          colClasses=list(
+            character=c("forecast_date", "target", "target_end_date", "type", "location"),
+            numeric = c("quantile", "value")
+          )
+        )
       })
 
       if (inherits(read_status, "try-error")) {

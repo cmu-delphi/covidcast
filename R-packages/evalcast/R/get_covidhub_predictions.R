@@ -301,7 +301,7 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
 #' @return Predictions card. For more flexible processing of COVID Hub data, try
 #'   using [zoltr](https://docs.zoltardata.com/zoltr/)
 #'
-#' @importFrom data.table fread rbindlist
+#' @importFrom data.table fread rbindlist %chin%
 get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
                                            forecast_dates = NULL,
                                            geo_values = "*",
@@ -365,9 +365,7 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
 
   # Create all derived columns from target first to join later
   # Works with just the distinct values of target for efficiency
-  target_separated <- ds %>%
-    select(.data$target) %>%
-    distinct() %>%
+  target_separated <- distinct(ds, target) %>%
     process_target(remove = FALSE)
 
   pcards <- ds %>%
@@ -384,12 +382,12 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
   pcards <- pcards %>%
     location_2_geo_value()
   if (!identical(geo_values, "*")) {
-    pcards <- filter(pcards, .data$geo_value %in% geo_values)
+    pcards <- filter(pcards, .data$geo_value %chin% geo_values)
   }
   if (!is.null(ahead)) {
     pcards <- filter(pcards, .data$ahead %in% !!ahead)
   }
-  pcards <- filter(pcards, .data$signal %in% !!signal)
+  pcards <- filter(pcards, .data$signal %chin% !!signal)
   class(pcards) = c("predictions_cards", class(pcards))
 
   return(pcards)
@@ -514,9 +512,6 @@ get_covidhub_forecaster_names <- function(
   }
   return(forecaster_names)
 }
-
-
-
 
 #' Vector of quantiles used for submission to the COVID 19 Forecast Hub
 #'

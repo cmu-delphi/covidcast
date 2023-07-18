@@ -301,7 +301,8 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
 #' @return Predictions card. For more flexible processing of COVID Hub data, try
 #'   using [zoltr](https://docs.zoltardata.com/zoltr/)
 #'
-#' @importFrom data.table fread rbindlist %chin%
+#' @importFrom data.table fread %chin%
+#' @importFrom dplyr bind_rows
 get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
                                            forecast_dates = NULL,
                                            geo_values = "*",
@@ -361,7 +362,7 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
 
     return(read_status)
   }) %>%
-    rbindlist()
+    bind_rows()
 
   # Create all derived columns from target first to join later
   # Works with just the distinct values of target for efficiency
@@ -373,9 +374,7 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
       select(-.data$target) %>%
       mutate(forecaster = covidhub_forecaster_name,
              forecast_date = lubridate::ymd(.data$forecast_date),
-             target_end_date = lubridate::ymd(.data$target_end_date),
-             quantile = as.double(.data$quantile),
-             value = as.double(.data$value)) %>%
+             target_end_date = lubridate::ymd(.data$target_end_date)) %>%
       filter_predictions(forecast_type, incidence_period, signal) %>%
       select_pcard_cols()
 

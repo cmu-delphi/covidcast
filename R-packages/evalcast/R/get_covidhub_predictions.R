@@ -328,7 +328,7 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
 
     # Read file. Re-attempt up to 8 times (max 2 min wait).
     attempt <- 0
-    n_max_attempt <- 4
+    n_max_attempt <- 8
     base_wait <- 1 # second
 
     while (attempt < n_max_attempt) {

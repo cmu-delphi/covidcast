@@ -1,7 +1,7 @@
 Package: evalcast
 Type: Package
 Title: Tools For Evaluating COVID Forecasters
-Version: 0.3.3
+Version: 0.3.4
 Authors@R:
   c(
     person(given = "Daniel",
@@ -77,7 +77,6 @@ Imports:
     covidHubUtils,
     forcats,
     data.table,
-    arrow,
     fs,
     plyr,
     bettermc,

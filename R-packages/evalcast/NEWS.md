@@ -1,7 +1,16 @@
+# evalcast 0.3.4
+
+- Change `get_forecaster_predictions_alt` to read forecaster input files using
+  `data.table::fread`. This replaces a several-years-old version of
+  `arrow::open_dataset`. `data.table::fread` is faster, doesn't require a
+  separate download step, and has more flexibility in column specification.
+
 # evalcast 0.3.3
 
 - Fix `get_covidhub_forecast_dates`, likely broken by GitHub website format
-  change, by refactoring it to use GitHub API
+  change, by refactoring it to use GitHub API. If requesting many dates, this
+  may require authentication with a
+  [GitHub API key](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
 
 # evalcast 0.3.2
 

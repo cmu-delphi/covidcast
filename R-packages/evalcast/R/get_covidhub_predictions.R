@@ -337,12 +337,24 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
       wait <- base_wait * 2 ^ (attempt - 1)
       # If the read attempt succeeds, returns a dataframe; else a try-error
       read_status <- try({
-        fread(target_url, showProgress = FALSE, data.table = FALSE,
-          colClasses=list(
-            character=c("forecast_date", "target", "target_end_date", "type", "location"),
-            numeric = c("quantile", "value")
-          )
-        )
+        fread(target_url,
+          # There are several different missing value encodings. Read them all as `NA`.
+          na.strings = c("\"NA\"", "NA", "NULL", "\"NULL\"", "\"   NA\""),
+          # Some values in PSI-DRAFT and PSI-DICE value columns have leading
+          # whitespace for some dates. `fread` can't read these in as
+          # numerics, so we need to read them as character and later cast to
+          # double.
+          colClasses=list(character=c(
+              "forecast_date",
+              "target",
+              "target_end_date",
+              "type",
+              "location",
+              "quantile",
+              "value"
+            )),
+          data.table = FALSE,
+          showProgress = FALSE)
       })
 
       if (inherits(read_status, "try-error")) {
@@ -374,7 +386,10 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
       select(-.data$target) %>%
       mutate(forecaster = covidhub_forecaster_name,
              forecast_date = lubridate::ymd(.data$forecast_date),
-             target_end_date = lubridate::ymd(.data$target_end_date)) %>%
+             target_end_date = lubridate::ymd(.data$target_end_date),
+             quantile = as.double(.data$quantile),
+             value = as.double(.data$value)
+            ) %>%
       filter_predictions(forecast_type, incidence_period, signal) %>%
       select_pcard_cols()
 

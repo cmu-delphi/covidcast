@@ -237,7 +237,8 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
                         forecast_date,
                         covidhub_forecaster_name)
     pred <- fread(filename,
-                  na.strings = c("\"NA\"", "NA"),
+                  # There are several different missing value encodings. Read them all as `NA`.
+                  na.strings = c("\"NA\"", "NA", "NULL", "\"NULL\"", "\"   NA\""),
                   colClasses = c(location = "character",
                                  quantile = "double",
                                  value = "double",

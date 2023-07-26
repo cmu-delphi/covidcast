@@ -239,11 +239,19 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
     pred <- fread(filename,
                   # There are several different missing value encodings. Read them all as `NA`.
                   na.strings = c("\"NA\"", "NA", "NULL", "\"NULL\"", "\"   NA\""),
-                  colClasses = c(location = "character",
-                                 quantile = "double",
-                                 value = "double",
-                                 target = "character",
-                                 type = "character"),
+                  # Some values in PSI-DRAFT and PSI-DICE value columns have leading
+                  # whitespace for some dates. `fread` can't read these in as
+                  # numerics, so we need to read them as character and later cast to
+                  # double.
+                  colClasses=list(character=c(
+                      "forecast_date",
+                      "target",
+                      "target_end_date",
+                      "type",
+                      "location",
+                      "quantile",
+                      "value"
+                    )),
                   data.table = FALSE,
                   showProgress = FALSE)
     # Specifying the date conversion after significantly speeds up loading
@@ -253,7 +261,11 @@ get_forecaster_predictions <- function(covidhub_forecaster_name,
 
     pcards[[forecast_date]] <- pred %>%
       process_target(remove = TRUE) %>%
-      mutate(forecaster = covidhub_forecaster_name) %>%
+      mutate(
+        forecaster = covidhub_forecaster_name,
+        quantile = as.double(.data$quantile),
+        value = as.double(.data$value)
+      ) %>%
       filter_predictions(forecast_type, incidence_period, signal) %>%
       select_pcard_cols()
   }

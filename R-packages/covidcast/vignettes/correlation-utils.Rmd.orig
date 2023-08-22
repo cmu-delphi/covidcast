@@ -11,7 +11,7 @@ vignette: >
 ```{r, setup, include=FALSE}
 knitr::opts_chunk$set(
   comment = "", fig.width = 6, fig.height = 6, fig.path = "figures/corr-",
-  fig.cap = ""
+  fig.cap = "", dev = "ragg_png"
 )
 ```
 

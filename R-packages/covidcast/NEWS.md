@@ -3,7 +3,10 @@
 - `covidcast_meta()` now caches the server's response for a length of time
   specified by the COVIDcast API server, based on how frequently the metadata is
   recomputed. Because `covidcast_meta()` is called by `covidcast_signal()`, this
-  saves one API call per call to `covidcast_signal()`.
+  saves one API call per call to `covidcast_signal()`. (@krivard, #645)
+
+- `covidcast_meta()` now more clearly reports errors when the API usage limit
+  has been reached.
 
 # covidcast 0.5.1
 

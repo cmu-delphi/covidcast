@@ -1,0 +1,297 @@
+---
+title: Get started with covidcast
+description: An introductory tutorial with examples.
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Get started with covidcast}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, setup, include=FALSE}
+knitr::opts_chunk$set(
+  comment = "", fig.width = 6, fig.height = 6, fig.path = "figures/covidcast-",
+  fig.cap = "", dev = "ragg_png"
+)
+```
+
+This package provides access to data frames of values from the [COVIDcast
+endpoint of the Epidata
+API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html). Using the
+`covidcast_signal()` function, you can fetch any data you may be interested in
+analyzing, then use `plot.covidcast_signal()` to make plots and maps. Since the
+data is provided as a simple data frame, you can also wrangle it into whatever
+form you need to conduct your desired analyses using other packages and
+functions.
+
+## Installing
+
+This package is [available on
+CRAN](https://cran.r-project.org/package=covidcast), so the easiest way to
+install it is simply
+
+```r
+install.packages("covidcast")
+```
+
+## Basic examples
+
+To obtain smoothed estimates of COVID-like illness from our [COVID-19 Trends and
+Impact Survey](https://delphi.cmu.edu/covidcast/surveys/) for every county in
+the United States between 2020-05-01 and 2020-05-07, we can use
+`covidcast_signal()`:
+
+```{r, message=FALSE}
+library(covidcast)
+library(dplyr)
+
+cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_wcli",
+                        start_day = "2020-05-01", end_day = "2020-05-07",
+                        geo_type = "county")
+knitr::kable(head(cli))
+```
+
+`covidcast_signal()` returns a data frame. (Here we're using `knitr::kable()` to
+make it more readable.) Each row represents one observation in one county on one
+day. The county FIPS code is given in the `geo_value` column, the date in the
+`time_value` column. Here `value` is the requested signal---in this case, the
+smoothed estimate of the percentage of people with COVID-like illness, based on
+the symptom surveys, and `stderr` is its standard error. See the
+`covidcast_signal()` documentation for details on the returned data frame.
+
+To get a basic summary of the returned data frame:
+
+```{r}
+summary(cli)
+```
+
+The COVIDcast API makes estimates available at several different geographic
+levels, and `covidcast_signal()` defaults to requesting county-level data. To
+request estimates for states instead of counties, we use the `geo_type`
+argument:
+
+```{r, message=FALSE}
+cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_wcli",
+                        start_day = "2020-05-01", end_day = "2020-05-07",
+                        geo_type = "state")
+knitr::kable(head(cli))
+```
+
+One can also select a specific geographic region by its ID. For example, this is
+the FIPS code for Allegheny County, Pennsylvania:
+
+```{r, message=FALSE}
+cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_wcli",
+                        start_day = "2020-05-01", end_day = "2020-05-07",
+                        geo_type = "county", geo_value = "42003")
+knitr::kable(head(cli))
+```
+
+### API keys
+
+By default, this package submits queries to the API anonymously. All the
+examples in the package documentation are compatible with anonymous use of the
+API, but [there are some limits on anonymous
+queries](https://cmu-delphi.github.io/delphi-epidata/api/api_keys.html),
+including rate limits on the number of queries that can be submitted per hour.
+To lift these limits, see the "API keys" section of the `covidcast_signal()`
+documentation for information on how to register for and use an API key.
+
+### Plotting and mapping
+
+This package provides convenient functions for plotting and mapping these
+signals. For example, simple line charts are easy to construct:
+
+```{r}
+plot(cli, plot_type = "line",
+     title = "Survey results in Allegheny County, PA")
+```
+
+For more details and examples, including choropleth and bubble maps, see
+`vignette("plotting-signals")`.
+
+
+### Finding signals of interest
+
+Above we used data from [Delphi's symptom
+surveys](https://delphi.cmu.edu/covid19/ctis/), but the COVIDcast API includes
+numerous data streams: medical claims data, cases and deaths, mobility, and many
+others; new signals are added regularly. This can make it a challenge to find
+the data stream that you are most interested in.
+
+The [COVIDcast Data Sources and Signals
+documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html)
+lists all data sources and signals available through COVIDcast. When you find a
+signal of interest, get the data source name (such as `jhu-csse` or `fb-survey`)
+and the signal name (such as `confirmed_incidence_num` or `smoothed_wcli`).
+These are provided as arguments to `covidcast_signal()` to request the data you
+want.
+
+
+### Finding counties and metro areas
+
+The COVIDcast API identifies counties by their 5-digit FIPS code and
+metropolitan areas by their CBSA ID number. (See the [geographic coding
+documentation](https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html)
+for details.) This means that to query a specific county or metropolitan area,
+we must have some way to quickly find its identifier.
+
+This package includes several utilities intended to make the process easier. For
+example, if we look at `?county_census`, we find that the package provides
+census data (such as population) on every county in the United States, including
+its FIPS code. Similarly, by looking at `?msa_census` we can find data about
+metropolitan statistical areas, their corresponding CBSA IDs, and recent census
+data.
+
+(Note: the `msa_census` data includes types of area beyond metropolitan
+statistical areas, including micropolitan statistical areas. The `LSAD` column
+identifies the type of each area. The COVIDcast API only provides estimates for
+metropolitan statistical areas, not for their divisions or for micropolitan
+areas.)
+
+Building on these datasets, the convenience functions `name_to_fips()` and
+`name_to_cbsa()` conduct `grep()`-based searching of county or metropolitan area
+names to find FIPS or CBSA codes, respectively:
+
+```{r}
+name_to_fips("Allegheny")
+name_to_cbsa("Pittsburgh")
+```
+
+Since these functions return vectors of IDs, we can use them to construct the
+`geo_values` argument to `covidcast_signal()` to select specific regions to
+query.
+
+You may also want to convert FIPS codes or CBSA IDs back to well-known names,
+for instance to report in tables or graphics. The package provides inverse
+mappings `county_fips_to_name()` and `cbsa_to_name()` that work in the
+analogous way:
+
+```{r}
+county_fips_to_name("42003")
+cbsa_to_name("38300")
+```
+
+See their documentation for more details (for example, the options for handling
+matches when counties have the same name).
+
+## Signal metadata
+
+If we are interested in exploring the available signals and their metadata, we
+can use `covidcast_meta()` to fetch a data frame of the available signals:
+
+```{r}
+meta <- covidcast_meta()
+knitr::kable(head(meta))
+```
+
+The `covidcast_meta()` documentation describes the columns and their meanings.
+The metadata data frame can be filtered and sliced as desired to obtain
+information about signals of interest. To get a basic summary of the metadata:
+
+```{r, eval = FALSE}
+summary(meta)
+```
+
+(We silenced the evaluation because the output of `summary()` here is still
+quite long.)
+
+## Tracking issues and updates
+
+The COVIDcast API records not just each signal's estimate for a given location
+on a given day, but also *when* that estimate was made, and all updates to that
+estimate.
+
+For example, consider using our [doctor visits
+signal](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html),
+which estimates the percentage of outpatient doctor visits that are
+COVID-related, and consider a result row with `time_value` 2020-05-01 for
+`geo_values = "pa"`. This is an estimate for the percentage in Pennsylvania on
+May 1, 2020. That estimate was *issued* on May 5, 2020, the delay being due to
+the aggregation of data by our source and the time taken by the COVIDcast API to
+ingest the data provided. Later, the estimate for May 1st could be updated,
+perhaps because additional visit data from May 1st arrived at our source and was
+reported to us. This constitutes a new *issue* of the data.
+
+### Data known "as of" a specific date
+
+By default, `covidcast_signal()` fetches the most recent issue available. This
+is the best option for users who simply want to graph the latest data or
+construct dashboards. But if we are interested in knowing *when* data was
+reported, we can request specific data versions using the `as_of`, `issues`, or
+`lag` arguments. (Note these are mutually exclusive; only one can be specified
+at a time.)
+
+First, we can request the data that was available *as of* a specific date, using
+the `as_of` argument:
+
+```{r, message = FALSE}
+covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
+                 start_day = "2020-05-01", end_day = "2020-05-01",
+                 geo_type = "state", geo_values = "pa", as_of = "2020-05-07")
+```
+
+This shows that an estimate of about 2.3% was issued on May 7. If we don't
+specify `as_of`, we get the most recent estimate available:
+
+```{r, message = FALSE}
+covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
+                 start_day = "2020-05-01", end_day = "2020-05-01",
+                 geo_type = "state", geo_values = "pa")
+```
+
+Note the substantial change in the estimate, to over 5%, reflecting new data
+that became available *after* May 7 about visits occurring on May 1. This
+illustrates the importance of issue date tracking, particularly for forecasting
+tasks. To backtest a forecasting model on past data, it is important to use the
+data that would have been available *at the time*, not data that arrived much
+later.
+
+### Multiple issues of observations
+
+By using the `issues` argument, we can request all issues in a certain time
+period:
+
+```{r, message = FALSE}
+covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
+                 start_day = "2020-05-01", end_day = "2020-05-01",
+                 geo_type = "state", geo_values = "pa",
+                 issues = c("2020-05-01", "2020-05-15")) %>%
+  knitr::kable()
+```
+
+This estimate was clearly updated many times as new data for May 1st arrived.
+Note that these results include only data issued or updated between 2020-05-01
+and 2020-05-15. If a value was first reported on 2020-04-15, and never updated,
+a query for issues between 2020-05-01 and 2020-05-15 will not include that value
+among its results.
+
+After fetching multiple issues of data, we can use the `latest_issue()` or
+`earliest_issue()` functions to subset the data frame to view only the latest or
+earliest issue of each observation.
+
+### Observations issued with a specific lag
+
+Finally, we can use the `lag` argument to request only data reported with a
+certain lag. For example, requesting a lag of 7 days means to request only
+issues 7 days after the corresponding `time_value`:
+
+```{r, message = FALSE}
+covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
+                 start_day = "2020-05-01", end_day = "2020-05-07",
+                 geo_type = "state", geo_values = "pa", lag = 7) %>%
+  knitr::kable()
+```
+
+Note that though this query requested all values between 2020-05-01 and
+2020-05-07, May 3rd and May 4th were *not* included in the results set. This is
+because the query will only include a result for May 3rd if a value were issued
+on May 10th (a 7-day lag), but in fact the value was not updated on that day:
+
+```{r, message = FALSE}
+covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
+                 start_day = "2020-05-03", end_day = "2020-05-03",
+                 geo_type = "state", geo_values = "pa",
+                 issues = c("2020-05-09", "2020-05-15")) %>%
+  knitr::kable()
+```

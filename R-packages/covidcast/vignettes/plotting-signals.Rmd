@@ -8,6 +8,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+
+
 Once you've fetched some COVIDcast signals using `covidcast_signal()`, the
 returned `covidcast` objects can be plotted and mapped in various ways. The data
 structure is designed to be tidy and easily wrangled using your favorite
@@ -20,33 +22,61 @@ as an example; it records the percentage of outpatient doctor visits with COVID
 symptom codes, as reported by Delphi's health system partners. We'll also use
 incident case counts. Fetching the data is simple:
 
-```{r, message=FALSE}
+
+```r
 library(covidcast)
 
 dv <- covidcast_signal(data_source = "doctor-visits",
-                         signal = "smoothed_adj_cli",
-                         start_day = "2020-07-01", end_day = "2020-07-14")
+                       signal = "smoothed_adj_cli",
+                       start_day = "2020-07-01", end_day = "2020-07-14")
 summary(dv)
+```
 
+```
+A `covidcast_signal` dataframe with 28450 rows and 15 columns.
+
+data_source : doctor-visits
+signal      : smoothed_adj_cli
+geo_type    : county
+
+first date                          : 2020-07-01
+last date                           : 2020-07-14
+median number of geo_values per day : 2035
+```
+
+```r
 inum <- covidcast_signal(data_source = "jhu-csse",
                          signal = "confirmed_7dav_incidence_prop",
                          start_day = "2020-07-01", end_day = "2020-07-14")
 summary(inum)
 ```
 
+```
+A `covidcast_signal` dataframe with 45864 rows and 15 columns.
+
+data_source : jhu-csse
+signal      : confirmed_7dav_incidence_prop
+geo_type    : county
+
+first date                          : 2020-07-01
+last date                           : 2020-07-14
+median number of geo_values per day : 3276
+```
+
 ## Choropleth maps
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(fig.width = 6, fig.height = 4)
-```
+
 
 The default `plot` method for `covidcast_signal` objects,
 `plot.covidcast_signal()`, produces choropleth maps by using `ggplot2` and the
 `usmap` package:
 
-```{r}
+
+```r
 plot(dv)
 ```
+
+![](figures/plot-unnamed-chunk-3-1.png)
 
 The color scheme is automatically chosen to be similar to that used on the
 online [COVIDcast mapping tool](https://delphi.cmu.edu/covidcast/). Also, by
@@ -54,15 +84,19 @@ default, this map shows the most recent day of data available in the data frame.
 One can choose the day and also choose the color scales, transparency level for
 mega counties, and title:
 
-```{r}
+
+```r
 plot(dv, time_value = "2020-07-04", choro_col = cm.colors(10), alpha = 0.4,
      title = "COVID doctor visits on 2020-07-04")
 ```
 
+![](figures/plot-unnamed-chunk-4-1.png)
+
 By providing `breaks` and `colors`, we can create custom color scales, for
 example to have a log-spaced color scale for incident case counts:
 
-```{r}
+
+```r
 breaks <- c(0, 1, 2, 5, 10, 20, 50, 100, 200)
 colors <- c("#D3D3D3", "#FFFFCC", "#FEDDA2", "#FDBB79", "#FD9950", "#EB7538",
             "#C74E32", "#A3272C", "#800026")
@@ -75,10 +109,13 @@ plot(inum, choro_col = colors, choro_params = list(breaks = breaks),
      title = "New COVID cases (7-day trailing average) on 2020-07-14")
 ```
 
+![](figures/plot-unnamed-chunk-5-1.png)
+
 Lastly, we show how we can use custom breaks to (visually) answer the question:
 which counties have cumulative case rates of at least 1/100?
 
-```{r, message=FALSE}
+
+```r
 cprop <- covidcast_signal(data_source = "jhu-csse",
                           signal = "confirmed_cumulative_prop",
                           start_day = "2020-07-01", end_day = "2020-07-14")
@@ -91,6 +128,8 @@ plot(cprop, choro_col = colors,
      title = "Cumulative COVID cases per 100k people on 2020-07-14")
 ```
 
+![](figures/plot-unnamed-chunk-6-1.png)
+
 ## Bubble maps
 
 As an alternative to choropleth maps, we can also quickly plot bubble maps. By
@@ -98,24 +137,43 @@ default, bubble maps have 8 bubble size bins evenly spaced over the range, where
 zero always means zero bubble size. The legend shows all bins, interpreted as
 each bubble size meaning *at least* the corresponding value.
 
-```{r}
+
+```r
 plot(inum, plot_type = "bubble")
 ```
+
+```
+Warning in plot_bubble(x, time_value = time_value, include = include, range =
+range, : Bubble maps can be hard to read when there is missing data;the
+locations without data are filled in gray.
+```
+
+![](figures/plot-unnamed-chunk-7-1.png)
 
 As before, we can of course set customized breaks. As values to the left of the
 first bin do not get drawn, this map is much sparser, and highlights areas with
 larger case counts.
 
-```{r}
+
+```r
 plot(inum, plot_type = "bubble",
      bubble_params = list(breaks = seq(20, 200, len = 6)))
 ```
+
+```
+Warning in plot_bubble(x, time_value = time_value, include = include, range =
+range, : Bubble maps can be hard to read when there is missing data;the
+locations without data are filled in gray.
+```
+
+![](figures/plot-unnamed-chunk-8-1.png)
 
 As a final example, suppose we want to plot only counties in the state of Texas.
 We'd like to compare counts per 100,000 against absolute counts, so we fetch the
 proportion signal:
 
-```{r, message=FALSE}
+
+```r
 iprop <- covidcast_signal(data_source = "jhu-csse",
                           signal = "confirmed_7dav_incidence_prop",
                           start_day = "2020-07-01", end_day = "2020-07-14")
@@ -123,7 +181,8 @@ iprop <- covidcast_signal(data_source = "jhu-csse",
 
 Then we make two maps side-by-side with custom ranges:
 
-```{r, fig.width=8, fig.height=4, message=FALSE}
+
+```r
 library(gridExtra)
 
 breaks1 <- c(1, 10, 100, 1000)
@@ -141,12 +200,15 @@ p2 <- plot(iprop, plot_type = "bubble",
 grid.arrange(p1, p2, nrow = 1)
 ```
 
+![](figures/plot-unnamed-chunk-10-1.png)
+
 ## Time series plots
 
 Let's fetch the doctor visits and case counts, but for all states rather than
 for all counties. This will make the time series plots more manageable.
 
-```{r, message=FALSE}
+
+```r
 dv_st <- covidcast_signal(data_source = "doctor-visits",
                           signal = "smoothed_adj_cli",
                           start_day = "2020-04-15", end_day = "2020-07-01",
@@ -161,13 +223,21 @@ By default, time series plots show all available data, including all
 geographies. A line for every state would be unmanageable, so let's select a few
 states and plot all data for them:
 
-```{r, message = FALSE}
+
+```r
 library(dplyr)
 
 states <- c("ca", "pa", "tx", "ny")
 plot(dv_st %>% filter(geo_value %in% states), plot_type = "line")
+```
+
+![](figures/plot-unnamed-chunk-12-1.png)
+
+```r
 plot(inum_st %>% filter(geo_value %in% states), plot_type = "line")
 ```
+
+![](figures/plot-unnamed-chunk-12-2.png)
 
 Notice how in Texas, the doctor visits indicator rose several weeks in advance
 of confirmed cases, suggesting the signal could be predictive.
@@ -180,18 +250,32 @@ this to customize the appearance of your plots however you choose.
 
 For example:
 
-```{r, warning = FALSE}
+
+```r
 library(ggplot2)
 
 dv_md <- covidcast_signal(data_source = "doctor-visits",
                           signal = "smoothed_adj_cli",
                           start_day = "2020-06-01", end_day = "2020-07-15",
                           geo_values = name_to_fips("Miami-Dade"))
+```
+
+```
+Fetched day 2020-06-01 to 2020-07-15: num_entries = 45
+```
+
+```r
 inum_md <- covidcast_signal(data_source = "jhu-csse",
                             signal = "confirmed_7dav_incidence_prop",
                             start_day = "2020-06-01", end_day = "2020-07-15",
                             geo_values = name_to_fips("Miami-Dade"))
+```
 
+```
+Fetched day 2020-06-01 to 2020-07-15: num_entries = 45
+```
+
+```r
 # Compute the ranges of the two signals
 range1 <- inum_md %>% select("value") %>% range
 range2 <- dv_md %>% select("value") %>% range
@@ -224,6 +308,8 @@ ggplot(df, aes(x = time_value, y = value)) +
   theme(legend.position = "bottom",
         legend.title = ggplot2::element_blank())
 ```
+
+![](figures/plot-unnamed-chunk-13-1.png)
 
 Again, we see that the doctor visits indicator starts rising several days before
 the new COVID-19 cases do.

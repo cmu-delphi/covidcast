@@ -8,6 +8,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+
+
 This package provides access to data frames of values from the [COVIDcast
 endpoint of the Epidata
 API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html). Using the
@@ -34,7 +36,8 @@ Impact Survey](https://delphi.cmu.edu/covidcast/surveys/) for every county in
 the United States between 2020-05-01 and 2020-05-07, we can use
 `covidcast_signal()`:
 
-```{r, message=FALSE}
+
+```r
 library(covidcast)
 library(dplyr)
 
@@ -43,6 +46,17 @@ cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_wcli",
                         geo_type = "county")
 knitr::kable(head(cli))
 ```
+
+
+
+|data_source |signal        |geo_value |time_value |source    |geo_type |time_type |issue      | lag| missing_value| missing_stderr| missing_sample_size|     value|    stderr| sample_size|
+|:-----------|:-------------|:---------|:----------|:---------|:--------|:---------|:----------|---:|-------------:|--------------:|-------------------:|---------:|---------:|-----------:|
+|fb-survey   |smoothed_wcli |01000     |2020-05-01 |fb-survey |county   |day       |2020-09-03 | 125|             0|              0|                   0| 0.8260625| 0.1341381|   1676.2773|
+|fb-survey   |smoothed_wcli |01001     |2020-05-01 |fb-survey |county   |day       |2020-09-03 | 125|             0|              0|                   0| 1.0707790| 0.8213119|    109.0866|
+|fb-survey   |smoothed_wcli |01003     |2020-05-01 |fb-survey |county   |day       |2020-09-03 | 125|             0|              0|                   0| 0.5081644| 0.2800777|    572.3194|
+|fb-survey   |smoothed_wcli |01015     |2020-05-01 |fb-survey |county   |day       |2020-09-03 | 125|             0|              0|                   0| 0.5277609| 0.5192431|    118.8275|
+|fb-survey   |smoothed_wcli |01031     |2020-05-01 |fb-survey |county   |day       |2020-09-03 | 125|             0|              0|                   0| 0.3733811| 0.3367309|    112.2687|
+|fb-survey   |smoothed_wcli |01045     |2020-05-01 |fb-survey |county   |day       |2020-09-03 | 125|             0|              0|                   0| 1.2369542| 0.6464530|    108.5803|
 
 `covidcast_signal()` returns a data frame. (Here we're using `knitr::kable()` to
 make it more readable.) Each row represents one observation in one county on one
@@ -54,8 +68,21 @@ the symptom surveys, and `stderr` is its standard error. See the
 
 To get a basic summary of the returned data frame:
 
-```{r}
+
+```r
 summary(cli)
+```
+
+```
+A `covidcast_signal` dataframe with 7030 rows and 15 columns.
+
+data_source : fb-survey
+signal      : smoothed_wcli
+geo_type    : county
+
+first date                          : 2020-05-01
+last date                           : 2020-05-07
+median number of geo_values per day : 1015
 ```
 
 The COVIDcast API makes estimates available at several different geographic
@@ -63,22 +90,46 @@ levels, and `covidcast_signal()` defaults to requesting county-level data. To
 request estimates for states instead of counties, we use the `geo_type`
 argument:
 
-```{r, message=FALSE}
+
+```r
 cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_wcli",
                         start_day = "2020-05-01", end_day = "2020-05-07",
                         geo_type = "state")
 knitr::kable(head(cli))
 ```
 
+
+
+|data_source |signal        |geo_value |time_value |source    |geo_type |time_type |issue      | lag| missing_value| missing_stderr| missing_sample_size|     value|    stderr| sample_size|
+|:-----------|:-------------|:---------|:----------|:---------|:--------|:---------|:----------|---:|-------------:|--------------:|-------------------:|---------:|---------:|-----------:|
+|fb-survey   |smoothed_wcli |ak        |2020-05-01 |fb-survey |state    |day       |2020-09-03 | 125|             0|              0|                   0| 0.3661909| 0.1469918|    1560.000|
+|fb-survey   |smoothed_wcli |al        |2020-05-01 |fb-survey |state    |day       |2020-09-03 | 125|             0|              0|                   0| 0.7764020| 0.1010989|    7360.237|
+|fb-survey   |smoothed_wcli |ar        |2020-05-01 |fb-survey |state    |day       |2020-09-03 | 125|             0|              0|                   0| 0.7065584| 0.1051584|    4781.483|
+|fb-survey   |smoothed_wcli |az        |2020-05-01 |fb-survey |state    |day       |2020-09-03 | 125|             0|              0|                   0| 0.6025853| 0.0724214|   10973.073|
+|fb-survey   |smoothed_wcli |ca        |2020-05-01 |fb-survey |state    |day       |2020-09-03 | 125|             0|              0|                   0| 0.4139045| 0.0306336|   50482.138|
+|fb-survey   |smoothed_wcli |co        |2020-05-01 |fb-survey |state    |day       |2020-09-03 | 125|             0|              0|                   0| 0.5984794| 0.0717395|    9888.894|
+
 One can also select a specific geographic region by its ID. For example, this is
 the FIPS code for Allegheny County, Pennsylvania:
 
-```{r, message=FALSE}
+
+```r
 cli <- covidcast_signal(data_source = "fb-survey", signal = "smoothed_wcli",
                         start_day = "2020-05-01", end_day = "2020-05-07",
                         geo_type = "county", geo_value = "42003")
 knitr::kable(head(cli))
 ```
+
+
+
+|data_source |signal        |geo_value |time_value |source    |geo_type |time_type |issue      | lag| missing_value| missing_stderr| missing_sample_size|     value|    stderr| sample_size|
+|:-----------|:-------------|:---------|:----------|:---------|:--------|:---------|:----------|---:|-------------:|--------------:|-------------------:|---------:|---------:|-----------:|
+|fb-survey   |smoothed_wcli |42003     |2020-05-01 |fb-survey |county   |day       |2020-09-03 | 125|             0|              0|                   0| 0.6270520| 0.2511377|    2554.564|
+|fb-survey   |smoothed_wcli |42003     |2020-05-02 |fb-survey |county   |day       |2020-09-03 | 124|             0|              0|                   0| 0.6453498| 0.2599037|    2509.176|
+|fb-survey   |smoothed_wcli |42003     |2020-05-03 |fb-survey |county   |day       |2020-09-03 | 123|             0|              0|                   0| 0.5523067| 0.2497662|    2473.456|
+|fb-survey   |smoothed_wcli |42003     |2020-05-04 |fb-survey |county   |day       |2020-09-03 | 122|             0|              0|                   0| 0.1430772| 0.0804642|    2493.730|
+|fb-survey   |smoothed_wcli |42003     |2020-05-05 |fb-survey |county   |day       |2020-09-03 | 121|             0|              0|                   0| 0.1861889| 0.0960907|    2415.204|
+|fb-survey   |smoothed_wcli |42003     |2020-05-06 |fb-survey |county   |day       |2020-09-03 | 120|             0|              0|                   0| 0.3124150| 0.1218194|    2465.422|
 
 ### API keys
 
@@ -95,10 +146,13 @@ documentation for information on how to register for and use an API key.
 This package provides convenient functions for plotting and mapping these
 signals. For example, simple line charts are easy to construct:
 
-```{r}
+
+```r
 plot(cli, plot_type = "line",
      title = "Survey results in Allegheny County, PA")
 ```
+
+![](figures/covidcast-unnamed-chunk-5-1.png)
 
 For more details and examples, including choropleth and bubble maps, see
 `vignette("plotting-signals")`.
@@ -146,9 +200,23 @@ Building on these datasets, the convenience functions `name_to_fips()` and
 `name_to_cbsa()` conduct `grep()`-based searching of county or metropolitan area
 names to find FIPS or CBSA codes, respectively:
 
-```{r}
+
+```r
 name_to_fips("Allegheny")
+```
+
+```
+Allegheny County 
+         "42003" 
+```
+
+```r
 name_to_cbsa("Pittsburgh")
+```
+
+```
+Pittsburgh, PA 
+       "38300" 
 ```
 
 Since these functions return vectors of IDs, we can use them to construct the
@@ -160,9 +228,23 @@ for instance to report in tables or graphics. The package provides inverse
 mappings `county_fips_to_name()` and `cbsa_to_name()` that work in the
 analogous way:
 
-```{r}
+
+```r
 county_fips_to_name("42003")
+```
+
+```
+             42003 
+"Allegheny County" 
+```
+
+```r
 cbsa_to_name("38300")
+```
+
+```
+           38300 
+"Pittsburgh, PA" 
 ```
 
 See their documentation for more details (for example, the options for handling
@@ -173,16 +255,29 @@ matches when counties have the same name).
 If we are interested in exploring the available signals and their metadata, we
 can use `covidcast_meta()` to fetch a data frame of the available signals:
 
-```{r}
+
+```r
 meta <- covidcast_meta()
 knitr::kable(head(meta))
 ```
+
+
+
+|data_source |signal                      |time_type |geo_type |min_time   |max_time   | num_locations| min_value| max_value| mean_value| stdev_value| last_update|max_issue  | min_lag| max_lag|
+|:-----------|:---------------------------|:---------|:--------|:----------|:----------|-------------:|---------:|---------:|----------:|-----------:|-----------:|:----------|-------:|-------:|
+|chng        |smoothed_adj_outpatient_cli |day       |county   |2020-02-01 |2023-02-14 |          3118| 0.0009331|  99.92012|   2.227852|    3.843579|  1683566979|2023-02-19 |       3|     674|
+|chng        |smoothed_adj_outpatient_cli |day       |hhs      |2020-02-01 |2023-06-14 |            10| 0.0061953|  20.77577|   2.530157|    2.531306|  1687231582|2023-06-19 |       5|     674|
+|chng        |smoothed_adj_outpatient_cli |day       |hrr      |2020-02-01 |2023-06-14 |           306| 0.0010292|  50.81590|   2.350355|    2.763442|  1687231582|2023-06-19 |       5|     674|
+|chng        |smoothed_adj_outpatient_cli |day       |msa      |2020-02-01 |2023-06-14 |           392| 0.0007662|  99.99898|   2.153204|    3.000248|  1687231583|2023-06-19 |       5|     674|
+|chng        |smoothed_adj_outpatient_cli |day       |nation   |2020-02-01 |2023-06-14 |             1| 0.0154639|  12.08697|   2.778260|    2.344107|  1687231583|2023-06-19 |       5|     674|
+|chng        |smoothed_adj_outpatient_cli |day       |state    |2020-02-01 |2023-06-14 |            55| 0.0013343|  33.23859|   2.264207|    2.563880|  1687231583|2023-06-19 |       5|     674|
 
 The `covidcast_meta()` documentation describes the columns and their meanings.
 The metadata data frame can be filtered and sliced as desired to obtain
 information about signals of interest. To get a basic summary of the metadata:
 
-```{r, eval = FALSE}
+
+```r
 summary(meta)
 ```
 
@@ -218,19 +313,51 @@ at a time.)
 First, we can request the data that was available *as of* a specific date, using
 the `as_of` argument:
 
-```{r, message = FALSE}
+
+```r
 covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
                  start_day = "2020-05-01", end_day = "2020-05-01",
                  geo_type = "state", geo_values = "pa", as_of = "2020-05-07")
 ```
 
+```
+A `covidcast_signal` dataframe with 1 rows and 15 columns.
+
+data_source : doctor-visits
+signal      : smoothed_adj_cli
+geo_type    : state
+
+    data_source           signal geo_value time_value        source geo_type
+1 doctor-visits smoothed_adj_cli        pa 2020-05-01 doctor-visits    state
+  time_type      issue lag missing_value missing_stderr missing_sample_size
+1       day 2020-05-07   6             0              5                   5
+     value stderr sample_size
+1 2.581509     NA          NA
+```
+
 This shows that an estimate of about 2.3% was issued on May 7. If we don't
 specify `as_of`, we get the most recent estimate available:
 
-```{r, message = FALSE}
+
+```r
 covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
                  start_day = "2020-05-01", end_day = "2020-05-01",
                  geo_type = "state", geo_values = "pa")
+```
+
+```
+A `covidcast_signal` dataframe with 1 rows and 15 columns.
+
+data_source : doctor-visits
+signal      : smoothed_adj_cli
+geo_type    : state
+
+    data_source           signal geo_value time_value        source geo_type
+1 doctor-visits smoothed_adj_cli        pa 2020-05-01 doctor-visits    state
+  time_type      issue lag missing_value missing_stderr missing_sample_size
+1       day 2020-07-04  64             0              5                   5
+     value stderr sample_size
+1 5.973572     NA          NA
 ```
 
 Note the substantial change in the estimate, to over 5%, reflecting new data
@@ -245,13 +372,26 @@ later.
 By using the `issues` argument, we can request all issues in a certain time
 period:
 
-```{r, message = FALSE}
+
+```r
 covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
                  start_day = "2020-05-01", end_day = "2020-05-01",
                  geo_type = "state", geo_values = "pa",
                  issues = c("2020-05-01", "2020-05-15")) %>%
   knitr::kable()
 ```
+
+
+
+|data_source   |signal           |geo_value |time_value |source        |geo_type |time_type |issue      | lag| missing_value| missing_stderr| missing_sample_size|    value|stderr |sample_size |
+|:-------------|:----------------|:---------|:----------|:-------------|:--------|:---------|:----------|---:|-------------:|--------------:|-------------------:|--------:|:------|:-----------|
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-01 |doctor-visits |state    |day       |2020-05-07 |   6|             0|              5|                   5| 2.581509|NA     |NA          |
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-01 |doctor-visits |state    |day       |2020-05-08 |   7|             0|              5|                   5| 3.278896|NA     |NA          |
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-01 |doctor-visits |state    |day       |2020-05-09 |   8|             0|              5|                   5| 3.321781|NA     |NA          |
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-01 |doctor-visits |state    |day       |2020-05-12 |  11|             0|              5|                   5| 3.588683|NA     |NA          |
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-01 |doctor-visits |state    |day       |2020-05-13 |  12|             0|              5|                   5| 3.631978|NA     |NA          |
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-01 |doctor-visits |state    |day       |2020-05-14 |  13|             0|              5|                   5| 3.658009|NA     |NA          |
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-01 |doctor-visits |state    |day       |2020-05-15 |  14|             0|              5|                   5| 3.662286|NA     |NA          |
 
 This estimate was clearly updated many times as new data for May 1st arrived.
 Note that these results include only data issued or updated between 2020-05-01
@@ -269,22 +409,48 @@ Finally, we can use the `lag` argument to request only data reported with a
 certain lag. For example, requesting a lag of 7 days means to request only
 issues 7 days after the corresponding `time_value`:
 
-```{r, message = FALSE}
+
+```r
 covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
                  start_day = "2020-05-01", end_day = "2020-05-07",
                  geo_type = "state", geo_values = "pa", lag = 7) %>%
   knitr::kable()
 ```
 
+```
+Warning: Data not fetched for the following days: 2020-05-01
+```
+
+
+
+|data_source   |signal           |geo_value |time_value |source        |geo_type |time_type |issue      | lag| missing_value| missing_stderr| missing_sample_size|    value|stderr |sample_size |
+|:-------------|:----------------|:---------|:----------|:-------------|:--------|:---------|:----------|---:|-------------:|--------------:|-------------------:|--------:|:------|:-----------|
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-01 |doctor-visits |state    |day       |2020-05-08 |   7|             0|              5|                   5| 3.278896|NA     |NA          |
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-02 |doctor-visits |state    |day       |2020-05-09 |   7|             0|              5|                   5| 3.225292|NA     |NA          |
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-05 |doctor-visits |state    |day       |2020-05-12 |   7|             0|              5|                   5| 2.779908|NA     |NA          |
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-06 |doctor-visits |state    |day       |2020-05-13 |   7|             0|              5|                   5| 2.557698|NA     |NA          |
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-07 |doctor-visits |state    |day       |2020-05-14 |   7|             0|              5|                   5| 2.191677|NA     |NA          |
+
 Note that though this query requested all values between 2020-05-01 and
 2020-05-07, May 3rd and May 4th were *not* included in the results set. This is
 because the query will only include a result for May 3rd if a value were issued
 on May 10th (a 7-day lag), but in fact the value was not updated on that day:
 
-```{r, message = FALSE}
+
+```r
 covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
                  start_day = "2020-05-03", end_day = "2020-05-03",
                  geo_type = "state", geo_values = "pa",
                  issues = c("2020-05-09", "2020-05-15")) %>%
   knitr::kable()
 ```
+
+
+
+|data_source   |signal           |geo_value |time_value |source        |geo_type |time_type |issue      | lag| missing_value| missing_stderr| missing_sample_size|    value|stderr |sample_size |
+|:-------------|:----------------|:---------|:----------|:-------------|:--------|:---------|:----------|---:|-------------:|--------------:|-------------------:|--------:|:------|:-----------|
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-03 |doctor-visits |state    |day       |2020-05-09 |   6|             0|              5|                   5| 2.788618|NA     |NA          |
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-03 |doctor-visits |state    |day       |2020-05-12 |   9|             0|              5|                   5| 3.015368|NA     |NA          |
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-03 |doctor-visits |state    |day       |2020-05-13 |  10|             0|              5|                   5| 3.039310|NA     |NA          |
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-03 |doctor-visits |state    |day       |2020-05-14 |  11|             0|              5|                   5| 3.021245|NA     |NA          |
+|doctor-visits |smoothed_adj_cli |pa        |2020-05-03 |doctor-visits |state    |day       |2020-05-15 |  12|             0|              5|                   5| 3.048725|NA     |NA          |

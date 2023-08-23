@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
       </span>
     </div>
 
@@ -100,8 +100,12 @@
 
     
     
-<p>The covidcast package provides some simple utilities for exploring the correlations between two signals, over space or time, which may be helpful for simple analyses and explorations of data.</p>
-<p>For these examples, we’ll load confirmed case and death rates per 100,000 population, and restrict our analysis to counties with at least 500 total cases by August 15th.</p>
+<p>The covidcast package provides some simple utilities for exploring
+the correlations between two signals, over space or time, which may be
+helpful for simple analyses and explorations of data.</p>
+<p>For these examples, we’ll load confirmed case and death rates per
+100,000 population, and restrict our analysis to counties with at least
+500 total cases by August 15th.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmu-delphi.github.io/covidcast/covidcastR/" class="external-link">covidcast</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
@@ -133,7 +137,11 @@
 <div class="section level2">
 <h2 id="correlations-sliced-by-time">Correlations sliced by time<a class="anchor" aria-label="anchor" href="#correlations-sliced-by-time"></a>
 </h2>
-<p>The <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code> function is your primary way to calculate correlations. The first option we have is to “slice by time”: this calculates, for each time, correlation between the signals over all geographic locations. This is obtained by setting <code>by = "time_value"</code>:</p>
+<p>The <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code> function is your primary way to
+calculate correlations. The first option we have is to “slice by time”:
+this calculates, for each time, correlation between the signals over all
+geographic locations. This is obtained by setting
+<code>by = "time_value"</code>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span></span>
@@ -147,12 +155,28 @@
 <span>                          <span class="va">case_num</span><span class="op">)</span>,</span>
 <span>       x <span class="op">=</span> <span class="st">"Date"</span>, y <span class="op">=</span> <span class="st">"Correlation"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/corr-unnamed-chunk-3-1.png"></p>
-<p>The above plot addresses the question: “on any given day, are case and death rates linearly associated, over US counties?”. We might be interested in broadening this question, instead asking: “on any given day, do higher case rates tend to associate with higher death rates?”, removing the dependence on a linear relationship. The latter can be addressed using Spearman correlation, accomplished by setting <code>method = "spearman"</code> in the call to <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code>. Spearman correlation is highly robust and invariant to monotone transformations (it doesn’t rely on any particular functional form for the dependence between two variables).</p>
+<p>The above plot addresses the question: “on any given day, are case
+and death rates linearly associated, over US counties?”. We might be
+interested in broadening this question, instead asking: “on any given
+day, do higher case rates tend to associate with higher death rates?”,
+removing the dependence on a linear relationship. The latter can be
+addressed using Spearman correlation, accomplished by setting
+<code>method = "spearman"</code> in the call to
+<code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code>. Spearman correlation is highly robust and
+invariant to monotone transformations (it doesn’t rely on any particular
+functional form for the dependence between two variables).</p>
 <div class="section level3">
 <h3 id="lagged-correlations">Lagged correlations<a class="anchor" aria-label="anchor" href="#lagged-correlations"></a>
 </h3>
-<p>We might also be interested in how case rates associate with death rates in the <em>future</em>. Using the <code>dt_x</code> parameter in <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code>, we can lag case rates back any number of days we want, before calculating correlations.</p>
-<p>Here we set <code>dt_x = -10</code>. This means that <code>cases</code> will be lagged by 10 days, meaning that cases on June 1st will be correlated with deaths on June 11th. (It might help to think of it this way: deaths on a certain day will be correlated with cases with an offset of -10 days.)</p>
+<p>We might also be interested in how case rates associate with death
+rates in the <em>future</em>. Using the <code>dt_x</code> parameter in
+<code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code>, we can lag case rates back any number of
+days we want, before calculating correlations.</p>
+<p>Here we set <code>dt_x = -10</code>. This means that
+<code>cases</code> will be lagged by 10 days, meaning that cases on June
+1st will be correlated with deaths on June 11th. (It might help to think
+of it this way: deaths on a certain day will be correlated with cases
+with an offset of -10 days.)</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Use Spearman correlation, with case rates and 10-day lagged case rates</span></span>
 <span><span class="va">df_cor1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_cor.html">covidcast_cor</a></span><span class="op">(</span><span class="va">cases</span>, <span class="va">deaths</span>, by <span class="op">=</span> <span class="st">"time_value"</span>,</span>
@@ -171,13 +195,20 @@
 <span>       x <span class="op">=</span> <span class="st">"Date"</span>, y <span class="op">=</span> <span class="st">"Correlation"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/corr-unnamed-chunk-4-1.png"></p>
-<p>We can see that, for the most part, the Spearman measure has bolstered the correlations; and generally, lagging the case rates back by 10 days improves correlations, confirming case rates are better correlated with death rates 10 days from now.</p>
+<p>We can see that, for the most part, the Spearman measure has
+bolstered the correlations; and generally, lagging the case rates back
+by 10 days improves correlations, confirming case rates are better
+correlated with death rates 10 days from now.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="correlations-sliced-by-county">Correlations sliced by county<a class="anchor" aria-label="anchor" href="#correlations-sliced-by-county"></a>
 </h2>
-<p>The second option we have is to “slice by location”: this calculates, for each geographic location, correlation between the time series of two signals. This is obtained by setting <code>by = "geo_value"</code>. We’ll again look at correlations both for observations at the same time and for 10-day lagged case rates:</p>
+<p>The second option we have is to “slice by location”: this calculates,
+for each geographic location, correlation between the time series of two
+signals. This is obtained by setting <code>by = "geo_value"</code>.
+We’ll again look at correlations both for observations at the same time
+and for 10-day lagged case rates:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Compute correlation per county, over all times</span></span>
 <span><span class="va">df_cor1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covidcast_cor.html">covidcast_cor</a></span><span class="op">(</span><span class="va">cases</span>, <span class="va">deaths</span>, by <span class="op">=</span> <span class="st">"geo_value"</span><span class="op">)</span></span>
@@ -193,7 +224,9 @@
 <span>       x <span class="op">=</span> <span class="st">"Date"</span>, y <span class="op">=</span> <span class="st">"Density"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/corr-unnamed-chunk-5-1.png"></p>
-<p>Using some tricks, we can attach the necessary properties to the data frame so we can plot these correlations in space as a choropleth map, using <code><a href="../reference/plot.covidcast_signal.html">plot.covidcast_signal()</a></code>:</p>
+<p>Using some tricks, we can attach the necessary properties to the data
+frame so we can plot these correlations in space as a choropleth map,
+using <code><a href="../reference/plot.covidcast_signal.html">plot.covidcast_signal()</a></code>:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Turn the data into a covidcast_signal data frame so it can be plotted</span></span>
 <span><span class="va">df_cor2</span><span class="op">$</span><span class="va">time_value</span> <span class="op">&lt;-</span> <span class="va">start_day</span></span>
@@ -209,7 +242,9 @@
 <div class="section level2">
 <h2 id="more-systematic-lag-analysis">More systematic lag analysis<a class="anchor" aria-label="anchor" href="#more-systematic-lag-analysis"></a>
 </h2>
-<p>You could also imagine trying to move the signals with various lags to see at what lag one signal is most correlated with the other. A simple way to achieve this:</p>
+<p>You could also imagine trying to move the signals with various lags
+to see at what lag one signal is most correlated with the other. A
+simple way to achieve this:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Loop over values for dt, and compute correlations per county</span></span>
 <span><span class="va">dt_vec</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">15</span><span class="op">)</span></span>
@@ -232,7 +267,9 @@
 <span>       x <span class="op">=</span> <span class="st">"dt"</span>, y <span class="op">=</span> <span class="st">"Correlation"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/corr-unnamed-chunk-7-1.png"></p>
-<p>We can see that the median correlation between case and death rates (where the correlations come from slicing by location) is maximized when we lag the case incidence rates back 8 days in time.</p>
+<p>We can see that the median correlation between case and death rates
+(where the correlations come from slicing by location) is maximized when
+we lag the case incidence rates back 8 days in time.</p>
 </div>
   </div>
 

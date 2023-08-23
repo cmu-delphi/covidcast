@@ -1022,12 +1022,17 @@ covidcast <- function(data_source, signal, time_type, geo_type, time_values,
   return(paste0(unlist(lapply(values, .listitem)), collapse=','))
 }
 
+# from testthat::is_testing(), under MIT license
+.is_testing <- function() {
+  identical(Sys.getenv("TESTTHAT"), "true")
+}
+
 # Helper function to use cached metadata whenever possible
 .request_meta <- function() {
   # temporary check while we wait for rerequest support in httptest: always
   # request while testing. see
   # https://github.com/nealrichardson/httptest/issues/84
-  pkg_env$META_RESPONSE <- if(identical(pkg_env$META_RESPONSE, NA) || testthat::is_testing()) {
+  pkg_env$META_RESPONSE <- if(identical(pkg_env$META_RESPONSE, NA) || .is_testing()) {
     .request("covidcast_meta", list(format = "csv"), raw = TRUE)
   } else {
     httr::rerequest(pkg_env$META_RESPONSE)

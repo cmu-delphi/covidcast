@@ -8,6 +8,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+
+
 Various analyses involve working with multiple signals at once. The covidcast
 package provides some helper functions for fetching multiple signals from the
 API, and aggregating them into one data frame for various downstream uses.
@@ -17,7 +19,8 @@ API, and aggregating them into one data frame for various downstream uses.
 To load confirmed cases and deaths at the state level, in a single function
 call, we can use `covidcast_signals()` (note the plural form of "signals"):
 
-```{r, message = FALSE}
+
+```r
 library(covidcast)
 
 start_day <- "2020-06-01"
@@ -30,7 +33,34 @@ signals <- covidcast_signals(data_source = "jhu-csse",
                              geo_type = "state", geo_values = "tx")
 
 summary(signals[[1]])
+```
+
+```
+A `covidcast_signal` dataframe with 123 rows and 15 columns.
+
+data_source : jhu-csse
+signal      : confirmed_7dav_incidence_prop
+geo_type    : state
+
+first date                          : 2020-06-01
+last date                           : 2020-10-01
+median number of geo_values per day : 1
+```
+
+```r
 summary(signals[[2]])
+```
+
+```
+A `covidcast_signal` dataframe with 123 rows and 15 columns.
+
+data_source : jhu-csse
+signal      : deaths_7dav_incidence_prop
+geo_type    : state
+
+first date                          : 2020-06-01
+last date                           : 2020-10-01
+median number of geo_values per day : 1
 ```
 
 This returns a list of `covidcast_signal` objects. The argument structure for
@@ -45,10 +75,28 @@ function, which accepts a list of `covidcast_signal` objects, as returned by
 `covidcast_signals()`. With all arguments set to their default values,
 `aggregate_signals()` returns a data frame in "wide" format:
 
-```{r, message=FALSE}
+
+```r
 library(dplyr)
 
 aggregate_signals(signals) %>% head()
+```
+
+```
+  geo_value time_value value+0:jhu-csse_confirmed_7dav_incidence_prop
+1        tx 2020-06-01                                       3.393256
+2        tx 2020-06-02                                       3.644320
+3        tx 2020-06-03                                       3.723629
+4        tx 2020-06-04                                       6.985028
+5        tx 2020-06-05                                       7.920192
+6        tx 2020-06-06                                       8.034533
+  value+0:jhu-csse_deaths_7dav_incidence_prop
+1                                   0.0856342
+2                                   0.0953654
+3                                   0.0909864
+4                                   0.0977982
+5                                   0.1002310
+6                                   0.0909864
 ```
 
 In "wide" format, only the latest issue of data is retained, and the columns
@@ -67,20 +115,111 @@ Negative shifts translate into in a *lag* value and positive shifts into a
 reported is the original value on June 1; if `dt = 0`, then the values are left
 as is.
 
-```{r}
+
+```r
 aggregate_signals(signals, dt = c(-1, 0)) %>%
   head()
+```
+
+```
+  geo_value time_value value-1:jhu-csse_confirmed_7dav_incidence_prop
+1        tx 2020-06-01                                             NA
+2        tx 2020-06-02                                       3.393256
+3        tx 2020-06-03                                       3.644320
+4        tx 2020-06-04                                       3.723629
+5        tx 2020-06-05                                       6.985028
+6        tx 2020-06-06                                       7.920192
+  value+0:jhu-csse_confirmed_7dav_incidence_prop
+1                                       3.393256
+2                                       3.644320
+3                                       3.723629
+4                                       6.985028
+5                                       7.920192
+6                                       8.034533
+  value-1:jhu-csse_deaths_7dav_incidence_prop
+1                                          NA
+2                                   0.0856342
+3                                   0.0953654
+4                                   0.0909864
+5                                   0.0977982
+6                                   0.1002310
+  value+0:jhu-csse_deaths_7dav_incidence_prop
+1                                   0.0856342
+2                                   0.0953654
+3                                   0.0909864
+4                                   0.0977982
+5                                   0.1002310
+6                                   0.0909864
+```
+
+```r
 aggregate_signals(signals, dt = list(0, c(-1, 0, 1))) %>%
   head()
+```
+
+```
+  geo_value time_value value+0:jhu-csse_confirmed_7dav_incidence_prop
+1        tx 2020-06-01                                       3.393256
+2        tx 2020-06-02                                       3.644320
+3        tx 2020-06-03                                       3.723629
+4        tx 2020-06-04                                       6.985028
+5        tx 2020-06-05                                       7.920192
+6        tx 2020-06-06                                       8.034533
+  value-1:jhu-csse_deaths_7dav_incidence_prop
+1                                          NA
+2                                   0.0856342
+3                                   0.0953654
+4                                   0.0909864
+5                                   0.0977982
+6                                   0.1002310
+  value+0:jhu-csse_deaths_7dav_incidence_prop
+1                                   0.0856342
+2                                   0.0953654
+3                                   0.0909864
+4                                   0.0977982
+5                                   0.1002310
+6                                   0.0909864
+  value+1:jhu-csse_deaths_7dav_incidence_prop
+1                                   0.0953654
+2                                   0.0909864
+3                                   0.0977982
+4                                   0.1002310
+5                                   0.0909864
+6                                   0.0885536
 ```
 
 Finally, `aggregate_signals()` also accepts a single data frame (instead of a
 list of data frames), intended to be convenient when applying shifts to a single
 `covidcast_signal` object:
 
-```{r}
+
+```r
 aggregate_signals(signals[[1]], dt = c(-1, 0, 1)) %>%
   head()
+```
+
+```
+  geo_value time_value value-1:jhu-csse_confirmed_7dav_incidence_prop
+1        tx 2020-06-01                                             NA
+2        tx 2020-06-02                                       3.393256
+3        tx 2020-06-03                                       3.644320
+4        tx 2020-06-04                                       3.723629
+5        tx 2020-06-05                                       6.985028
+6        tx 2020-06-06                                       7.920192
+  value+0:jhu-csse_confirmed_7dav_incidence_prop
+1                                       3.393256
+2                                       3.644320
+3                                       3.723629
+4                                       6.985028
+5                                       7.920192
+6                                       8.034533
+  value+1:jhu-csse_confirmed_7dav_incidence_prop
+1                                       3.644320
+2                                       3.723629
+3                                       6.985028
+4                                       7.920192
+5                                       8.034533
+6                                       7.957171
 ```
 
 ## Aggregating signals, long format
@@ -88,15 +227,92 @@ aggregate_signals(signals[[1]], dt = c(-1, 0, 1)) %>%
 We can also use `aggregate_signals()` in "long" format, with one observation
 per row:
 
-```{r}
+
+```r
 aggregate_signals(signals, format = "long") %>%
   head()
+```
 
+```
+  data_source                        signal geo_value time_value   source
+1    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-01 jhu-csse
+2    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-02 jhu-csse
+3    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-03 jhu-csse
+4    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-04 jhu-csse
+5    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-05 jhu-csse
+6    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-06 jhu-csse
+  geo_type time_type      issue  lag missing_value missing_stderr
+1    state       day 2023-03-03 1005             0              5
+2    state       day 2023-03-03 1004             0              5
+3    state       day 2023-03-03 1003             0              5
+4    state       day 2023-03-03 1002             0              5
+5    state       day 2023-03-03 1001             0              5
+6    state       day 2023-03-03 1000             0              5
+  missing_sample_size stderr sample_size dt    value
+1                   5     NA          NA  0 3.393256
+2                   5     NA          NA  0 3.644320
+3                   5     NA          NA  0 3.723629
+4                   5     NA          NA  0 6.985028
+5                   5     NA          NA  0 7.920192
+6                   5     NA          NA  0 8.034533
+```
+
+```r
 aggregate_signals(signals, dt = c(-1, 0), format = "long") %>%
   head()
+```
 
+```
+  data_source                        signal geo_value time_value   source
+1    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-01 jhu-csse
+2    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-01 jhu-csse
+3    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-02 jhu-csse
+4    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-02 jhu-csse
+5    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-03 jhu-csse
+6    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-03 jhu-csse
+  geo_type time_type      issue  lag missing_value missing_stderr
+1    state       day 2023-03-03 1005             0              5
+2    state       day 2023-03-03 1005             0              5
+3    state       day 2023-03-03 1004             0              5
+4    state       day 2023-03-03 1004             0              5
+5    state       day 2023-03-03 1003             0              5
+6    state       day 2023-03-03 1003             0              5
+  missing_sample_size stderr sample_size dt    value
+1                   5     NA          NA -1       NA
+2                   5     NA          NA  0 3.393256
+3                   5     NA          NA -1 3.393256
+4                   5     NA          NA  0 3.644320
+5                   5     NA          NA -1 3.644320
+6                   5     NA          NA  0 3.723629
+```
+
+```r
 aggregate_signals(signals, dt = list(-1, 0), format = "long") %>%
   head()
+```
+
+```
+  data_source                        signal geo_value time_value   source
+1    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-01 jhu-csse
+2    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-02 jhu-csse
+3    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-03 jhu-csse
+4    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-04 jhu-csse
+5    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-05 jhu-csse
+6    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-06 jhu-csse
+  geo_type time_type      issue  lag missing_value missing_stderr
+1    state       day 2023-03-03 1005             0              5
+2    state       day 2023-03-03 1004             0              5
+3    state       day 2023-03-03 1003             0              5
+4    state       day 2023-03-03 1002             0              5
+5    state       day 2023-03-03 1001             0              5
+6    state       day 2023-03-03 1000             0              5
+  missing_sample_size stderr sample_size dt    value
+1                   5     NA          NA -1       NA
+2                   5     NA          NA -1 3.393256
+3                   5     NA          NA -1 3.644320
+4                   5     NA          NA -1 3.723629
+5                   5     NA          NA -1 6.985028
+6                   5     NA          NA -1 7.920192
 ```
 
 As we can see, time-shifts work just as before, in "wide" format. However, in
@@ -106,9 +322,34 @@ to record the time-shift being used.
 Just as before, `covidcast_signals()` can also operate on a single data frame,
 to conveniently apply shifts, in "long" format:
 
-```{r}
+
+```r
 aggregate_signals(signals[[1]], dt = c(-1, 0), format = "long") %>%
   head()
+```
+
+```
+  data_source                        signal geo_value time_value   source
+1    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-01 jhu-csse
+2    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-01 jhu-csse
+3    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-02 jhu-csse
+4    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-02 jhu-csse
+5    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-03 jhu-csse
+6    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-03 jhu-csse
+  geo_type time_type      issue  lag missing_value missing_stderr
+1    state       day 2023-03-03 1005             0              5
+2    state       day 2023-03-03 1005             0              5
+3    state       day 2023-03-03 1004             0              5
+4    state       day 2023-03-03 1004             0              5
+5    state       day 2023-03-03 1003             0              5
+6    state       day 2023-03-03 1003             0              5
+  missing_sample_size stderr sample_size dt    value
+1                   5     NA          NA -1       NA
+2                   5     NA          NA  0 3.393256
+3                   5     NA          NA -1 3.393256
+4                   5     NA          NA  0 3.644320
+5                   5     NA          NA -1 3.644320
+6                   5     NA          NA  0 3.723629
 ```
 
 ## Pivoting longer or wider
@@ -118,18 +359,47 @@ longer or wider. These are essentially wrappers around `pivot_longer()` and
 `pivot_wider()` from the `tidyr` package, that set the column structure and
 column names appropriately. For example, to pivot longer:
 
-```{r}
+
+```r
 aggregate_signals(signals, dt = list(-1, 0)) %>%
   covidcast_longer() %>%
   head()
 ```
 
+```
+  data_source                        signal geo_value time_value dt     value
+1    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-01 -1        NA
+2    jhu-csse    deaths_7dav_incidence_prop        tx 2020-06-01  0 0.0856342
+3    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-02 -1 3.3932560
+4    jhu-csse    deaths_7dav_incidence_prop        tx 2020-06-02  0 0.0953654
+5    jhu-csse confirmed_7dav_incidence_prop        tx 2020-06-03 -1 3.6443200
+6    jhu-csse    deaths_7dav_incidence_prop        tx 2020-06-03  0 0.0909864
+```
+
 And to pivot wider:
 
-```{r}
+
+```r
 aggregate_signals(signals, dt = list(-1, 0), format = "long") %>%
   covidcast_wider() %>%
   head()
+```
+
+```
+  geo_value time_value value-1:jhu-csse_confirmed_7dav_incidence_prop
+1        tx 2020-06-01                                             NA
+2        tx 2020-06-02                                       3.393256
+3        tx 2020-06-03                                       3.644320
+4        tx 2020-06-04                                       3.723629
+5        tx 2020-06-05                                       6.985028
+6        tx 2020-06-06                                       7.920192
+  value+0:jhu-csse_deaths_7dav_incidence_prop
+1                                   0.0856342
+2                                   0.0953654
+3                                   0.0909864
+4                                   0.0977982
+5                                   0.1002310
+6                                   0.0909864
 ```
 
 ## A sanity check
@@ -139,11 +409,16 @@ Lastly, here's a small sanity check, that lagging cases by 7 days using
 yields the same result as telling `covidcast_cor()` to do the time-shifting
 itself:
 
-```{r}
+
+```r
 df_cor1 <- covidcast_cor(x = aggregate_signals(signals[[1]], dt = -7,
                                               format = "long"),
                         y = signals[[2]])
 
 df_cor2 <- covidcast_cor(x = signals[[1]], y = signals[[2]], dt_x = -7)
 identical(df_cor1, df_cor2)
+```
+
+```
+[1] TRUE
 ```

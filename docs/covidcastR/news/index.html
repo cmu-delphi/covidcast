@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidcast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
       </span>
     </div>
 
@@ -70,7 +70,18 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.5.0" id="covidcast-050">covidcast 0.5.0<a class="anchor" aria-label="anchor" href="#covidcast-050"></a></h2>
+<h2 class="page-header" data-toc-text="0.5.2" id="covidcast-052">covidcast 0.5.2<small>2023-07-12</small><a class="anchor" aria-label="anchor" href="#covidcast-052"></a></h2>
+<ul><li><p><code><a href="../reference/covidcast_meta.html">covidcast_meta()</a></code> now caches the server’s response for a length of time specified by the COVIDcast API server, based on how frequently the metadata is recomputed. Because <code><a href="../reference/covidcast_meta.html">covidcast_meta()</a></code> is called by <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code>, this saves one API call per call to <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code>. (<a href="https://github.com/krivard" class="external-link">@krivard</a>, <a href="https://github.com/cmu-delphi/covidcast/issues/645" class="external-link">#645</a>)</p></li>
+<li><p><code><a href="../reference/covidcast_meta.html">covidcast_meta()</a></code> now more clearly reports errors when the API usage limit has been reached.</p></li>
+<li><p>Package vignettes have been adjusted so they do not make requests to the COVIDcast API during CRAN check runs. This change only affects the package build and check process, and shouldn’t affect end users.</p></li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.1" id="covidcast-051">covidcast 0.5.1<small>2023-06-26</small><a class="anchor" aria-label="anchor" href="#covidcast-051"></a></h2>
+<ul><li><p><code><a href="../reference/covidcast_signals.html">covidcast_signals()</a></code> now supports the <code>time_type</code> argument, to match <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code>. If you used optional arguments to <code><a href="../reference/covidcast_signals.html">covidcast_signals()</a></code> by position rather than by name, this may cause problems until you switch to using named arguments.</p></li>
+<li><p>Package vignettes have been altered to demonstrate more widely suitable signals, and to consolidate on a smaller set of signals.</p></li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.0" id="covidcast-050">covidcast 0.5.0<small>2023-06-01</small><a class="anchor" aria-label="anchor" href="#covidcast-050"></a></h2>
 <ul><li><p>The package now supports supplying API keys with requests to the COVIDcast Epidata API. Beginning June 21, 2023, the Epidata API server will limit the rate and type of queries made without an API key. See the “API keys” section of <code><a href="../reference/covidcast_signal.html">?covidcast_signal</a></code> for details on how to obtain and specify an API key. (<a href="https://github.com/krivard" class="external-link">@krivard</a>, <a href="https://github.com/cmu-delphi/covidcast/issues/618" class="external-link">#618</a>)</p></li>
 <li><p>Updates to be compatible with changes in dplyr 1.1.0. (<a href="https://github.com/capnrefsmmat" class="external-link">@capnrefsmmat</a>, <a href="https://github.com/cmu-delphi/covidcast/issues/620" class="external-link">#620</a>)</p></li>
 </ul></div>
@@ -115,7 +126,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="minor-changes-0-4-1">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-0-4-1"></a></h3>
-<ul><li>Geographic lookup functions, such as <code>fips_to_name()</code> or <code><a href="../reference/name_to_fips.html">name_to_cbsa()</a></code>, are now much faster when given input vectors with many duplicate values.</li></ul></div>
+<ul><li>Geographic lookup functions, such as <code>fips_to_name()</code> or <code><a href="../reference/name_to_fips.html">name_to_cbsa()</a></code>, are now much faster when given input vectors with many duplicate values.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.0" id="covidcast-040">covidcast 0.4.0<a class="anchor" aria-label="anchor" href="#covidcast-040"></a></h2>
@@ -136,10 +148,12 @@
 <p>Released October 31, 2020.</p>
 <div class="section level3">
 <h3 id="breaking-changes-0-3-1">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-3-1"></a></h3>
-<ul><li>The <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code> function now interprets its <code>dt_x</code> and <code>dt_y</code> arguments in the opposite way as before, i.e. what was once a positive lag is now a negative lag. See the documentation for details.</li></ul></div>
+<ul><li>The <code><a href="../reference/covidcast_cor.html">covidcast_cor()</a></code> function now interprets its <code>dt_x</code> and <code>dt_y</code> arguments in the opposite way as before, i.e. what was once a positive lag is now a negative lag. See the documentation for details.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="major-changes-0-3-1">Major changes<a class="anchor" aria-label="anchor" href="#major-changes-0-3-1"></a></h3>
-<ul><li>The new <code><a href="../reference/covidcast_signals.html">covidcast_signals()</a></code> function allows users to query multiple signals from the API at once, returning a list of data frames. The <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> function can convert this list into a “wide” or “long” format data frame for further analysis, while <code><a href="../reference/covidcast_longer.html">covidcast_wider()</a></code> and <code><a href="../reference/covidcast_longer.html">covidcast_longer()</a></code> can convert from “long” to “wide” format and vice versa.</li></ul></div>
+<ul><li>The new <code><a href="../reference/covidcast_signals.html">covidcast_signals()</a></code> function allows users to query multiple signals from the API at once, returning a list of data frames. The <code><a href="../reference/aggregate_signals.html">aggregate_signals()</a></code> function can convert this list into a “wide” or “long” format data frame for further analysis, while <code><a href="../reference/covidcast_longer.html">covidcast_wider()</a></code> and <code><a href="../reference/covidcast_longer.html">covidcast_longer()</a></code> can convert from “long” to “wide” format and vice versa.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.0" id="covidcast-030">covidcast 0.3.0<a class="anchor" aria-label="anchor" href="#covidcast-030"></a></h2>
@@ -164,11 +178,13 @@
 </ul></div>
 <div class="section level3">
 <h3 id="minor-changes-0-2-0">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-0-2-0"></a></h3>
-<ul><li>The object returned from <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> is now a data frame augmented with extra attributes indicating the geography type and signal metadata. Additional <code>data_source</code> and <code>signal</code> columns are provided, in anticipation of options to request more than one signal at once. Methods for <code>print</code> and <code>summary</code> are provided (as <code><a href="../reference/print.covidcast_signal.html">print.covidcast_signal()</a></code> and <code><a href="../reference/summary.covidcast_signal.html">summary.covidcast_signal()</a></code>) to conveniently view these objects. They can still be used as ordinary data frames as well.</li></ul></div>
+<ul><li>The object returned from <code><a href="../reference/covidcast_signal.html">covidcast_signal()</a></code> is now a data frame augmented with extra attributes indicating the geography type and signal metadata. Additional <code>data_source</code> and <code>signal</code> columns are provided, in anticipation of options to request more than one signal at once. Methods for <code>print</code> and <code>summary</code> are provided (as <code><a href="../reference/print.covidcast_signal.html">print.covidcast_signal()</a></code> and <code><a href="../reference/summary.covidcast_signal.html">summary.covidcast_signal()</a></code>) to conveniently view these objects. They can still be used as ordinary data frames as well.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.0" id="covidcast-010">covidcast 0.1.0<a class="anchor" aria-label="anchor" href="#covidcast-010"></a></h2>
-<ul><li>First major release.</li></ul></div>
+<ul><li>First major release.</li>
+</ul></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

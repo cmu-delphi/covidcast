@@ -151,11 +151,7 @@ get_forecast_dates <- function(forecasters,
   forecast_dates <- as_date(forecast_dates)
   forecaster_dates <- vector("list", length = length(forecasters))
   for (i in seq_len(length(forecasters))) {
-    forecaster_dates[[i]] <- tryCatch({
-      lubridate::as_date(get_covidhub_forecast_dates(forecasters[i]))
-    },
-    error = function(e) cat(sprintf("%i. %s\n", i, e$message))
-    )
+    forecaster_dates[[i]] <- lubridate::as_date(get_covidhub_forecast_dates(forecasters[i]))
   }
   if (length(forecast_dates) != 0) {
     # Intersect acts oddly with dates. If foo = as_date(bar), then foo == bar is

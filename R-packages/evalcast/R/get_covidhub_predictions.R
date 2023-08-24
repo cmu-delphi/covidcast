@@ -453,6 +453,7 @@ get_covidhub_forecast_dates <- function(forecaster_name) {
   submissions_folder <- url %>%
     httr::GET(auth_header) %>%
     is_rate_limit_exceeded() %>%
+    httr::stop_for_status() %>%
     httr::content() %>%
     purrr::pluck("tree") %>%
     magrittr::extract2(which(purrr::map_chr(., "path") == "data-processed"))
@@ -461,6 +462,7 @@ get_covidhub_forecast_dates <- function(forecaster_name) {
   forecaster_folder <- submissions_folder$url %>%
     httr::GET(auth_header) %>%
     is_rate_limit_exceeded() %>%
+    httr::stop_for_status() %>%
     httr::content() %>%
     purrr::pluck("tree") %>%
     magrittr::extract2(which(purrr::map_chr(., "path") == forecaster_name))
@@ -470,6 +472,7 @@ get_covidhub_forecast_dates <- function(forecaster_name) {
   submission_files <- forecaster_folder$url %>%
     httr::GET(auth_header) %>%
     is_rate_limit_exceeded() %>%
+    httr::stop_for_status() %>%
     httr::content() %>%
     purrr::pluck("tree") %>%
     purrr::map_chr("path") %>%

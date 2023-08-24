@@ -148,12 +148,12 @@ get_forecast_dates <- function(forecasters,
                                start_date,
                                end_date,
                                date_filtering_function) {
-  forecast_dates <- as_date(forecast_dates)
   forecaster_dates <- vector("list", length = length(forecasters))
   for (i in seq_len(length(forecasters))) {
     forecaster_dates[[i]] <- lubridate::as_date(get_covidhub_forecast_dates(forecasters[i]))
   }
   if (length(forecast_dates) != 0) {
+    forecast_dates <- as_date(forecast_dates)
     # Intersect acts oddly with dates. If foo = as_date(bar), then foo == bar is
     # true, but (foo %in% bar) is false and intersect(foo, bar) is an empty
     # vector. Additionally, intersect returns a numeric object instead of a

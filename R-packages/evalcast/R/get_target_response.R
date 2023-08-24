@@ -92,13 +92,23 @@ get_target_response <- function(signals,
   }
   names(out) <- forecast_dates
   target_periods$forecast_date = lubridate::ymd(forecast_dates)
+
+  if (grepl("cumulative", response$signal, fixed=TRUE)) {
+    agg_fn <- function(df) {
+      slice(df, which.max(time_value)) %>% select(geo_value, forecast_date, actual = value)
+    }
+  } else {
+    agg_fn <- function(df) {
+      summarize(df, actual = sum(.data$value))
+    }
+  }
   out <- out %>%
     bind_rows(.id = "forecast_date") %>%
     mutate(forecast_date = lubridate::ymd(.data$forecast_date)) %>%
     group_by(.data$geo_value, .data$forecast_date) %>%
-    summarize(actual = sum(.data$value)) %>%
-    #    mutate(forecast_date = forecast_dates[as.numeric(.data$forecast_date)]) %>%
+    agg_fn() %>%
     left_join(target_periods, by = "forecast_date")
+
   # record date that this function was run for reproducibility
   attr(out, "as_of") <- Sys.Date()
   out

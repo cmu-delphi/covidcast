@@ -1,3 +1,19 @@
+# evalcast 0.3.5
+
+- Raise non-successful HTTP statuses as errors in
+  `get_covidhub_forecast_dates`. This is especially useful for debugging
+  issues with GitHub API authentication.
+- Stop `get_forecast_dates` from swallowing all errors raised by
+  `get_covidhub_forecast_dates` and potentially silently returning bogus
+  results, which can cause mysterious and hard-to-debug errors downstream.
+  This means that `get_forecast_dates` may fail more often, but there are
+  several benefits. First, without valid forecast dates, downstream calls
+  won't get valid forecast data. Fetching forecast dates is fast, so the cost
+  of rerunning is low, while downloading forecasts is time-consuming. This
+  change also lets us verify GitHub API authentication upfront, which is
+  necessary for forecast downloads later.
+
+
 # evalcast 0.3.4
 
 - Change `get_forecaster_predictions_alt` to read forecaster input files using

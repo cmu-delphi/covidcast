@@ -1,3 +1,10 @@
+# evalcast 0.3.5
+
+- Fix truth value generation for cumulative signals. `get_target_response` now
+  returns the most recent value within a given time period for either a `day`
+  or `epiweek` incidence period. For incidence signals, `get_target_response`
+  still sums all values within the time period.
+
 # evalcast 0.3.4
 
 - Change `get_forecaster_predictions_alt` to read forecaster input files using

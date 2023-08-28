@@ -12,6 +12,8 @@
   of rerunning is low, while downloading forecasts is time-consuming. This
   change also lets us verify GitHub API authentication upfront, which is
   necessary for forecast downloads later.
+- Retry HTTP requests in `get_forecast_dates` if they don't succeed
+  initially.
 
 
 # evalcast 0.3.4

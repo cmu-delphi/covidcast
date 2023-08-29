@@ -148,16 +148,12 @@ get_forecast_dates <- function(forecasters,
                                start_date,
                                end_date,
                                date_filtering_function) {
-  forecast_dates <- as_date(forecast_dates)
   forecaster_dates <- vector("list", length = length(forecasters))
   for (i in seq_len(length(forecasters))) {
-    forecaster_dates[[i]] <- tryCatch({
-      lubridate::as_date(get_covidhub_forecast_dates(forecasters[i]))
-    },
-    error = function(e) cat(sprintf("%i. %s\n", i, e$message))
-    )
+    forecaster_dates[[i]] <- lubridate::as_date(get_covidhub_forecast_dates(forecasters[i]))
   }
   if (length(forecast_dates) != 0) {
+    forecast_dates <- as_date(forecast_dates)
     # Intersect acts oddly with dates. If foo = as_date(bar), then foo == bar is
     # true, but (foo %in% bar) is false and intersect(foo, bar) is an empty
     # vector. Additionally, intersect returns a numeric object instead of a
@@ -431,6 +427,8 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
 #'
 #' @return vector of forecast dates
 #'
+#' @importFrom httr GET RETRY
+#'
 #' @export
 get_covidhub_forecast_dates <- function(forecaster_name) {
   url <- "https://api.github.com/repos/reichlab/covid19-forecast-hub/git/trees/master"
@@ -451,16 +449,18 @@ get_covidhub_forecast_dates <- function(forecaster_name) {
 
   # Get the URL for the submissions folder "data-processed".
   submissions_folder <- url %>%
-    httr::GET(auth_header) %>%
+    RETRY("GET", url = ., auth_header) %>%
     is_rate_limit_exceeded() %>%
+    httr::stop_for_status() %>%
     httr::content() %>%
     purrr::pluck("tree") %>%
     magrittr::extract2(which(purrr::map_chr(., "path") == "data-processed"))
 
   # Get the URL for the specified forecaster folder.
   forecaster_folder <- submissions_folder$url %>%
-    httr::GET(auth_header) %>%
+    RETRY("GET", url = ., auth_header) %>%
     is_rate_limit_exceeded() %>%
+    httr::stop_for_status() %>%
     httr::content() %>%
     purrr::pluck("tree") %>%
     magrittr::extract2(which(purrr::map_chr(., "path") == forecaster_name))
@@ -468,8 +468,9 @@ get_covidhub_forecast_dates <- function(forecaster_name) {
   # Get the forecaster submission files.
   submission_file_pattern <- sprintf("^(20\\d{2}-\\d{2}-\\d{2})-%s.csv$", forecaster_name)
   submission_files <- forecaster_folder$url %>%
-    httr::GET(auth_header) %>%
+    RETRY("GET", url = ., auth_header) %>%
     is_rate_limit_exceeded() %>%
+    httr::stop_for_status() %>%
     httr::content() %>%
     purrr::pluck("tree") %>%
     purrr::map_chr("path") %>%

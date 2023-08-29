@@ -1,5 +1,9 @@
 # evalcast 0.3.5
 
+- Fix truth value generation for cumulative signals. `get_target_response` now
+  returns the most recent value within a given time period for either a `day`
+  or `epiweek` incidence period. For incidence signals, `get_target_response`
+  still sums all values within the time period.
 - Raise non-successful HTTP statuses as errors in
   `get_covidhub_forecast_dates`. This is especially useful for debugging
   issues with GitHub API authentication.
@@ -14,7 +18,6 @@
   necessary for forecast downloads later.
 - Retry HTTP requests in `get_forecast_dates` if they don't succeed
   initially.
-
 
 # evalcast 0.3.4
 

@@ -413,6 +413,9 @@ get_forecaster_predictions_alt <- function(covidhub_forecaster_name,
   pcards <- filter(pcards, .data$signal %chin% !!signal)
   class(pcards) = c("predictions_cards", class(pcards))
 
+  # Try to free memory
+  invisible(gc())
+
   return(pcards)
 }
 

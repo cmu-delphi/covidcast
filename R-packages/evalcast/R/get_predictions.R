@@ -92,13 +92,39 @@ get_predictions <- function(forecaster,
                             honest_as_of = TRUE,
                             offline_signal_dir = NULL) {
   assert_that(is_tibble(signals), msg = "`signals` should be a tibble.")
-  assert_that(xor(honest_as_of, "as_of" %in% names(signals)), msg = "`honest_as_of` should be set if and only if `as_of` is not set. Either remove as_of specification or set honest_as_of to FALSE.")
+  assert_that(
+    xor(honest_as_of, "as_of" %in% names(signals)),
+    msg = paste(
+      "`honest_as_of` should be set if and only if `as_of` is not set. Either",
+      " remove as_of specification or set honest_as_of to FALSE."
+    )
+  )
   incidence_period <- match.arg(incidence_period)
 
-  if (incidence_period == "epiweek") rlang::warn("incidence_period of 'epiweek' only selects weekly (Saturday) target end dates, actual 'epiweek' signals not supported.", "evalcast::get_predictions")
-  if ("time_type" %in% names(signals) && any(signals$time_type == "week" | signals$time_type == "epiweek")) rlang::abort("time_type in the signals arg can only be 'day'.", "evalcast::get_predictions")
-  if ("lag" %in% names(signals)) rlang::warn("lag in the signals arg will be ignored.", "evalcast::get_predictions")
-  if ("issues" %in% names(signals)) rlang::warn("issues in the signals arg will be ignored.", "evalcast::get_predictions")
+  if (incidence_period == "epiweek") {
+    rlang::warn(
+      paste(
+        "incidence_period of 'epiweek' only selects weekly (Saturday) target ",
+        "end dates, actual 'epiweek' signals not supported."
+      ),
+      "evalcast::get_predictions"
+    )
+  }
+  if (
+    "time_type" %in% names(signals) &&
+      any(signals$time_type == "week" | signals$time_type == "epiweek")
+  ) {
+    rlang::abort(
+      "time_type in the signals arg can only be 'day'.",
+      "evalcast::get_predictions"
+    )
+  }
+  if ("lag" %in% names(signals)) {
+    rlang::warn("lag in the signals arg will be ignored.", "evalcast::get_predictions")
+  }
+  if ("issues" %in% names(signals)) {
+    rlang::warn("issues in the signals arg will be ignored.", "evalcast::get_predictions")
+  }
 
   if (rlang::is_bool(parallel_execution) && parallel_execution == TRUE) {
     num_cores <- max(1L, parallel::detectCores() - 1L)
@@ -110,8 +136,10 @@ get_predictions <- function(forecaster,
     stop("parallel_execution argument is neither boolean nor integer.")
   }
 
-  assert_that(rlang::is_named2(additional_mclapply_args) &&
-    all(rlang::names2(additional_mclapply_args) %in% rlang::fn_fmls_names(bettermc::mclapply)))
+  assert_that(
+    rlang::is_named2(additional_mclapply_args) &&
+      all(rlang::names2(additional_mclapply_args) %in% rlang::fn_fmls_names(bettermc::mclapply))
+  )
 
   get_predictions_single_date_ <- function(forecast_date) {
     preds <- do.call(
@@ -130,7 +158,14 @@ get_predictions <- function(forecaster,
   }
 
   if (num_cores > 1L) {
-    out <- rlang::inject(bettermc::mclapply(forecast_dates, get_predictions_single_date_, mc.cores = num_cores, !!!additional_mclapply_args)) %>% bind_rows()
+    out <- rlang::inject(
+      bettermc::mclapply(
+        forecast_dates,
+        get_predictions_single_date_,
+        mc.cores = num_cores,
+        !!!additional_mclapply_args
+      )
+    ) %>% bind_rows()
   } else {
     out <- lapply(forecast_dates, get_predictions_single_date_) %>% bind_rows()
   }

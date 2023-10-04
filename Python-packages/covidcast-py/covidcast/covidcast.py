@@ -12,7 +12,7 @@ from epiweeks import Week
 from .errors import NoDataWarning
 
 # Point API requests to the default endpoint
-Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
+Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata"
 
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state",  "hhs", "nation"}
 

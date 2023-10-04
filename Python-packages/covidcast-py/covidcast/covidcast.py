@@ -12,7 +12,7 @@ from epiweeks import Week
 from .errors import NoDataWarning
 
 # Point API requests to the default endpoint
-Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata"
+Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
 
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state",  "hhs", "nation"}
 
@@ -476,6 +476,7 @@ def _async_fetch_epidata(data_source: str,
     date_range = pd.date_range(start_day, end_day, freq="D" if time_type == "day" else "W")
     for day in date_range:
         day_param = {
+            "source": "covidcast",
             "data_source": data_source,
             "signals": signal,
             "time_type": "day",
@@ -490,7 +491,7 @@ def _async_fetch_epidata(data_source: str,
         if lag:
             day_param["lag"] = lag
         params.append(day_param)
-    output = Epidata.async_epidata("covidcast", params, batch_size=100)
+    output = Epidata.async_epidata(params, batch_size=100)
     for day_data, params in output:
         if day_data["message"] == "no results":
             warnings.warn(f"No {data_source} {signal} data found on {params['time_values']} "

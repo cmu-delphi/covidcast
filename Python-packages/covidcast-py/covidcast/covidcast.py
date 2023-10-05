@@ -7,12 +7,22 @@ from typing import Union, Iterable, Tuple, List
 import pandas as pd
 import numpy as np
 from delphi_epidata import Epidata
+from delphi_epidata.delphi_epidata import _HEADERS
+from pkg_resources import get_distribution, DistributionNotFound
 from epiweeks import Week
 
 from .errors import NoDataWarning
 
+
 # Point API requests to the default endpoint
-Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata"
+Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
+# Prepend to Epidata client's user agent to specify this package and version
+try:
+    _ver = get_distribution("covidcast").version
+except DistributionNotFound:
+    _ver = "0.0.0"
+_HEADERS['user-agent'] = f"covidcast/{_ver} " + _HEADERS['user-agent']
+
 
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state",  "hhs", "nation"}
 

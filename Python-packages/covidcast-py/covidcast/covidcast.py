@@ -15,7 +15,7 @@ from .errors import NoDataWarning
 
 
 # Point API requests to the default endpoint
-Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
+Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata"
 # Prepend to Epidata client's user agent to specify this package and version
 try:
     _ver = get_distribution("covidcast").version

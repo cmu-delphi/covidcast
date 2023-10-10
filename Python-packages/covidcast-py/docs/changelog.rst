@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v0.2.2, October 10, 2023
+--------------------
+
+- Remove usage of PHP alias in the Python client.
+
 v0.2.1, June 1, 2023
 --------------------
 

@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Plotting Examples &#8212; COVIDcast API client 0.2.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
-    <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
+    <title>Plotting Examples &#8212; COVIDcast API client 0.2.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <link rel="stylesheet" type="text/css" href="_static/plot_directive.css?v=7f9a90b1" />
+    <script src="_static/documentation_options.js?v=000c92bf"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Plotting Reference" href="plotting.html" />
@@ -33,9 +33,9 @@
           <div class="body" role="main">
             
   <section id="plotting-examples">
-<span id="id1"></span><h1>Plotting Examples<a class="headerlink" href="#plotting-examples" title="Permalink to this heading">¶</a></h1>
+<span id="id1"></span><h1>Plotting Examples<a class="headerlink" href="#plotting-examples" title="Link to this heading">¶</a></h1>
 <section id="built-in-functionality">
-<h2>Built-in functionality<a class="headerlink" href="#built-in-functionality" title="Permalink to this heading">¶</a></h2>
+<h2>Built-in functionality<a class="headerlink" href="#built-in-functionality" title="Link to this heading">¶</a></h2>
 <p>The returned DataFrame from <a class="reference internal" href="signals.html#covidcast.signal" title="covidcast.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.signal()</span></code></a> can be plotted using the built-in
 <a class="reference internal" href="plotting.html#covidcast.plot" title="covidcast.plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.plot()</span></code></a>. Currently, state, county, hospital referral regions
 (HRR), and metropolitan statistical area (MSA) geography types are supported.</p>
@@ -132,7 +132,7 @@ which can be stored and altered further.</p>
 </div>
 </section>
 <section id="animations">
-<h2>Animations<a class="headerlink" href="#animations" title="Permalink to this heading">¶</a></h2>
+<h2>Animations<a class="headerlink" href="#animations" title="Link to this heading">¶</a></h2>
 <p>To create an animation, simply pass the signal DataFrame to <a class="reference internal" href="plotting.html#covidcast.animate" title="covidcast.animate"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.animate()</span></code></a>.
 The following code creates an MP4 file named <cite>test_plot.mp4</cite> which animates our daily signal for
 the month of August.</p>
@@ -160,7 +160,7 @@ keyword arguments can be provided and are passed to <a class="reference internal
     Your browser does not support the HTML5 Video element
 </video></section>
 <section id="further-customization">
-<h2>Further customization<a class="headerlink" href="#further-customization" title="Permalink to this heading">¶</a></h2>
+<h2>Further customization<a class="headerlink" href="#further-customization" title="Link to this heading">¶</a></h2>
 <p>If more control is desired, the signal data can be passed to <a class="reference internal" href="plotting.html#covidcast.get_geo_df" title="covidcast.get_geo_df"><code class="xref py py-func docutils literal notranslate"><span class="pre">covidcast.get_geo_df()</span></code></a>, which
 will return a
 <a class="reference external" href="https://geopandas.org/reference/geopandas.GeoDataFrame.html">GeoPandas GeoDataFrame</a> with
@@ -309,7 +309,7 @@ projection</a>:</p>
       &copy;2023, Delphi research group.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |

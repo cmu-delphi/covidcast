@@ -473,7 +473,7 @@ def _async_fetch_epidata(data_source: str,
                          issues: Union[date, tuple, list],
                          lag: int,
                          time_type: str = "day") -> Union[pd.DataFrame, None]:
-    """[DEPRECATED] Fetch data from Epidata API asynchronously.
+    """Fetch data from Epidata API asynchronously. [DEPRECATED]
 
     signal() wraps this to support fetching data over a range of dates
     and stacks the resulting data frames.

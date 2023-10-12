@@ -265,19 +265,25 @@ def test__async_fetch_epidata(mock_async_epidata):
     with warnings.catch_warnings(record=True) as w:
         covidcast._async_fetch_epidata("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
                                        "*", None, None, None, None)
-        assert len(w) == 1
+        assert len(w) == 2 # including deprecation warning
         assert str(w[0].message) == \
+               "`_async_fetch_epidata` is deprecated and will be removed in a future version."
+        assert w[0].category is DeprecationWarning
+        assert str(w[1].message) == \
                "Problem obtaining source signal data on 20200402 for geography '*': failed"
-        assert w[0].category is RuntimeWarning
+        assert w[1].category is RuntimeWarning
 
     # test warning when a no data response is received
     mock_async_epidata.return_value = [({"message": "no results"}, {"time_values": 20200402})]  # no data API response
     with warnings.catch_warnings(record=True) as w:
         covidcast._async_fetch_epidata("source", "signal", date(2020, 4, 2), date(2020, 4, 2),
                                        "county", None, None, None, None)
-        assert len(w) == 1
-        assert str(w[0].message) == "No source signal data found on 20200402 for geography 'county'"
-        assert w[0].category is NoDataWarning
+        assert len(w) == 2 # including deprecation warning
+        assert str(w[0].message) == \
+               "`_async_fetch_epidata` is deprecated and will be removed in a future version."
+        assert w[0].category is DeprecationWarning
+        assert str(w[1].message) == "No source signal data found on 20200402 for geography 'county'"
+        assert w[1].category is NoDataWarning
 
     # test no epidata yields nothing
     mock_async_epidata.return_value = [({"message": "success"}, None)]  # no epidata

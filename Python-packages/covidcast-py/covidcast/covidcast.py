@@ -7,12 +7,22 @@ from typing import Union, Iterable, Tuple, List
 import pandas as pd
 import numpy as np
 from delphi_epidata import Epidata
+from delphi_epidata.delphi_epidata import _HEADERS
+from pkg_resources import get_distribution, DistributionNotFound
 from epiweeks import Week
 
 from .errors import NoDataWarning
 
+
 # Point API requests to the default endpoint
-Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
+Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata"
+# Prepend to Epidata client's user agent to specify this package and version
+try:
+    _ver = get_distribution("covidcast").version
+except DistributionNotFound:
+    _ver = "0.0.0"
+_HEADERS['user-agent'] = f"covidcast/{_ver} " + _HEADERS['user-agent']
+
 
 VALID_GEO_TYPES = {"county", "hrr", "msa", "dma", "state",  "hhs", "nation"}
 
@@ -463,7 +473,7 @@ def _async_fetch_epidata(data_source: str,
                          issues: Union[date, tuple, list],
                          lag: int,
                          time_type: str = "day") -> Union[pd.DataFrame, None]:
-    """Fetch data from Epidata API asynchronously.
+    """Fetch data from Epidata API asynchronously [DEPRECATED].
 
     signal() wraps this to support fetching data over a range of dates
     and stacks the resulting data frames.
@@ -471,6 +481,8 @@ def _async_fetch_epidata(data_source: str,
     If no data is found, return None, so signal() can easily filter out these
     entries.
     """
+    warnings.warn("`_async_fetch_epidata` is deprecated and will be removed in a future version.",
+                  category=DeprecationWarning)
     dfs = []
     params = []
     date_range = pd.date_range(start_day, end_day, freq="D" if time_type == "day" else "W")

@@ -1,6 +1,14 @@
 Changelog
 =========
 
+v0.2.2, October 10, 2023
+--------------------
+
+- New feature: Web requests now identify themselves with a `covidcast`-specific "user agent" string.
+- Update: Now uses newer version of the `delphi-epidata` libarary.
+- Bug fix: Removed usage of PHP alias endpoint for compatibility with new `delphi-epidata` version.
+- Deprecated function: Private method :py:func:`_async_fetch_epidata` has been deprecated.
+
 v0.2.1, June 1, 2023
 --------------------
 

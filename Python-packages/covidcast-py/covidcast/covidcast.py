@@ -481,7 +481,7 @@ def _async_fetch_epidata(data_source: str,
 
     If no data is found, return None, so signal() can easily filter out these
     entries.
-    """
+    """  # noqa: D401
     warnings.warn("`_async_fetch_epidata` is deprecated and will be removed in a future version.",
                   category=DeprecationWarning)
     dfs = []

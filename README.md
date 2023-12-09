@@ -10,7 +10,7 @@ This repository includes two clients for the [COVIDcast
 API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html), which
 provides access to Delphi's COVID-19 indicators and related data:
 
-- R: [covidcast](https://cmu-delphi.github.io/covidcast/covidcastR/)
+- R: ~[covidcast](https://cmu-delphi.github.io/covidcast/covidcastR/)~ (DEPRECATED), use [epidatr](https://github.com/cmu-delphi/epidatr)
 - Python: [covidcast](https://cmu-delphi.github.io/covidcast/covidcast-py/html/)
 
 ## Modeling packages

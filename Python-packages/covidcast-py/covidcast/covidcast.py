@@ -3,12 +3,12 @@ import warnings
 from datetime import timedelta, date
 from functools import reduce
 from typing import Union, Iterable, Tuple, List
+from importlib.metadata import version, PackageNotFoundError
 
 import pandas as pd
 import numpy as np
 from delphi_epidata import Epidata
 from delphi_epidata.delphi_epidata import _HEADERS
-from importlib.metadata import version, PackageNotFoundError
 from epiweeks import Week
 
 from .errors import NoDataWarning

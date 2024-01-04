@@ -297,7 +297,7 @@ def _plot_background_states(figsize: tuple) -> tuple:
     ax.axis("off")
     state_shapefile = importlib_resources.files(__name__) / SHAPEFILE_PATHS["state"]
     with importlib_resources.as_file(state_shapefile) as state_shapefile_path:
-      state = gpd.read_file(state_shapefile_path)
+        state = gpd.read_file(state_shapefile_path)
     for state in _project_and_transform(state, "STATEFP"):
         state.plot(color="0.9", ax=ax, edgecolor="0.8", linewidth=0.5)
     ax.set_xlim(plt.xlim())

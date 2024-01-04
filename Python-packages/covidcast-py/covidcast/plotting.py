@@ -9,7 +9,7 @@ import geopandas as gpd
 import imageio
 import numpy as np
 import pandas as pd
-import pkg_resources
+import importlib_resources
 from matplotlib import pyplot as plt
 from matplotlib import figure, axes
 from tqdm import tqdm
@@ -182,8 +182,9 @@ def get_geo_df(data: pd.DataFrame,
         raise ValueError("Unsupported geography type; "
                          "only `state`, `county`, `hrr`, and `msa` supported.")
 
-    shapefile_path = pkg_resources.resource_filename(__name__, SHAPEFILE_PATHS[geo_type])
-    geo_info = gpd.read_file(shapefile_path)
+    shapefile = importlib_resources.files(__name__) / SHAPEFILE_PATHS[geo_type]
+    with importlib_resources.as_file(shapefile) as shapefile_path:
+        geo_info = gpd.read_file(shapefile_path)
 
     if geo_type == "state":
         output = _join_state_geo_df(data, geo_value_col, geo_info, join_type)
@@ -294,8 +295,9 @@ def _plot_background_states(figsize: tuple) -> tuple:
     """
     fig, ax = plt.subplots(1, figsize=figsize)
     ax.axis("off")
-    state_shapefile_path = pkg_resources.resource_filename(__name__, SHAPEFILE_PATHS["state"])
-    state = gpd.read_file(state_shapefile_path)
+    state_shapefile = importlib_resources.files(__name__) / SHAPEFILE_PATHS["state"]
+    with importlib_resources.as_file(state_shapefile) as state_shapefile_path:
+      state = gpd.read_file(state_shapefile_path)
     for state in _project_and_transform(state, "STATEFP"):
         state.plot(color="0.9", ax=ax, edgecolor="0.8", linewidth=0.5)
     ax.set_xlim(plt.xlim())

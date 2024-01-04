@@ -30,7 +30,8 @@ setuptools.setup(
         "imageio-ffmpeg",
         "imageio",
         "tqdm",
-        "epiweeks"
+        "epiweeks",
+        "importlib_resources==6.1.1",
     ],
     package_data={"covidcast": ["shapefiles/*/*", "geo_mappings/*"]}
 )

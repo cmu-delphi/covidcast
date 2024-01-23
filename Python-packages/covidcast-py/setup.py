@@ -31,7 +31,7 @@ setuptools.setup(
         "imageio",
         "tqdm",
         "epiweeks",
-        "importlib_resources==6.1.1",
+        "importlib_resources>=1.3",
     ],
     package_data={"covidcast": ["shapefiles/*/*", "geo_mappings/*"]}
 )

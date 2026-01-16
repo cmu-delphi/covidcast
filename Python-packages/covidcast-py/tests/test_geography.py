@@ -131,7 +131,8 @@ def test_name_to_abbr(test_key, test_kwargs, expected):
               '27000': ['MN'],
               '37000': ['NC'],
               '47000': ['TN'],
-              '72000': ['PR']}]
+              '72000': ['PR'],
+              '78000': ['VI']}]
 
     ),
     (

@@ -1,0 +1,188 @@
+---
+title: "Changes in mask wearing over time"
+output:
+  html_document:
+    df_print: paged
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+library("dplyr")
+library("ggplot2")
+library("covidcast")
+library("usmap")
+library("maps")
+library("grid")
+library("gridExtra")
+library("stringr")
+```
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+start_date = "2020-09-10"
+end_date = "2020-10-23"
+```
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+# Construct a state info table since we want to group states by region
+state_info <- tibble(
+  geo_value = tolower(state.abb), 
+  region = state.region, 
+  division = state.division
+)
+```
+
+From `r start_date` to `r end_date` there has been a modest gain in mask wearing
+nation wide, but this varies widely by region:
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+national_wearing_mask = covidcast_signal(
+  data_source = "fb-survey", 
+  signal = "smoothed_wearing_mask", 
+  start_day = start_date, end_day = end_date, 
+  geo_type = "state")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#-------------------------------------------------------------------------------
+# Create a bar plot by region
+#-------------------------------------------------------------------------------
+national_change_title = str_interp(
+  "Difference in national mask wearing ${start_date} to ${end_date}"
+)
+
+mask_diff <- national_wearing_mask %>%
+  group_by(geo_value) %>% 
+  summarize(first_day=first(value), last_day=last(value)) %>%
+  mutate(value =  (last_day-first_day)/first_day) %>% 
+  inner_join(state_info, on="geo_value") %>%
+  select(geo_value,region,value) 
+
+ggplot(mask_diff, aes(x=reorder(geo_value,-value), value, fill=region)) + 
+  geom_bar(stat="identity") +
+  scale_y_continuous(labels = scales::percent) + 
+  facet_wrap(~region,scales="free_x") +
+  ylab("Change in mask wearing") +
+  xlab("State") +
+  theme_light()
+```
+
+Note that the largest increase in mask wearing, is where cases are currently 
+spiking (upper great plains states). Where mask wearing has gone down there are 
+more modest changes in cases:
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+# Add columns and attributes so that we can use the delphi choropleth map plot
+mask_diff$time_value = end_date
+mask_diff$issue = end_date
+attributes(mask_diff)$geo_type = "state"
+class(mask_diff) = c("covidcast_signal", "data.frame")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+national_change_title = str_interp(
+  "Percent change in mask wearing ${start_date} to ${end_date}"
+)
+
+masks_plot <- plot(mask_diff, 
+     title = national_change_title, 
+     range = c(-0.06,0.06),
+     choro_col = c("brown3","chartreuse3")
+)
+```
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+#-------------------------------------------------------------------------------
+# Get 7-day incidence prop and do the same period analysis
+#-------------------------------------------------------------------------------
+cases = covidcast_signal(
+  data_source = "indicator-combination", 
+  signal = "confirmed_7dav_incidence_prop", 
+  start_day = start_date, end_day = end_date, 
+  geo_type = "state")
+```
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+cases_diff <- cases %>% 
+  group_by(geo_value) %>% 
+  summarize(first_day=first(value), last_day=last(value)) %>%
+  mutate(value =  (last_day-first_day)/first_day) %>% 
+  select(geo_value,value)
+
+cases_diff$time_value = end_date
+cases_diff$issue = end_date
+attributes(cases_diff)$geo_type = "state"
+class(cases_diff) = c("covidcast_signal", "data.frame")
+
+cases_diff_plot <- plot(cases_diff,
+  title=str_interp("Multiples change in cases ${start_date} to ${end_date}")
+)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Side by side plot
+grid.arrange(cases_diff_plot, masks_plot, nrow = 1)
+```
+
+Visually, there appears to be a correlation between areas of spiking case rates,
+and changes in mask wearing behavior.  
+
+Areas wear there are only modest increases, have stable or declining mask 
+wearing rates.
+
+Let inspect the correlation between changes in case incident rates, and mask
+wearing:
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Size of dot = latest case value
+latest_cases <- cases %>% filter(time_value == end_date) %>% 
+  mutate(cases_value = value) %>%
+  select(geo_value,cases_value)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+cases_by_masks <- cases_diff %>% 
+  inner_join(mask_diff, 
+             by=c("geo_value","time_value"), 
+             suffix=c(".cases",".masks")) %>%
+  inner_join(state_info, by=c("geo_value")) %>%
+  inner_join(latest_cases, by=c("geo_value"))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+cases_scatter_title <- str_interp(paste(
+    "Regional differences in rates of mask",
+    "wearing by new cases from ${start_date} to ${end_date}"
+  ))
+
+cases_scatter_plot <- cases_by_masks %>% 
+  ggplot(aes(value.cases, value.masks, color=region.x, label=geo_value)) + 
+  geom_point(aes(size=cases_value)) + 
+  geom_text(aes(label=geo_value),hjust=-0.5, vjust=-0.5, show.legend = FALSE) +
+  ylab("Mask wearing (%)")+
+  xlab("Case incidence (multiples)")+
+  scale_y_continuous(labels = scales::percent) + 
+  scale_x_continuous(labels = function(x) paste0(x, "x")) + 
+  labs(title=cases_scatter_title,size="Cases per 100K", color="Region")+
+  guides(color = guide_legend(override.aes = list(linetype = 0, size=5))) +
+  theme_light()
+
+cases_scatter_plot
+```
+
+Here we show a regional trend in the southern gulf states of declining mask 
+wearing rates.  
+
+This may be an effect of "pandemic fatigue": in areas where cases aren't 
+spiking, people may feel more complacent with regard to wearing masks in public.
+
+This is troubling because this behavior may indicate that these areas are at a
+greater risk of spikes compared to areas with increasing mask wearing rates.
+
+## Data used
+
+Data Source             | Signal                         | Description
+------------------------|--------------------------------|----------------------
+`indicator-combination` |`confirmed_7dav_incidence_prop` | Number of new confirmed COVID-19 cases per 100,000 population, daily
+`fb-survey`             |`smoothed_wearing_mask`         | Estimated percentage of people who wore a mask most or all of the time while in public in the past 5 days; those not in public in the past 5 days are not counted.

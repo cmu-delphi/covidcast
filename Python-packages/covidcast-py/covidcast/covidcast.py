@@ -3,12 +3,12 @@ import warnings
 from datetime import timedelta, date
 from functools import reduce
 from typing import Union, Iterable, Tuple, List
+from importlib.metadata import version, PackageNotFoundError
 
 import pandas as pd
 import numpy as np
 from delphi_epidata import Epidata
 from delphi_epidata.delphi_epidata import _HEADERS
-from pkg_resources import get_distribution, DistributionNotFound
 from epiweeks import Week
 
 from .errors import NoDataWarning
@@ -18,8 +18,8 @@ from .errors import NoDataWarning
 Epidata.BASE_URL = "https://api.covidcast.cmu.edu/epidata"
 # Prepend to Epidata client's user agent to specify this package and version
 try:
-    _ver = get_distribution("covidcast").version
-except DistributionNotFound:
+    _ver = version("covidcast")
+except PackageNotFoundError:
     _ver = "0.0.0"
 _HEADERS['user-agent'] = f"covidcast/{_ver} " + _HEADERS['user-agent']
 

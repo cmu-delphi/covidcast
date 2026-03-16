@@ -4,14 +4,19 @@ import warnings
 from typing import Union, Iterable
 
 import pandas as pd
-import pkg_resources
+import importlib_resources
 
-COUNTY_CENSUS = pd.read_csv(
-    pkg_resources.resource_filename(__name__, "geo_mappings/county_census.csv"), dtype=str)
-MSA_CENSUS = pd.read_csv(
-    pkg_resources.resource_filename(__name__, "geo_mappings/msa_census.csv"), dtype=str)
-STATE_CENSUS = pd.read_csv(
-    pkg_resources.resource_filename(__name__, "geo_mappings/state_census.csv"), dtype=str)
+county_census = importlib_resources.files(__name__) / 'geo_mappings' / 'county_census.csv'
+with importlib_resources.as_file(county_census) as path:
+    COUNTY_CENSUS = pd.read_csv(path, dtype=str)
+
+msa_census = importlib_resources.files(__name__) / 'geo_mappings' / 'msa_census.csv'
+with importlib_resources.as_file(msa_census) as path:
+    MSA_CENSUS = pd.read_csv(path, dtype=str)
+
+state_census = importlib_resources.files(__name__) / 'geo_mappings' / 'state_census.csv'
+with importlib_resources.as_file(state_census) as path:
+    STATE_CENSUS = pd.read_csv(path, dtype=str)
 
 # Filter undesired rows from CSVs.
 # They're not removed from the files to keep them identical to rda files.

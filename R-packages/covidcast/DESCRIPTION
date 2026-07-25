@@ -48,7 +48,7 @@ Description: Tools for Delphi's 'COVIDcast Epidata' API: data access, maps and
     mobility data, typically updated daily and at the county level. All data
     sources are documented at
     <https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html>.
-Depends: R (>= 3.5.0)
+Depends: R (>= 4.0.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

@@ -311,16 +311,32 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
 
   geom_args$fill <- main_col
   geom_args$data <- main_df
-  back_main_layer <- do.call(ggplot2::geom_sf, geom_args)
+  back_main_layer <- if (nrow(main_df) > 0) {
+    do.call(ggplot2::geom_sf, geom_args)
+  } else {
+    ggplot2::geom_blank()
+  }
   geom_args$fill <- pr_col
   geom_args$data <- pr_df
-  back_pr_layer <- do.call(ggplot2::geom_sf, geom_args)
+  back_pr_layer <- if (nrow(pr_df) > 0) {
+    do.call(ggplot2::geom_sf, geom_args)
+  } else {
+    ggplot2::geom_blank()
+  }
   geom_args$fill <- hawaii_col
   geom_args$data <- hawaii_df
-  back_hawaii_layer <- do.call(ggplot2::geom_sf, geom_args)
-  geom_args$fill <- alaska_col
+  back_hawaii_layer <- if (nrow(hawaii_df) > 0) {
+    do.call(ggplot2::geom_sf, geom_args)
+  } else {
+    ggplot2::geom_blank()
+  }
   geom_args$data <- alaska_df
-  back_alaska_layer <- do.call(ggplot2::geom_sf, geom_args)
+  geom_args$fill <- alaska_col
+  back_alaska_layer <- if (nrow(alaska_df) > 0) {
+    do.call(ggplot2::geom_sf, geom_args)
+  } else {
+    ggplot2::geom_blank()
+  }
 
   # Create the choropleth colors for counties
   if (attributes(x)$metadata$geo_type == "county") {
@@ -438,16 +454,32 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
 
   geom_args$fill <- main_col
   geom_args$data <- main_df
-  main_layer <- do.call(ggplot2::geom_sf, geom_args)
+  main_layer <- if (nrow(main_df) > 0) {
+    do.call(ggplot2::geom_sf, geom_args)
+  } else {
+    ggplot2::geom_blank()
+  }
   geom_args$fill <- pr_col
   geom_args$data <- pr_df
-  pr_layer <- do.call(ggplot2::geom_sf, geom_args)
+  pr_layer <- if (nrow(pr_df) > 0) {
+    do.call(ggplot2::geom_sf, geom_args)
+  } else {
+    ggplot2::geom_blank()
+  }
   geom_args$fill <- hawaii_col
   geom_args$data <- hawaii_df
-  hawaii_layer <- do.call(ggplot2::geom_sf, geom_args)
+  hawaii_layer <- if (nrow(hawaii_df) > 0) {
+    do.call(ggplot2::geom_sf, geom_args)
+  } else {
+    ggplot2::geom_blank()
+  }
   geom_args$fill <- alaska_col
   geom_args$data <- alaska_df
-  alaska_layer <- do.call(ggplot2::geom_sf, geom_args)
+  alaska_layer <- if (nrow(alaska_df) > 0) {
+    do.call(ggplot2::geom_sf, geom_args)
+  } else {
+    ggplot2::geom_blank()
+  }
   coord_layer <- do.call(ggplot2::coord_sf, coord_args)
 
   # For continuous color scale, create a legend layer
@@ -467,9 +499,9 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
     hidden_layer <- ggplot2::geom_point(ggplot2::aes(
       x = .data$x, y = .data$x, color = .data$z),
                                        data = hidden_df, alpha = 0)
-    guide <- ggplot2::guide_colorbar(title = NULL, horizontal = TRUE,
-                                    barheight = legend_height,
-                                    barwidth = legend_width)
+    guide <- ggplot2::guide_colorbar(title = NULL, direction = "horizontal",
+                                     barheight = legend_height,
+                                     barwidth = legend_width)
     scale_layer <- ggplot2::scale_color_gradientn(colors = col_fun(d),
                                                  limits = range(d),
                                                  breaks = legend_breaks,
@@ -490,11 +522,11 @@ plot_choro <- function(x, time_value = NULL, include = c(), range,
       ggplot2::aes(x = .data$x, y = .data$x, fill = .data$z),
       data = hidden_df, alpha = 0
     )
-    guide <- ggplot2::guide_legend(title = NULL, horizontal = TRUE, nrow = 1,
-                                  keyheight = legend_height,
-                                  keywidth = legend_width / n,
-                                  label.position = "bottom", label.hjust = 0,
-                                  override.aes = list(alpha = 1))
+    guide <- ggplot2::guide_legend(title = NULL, direction = "horizontal", nrow = 1,
+                                   keyheight = legend_height,
+                                   keywidth = legend_width / n,
+                                   label.position = "bottom", label.hjust = 0,
+                                   override.aes = list(alpha = 1))
     scale_layer <- ggplot2::scale_fill_manual(values = col,
                                              breaks = legend_breaks,
                                              labels = legend_labels,
@@ -665,7 +697,7 @@ plot_bubble <- function(x, time_value = NULL, include = c(), range = NULL,
 
   # Warn if there's any missing locations
   if (any(map_df$back_color == missing_col)) {
-    warning("Bubble maps can be hard to read when there is missing data;",
+    warning("Bubble maps can be hard to read when there is missing data; ",
             "the locations without data are filled in gray.")
   }
 
@@ -683,16 +715,32 @@ plot_bubble <- function(x, time_value = NULL, include = c(), range = NULL,
   geom_args$mapping <- ggplot2::aes(geometry=.data$geometry)
   geom_args$fill <- main_df$back_color
   geom_args$data <- main_df
-  main_layer <- do.call(ggplot2::geom_sf, geom_args)
+  main_layer <- if (nrow(main_df) > 0) {
+    do.call(ggplot2::geom_sf, geom_args)
+  } else {
+    ggplot2::geom_blank()
+  }
   geom_args$fill <- pr_df$back_color
   geom_args$data <- pr_df
-  pr_layer <- do.call(ggplot2::geom_sf, geom_args)
-  geom_args$fill <- hawaii_df$back_color
+  pr_layer <- if (nrow(pr_df) > 0) {
+    do.call(ggplot2::geom_sf, geom_args)
+  } else {
+    ggplot2::geom_blank()
+  }
   geom_args$data <- hawaii_df
-  hawaii_layer <- do.call(ggplot2::geom_sf, geom_args)
-  geom_args$fill <- alaska_df$back_color
+  geom_args$fill <- hawaii_df$back_color
+  hawaii_layer <- if (nrow(hawaii_df) > 0) {
+    do.call(ggplot2::geom_sf, geom_args)
+  } else {
+    ggplot2::geom_blank()
+  }
   geom_args$data <- alaska_df
-  alaska_layer <- do.call(ggplot2::geom_sf, geom_args)
+  geom_args$fill <- alaska_df$back_color
+  alaska_layer <- if (nrow(alaska_df) > 0) {
+    do.call(ggplot2::geom_sf, geom_args)
+  } else {
+    ggplot2::geom_blank()
+  }
 
   # Change geometry to centroids
   # Use centroid coordinates for plotting bubbles
@@ -733,7 +781,7 @@ plot_bubble <- function(x, time_value = NULL, include = c(), range = NULL,
 
   # Create the scale layer
   labels <- round(breaks, legend_digits)
-  guide <- ggplot2::guide_legend(title = NULL, horizontal = TRUE, nrow = 1)
+  guide <- ggplot2::guide_legend(title = NULL, direction = "horizontal", nrow = 1)
   scale_layer <- ggplot2::scale_size_manual(values = sizes, breaks = breaks,
                                             labels = labels, drop = FALSE,
                                             guide = guide)

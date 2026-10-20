@@ -289,6 +289,9 @@ def metadata() -> pd.DataFrame:
       ``last_update``
         The UTC datetime for when the signal value was last updated.
 
+      ``min_issue``
+        Oldest date data was issued.
+
       ``max_issue``
         Most recent date data was issued.
 

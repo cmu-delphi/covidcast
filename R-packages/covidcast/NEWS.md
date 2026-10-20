@@ -1,6 +1,6 @@
 # covidcast 0.5.3
 
-To be released.
+- Changes to be compatible with an upcoming release of ggplot2.
 
 - Package vignettes have been adjusted so they do not make requests to the
   COVIDcast API during CRAN check runs. This change only affects the package
